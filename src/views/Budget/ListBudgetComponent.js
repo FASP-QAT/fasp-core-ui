@@ -510,6 +510,7 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import { DATE_FORMAT_CAP } from '../../Constants.js';
 import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
+import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 
 const entityname = i18n.t('static.dashboard.budget');
@@ -615,7 +616,7 @@ class ListBudgetComponent extends Component {
       data[6] = budgetList[j].currency.currencyCode + " " + (budgetList[j].budgetAmt - budgetList[j].usedUsdAmt).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
       data[7] = (budgetList[j].startDate ? moment(budgetList[j].startDate).format(`${DATE_FORMAT_CAP}`) : null);
       data[8] = (budgetList[j].stopDate ? moment(budgetList[j].stopDate).format(`${DATE_FORMAT_CAP}`) : null);
-      data[9] = budgetList[j].active;
+      data[9] = (budgetList[j].active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'));
       data[10] = budgetList[j].budgetAmt;
       data[11] = budgetList[j].usedUsdAmt;
       data[12] = budgetList[j].stopDate;
@@ -625,10 +626,10 @@ class ListBudgetComponent extends Component {
       budgetArray[count] = data;
       count++;
     }
-    if (budgetList.length == 0) {
-      data = [];
-      budgetArray[0] = data;
-    }
+    // if (budgetList.length == 0) {
+    //   data = [];
+    //   budgetArray[0] = data;
+    // }
     // console.log("budgetArray---->", budgetArray);
     this.el = jexcel(document.getElementById("tableDiv"), '');
     this.el.destroy();
@@ -638,7 +639,7 @@ class ListBudgetComponent extends Component {
     var options = {
       data: data,
       columnDrag: true,
-      colWidths: [150, 150, 100],
+      colWidths: [150, 60, 60, 60, 100,],
       colHeaderClasses: ["Reqasterisk"],
       columns: [
         {
@@ -686,13 +687,13 @@ class ListBudgetComponent extends Component {
           // readOnly: true
         },
         {
-          type: 'dropdown',
+          type: 'text',
           title: i18n.t('static.common.status'),
           // readOnly: true,
-          source: [
-            { id: true, name: i18n.t('static.common.active') },
-            { id: false, name: i18n.t('static.common.disabled') }
-          ]
+          // source: [
+          //   { id: true, name: i18n.t('static.common.active') },
+          //   { id: false, name: i18n.t('static.common.disabled') }
+          // ]
         },
         {
           title: i18n.t('static.budget.budgetamount'),
@@ -729,6 +730,8 @@ class ListBudgetComponent extends Component {
           for (var i = 0; i < colArr.length; i++) {
             elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
             elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', '#f48282');
+            let textColor = contrast('#f48282');
+            elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'color', textColor);
           }
         } else {
           for (var i = 0; i < colArr.length; i++) {
@@ -760,13 +763,13 @@ class ListBudgetComponent extends Component {
     var languageEl = jexcel(document.getElementById("tableDiv"), options);
     this.el = languageEl;
     this.setState({
-      languageEl: languageEl
+      languageEl: languageEl, loading: false
     })
   }
 
   selected = function (instance, cell, x, y, value) {
 
-    if (x == 0 && value != 0) {
+    if ((x == 0 && value != 0) || (y == 0)) {
       // console.log("HEADER SELECTION--------------------------");
     } else {
       // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
@@ -801,7 +804,7 @@ class ListBudgetComponent extends Component {
           });
         } else {
           this.setState({
-            message: response.data.messageCode
+            message: response.data.messageCode, loading: false
           },
             () => {
               this.hideSecondComponent();
@@ -817,7 +820,7 @@ class ListBudgetComponent extends Component {
             fundingSourceList: response.data
           })
         } else {
-          this.setState({ message: response.data.messageCode })
+          this.setState({ message: response.data.messageCode, loading: false })
         }
       })
   }
@@ -1008,6 +1011,8 @@ class ListBudgetComponent extends Component {
       <div className="animated">
         <AuthenticationServiceComponent history={this.props.history} message={(message) => {
           this.setState({ message: message })
+        }} loading={(loading) => {
+          this.setState({ loading: loading })
         }} />
         <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
         <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
@@ -1043,12 +1048,12 @@ class ListBudgetComponent extends Component {
                 </div>
               </FormGroup>
             </Col>
-          
-              {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground">
-              </div>
-              <h5>*Rows in red indicate that Budget has either lapsed or has no money in it</h5>
 
-            
+            {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground">
+            </div>
+            <h5>*Rows in red indicate that Budget has either lapsed or has no money in it</h5>
+
+
           </CardBody>
         </Card>
         <div style={{ display: this.state.loading ? "block" : "none" }}>

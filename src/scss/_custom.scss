@@ -416,6 +416,7 @@ label.arrow_label:after {
   //  color: #f86c6b !important;
 
   color: red !important;
+  font-size: 14px;
 }
 .blue{color: 20a8d8 !important;}
 .green {
@@ -859,7 +860,9 @@ label.arrow_label:after {
 .AddListbatchtrHeight .jexcel_content .jexcel tbody.draggable tr{
   height: 30px;
 }
-
+.RowheightForjexceladdRow .jexcel_content .jexcel tbody.draggable tr{ 
+  height: 30px;
+}
 
 // Multiselect z-index going behind table 
 .go2139093995 * {
@@ -867,8 +870,25 @@ label.arrow_label:after {
 }
 
 
+// scroller size
+.jexcel_content::-webkit-scrollbar {
+  width: 10px !important;
+  height: 10px !important;
+}
+
 // .realmcountrypUnitTd{text-align: right !important;}
 
+.jexcel > thead.resizable > tr > .AsteriskTheadtrTd::after {
+ position: relative;
+  width: 3px;
+  height: 100%;
+  color: red; 
+  top: 0px;
+  left: 6px;
+  cursor: col-resize;
+  content: "*" !important; 
+font-size: 14px;
+}
 
 
 // css by junaid last line
@@ -971,7 +991,7 @@ label.arrow_label:after {
   width: 100%;
 }
 .upper-logo {
-  max-width: 325px;
+  max-width: 300px;
   margin-top: 1% !important;
   margin-left: 0%;
 }
@@ -1793,7 +1813,8 @@ input::placeholder {
 }
 .progressbartext7 {
   // left: 94.95%;
-  left: 100%;
+  width: 100px;
+  left: 102%;
   transform: translateX(-99%) scale(1);
 }
 ////pipelinesetup progress bar
@@ -3088,8 +3109,12 @@ border-radius: 2em;
   visibility: hidden !important;
 }
 .go626121005 span {
-  display: inline!important;
-  padding-left: 5px;
+  // display: inline!important;
+  // padding-left: 5px;
+  padding-left:19px!important;
+  text-align: left;
+    display: table!important;
+    margin-top: -18px!important;
 }
 .go2139093995 * {
   z-index: unset;
@@ -3099,6 +3124,9 @@ border-radius: 2em;
 // }
 .go355775859 .gray svg{
   visibility: hidden !important;
+}
+.go3973839879{
+  padding: 5px!important;
 }
 .go2139093995 .gray {
   color: #697069!important;
@@ -3118,7 +3146,7 @@ border-radius: 2em;
   bottom: 0;
   color: #aaa;
   left: 0;
-  line-height: 28px!important;
+  line-height: 26px!important;
   padding-left: 10px;
   padding-right: 10px;
   position: absolute;
@@ -3131,14 +3159,30 @@ border-radius: 2em;
 }
 .Select-input {
   height: 27px!important;
+  // margin-bottom: -5px!important;
   
 }
 .Select-control {
   border-radius: 0.2rem!important;
-  border: 1px solid #e4e7ea!important;
+  // border: 1px solid #e4e7ea!important;
   color: #697069!important;
   height: 0px!important;
+  border: none!important;
+   background-color:transparent!important;
 }
+.Select.form-control{
+  height: 0%!important;
+  padding: 0px!important;
+}
+.Select.bg-light{
+  background-color:transparent !important;
+}
+.Select-control:hover {
+  box-shadow: none!important;
+}
+// .Select-arrow-zone {
+//   width: 49px!important;
+// }
 //////top header
 
 .HomeIcon{
@@ -3160,3 +3204,40 @@ border-radius: 2em;
 .SelectField {
   width: 210px;
 }
+.btn-Icon-productTreeNextPre {
+ font-size: 15px;
+ font-weight: bold;
+}
+.ReportSearchMarginTop{
+  margin-top: -51px;
+}
+.TextWhite{
+  color:#fff!important;
+}
+
+.Select.is-searchable.is-open>.Select-control{
+  cursor: pointer!important;
+  color: transparent!important;
+  outline:none!important;
+}
+
+.Select.is-searchable.is-focused.is-open>.Select-control{
+  cursor: pointer!important;
+  color: transparent!important;
+  outline:none!important;
+}
+.is-focused .Select-input >input
+{
+  cursor: pointer!important;
+}
+
+// .Select-control.form-control-sm:invalid, .form-control-sm.is-invalid {
+//   border-color: #f86c6b!important;
+//   padding-right: calc(1.5em + 0.75rem);
+  
+// }
+// .Select-control .form-control-sm:valid, .form-control-sm.is-valid {
+//   border-color: #4dbd74;
+//   padding-right: calc(1.5em + 0.75rem);
+ 
+// }

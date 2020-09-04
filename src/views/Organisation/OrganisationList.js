@@ -387,12 +387,12 @@ export default class OrganisationListComponent extends Component {
             this.setState({
                 selSource
             },
-            () => { this.buildJexcel()})
+                () => { this.buildJexcel() })
         } else {
             this.setState({
                 selSource: this.state.organisations
             },
-            () => { this.buildJexcel()})
+                () => { this.buildJexcel() })
         }
     }
     buildJexcel() {
@@ -412,10 +412,10 @@ export default class OrganisationListComponent extends Component {
             organisationsArray[count] = data;
             count++;
         }
-        if (organisations.length == 0) {
-            data = [];
-            organisationsArray[0] = data;
-        }
+        // if (organisations.length == 0) {
+        //     data = [];
+        //     organisationsArray[0] = data;
+        // }
         // console.log("organisationsArray---->", organisationsArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();
@@ -495,11 +495,11 @@ export default class OrganisationListComponent extends Component {
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        realms: response.data, loading: false
-                    }, () => { this.buildJexcel() })
+                        realms: response.data
+                    }, () => {  })
                 } else {
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode, loading: false
                     },
                         () => {
                             this.hideSecondComponent();
@@ -587,6 +587,8 @@ export default class OrganisationListComponent extends Component {
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
                 }} />
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
@@ -652,7 +654,7 @@ export default class OrganisationListComponent extends Component {
         }
     }
     selected = function (instance, cell, x, y, value) {
-        if (x == 0 && value != 0) {
+        if ((x == 0 && value != 0) || (y == 0)) {
             // console.log("HEADER SELECTION--------------------------");
         } else {
             if (this.state.selSource.length != 0) {

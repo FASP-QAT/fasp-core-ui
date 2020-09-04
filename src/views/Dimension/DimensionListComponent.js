@@ -277,6 +277,76 @@ export default class DimensionListComponent extends Component {
         this.editDimension = this.editDimension.bind(this);
         this.formatLabel = this.formatLabel.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.buildJexcel = this.buildJexcel.bind(this);
+    }
+    buildJexcel() {
+        let dimensionList = this.state.selSource;
+        // console.log("dimensionList---->", dimensionList);
+        let dimensionArray = [];
+        let count = 0;
+
+        for (var j = 0; j < dimensionList.length; j++) {
+            data = [];
+            data[0] = dimensionList[j].dimensionId
+            data[1] = getLabelText(dimensionList[j].label, this.state.lang)
+            dimensionArray[count] = data;
+            count++;
+        }
+        // if (dimensionList.length == 0) {
+        //     data = [];
+        //     dimensionArray[0] = data;
+        // }
+        // console.log("dimensionArray---->", dimensionArray);
+        this.el = jexcel(document.getElementById("tableDiv"), '');
+        this.el.destroy();
+        var json = [];
+        var data = dimensionArray;
+
+        var options = {
+            data: data,
+            columnDrag: true,
+            colWidths: [150, 150, 100],
+            colHeaderClasses: ["Reqasterisk"],
+            columns: [
+                {
+                    title: 'dimensionId',
+                    type: 'hidden',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.dimension.dimension'),
+                    type: 'text',
+                    readOnly: true
+                }
+            ],
+            text: {
+                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
+                show: '',
+                entries: '',
+            },
+            onload: this.loaded,
+            pagination: 10,
+            search: true,
+            columnSorting: true,
+            tableOverflow: true,
+            wordWrap: true,
+            allowInsertColumn: false,
+            allowManualInsertColumn: false,
+            allowDeleteRow: false,
+            onselection: this.selected,
+            oneditionend: this.onedit,
+            copyCompatibility: true,
+            allowExport: false,
+            paginationOptions: [10, 25, 50],
+            position: 'top',
+            contextMenu: false
+        };
+        var DimensionListEl = jexcel(document.getElementById("tableDiv"), options);
+        this.el = DimensionListEl;
+        this.setState({
+            DimensionListEl: DimensionListEl, loading: false
+        })
     }
     hideSecondComponent() {
         setTimeout(function () {
@@ -304,88 +374,14 @@ export default class DimensionListComponent extends Component {
                 // })
                 this.setState({
                     dimensionList: response.data,
-                    selSource: response.data, loading: false
+                    selSource: response.data
                 },
-                    () => {
-
-                        let dimensionList = this.state.dimensionList;
-                        // console.log("dimensionList---->", dimensionList);
-                        let dimensionArray = [];
-                        let count = 0;
-
-                        for (var j = 0; j < dimensionList.length; j++) {
-                            data = [];
-                            data[0] = dimensionList[j].dimensionId
-                            data[1] = getLabelText(dimensionList[j].label, this.state.lang)
-                            dimensionArray[count] = data;
-                            count++;
-                        }
-                        if (dimensionList.length == 0) {
-                            data = [];
-                            dimensionArray[0] = data;
-                        }
-                        // console.log("dimensionArray---->", dimensionArray);
-                        this.el = jexcel(document.getElementById("tableDiv"), '');
-                        this.el.destroy();
-                        var json = [];
-                        var data = dimensionArray;
-
-                        var options = {
-                            data: data,
-                            columnDrag: true,
-                            colWidths: [150, 150, 100],
-                            colHeaderClasses: ["Reqasterisk"],
-                            columns: [
-                                {
-                                    title: 'dimensionId',
-                                    type: 'hidden',
-                                    readOnly: true
-                                },
-                                {
-                                    title: i18n.t('static.dimension.dimension'),
-                                    type: 'text',
-                                    readOnly: true
-                                }
-                            ],
-                            text: {
-                                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
-                                show: '',
-                                entries: '',
-                            },
-                            onload: this.loaded,
-                            pagination: 10,
-                            search: true,
-                            columnSorting: true,
-                            tableOverflow: true,
-                            wordWrap: true,
-                            allowInsertColumn: false,
-                            allowManualInsertColumn: false,
-                            allowDeleteRow: false,
-                            onselection: this.selected,
-
-
-                            oneditionend: this.onedit,
-                            copyCompatibility: true,
-                            allowExport: false,
-                            paginationOptions: [10, 25, 50],
-                            position: 'top',
-                            contextMenu: false
-                        };
-                        var languageEl = jexcel(document.getElementById("tableDiv"), options);
-                        this.el = languageEl;
-                        this.setState({
-                            languageEl: languageEl, loading: false
-                        })
-
-
-
-                    })
+                    () => { this.buildJexcel() })
 
             }
             else {
                 this.setState({
-                    message: response.data.messageCode
+                    message: response.data.messageCode, loading: false
                 },
                     () => {
                         this.hideSecondComponent();
@@ -428,7 +424,7 @@ export default class DimensionListComponent extends Component {
     }
     selected = function (instance, cell, x, y, value) {
 
-        if (x == 0 && value != 0) {
+        if ((x == 0 && value != 0) || (y == 0)) {
             // console.log("HEADER SELECTION--------------------------");
         } else {
             if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_CURRENCY')) {
@@ -436,6 +432,21 @@ export default class DimensionListComponent extends Component {
                     pathname: `/diamension/editDiamension/${this.el.getValueFromCoords(0, x)}`,
                     // state: { currency: currency }
                 });
+            }
+        }
+    }.bind(this);
+
+    selected = function (instance, cell, x, y, value) {
+        if (x == 0 && value != 0) {
+            // console.log("HEADER SELECTION--------------------------");
+        } else {
+            if (this.state.selSource.length != 0) {
+                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_ROLE')) {
+                    this.props.history.push({
+                        pathname: `/diamension/editDiamension/${this.el.getValueFromCoords(0, x)}`,
+                        // state: { role }
+                    });
+                }
             }
         }
     }.bind(this);
@@ -464,6 +475,8 @@ export default class DimensionListComponent extends Component {
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
                 }} />
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>

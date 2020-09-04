@@ -965,6 +965,8 @@ import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
+import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 
 
 const entityname = i18n.t('static.dashboard.costOfInventory');
@@ -994,6 +996,7 @@ export default class CostOfInventory extends Component {
             versions: [],
             message: '',
             singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
+            loading: true
 
         }
         this.formSubmit = this.formSubmit.bind(this);
@@ -1016,15 +1019,15 @@ export default class CostOfInventory extends Component {
                 .then(response => {
                     console.log(JSON.stringify(response.data))
                     this.setState({
-                        programs: response.data
+                        programs: response.data, loading: false
                     }, () => { this.consolidatedProgramList() })
                 }).catch(
                     error => {
                         this.setState({
-                            programs: []
+                            programs: [], loading: false
                         }, () => { this.consolidatedProgramList() })
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
+                            this.setState({ message: error.message, loading: false });
                         } else {
                             switch (error.response ? error.response.status : "") {
                                 case 500:
@@ -1032,10 +1035,10 @@ export default class CostOfInventory extends Component {
                                 case 404:
                                 case 406:
                                 case 412:
-                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                    this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
                                     break;
                                 default:
-                                    this.setState({ message: 'static.unkownError' });
+                                    this.setState({ message: 'static.unkownError', loading: false });
                                     break;
                             }
                         }
@@ -1045,6 +1048,7 @@ export default class CostOfInventory extends Component {
         } else {
             console.log('offline')
             this.consolidatedProgramList()
+            this.setState({ loading: false })
         }
 
     }
@@ -1055,7 +1059,7 @@ export default class CostOfInventory extends Component {
 
         var db1;
         getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
             var transaction = db1.transaction(['programData'], 'readwrite');
@@ -1157,7 +1161,7 @@ export default class CostOfInventory extends Component {
 
         var db1;
         getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
             var transaction = db1.transaction(['programData'], 'readwrite');
@@ -1414,10 +1418,10 @@ export default class CostOfInventory extends Component {
             costOfInventoryArray[count] = data;
             count++;
         }
-        if (costOfInventory.length == 0) {
-            data = [];
-            costOfInventoryArray[0] = data;
-        }
+        // if (costOfInventory.length == 0) {
+        //     data = [];
+        //     costOfInventoryArray[0] = data;
+        // }
         // console.log("costOfInventoryArray---->", costOfInventoryArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();
@@ -1430,7 +1434,7 @@ export default class CostOfInventory extends Component {
             colWidths: [150, 150, 100],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
-                
+
                 {
                     title: i18n.t('static.report.planningUnit'),
                     type: 'text',
@@ -1479,7 +1483,7 @@ export default class CostOfInventory extends Component {
         var languageEl = jexcel(document.getElementById("tableDiv"), options);
         this.el = languageEl;
         this.setState({
-            languageEl: languageEl
+            languageEl: languageEl, loading: false
         })
     }
 
@@ -1501,7 +1505,7 @@ export default class CostOfInventory extends Component {
                 var db1;
                 var storeOS;
                 getDatabase();
-                var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
+                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                 openRequest.onerror = function (event) {
                     this.setState({
                         message: i18n.t('static.program.errortext')
@@ -1523,7 +1527,7 @@ export default class CostOfInventory extends Component {
                         })
                     }.bind(this);
                     programRequest.onsuccess = function (e) {
-
+                        // this.setState({ loading: true })
                         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         var programJson = JSON.parse(programData);
@@ -1679,6 +1683,7 @@ export default class CostOfInventory extends Component {
                     }.bind(this)
                 }.bind(this)
             } else {
+                this.setState({ loading: true })
                 var inputjson = {
                     "programId": programId,
                     "versionId": versionId,
@@ -1811,32 +1816,37 @@ export default class CostOfInventory extends Component {
         }
         return (
             <div className="animated fadeIn" >
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
+                }} />
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
-
-                <Card>
+                <SupplyPlanFormulas ref="formulaeChild" />
+                <Card style={{ display: this.state.loading ? "none" : "block" }}>
                     <div className="Card-header-reporticon">
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.costOfInventory')}</strong> */}
 
                         <div className="card-header-actions">
                             <a className="card-header-action">
-                                <Link to='/supplyPlanFormulas' target="_blank"><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></Link>
+                                <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.togglecostOfInventory() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span>
                             </a>
                             <a className="card-header-action">
                                 {this.state.costOfInventory.length > 0 && <div className="card-header-actions">
-                                    <img style={{ height: '25px', width: '25px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF(columns)} />
-                                    <img style={{ height: '25px', width: '25px' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
+                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF(columns)} />
+                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
                                 </div>}
                             </a>
                         </div>
                     </div>
-                    <CardBody className="pb-lg-2 pt-lg-0 ">
-                        <div className="TableCust" >
+                    <CardBody className="pb-lg-2 pt-lg-1 ">
+                        <div className="" >
                             <div ref={ref}>
 
                                 <Form >
-                                    <Col md="12 pl-0">
-                                        <div className="row">
+                                    <div className="pl-0">
+                                        <div className="row ">
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.program.programMaster')}</Label>
                                                 <div className="controls ">
@@ -1913,7 +1923,7 @@ export default class CostOfInventory extends Component {
 
                                             </FormGroup>
                                         </div>
-                                    </Col>
+                                    </div>
                                 </Form>
                             </div>
                         </div>
@@ -1923,6 +1933,17 @@ export default class CostOfInventory extends Component {
 
                     </CardBody>
                 </Card>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
             </div >
 

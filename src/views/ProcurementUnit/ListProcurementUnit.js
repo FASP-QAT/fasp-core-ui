@@ -412,10 +412,10 @@ export default class ListProcurementUnit extends Component {
       procurementUnitArray[count] = data;
       count++;
     }
-    if (procurementUnitList.length == 0) {
-      data = [];
-      procurementUnitArray[0] = data;
-    }
+    // if (procurementUnitList.length == 0) {
+    //   data = [];
+    //   procurementUnitArray[0] = data;
+    // }
     // console.log("procurementUnitArray---->", procurementUnitArray);
     this.el = jexcel(document.getElementById("tableDiv"), '');
     this.el.destroy();
@@ -500,13 +500,14 @@ export default class ListProcurementUnit extends Component {
     var languageEl = jexcel(document.getElementById("tableDiv"), options);
     this.el = languageEl;
     this.setState({
-      languageEl: languageEl
+      languageEl: languageEl,
+      loading: false
     })
   }
 
   selected = function (instance, cell, x, y, value) {
 
-    if (x == 0 && value != 0) {
+    if ((x == 0 && value != 0) || (y == 0)) {
       // console.log("HEADER SELECTION--------------------------");
     } else {
       // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
@@ -533,13 +534,13 @@ export default class ListProcurementUnit extends Component {
         this.setState({
           procurementUnitList: response.data,
           selProcurementUnit: response.data,
-          loading: false
+          // loading: false
         }, () => {
           this.buildJExcel();
         });
       } else {
         this.setState({
-          message: response.data.messageCode
+          message: response.data.messageCode, loading: false
         },
           () => {
             this.hideSecondComponent();
@@ -554,7 +555,7 @@ export default class ListProcurementUnit extends Component {
           planningUnitList: response.data,
         })
       } else {
-        this.setState({ message: response.data.messageCode })
+        this.setState({ message: response.data.messageCode, loading: false })
       }
     })
 
@@ -677,6 +678,8 @@ export default class ListProcurementUnit extends Component {
       <div className="animated">
         <AuthenticationServiceComponent history={this.props.history} message={(message) => {
           this.setState({ message: message })
+        }} loading={(loading) => {
+          this.setState({ loading: loading })
         }} />
         <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
         <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
@@ -691,31 +694,31 @@ export default class ListProcurementUnit extends Component {
           </div>
           <CardBody className="pb-lg-0">
             <Col md="3 pl-0" >
-            <div className="d-md-flex Selectdiv2">
-              <FormGroup className="mt-md-2 mb-md-0 ">
-                <Label htmlFor="appendedInputButton">{i18n.t('static.procurementUnit.planningUnit')}</Label>
+              <div className="d-md-flex Selectdiv2">
+                <FormGroup className="mt-md-2 mb-md-0 ">
+                  <Label htmlFor="appendedInputButton">{i18n.t('static.procurementUnit.planningUnit')}</Label>
 
-                <div className="controls SelectGo">
-                  <InputGroup >
-                    <Input
-                      type="select"
-                      name="planningUnitId"
-                      id="planningUnitId"
-                      bsSize="sm"
-                      onChange={this.filterData}
-                    >
-                      <option value="0">{i18n.t('static.common.all')}</option>
-                      {planningUnits}
-                    </Input>
-                    {/* <InputGroupAddon addonType="append">
+                  <div className="controls SelectGo">
+                    <InputGroup >
+                      <Input
+                        type="select"
+                        name="planningUnitId"
+                        id="planningUnitId"
+                        bsSize="sm"
+                        onChange={this.filterData}
+                      >
+                        <option value="0">{i18n.t('static.common.all')}</option>
+                        {planningUnits}
+                      </Input>
+                      {/* <InputGroupAddon addonType="append">
                       <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
                     </InputGroupAddon> */}
-                  </InputGroup>
-                </div>
-              </FormGroup>
+                    </InputGroup>
+                  </div>
+                </FormGroup>
               </div>
             </Col>
-            <div className="table-responsive">
+            <div >
               {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground">
               </div>
 

@@ -22,12 +22,13 @@ import StepTwo from './StepTwo.js';
 import StepThree from './StepThree.js';
 import StepFour from './StepFour.js';
 import StepSix from './StepSix.js'
-
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 const entityname = i18n.t('static.program.programMaster');
 export default class ProgramOnboarding extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            loading: true,
             program: {
                 label: {
                     label_en: '',
@@ -128,11 +129,11 @@ export default class ProgramOnboarding extends Component {
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        realmList: response.data
+                        realmList: response.data, loading: false
                     })
                 } else {
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode, loading: false
                     })
                 }
             })
@@ -215,6 +216,7 @@ export default class ProgramOnboarding extends Component {
         console.log("program-----------", this.state.program);
 
         if (validation == true) {
+            this.setState({ loading: true });
             AuthenticationService.setupAxiosInterceptors();
             ProgramService.programInitialize(this.state.program).then(response => {
                 if (response.status == "200") {
@@ -222,7 +224,7 @@ export default class ProgramOnboarding extends Component {
                     this.props.history.push(`/program/listProgram/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                 } else {
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode, loading: false
                     })
                 }
             }
@@ -330,7 +332,7 @@ export default class ProgramOnboarding extends Component {
         // if (event.target.name == 'draftToSubmittedLeadTime') {
         //     program.draftToSubmittedLeadTime = event.target.value;
         // } 
-        
+
         if (event.target.name == 'plannedToSubmittedLeadTime') {
             program.plannedToSubmittedLeadTime = event.target.value;
         } if (event.target.name == 'submittedToApprovedLeadTime') {
@@ -515,10 +517,15 @@ export default class ProgramOnboarding extends Component {
 
 
             <div className="animated fadeIn">
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
+                }} />
                 <h5></h5>
                 <Row>
                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
-                        <Card>
+                        <Card style={{ display: this.state.loading ? "none" : "block" }}>
                             {/* <CardHeader>
                                 <i className="icon-note"></i><strong>Setup Program</strong>{' '}
                             </CardHeader> */}
@@ -716,11 +723,11 @@ export default class ProgramOnboarding extends Component {
                                 </div>
                                 <div id="stepFive">
                                     {/* <StepFive ref='regionChild' finishedStepFive={this.finishedStepFive} previousToStepFour={this.previousToStepFour} updateFieldData={this.updateFieldData}></StepFive> */}
-                                    <FormGroup>
+                                    <FormGroup className="col-md-4 pl-0">
                                         <Label htmlFor="select">{i18n.t('static.program.region')}<span class="red Reqasterisk">*</span><span class="red Reqasterisk">*</span></Label>
                                         <Select
                                             onChange={(e) => { this.updateFieldData(e) }}
-                                            className="col-md-4 ml-field"
+                                            // className="col-md-4 ml-field"
                                             bsSize="sm"
                                             name="regionId"
                                             id="regionId"
@@ -880,7 +887,19 @@ export default class ProgramOnboarding extends Component {
                                         &nbsp;
                                     </FormGroup>
                                 </div>
-                            </CardBody></Card></Col></Row></div>
+                            </CardBody></Card>
+                        <div style={{ display: this.state.loading ? "block" : "none" }}>
+                            <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                <div class="align-items-center">
+                                    <div ><h4> <strong>Loading...</strong></h4></div>
+
+                                    <div class="spinner-border blue ml-4" role="status">
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </Col></Row></div>
 
 
 

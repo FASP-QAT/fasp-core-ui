@@ -22,9 +22,9 @@ export default class PipelineProgramProcurementAgent extends Component {
         this.saveProcurementAgent = this.saveProcurementAgent.bind(this);
         //this.dropdownFilter = this.dropdownFilter.bind(this);
     }
-    
-  
-  
+
+
+
     loaded() {
         var list = this.state.procurementAgentList;
         var json = this.el.getJson();
@@ -46,7 +46,7 @@ export default class PipelineProgramProcurementAgent extends Component {
     }
 
     changed = function (instance, cell, x, y, value) {
-      
+
 
         //Planning Unit
         if (x == 1) {
@@ -57,16 +57,16 @@ export default class PipelineProgramProcurementAgent extends Component {
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-               
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setComments(col, "");
-                   
+
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+
             }
             // var columnName = jexcel.getColumnNameFromId([x + 1, y]);
             // instance.jexcel.setValue(columnName, '');
         }
-        
-       
+
+
     }
 
     checkValidation() {
@@ -90,10 +90,10 @@ export default class PipelineProgramProcurementAgent extends Component {
             } else {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
-                
+
             }
-       }
-        return valid;   
+        }
+        return valid;
     }
 
     saveProcurementAgent() {
@@ -116,10 +116,10 @@ export default class PipelineProgramProcurementAgent extends Component {
                 //     id: this.props.pipelineId
                 // },
                 // active: true,
-                
+
                 procurementAgentId: procurementAgentId,
-               pipelineProcurementAgentId:map.get("2")
-               
+                pipelineProcurementAgentId: map.get("2")
+
 
             }
             procurementAgentArray.push(procurementAgentJson);
@@ -147,97 +147,99 @@ export default class PipelineProgramProcurementAgent extends Component {
                     }
                     this.setState({ ProcurementAgentListQat: ProcurementAgentListQat });
 
-   
-                        AuthenticationService.setupAxiosInterceptors();
-                            PipelineService.getQatTempProcurementAgentList(this.props.pipelineId)
-                                .then(response => {
-                                    if (response.status == 200) {
-                                        if (response.data.length > 0) {
 
-                                            var procurementAgentList = response.data;
-                                            var data = [];
-                                            var productDataArr = []
-                                            //seting this for loaded function
-                                            this.setState({ procurementAgentList: procurementAgentList });
-                                            //seting this for loaded function
-                                            if (procurementAgentList.length != 0) {
-                                                for (var j = 0; j < procurementAgentList.length; j++) {
-                                                    data = [];
+                    AuthenticationService.setupAxiosInterceptors();
+                    PipelineService.getQatTempProcurementAgentList(this.props.pipelineId)
+                        .then(response => {
+                            if (response.status == 200) {
+                                if (response.data.length > 0) {
 
-                                                    data[0] = procurementAgentList[j].pipelineProcurementAgent;
-                                                    data[1] = procurementAgentList[j].procurementAgentId;
-                                                    data[2] = procurementAgentList[j].pipelineProcurementAgentId;
-                                                    productDataArr.push(data);
+                                    var procurementAgentList = response.data;
+                                    var data = [];
+                                    var productDataArr = []
+                                    //seting this for loaded function
+                                    this.setState({ procurementAgentList: procurementAgentList });
+                                    //seting this for loaded function
+                                    if (procurementAgentList.length != 0) {
+                                        for (var j = 0; j < procurementAgentList.length; j++) {
+                                            data = [];
 
-                                                }
-                                            } else {
-                                                console.log("procurementagent list length is 0.");
-                                            }
-
-                                            this.el = jexcel(document.getElementById("mapProcurementAgent"), '');
-                                            this.el.destroy();
-                                            var json = [];
-                                            var data = productDataArr;
-                                            // var data = []
-                                            var options = {
-                                                data: data,
-                                                columnDrag: true,
-                                                colWidths: [250,250],
-                                                columns: [
-
-                                                  {
-                                                        title:  i18n.t('static.pipeline.pplnprocurementagent'),
-                                                        type: 'text',
-                                                        readonly: true
-                                                    },
-                                                   
-                                                    {
-                                                        title:  i18n.t('static.procurementagent.procurementagent'),
-                                                        type: 'autocomplete',
-                                                        source: ProcurementAgentListQat,
-                                                        //filter: this.dropdownFilter
-                                                    }, {
-                                                        title:  i18n.t('static.inventory.procurementAgent'),
-                                                        type: 'hidden',
-                                                        readonly: true
-                                                    }
-                                                ],
-                                                pagination: 10,
-                                                search: true,
-                                                columnSorting: true,
-                                                tableOverflow: true,
-                                                wordWrap: true,
-                                                paginationOptions: [10, 25, 50, 100],
-                                                // position: 'top',
-                                                allowInsertColumn: false,
-                                                allowManualInsertColumn: false,
-                                                allowDeleteRow: false,
-                                                onchange: this.changed,
-                                                oneditionend: this.onedit,
-                                                copyCompatibility: true,
-                                                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                                                    text: {
-                                                    show: '',
-                                                    entries: '',
-                                                },
-                                                onload: this.loadedJexcelCommonFunction,
-                                                // onload: this.loaded
-
-                                            };
-                                            var elVar = jexcel(document.getElementById("mapProcurementAgent"), options);
-                                            this.el = elVar;
-                                            this.loaded();
+                                            data[0] = procurementAgentList[j].pipelineProcurementAgent;
+                                            data[1] = procurementAgentList[j].procurementAgentId;
+                                            data[2] = procurementAgentList[j].pipelineProcurementAgentId;
+                                            productDataArr.push(data);
 
                                         }
                                     } else {
-                                        this.setState({ message: response.data.messageCode })
+                                        console.log("procurementagent list length is 0.");
                                     }
-                                });
 
-                      
-             } })
+                                    this.el = jexcel(document.getElementById("mapProcurementAgent"), '');
+                                    this.el.destroy();
+                                    var json = [];
+                                    var data = productDataArr;
+                                    // var data = []
+                                    var options = {
+                                        data: data,
+                                        columnDrag: true,
+                                        colWidths: [250, 250],
+                                        columns: [
 
-           
+                                            {
+                                                title: i18n.t('static.pipeline.pplnprocurementagent'),
+                                                type: 'text',
+                                                readonly: true
+                                            },
+
+                                            {
+                                                title: i18n.t('static.procurementagent.procurementagent'),
+                                                type: 'autocomplete',
+                                                source: ProcurementAgentListQat,
+                                                //filter: this.dropdownFilter
+                                            }, {
+                                                title: i18n.t('static.inventory.procurementAgent'),
+                                                type: 'hidden',
+                                                readonly: true
+                                            }
+                                        ],
+                                        pagination: 10,
+                                        search: true,
+                                        columnSorting: true,
+                                        tableOverflow: true,
+                                        wordWrap: true,
+                                        paginationOptions: [10, 25, 50, 100],
+                                        // position: 'top',
+                                        allowInsertColumn: false,
+                                        allowManualInsertColumn: false,
+                                        allowDeleteRow: false,
+                                        onchange: this.changed,
+                                        oneditionend: this.onedit,
+                                        copyCompatibility: true,
+                                        // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                                        text: {
+                                            showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
+                                            show: '',
+                                            entries: '',
+                                        },
+                                        // onload: this.loadedJexcelCommonFunction,
+                                        onload: this.loaded
+
+                                    };
+                                    var elVar = jexcel(document.getElementById("mapProcurementAgent"), options);
+                                    this.el = elVar;
+                                    this.loaded();
+
+                                }
+                            } else {
+                                this.setState({ message: response.data.messageCode })
+                            }
+                        });
+
+
+                }
+            })
+
+
 
 
     }

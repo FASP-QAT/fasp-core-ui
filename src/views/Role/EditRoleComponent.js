@@ -6,11 +6,12 @@ import '../Forms/ValidationForms/ValidationForms.css'
 import i18n from '../../i18n'
 import UserService from "../../api/UserService";
 import AuthenticationService from '../Common/AuthenticationService.js';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import getLabelText from '../../CommonComponent/getLabelText';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
-import {LABEL_REGEX} from '../../Constants.js';
-
+import { LABEL_REGEX } from '../../Constants.js';
+import classNames from 'classnames';
 const initialValues = {
     roleName: "",
     businessFunctions: [],
@@ -66,6 +67,7 @@ class EditRoleComponent extends Component {
                     label_en: ''
                 }
             },
+            loading: true,
             businessFunctionId: '',
             businessFunctionList: [],
             canCreateRoleId: '',
@@ -79,6 +81,10 @@ class EditRoleComponent extends Component {
         this.canCreateRoleChange = this.canCreateRoleChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.changeLoading = this.changeLoading.bind(this);
+    }
+    changeLoading(loading) {
+        this.setState({ loading: loading })
     }
 
     hideSecondComponent() {
@@ -171,11 +177,11 @@ class EditRoleComponent extends Component {
                         businessFunctionList[i] = { value: response.data[i].businessFunctionId, label: getLabelText(response.data[i].label, this.state.lang) }
                     }
                     this.setState({
-                        businessFunctionList
+                        businessFunctionList, loading: false
                     })
                 } else {
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode, loading: false
                     },
                         () => {
                             this.hideSecondComponent();
@@ -184,7 +190,7 @@ class EditRoleComponent extends Component {
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
+                        this.setState({ message: error.message, loading: false });
                     } else {
                         switch (error.response ? error.response.status : "") {
                             case 500:
@@ -192,10 +198,10 @@ class EditRoleComponent extends Component {
                             case 404:
                             case 406:
                             case 412:
-                                this.setState({ message: error.response.data.messageCode });
+                                this.setState({ message: error.response.data.messageCode, loading: false });
                                 break;
                             default:
-                                this.setState({ message: 'static.unkownError' });
+                                this.setState({ message: 'static.unkownError', loading: false });
                                 break;
                         }
                     }
@@ -209,11 +215,12 @@ class EditRoleComponent extends Component {
                         canCreateRoleList[i] = { value: response.data[i].roleId, label: getLabelText(response.data[i].label, this.state.lang) }
                     }
                     this.setState({
-                        canCreateRoleList
+                        canCreateRoleList,
+                        loading: false
                     })
                 } else {
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode, loading: false
                     },
                         () => {
                             this.hideSecondComponent();
@@ -222,7 +229,7 @@ class EditRoleComponent extends Component {
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
+                        this.setState({ message: error.message, loading: false });
                     } else {
                         switch (error.response ? error.response.status : "") {
                             case 500:
@@ -230,10 +237,10 @@ class EditRoleComponent extends Component {
                             case 404:
                             case 406:
                             case 412:
-                                this.setState({ message: error.response.data.messageCode });
+                                this.setState({ message: error.response.data.messageCode, loading: false });
                                 break;
                             default:
-                                this.setState({ message: 'static.unkownError' });
+                                this.setState({ message: 'static.unkownError', loading: false });
                                 break;
                         }
                     }
@@ -244,14 +251,14 @@ class EditRoleComponent extends Component {
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        role: response.data
+                        role: response.data, loading: false
                     },
                         () => {
                             console.log("ROLE****************> ", this.state.role)
                         });
                 } else {
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode, loading: false
                     },
                         () => {
                             this.hideSecondComponent();
@@ -260,7 +267,7 @@ class EditRoleComponent extends Component {
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
+                        this.setState({ message: error.message, loading: false });
                     } else {
                         switch (error.response ? error.response.status : "") {
                             case 500:
@@ -268,10 +275,10 @@ class EditRoleComponent extends Component {
                             case 404:
                             case 406:
                             case 412:
-                                this.setState({ message: error.response.data.messageCode });
+                                this.setState({ message: error.response.data.messageCode, loading: false });
                                 break;
                             default:
-                                this.setState({ message: 'static.unkownError' });
+                                this.setState({ message: 'static.unkownError', loading: false });
                                 break;
                         }
                     }
@@ -282,8 +289,9 @@ class EditRoleComponent extends Component {
     render() {
         return (
             <div className="animated fadeIn">
+                <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} loading={this.changeLoading} />
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-                <Row>
+                <Row style={{ display: this.state.loading ? "none" : "block" }}>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             {/* <CardHeader>
@@ -298,13 +306,16 @@ class EditRoleComponent extends Component {
                                 }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
+                                    this.setState({
+                                        loading: true
+                                    })
                                     UserService.editRole(this.state.role)
                                         .then(response => {
                                             if (response.status == 200) {
                                                 this.props.history.push(`/role/listRole/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
-                                                    message: response.data.messageCode
+                                                    message: response.data.messageCode, loadig: false
                                                 },
                                                     () => {
                                                         this.hideSecondComponent();
@@ -323,10 +334,10 @@ class EditRoleComponent extends Component {
                                                         case 404:
                                                         case 406:
                                                         case 412:
-                                                            this.setState({ message: error.response.data.messageCode });
+                                                            this.setState({ loadig: false, message: error.response.data.messageCode });
                                                             break;
                                                         default:
-                                                            this.setState({ message: 'static.unkownError' });
+                                                            this.setState({ loadig: false, message: 'static.unkownError' });
                                                             break;
                                                     }
                                                 }
@@ -345,7 +356,9 @@ class EditRoleComponent extends Component {
                                         handleSubmit,
                                         isSubmitting,
                                         isValid,
-                                        setTouched
+                                        setTouched,
+                                        setFieldValue,
+                                        setFieldTouched
                                     }) => (
                                             <Form onSubmit={handleSubmit} noValidate name='roleForm'>
                                                 <CardBody className="pt-2 pb-0">
@@ -367,11 +380,19 @@ class EditRoleComponent extends Component {
                                                     <FormGroup>
                                                         <Label htmlFor="businessFunctions">{i18n.t('static.role.businessfunction')}<span className="red Reqasterisk">*</span> </Label>
                                                         <Select
-                                                            valid={!errors.businessFunctions}
+                                                         className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                         { 'is-valid': !errors.businessFunctions && this.state.role.businessFunctions.length != 0 },
+                                                         { 'is-invalid': (touched.businessFunctions && !!errors.businessFunctions) }
+                                                     )}
+                                                            // valid={!errors.businessFunctions}
                                                             bsSize="sm"
-                                                            invalid={touched.businessFunctions && !!errors.businessFunctions}
-                                                            onChange={(e) => { handleChange(e); this.businessFunctionChange(e) }}
-                                                            onBlur={handleBlur}
+                                                            // invalid={touched.businessFunctions && !!errors.businessFunctions}
+                                                            onChange={(e) => {
+                                                                handleChange(e);
+                                                                setFieldValue("businessFunctions", e);
+                                                                this.businessFunctionChange(e);
+                                                            }}
+                                                            onBlur={() => setFieldTouched("businessFunctions", true)}
                                                             name="businessFunctions"
                                                             id="businessFunctions"
                                                             multi
@@ -419,6 +440,17 @@ class EditRoleComponent extends Component {
                         </Card>
                     </Col>
                 </Row>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }

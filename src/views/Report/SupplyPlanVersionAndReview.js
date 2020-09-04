@@ -899,6 +899,7 @@ class SupplyPlanVersionAndReview extends Component {
         super(props);
 
         this.state = {
+            loading: true,
             matricsList: [],
             dropdownOpen: false,
             radioSelected: 2,
@@ -949,10 +950,10 @@ class SupplyPlanVersionAndReview extends Component {
             matricsArray[count] = data;
             count++;
         }
-        if (matricsList.length == 0) {
-            data = [];
-            matricsArray[0] = data;
-        }
+        // if (matricsList.length == 0) {
+        //     data = [];
+        //     matricsArray[0] = data;
+        // }
         // console.log("matricsArray---->", matricsArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();
@@ -962,7 +963,7 @@ class SupplyPlanVersionAndReview extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            // colWidths: [150, 150, 100],
+            colWidths: [100, 50, 50],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
@@ -1036,6 +1037,26 @@ class SupplyPlanVersionAndReview extends Component {
         })
     }
 
+    selected = function (instance, cell, x, y, value) {
+
+        if ((x == 0 && value != 0) || (y == 0)) {
+            // console.log("HEADER SELECTION--------------------------");
+        } else {
+
+            let programId = document.getElementById("programId").value;
+            // let countryId = document.getElementById("countryId").value;
+            let versionStatusId = document.getElementById("versionStatusId").value;
+            let versionTypeId = document.getElementById("versionTypeId").value;
+            if (versionStatusId == 1 && versionTypeId == 2) {
+                this.props.history.push({
+                    pathname: `/report/editStatus/${programId}/${this.el.getValueFromCoords(1, x)}`,
+
+                });
+            }
+
+        }
+    }.bind(this);
+
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
     }
@@ -1089,15 +1110,15 @@ class SupplyPlanVersionAndReview extends Component {
         RealmCountryService.getRealmCountryrealmIdById(realmId)
             .then(response => {
                 this.setState({
-                    countries: response.data
+                    countries: response.data, loading: false
                 })
             }).catch(
                 error => {
                     this.setState({
-                        countries: []
+                        countries: [], loading: false
                     })
                     if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
+                        this.setState({ loading: false, message: error.message });
                     } else {
                         switch (error.response ? error.response.status : "") {
                             case 500:
@@ -1105,10 +1126,10 @@ class SupplyPlanVersionAndReview extends Component {
                             case 404:
                             case 406:
                             case 412:
-                                this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }) });
+                                this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }) });
                                 break;
                             default:
-                                this.setState({ message: 'static.unkownError' });
+                                this.setState({ loading: false, message: 'static.unkownError' });
                                 break;
                         }
                     }
@@ -1140,15 +1161,15 @@ class SupplyPlanVersionAndReview extends Component {
             .then(response => {
                 console.log(JSON.stringify(response.data))
                 this.setState({
-                    programs: response.data
+                    programs: response.data, loading: false
                 })
             }).catch(
                 error => {
                     this.setState({
-                        programs: []
+                        programs: [], loading: false
                     })
                     if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
+                        this.setState({ loading: false, message: error.message });
                     } else {
                         switch (error.response ? error.response.status : "") {
                             case 500:
@@ -1156,10 +1177,10 @@ class SupplyPlanVersionAndReview extends Component {
                             case 404:
                             case 406:
                             case 412:
-                                this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
                                 break;
                             default:
-                                this.setState({ message: 'static.unkownError' });
+                                this.setState({ loading: false, message: 'static.unkownError' });
                                 break;
                         }
                     }
@@ -1172,7 +1193,7 @@ class SupplyPlanVersionAndReview extends Component {
         ProgramService.getVersionTypeList().then(response => {
             console.log('**' + JSON.stringify(response.data))
             this.setState({
-                versionTypeList: response.data
+                versionTypeList: response.data, loading: false
             })
         })
     }
@@ -1181,16 +1202,16 @@ class SupplyPlanVersionAndReview extends Component {
         ProgramService.getVersionStatusList().then(response => {
             console.log('**' + JSON.stringify(response.data))
             this.setState({
-                statuses: response.data,
+                statuses: response.data, loading: false
             })
         })
             .catch(
                 error => {
                     this.setState({
-                        statuses: [],
+                        statuses: [], loading: false
                     })
                     if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
+                        this.setState({ loading: false, message: error.message });
                     } else {
                         switch (error.response ? error.response.status : "") {
                             case 500:
@@ -1198,10 +1219,10 @@ class SupplyPlanVersionAndReview extends Component {
                             case 404:
                             case 406:
                             case 412:
-                                this.setState({ message: error.response.data.messageCode });
+                                this.setState({ loading: false, message: error.response.data.messageCode });
                                 break;
                             default:
-                                this.setState({ message: 'static.unkownError' });
+                                this.setState({ loading: false, message: 'static.unkownError' });
                                 break;
                         }
                     }
@@ -1217,9 +1238,11 @@ class SupplyPlanVersionAndReview extends Component {
         let versionTypeId = document.getElementById("versionTypeId").value;
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
+        console.log('endDate', endDate)
         if (programId != 0 && countryId != 0) {
+            this.setState({ loading: true })
             AuthenticationService.setupAxiosInterceptors();
-            ReportService.getProgramVersionList(programId, countryId, versionStatusId, startDate, endDate)
+            ReportService.getProgramVersionList(programId, countryId, versionStatusId, versionTypeId, startDate, endDate)
                 .then(response => {
                     console.log(JSON.stringify(response.data))
                     this.setState({
@@ -1229,14 +1252,14 @@ class SupplyPlanVersionAndReview extends Component {
                 }).catch(
                     error => {
                         this.setState({
-                            matricsList: []
+                            matricsList: [], loading: false
                         },
                             () => {
                                 this.el = jexcel(document.getElementById("tableDiv"), '');
                                 this.el.destroy();
                             })
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
+                            this.setState({ loading: false, message: error.message });
                         } else {
                             switch (error.response ? error.response.status : "") {
                                 case 500:
@@ -1244,10 +1267,10 @@ class SupplyPlanVersionAndReview extends Component {
                                 case 404:
                                 case 406:
                                 case 412:
-                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                    this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
                                     break;
                                 default:
-                                    this.setState({ message: 'static.unkownError' });
+                                    this.setState({ loading: false, message: 'static.unkownError' });
                                     break;
                             }
                         }
@@ -1508,85 +1531,85 @@ class SupplyPlanVersionAndReview extends Component {
         }
 
         const columns = [
-                        {
-                            dataField: 'program.label',
-                            text: i18n.t('static.program.program'),
-                            sort: true,
-                            align: 'center',
-                            headerAlign: 'center',
-                            formatter: this.formatLabel
-            
-                        },
-                        {
-                            dataField: 'versionId',
-                            text: i18n.t('static.report.version'),
-                            sort: true,
-                            align: 'center',
-                            headerAlign: 'center'
-                        },
-                        {
-                            dataField: 'versionType.label',
-                            text: i18n.t('static.report.versiontype'),
-                            sort: true,
-                            align: 'center',
-                            headerAlign: 'center',
-                            formatter: this.formatLabel
-                        },
-                        {
-                            dataField: 'createdDate',
-                            text: i18n.t('static.report.veruploaddate'),
-                            sort: true,
-                            align: 'center',
-                            headerAlign: 'center',
-                            formatter: (cellContent, row) => {
-                                return (
-                                    (row.createdDate ? moment(row.createdDate).format(`${DATE_FORMAT_CAP}`) : null)
-                                    // (row.lastLoginDate ? moment(row.lastLoginDate).format('DD-MMM-YY hh:mm A') : null)
-                                );
-                            }
-                        }
-                        , {
-                            dataField: 'createdBy.username',
-                            text: i18n.t('static.report.veruploaduser'),
-                            sort: true,
-                            align: 'center',
-                            headerAlign: 'center'
-                        }, {
-                            dataField: 'versionStatus.label',
-                            text: i18n.t('static.report.issupplyplanapprove'),
-                            sort: true,
-                            align: 'center',
-                            headerAlign: 'center',
-                            formatter: this.formatLabel
-                        }
-                        , {
-                            dataField: 'lastModifiedBy.username',
-                            text: i18n.t('static.report.approver'),
-                            sort: true,
-                            align: 'center',
-                            headerAlign: 'center',
-                            formatter: this.checkValue
-                        }, {
-                            dataField: 'lastModifiedDate',
-                            text: i18n.t('static.report.approveddate'),
-                            sort: true,
-                            align: 'center',
-                            headerAlign: 'center',
-                             formatter: (cellContent, row) => {
-                                return (
-                                    (row.versionStatus.id == 2)? (row.lastModifiedDate ? moment(row.lastModifiedDate).format(`${DATE_FORMAT_CAP} hh:mm A`) : null):null
-                                    // (row.lastLoginDate ? moment(row.lastLoginDate).format('DD-MMM-YY hh:mm A') : null)
-                                );
-                            }
-            
-                        }, {
-                            dataField: 'notes',
-                            text: i18n.t('static.report.comment'),
-                            sort: true,
-                            align: 'center',
-                            headerAlign: 'center',
-            
-                        }];
+            {
+                dataField: 'program.label',
+                text: i18n.t('static.program.program'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.formatLabel
+
+            },
+            {
+                dataField: 'versionId',
+                text: i18n.t('static.report.version'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'versionType.label',
+                text: i18n.t('static.report.versiontype'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.formatLabel
+            },
+            {
+                dataField: 'createdDate',
+                text: i18n.t('static.report.veruploaddate'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: (cellContent, row) => {
+                    return (
+                        (row.createdDate ? moment(row.createdDate).format(`${DATE_FORMAT_CAP}`) : null)
+                        // (row.lastLoginDate ? moment(row.lastLoginDate).format('DD-MMM-YY hh:mm A') : null)
+                    );
+                }
+            }
+            , {
+                dataField: 'createdBy.username',
+                text: i18n.t('static.report.veruploaduser'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            }, {
+                dataField: 'versionStatus.label',
+                text: i18n.t('static.report.issupplyplanapprove'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.formatLabel
+            }
+            , {
+                dataField: 'lastModifiedBy.username',
+                text: i18n.t('static.report.approver'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.checkValue
+            }, {
+                dataField: 'lastModifiedDate',
+                text: i18n.t('static.report.approveddate'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: (cellContent, row) => {
+                    return (
+                        (row.versionStatus.id == 2) ? (row.lastModifiedDate ? moment(row.lastModifiedDate).format(`${DATE_FORMAT_CAP} hh:mm A`) : null) : null
+                        // (row.lastLoginDate ? moment(row.lastLoginDate).format('DD-MMM-YY hh:mm A') : null)
+                    );
+                }
+
+            }, {
+                dataField: 'notes',
+                text: i18n.t('static.report.comment'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+
+            }];
 
         const options = {
             hidePageListOnlyOnePage: true,
@@ -1635,11 +1658,13 @@ class SupplyPlanVersionAndReview extends Component {
             <div className="animated fadeIn" >
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
                 }} />
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
 
-                <Card>
+                <Card style={{ display: this.state.loading ? "none" : "block" }}>
                     <div className="Card-header-reporticon">
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.report.supplyplanversionandreviewReport')}</strong> */}
                         {
@@ -1653,11 +1678,11 @@ class SupplyPlanVersionAndReview extends Component {
                             </div>
                         }
                     </div>
-                    <CardBody className="pb-lg-2 pt-lg-0">
+                    <CardBody className="pb-lg-5 pt-lg-0">
 
                         <div>
                             <Form >
-                                <Col md="12 pl-0">
+                                <div className="pl-0">
                                     <div className="row">
                                         <FormGroup className="col-md-3">
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
@@ -1741,21 +1766,27 @@ class SupplyPlanVersionAndReview extends Component {
                                                 </InputGroup>    </div></FormGroup>
 
                                     </div>
-                                </Col>
-                            </Form>
-                            <Col md="12 pl-0">
-
-                                <div className="row">
-                                    <div className="col-md-12">
-                                        <div id="tableDiv" className="jexcelremoveReadonlybackground">
-                                        </div>
-
-                                    </div>
                                 </div>
-                            </Col>
-
+                            </Form>
                         </div>
-                    </CardBody></Card>
+                        <div className="ReportSearchMarginTop">
+                            <div id="tableDiv" className="jexcelremoveReadonlybackground">
+                            </div>
+                        </div>
+
+                    </CardBody>
+                </Card>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
 

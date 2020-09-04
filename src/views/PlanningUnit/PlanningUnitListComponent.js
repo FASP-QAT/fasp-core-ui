@@ -504,10 +504,10 @@ export default class PlanningUnitListComponent extends Component {
             planningUnitArray[count] = data;
             count++;
         }
-        if (planningUnitList.length == 0) {
-            data = [];
-            planningUnitArray[0] = data;
-        }
+        // if (planningUnitList.length == 0) {
+        //     data = [];
+        //     planningUnitArray[0] = data;
+        // }
         // console.log("planningUnitArray---->", planningUnitArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();
@@ -603,13 +603,14 @@ export default class PlanningUnitListComponent extends Component {
         var languageEl = jexcel(document.getElementById("tableDiv"), options);
         this.el = languageEl;
         this.setState({
-            languageEl: languageEl
+            languageEl: languageEl,
+            loading: false
         })
     }
 
     selected = function (instance, cell, x, y, value) {
 
-        if (x == 0 && value != 0) {
+        if ((x == 0 && value != 0) || (y == 0)) {
             // console.log("HEADER SELECTION--------------------------");
         } else {
             // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
@@ -635,7 +636,8 @@ export default class PlanningUnitListComponent extends Component {
             // console.log(response.data)
             if (response.status == 200) {
                 this.setState({
-                    forecastingUnits: response.data, loading: false
+                    forecastingUnits: response.data,
+                    // loading: false
 
                 })
             }
@@ -657,7 +659,7 @@ export default class PlanningUnitListComponent extends Component {
                     this.setState({
                         realms: response.data,
                         realmId: response.data[0].realmId,
-                        loading: false
+                        // loading: false
                     })
 
                     PlanningUnitService.getPlanningUnitByRealmId(this.state.realmId).then(response => {
@@ -812,6 +814,8 @@ export default class PlanningUnitListComponent extends Component {
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
                 }} />
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
@@ -827,10 +831,10 @@ export default class PlanningUnitListComponent extends Component {
                     </div>
                     <CardBody className="pb-lg-5">
                         <Col md="9 pl-0">
-                            <div className="d-md-flex Selectdiv2">
-                                <FormGroup className="mt-md-2 mb-md-0 ">
+                            <div className="d-md-flex  Selectdiv2 ">
+                                <FormGroup className="mt-md-2 mb-md-0">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
-                                    <div className="controls SelectGo">
+                                    <div className="controls SelectField">
                                         <InputGroup>
                                             <Input
                                                 type="select"
@@ -849,9 +853,9 @@ export default class PlanningUnitListComponent extends Component {
                                     </div>
                                 </FormGroup>
                                 &nbsp;
-                            <FormGroup className="tab-ml-1 mt-md-2 mb-md-0">
+                            <FormGroup className=" tab-ml-1 mt-md-2 mb-md-0">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.forecastingunit.forecastingunit')}</Label>
-                                    <div className="controls SelectGo">
+                                    <div className="controls SelectField">
                                         <InputGroup>
                                             <Input
                                                 type="select"
@@ -871,11 +875,11 @@ export default class PlanningUnitListComponent extends Component {
                                 </FormGroup>
                             </div>
                         </Col>
-                        <div className=" table-responsive">
-                            {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground">
-                            </div>
 
+                        {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground">
                         </div>
+
+
 
                     </CardBody>
                 </Card>

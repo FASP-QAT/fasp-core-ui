@@ -82,6 +82,7 @@ export default class UpdateDataSourceComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            loading: true,
             // realm: this.props.location.state.realm,
             realm: {
                 realmCode: '',
@@ -108,6 +109,10 @@ export default class UpdateDataSourceComponent extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.changeMessage = this.changeMessage.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.changeLoading = this.changeLoading.bind(this);
+    }
+    changeLoading(loading) {
+        this.setState({ loading: loading })
     }
     hideSecondComponent() {
         setTimeout(function () {
@@ -186,13 +191,13 @@ export default class UpdateDataSourceComponent extends Component {
         RealmService.getRealmById(this.props.match.params.realmId).then(response => {
             if (response.status == 200) {
                 this.setState({
-                    realm: response.data
+                    realm: response.data, loading: false
                 });
             }
             else {
 
                 this.setState({
-                    message: response.data.messageCode
+                    message: response.data.messageCode, loading: false
                 },
                     () => {
                         this.hideSecondComponent();
@@ -215,9 +220,9 @@ export default class UpdateDataSourceComponent extends Component {
 
         return (
             <div className="animated fadeIn">
-                <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} />
+                <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} loading={this.changeLoading} />
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-                <Row>
+                <Row style={{ display: this.state.loading ? "none" : "block" }}>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             {/* <CardHeader>
@@ -236,6 +241,9 @@ export default class UpdateDataSourceComponent extends Component {
 
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
+                                    this.setState({
+                                        loading: true
+                                        })
                                     AuthenticationService.setupAxiosInterceptors();
                                     RealmService.updateRealm(this.state.realm)
                                         .then(response => {
@@ -243,7 +251,7 @@ export default class UpdateDataSourceComponent extends Component {
                                                 this.props.history.push(`/realm/listRealm/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
-                                                    message: response.data.messageCode
+                                                    message: response.data.messageCode, loading: false
                                                 },
                                                     () => {
                                                         this.hideSecondComponent();
@@ -303,7 +311,7 @@ export default class UpdateDataSourceComponent extends Component {
                                                             name="minMosMinGaurdrail"
                                                             id="minMosMinGaurdrail"
                                                             bsSize="sm"
-                                                            valid={!errors.minMosMinGaurdrail && ( this.state.realm.minMosMinGaurdrail >= 0)}
+                                                            valid={!errors.minMosMinGaurdrail && (this.state.realm.minMosMinGaurdrail >= 0)}
                                                             invalid={(touched.minMosMinGaurdrail && !!errors.minMosMinGaurdrail) || (this.state.realm.minMosMinGaurdrail < 0 || (this.state.realm.minMosMinGaurdrail).toString() == '')}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
@@ -318,8 +326,8 @@ export default class UpdateDataSourceComponent extends Component {
                                                             name="minMosMaxGaurdrail"
                                                             id="minMosMaxGaurdrail"
                                                             bsSize="sm"
-                                                            valid={!errors.minMosMaxGaurdrail && this.state.realm.minMosMaxGaurdrail != ''}
-                                                            invalid={touched.minMosMaxGaurdrail && !!errors.minMosMaxGaurdrail || this.state.realm.minMosMaxGaurdrail == ''}
+                                                            valid={!errors.minMosMaxGaurdrail && (this.state.realm.minMosMaxGaurdrail >= 0)}
+                                                            invalid={(touched.minMosMaxGaurdrail && !!errors.minMosMaxGaurdrail) || (this.state.realm.minMosMaxGaurdrail < 0 || (this.state.realm.minMosMaxGaurdrail).toString() == '')}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.realm.minMosMaxGaurdrail}
@@ -333,8 +341,8 @@ export default class UpdateDataSourceComponent extends Component {
                                                             name="maxMosMaxGaurdrail"
                                                             id="maxMosMaxGaurdrail"
                                                             bsSize="sm"
-                                                            valid={!errors.maxMosMaxGaurdrail && this.state.realm.maxMosMaxGaurdrail != ''}
-                                                            invalid={touched.maxMosMaxGaurdrail && !!errors.maxMosMaxGaurdrail || this.state.realm.maxMosMaxGaurdrail == ''}
+                                                            valid={!errors.maxMosMaxGaurdrail && (this.state.realm.maxMosMaxGaurdrail >= 0)}
+                                                            invalid={(touched.maxMosMaxGaurdrail && !!errors.maxMosMaxGaurdrail) || (this.state.realm.maxMosMaxGaurdrail < 0 || (this.state.realm.maxMosMaxGaurdrail).toString() == '')}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.realm.maxMosMaxGaurdrail}
@@ -435,6 +443,17 @@ export default class UpdateDataSourceComponent extends Component {
                         </Card>
                     </Col>
                 </Row>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }

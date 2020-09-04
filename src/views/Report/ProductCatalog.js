@@ -1532,19 +1532,12 @@ class ProductCatalog extends Component {
             procurementAgentLabels: [],
             outPutList: [],
             productCategories: [],
-            tracerCategories: []
+            tracerCategories: [],
+            loading: true
         };
-        this.filterData = this.filterData.bind(this);
+
         this.getPrograms = this.getPrograms.bind(this);
-        this.handleChangeProgram = this.handleChangeProgram.bind(this);
         this.consolidatedProgramList = this.consolidatedProgramList.bind(this);
-        this.filterVersion = this.filterVersion.bind(this);
-        this.consolidatedVersionList = this.consolidatedVersionList.bind(this);
-        this.getPlanningUnit = this.getPlanningUnit.bind(this);
-        this.getProcurementAgent = this.getProcurementAgent.bind(this);
-        this.consolidatedProcurementAgentList = this.consolidatedProcurementAgentList.bind(this);
-        this.handlePlanningUnitChange = this.handlePlanningUnitChange.bind(this);
-        this.handleProcurementAgentChange = this.handleProcurementAgentChange.bind(this);
         this.fetchData = this.fetchData.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
         this.getProductCategories = this.getProductCategories.bind(this);
@@ -1556,21 +1549,10 @@ class ProductCatalog extends Component {
         csvRow.push(i18n.t('static.program.program') + ' , ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20'));
         csvRow.push('')
         csvRow.push((i18n.t('static.dashboard.productcategory')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("productCategoryId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
-        // csvRow.push('Product Category' + ' , ' + (document.getElementById("productCategoryId").selectedOptions[0].text).replaceAll(' ', '%20'));
         csvRow.push('')
-        csvRow.push((i18n.t('static.tracercategory.tracercategory')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("productCategoryId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
-        // csvRow.push('Tracer Category' + ' , ' + (document.getElementById("tracerCategoryId").selectedOptions[0].text).replaceAll(' ', '%20'));
+        csvRow.push((i18n.t('static.tracercategory.tracercategory')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("tracerCategoryId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
         csvRow.push('')
         csvRow.push('')
-        // this.state.programLabels.map(ele =>
-        // csvRow.push(i18n.t('static.program.program') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
-        // csvRow.push('')
-        // csvRow.push('')
-        // csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
-        // csvRow.push('')
-        // var re;
-        // var A = [[("Program Name").replaceAll(' ', '%20'), ("Freight Cost Sea (%)").replaceAll(' ', '%20'), ("Freight Cost Air (%)").replaceAll(' ', '%20'), ("Plan to Draft LT (Months)").replaceAll(' ', '%20'), ("Draft to Submitted LT (Months)").replaceAll(' ', '%20'), ("Submitted to Approved LT (Months)").replaceAll(' ', '%20'), ("Approved to Shipped LT (Months)").replaceAll(' ', '%20'), ("Shipped to Arrived by Sea LT (Months)").replaceAll(' ', '%20'), ("Shipped to Arrived by Air LT (Months)").replaceAll(' ', '%20'), ("Arrived to Delivered LT (Months)").replaceAll(' ', '%20'), ("Total LT By Sea (Months)").replaceAll(' ', '%20'), ("Total LT By Air (Months)").replaceAll(' ', '%20')]]
-        // re = this.state.procurementAgents
         csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
         csvRow.push('')
         const headers = [];
@@ -1593,10 +1575,6 @@ class ProductCatalog extends Component {
                 ele.shelfLife,
                 ele.catalogPrice,
                 ele.active ? i18n.t('static.common.active') : i18n.t('static.common.disabled')
-                // (new moment(ele.inventoryDate).format('MMM YYYY')).replaceAll(' ', '%20'),
-                // ele.stockAdjustemntQty,
-                // ele.lastModifiedBy.username,
-                // new moment(ele.lastModifiedDate).format('MMM-DD-YYYY'), ele.notes
             ]));
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
@@ -1605,7 +1583,7 @@ class ProductCatalog extends Component {
         var a = document.createElement("a")
         a.href = 'data:attachment/csv,' + csvString
         a.target = "_Blank"
-        a.download = "Product Catalog Report.csv"
+        a.download = i18n.t('static.report.productCatalog') + '.csv';
         document.body.appendChild(a)
         a.click()
     }
@@ -1633,19 +1611,6 @@ class ProductCatalog extends Component {
             const pageCount = doc.internal.getNumberOfPages()
 
             for (var i = 1; i <= pageCount; i++) {
-                // doc.setFontSize(12)
-                // doc.setPage(i)
-                // doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
-                // doc.setTextColor("#002f6c");
-                // doc.text("Product Catalog Report", doc.internal.pageSize.width / 2, 60, {
-                //     align: 'center'
-                // })
-                // if (i == 1) {
-                //     doc.setFontSize(8)
-                //     var planningText = doc.splitTextToSize(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width * 3 / 4);
-                //     doc.text(doc.internal.pageSize.width / 8, 90, planningText)
-
-                // }
                 doc.setFont('helvetica', 'bold')
                 doc.setFontSize(12)
                 doc.setFont('helvetica', 'bold')
@@ -1658,21 +1623,16 @@ class ProductCatalog extends Component {
                 if (i == 1) {
                     doc.setFontSize(8)
                     doc.setFont('helvetica', 'normal')
-                    // doc.text(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
-                    //     align: 'left'
-                    // })
                     doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
                         align: 'left'
                     })
 
-                    doc.text('Product Category' + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
+                    doc.text(i18n.t('static.dashboard.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
                         align: 'left'
                     })
-                    doc.text('Tracer Category' + ' : ' + document.getElementById("tracerCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
+                    doc.text(i18n.t('static.tracercategory.tracercategory') + ' : ' + document.getElementById("tracerCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
                         align: 'left'
                     })
-                    // var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-                    // doc.text(doc.internal.pageSize.width / 8, 150, planningText)
 
                 }
 
@@ -1686,17 +1646,10 @@ class ProductCatalog extends Component {
         const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size, true);
         doc.setFontSize(8);
-        const title = "Product Catalog Report";
-        // var canvas = document.getElementById("cool-canvas");
-        //creates image
-        // var canvasImg = canvas.toDataURL("image/png", 1.0);
+        const title = i18n.t('static.report.productCatalogReport');
         var width = doc.internal.pageSize.width;
         var height = doc.internal.pageSize.height;
         var h1 = 50;
-        // var aspectwidth1 = (width - h1);
-        // doc.addImage(canvasImg, 'png', 50, 200, 750, 290, 'CANVAS');
-        // const headers = [["Program Name", "Freight Cost Sea (%)", "Freight Cost Air (%)", "Plan to Draft LT (Months)", "Draft to Submitted LT (Months)", "Submitted to Approved LT (Months)", "Approved to Shipped LT (Months)", "Shipped to Arrived by Sea LT (Months)", "Shipped to Arrived by Air LT (Months)", "Arrived to Delivered LT (Months)", "Total LT By Sea (Months)", "Total LT By Air (Months)"]]
-        // const data = this.state.procurementAgents.map(elt => [getLabelText(elt.label), elt.seaFreightPerc, elt.airFreightPerc, elt.plannedToDraftLeadTime, elt.draftToSubmittedLeadTime, elt.submittedToApprovedLeadTime, elt.approvedToShippedLeadTime, elt.shippedToArrivedBySeaLeadTime, elt.shippedToArrivedByAirLeadTime, elt.arrivedToDeliveredLeadTime, (elt.plannedToDraftLeadTime + elt.draftToSubmittedLeadTime + elt.submittedToApprovedLeadTime + elt.approvedToShippedLeadTime + elt.shippedToArrivedBySeaLeadTime + elt.arrivedToDeliveredLeadTime), (elt.plannedToDraftLeadTime + elt.draftToSubmittedLeadTime + elt.submittedToApprovedLeadTime + elt.approvedToShippedLeadTime + elt.shippedToArrivedByAirLeadTime + elt.arrivedToDeliveredLeadTime)]);
 
         const headers = [];
         columns.map((item, idx) => { headers[idx] = (item.text) });
@@ -1715,9 +1668,6 @@ class ProductCatalog extends Component {
             ele.shelfLife,
             ele.catalogPrice,
             ele.active ? i18n.t('static.common.active') : i18n.t('static.common.disabled')
-            // ele.totalSeaLeadTime,
-            // ele.totalAirLeadTime,
-            // ele.localProcurementLeadTime
         ]);
 
         let content = {
@@ -1726,91 +1676,13 @@ class ProductCatalog extends Component {
             head: [headers],
             body: data,
             styles: { lineWidth: 1, fontSize: 8, cellWidth: 55, halign: 'center' },
-            // columnStyles: {
-            //     0: { cellWidth: 170 },
-            //     1: { cellWidth: 171.89 },
-            //     6: { cellWidth: 100 }
-            // }
         };
         doc.autoTable(content);
         addHeaders(doc)
         addFooters(doc)
-        doc.save("Product Catalog Report.pdf")
-    }
-    handleChangeProgram(programIds) {
-
-        this.setState({
-            programValues: programIds.map(ele => ele.value),
-            programLabels: programIds.map(ele => ele.label)
-        }, () => {
-
-            // this.filterData(this.state.rangeValue)
-        })
-
-    }
-    handlePlanningUnitChange = (planningUnitIds) => {
-        this.setState({
-            planningUnitValues: planningUnitIds.map(ele => ele.value),
-            planningUnitLabels: planningUnitIds.map(ele => ele.label)
-        }, () => {
-            this.fetchData()
-        })
+        doc.save(i18n.t('static.report.productCatalog') + '.pdf')
     }
 
-    handleProcurementAgentChange = (procurementAgentIds) => {
-        this.setState({
-            procurementAgenttValues: procurementAgentIds.map(ele => ele.value),
-            procurementAgentLabels: procurementAgentIds.map(ele => ele.label)
-        }, () => {
-            this.fetchData()
-        })
-    }
-
-    filterData(rangeValue) {
-        setTimeout('', 10000);
-        let programIds = this.state.programValues;
-        if (programIds.length > 0) {
-            AuthenticationService.setupAxiosInterceptors();
-
-            ReportService.getProcurementAgentExportData(programIds)
-                .then(response => {
-                    console.log(JSON.stringify(response.data));
-                    this.setState({
-                        procurementAgents: response.data,
-                        message: ''
-                    })
-                }).catch(
-                    error => {
-                        this.setState({
-                            procurementAgents: []
-                        })
-
-                        if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
-                        } else {
-                            switch (error.response ? error.response.status : "") {
-                                case 500:
-                                case 401:
-                                case 404:
-                                case 406:
-                                case 412:
-                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }) });
-                                    break;
-                                default:
-                                    this.setState({ message: 'static.unkownError' });
-                                    break;
-                            }
-                        }
-                    }
-                );
-        } else if (programIds.length == 0) {
-            this.setState({ message: i18n.t('static.common.selectProgram'), procurementAgents: [] });
-
-        } else {
-            this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), procurementAgents: [] });
-
-        }
-    }
 
     getTracerCategoryList() {
         var programId = document.getElementById('programId').value;
@@ -1932,89 +1804,26 @@ class ProductCatalog extends Component {
         }
     }
 
-    getProductCategories() {
-        if (navigator.onLine) {
-            AuthenticationService.setupAxiosInterceptors();
-            let realmId = AuthenticationService.getRealmId();
-            ProductService.getProductCategoryList(realmId)
-                .then(response => {
-                    console.log(response.data)
-                    this.setState({
-                        productCategories: response.data
-                    })
-                }).catch(
-                    error => {
-                        this.setState({
-                            productCategories: []
-                        })
-                        if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
-                        } else {
-                            switch (error.response ? error.response.status : "") {
-                                case 500:
-                                case 401:
-                                case 404:
-                                case 406:
-                                case 412:
-                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
-                                    break;
-                                default:
-                                    this.setState({ message: 'static.unkownError' });
-                                    break;
-                            }
-                        }
-                    }
-                );
-        } else {
-            const lan = 'en';
-            const { productCategories } = this.state
-            var proList = productCategories;
 
-            var db1;
-            getDatabase();
-            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-            openRequest.onsuccess = function (e) {
-                db1 = e.target.result;
-                var transaction = db1.transaction(['productCategory'], 'readwrite');
-                var program = transaction.objectStore('productCategory');
-                var getRequest = program.getAll();
-
-                getRequest.onerror = function (event) {
-                    // Handle errors!
-                };
-                getRequest.onsuccess = function (event) {
-                    var myResult = [];
-                    myResult = getRequest.result;
-                    // for (var i = 0; i < myResult.length; i++) {
-                    //     var databytes = CryptoJS.AES.decrypt(myResult[i].productCategory, SECRET_KEY);
-                    //     var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
-                    //     proList.push(programData)
-                    // }
-                    this.setState({
-                        productCategories: myResult
-                    })
-                }.bind(this)
-            }.bind(this)
-        }
-    }
 
     getPrograms() {
         if (navigator.onLine) {
             AuthenticationService.setupAxiosInterceptors();
             let realmId = AuthenticationService.getRealmId();
-            ProgramService.getProgramByRealmId(realmId)
+            // ProgramService.getProgramByRealmId(realmId)
+            ProgramService.getProgramList()
                 .then(response => {
                     console.log(JSON.stringify(response.data))
                     this.setState({
-                        programs: response.data
+                        programs: response.data, loading: false
                     }, () => { this.consolidatedProgramList() })
                 }).catch(
                     error => {
                         this.setState({
-                            programs: []
+                            programs: [], loading: false
                         }, () => { this.consolidatedProgramList() })
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
+                            this.setState({ message: error.message, loading: false });
                         } else {
                             switch (error.response ? error.response.status : "") {
                                 case 500:
@@ -2022,10 +1831,10 @@ class ProductCatalog extends Component {
                                 case 404:
                                 case 406:
                                 case 412:
-                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }), loading: false });
                                     break;
                                 default:
-                                    this.setState({ message: 'static.unkownError' });
+                                    this.setState({ message: 'static.unkownError', loading: false });
                                     break;
                             }
                         }
@@ -2034,6 +1843,7 @@ class ProductCatalog extends Component {
         } else {
             console.log('offline')
             this.consolidatedProgramList()
+            this.setState({ loading: false })
         }
     }
 
@@ -2081,192 +1891,37 @@ class ProductCatalog extends Component {
                 }
                 this.setState({
                     programs: proList
-                })
+                }, () => {
+                    this.getProductCategories()
+                }
+                )
 
             }.bind(this);
 
         }.bind(this);
     }
-    filterVersion = () => {
-        let programId = document.getElementById("programId").value;
-        if (programId != 0) {
-            const program = this.state.programs.filter(c => c.programId == programId)
-            console.log(program)
-            if (program.length == 1) {
-                if (navigator.onLine) {
-                    this.setState({
-                        versions: [],
-                        planningUnits: [],
-                        // outPutList: []
 
-                    }, () => {
-                        this.setState({
-                            versions: program[0].versionList.filter(function (x, i, a) {
-                                return a.indexOf(x) === i;
-                            })
-                        }, () => { this.consolidatedVersionList(programId) });
-                    });
-                } else {
-                    this.setState({
-                        versions: []
-                    }, () => { this.consolidatedVersionList(programId) })
-                }
-            } else {
+    getProductCategories() {
 
-                this.setState({
-                    versions: []
-                })
-            }
-        } else {
-            this.setState({
-                versions: []
-            })
-        }
-    }
+        // alert(navigator.onLine);
 
-    consolidatedVersionList = (programId) => {
-        const lan = 'en';
-        const { versions } = this.state
-        var verList = versions;
-
-        var db1;
-        getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-            var transaction = db1.transaction(['programData'], 'readwrite');
-            var program = transaction.objectStore('programData');
-            var getRequest = program.getAll();
-
-            getRequest.onerror = function (event) {
-                // Handle errors!
-            };
-            getRequest.onsuccess = function (event) {
-                var myResult = [];
-                myResult = getRequest.result;
-                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                for (var i = 0; i < myResult.length; i++) {
-                    if (myResult[i].userId == userId && myResult[i].programId == programId) {
-                        var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
-                        var programData = databytes.toString(CryptoJS.enc.Utf8)
-                        var version = JSON.parse(programData).currentVersion
-
-                        version.versionId = `${version.versionId} (Local)`
-                        verList.push(version)
-                    }
-                }
-                console.log(verList)
-                this.setState({
-                    versions: verList.filter(function (x, i, a) {
-                        return a.indexOf(x) === i;
-                    })
-                })
-
-            }.bind(this);
-        }.bind(this)
-    }
-
-    getPlanningUnit = () => {
-        let programId = document.getElementById("programId").value;
-        // let versionId = document.getElementById("versionId").value;
-        this.setState({
-            planningUnits: []
-        }, () => {
-            // if (versionId.includes('Local')) {
-            if (!navigator.onLine) {
-                const lan = 'en';
-                var db1;
-                var storeOS;
-                getDatabase();
-                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                openRequest.onsuccess = function (e) {
-                    db1 = e.target.result;
-                    var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
-                    var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
-                    var planningunitRequest = planningunitOs.getAll();
-                    var planningList = []
-                    planningunitRequest.onerror = function (event) {
-                        // Handle errors!
-                    };
-                    planningunitRequest.onsuccess = function (e) {
-                        var myResult = [];
-                        myResult = planningunitRequest.result;
-                        var programId = (document.getElementById("programId").value).split("_")[0];
-                        var proList = []
-                        console.log(myResult)
-                        for (var i = 0; i < myResult.length; i++) {
-                            if (myResult[i].program.id == programId) {
-
-                                proList[i] = myResult[i]
-                            }
-                        }
-                        this.setState({
-                            planningUnits: proList, message: ''
-                        }, () => {
-                            this.fetchData();
-                        })
-                    }.bind(this);
-                }.bind(this)
-
-
-            }
-            else {
-                AuthenticationService.setupAxiosInterceptors();
-
-                //let productCategoryId = document.getElementById("productCategoryId").value;
-                ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
-                    console.log('**' + JSON.stringify(response.data))
-                    this.setState({
-                        planningUnits: response.data, message: ''
-                    }, () => {
-                        this.fetchData();
-                    })
-                })
-                    .catch(
-                        error => {
-                            this.setState({
-                                planningUnits: [],
-                            })
-                            if (error.message === "Network Error") {
-                                this.setState({ message: error.message });
-                            } else {
-                                switch (error.response ? error.response.status : "") {
-                                    case 500:
-                                    case 401:
-                                    case 404:
-                                    case 406:
-                                    case 412:
-                                        this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
-                                        break;
-                                    default:
-                                        this.setState({ message: 'static.unkownError' });
-                                        break;
-                                }
-                            }
-                        }
-                    );
-            }
-        });
-
-    }
-
-    getProcurementAgent = () => {
         if (navigator.onLine) {
             AuthenticationService.setupAxiosInterceptors();
-            ProcurementAgentService.getProcurementAgentListAll()
+            let realmId = AuthenticationService.getRealmId();
+            ProductService.getProductCategoryList(realmId)
                 .then(response => {
-                    // console.log(JSON.stringify(response.data))
+                    console.log(response.data);
+                    var list = response.data.slice(1);
+                    console.log("my list=======", list);
+
                     this.setState({
-                        procurementAgents: response.data
-                    }, () => { this.consolidatedProcurementAgentList() })
+                        productCategories: list
+                    })
                 }).catch(
                     error => {
                         this.setState({
-                            procurementAgents: []
-                        }, () => { this.consolidatedProcurementAgentList() })
+                            productCategories: []
+                        })
                         if (error.message === "Network Error") {
                             this.setState({ message: error.message });
                         } else {
@@ -2276,7 +1931,7 @@ class ProductCatalog extends Component {
                                 case 404:
                                 case 406:
                                 case 412:
-                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
                                     break;
                                 default:
                                     this.setState({ message: 'static.unkownError' });
@@ -2285,60 +1940,41 @@ class ProductCatalog extends Component {
                         }
                     }
                 );
-
         } else {
-            console.log('offline')
-            this.consolidatedProcurementAgentList()
+            // alert("in else");
+            const lan = 'en';
+            const { productCategories } = this.state
+            var proList = productCategories;
+
+            var db1;
+            getDatabase();
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            openRequest.onsuccess = function (e) {
+                db1 = e.target.result;
+                var transaction = db1.transaction(['productCategory'], 'readwrite');
+                var program = transaction.objectStore('productCategory');
+                var getRequest = program.getAll();
+
+                getRequest.onerror = function (event) {
+                    // Handle errors!
+                };
+                getRequest.onsuccess = function (event) {
+                    var myResult = [];
+                    myResult = getRequest.result;
+                    // alert("hi---");
+                    console.log("offline result==>", myResult);
+
+                    // for (var i = 0; i < myResult.length; i++) {
+                    //     var databytes = CryptoJS.AES.decrypt(myResult[i].productCategory, SECRET_KEY);
+                    //     var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                    //     proList.push(programData)
+                    // }
+                    this.setState({
+                        productCategories: myResult
+                    })
+                }.bind(this)
+            }.bind(this)
         }
-
-    }
-
-    consolidatedProcurementAgentList = () => {
-        const lan = 'en';
-        const { procurementAgents } = this.state
-        var proList = procurementAgents;
-
-        var db1;
-        getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-            var transaction = db1.transaction(['procurementAgent'], 'readwrite');
-            var procuremntAgent = transaction.objectStore('procurementAgent');
-            var getRequest = procuremntAgent.getAll();
-
-            getRequest.onerror = function (event) {
-                // Handle errors!
-            };
-            getRequest.onsuccess = function (event) {
-                var myResult = [];
-                myResult = getRequest.result;
-                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                // console.log("ProcurementAgentMyResult------>>>>", myResult);
-                for (var i = 0; i < myResult.length; i++) {
-
-                    var f = 0
-                    for (var k = 0; k < this.state.procurementAgents.length; k++) {
-                        if (this.state.procurementAgents[k].procurementAgentId == myResult[i].procurementAgentId) {
-                            f = 1;
-                            console.log('already exist')
-                        }
-                    }
-                    var programData = myResult[i];
-                    if (f == 0) {
-                        proList.push(programData)
-                    }
-
-                }
-
-                this.setState({
-                    procurementAgents: proList
-                })
-
-            }.bind(this);
-
-        }.bind(this);
     }
 
 
@@ -2368,10 +2004,10 @@ class ProductCatalog extends Component {
             outPutArray[count] = data;
             count++;
         }
-        if (outPutList.length == 0) {
-            data = [];
-            outPutArray[0] = data;
-        }
+        // if (outPutList.length == 0) {
+        //     data = [];
+        //     outPutArray[0] = data;
+        // }
         // console.log("outPutArray---->", outPutArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();
@@ -2486,19 +2122,13 @@ class ProductCatalog extends Component {
         jExcelLoadedFunction(instance);
     }
     fetchData = () => {
-        // let versionId = document.getElementById("versionId").value;
         let programId = document.getElementById("programId").value;
         let productCategoryId = document.getElementById("productCategoryId").value;
         let tracerCategoryId = document.getElementById("tracerCategoryId").value;
-        // let plannedShipments = document.getElementById("shipmentStatusId").value;
-        // let planningUnitIds = this.state.planningUnitValues;
-        // let procurementAgentIds = this.state.procurementAgenttValues;
-        // let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
-        // let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
 
         let json = {
             "programId": parseInt(document.getElementById("programId").value),
-            "productCategoryId": parseInt(document.getElementById("productCategoryId").value),
+            "productCategoryId": parseInt(document.getElementById("productCategoryId").value) == 0 ? -1 : parseInt(document.getElementById("productCategoryId").value),
             "tracerCategoryId": parseInt(document.getElementById("tracerCategoryId").value),
 
         }
@@ -2506,6 +2136,8 @@ class ProductCatalog extends Component {
         if (programId > 0) {
 
             if (navigator.onLine) {
+
+                this.setState({ loading: true })
                 console.log("json---", json);
                 AuthenticationService.setupAxiosInterceptors();
                 ReportService.programProductCatalog(json)
@@ -2514,13 +2146,16 @@ class ProductCatalog extends Component {
                         var outPutList = response.data;
                         // var responseData = response.data;
                         this.setState({
-                            outPutList: outPutList
+                            outPutList: outPutList,
+                            message: '',
+                            // loading: false
                         },
                             () => { this.buildJexcel() })
                     }).catch(
                         error => {
                             this.setState({
-                                outPutList: []
+                                outPutList: [],
+                                loading: false
                             },
                                 () => {
                                     this.el = jexcel(document.getElementById("tableDiv"), '');
@@ -2528,7 +2163,7 @@ class ProductCatalog extends Component {
                                 })
 
                             if (error.message === "Network Error") {
-                                this.setState({ message: error.message });
+                                this.setState({ message: error.message, loading: false });
                             } else {
                                 switch (error.response ? error.response.status : "") {
                                     case 500:
@@ -2536,10 +2171,10 @@ class ProductCatalog extends Component {
                                     case 404:
                                     case 406:
                                     case 412:
-                                        this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                        this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
                                         break;
                                     default:
-                                        this.setState({ message: 'static.unkownError' });
+                                        this.setState({ loading: false, message: 'static.unkownError' });
                                         break;
                                 }
                             }
@@ -2606,6 +2241,7 @@ class ProductCatalog extends Component {
                                 }.bind(this);
 
                                 ppuRequest.onsuccess = function (e) {
+                                    // this.setState({ loading: true })
                                     var result3 = ppuRequest.result;
                                     result3 = result3.filter(c => c.program.id == programId);
                                     console.log("4------>", result3);
@@ -2627,12 +2263,6 @@ class ProductCatalog extends Component {
                                             var tracerCategory = (result1.filter(c => c.forecastingUnitId == filteredList[j].forecastingUnit.forecastingUnitId)[0]).tracerCategory;
                                             var fUnit = (result1.filter(c => c.forecastingUnitId == filteredList[j].forecastingUnit.forecastingUnitId)[0]).unit;
                                             var genericLabel = (result1.filter(c => c.forecastingUnitId == filteredList[j].forecastingUnit.forecastingUnitId)[0]).genericLabel;
-                                            // console.log("6---->", productCategory);
-                                            // if (result3[i].active && filteredList[i].active) {
-                                            //     active = true;
-                                            // } else {
-                                            //     active = false;
-                                            // }
                                             var json = {
                                                 program: program,
                                                 productCategory: productCategory,
@@ -2670,7 +2300,7 @@ class ProductCatalog extends Component {
                                         outPutList = outPutList;
                                     }
                                     console.log("outPutList------>", outPutList);
-                                    this.setState({ outPutList: outPutList },
+                                    this.setState({ outPutList: outPutList, message: '' },
                                         () => { this.buildJexcel() });
 
                                 }.bind(this)
@@ -2693,10 +2323,14 @@ class ProductCatalog extends Component {
         // }
     }
     componentDidMount() {
-        // AuthenticationService.setupAxiosInterceptors();
         this.getPrograms();
+        // setTimeout(function () { //Start the timer
+        //     // this.setState({render: true}) //After 1 second, set render to true
+        //     this.setState({ loading: false })
+        // }.bind(this), 500)
         // this.getProcurementAgent();
-        this.getProductCategories();
+        // this.getProductCategories();
+
     }
 
     toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
@@ -2716,33 +2350,8 @@ class ProductCatalog extends Component {
         );
 
         const { programs } = this.state;
-        const { versions } = this.state;
         const { productCategories } = this.state;
         const { tracerCategories } = this.state;
-
-        let versionList = versions.length > 0
-            && versions.map((item, i) => {
-                return (
-                    <option key={i} value={item.versionId}>
-                        {item.versionId}
-                    </option>
-                )
-            }, this);
-
-        const { planningUnits } = this.state
-        let planningUnitList = planningUnits.length > 0
-            && planningUnits.map((item, i) => {
-                return ({ label: getLabelText(item.planningUnit.label, this.state.lang), value: item.planningUnit.id })
-
-            }, this);
-
-        const { procurementAgents } = this.state
-        let procurementAgentList = procurementAgents.length > 0
-            && procurementAgents.map((item, i) => {
-                return ({ label: getLabelText(item.label, this.state.lang), value: item.procurementAgentId })
-
-            }, this);
-
 
 
         const columns = [
@@ -2823,13 +2432,7 @@ class ProductCatalog extends Component {
                     return getLabelText(cell, this.state.lang);
                 }
             },
-            // {
-            //     dataField: 'NoOfItems',
-            //     text: "No. Of Items",
-            //     sort: true,
-            //     align: 'right',
-            //     headerAlign: 'right'
-            // },
+
 
             {
                 dataField: 'pUnit.label',
@@ -2841,13 +2444,7 @@ class ProductCatalog extends Component {
                     return getLabelText(cell, this.state.lang);
                 }
             },
-            // {
-            //     dataField: 'MultipliertoForecastingUnit',
-            //     text: "Multiplier",
-            //     sort: true,
-            //     align: 'right',
-            //     headerAlign: 'right'
-            // },
+
             {
                 dataField: 'minMonthsOfStock',
                 text: i18n.t('static.report.min'),
@@ -2922,6 +2519,8 @@ class ProductCatalog extends Component {
             <div className="animated fadeIn" >
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
                 }} />
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
@@ -2938,98 +2537,109 @@ class ProductCatalog extends Component {
                     <CardBody className="pb-lg-5 pt-lg-0">
                         {/* <div ref={ref}> */}
                         <br />
-                     
-                            <Col md="12 pl-0">
-                           
-                                <div className="d-md-flex  Selectdiv2 ">
-                                    <FormGroup className="mt-md-2 mb-md-0 ">
-                                        <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
-                                        <div className="controls SelectField">
-                                            <InputGroup>
-                                                <Input
-                                                    type="select"
-                                                    name="programId"
-                                                    id="programId"
-                                                    bsSize="sm"
-                                                    // onChange={this.filterVersion}
-                                                    onChange={(e) => { this.fetchData(); this.getTracerCategoryList(); }}
-                                                >
-                                                    <option value="0">{i18n.t('static.common.select')}</option>
-                                                    {programs.length > 0
-                                                        && programs.map((item, i) => {
-                                                            return (
-                                                                <option key={i} value={item.programId}>
-                                                                    {getLabelText(item.label, this.state.lang)}
-                                                                </option>
-                                                            )
-                                                        }, this)}
-                                                </Input>
-                                            </InputGroup>
-                                        </div>
-                                    </FormGroup>
-                                    <FormGroup className="tab-ml-1 mt-md-2 mb-md-0">
-                                        <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.productcategory')}</Label>
-                                        <div className="controls SelectField">
-                                            <InputGroup>
-                                                <Input
-                                                    type="select"
-                                                    name="productCategoryId"
-                                                    id="productCategoryId"
-                                                    bsSize="sm"
-                                                    onChange={this.fetchData}
-                                                // onChange={(e) => { this.getPlanningUnit(); }}
-                                                >
-                                                    <option value="-1">{i18n.t('static.common.all')}</option>
-                                                    {productCategories.length > 0
-                                                        && productCategories.map((item, i) => {
-                                                            return (
-                                                                <option key={i} value={item.payload.productCategoryId} disabled={item.payload.active ? "" : "disabled"}>
-                                                                    {Array(item.level).fill(' ').join('') + (getLabelText(item.payload.label, this.state.lang))}
-                                                                </option>
-                                                            )
-                                                        }, this)}
 
-                                                </Input>
-                                            </InputGroup>
-                                        </div>
-                                    </FormGroup>
-                                    <FormGroup className="tab-ml-1 mt-md-2 mb-md-0">
-                                        <Label htmlFor="appendedInputButton">{i18n.t('static.tracercategory.tracercategory')}</Label>
-                                        <div className="controls SelectField">
-                                            <InputGroup>
-                                                <Input
-                                                    type="select"
-                                                    name="tracerCategoryId"
-                                                    id="tracerCategoryId"
-                                                    bsSize="sm"
-                                                    onChange={this.fetchData}
-                                                // onChange={(e) => { this.getPlanningUnit(); }}
-                                                >
-                                                    <option value="-1">{i18n.t('static.common.all')}</option>
-                                                    {tracerCategories.length > 0
-                                                        && tracerCategories.map((item, i) => {
-                                                            return (
-                                                                <option key={i} value={item.tracerCategoryId}>
-                                                                    {getLabelText(item.label, this.state.lang)}
-                                                                </option>
-                                                            )
-                                                        }, this)}
+                        <Col md="12 pl-0">
 
-                                                </Input>
-                                            </InputGroup>
-                                        </div>
-                                    </FormGroup>
-                                </div>
-                             
-                            </Col>
-                        
-                        
+                            <div className="d-md-flex  Selectdiv2 ">
+                                <FormGroup className="mt-md-2 mb-md-0 ">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
+                                    <div className="controls SelectField">
+                                        <InputGroup>
+                                            <Input
+                                                type="select"
+                                                name="programId"
+                                                id="programId"
+                                                bsSize="sm"
+                                                // onChange={this.filterVersion}
+                                                onChange={(e) => { this.fetchData(); this.getTracerCategoryList(); }}
+                                            >
+                                                <option value="0">{i18n.t('static.common.select')}</option>
+                                                {programs.length > 0
+                                                    && programs.map((item, i) => {
+                                                        return (
+                                                            <option key={i} value={item.programId}>
+                                                                {getLabelText(item.label, this.state.lang)}
+                                                            </option>
+                                                        )
+                                                    }, this)}
+                                            </Input>
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
+                                <FormGroup className="tab-ml-1 mt-md-2 mb-md-0">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.productcategory')}</Label>
+                                    <div className="controls SelectField">
+                                        <InputGroup>
+                                            <Input
+                                                type="select"
+                                                name="productCategoryId"
+                                                id="productCategoryId"
+                                                bsSize="sm"
+                                                onChange={this.fetchData}
+                                            // onChange={(e) => { this.getPlanningUnit(); }}
+                                            >
+                                                {/* <option value="-1">{i18n.t('static.common.all')}</option> */}
+                                                {productCategories.length > 0
+                                                    && productCategories.map((item, i) => {
+                                                        return (
+                                                            <option key={i} value={item.payload.productCategoryId} disabled={item.payload.active ? "" : "disabled"}>
+                                                                {Array(item.level).fill(' ').join('') + (getLabelText(item.payload.label, this.state.lang))}
+                                                            </option>
+                                                        )
+                                                    }, this)}
+
+                                            </Input>
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
+                                <FormGroup className="tab-ml-1 mt-md-2 mb-md-0">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.tracercategory.tracercategory')}</Label>
+                                    <div className="controls SelectField">
+                                        <InputGroup>
+                                            <Input
+                                                type="select"
+                                                name="tracerCategoryId"
+                                                id="tracerCategoryId"
+                                                bsSize="sm"
+                                                onChange={this.fetchData}
+                                            // onChange={(e) => { this.getPlanningUnit(); }}
+                                            >
+                                                <option value="-1">{i18n.t('static.common.all')}</option>
+                                                {tracerCategories.length > 0
+                                                    && tracerCategories.map((item, i) => {
+                                                        return (
+                                                            <option key={i} value={item.tracerCategoryId}>
+                                                                {getLabelText(item.label, this.state.lang)}
+                                                            </option>
+                                                        )
+                                                    }, this)}
+
+                                            </Input>
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
+                            </div>
+
+                        </Col>
+
+
                         <div id="tableDiv" className="jexcelremoveReadonlybackground">
                         </div>
-                       
-                       
+
+
                     </CardBody>
                 </Card>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
             </div>
         );

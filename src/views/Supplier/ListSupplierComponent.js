@@ -370,7 +370,7 @@ class SupplierListComponent extends Component {
         jExcelLoadedFunction(instance);
     }
     selected = function (instance, cell, x, y, value) {
-        if (x == 0 && value != 0) {
+        if ((x == 0 && value != 0) || (y == 0)) {
             // console.log("HEADER SELECTION--------------------------");
         } else {
             if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_CURRENCY')) {
@@ -393,13 +393,13 @@ class SupplierListComponent extends Component {
             this.setState({
                 selSource
             },
-            () => {this.buildJexcel()})
+                () => { this.buildJexcel() })
         } else {
             this.setState({
                 selSource: this.state.supplierList
             },
-            () => { this.buildJexcel()})
-         }
+                () => { this.buildJexcel() })
+        }
     }
     buildJexcel() {
         let supplierList = this.state.selSource;
@@ -416,10 +416,10 @@ class SupplierListComponent extends Component {
             supplierArray[count] = data;
             count++;
         }
-        if (supplierList.length == 0) {
-            data = [];
-            supplierArray[0] = data;
-        }
+        // if (supplierList.length == 0) {
+        //     data = [];
+        //     supplierArray[0] = data;
+        // }
         // console.log("supplierArray---->", supplierArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();
@@ -492,11 +492,11 @@ class SupplierListComponent extends Component {
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        realms: response.data, loading: false
+                        realms: response.data
                     })
                 } else {
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode, loading: false
                     },
                         () => {
                             this.hideSecondComponent();
@@ -529,9 +529,9 @@ class SupplierListComponent extends Component {
                 console.log(response.data)
                 this.setState({
                     supplierList: response.data,
-                    selSource: response.data
+                    selSource: response.data, 
                 },
-                    () => { this.buildJexcel()})
+                    () => { this.buildJexcel() })
             })
     }
     formatLabel(cell, row) {
@@ -559,6 +559,8 @@ class SupplierListComponent extends Component {
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
                 }} />
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>

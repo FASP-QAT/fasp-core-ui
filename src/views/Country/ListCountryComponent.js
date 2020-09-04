@@ -435,10 +435,10 @@ export default class CountryListComponent extends Component {
             countryArray[count] = data;
             count++;
         }
-        if (countryList.length == 0) {
-            data = [];
-            countryArray[0] = data;
-        }
+        // if (countryList.length == 0) {
+        //     data = [];
+        //     countryArray[0] = data;
+        // }
         // console.log("countryArray---->", countryArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();
@@ -523,7 +523,7 @@ export default class CountryListComponent extends Component {
                 // })
                 this.setState({
                     countryList: response.data,
-                    selCountry: response.data, loading: false
+                    selCountry: response.data
                 },
                     () => {
                         this.buildJExcel();
@@ -533,7 +533,7 @@ export default class CountryListComponent extends Component {
             } else {
 
                 this.setState({
-                    message: response.data.messageCode
+                    message: response.data.messageCode, loading: false
                 },
                     () => {
                         this.hideSecondComponent();
@@ -571,7 +571,7 @@ export default class CountryListComponent extends Component {
     }
     selected = function (instance, cell, x, y, value) {
 
-        if (x == 0 && value != 0) {
+        if ((x == 0 && value != 0) || (y == 0)) {
             // console.log("HEADER SELECTION--------------------------");
         } else {
             // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
@@ -593,8 +593,13 @@ export default class CountryListComponent extends Component {
 
         return (
             <div className="animated">
+                {/* <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} /> */}
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
                 }} />
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>

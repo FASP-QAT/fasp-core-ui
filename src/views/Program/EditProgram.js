@@ -201,7 +201,8 @@ export default class EditProgram extends Component {
             healthAreaList: [],
             programManagerList: [],
             regionList: [],
-            message: ''
+            message: '',
+            loading: true
 
         }
 
@@ -211,10 +212,15 @@ export default class EditProgram extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.changeMessage = this.changeMessage.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.changeLoading = this.changeLoading.bind(this);
     }
 
     changeMessage(message) {
         this.setState({ message: message })
+    }
+
+    changeLoading(loading) {
+        this.setState({ loading: loading })
     }
     hideSecondComponent() {
         setTimeout(function () {
@@ -230,7 +236,7 @@ export default class EditProgram extends Component {
         AuthenticationService.setupAxiosInterceptors();
         ProgramService.getProgramById(this.props.match.params.programId).then(response => {
             this.setState({
-                program: response.data
+                program: response.data, loading: false
             })
             // initialValues = {
             //     programName: getLabelText(this.state.program.label, lang),
@@ -257,11 +263,11 @@ export default class EditProgram extends Component {
                     console.log("realm list---", response.data);
                     if (response.status == 200) {
                         this.setState({
-                            programManagerList: response.data
+                            programManagerList: response.data, loading: false
                         })
                     } else {
                         this.setState({
-                            message: response.data.messageCode
+                            message: response.data.messageCode, loading: false
                         },
                             () => {
                                 this.hideSecondComponent();
@@ -279,11 +285,11 @@ export default class EditProgram extends Component {
                             regList[i] = { value: json[i].regionId, label: getLabelText(json[i].label, this.state.lan) }
                         }
                         this.setState({
-                            regionList: regList
+                            regionList: regList, loading: false
                         })
                     } else {
                         this.setState({
-                            message: response.data.messageCode
+                            message: response.data.messageCode, loading: false
                         })
                     }
                 })
@@ -397,9 +403,9 @@ export default class EditProgram extends Component {
         return (
 
             <div className="animated fadeIn">
-                <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} />
+                <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} loading={this.changeLoading} />
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-                <Row>
+                <Row style={{ display: this.state.loading ? "none" : "block" }}>
                     <Col sm={12} md={8} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <Formik
@@ -425,13 +431,16 @@ export default class EditProgram extends Component {
                                 }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
+                                    this.setState({
+                                        loading: true
+                                    })
                                     AuthenticationService.setupAxiosInterceptors();
                                     ProgramService.editProgram(this.state.program).then(response => {
                                         if (response.status == 200) {
                                             this.props.history.push(`/program/listProgram/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                         } else {
                                             this.setState({
-                                                message: response.data.messageCode
+                                                message: response.data.messageCode, loading: false
                                             },
                                                 () => {
                                                     this.hideSecondComponent();
@@ -771,6 +780,17 @@ export default class EditProgram extends Component {
                         </Card>
                     </Col>
                 </Row>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
         );

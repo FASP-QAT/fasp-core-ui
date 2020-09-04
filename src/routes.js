@@ -248,10 +248,10 @@ const routes = [
   { path: '/pipeline/pieplineProgramSetup/:pipelineId', name: 'Pipeline Program Setup', component: pipelineProgramSetup },
   { path: '/pipeline/pipelineProgramImport', name: 'Pipeline Program Import', component: pipeline },
   { path: '/program/programOnboarding', name: 'Setup Program', component: ProgramOnboarding },
- 
+
   { path: '/inventory/addInventory/:programId/:versionId/:planningUnitId', name: i18n.t('static.dashboard.inventorydetails'), component: AddInventory },
-  { path: '/inventory/addInventory',name: i18n.t('static.dashboard.inventorydetails'), component: AddInventory,exact:true },
- 
+  { path: '/inventory/addInventory', name: i18n.t('static.dashboard.inventorydetails'), component: AddInventory, exact: true },
+
   { path: '/productCategory/productCategoryTree', name: 'Product Category', component: ProductCategoryTree },
   { path: '/productCategory/productCategoryTree/:color/:message', name: 'Product Category', component: ProductCategoryTree },
 
@@ -317,12 +317,12 @@ const routes = [
   { path: '/subFundingSource/listSubFundingSource', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.subfundingsource') }), component: ListSubFundingSource },
   { path: '/subFundingSource/editSubFundingSource/:subFundingSourceId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.subfundingsource') }), component: EditSubFundingSource },
   { path: '/subFundingSource/subFundingSourceList/:message', component: SubFundingSourceList },
-  { path: '/ApplicationDashboard/:id', name: i18n.t('static.dashboard.applicationdashboard'), component: ApplicationDashboard },
-  { path: '/ApplicationDashboard/:id/:color/:message', name: i18n.t('static.dashboard.applicationdashboard'), component: ApplicationDashboard },
+  { path: '/ApplicationDashboard/:id', exact: true, name: i18n.t('static.dashboard.applicationdashboard'), component: ApplicationDashboard },
+  { path: '/ApplicationDashboard/:id/:color/:message', exact: true, name: i18n.t('static.dashboard.applicationdashboard'), component: ApplicationDashboard },
   { path: '/ApplicationDashboard', exact: true, name: i18n.t('static.dashboard.applicationdashboard'), component: ApplicationDashboard },
   // { path: '/ApplicationDashboard/:message', component: ApplicationDashboard },
-  { path: '/ApplicationDashboard/:color/:message', name: i18n.t('static.dashboard.applicationdashboard'), component: ApplicationDashboard },
-  
+  { path: '/ApplicationDashboard/:color/:message', exact: true, name: i18n.t('static.dashboard.applicationdashboard'), component: ApplicationDashboard },
+
   { path: '/RealmDashboard', name: i18n.t('static.dashboard.realmdashboard'), component: RealmDashboard },
   { path: '/ProgramDashboard', name: i18n.t('static.dashboard.programdashboard'), component: ProgramDashboard },
   { path: '/dashboard', exact: true, name: i18n.t('static.common.dashboard'), component: Dashboard },
@@ -391,7 +391,7 @@ const routes = [
   // { path: '/masterDataSync', name: i18n.t('static.dashboard.masterdatasync'), component: MasterDataSync },
   // { path: '/masterDataSync/:message',  component: MasterDataSync },
 
-  { path: '/consumptionDetails',exact:true, name: i18n.t('static.dashboard.consumptiondetails'), component: ConsumptionDetails },
+  { path: '/consumptionDetails', exact: true, name: i18n.t('static.dashboard.consumptiondetails'), component: ConsumptionDetails },
 
   { path: '/language/addLanguage', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.languageheader') }), component: AddLanguage },
   { path: '/language/listLanguage', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.language') }), component: ListLanguage },
@@ -433,7 +433,7 @@ const routes = [
   { path: '/translations/databaseTranslations', name: i18n.t('static.label.databaseTranslations'), component: DatabaseTranslation },
   { path: '/translations/labelTranslations', name: i18n.t('static.label.labelTranslations'), component: LabelTranslation },
 
-  { path: '/supplyPlan',exact:true, name: i18n.t('static.dashboard.supplyPlan'), component: SupplyPlan },
+  { path: '/supplyPlan', exact: true, name: i18n.t('static.dashboard.supplyPlan'), component: SupplyPlan },
   { path: '/supplyPlan/:programId/:versionId/:planningUnitId', name: i18n.t('static.dashboard.supplyPlan'), component: SupplyPlan },
   { path: '/report/whatIf', name: i18n.t('static.dashboard.whatIf'), component: WhatIfReport },
   { path: '/shipment/manualTagging', name: i18n.t('static.dashboard.manualTagging'), component: ManualTagging },
@@ -561,7 +561,7 @@ const routes = [
   { path: '/apps/invoicing/invoice', name: 'Invoice', component: Invoice },
   { path: '/users', exact: true, name: 'Users', component: Users },
   { path: '/users/:id', exact: true, name: 'User Details', component: User },
-  { path: '/shipment/shipmentDetails', name: i18n.t('static.dashboard.shipmentdetails'), component: ShipmentList,exact:true },
+  { path: '/shipment/shipmentDetails', name: i18n.t('static.dashboard.shipmentdetails'), component: ShipmentList, exact: true },
   { path: '/report/warehouseCapacity', name: i18n.t('static.report.warehouseCapacity'), component: WarehouseCapacity },
   { path: '/report/stockStatusAccrossPlanningUnitGlobalView', name: i18n.t('static.report.stockStatusAccrossPlanningUnitGlobalView'), component: StockStatusAccrossPlanningUnitGlobalView },
   { path: '/report/stockAdjustment', name: i18n.t('static.report.stockAdjustment'), component: StockAdjustment },

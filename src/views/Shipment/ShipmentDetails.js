@@ -14,6 +14,7 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import ShipmentsInSupplyPlanComponent from "../SupplyPlan/ShipmentsInSupplyPlan";
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
+import AuthenticationService from "../Common/AuthenticationService.js";
 
 const entityname = i18n.t('static.dashboard.shipmentdetails');
 
@@ -23,6 +24,7 @@ export default class ShipmentDetails extends React.Component {
         super(props);
         this.options = props.options;
         this.state = {
+            loading: true,
             message: '',
             lang: localStorage.getItem("lang"),
             programList: [],
@@ -98,7 +100,8 @@ export default class ShipmentDetails extends React.Component {
                     }
                 }
                 this.setState({
-                    programList: proList
+                    programList: proList,
+                    loading: false
                 })
 
                 var programIdd = this.props.match.params.programId;
@@ -120,9 +123,10 @@ export default class ShipmentDetails extends React.Component {
         document.getElementById("planningUnit").value = "";
         this.setState({
             programSelect: value,
-            programId: value.value,
-            planningUnit:"",
-            planningUnitId:""
+            programId: value != "" && value != undefined ? value != "" && value != undefined ? value.value : 0 : 0,
+            planningUnit: "",
+            planningUnitId: "",
+            loading: true
         })
         var db1;
         var storeOS;
@@ -150,7 +154,7 @@ export default class ShipmentDetails extends React.Component {
                 var myResult = [];
                 myResult = planningunitRequest.result;
                 console.log("myResult", myResult);
-                var programId = (value.value).split("_")[0];
+                var programId = (value != "" && value != undefined ? value.value : 0).split("_")[0];
                 console.log('programId----->>>', programId)
                 console.log(myResult);
                 var proList = []
@@ -166,7 +170,8 @@ export default class ShipmentDetails extends React.Component {
                 console.log("proList---" + proList);
                 this.setState({
                     planningUnitList: proList,
-                    planningUnitListAll: myResult
+                    planningUnitListAll: myResult,
+                    loading: false
                 })
                 var planningUnitIdProp = this.props.match.params.planningUnitId;
                 console.log("planningUnitIdProp===>", planningUnitIdProp);
@@ -183,9 +188,10 @@ export default class ShipmentDetails extends React.Component {
     }
 
     formSubmit(value) {
+        this.setState({ loading: true })
         var programId = document.getElementById('programId').value;
-        this.setState({ programId: programId, planningUnitId: value.value, planningUnit: value });
-        var planningUnitId = value.value;
+        this.setState({ programId: programId, planningUnitId: value != "" && value != undefined ? value.value : 0, planningUnit: value });
+        var planningUnitId = value != "" && value != undefined ? value.value : 0;
         var programId = document.getElementById("programId").value;
         var db1;
         getDatabase();
@@ -218,7 +224,8 @@ export default class ShipmentDetails extends React.Component {
                 this.setState({
                     shipmentListUnFiltered: shipmentListUnFiltered
                 })
-                var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == value.value);
+                var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == (value != "" && value != undefined ? value.value : 0));
+                console.log("Shipment list", shipmentList);
                 this.setState({
                     shelfLife: programPlanningUnit.shelfLife,
                     programJson: programJson,
@@ -226,13 +233,14 @@ export default class ShipmentDetails extends React.Component {
                     shipmentList: shipmentList,
                     showShipments: 1,
                 })
-
+                this.refs.shipmentChild.showShipmentData();
             }.bind(this)
         }.bind(this)
     }
 
     cancelClicked() {
-        this.props.history.push(`/ApplicationDashboard/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
+        let id = AuthenticationService.displayDashboardBasedOnRole();
+        this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
     toggleLarge() {
@@ -267,17 +275,19 @@ export default class ShipmentDetails extends React.Component {
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
                 }} />
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 className={this.state.color} id="div1">{i18n.t(this.state.message, { entityname })}</h5>
-                <Card>
-                    <CardBody className="pb-lg-2 pt-lg-2">
+                <Card style={{ display: this.state.loading ? "none" : "block" }}>
+                    <CardBody className="pb-lg-5 pt-lg-2">
                         <Formik
                             render={
                                 ({
                                 }) => (
                                         <Form name='simpleForm'>
-                                            <Col md="12 pl-0">
+                                            <Col md="10 pl-0">
                                                 <div className="row">
                                                     <FormGroup className="col-md-4">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
@@ -313,7 +323,7 @@ export default class ShipmentDetails extends React.Component {
                                     )} />
 
                         <Col xs="12" sm="12" className="p-0">
-                            {this.state.showShipments == 1 && <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} updateState={this.updateState} toggleLarge={this.toggleLarge} shipmentPage="shipmentDataEntry" />}
+                            {this.state.showShipments == 1 && <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} updateState={this.updateState} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} shipmentPage="shipmentDataEntry" />}
                             <h6 className="red">{this.state.noFundsBudgetError || this.state.shipmentBatchError || this.state.shipmentError || this.state.supplyPlanError}</h6>
                             <div className="table-responsive">
                                 <div id="shipmentsDetailsTable" />
@@ -349,7 +359,7 @@ export default class ShipmentDetails extends React.Component {
                         </div>
                         <h6 className="red">{this.state.shipmentBatchInfoDuplicateError || this.state.shipmentValidationBatchError}</h6>
                         <div className="table-responsive">
-                            <div id="shipmentBatchInfoTable"></div>
+                            <div id="shipmentBatchInfoTable" className="AddListbatchtrHeight"></div>
                         </div>
 
                     </ModalBody>
@@ -367,6 +377,17 @@ export default class ShipmentDetails extends React.Component {
                     </ModalFooter>
                 </Modal>
                 {/* Shipments modal */}
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }

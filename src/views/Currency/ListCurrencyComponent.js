@@ -390,10 +390,10 @@ export default class CurrencyListComponent extends Component {
                             currencyArray[count] = data;
                             count++;
                         }
-                        if (currencyList.length == 0) {
-                            data = [];
-                            currencyArray[0] = data;
-                        }
+                        // if (currencyList.length == 0) {
+                        //     data = [];
+                        //     currencyArray[0] = data;
+                        // }
                         // console.log("currencyArray---->", currencyArray);
                         this.el = jexcel(document.getElementById("tableDiv"), '');
                         this.el.destroy();
@@ -465,7 +465,7 @@ export default class CurrencyListComponent extends Component {
             } else {
 
                 this.setState({
-                    message: response.data.messageCode
+                    message: response.data.messageCode, loading: false
                 },
                     () => {
                         this.hideSecondComponent();
@@ -506,7 +506,7 @@ export default class CurrencyListComponent extends Component {
     }
     selected = function (instance, cell, x, y, value) {
 
-        if (x == 0 && value != 0) {
+        if ((x == 0 && value != 0) || (y == 0)) {
             // console.log("HEADER SELECTION--------------------------");
         } else {
             if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_CURRENCY')) {
@@ -552,6 +552,8 @@ export default class CurrencyListComponent extends Component {
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
                 }} />
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
@@ -567,7 +569,7 @@ export default class CurrencyListComponent extends Component {
                     </div>
                     <CardBody className="table-responsive pt-md-1 pb-md-1">
                         {/* <div id="loader" className="center"></div> */}
-                        <div id="tableDiv"  className="jexcelremoveReadonlybackground"></div>
+                        <div id="tableDiv" className="jexcelremoveReadonlybackground"></div>
                     </CardBody>
                 </Card>
                 <div style={{ display: this.state.loading ? "block" : "none" }}>

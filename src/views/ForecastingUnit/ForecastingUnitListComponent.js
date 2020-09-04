@@ -557,7 +557,7 @@ export default class ForecastingUnitListComponent extends Component {
         this.buildJexcel = this.buildJexcel.bind(this);
     }
     buildJexcel() {
-         let forecastingUnitList = this.state.selSource;
+        let forecastingUnitList = this.state.selSource;
         // console.log("forecastingUnitList---->", forecastingUnitList);
         let forecastingUnitListArray = [];
         let count = 0;
@@ -576,10 +576,10 @@ export default class ForecastingUnitListComponent extends Component {
             forecastingUnitListArray[count] = data;
             count++;
         }
-        if (forecastingUnitList.length == 0) {
-            data = [];
-            forecastingUnitListArray[0] = data;
-        }
+        // if (forecastingUnitList.length == 0) {
+        //     data = [];
+        //     forecastingUnitListArray[0] = data;
+        // }
         // console.log("forecastingUnitListArray---->", forecastingUnitListArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();
@@ -589,7 +589,7 @@ export default class ForecastingUnitListComponent extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [150, 150, 100],
+            colWidths: [150, 60, 100, 60, 60, 60, 100, 60],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
@@ -654,7 +654,7 @@ export default class ForecastingUnitListComponent extends Component {
             allowManualInsertColumn: false,
             allowDeleteRow: false,
             onselection: this.selected,
-             oneditionend: this.onedit,
+            oneditionend: this.onedit,
             copyCompatibility: true,
             allowExport: false,
             paginationOptions: [10, 25, 50],
@@ -690,22 +690,26 @@ export default class ForecastingUnitListComponent extends Component {
     }
 
     filterDataForRealm() {
+        this.setState({ loading: true })
         let realmId = document.getElementById("realmId").value;
+        console.log("realmId---", realmId)
+        this.getProductCategories();
         ForecastingUnitService.getForcastingUnitByRealmId(realmId).then(response => {
             if (response.status == 200) {
                 console.log("response------->" + response);
                 this.setState({
                     forecastingUnitList: response.data,
-                    selSource: response.data
+                    selSource: response.data,
+                    loading: false
                 },
-                () => {
-                    this.buildJexcel();
-                })
+                    () => {
+                        this.buildJexcel();
+                    })
             }
             else {
 
                 this.setState({
-                    message: response.data.messageCode
+                    message: response.data.messageCode, loading: false
                 },
                     () => {
                         this.hideSecondComponent();
@@ -741,13 +745,15 @@ export default class ForecastingUnitListComponent extends Component {
         //     });
         // } else 
         if (productCategoryId != 0 && tracerCategoryId != 0) {
+            this.setState({ loading: true })
             const selSource = this.state.forecastingUnitList.filter(c => c.tracerCategory.id == tracerCategoryId && c.productCategory.id == productCategoryId)
             this.setState({
-                selSource
+                selSource,
+                loading: false
             },
-            () => {
-                this.buildJexcel();
-            })
+                () => {
+                    this.buildJexcel();
+                })
         }
         // else if (realmId != 0) {
         //     const selSource = this.state.forecastingUnitList.filter(c => c.realm.id == realmId)
@@ -762,24 +768,24 @@ export default class ForecastingUnitListComponent extends Component {
             this.setState({
                 selSource
             },
-            () => {
-                this.buildJexcel();
-            })
+                () => {
+                    this.buildJexcel();
+                })
         } else if (tracerCategoryId != 0) {
             const selSource = this.state.forecastingUnitList.filter(c => c.tracerCategory.id == tracerCategoryId)
             this.setState({
                 selSource
             },
-            () => {
-                this.buildJexcel();
-            })
+                () => {
+                    this.buildJexcel();
+                })
         } else {
             this.setState({
                 selSource: this.state.forecastingUnitList
             },
-            () => {
-                this.buildJexcel();
-            })
+                () => {
+                    this.buildJexcel();
+                })
         }
     }
     getProductCategories() {
@@ -788,8 +794,6 @@ export default class ForecastingUnitListComponent extends Component {
         ProductService.getProductCategoryList(realmId)
             .then(response => {
                 console.log("product category list---", JSON.stringify(response.data))
-
-
                 this.setState({
                     productCategories: response.data
                 })
@@ -806,30 +810,30 @@ export default class ForecastingUnitListComponent extends Component {
                         realms: response.data,
                         realmId: response.data[0].realmId, loading: false
                     })
-                    this.getProductCategories();
-                    ForecastingUnitService.getForcastingUnitByRealmId(this.state.realmId).then(response => {
-                        console.log("response------->" + response);
-                        if (response.status == 200) {
-                            this.setState({
-                                forecastingUnitList: response.data,
-                                selSource: response.data
-                            })
-                        } else {
-                            this.setState({
-                                message: response.data.messageCode
-                            },
-                                () => {
-                                    this.hideSecondComponent();
-                                })
-                        }
+                    // this.getProductCategories();
+                    // ForecastingUnitService.getForcastingUnitByRealmId(this.state.realmId).then(response => {
+                    //     console.log("response------->" + response);
+                    //     if (response.status == 200) {
+                    //         this.setState({
+                    //             forecastingUnitList: response.data,
+                    //             selSource: response.data
+                    //         })
+                    //     } else {
+                    //         this.setState({
+                    //             message: response.data.messageCode
+                    //         },
+                    //             () => {
+                    //                 this.hideSecondComponent();
+                    //             })
+                    //     }
 
 
-                    })
+                    // })
 
                 } else {
 
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode, loading: false
                     },
                         () => {
                             this.hideSecondComponent();
@@ -846,7 +850,7 @@ export default class ForecastingUnitListComponent extends Component {
                     })
                 } else {
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode, loading: false
                     },
                         () => {
                             this.hideSecondComponent();
@@ -860,11 +864,12 @@ export default class ForecastingUnitListComponent extends Component {
             if (response.status == 200) {
                 this.setState({
                     forecastingUnitList: response.data,
-                    selSource: response.data
+                    selSource: response.data,
+                    loading: false
                 })
             } else {
                 this.setState({
-                    message: response.data.messageCode
+                    message: response.data.messageCode, loading: false
                 },
                     () => {
                         this.hideSecondComponent();
@@ -877,7 +882,7 @@ export default class ForecastingUnitListComponent extends Component {
     }
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
-        }
+    }
 
     editForecastingUnit(forecastingUnit) {
         if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_FORECASTING_UNIT')) {
@@ -888,10 +893,10 @@ export default class ForecastingUnitListComponent extends Component {
         }
     }
     selected = function (instance, cell, x, y, value) {
-        if (x == 0 && value != 0) {
+        if ((x == 0 && value != 0) || (y == 0)) {
             // console.log("HEADER SELECTION--------------------------");
         } else {
-            if( this.state.selSource.length != 0 ){
+            if (this.state.selSource.length != 0) {
                 if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_ROLE')) {
                     this.props.history.push({
                         pathname: `/forecastingUnit/editForecastingUnit/${this.el.getValueFromCoords(0, x)}`,
@@ -950,6 +955,8 @@ export default class ForecastingUnitListComponent extends Component {
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
                 }} />
                 <h5 className={this.props.match.params.color} id="div1"><strong></strong>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
@@ -964,72 +971,72 @@ export default class ForecastingUnitListComponent extends Component {
 
                     </div>
                     <CardBody className="pb-lg-5">
-                       
-                            <Col md="9 pl-0">
-                                <div className="d-md-flex  Selectdiv2">
-                                    <FormGroup className="mt-md-2 mb-md-0 "> 
-                                        <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
-                                        <div className="controls SelectField">
-                                            <InputGroup>
-                                                <Input
-                                                    type="select"
-                                                    name="realmId"
-                                                    id="realmId"
-                                                    bsSize="sm"
-                                                // onChange={this.filterDataForRealm}
-                                                >
-                                                    <option value="-1">{i18n.t('static.common.all')}</option>
 
-                                                    {realmList}
-                                                </Input>
-                                                <InputGroupAddon addonType="append">
-                                                    <Button color="secondary Gobtn btn-sm" onClick={this.filterDataForRealm}>{i18n.t('static.common.go')}</Button>
-                                                </InputGroupAddon>
-                                            </InputGroup>
-                                        </div>
-                                    </FormGroup>
-                                    
-                                    <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
-                                        <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
-                                        <div className="controls SelectField">
-                                            <InputGroup>
-                                                <Input
-                                                    type="select"
-                                                    name="productCategoryId"
-                                                    id="productCategoryId"
-                                                    bsSize="sm"
-                                                >
-                                                    {/* <option value="0">{i18n.t('static.common.all')}</option> */}
-                                                    {productCategoryList}
-                                                </Input>
+                        <Col md="9 pl-0">
+                            <div className="d-md-flex  Selectdiv2">
+                                <FormGroup className="mt-md-2 mb-md-0 ">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
+                                    <div className="controls SelectField">
+                                        <InputGroup>
+                                            <Input
+                                                type="select"
+                                                name="realmId"
+                                                id="realmId"
+                                                bsSize="sm"
+                                            // onChange={this.filterDataForRealm}
+                                            >
+                                                <option value="-1">{i18n.t('static.common.all')}</option>
 
-                                            </InputGroup>
-                                        </div>
-                                    </FormGroup>
-                                    <FormGroup className="tab-ml-1 mt-md-2 mb-md-0">
-                                        <Label htmlFor="appendedInputButton">{i18n.t('static.tracercategory.tracercategory')}</Label>
-                                        <div className="controls SelectField ">
-                                            <InputGroup>
-                                                <Input
-                                                    type="select"
-                                                    name="tracerCategoryId"
-                                                    id="tracerCategoryId"
-                                                    bsSize="sm"
-                                                >
-                                                    <option value="0">{i18n.t('static.common.all')}</option>
-                                                    {tracercategoryList}
-                                                </Input>
-                                                <InputGroupAddon addonType="append">
-                                                    <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
-                                                </InputGroupAddon>
-                                            </InputGroup>
-                                        </div>
-                                    </FormGroup>
-                                </div>
-                               
-                            </Col>
-                            {/* <div className="SearchMarginTopLarge"> */}
-                            <div id="tableDiv" className="jexcelremoveReadonlybackground"> </div>
+                                                {realmList}
+                                            </Input>
+                                            <InputGroupAddon addonType="append">
+                                                <Button color="secondary Gobtn btn-sm" onClick={this.filterDataForRealm}>{i18n.t('static.common.go')}</Button>
+                                            </InputGroupAddon>
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
+
+                                <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
+                                    <div className="controls SelectField">
+                                        <InputGroup>
+                                            <Input
+                                                type="select"
+                                                name="productCategoryId"
+                                                id="productCategoryId"
+                                                bsSize="sm"
+                                            >
+                                                {/* <option value="0">{i18n.t('static.common.all')}</option> */}
+                                                {productCategoryList}
+                                            </Input>
+
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
+                                <FormGroup className="tab-ml-1 mt-md-2 mb-md-0">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.tracercategory.tracercategory')}</Label>
+                                    <div className="controls SelectField ">
+                                        <InputGroup>
+                                            <Input
+                                                type="select"
+                                                name="tracerCategoryId"
+                                                id="tracerCategoryId"
+                                                bsSize="sm"
+                                            >
+                                                <option value="0">{i18n.t('static.common.all')}</option>
+                                                {tracercategoryList}
+                                            </Input>
+                                            <InputGroupAddon addonType="append">
+                                                <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
+                                            </InputGroupAddon>
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
+                            </div>
+
+                        </Col>
+                        {/* <div className="SearchMarginTopLarge"> */}
+                        <div id="tableDiv" className="jexcelremoveReadonlybackground"> </div>
                         {/* </div> */}
 
                     </CardBody>

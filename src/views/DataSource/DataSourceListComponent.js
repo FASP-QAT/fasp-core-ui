@@ -583,20 +583,20 @@ export default class DataSourceListComponent extends Component {
             this.setState({
                 selSource
             },
-            () => { this.buildJexcel()});
+                () => { this.buildJexcel() });
         } else if (realmId != 0 && dataSourceTypeId != 0) {
             const selSource = this.state.dataSourceList.filter(c => c.realm.id == realmId && c.dataSourceType.id == dataSourceTypeId)
             this.setState({
                 selSource
             },
-            () => { this.buildJexcel()});
+                () => { this.buildJexcel() });
         } else if (realmId != 0 && programId != 0) {
             const selSource = this.state.dataSourceList.filter(c => c.realm.id == realmId && c.program.id == programId)
 
             this.setState({
                 selSource
             },
-            () => { this.buildJexcel()});
+                () => { this.buildJexcel() });
         } else if (dataSourceTypeId != 0 && programId != 0) {
             const selSource = this.state.dataSourceList.filter(c => c.program.id == programId && c.dataSourceType.id == dataSourceTypeId)
             this.setState({
@@ -607,29 +607,29 @@ export default class DataSourceListComponent extends Component {
             this.setState({
                 selSource
             },
-            () => { this.buildJexcel()});
+                () => { this.buildJexcel() });
         } else if (dataSourceTypeId != 0) {
             const selSource = this.state.dataSourceList.filter(c => c.dataSourceType.id == dataSourceTypeId)
             this.setState({
                 selSource
             },
-            () => { this.buildJexcel()});
+                () => { this.buildJexcel() });
         } else if (programId != 0) {
             const selSource = this.state.dataSourceList.filter(c => c.program.id == programId)
             this.setState({
                 selSource
             },
-            () => { this.buildJexcel()});
+                () => { this.buildJexcel() });
         } else {
             this.setState({
                 selSource: this.state.dataSourceList
             },
-            () => { this.buildJexcel()});
+                () => { this.buildJexcel() });
         }
 
     }
     buildJexcel() {
-         let dataSourceList = this.state.selSource;
+        let dataSourceList = this.state.selSource;
         // console.log("dataSourceList---->", dataSourceList);
         let dataSourceArray = [];
         let count = 0;
@@ -645,10 +645,10 @@ export default class DataSourceListComponent extends Component {
             dataSourceArray[count] = data;
             count++;
         }
-        if (dataSourceList.length == 0) {
-            data = [];
-            dataSourceArray[0] = data;
-        }
+        // if (dataSourceList.length == 0) {
+        //     data = [];
+        //     dataSourceArray[0] = data;
+        // }
         // console.log("dataSourceArray---->", dataSourceArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();
@@ -743,7 +743,7 @@ export default class DataSourceListComponent extends Component {
                 else {
 
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode, loading: false
                     },
                         () => {
                             this.hideSecondComponent();
@@ -776,10 +776,10 @@ export default class DataSourceListComponent extends Component {
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        realms: response.data
+                        realms: response.data, loading: false
                     })
                 } else {
-                    this.setState({ message: response.data.messageCode })
+                    this.setState({ message: response.data.messageCode, loading: false })
                 }
             })
         // .catch(
@@ -806,7 +806,7 @@ export default class DataSourceListComponent extends Component {
         DataSourceTypeService.getDataSourceTypeList().then(response => {
             console.log(response.data)
             this.setState({
-                dataSourceTypes: response.data,
+                dataSourceTypes: response.data, loading: false
 
             })
         })
@@ -837,8 +837,8 @@ export default class DataSourceListComponent extends Component {
             //     selSource: response.data
             // })
             this.setState({
-                dataSourceList: response.data, selSource: response.data
-            },() => { this.buildJexcel()})
+                dataSourceList: response.data, selSource: response.data, loading: false
+            }, () => { this.buildJexcel() })
         })
 
     }
@@ -854,8 +854,9 @@ export default class DataSourceListComponent extends Component {
             });
         }
     }
+    
     selected = function (instance, cell, x, y, value) {
-         if (x == 0 && value != 0) {
+        if ((x == 0 && value != 0) || (y == 0)) {
             // console.log("HEADER SELECTION--------------------------");
         } else {
             if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_CURRENCY')) {
@@ -923,6 +924,8 @@ export default class DataSourceListComponent extends Component {
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
                 }} />
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>

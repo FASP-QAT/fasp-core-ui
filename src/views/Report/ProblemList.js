@@ -639,6 +639,7 @@ import getProblemDesc from '../../CommonComponent/getProblemDesc';
 import getSuggestion from '../../CommonComponent/getSuggestion';
 import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
+import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 
 import QatProblemActions from '../../CommonComponent/QatProblemActions'
@@ -796,10 +797,10 @@ export default class ConsumptionDetails extends React.Component {
             problemArray[count] = data;
             count++;
         }
-        if (problemList.length == 0) {
-            data = [];
-            problemArray[0] = data;
-        }
+        // if (problemList.length == 0) {
+        //     data = [];
+        //     problemArray[0] = data;
+        // }
         // console.log("problemArray---->", problemArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();
@@ -809,7 +810,7 @@ export default class ConsumptionDetails extends React.Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [150, 150, 100],
+            colWidths: [10, 10, 50, 50, 10, 10, 10, 50, 200, 200, 50, 50],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
@@ -903,16 +904,22 @@ export default class ConsumptionDetails extends React.Component {
                     for (var i = 0; i < colArr.length; i++) {
                         elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
                         elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', '#f48282');
+                        let textColor = contrast('#f48282');
+                        elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'color', textColor);
                     }
                 } else if (criticalityId == 2 && problemStatusId == 1) {
                     for (var i = 0; i < colArr.length; i++) {
                         elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
                         elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'orange');
+                        let textColor = contrast('orange');
+                        elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'color', textColor);
                     }
                 } else if (criticalityId == 1 && problemStatusId == 1) {
                     for (var i = 0; i < colArr.length; i++) {
                         elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
                         elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'yellow');
+                        let textColor = contrast('yellow');
+                        elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'color', textColor);
                     }
                 }
 
@@ -951,9 +958,9 @@ export default class ConsumptionDetails extends React.Component {
                                 var versionId = this.el.getValueFromCoords(3, y)
 
                                 // if (this.el.getValueFromCoords(14, y) != 2) {
-                                    this.props.history.push({
-                                        pathname: `${this.el.getValueFromCoords(15, y)}/${programId}/${versionId}/${planningunitId}`,
-                                    });
+                                this.props.history.push({
+                                    pathname: `${this.el.getValueFromCoords(15, y)}/${programId}/${versionId}/${planningunitId}`,
+                                });
                                 // } else {
                                 //     this.props.history.push({
                                 //         pathname: `${this.el.getValueFromCoords(15, y)}`,
@@ -972,18 +979,18 @@ export default class ConsumptionDetails extends React.Component {
         var languageEl = jexcel(document.getElementById("tableDiv"), options);
         this.el = languageEl;
         this.setState({
-            languageEl: languageEl
+          loading:false,languageEl: languageEl
         })
     }
 
     selected = function (instance, cell, x, y, value) {
 
-        if (x == 0 && value != 0) {
+        if ((x == 0 && value != 0) || (y == 0)) {
             // console.log("HEADER SELECTION--------------------------");
         } else {
             // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
             if (this.state.data.length != 0) {
-                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_BUDGET')) {
+                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROBLEM')) {
                     let problemStatusId = document.getElementById('problemStatusId').value;
                     let problemTypeId = document.getElementById('problemTypeId').value;
                     // console.log("problemReportId--------------------------", this.el.getValueFromCoords(0, x));
@@ -1003,7 +1010,7 @@ export default class ConsumptionDetails extends React.Component {
     fetchData() {
         this.setState({
             data: [],
-            message: ''
+            message: '',loading:true
         },
             () => {
                 this.el = jexcel(document.getElementById("tableDiv"), '');
@@ -1022,14 +1029,23 @@ export default class ConsumptionDetails extends React.Component {
             var procurementAgentList = [];
             var fundingSourceList = [];
             var budgetList = [];
+            openRequest.onerror = function (event) {
+                this.setState({ loading:false });
+            };
             openRequest.onsuccess = function (e) {
                 db1 = e.target.result;
 
                 var transaction = db1.transaction(['programData'], 'readwrite');
                 var programTransaction = transaction.objectStore('programData');
                 var programRequest = programTransaction.get(programId);
-
+                programRequest.onerror = function (event) {
+                    this.setState({ loading:false });
+                };
                 programRequest.onsuccess = function (event) {
+                     this.setState({loading:true},
+                        () => {
+                           console.log("callback")
+                        })
                     var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                     var programJson = JSON.parse(programData);
@@ -1080,12 +1096,14 @@ export default class ConsumptionDetails extends React.Component {
     }
 
     editProblem(problem, index) {
-        let problemStatusId = document.getElementById('problemStatusId').value;
-        let problemTypeId = document.getElementById('problemTypeId').value;
-        this.props.history.push({
-            pathname: `/report/editProblem/${problem.problemReportId}/ ${this.state.programId}/${problem.problemActionIndex}/${problemStatusId}/${problemTypeId}`,
-            // state: { language }
-        });
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROBLEM')) {
+            let problemStatusId = document.getElementById('problemStatusId').value;
+            let problemTypeId = document.getElementById('problemTypeId').value;
+            this.props.history.push({
+                pathname: `/report/editProblem/${problem.problemReportId}/ ${this.state.programId}/${problem.problemActionIndex}/${problemStatusId}/${problemTypeId}`,
+                // state: { language }
+            });
+        }
 
     }
 
@@ -1111,12 +1129,12 @@ export default class ConsumptionDetails extends React.Component {
         var versionId = row.versionId
         event.stopPropagation();
         // if (row.realmProblem.problem.problemId != 2) {
-            alert(`${cell}/${programId}/${versionId}/${planningunitId}`);
-            this.props.history.push({
-                // pathname: `/programProduct/addProgramProduct/${cell}`,
-                // pathname: `/report/addProblem`,
-                pathname: `${cell}/${programId}/${versionId}/${planningunitId}`,
-            });
+        alert(`${cell}/${programId}/${versionId}/${planningunitId}`);
+        this.props.history.push({
+            // pathname: `/programProduct/addProgramProduct/${cell}`,
+            // pathname: `/report/addProblem`,
+            pathname: `${cell}/${programId}/${versionId}/${planningunitId}`,
+        });
         // } else {
         //     this.props.history.push({
         //         pathname: `${cell}`,
@@ -1332,14 +1350,15 @@ export default class ConsumptionDetails extends React.Component {
                     <div className="Card-header-addicon">
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addMannualProblem}><i className="fa fa-plus-square"></i></a>
+
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_PROBLEM') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addMannualProblem}><i className="fa fa-plus-square"></i></a>}
                             </div>
                         </div>
                     </div>
                     <CardBody className="pb-lg-5 ">
                         <Col md="9 pl-1">
                             <div className="d-md-flex Selectdiv2">
-                                <FormGroup  className="mt-md-2 mb-md-0 ">
+                                <FormGroup className="mt-md-2 mb-md-0 ">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                     <div className="controls SelectField">
                                         <InputGroup>
@@ -1394,8 +1413,8 @@ export default class ConsumptionDetails extends React.Component {
                             </div>
                         </Col>
                         {/* <div className="ProgramListSearch"> */}
-                            <div id="tableDiv" className="jexcelremoveReadonlybackground">
-                            </div>
+                        <div id="tableDiv" className="jexcelremoveReadonlybackground">
+                        </div>
                         {/* </div> */}
                     </CardBody>
 

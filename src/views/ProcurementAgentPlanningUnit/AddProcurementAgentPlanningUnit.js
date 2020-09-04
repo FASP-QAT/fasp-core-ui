@@ -1019,7 +1019,8 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                         oneditionend: this.onedit,
                                                         copyCompatibility: true,
                                                         text: {
-                                                            showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                                                            // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                                                            showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
                                                             show: '',
                                                             entries: '',
                                                         },
@@ -1318,6 +1319,9 @@ export default class AddProcurementAgentPlanningUnit extends Component {
         var validation = this.checkValidation();
 
         if (validation == true && duplicateValidation == true) {
+            this.setState({
+                loading: false
+            })
             var tableJson = this.el.getJson();
             let changedpapuList = [];
             for (var i = 0; i < tableJson.length; i++) {
@@ -1353,7 +1357,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                         this.props.history.push(`/procurementAgent/listProcurementAgent/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                     } else {
                         this.setState({
-                            message: response.data.messageCode
+                            message: response.data.messageCode,loading:false
                         },
                             () => {
                                 this.hideSecondComponent();
@@ -1363,7 +1367,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                 }).catch(
                     error => {
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
+                            this.setState({ message: error.message,loading:false });
                         } else {
                             switch (error.response ? error.response.status : "") {
                                 case 500:
@@ -1371,10 +1375,10 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                 case 404:
                                 case 406:
                                 case 412:
-                                    this.setState({ message: error.response.data.messageCode });
+                                    this.setState({ message: error.response.data.messageCode,loading:false });
                                     break;
                                 default:
-                                    this.setState({ message: 'static.unkownError' });
+                                    this.setState({ message: 'static.unkownError',loading:false });
                                     console.log("Error code unkown");
                                     break;
                             }

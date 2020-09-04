@@ -48,7 +48,8 @@ class Program extends Component {
             message: '',
             color: '',
             lang: localStorage.getItem('lang'),
-            realmId: AuthenticationService.getRealmId()
+            realmId: AuthenticationService.getRealmId(),
+            loading: true
         };
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
     }
@@ -75,17 +76,18 @@ class Program extends Component {
                 .then(response => {
                     if (response.status == 200) {
                         this.setState({
-                            realmList: response.data
+                            realmList: response.data,
+                            loading: false
                         })
                     } else {
                         this.setState({
-                            message: response.data.messageCode
+                            message: response.data.messageCode, loading: false
                         })
                     }
                 }).catch(
                     error => {
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
+                            this.setState({ message: error.message, loading: false });
                         } else {
                             switch (error.response.status) {
                                 case 500:
@@ -93,10 +95,10 @@ class Program extends Component {
                                 case 404:
                                 case 406:
                                 case 412:
-                                    this.setState({ message: error.response.data.messageCode });
+                                    this.setState({ message: error.response.data.messageCode, loading: false });
                                     break;
                                 default:
-                                    this.setState({ message: 'static.unkownError' });
+                                    this.setState({ message: 'static.unkownError', loading: false });
                                     console.log("Error code unkown");
                                     break;
                             }
@@ -106,7 +108,7 @@ class Program extends Component {
         } else {
             document.getElementById("realmDiv").style.display = "none"
             this.setState({
-                realmId: AuthenticationService.getRealmId()
+                realmId: AuthenticationService.getRealmId(), loading: false
             })
             this.getTree();
         }
@@ -224,8 +226,10 @@ class Program extends Component {
         } else {
             document.getElementById("treeDiv").style.display = "none";
             this.setState({
-                message: i18n.t('static.common.realmtext')
+                message: i18n.t('static.common.realmtext'),
+                color: "red"
             })
+            this.hideFirstComponent()
         }
     }
 
@@ -265,8 +269,10 @@ class Program extends Component {
                 {/* <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5> */}
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
                 }} />
-                <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
+                <h5 >{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 className={this.state.color} id="div1">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
@@ -381,10 +387,12 @@ class Program extends Component {
     }
 
     cancelClicked() {
-        this.props.history.push(`/ApplicationDashboard/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
+        let id = AuthenticationService.displayDashboardBasedOnRole();
+        this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
     downloadClicked() {
+        this.setState({ loading: true })
         var programCheckboxes = document.getElementsByName("programCheckBox");
         var checkboxesChecked = [];
         var programCheckedCount = 0;
@@ -438,7 +446,8 @@ class Program extends Component {
         }
         if (programCheckedCount == 0) {
             this.setState({
-                message: i18n.t('static.program.errorSelectAtleastOneProgram')
+                message: i18n.t('static.program.errorSelectAtleastOneProgram'),
+                loading: false
             },
                 () => {
                     this.hideSecondComponent();
@@ -467,7 +476,7 @@ class Program extends Component {
                             console.log("Version", version)
                             var db1;
                             getDatabase();
-                            var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
+                            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                             openRequest.onsuccess = function (e) {
                                 db1 = e.target.result;
                                 var transaction = db1.transaction(['programData'], 'readwrite');
@@ -537,7 +546,8 @@ class Program extends Component {
                                             console.log("in transaction complete");
                                             this.setState({
                                                 message: 'static.program.downloadsuccess',
-                                                color: 'green'
+                                                color: 'green',
+                                                loading: false
                                             })
                                             this.hideFirstComponent();
                                             // this.props.history.push(`/dashboard/`+'green/' + i18n.t('static.program.downloadsuccess'))
@@ -599,10 +609,10 @@ class Program extends Component {
                                                         // }
                                                         transactionForOverwriteDownloadedProgramData.oncomplete = function (event) {
                                                             // this.props.history.push(`/dashboard/` + 'green/' + "Program downloaded successfully.")
-
                                                             this.setState({
                                                                 message: 'static.program.downloadsuccess',
-                                                                color: 'green'
+                                                                color: 'green',
+                                                                loading: false
                                                             })
                                                             this.hideFirstComponent();
                                                             this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.downloadsuccess'))
@@ -617,7 +627,7 @@ class Program extends Component {
                                                     label: i18n.t('static.program.no'),
                                                     onClick: () => {
                                                         this.setState({
-                                                            message: i18n.t('static.program.actioncancelled')
+                                                            message: i18n.t('static.program.actioncancelled'), loading: false
                                                         })
                                                         this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.actioncancelled'))
                                                     }
@@ -631,7 +641,7 @@ class Program extends Component {
                         .catch(
                             error => {
                                 if (error.message === "Network Error") {
-                                    this.setState({ message: error.message });
+                                    this.setState({ message: error.message, loading: false });
                                 } else {
                                     switch (error.response ? error.response.status : "") {
                                         case 500:
@@ -639,10 +649,10 @@ class Program extends Component {
                                         case 404:
                                         case 406:
                                         case 412:
-                                            this.setState({ message: error.response.data.messageCode });
+                                            this.setState({ message: error.response.data.messageCode, loading: false });
                                             break;
                                         default:
-                                            this.setState({ message: 'static.unkownError' });
+                                            this.setState({ message: 'static.unkownError', loading: false });
                                             console.log("Error code unkown");
                                             break;
                                     }
@@ -664,6 +674,7 @@ class Program extends Component {
                         )
 
                 } else {
+                    this.setState({ loading: false })
                     alert(i18n.t('static.common.online'))
                 }
             }

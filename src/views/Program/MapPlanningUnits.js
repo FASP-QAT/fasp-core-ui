@@ -25,9 +25,26 @@ export default class MapPlanningUnits extends Component {
 
     addRow = function () {
         console.log("add row called");
-        this.el.insertRow();
+        var data = [];
+        // data[0] = 0;
+        // data[1] = "";
+        // data[2] = "";
+        // data[3] = "";
+        // data[4] = "";
+        // data[5] = "";
+        // data[6] = "";
+        // data[7] = "";
+        // data[8] = 0;
+        // data[9] = 0;
+        // data[10] = 1;
+        // data[11] = 1;
+        // data[12] = this.props.match.params.programId;
+        this.el.insertRow(
+            data, 0, 1
+        );
+        // this.el.insertRow();
         console.log("insert row called");
-        var json = this.el.getJson();
+        var json = this.el.getJson()
     }
 
     checkValidation() {
@@ -442,10 +459,25 @@ export default class MapPlanningUnits extends Component {
                                     list.push(planningUnitJson);
                                 }
 
+                                var productDataArr = []
+                                // if (productDataArr.length == 0) {
+                                data = [];
+                                data[0] = "";
+                                data[1] = "";
+                                data[2] = "";
+                                data[3] = "";
+                                data[4] = "";
+                                data[5] = "";
+                                data[6] = "";
+                                data[7] = "";
+                                data[8] = "";
+                                productDataArr[0] = data;
+                                // }
+
                                 this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
                                 this.el.destroy();
                                 var json = [];
-                                var data = [{}];
+                                var data = productDataArr;
                                 var options = {
                                     data: data,
                                     columnDrag: true,
@@ -517,167 +549,165 @@ export default class MapPlanningUnits extends Component {
                                         entries: '',
                                     },
                                     onload: this.loaded,
-                                    // contextMenu: function (obj, x, y, e) {
-                                    //     var items = [];
-                                    //     //Add consumption batch info
+                                    contextMenu: function (obj, x, y, e) {
+                                        var items = [];
+                                        //Add consumption batch info
 
 
-                                    //     if (y == null) {
-                                    //         // Insert a new column
-                                    //         if (obj.options.allowInsertColumn == true) {
-                                    //             items.push({
-                                    //                 title: obj.options.text.insertANewColumnBefore,
-                                    //                 onclick: function () {
-                                    //                     obj.insertColumn(1, parseInt(x), 1);
-                                    //                 }
-                                    //             });
-                                    //         }
+                                        if (y == null) {
+                                            // Insert a new column
+                                            if (obj.options.allowInsertColumn == true) {
+                                                items.push({
+                                                    title: obj.options.text.insertANewColumnBefore,
+                                                    onclick: function () {
+                                                        obj.insertColumn(1, parseInt(x), 1);
+                                                    }
+                                                });
+                                            }
 
-                                    //         if (obj.options.allowInsertColumn == true) {
-                                    //             items.push({
-                                    //                 title: obj.options.text.insertANewColumnAfter,
-                                    //                 onclick: function () {
-                                    //                     obj.insertColumn(1, parseInt(x), 0);
-                                    //                 }
-                                    //             });
-                                    //         }
+                                            if (obj.options.allowInsertColumn == true) {
+                                                items.push({
+                                                    title: obj.options.text.insertANewColumnAfter,
+                                                    onclick: function () {
+                                                        obj.insertColumn(1, parseInt(x), 0);
+                                                    }
+                                                });
+                                            }
 
-                                    //         // Delete a column
-                                    //         // if (obj.options.allowDeleteColumn == true) {
-                                    //         //     items.push({
-                                    //         //         title: obj.options.text.deleteSelectedColumns,
-                                    //         //         onclick: function () {
-                                    //         //             obj.deleteColumn(obj.getSelectedColumns().length ? undefined : parseInt(x));
-                                    //         //         }
-                                    //         //     });
-                                    //         // }
+                                            // Delete a column
+                                            // if (obj.options.allowDeleteColumn == true) {
+                                            //     items.push({
+                                            //         title: obj.options.text.deleteSelectedColumns,
+                                            //         onclick: function () {
+                                            //             obj.deleteColumn(obj.getSelectedColumns().length ? undefined : parseInt(x));
+                                            //         }
+                                            //     });
+                                            // }
 
-                                    //         // Rename column
-                                    //         // if (obj.options.allowRenameColumn == true) {
-                                    //         //     items.push({
-                                    //         //         title: obj.options.text.renameThisColumn,
-                                    //         //         onclick: function () {
-                                    //         //             obj.setHeader(x);
-                                    //         //         }
-                                    //         //     });
-                                    //         // }
+                                            // Rename column
+                                            // if (obj.options.allowRenameColumn == true) {
+                                            //     items.push({
+                                            //         title: obj.options.text.renameThisColumn,
+                                            //         onclick: function () {
+                                            //             obj.setHeader(x);
+                                            //         }
+                                            //     });
+                                            // }
 
-                                    //         // Sorting
-                                    //         if (obj.options.columnSorting == true) {
-                                    //             // Line
-                                    //             items.push({ type: 'line' });
+                                            // Sorting
+                                            if (obj.options.columnSorting == true) {
+                                                // Line
+                                                items.push({ type: 'line' });
 
-                                    //             items.push({
-                                    //                 title: obj.options.text.orderAscending,
-                                    //                 onclick: function () {
-                                    //                     obj.orderBy(x, 0);
-                                    //                 }
-                                    //             });
-                                    //             items.push({
-                                    //                 title: obj.options.text.orderDescending,
-                                    //                 onclick: function () {
-                                    //                     obj.orderBy(x, 1);
-                                    //                 }
-                                    //             });
-                                    //         }
-                                    //     } else {
-                                    //         // Insert new row before
-                                    //         if (obj.options.allowInsertRow == true) {
-                                    //             items.push({
-                                    //                 title: i18n.t('static.common.insertNewRowBefore'),
-                                    //                 onclick: function () {
-                                    //                     // var data = [];
-                                    //                     // data[0] = this.state.realmCountry.realm.label.label_en + "-" + this.state.realmCountry.country.label.label_en;
-                                    //                     // data[1] = "";
-                                    //                     // data[2] = "";
-                                    //                     // data[3] = "";
-                                    //                     // data[4] = "";
-                                    //                     // data[5] = "";
-                                    //                     // data[6] = true;
-                                    //                     // data[7] = this.props.match.params.realmCountryId;
-                                    //                     // data[8] = 0;
-                                    //                     // data[9] = 1;
-                                    //                     // this.el.insertRow();
-                                    //                     // var json = this.el.getJson();
-                                    //                     obj.insertRow(parseInt(y), 1);
-                                    //                 }.bind(this)
-                                    //             });
-                                    //         }
-                                    //         // after
-                                    //         if (obj.options.allowInsertRow == true) {
-                                    //             items.push({
-                                    //                 title: i18n.t('static.common.insertNewRowAfter'),
-                                    //                 onclick: function () {
-                                    //                     // var data = [];
-                                    //                     // data[0] = this.state.realmCountry.realm.label.label_en + "-" + this.state.realmCountry.country.label.label_en;
-                                    //                     // data[1] = "";
-                                    //                     // data[2] = "";
-                                    //                     // data[3] = "";
-                                    //                     // data[4] = "";
-                                    //                     // data[5] = "";
-                                    //                     // data[6] = true;
-                                    //                     // data[7] = this.props.match.params.realmCountryId;
-                                    //                     // data[8] = 0;
-                                    //                     // data[9] = 1;
-                                    //                     // obj.insertRow(data, parseInt(y));
-                                    //                     obj.insertRow(parseInt(y), 1);
-                                    //                 }.bind(this)
-                                    //             });
-                                    //         }
-                                    //         // Delete a row
-                                    //         if (obj.options.allowDeleteRow == true) {
-                                    //             // region id
-                                    //             // if (obj.getRowData(y)[8] == 0) {
-                                    //                 items.push({
-                                    //                     title: obj.options.text.deleteSelectedRows,
-                                    //                     onclick: function () {
-                                    //                         obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y));
-                                    //                     }
-                                    //                 });
-                                    //             // }
-                                    //         }
+                                                items.push({
+                                                    title: obj.options.text.orderAscending,
+                                                    onclick: function () {
+                                                        obj.orderBy(x, 0);
+                                                    }
+                                                });
+                                                items.push({
+                                                    title: obj.options.text.orderDescending,
+                                                    onclick: function () {
+                                                        obj.orderBy(x, 1);
+                                                    }
+                                                });
+                                            }
+                                        } else {
+                                            // Insert new row before
+                                            if (obj.options.allowInsertRow == true) {
+                                                items.push({
+                                                    title: i18n.t('static.common.insertNewRowBefore'),
+                                                    onclick: function () {
+                                                        var data = [];
+                                                        data[0] = "";
+                                                        data[1] = "";
+                                                        data[2] = "";
+                                                        data[3] = "";
+                                                        data[4] = "";
+                                                        data[5] = "";
+                                                        data[6] = "";
+                                                        data[7] = "";
+                                                        data[8] = "";
+                                                        // this.el.insertRow();
+                                                        // var json = this.el.getJson();
+                                                        obj.insertRow(data, parseInt(y), 1);
+                                                    }.bind(this)
+                                                });
+                                            }
+                                            // after
+                                            if (obj.options.allowInsertRow == true) {
+                                                items.push({
+                                                    title: i18n.t('static.common.insertNewRowAfter'),
+                                                    onclick: function () {
+                                                        var data = [];
+                                                        data[0] = "";
+                                                        data[1] = "";
+                                                        data[2] = "";
+                                                        data[3] = "";
+                                                        data[4] = "";
+                                                        data[5] = "";
+                                                        data[6] = "";
+                                                        data[7] = "";
+                                                        data[8] = "";
+                                                        obj.insertRow(data, parseInt(y));
+                                                        // obj.insertRow(parseInt(y), 1);
+                                                    }.bind(this)
+                                                });
+                                            }
+                                            // Delete a row
+                                            if (obj.options.allowDeleteRow == true) {
+                                                // region id
+                                                // if (obj.getRowData(y)[8] == 0) {
+                                                items.push({
+                                                    title: obj.options.text.deleteSelectedRows,
+                                                    onclick: function () {
+                                                        obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y));
+                                                    }
+                                                });
+                                                // }
+                                            }
 
-                                    //         if (x) {
-                                    //             if (obj.options.allowComments == true) {
-                                    //                 items.push({ type: 'line' });
+                                            if (x) {
+                                                if (obj.options.allowComments == true) {
+                                                    items.push({ type: 'line' });
 
-                                    //                 var title = obj.records[y][x].getAttribute('title') || '';
+                                                    var title = obj.records[y][x].getAttribute('title') || '';
 
-                                    //                 items.push({
-                                    //                     title: title ? obj.options.text.editComments : obj.options.text.addComments,
-                                    //                     onclick: function () {
-                                    //                         obj.setComments([x, y], prompt(obj.options.text.comments, title));
-                                    //                     }
-                                    //                 });
+                                                    items.push({
+                                                        title: title ? obj.options.text.editComments : obj.options.text.addComments,
+                                                        onclick: function () {
+                                                            obj.setComments([x, y], prompt(obj.options.text.comments, title));
+                                                        }
+                                                    });
 
-                                    //                 if (title) {
-                                    //                     items.push({
-                                    //                         title: obj.options.text.clearComments,
-                                    //                         onclick: function () {
-                                    //                             obj.setComments([x, y], '');
-                                    //                         }
-                                    //                     });
-                                    //                 }
-                                    //             }
-                                    //         }
-                                    //     }
+                                                    if (title) {
+                                                        items.push({
+                                                            title: obj.options.text.clearComments,
+                                                            onclick: function () {
+                                                                obj.setComments([x, y], '');
+                                                            }
+                                                        });
+                                                    }
+                                                }
+                                            }
+                                        }
 
-                                    //     // Line
-                                    //     items.push({ type: 'line' });
+                                        // Line
+                                        items.push({ type: 'line' });
 
-                                    //     // Save
-                                    //     if (obj.options.allowExport) {
-                                    //         items.push({
-                                    //             title: i18n.t('static.supplyPlan.exportAsCsv'),
-                                    //             shortcut: 'Ctrl + S',
-                                    //             onclick: function () {
-                                    //                 obj.download(true);
-                                    //             }
-                                    //         });
-                                    //     }
+                                        // Save
+                                        if (obj.options.allowExport) {
+                                            items.push({
+                                                title: i18n.t('static.supplyPlan.exportAsCsv'),
+                                                shortcut: 'Ctrl + S',
+                                                onclick: function () {
+                                                    obj.download(true);
+                                                }
+                                            });
+                                        }
 
-                                    //     return items;
-                                    // }.bind(this)
+                                        return items;
+                                    }.bind(this)
                                 };
                                 var elVar = jexcel(document.getElementById("mapPlanningUnit"), options);
                                 this.el = elVar;
@@ -740,7 +770,7 @@ export default class MapPlanningUnits extends Component {
                 <h4 className="red">{this.props.message}</h4>
                 <div className="table-responsive" >
 
-                    <div id="mapPlanningUnit">
+                    <div id="mapPlanningUnit" className="RowheightForjexceladdRow">
                     </div>
                 </div>
             </>

@@ -1032,7 +1032,10 @@ import ProgramService from '../../api/ProgramService';
 import MultiSelect from "react-multi-select-component";
 import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
+import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
+import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 
 // const { getToggledOptions } = utils;
 const Widget04 = lazy(() => import('../Widgets/Widget04'));
@@ -1104,6 +1107,7 @@ class ForecastMetrics extends Component {
 
 
     this.state = {
+
       dropdownOpen: false,
       radioSelected: 2,
       lang: localStorage.getItem('lang'),
@@ -1121,10 +1125,12 @@ class ForecastMetrics extends Component {
       message: '',
       singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
       rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+      loading: true
 
 
 
     };
+
     this.getCountrys = this.getCountrys.bind(this);
     this.filterData = this.filterData.bind(this);
     this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
@@ -1172,6 +1178,8 @@ class ForecastMetrics extends Component {
 
     var csvRow = [];
     csvRow.push((i18n.t('static.report.month') + ' , ' + this.makeText(this.state.singleValue2)).replaceAll(' ', '%20'))
+    csvRow.push((i18n.t('static.report.timeWindow')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("viewById").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+
     this.state.countryLabels.map(ele =>
       csvRow.push(i18n.t('static.dashboard.country') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
     this.state.programLabels.map(ele =>
@@ -1256,15 +1264,10 @@ class ForecastMetrics extends Component {
           doc.text(i18n.t('static.report.month') + ' : ' + this.makeText(this.state.singleValue2), doc.internal.pageSize.width / 8, 90, {
             align: 'left'
           })
-          var planningText = doc.splitTextToSize(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.toString(), doc.internal.pageSize.width * 3 / 4);
-          doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+          doc.text(i18n.t('static.report.timeWindow') + ' : ' + document.getElementById("viewById").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
+            align: 'left'
+          })
 
-          planningText = doc.splitTextToSize(i18n.t('static.program.program') + ' : ' + this.state.programLabels.toString(), doc.internal.pageSize.width * 3 / 4);
-
-          doc.text(doc.internal.pageSize.width / 8, 130, planningText)
-          planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-
-          doc.text(doc.internal.pageSize.width / 8, this.state.programLabels.size > 3 ? 180 : 150, planningText)
         }
 
       }
@@ -1275,21 +1278,72 @@ class ForecastMetrics extends Component {
 
     const marginLeft = 10;
     const doc = new jsPDF(orientation, unit, size, true);
-
     doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal')
+    doc.setTextColor("#002f6c");
+
+
+    var y = 130;
+    var planningText = doc.splitTextToSize(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.join('; '), doc.internal.pageSize.width * 3 / 4);
+    // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+    for (var i = 0; i < planningText.length; i++) {
+      if (y > doc.internal.pageSize.height - 100) {
+        doc.addPage();
+        y = 80;
+
+      }
+      doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
+      y = y + 10;
+      console.log(y)
+    }
+    planningText = doc.splitTextToSize(i18n.t('static.program.program') + ' : ' + this.state.programLabels.join('; '), doc.internal.pageSize.width * 3 / 4);
+    //  doc.text(doc.internal.pageSize.width / 8, 130, planningText)
+    y = y + 10;
+    for (var i = 0; i < planningText.length; i++) {
+      if (y > doc.internal.pageSize.height - 100) {
+        doc.addPage();
+        y = 80;
+
+      }
+      doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
+      y = y + 10;
+      console.log(y)
+    }
+
+    planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+    // doc.text(doc.internal.pageSize.width / 9, this.state.programLabels.size > 5 ? 190 : 150, planningText)
+    y = y + 10;
+    for (var i = 0; i < planningText.length; i++) {
+      if (y > doc.internal.pageSize.height - 100) {
+        doc.addPage();
+        y = 80;
+
+      }
+      doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
+      y = y + 10;
+      console.log(y)
+    }
+
 
 
     var height = doc.internal.pageSize.height;
+    var h1 = 50;
+    let startY = y
+    console.log('startY', startY)
+    let pages = Math.ceil(startY / height)
+    for (var j = 1; j < pages; j++) {
+      doc.addPage()
+    }
+    let startYtable = startY - ((height - h1) * (pages - 1))
     const headers = [[i18n.t('static.program.program'), i18n.t('static.dashboard.planningunit'),
     //i18n.t('static.report.historicalConsumptionDiff'),i18n.t('static.report.historicalConsumptionActual'),
     i18n.t('static.report.error'), i18n.t('static.report.noofmonth')]]
     const data = this.state.consumptions.map(elt => [getLabelText(elt.program.label), getLabelText(elt.planningUnit.label),
     //elt.historicalConsumptionDiff,elt.historicalConsumptionActual,
     elt.monthCount == 0 ? "No data points containing both actual and forecast consumption" : this.roundN(elt.forecastError) + '%', elt.monthCount]);
-    let startY = 170 + (this.state.planningUnitLabels.length * 3)
     let content = {
       margin: { top: 80, bottom: 50 },
-      startY: startY,
+      startY: startYtable,
       head: headers,
       body: data,
       styles: { lineWidth: 1, fontSize: 8, halign: 'center' },
@@ -1327,7 +1381,6 @@ class ForecastMetrics extends Component {
 
 
   handleChange(countrysId) {
-    console.log(countrysId)
     countrysId = countrysId.sort(function (a, b) {
       return parseInt(a.value) - parseInt(b.value);
     })
@@ -1353,7 +1406,9 @@ class ForecastMetrics extends Component {
 
   }
 
+
   handlePlanningUnitChange(planningUnitIds) {
+    console.log(planningUnitIds)
     planningUnitIds = planningUnitIds.sort(function (a, b) {
       return parseInt(a.value) - parseInt(b.value);
     })
@@ -1383,10 +1438,10 @@ class ForecastMetrics extends Component {
       consumptionArray[count] = data;
       count++;
     }
-    if (consumptions.length == 0) {
-      data = [];
-      consumptionArray[0] = data;
-    }
+    // if (consumptions.length == 0) {
+    //   data = [];
+    //   consumptionArray[0] = data;
+    // }
     // console.log("consumptionArray---->", consumptionArray);
     this.el = jexcel(document.getElementById("tableDiv"), '');
     this.el.destroy();
@@ -1439,6 +1494,8 @@ class ForecastMetrics extends Component {
           for (var i = 0; i < colArr.length; i++) {
             elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
             elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', '#f48282');
+            let textColor = contrast('#f48282');
+            elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'color', textColor);
           }
         } else {
           for (var i = 0; i < colArr.length; i++) {
@@ -1470,7 +1527,7 @@ class ForecastMetrics extends Component {
     var languageEl = jexcel(document.getElementById("tableDiv"), options);
     this.el = languageEl;
     this.setState({
-      languageEl: languageEl
+      languageEl: languageEl, loading: false
     })
   }
 
@@ -1487,7 +1544,7 @@ class ForecastMetrics extends Component {
     let startDate = (this.state.singleValue2.year) + '-' + this.state.singleValue2.month + '-01';
     let monthInCalc = document.getElementById("viewById").value;
     if (this.state.countryValues.length > 0 && this.state.planningUnitValues.length > 0 && this.state.programValues.length > 0) {
-
+      this.setState({ loading: true })
       var inputjson = {
         "realmCountryIds": CountryIds, "programIds": programIds, "planningUnitIds": planningUnitIds, "startDate": startDate, "previousMonths": monthInCalc
       }
@@ -1505,14 +1562,14 @@ class ForecastMetrics extends Component {
         }).catch(
           error => {
             this.setState({
-              consumptions: []
+              consumptions: [], loading: false
             }, () => {
               this.el = jexcel(document.getElementById("tableDiv"), '');
               this.el.destroy();
             });
 
             if (error.message === "Network Error") {
-              this.setState({ message: error.message });
+              this.setState({ message: error.message, loading: false });
             } else {
               switch (error.response ? error.response.status : "") {
                 case 500:
@@ -1520,10 +1577,10 @@ class ForecastMetrics extends Component {
                 case 404:
                 case 406:
                 case 412:
-                  this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }) });
+                  this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }), loading: false });
                   break;
                 default:
-                  this.setState({ message: 'static.unkownError' });
+                  this.setState({ message: 'static.unkownError', loading: false });
                   break;
               }
             }
@@ -1557,15 +1614,15 @@ class ForecastMetrics extends Component {
       RealmCountryService.getRealmCountryrealmIdById(realmId)
         .then(response => {
           this.setState({
-            countrys: response.data
+            countrys: response.data, loading: false
           })
         }).catch(
           error => {
             this.setState({
-              countrys: []
+              countrys: [], loading: false
             })
             if (error.message === "Network Error") {
-              this.setState({ message: error.message });
+              this.setState({ message: error.message, loading: false });
             } else {
               switch (error.response ? error.response.status : "") {
                 case 500:
@@ -1574,9 +1631,9 @@ class ForecastMetrics extends Component {
                 case 406:
                 case 412:
                 default:
-                  this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }) });
+                  this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }), loading: false });
                   break;
-                  this.setState({ message: 'static.unkownError' });
+                  this.setState({ message: 'static.unkownError', loading: false });
                   break;
               }
             }
@@ -1651,15 +1708,15 @@ class ForecastMetrics extends Component {
       .then(response => {
         console.log(JSON.stringify(response.data))
         this.setState({
-          programs: response.data
+          programs: response.data, loading: false
         })
       }).catch(
         error => {
           this.setState({
-            programs: []
+            programs: [], loading: false
           })
           if (error.message === "Network Error") {
-            this.setState({ message: error.message });
+            this.setState({ message: error.message, loading: false });
           } else {
             switch (error.response ? error.response.status : "") {
               case 500:
@@ -1667,10 +1724,10 @@ class ForecastMetrics extends Component {
               case 404:
               case 406:
               case 412:
-                this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }), loading: false });
                 break;
               default:
-                this.setState({ message: 'static.unkownError' });
+                this.setState({ message: 'static.unkownError', loading: false });
                 break;
             }
           }
@@ -1777,7 +1834,7 @@ class ForecastMetrics extends Component {
       && planningUnits.map((item, i) => {
         return (
 
-          { label: getLabelText(item.label, this.state.lang), value: item.planningUnitId }
+          { label: getLabelText(item.label, this.state.lang), value: item.id }
 
         )
       }, this);
@@ -1902,26 +1959,38 @@ class ForecastMetrics extends Component {
 
     return (
       <div className="animated fadeIn" >
+        <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+          this.setState({ message: message })
+        }} loading={(loading) => {
+          this.setState({ loading: loading })
+        }} />
         <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
         <h5 className="red">{i18n.t(this.state.message)}</h5>
-
+        <SupplyPlanFormulas ref="formulaeChild" />
         <Card>
           <div className="Card-header-reporticon">
-            {/* <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.forecastmetrics')}</strong> */}
-            {this.state.consumptions.length > 0 && <div className="card-header-actions">
+            <div className="card-header-actions">
               <a className="card-header-action">
-                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF()} />
-                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
+                <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggleForecastMatrix() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span>
 
               </a>
-            </div>}
+              {/* <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.forecastmetrics')}</strong> */}
+              {this.state.consumptions.length > 0 &&
+
+                <a className="card-header-action">
+                  <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF()} />
+                  <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
+
+                </a>
+              }
+            </div>
           </div>
-          <CardBody className="pb-lg-0 pt-lg-0">
+          <CardBody className="pb-lg-5 pt-lg-0 ">
 
             <div ref={ref}>
 
               <Form >
-                <Col md="12 pl-0">
+                <div className="pl-0" >
                   <div className="row">
 
                     <FormGroup className="col-md-3">
@@ -2023,15 +2092,16 @@ class ForecastMetrics extends Component {
                       </div>
                     </FormGroup>
 
-                  </div>
-                </Col>
-              </Form>
 
-              <Col md="12 pl-0">
+                  </div>
+                </div>
+              </Form>
+            </div>
+            {/* <Col md="12 pl-0">
 
                 <div className="row">
-                  <div className="col-md-12">
-                    {/* {this.state.consumptions.length > 0 &&
+                  <div className="col-md-12"> */}
+            {/* {this.state.consumptions.length > 0 &&
                        <ToolkitProvider
                         keyField="procurementUnitId"
                         data={this.state.consumptions}
@@ -2059,18 +2129,21 @@ class ForecastMetrics extends Component {
                       </ToolkitProvider>
                     } */}
 
-                    <CardBody className=" pt-md-0 pb-md-0 table-responsive">
-                      <div id="tableDiv" className="jexcelremoveReadonlybackground">
-                      </div>
-                    </CardBody>
-                  </div>
+            {/* <CardBody className=" pt-md-0 pb-md-0 table-responsive"> */}
+            {/* <div id="tableDiv" className="jexcelremoveReadonlybackground">
+                      </div> */}
+            {/* </CardBody> */}
+            {/* </div>
                 </div>
-              </Col>
+              </Col> */}
 
+            <div className="ReportSearchMarginTop">
+              <div id="tableDiv" className="jexcelremoveReadonlybackground">
+              </div>
             </div>
-
           </CardBody>
         </Card>
+
 
       </div>
     );

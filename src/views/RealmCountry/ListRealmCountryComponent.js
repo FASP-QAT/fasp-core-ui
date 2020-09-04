@@ -429,6 +429,7 @@ import i18n from '../../i18n'
 import RealmService from "../../api/RealmService";
 import RealmCountryService from "../../api/RealmCountryService";
 import AuthenticationService from '../Common/AuthenticationService.js';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import getLabelText from '../../CommonComponent/getLabelText';
 import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
@@ -523,10 +524,10 @@ class ListRealmCountryComponent extends Component {
             realmCountryArray[count] = data;
             count++;
         }
-        if (realmCountryList.length == 0) {
-            data = [];
-            realmCountryArray[0] = data;
-        }
+        // if (realmCountryList.length == 0) {
+        //     data = [];
+        //     realmCountryArray[0] = data;
+        // }
         // console.log("realmCountryArray---->", realmCountryArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();
@@ -630,7 +631,7 @@ class ListRealmCountryComponent extends Component {
         var languageEl = jexcel(document.getElementById("tableDiv"), options);
         this.el = languageEl;
         this.setState({
-            languageEl: languageEl
+            languageEl: languageEl, loading: false
         })
     }
 
@@ -679,7 +680,7 @@ class ListRealmCountryComponent extends Component {
                     })
                 } else {
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode, loading: false
                     },
                         () => {
                             this.hideSecondComponent();
@@ -688,7 +689,7 @@ class ListRealmCountryComponent extends Component {
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
+                        this.setState({ message: error.message, loading: false });
                     } else {
                         switch (error.response ? error.response.status : "") {
                             case 500:
@@ -696,10 +697,10 @@ class ListRealmCountryComponent extends Component {
                             case 404:
                             case 406:
                             case 412:
-                                this.setState({ message: error.response.data.messageCode });
+                                this.setState({ message: error.response.data.messageCode, loading: false });
                                 break;
                             default:
-                                this.setState({ message: 'static.unkownError' });
+                                this.setState({ message: 'static.unkownError', loading: false });
                                 break;
                         }
                     }
@@ -712,13 +713,14 @@ class ListRealmCountryComponent extends Component {
                 if (response.status == 200) {
                     this.setState({
                         realmCountryList: response.data,
-                        selRealmCountry: response.data
+                        selRealmCountry: response.data,
+                        loading: false
                     }, () => {
                         this.buildJExcel();
                     });
                 } else {
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode, loading: false
                     },
                         () => {
                             this.hideSecondComponent();
@@ -727,7 +729,7 @@ class ListRealmCountryComponent extends Component {
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
+                        this.setState({ message: error.message, loading: false });
                     } else {
                         switch (error.response ? error.response.status : "") {
                             case 500:
@@ -735,10 +737,10 @@ class ListRealmCountryComponent extends Component {
                             case 404:
                             case 406:
                             case 412:
-                                this.setState({ message: error.response.data.messageCode });
+                                this.setState({ message: error.response.data.messageCode, loading: false });
                                 break;
                             default:
-                                this.setState({ message: 'static.unkownError' });
+                                this.setState({ message: 'static.unkownError', loading: false });
                                 break;
                         }
                     }
@@ -789,6 +791,11 @@ class ListRealmCountryComponent extends Component {
 
         return (
             <div className="animated">
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
+                }} />
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
@@ -822,11 +829,11 @@ class ListRealmCountryComponent extends Component {
                                 </div>
                             </FormGroup>
                         </Col>
-                      
-                            {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground ">
-                            </div>
 
-                      
+                        {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground ">
+                        </div>
+
+
 
                     </CardBody>
                 </Card>

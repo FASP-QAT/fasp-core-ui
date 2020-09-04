@@ -78,7 +78,8 @@ export default class AddOrganisationComponent extends Component {
             realmCountryId: '',
             realmCountryList: [],
             selCountries: [],
-            message: ''
+            message: '',
+            loading: true,
         }
 
 
@@ -142,7 +143,7 @@ export default class AddOrganisationComponent extends Component {
             .then(response => {
                 console.log("country list---", response.data);
                 this.setState({
-                    countries: response.data
+                    countries: response.data, loading: false,
                 })
             })
 
@@ -150,7 +151,8 @@ export default class AddOrganisationComponent extends Component {
             .then(response => {
                 console.log("realm list---", response.data);
                 this.setState({
-                    realms: response.data
+                    realms: response.data,
+                    loading: false,
                 })
             })
     }
@@ -185,7 +187,8 @@ export default class AddOrganisationComponent extends Component {
                     }
                     this.setState({
                         realmCountryId: '',
-                        realmCountryList: regList
+                        realmCountryList: regList,
+                        loading: false,
                     })
                 } else {
                     this.setState({
@@ -233,9 +236,11 @@ export default class AddOrganisationComponent extends Component {
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
                 }} />
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-                <Row>
+                <Row style={{ display: this.state.loading ? "none" : "block" }}>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             {/* <CardHeader>
@@ -245,15 +250,19 @@ export default class AddOrganisationComponent extends Component {
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
+
                                     // console.log("-------------------->" + this.state.organisation.organisationCode);
                                     if (this.state.organisation.organisationCode != '') {
+                                        this.setState({
+                                            loading: true
+                                        })
                                         OrganisationService.addOrganisation(this.state.organisation)
                                             .then(response => {
                                                 if (response.status == 200) {
                                                     this.props.history.push(`/organisation/listOrganisation/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                                 } else {
                                                     this.setState({
-                                                        message: response.data.messageCode
+                                                        message: response.data.messageCode, loading: false
                                                     })
                                                 }
                                             })
@@ -353,6 +362,17 @@ export default class AddOrganisationComponent extends Component {
                         </Card>
                     </Col>
                 </Row>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }

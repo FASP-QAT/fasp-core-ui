@@ -416,10 +416,10 @@ export default class DataSourceTypeListComponent extends Component {
             dataSourceTypeArray[count] = data;
             count++;
         }
-        if (dataSourceTypeList.length == 0) {
-            data = [];
-            dataSourceTypeArray[0] = data;
-        }
+        // if (dataSourceTypeList.length == 0) {
+        //     data = [];
+        //     dataSourceTypeArray[0] = data;
+        // }
         // console.log("dataSourceTypeArray---->", dataSourceTypeArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();
@@ -491,7 +491,7 @@ export default class DataSourceTypeListComponent extends Component {
 
     selected = function (instance, cell, x, y, value) {
 
-        if (x == 0 && value != 0) {
+        if ((x == 0 && value != 0) || (y == 0)) {
             // console.log("HEADER SELECTION--------------------------");
         } else {
             // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
@@ -514,11 +514,11 @@ export default class DataSourceTypeListComponent extends Component {
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        realms: response.data, loading: false
+                        realms: response.data
                     })
                 } else {
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode, loading: false
                     },
                         () => {
                             this.hideSecondComponent();
@@ -532,7 +532,7 @@ export default class DataSourceTypeListComponent extends Component {
                 console.log(response.data)
                 this.setState({
                     dataSourceList: response.data,
-                    selSource: response.data
+                    selSource: response.data, 
                 }, () => {
                     this.buildJexcel();
                 });
@@ -540,7 +540,7 @@ export default class DataSourceTypeListComponent extends Component {
             else {
 
                 this.setState({
-                    message: response.data.messageCode
+                    message: response.data.messageCode, loading: false
                 },
                     () => {
                         this.hideSecondComponent();
@@ -548,7 +548,7 @@ export default class DataSourceTypeListComponent extends Component {
             }
 
         })
-        
+
     }
 
     editDataSourceType(dataSourceType) {
@@ -595,6 +595,8 @@ export default class DataSourceTypeListComponent extends Component {
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
                 }} />
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
@@ -631,7 +633,7 @@ export default class DataSourceTypeListComponent extends Component {
                                 </div>
                             </FormGroup>
                         </Col>
-                        <div className=" table-responsive SearchMarginTop">
+                        <div className="SearchMarginTop">
                             {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground ">
                             </div>
 

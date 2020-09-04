@@ -1015,7 +1015,7 @@ class StockAdjustmentComponent extends Component {
             data: [],
             lang: localStorage.getItem('lang'),
             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            loading: false
+            loading: true
         }
         this.formatLabel = this.formatLabel.bind(this);
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
@@ -1037,15 +1037,15 @@ class StockAdjustmentComponent extends Component {
                 .then(response => {
                     // console.log(JSON.stringify(response.data))
                     this.setState({
-                        programs: response.data
+                        programs: response.data, loading: false
                     }, () => { this.consolidatedProgramList() })
                 }).catch(
                     error => {
                         this.setState({
-                            programs: []
+                            programs: [], loading: false
                         }, () => { this.consolidatedProgramList() })
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
+                            this.setState({ message: error.message, loading: false });
                         } else {
                             switch (error.response ? error.response.status : "") {
                                 case 500:
@@ -1053,10 +1053,10 @@ class StockAdjustmentComponent extends Component {
                                 case 404:
                                 case 406:
                                 case 412:
-                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                    this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
                                     break;
                                 default:
-                                    this.setState({ message: 'static.unkownError' });
+                                    this.setState({ message: 'static.unkownError', loading: false });
                                     break;
                             }
                         }
@@ -1066,6 +1066,7 @@ class StockAdjustmentComponent extends Component {
         } else {
             console.log('offline')
             this.consolidatedProgramList()
+            this.setState({ loading: false })
         }
 
     }
@@ -1488,10 +1489,10 @@ class StockAdjustmentComponent extends Component {
             stockAdjustmentArray[count] = data;
             count++;
         }
-        if (stockAdjustmentList.length == 0) {
-            data = [];
-            stockAdjustmentArray[0] = data;
-        }
+        // if (stockAdjustmentList.length == 0) {
+        //     data = [];
+        //     stockAdjustmentArray[0] = data;
+        // }
         // console.log("stockAdjustmentArray---->", stockAdjustmentArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();
@@ -1567,7 +1568,8 @@ class StockAdjustmentComponent extends Component {
         var languageEl = jexcel(document.getElementById("tableDiv"), options);
         this.el = languageEl;
         this.setState({
-            languageEl: languageEl
+            languageEl: languageEl,
+            loading: false
         })
     }
 
@@ -1620,6 +1622,7 @@ class StockAdjustmentComponent extends Component {
                         })
                     }.bind(this);
                     programRequest.onsuccess = function (e) {
+                        // this.setState({ loading: true })
                         console.log("2----", programRequest)
                         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
@@ -1665,6 +1668,7 @@ class StockAdjustmentComponent extends Component {
                     }.bind(this)
                 }.bind(this)
             } else {
+                this.setState({ loading: true })
                 var inputjson = {
                     programId: programId,
                     versionId: versionId,
@@ -1687,13 +1691,14 @@ class StockAdjustmentComponent extends Component {
                     }).catch(
                         error => {
                             this.setState({
-                                data: []
+                                data: [],
+                                loading: false
                             }, () => {
                                 this.el = jexcel(document.getElementById("tableDiv"), '');
                                 this.el.destroy();
                             });
                             if (error.message === "Network Error") {
-                                this.setState({ message: error.message });
+                                this.setState({ message: error.message, loading: false });
                             } else {
                                 switch (error.response ? error.response.status : "") {
                                     case 500:
@@ -1701,10 +1706,10 @@ class StockAdjustmentComponent extends Component {
                                     case 404:
                                     case 406:
                                     case 412:
-                                        this.setState({ message: i18n.t(error.response.data.messageCode) });
+                                        this.setState({ loading: false, message: i18n.t(error.response.data.messageCode) });
                                         break;
                                     default:
-                                        this.setState({ message: 'static.unkownError' });
+                                        this.setState({ message: 'static.unkownError', loading: false });
                                         break;
                                 }
                             }
@@ -1888,6 +1893,8 @@ class StockAdjustmentComponent extends Component {
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
                 }} />
                 <h5>{i18n.t(this.props.match.params.message)}</h5>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
@@ -1903,7 +1910,7 @@ class StockAdjustmentComponent extends Component {
                     </div>
                     <CardBody className="pt-1">
 
-                        <Col md="12 pl-0">
+                        <div className="pl-0">
                             <div className="row">
                                 <FormGroup className="col-md-3">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
@@ -1987,7 +1994,7 @@ class StockAdjustmentComponent extends Component {
                                     </div>
                                 </FormGroup>
                             </div>
-                        </Col>
+                        </div>
 
 
                         <div id="tableDiv" className="jexcelremoveReadonlybackground">

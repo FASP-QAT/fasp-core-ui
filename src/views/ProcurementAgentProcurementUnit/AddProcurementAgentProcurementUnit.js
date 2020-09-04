@@ -136,6 +136,9 @@ export default class AddProcurementAgentProcurementUnit extends Component {
         var validation = this.checkValidation();
 
         if (validation == true && duplicateValidation == true) {
+            this.setState({
+                loading: false
+            })
             var json = this.el.getJson();
             console.log("Rows on submit", json)
             var procurementUnitArray = []
@@ -173,7 +176,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
 
                     } else {
                         this.setState({
-                            message: response.data.messageCode
+                            message: response.data.messageCode,loading:false
                         },
                             () => {
                                 this.hideSecondComponent();
@@ -183,7 +186,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                 }).catch(
                     error => {
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
+                            this.setState({ message: error.message,loading:false });
                         } else {
                             switch (error.response ? error.response.status : "") {
                                 case 500:
@@ -191,10 +194,10 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                 case 404:
                                 case 406:
                                 case 412:
-                                    this.setState({ message: error.response.data.messageCode });
+                                    this.setState({ message: error.response.data.messageCode,loading:false });
                                     break;
                                 default:
-                                    this.setState({ message: 'static.unkownError' });
+                                    this.setState({ message: 'static.unkownError',loading:false });
                                     console.log("Error code unkown");
                                     break;
                             }
@@ -531,7 +534,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                         columnSorting: true,
                                         tableOverflow: true,
                                         wordWrap: true,
-                                        paginationOptions: [10, 25, 50, 100],
+                                        paginationOptions: [10, 25, 50,],
                                         position: 'top',
                                         allowInsertColumn: false,
                                         allowManualInsertColumn: false,
@@ -540,7 +543,8 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                         oneditionend: this.onedit,
                                         copyCompatibility: true,
                                         text: {
-                                            showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                                            // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                                            showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
                                             show: '',
                                             entries: '',
                                         },

@@ -279,14 +279,14 @@ export default class PipelineProgramInventory extends Component {
 
                                         },
                                         {
-                                            title: "Realm Country Planning Unit",
+                                            title: i18n.t('static.planningunit.countrysku'),
                                             type: 'dropdown',
                                             source: realmCountryPlanningUnitList,
                                             filter: this.dropdownFilter
 
                                         },
                                         {
-                                            title: "Multiplier",
+                                            title: i18n.t('static.unit.multiplier'),
                                             type: 'text',
                                             readonly: true
                                         },
@@ -344,7 +344,7 @@ export default class PipelineProgramInventory extends Component {
     }
 
     loadedJexcelCommonFunction = function (instance, cell, x, y, value) {
-        // jExcelLoadedFunction(instance);
+        jExcelLoadedFunction(instance);
     }
 
     render() {

@@ -135,7 +135,7 @@ class Budgets extends Component {
         columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ', '%20') });
 
         var A = [headers]
-        this.state.selBudget.map(ele => A.push([(getLabelText(ele.budget.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.budget.code,  (ele.fundingSource.code.replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.currency.label).replaceAll(',', ' ')).replaceAll(' ', '%20'),this.roundN(ele.budgetAmt), this.roundN(ele.plannedBudgetAmt), this.roundN(ele.orderedBudgetAmt), this.roundN((ele.budgetAmt - (ele.plannedBudgetAmt + ele.orderedBudgetAmt))), this.formatDate(ele.startDate), this.formatDate(ele.stopDate)]));
+        this.state.selBudget.map(ele => A.push([(getLabelText(ele.budget.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), "\""+(ele.budget.code.replaceAll(',', ' ')).replaceAll(' ', '%20')+"\"",  (ele.fundingSource.code.replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.currency.label).replaceAll(',', ' ')).replaceAll(' ', '%20'),this.roundN(ele.budgetAmt), this.roundN(ele.plannedBudgetAmt), this.roundN(ele.orderedBudgetAmt), this.roundN((ele.budgetAmt - (ele.plannedBudgetAmt + ele.orderedBudgetAmt))), this.formatDate(ele.startDate), this.formatDate(ele.stopDate)]));
 
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
@@ -226,9 +226,12 @@ class Budgets extends Component {
             body: data,
             styles: { lineWidth: 1, fontSize: 8, halign: 'center', cellWidth: 60 },
             columnStyles: {
-                0: { cellWidth: 74.89 },
+                0: { cellWidth: 90 },
                 2: { cellWidth: 73.5 },
                 4: { cellWidth: 73.5 },
+                5: { cellWidth: 90 },
+                6: { cellWidth: 90 },
+                7: { cellWidth: 90 },
             }
 
         };
@@ -294,11 +297,11 @@ class Budgets extends Component {
                                     console.log(OrderedShipmentbudget, '+', ele.productCost + ele.freightCost)
                                     OrderedShipmentbudget = OrderedShipmentbudget + (ele.productCost + ele.freightCost) * ele.currency.conversionRateToUsd
                                 });
-
+                                console.log("budget list==>",budgetList[l]);
                                 var json = {
                                     budget: { id: budgetList[l].budgetId, label: budgetList[l].label, code: budgetList[l].budgetCode },
                                     program: { id: budgetList[l].program.id, label: budgetList[l].program.label, code: programJson.programCode },
-                                    fundingSource: budgetList[l].fundingSource,
+                                    fundingSource: { id: budgetList[l].fundingSource.fundingSourceId, label: budgetList[l].fundingSource.label, code: budgetList[l].fundingSource.fundingSourceCode },
                                     currency: budgetList[l].currency,
                                     plannedBudgetAmt: (plannedShipmentbudget / budgetList[l].currency.conversionRateToUsd) / 1000000,
                                     orderedBudgetAmt: (OrderedShipmentbudget / budgetList[l].currency.conversionRateToUsd) / 1000000,
@@ -309,6 +312,7 @@ class Budgets extends Component {
                                 }
                                 data.push(json)
                             }
+                            console.log("ofline data===>",data);
                             this.setState({
                                 selBudget: data,
                                 message:''
@@ -885,7 +889,7 @@ class Budgets extends Component {
                     </div>
                     <CardBody className="pb-lg-2 pt-lg-0">
 
-                        <Col md="10 pl-0">
+                        <Col md="11 pl-0">
                             <div className="row">
                                 <FormGroup className="col-md-3">
                                     <Label htmlFor="appendedInputButton">Program</Label>

@@ -365,10 +365,10 @@ export default class LanguageListComponent extends Component {
                                 languageArray[count] = data;
                                 count++;
                             }
-                            if (langaugeList.length == 0) {
-                                data = [];
-                                languageArray[0] = data;
-                            }
+                            // if (langaugeList.length == 0) {
+                            //     data = [];
+                            //     languageArray[0] = data;
+                            // }
                             // console.log("languageArray---->", languageArray);
                             this.el = jexcel(document.getElementById("tableDiv"), '');
                             this.el.destroy();
@@ -442,7 +442,7 @@ export default class LanguageListComponent extends Component {
                         })
                 } else {
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode, loading: false
                     },
                         () => {
                             this.hideSecondComponent();
@@ -456,7 +456,7 @@ export default class LanguageListComponent extends Component {
 
     selected = function (instance, cell, x, y, value) {
 
-        if (x == 0 && value != 0) {
+        if ((x == 0 && value != 0) || (y == 0)) {
             // console.log("HEADER SELECTION--------------------------");
         } else {
             // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
@@ -483,6 +483,8 @@ export default class LanguageListComponent extends Component {
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
                 }} />
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
@@ -496,7 +498,7 @@ export default class LanguageListComponent extends Component {
                         </div>
                     </div>
                     <CardBody className=" pt-md-1 pb-md-1 table-responsive">
-                        {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground">
+                        <div id="tableDiv" className="jexcelremoveReadonlybackground">
                         </div>
 
                     </CardBody>

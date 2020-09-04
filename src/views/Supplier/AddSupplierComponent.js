@@ -58,7 +58,8 @@ class AddSupplierComponent extends Component {
           label_en: ''
         }
       },
-      message: ''
+      message: '',
+      loading: true,
     }
     this.cancelClicked = this.cancelClicked.bind(this);
     this.dataChange = this.dataChange.bind(this);
@@ -68,9 +69,9 @@ class AddSupplierComponent extends Component {
   }
   hideSecondComponent() {
     setTimeout(function () {
-        document.getElementById('div2').style.display = 'none';
+      document.getElementById('div2').style.display = 'none';
     }, 8000);
-}
+  }
   Capitalize(str) {
     if (str != null && str != "") {
       return str.charAt(0).toUpperCase() + str.slice(1);
@@ -121,7 +122,7 @@ class AddSupplierComponent extends Component {
     RealmService.getRealmListAll()
       .then(response => {
         this.setState({
-          realms: response.data
+          realms: response.data, loading: false
         })
       })
   }
@@ -140,9 +141,11 @@ class AddSupplierComponent extends Component {
       <div className="animated fadeIn">
         <AuthenticationServiceComponent history={this.props.history} message={(message) => {
           this.setState({ message: message })
+        }} loading={(loading) => {
+          this.setState({ loading: loading })
         }} />
         <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-        <Row>
+        <Row style={{ display: this.state.loading ? "none" : "block" }}>
           <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
             <Card>
               {/* <CardHeader>
@@ -152,6 +155,9 @@ class AddSupplierComponent extends Component {
                 initialValues={initialValues}
                 validate={validate(validationSchema)}
                 onSubmit={(values, { setSubmitting, setErrors }) => {
+                  this.setState({
+                    loading: true
+                  })
                   console.log("Submit clicked");
                   SupplierService.addSupplier(this.state.supplier)
                     .then(response => {
@@ -160,11 +166,11 @@ class AddSupplierComponent extends Component {
                         this.props.history.push(`/supplier/listSupplier/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                       } else {
                         this.setState({
-                            message: response.data.messageCode
+                          message: response.data.messageCode, loading: false
                         },
-                            () => {
-                                this.hideSecondComponent();
-                            })
+                          () => {
+                            this.hideSecondComponent();
+                          })
                       }
                     })
                 }}
@@ -200,7 +206,7 @@ class AddSupplierComponent extends Component {
                               <option value="0">{i18n.t('static.common.select')}</option>
                               {realmList}
                             </Input>
-                            <FormText className="red">{errors.realmId}</FormText>
+                            <FormFeedback className="red">{errors.realmId}</FormFeedback>
                           </FormGroup>
                           <FormGroup>
                             <Label for="supplier">{i18n.t('static.supplier.supplier')}<span className="red Reqasterisk">*</span></Label>
@@ -215,7 +221,7 @@ class AddSupplierComponent extends Component {
                               required
                               value={this.Capitalize(this.state.supplier.label.label_en)}
                             />
-                            <FormText className="red">{errors.supplier}</FormText>
+                            <FormFeedback className="red">{errors.supplier}</FormFeedback>
                           </FormGroup>
                         </CardBody>
                         <CardFooter>
@@ -233,6 +239,17 @@ class AddSupplierComponent extends Component {
             </Card>
           </Col>
         </Row>
+        <div style={{ display: this.state.loading ? "block" : "none" }}>
+          <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+            <div class="align-items-center">
+              <div ><h4> <strong>Loading...</strong></h4></div>
+
+              <div class="spinner-border blue ml-4" role="status">
+
+              </div>
+            </div>
+          </div>
+        </div>
         <div>
           <h6>{i18n.t(this.state.message)}</h6>
           <h6>{i18n.t(this.props.match.params.message)}</h6>
@@ -241,7 +258,7 @@ class AddSupplierComponent extends Component {
     );
   }
   cancelClicked() {
-    this.props.history.push(`/supplier/listSupplier/`+ 'red/' + i18n.t('static.message.cancelled', { entityname }))
+    this.props.history.push(`/supplier/listSupplier/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
   }
 
   resetClicked() {

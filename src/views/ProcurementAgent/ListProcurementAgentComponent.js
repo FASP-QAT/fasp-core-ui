@@ -695,10 +695,10 @@ class ListProcurementAgentComponent extends Component {
             procurementAgentArray[count] = data;
             count++;
         }
-        if (procurementAgentList.length == 0) {
-            data = [];
-            procurementAgentArray[0] = data;
-        }
+        // if (procurementAgentList.length == 0) {
+        //     data = [];
+        //     procurementAgentArray[0] = data;
+        // }
         // console.log("procurementAgentArray---->", procurementAgentArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();
@@ -708,7 +708,7 @@ class ListProcurementAgentComponent extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [150, 150, 100],
+            colWidths: [100,100,200,100,100,100,100,100],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
@@ -823,13 +823,13 @@ class ListProcurementAgentComponent extends Component {
         var languageEl = jexcel(document.getElementById("tableDiv"), options);
         this.el = languageEl;
         this.setState({
-            languageEl: languageEl
+            languageEl: languageEl, loading: false
         })
     }
 
     selected = function (instance, cell, x, y, value) {
 
-        if (x == 0 && value != 0) {
+        if ((x == 0 && value != 0) || (y == 0)) {
             // console.log("HEADER SELECTION--------------------------");
         } else {
             // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
@@ -852,11 +852,11 @@ class ListProcurementAgentComponent extends Component {
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        realms: response.data, loading: false
+                        realms: response.data
                     })
                 } else {
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode, loading: false
                     },
                         () => {
                             this.hideSecondComponent();
@@ -889,14 +889,14 @@ class ListProcurementAgentComponent extends Component {
                 if (response.status == 200) {
                     this.setState({
                         procurementAgentList: response.data,
-                        selProcurementAgent: response.data
+                        selProcurementAgent: response.data,
                     },
                         () => {
                             this.buildJExcel();
                         })
                 } else {
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode, loading: false
                     },
                         () => {
                             this.hideSecondComponent();
@@ -1065,6 +1065,8 @@ class ListProcurementAgentComponent extends Component {
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
                 }} />
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
@@ -1100,9 +1102,9 @@ class ListProcurementAgentComponent extends Component {
                                 </div>
                             </FormGroup>
                         </Col>
-                       
-                            {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground">
-                            </div>
+
+                        {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground">
+                        </div>
 
                     </CardBody>
                 </Card>
