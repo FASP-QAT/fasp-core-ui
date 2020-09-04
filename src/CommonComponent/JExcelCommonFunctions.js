@@ -70,6 +70,59 @@ export function jExcelLoadedFunction(instance, number) {
     // document.getElementById("clearBtnID").onclick= function(){alert("ok");}
 }
 
+
+export function jExcelLoadedFunctionPipeline(instance,number) {
+    // console.log("number====>",number);
+    // console.log("class name and number =====>",document.getElementsByClassName('resizable'));
+    var obj = {};
+    obj.options = {};
+    var elInstance = instance.jexcel;
+    elInstance.hideIndex(0);
+    console.log("In loaded function hide method");
+    var pagignation = document.getElementsByClassName('jexcel_pagination')[number];
+    pagignation.classList.add('row');
+    var searchContainer = document.getElementsByClassName('jexcel_filter')[number];
+    var searchDiv = (document.getElementsByClassName('jexcel_filter')[number]).childNodes[1];
+    console.log("Search div", searchDiv);
+    searchDiv.removeChild(((document.getElementsByClassName('jexcel_filter')[number]).childNodes[1]).childNodes[0]);
+    document.getElementsByClassName("jexcel_search")[number].placeholder = "Search";
+    // searchContainer.classList.add('TableCust');
+    console.log('searchContainer', searchContainer);
+    var clearBtn = document.createElement('button');
+    clearBtn.type = "button";
+    clearBtn.classList.add('btn-default');
+    clearBtn.classList.add('btn');
+    clearBtn.classList.add('jexcel_clear_btn');
+
+    var clarText = document.createTextNode('Clear');
+    clearBtn.setAttribute("id", "clearBtnID");
+    clearBtn.onclick = function () {
+        document.getElementsByClassName("jexcel_search")[number].value = "";
+        elInstance.resetSearch();
+    };
+    clearBtn.appendChild(clarText);
+    searchContainer.appendChild(clearBtn);
+
+    var jexcel_pagination = document.getElementsByClassName('jexcel_pagination')[number];
+    jexcel_pagination.lastChild.classList.add('order-3');
+    console.log(obj.show, '....................in show');
+    jexcel_pagination.firstChild.classList.add('order-2');
+    jexcel_pagination.firstChild.classList.add('mr-auto');
+    jexcel_pagination.firstChild.classList.add('pl-0');
+    var pageSelect = document.getElementsByClassName('jexcel_pagination_dropdown')[number];
+    pageSelect.options[pageSelect.options.length] = new Option('All', 5000000);
+
+    var jexcel_filterFirstdiv = document.getElementsByClassName('jexcel_filter')[number];
+    var filter = jexcel_filterFirstdiv.firstChild;
+    filter.classList.add('order-1');
+    filter.classList.add('pr-1');
+    filter.classList.add('ml-2');
+    jexcel_pagination.appendChild(filter);
+
+    // document.getElementById("clearBtnID").onclick= function(){alert("ok");}
+}
+
+// export function jExcelLoadedFunctionWithoutPagination(instance) {
 export function jExcelLoadedFunctionWithoutPagination(instance, number) {
     if (number == undefined) {
         number = 0;
