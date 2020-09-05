@@ -3167,7 +3167,7 @@ border-radius: 2em;
   // border: 1px solid #e4e7ea!important;
   color: #697069!important;
   height: 0px!important;
-  border: none!important;
+  // border: none!important;
    background-color:transparent!important;
 }
 .Select.form-control{
@@ -3179,6 +3179,12 @@ border-radius: 2em;
 }
 .Select-control:hover {
   box-shadow: none!important;
+}
+// .selectb-none.Select-control{
+//   border:none!important;
+// }
+.selectb-none.Select.Select-control{
+  border:none!important;
 }
 // .Select-arrow-zone {
 //   width: 49px!important;
