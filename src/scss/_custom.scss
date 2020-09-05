@@ -889,7 +889,10 @@ label.arrow_label:after {
   content: "*" !important; 
 font-size: 14px;
 }
-
+// Multiselect selectcontrol border none
+.Selectcontrol-bdrNone .Select .Select-control {
+  border: none !important;
+}
 
 // css by junaid last line
 

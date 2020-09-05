@@ -987,7 +987,7 @@ export default class PipelineProgramShipment extends Component {
             oneditionend: this.onedit,
             copyCompatibility: true,
             text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
                 show: '',
                 entries: '',
             },

@@ -325,7 +325,7 @@ export default class PipelineProgramInventory extends Component {
                                     paginationOptions: [10, 25, 50],
                                     position: 'top',
                                     text: {
-                                        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                                        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
                                         show: '',
                                         entries: '',
                                     },
