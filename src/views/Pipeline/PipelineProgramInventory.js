@@ -11,12 +11,16 @@ import RealmCountryService from '../../api/RealmCountryService'
 export default class PipelineProgramInventory extends Component {
 
     constructor(props) {
+       
         super(props);
         this.saveInventory = this.saveInventory.bind(this);
         this.loaded = this.loaded.bind(this);
         this.changed = this.changed.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
         this.dropdownFilter = this.dropdownFilter.bind(this);
+        this.state = {
+            loading:true
+        }
     }
 
     dropdownFilter = function (instance, cell, c, r, source) {
@@ -334,6 +338,9 @@ export default class PipelineProgramInventory extends Component {
 
                                 this.el = jexcel(document.getElementById("inventorytableDiv"), options);
                                 this.loaded();
+                                this.setState({
+                                    loading: false
+                                })
                             });
 
 
@@ -350,9 +357,20 @@ export default class PipelineProgramInventory extends Component {
     render() {
         return (
             <>
-                <div className="table-responsive" >
+                <div className="table-responsive" style={{ display: this.state.loading ? "none" : "block" }}>
 
                     <div id="inventorytableDiv">
+                    </div>
+                </div>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
                     </div>
                 </div>
             </>
