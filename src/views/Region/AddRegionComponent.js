@@ -144,6 +144,8 @@ class AddRegionComponent extends Component {
       <div className="animated fadeIn">
         <AuthenticationServiceComponent history={this.props.history} message={(message) => {
           this.setState({ message: message })
+        }} loading={(loading) => {
+          this.setState({ loading: loading })
         }} />
         <h5>{i18n.t(this.state.message, { entityname })}</h5>
         <Row>

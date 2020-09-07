@@ -1045,8 +1045,9 @@ class SupplyPlanVersionAndReview extends Component {
 
             let programId = document.getElementById("programId").value;
             // let countryId = document.getElementById("countryId").value;
-            let versionStatusId = document.getElementById("versionStatusId").value;
-            let versionTypeId = document.getElementById("versionTypeId").value;
+            let versionStatusId = this.el.getValueFromCoords(5, x);
+            let versionTypeId =this.el.getValueFromCoords(2, x);
+            console.log("====>",versionStatusId,"====>",versionTypeId);
             if (versionStatusId == 1 && versionTypeId == 2) {
                 this.props.history.push({
                     pathname: `/report/editStatus/${programId}/${this.el.getValueFromCoords(1, x)}`,
@@ -1156,8 +1157,7 @@ class SupplyPlanVersionAndReview extends Component {
 
     getPrograms() {
         AuthenticationService.setupAxiosInterceptors();
-        let realmId = AuthenticationService.getRealmId();
-        ProgramService.getProgramByRealmId(realmId)
+        ProgramService.getProgramList()
             .then(response => {
                 console.log(JSON.stringify(response.data))
                 this.setState({
