@@ -1014,8 +1014,8 @@ export default class CostOfInventory extends Component {
     getPrograms = () => {
         if (navigator.onLine) {
             AuthenticationService.setupAxiosInterceptors();
-            let realmId = AuthenticationService.getRealmId();
-            ProgramService.getProgramByRealmId(realmId)
+            //let realmId = AuthenticationService.getRealmId();
+            ProgramService.getProgramList()
                 .then(response => {
                     console.log(JSON.stringify(response.data))
                     this.setState({

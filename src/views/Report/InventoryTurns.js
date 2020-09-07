@@ -999,8 +999,7 @@ export default class InventoryTurns extends Component {
     getPrograms = () => {
         if (navigator.onLine) {
             AuthenticationService.setupAxiosInterceptors();
-            let realmId = AuthenticationService.getRealmId();
-            ProgramService.getProgramByRealmId(realmId)
+            ProgramService.getProgramList()
                 .then(response => {
                     console.log(JSON.stringify(response.data))
                     this.setState({

@@ -428,8 +428,7 @@ export default class StockStatusMatrix extends React.Component {
   getPrograms = () => {
     if (navigator.onLine) {
       AuthenticationService.setupAxiosInterceptors();
-      let realmId = AuthenticationService.getRealmId();
-      ProgramService.getProgramByRealmId(realmId)
+      ProgramService.getProgramList()
         .then(response => {
           console.log(JSON.stringify(response.data))
           this.setState({
@@ -888,12 +887,12 @@ export default class StockStatusMatrix extends React.Component {
   cellStyle = (min, value) => {
     if (value != '')
       if (min > value) {
-        return { backgroundColor: '#f48282' }
+        return { backgroundColor: legendcolor[0].color }
       } else {
         return {}
       }
     else {
-      return { backgroundColor: '#f48282' }
+      return { backgroundColor: legendcolor[0].color }
     }
   }
   render() {
