@@ -1009,7 +1009,7 @@ class StockStatusOverTime extends Component {
         const headers = [[i18n.t('static.report.month'), i18n.t('static.program.program'), i18n.t('static.planningunit.planningunit'), i18n.t('static.report.stock'), i18n.t('static.report.consupmtionqty'), i18n.t('static.report.amc'), i18n.t('static.report.noofmonth'), i18n.t('static.report.mos')]];
 
         const data = [];
-        this.state.matricsList.map(elt => data.push([this.dateFormatter(elt.dt), getLabelText(elt.program.label, this.state.lang), getLabelText(elt.planningUnit.label, this.state.lang), elt.stock, elt.consumptionQty, this.formatter(this.formatAmc(elt.amc)), elt.amcMonthCount, this.roundN(elt.mos)]));
+        this.state.matricsList.map(elt => data.push([this.dateFormatter(elt.dt), getLabelText(elt.program.label, this.state.lang), getLabelText(elt.planningUnit.label, this.state.lang), this.formatter(elt.stock), this.formatter(elt.consumptionQty), this.formatter(this.formatAmc(elt.amc)), elt.amcMonthCount, this.roundN(elt.mos)]));
         doc.addPage()
         startYtable = 80
         let content = {
