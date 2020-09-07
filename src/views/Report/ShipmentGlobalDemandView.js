@@ -1874,14 +1874,14 @@ class ShipmentGlobalDemandView extends Component {
             startYtable = 80
         }
         console.log(startYtable)
-        doc.addImage(canvasImg, 'png', 50, startYtable, 300, 200, 'a', 'CANVAS');
+        doc.addImage(canvasImg, 'png', 10, startYtable, 500, 280, 'a', 'CANVAS');
 
         //creates image2
         canvas = document.getElementById("cool-canvas2");
 
         canvasImg = canvas.toDataURL("image/png", 1.0);
 
-        doc.addImage(canvasImg, 'png', width / 2, startYtable, 280, 140, 'b', 'CANVAS');
+        doc.addImage(canvasImg, 'png',500, startYtable, 340, 170, 'b', 'CANVAS');
 
         // let tableHeadLength = this.state.table1Headers.length;
         let length = this.state.table1Headers.length + 1;
@@ -1891,9 +1891,9 @@ class ShipmentGlobalDemandView extends Component {
         let content1 = {
             margin: { top: 80, bottom: 70 },
             startY: startYtable,
-            styles: { lineWidth: 1, fontSize: 8, cellWidth: 53, halign: 'center' },
+            styles: { lineWidth: 1, fontSize: 8, cellWidth: 50, halign: 'center' },
             columnStyles: {
-                // 0: { cellWidth: 70 },
+                 0: { cellWidth: 61.89 },
                 // 1: { cellWidth: 100 },
                 // 2: { cellWidth: 200 },
                 // 3: { cellWidth: 100 },
@@ -2939,6 +2939,14 @@ class ShipmentGlobalDemandView extends Component {
             '#000',
             '#ffc107',
             '#f86c6b',
+            '#20a8d8',
+            '#042e6a',
+            '#59cacc',
+            '#118b70',
+            '#EDB944',
+            '#F48521',
+            '#ED5626',
+            '#3fe488'
         ]
 
         const chartData = {
@@ -2979,7 +2987,13 @@ class ShipmentGlobalDemandView extends Component {
             labels: [...new Set(this.state.fundingSourceSplit.map(ele => ele.fundingSource.code))],
             datasets: [{
                 data: this.state.fundingSourceSplit.map(ele => (ele.amount)),
-                backgroundColor: ['#4dbd74', '#f86c6b', '#8aa9e6', '#EDB944'],
+                backgroundColor: ['#4dbd74', '#f86c6b', '#8aa9e6', '#EDB944', '#20a8d8',
+                '#042e6a',
+                '#59cacc','#118b70',
+                '#EDB944',
+                '#F48521',
+                '#ED5626',
+                '#3fe488'],
                 legend: {
                     position: 'bottom'
                 }
@@ -3217,7 +3231,7 @@ class ShipmentGlobalDemandView extends Component {
                                     {
                                         this.state.planningUnitSplit.length > 0 &&
                                         <Col md="8 pl-0">
-                                            <div className="chart-wrapper" >
+                                            <div className="chart-wrapper shipmentOverviewgraphheight" >
                                                 <HorizontalBar id="cool-canvas1" data={chartData} options={options} />
                                             </div>
                                         </Col>

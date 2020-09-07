@@ -115,7 +115,7 @@ export default class SupplyPlanComponent extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            // loading: true,
+            loading: true,
             monthsArray: [],
             programList: [],
             planningUnitList: [],
@@ -1001,7 +1001,7 @@ export default class SupplyPlanComponent extends React.Component {
 
                     {/* Consumption modal */}
                     <Modal isOpen={this.state.consumption}
-                        className={'modal-lg ' + this.props.className, "modalWidth"}>
+                        className={'modal-lg ' + this.props.className, "modalWidth"} style={{ display: this.state.loading ? "none" : "block" }}>
                         <ModalHeader toggle={() => this.toggleLarge('Consumption')} className="modalHeaderSupplyPlan">
                             <strong>{i18n.t('static.dashboard.consumptiondetails')}</strong>
                             <ul className="legendcommitversion" style={{ display: 'inline-flex' }}>
@@ -1082,7 +1082,7 @@ export default class SupplyPlanComponent extends React.Component {
                     {/* Consumption modal */}
                     {/* Adjustments modal */}
                     <Modal isOpen={this.state.adjustments}
-                        className={'modal-lg ' + this.props.className, "modalWidth"}>
+                        className={'modal-lg ' + this.props.className, "modalWidth"} style={{ display: this.state.loading ? "none" : "block" }}>
                         <ModalHeader toggle={() => this.toggleLarge('Adjustments')} className="modalHeaderSupplyPlan">{i18n.t('static.supplyPlan.adjustmentsDetails')}</ModalHeader>
                         <ModalBody>
                             <h6 className="red">{this.state.inventoryDuplicateError || this.state.inventoryNoStockError || this.state.inventoryError}</h6>
@@ -1272,7 +1272,7 @@ export default class SupplyPlanComponent extends React.Component {
 
                     {/* Shipments modal */}
                     <Modal isOpen={this.state.shipments}
-                        className={'modal-lg ' + this.props.className, "modalWidth"}>
+                        className={'modal-lg ' + this.props.className, "modalWidth"} style={{ display: this.state.loading ? "none" : "block" }}>
                         <ModalHeader toggle={() => this.toggleLarge('shipments')} className="modalHeaderSupplyPlan">
                             <strong>{i18n.t('static.supplyPlan.shipmentsDetails')} -  {i18n.t('static.planningunit.planningunit')} - {this.state.planningUnitName} </strong>
                         </ModalHeader>
@@ -1322,7 +1322,7 @@ export default class SupplyPlanComponent extends React.Component {
                     {/* Shipments modal */}
                     {/* Expired Stock modal */}
                     <Modal isOpen={this.state.expiredStockModal}
-                        className={'modal-md ' + this.props.className}>
+                        className={'modal-md ' + this.props.className} style={{ display: this.state.loading ? "none" : "block" }}>
                         <ModalHeader toggle={() => this.toggleLarge('expiredStock')} className="modalHeaderSupplyPlan">
                             <strong>{i18n.t('static.dashboard.expiryDetails')}</strong>
                         </ModalHeader>
@@ -1388,7 +1388,8 @@ export default class SupplyPlanComponent extends React.Component {
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
             this.setState({
-                supplyPlanError: i18n.t('static.program.errortext')
+                supplyPlanError: i18n.t('static.program.errortext'),
+                loading:false
             })
         }.bind(this);
         openRequest.onsuccess = function (e) {
@@ -1399,7 +1400,8 @@ export default class SupplyPlanComponent extends React.Component {
             var proList = []
             getRequest.onerror = function (event) {
                 this.setState({
-                    supplyPlanError: i18n.t('static.program.errortext')
+                    supplyPlanError: i18n.t('static.program.errortext'),
+                    loading:false
                 })
             };
             getRequest.onsuccess = function (event) {
@@ -1447,7 +1449,7 @@ export default class SupplyPlanComponent extends React.Component {
         document.getElementById("planningUnitId").value = 0;
         document.getElementById("planningUnit").value = "";
         this.setState({
-            // loading: true,
+            loading: true,
             display: 'none',
             planningUnitChange: false,
             programSelect: value,
@@ -1464,7 +1466,8 @@ export default class SupplyPlanComponent extends React.Component {
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
             this.setState({
-                supplyPlanError: i18n.t('static.program.errortext')
+                supplyPlanError: i18n.t('static.program.errortext'),
+                loading:false
             })
         }.bind(this);
         openRequest.onsuccess = function (e) {
@@ -1474,7 +1477,8 @@ export default class SupplyPlanComponent extends React.Component {
             var programRequest = programDataOs.get(value != "" && value != undefined ? value.value : 0);
             programRequest.onerror = function (event) {
                 this.setState({
-                    supplyPlanError: i18n.t('static.program.errortext')
+                    supplyPlanError: i18n.t('static.program.errortext'),
+                    loading:false
                 })
             }.bind(this);
             programRequest.onsuccess = function (e) {
@@ -1496,7 +1500,8 @@ export default class SupplyPlanComponent extends React.Component {
                 var planningList = []
                 planningunitRequest.onerror = function (event) {
                     this.setState({
-                        supplyPlanError: i18n.t('static.program.errortext')
+                        supplyPlanError: i18n.t('static.program.errortext'),
+                        loading:false
                     })
                 }.bind(this);
                 planningunitRequest.onsuccess = function (e) {
@@ -1521,7 +1526,8 @@ export default class SupplyPlanComponent extends React.Component {
                     var planningUnitListForConsumption = []
                     puRequest.onerror = function (event) {
                         this.setState({
-                            supplyPlanError: i18n.t('static.program.errortext')
+                            supplyPlanError: i18n.t('static.program.errortext'),
+                            loading:false
                         })
                     }.bind(this);
                     puRequest.onsuccess = function (e) {
@@ -1535,7 +1541,8 @@ export default class SupplyPlanComponent extends React.Component {
                         var dataSourceRequest = dataSourceOs.getAll();
                         dataSourceRequest.onerror = function (event) {
                             this.setState({
-                                supplyPlanError: i18n.t('static.program.errortext')
+                                supplyPlanError: i18n.t('static.program.errortext'),
+                                loading:false
                             })
                         }.bind(this);
                         dataSourceRequest.onsuccess = function (event) {
@@ -1610,7 +1617,7 @@ export default class SupplyPlanComponent extends React.Component {
                 display: 'none'
             })
         }
-        // this.setState({ loading: true });
+        this.setState({ loading: true });
         var m = this.getMonthArray(moment(Date.now()).add(monthCount, 'months').utcOffset('-0500'));
         var planningUnitId = value != "" && value != undefined ? value.value : 0;
         var planningUnitName = value.label;
@@ -1651,7 +1658,8 @@ export default class SupplyPlanComponent extends React.Component {
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
             this.setState({
-                supplyPlanError: i18n.t('static.program.errortext')
+                supplyPlanError: i18n.t('static.program.errortext'),
+                loading:false
             })
         }.bind(this);
         openRequest.onsuccess = function (e) {
@@ -1661,7 +1669,8 @@ export default class SupplyPlanComponent extends React.Component {
             var programRequest = programDataOs.get(document.getElementById("programId").value);
             programRequest.onerror = function (event) {
                 this.setState({
-                    supplyPlanError: i18n.t('static.program.errortext')
+                    supplyPlanError: i18n.t('static.program.errortext'),
+                    loading:false
                 })
             }.bind(this);
             programRequest.onsuccess = function (e) {
@@ -1681,6 +1690,10 @@ export default class SupplyPlanComponent extends React.Component {
                 var shipmentStatusOs = shipmentStatusTransaction.objectStore('shipmentStatus');
                 var shipmentStatusRequest = shipmentStatusOs.getAll();
                 shipmentStatusRequest.onerror = function (event) {
+                    this.setState({
+                        supplyPlanError: i18n.t('static.program.errortext'),
+                        loading:false
+                    })  
                 }.bind(this);
                 shipmentStatusRequest.onsuccess = function (event) {
                     var shipmentStatusResult = [];
@@ -1689,6 +1702,10 @@ export default class SupplyPlanComponent extends React.Component {
                     var papuOs = papuTransaction.objectStore('procurementAgent');
                     var papuRequest = papuOs.getAll();
                     papuRequest.onerror = function (event) {
+                        this.setState({
+                            supplyPlanError: i18n.t('static.program.errortext'),
+                            loading:false
+                        })
                     }.bind(this);
                     papuRequest.onsuccess = function (event) {
                         var papuResult = [];
@@ -2311,13 +2328,15 @@ export default class SupplyPlanComponent extends React.Component {
             });
             this.formSubmit(this.state.planningUnit, monthCountAdjustments);
         } else if (supplyPlanType == 'expiredStock') {
+            this.setState({ loading: true });
             var details = (this.state.expiredStockArr).filter(c => moment(c.month.startDate).format("YYYY-MM-DD") == moment(startDate).format("YYYY-MM-DD"))
             console.log("startDate", startDate)
             if (startDate != undefined) {
                 this.setState({
                     expiredStockModal: !this.state.expiredStockModal,
                     expiredStockDetails: details[0].details,
-                    expiredStockDetailsTotal: details[0].qty
+                    expiredStockDetailsTotal: details[0].qty,
+                    loading: false
                 })
             } else {
                 this.setState({
@@ -2444,6 +2463,7 @@ export default class SupplyPlanComponent extends React.Component {
 
     // Show consumption details
     consumptionDetailsClicked(startDate, endDate, region, actualFlag, month) {
+        this.setState({ loading: true });
         var elInstance = this.state.consumptionBatchInfoTableEl;
         if (elInstance != undefined && elInstance != "") {
             elInstance.destroy();
@@ -2456,7 +2476,8 @@ export default class SupplyPlanComponent extends React.Component {
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
             this.setState({
-                supplyPlanError: i18n.t('static.program.errortext')
+                supplyPlanError: i18n.t('static.program.errortext'),
+                loading:false
             })
         }.bind(this);
         openRequest.onsuccess = function (e) {
@@ -2466,7 +2487,8 @@ export default class SupplyPlanComponent extends React.Component {
             var programRequest = programDataOs.get(programId);
             programRequest.onerror = function (event) {
                 this.setState({
-                    supplyPlanError: i18n.t('static.program.errortext')
+                    supplyPlanError: i18n.t('static.program.errortext'),
+                    loading:false
                 })
             }.bind(this);
             programRequest.onsuccess = function (e) {
@@ -2499,6 +2521,7 @@ export default class SupplyPlanComponent extends React.Component {
     // Adjustments Functionality
     // Show adjustments details
     adjustmentsDetailsClicked(region, month, endDate, inventoryType) {
+        this.setState({ loading: true })
         var elInstance = this.state.inventoryBatchInfoTableEl;
         if (elInstance != undefined && elInstance != "") {
             elInstance.destroy();
@@ -2510,7 +2533,8 @@ export default class SupplyPlanComponent extends React.Component {
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
             this.setState({
-                supplyPlanError: i18n.t('static.program.errortext')
+                supplyPlanError: i18n.t('static.program.errortext'),
+                loading:false
             })
         }.bind(this);
         openRequest.onsuccess = function (e) {
@@ -2520,7 +2544,8 @@ export default class SupplyPlanComponent extends React.Component {
             var programRequest = programTransaction.get(programId);
             programRequest.onerror = function (event) {
                 this.setState({
-                    supplyPlanError: i18n.t('static.program.errortext')
+                    supplyPlanError: i18n.t('static.program.errortext'),
+                    loading:false
                 })
             }.bind(this);
             programRequest.onsuccess = function (event) {
@@ -2562,13 +2587,15 @@ export default class SupplyPlanComponent extends React.Component {
 
     //Show Suggested shipments details
     suggestedShipmentsDetailsClicked(month, quantity, isEmergencyOrder) {
+        this.setState({ loading: true })
         var programId = document.getElementById("programId").value;
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
             this.setState({
-                supplyPlanError: i18n.t('static.program.errortext')
+                supplyPlanError: i18n.t('static.program.errortext'),
+                loading:false
             })
         }.bind(this);
         openRequest.onsuccess = function (e) {
@@ -2578,7 +2605,8 @@ export default class SupplyPlanComponent extends React.Component {
             var programRequest = programTransaction.get(programId);
             programRequest.onerror = function (event) {
                 this.setState({
-                    supplyPlanError: i18n.t('static.program.errortext')
+                    supplyPlanError: i18n.t('static.program.errortext'),
+                    loading:false
                 })
             }.bind(this);
             programRequest.onsuccess = function (event) {
@@ -2665,6 +2693,7 @@ export default class SupplyPlanComponent extends React.Component {
                         <div className="card-header-actions">
                             <a className="card-header-action">
                                 <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggle() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span>
+                                {/* <Link to='/supplyPlanFormulas' target="_blank"><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></Link> */}
                             </a>
                         </div>
                     </div>
@@ -2685,7 +2714,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 ({
                                 }) => (
                                         <Form name='simpleForm'>
-                                            <Col md="12 pl-0">
+                                            <div className=" pl-0">
                                                 <div className="row">
                                                     <FormGroup className="col-md-4">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
@@ -2740,7 +2769,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                         <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.shelfLife")} - {this.state.shelfLife}</span></li>
                                                     </ul>
                                                 </FormGroup>
-                                            </Col>
+                                            </div>
                                         </Form>
                                     )} />
                         <div className="animated fadeIn" style={{ display: this.state.display }}>
@@ -2787,13 +2816,15 @@ export default class SupplyPlanComponent extends React.Component {
     }
 
     shipmentsDetailsClicked(supplyPlanType, startDate, endDate) {
+        this.setState({ loading: true })
         var programId = document.getElementById("programId").value;
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
             this.setState({
-                supplyPlanError: i18n.t('static.program.errortext')
+                supplyPlanError: i18n.t('static.program.errortext'),
+                loading:false
             })
         }.bind(this);
         openRequest.onsuccess = function (e) {

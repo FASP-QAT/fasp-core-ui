@@ -2511,6 +2511,14 @@ class ShipmentGlobalView extends Component {
             '#000',
             '#ffc107',
             '#f86c6b',
+            '#20a8d8',
+            '#042e6a',
+            '#59cacc',
+            '#118b70',
+            '#EDB944',
+            '#F48521',
+            '#ED5626',
+            '#3fe488'
         ]
 
         const pickerLang = {

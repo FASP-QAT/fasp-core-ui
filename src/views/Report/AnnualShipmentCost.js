@@ -166,7 +166,7 @@ class AnnualShipmentCost extends Component {
                                 if (reportbaseValue == 1) {
                                     list = shipmentList.filter(c => c.planningUnit.id == planningUnitId && (moment(c.shippedDate).format('YYYY-MM-DD') >= moment(startDate).format('YYYY-MM-DD') && moment(c.shippedDate).format('YYYY-MM-DD') <= moment(endDate).format('YYYY-MM-DD')));
                                 } else {
-                                    list = shipmentList.filter(c => c.planningUnit.id == planningUnitId && (moment(c.deliveredDate).format('YYYY-MM-DD') >= moment(startDate).format('YYYY-MM-DD') && moment(c.deliveredDate).format('YYYY-MM-DD') <= moment(endDate).format('YYYY-MM-DD')));
+                                    list = shipmentList.filter(c => c.planningUnit.id == planningUnitId && (moment(c.receivedDate).format('YYYY-MM-DD') >= moment(startDate).format('YYYY-MM-DD') && moment(c.receivedDate).format('YYYY-MM-DD') <= moment(endDate).format('YYYY-MM-DD')));
                                 }
                                 // var list = shipmentList.filter(c => c.planningUnit.id == planningUnitId && (c.shippedDate >=moment(startDate).format('YYYY-MM-DD') && c.shippedDate <= moment(endDate).format('YYYY-MM-DD')));
                                 var procurementAgentId = document.getElementById("procurementAgentId").value;
@@ -281,7 +281,7 @@ class AnnualShipmentCost extends Component {
                         }
                         console.log("json final---", json);
                         this.setState({
-                            outPutList: outPutList
+                            outPutList: outPutList, message: '' 
                         })
                     }).catch(
                         error => {
@@ -322,8 +322,7 @@ class AnnualShipmentCost extends Component {
     getPrograms() {
         if (navigator.onLine) {
             AuthenticationService.setupAxiosInterceptors();
-            let realmId = AuthenticationService.getRealmId();
-            ProgramService.getProgramByRealmId(realmId)
+            ProgramService.getProgramList()
                 .then(response => {
                     console.log(JSON.stringify(response.data))
                     this.setState({
@@ -524,13 +523,13 @@ class AnnualShipmentCost extends Component {
         doc.setFontSize(9);
         doc.setTextColor("#002f6c");
         doc.setFont('helvetica', 'bold')
-        doc.text(i18n.t('static.procurementagent.procurementagent'), doc.internal.pageSize.width / 8, 180, {
+        doc.text(i18n.t('static.procurementagent.procurementagent'), 50, 180, {
             align: 'left'
         })
-        doc.text(i18n.t(i18n.t('static.fundingsource.fundingsource')), doc.internal.pageSize.width / 8, 190, {
+        doc.text(i18n.t(i18n.t('static.fundingsource.fundingsource')), 50, 190, {
             align: 'left'
         })
-        doc.text(i18n.t('static.planningunit.planningunit'), doc.internal.pageSize.width / 8, 200, {
+        doc.text(i18n.t('static.planningunit.planningunit'), 50 , 200, {
             align: 'left'
         })
         doc.line(50, 210, doc.internal.pageSize.width - 50, 210);
@@ -572,7 +571,18 @@ class AnnualShipmentCost extends Component {
             var total = 0
             var splittext = doc.splitTextToSize(record.procurementAgent + '\n' + record.fundingsource + '\n' + record.planningUnit + '\n' + '\n', index);
 
-            doc.text(doc.internal.pageSize.width / 8, yindex, splittext)
+            //doc.text(doc.internal.pageSize.width / 8, yindex, splittext)
+          //  yindex = yindex + 10;
+    for (var i = 0; i < splittext.length; i++) {
+        yindex = yindex + 10;
+      if (yindex > doc.internal.pageSize.height - 100) {
+        doc.addPage();
+        yindex = 80;
+
+      }
+      doc.text(50 , yindex, splittext[i]);
+      
+    }
             initalvalue = initalvalue + index
             for (var x = 0; x < year.length; x++) {
                 for (var n = 0; n < keys.length; n++) {
@@ -582,14 +592,14 @@ class AnnualShipmentCost extends Component {
                         totalAmount[x] = totalAmount[x] == null ? values[n] : totalAmount[x] + values[n]
                         GrandTotalAmount[x] = GrandTotalAmount[x] == null ? values[n] : GrandTotalAmount[x] + values[n]
                         doc.setFont('helvetica', 'normal')
-                        doc.text(this.formatter(values[n]).toString(), initalvalue, yindex, {
+                        doc.text(this.formatter(values[n]).toString(), initalvalue, yindex -30, {
                             align: 'left'
                         })
                     }
                 }
             }
             doc.setFont('helvetica', 'bold')
-            doc.text(this.formatter(total).toString() , initalvalue + index, yindex, {
+            doc.text(this.formatter(total).toString() , initalvalue + index, yindex-30, {
                 align: 'left',
                 
             });
@@ -1442,7 +1452,6 @@ class AnnualShipmentCost extends Component {
                                             {this.state.outPutList.length > 0 &&
                                                 // {true &&
                                                 <div className="col-md-12">
-
                                                     <button className="mr-1 float-right btn btn-info btn-md showdatabtn mt-1 mb-3" onClick={this.previewPDF}>Preview</button>
 
                                                     <p style={{ width: '100%', height: '700px', overflow: 'hidden' }} id='pdf'></p>   </div>}
