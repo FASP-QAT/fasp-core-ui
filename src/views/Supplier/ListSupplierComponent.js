@@ -373,7 +373,7 @@ class SupplierListComponent extends Component {
         if ((x == 0 && value != 0) || (y == 0)) {
             // console.log("HEADER SELECTION--------------------------");
         } else {
-            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_CURRENCY')) {
+            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_SUPPLIER')) {
                 this.props.history.push({
                     pathname: `/supplier/editSupplier/${this.el.getValueFromCoords(0, x)}`,
                     // state: { currency: currency }

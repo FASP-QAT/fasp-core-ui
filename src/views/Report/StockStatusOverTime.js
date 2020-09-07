@@ -735,21 +735,21 @@ class StockStatusOverTime extends Component {
 
 
 
-                                        if (month == this.state.rangeValue.to.month && from == to) {
-                                            this.setState({
-                                                matricsList: data,
-                                                message: ''
-                                            })
+                                    if (month == this.state.rangeValue.to.month && from == to) {
+                                        this.setState({
+                                            matricsList: data,
+                                            message: ''
+                                        })
 
-                                            return;
-                                        }
-
+                                        return;
                                     }
-                                    monthstartfrom = 1
 
                                 }
+                                monthstartfrom = 1
 
-                            
+                            }
+
+
 
 
                         })
@@ -991,25 +991,25 @@ class StockStatusOverTime extends Component {
         var height = doc.internal.pageSize.height;
         var h1 = 50;
         var aspectwidth1 = (width - h1);
-        var startY=190 + (this.state.planningUnitValues.length * 3)
+        var startY = 190 + (this.state.planningUnitValues.length * 3)
         let pages = Math.ceil(startY / height)
         for (var j = 1; j < pages; j++) {
-          doc.addPage()
+            doc.addPage()
         }
         let startYtable = startY - ((height - h1) * (pages - 1))
         doc.setTextColor("#fff");
-        console.log(startYtable , (height - 500))
+        console.log(startYtable, (height - 500))
         if (startYtable > (height - 400)) {
-          doc.addPage()
-          startYtable = 80
-      }
+            doc.addPage()
+            startYtable = 80
+        }
         // doc.addImage(canvasImg, 'png', 50, 130, aspectwidth1, height * 2 / 3);
         doc.addImage(canvasImg, 'png', 50, startYtable, 750, 230, 'CANVAS');
 
         const headers = [[i18n.t('static.report.month'), i18n.t('static.program.program'), i18n.t('static.planningunit.planningunit'), i18n.t('static.report.stock'), i18n.t('static.report.consupmtionqty'), i18n.t('static.report.amc'), i18n.t('static.report.noofmonth'), i18n.t('static.report.mos')]];
 
         const data = [];
-        this.state.matricsList.map(elt => data.push([this.dateFormatter(elt.dt), getLabelText(elt.program.label, this.state.lang), getLabelText(elt.planningUnit.label, this.state.lang), elt.stock, elt.consumptionQty, this.formatter(this.formatAmc(elt.amc)), elt.amcMonthCount, this.roundN(elt.mos)]));
+        this.state.matricsList.map(elt => data.push([this.dateFormatter(elt.dt), getLabelText(elt.program.label, this.state.lang), getLabelText(elt.planningUnit.label, this.state.lang), this.formatter(elt.stock), this.formatter(elt.consumptionQty), this.formatter(this.formatAmc(elt.amc)), elt.amcMonthCount, this.roundN(elt.mos)]));
         doc.addPage()
         startYtable = 80
         let content = {
@@ -1161,7 +1161,7 @@ class StockStatusOverTime extends Component {
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
                 <SupplyPlanFormulas ref="formulaeChild" />
-                <Card>
+                <Card style={{ display: this.state.loading ? "none" : "block" }}>
                     <div className="Card-header-reporticon">
                         <div className="card-header-actions">
                             <a className="card-header-action">
@@ -1421,6 +1421,18 @@ class StockStatusOverTime extends Component {
                             </div>
                         </div>
                     </CardBody></Card>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
 

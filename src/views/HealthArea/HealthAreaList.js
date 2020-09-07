@@ -677,7 +677,7 @@ export default class HealthAreaListComponent extends Component {
             // console.log("HEADER SELECTION--------------------------");
         } else {
             if (this.state.selSource.length != 0) {
-                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_ROLE')) {
+                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_HEALTH_AREA')) {
                     this.props.history.push({
                         pathname: `/healthArea/editHealthArea/${this.el.getValueFromCoords(0, x)}`,
                         // state: { role }

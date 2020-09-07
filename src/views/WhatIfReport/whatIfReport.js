@@ -1074,7 +1074,8 @@ export default class WhatIfReportComponent extends React.Component {
             display: 'none',
             planningUnitChange: false,
             programSelect: value,
-            programId: value != "" && value != undefined ? value.value : 0
+            programId: value != "" && value != undefined ? value.value : 0,
+            planningUnit: ""
         })
         var db1;
         var storeOS;

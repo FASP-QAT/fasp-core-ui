@@ -13,6 +13,7 @@ import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import { LABEL_REGEX } from '../../Constants.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import classNames from 'classnames';
 
 const initialValues = {
     username: "",
@@ -43,6 +44,8 @@ const validationSchema = function (values) {
                 }
                 return schema;
             }),
+        roleId: Yup.string()
+            .required(i18n.t('static.user.validrole')),
         // roleId: Yup.array()
         // .min(3, 'Pick at least 3 tags')
         // .of(
@@ -371,7 +374,7 @@ class AddUserComponent extends Component {
                                                 this.props.history.push(`/user/listUser/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
-                                                    message: response.data.messageCode,loading: false
+                                                    message: response.data.messageCode, loading: false
                                                 },
                                                     () => {
                                                         this.hideSecondComponent();
@@ -391,7 +394,9 @@ class AddUserComponent extends Component {
                                         isSubmitting,
                                         isValid,
                                         setTouched,
-                                        handleReset
+                                        handleReset,
+                                        setFieldValue,
+                                        setFieldTouched
                                     }) => (
                                             <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='userForm'>
                                                 <CardBody className="pt-2 pb-0">
@@ -465,11 +470,17 @@ class AddUserComponent extends Component {
                                                     <FormGroup>
                                                         <Label htmlFor="roleId">{i18n.t('static.role.role')}<span class="red Reqasterisk">*</span></Label>
                                                         <Select
-                                                            valid={!errors.roleId}
+                                                            className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                                { 'is-valid': !errors.roleId && this.state.user.roles.length != 0 },
+                                                                { 'is-invalid': (touched.roleId && !!errors.roleId) }
+                                                            )}
                                                             bsSize="sm"
-                                                            invalid={touched.roleId && !!errors.roleId}
-                                                            onChange={(e) => { handleChange(e); this.roleChange(e) }}
-                                                            onBlur={handleBlur}
+                                                            onChange={(e) => {
+                                                                handleChange(e);
+                                                                setFieldValue("roleId", e);
+                                                                this.roleChange(e);
+                                                            }}
+                                                            onBlur={() => setFieldTouched("roleId", true)}
                                                             name="roleId"
                                                             id="roleId"
                                                             multi
@@ -477,30 +488,8 @@ class AddUserComponent extends Component {
                                                             min={1}
                                                             options={this.state.roleList}
                                                             value={this.state.roleId}
-                                                            error={errors.roleId}
-                                                            touched={touched.roleId}
                                                         />
-                                                        {!!this.props.error &&
-                                                            this.props.touched && (
-                                                                <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
-                                                            )}
-                                                        {/* <Input
- type="select"
- name="roleId"
- id="roleId"
- bsSize="sm"
- valid={!errors.roleId}
- invalid={touched.roleId && !!errors.roleId}
- onChange={(e) => { handleChange(e); this.dataChange(e) }}
- onBlur={handleBlur}
- required
- value={this.state.user.roles}
- multiple={true}
- >
- <option value="" disabled>{i18n.t('static.common.select')}</option>
- {roleList}
- </Input> */}
-                                                        {/* <FormFeedback>{errors.roleId}</FormFeedback> */}
+                                                        <FormFeedback className="red">{errors.roleId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="languageId">{i18n.t('static.language.language')}<span class="red Reqasterisk">*</span></Label>

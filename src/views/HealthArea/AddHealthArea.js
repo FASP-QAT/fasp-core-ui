@@ -11,13 +11,15 @@ import HealthAreaService from "../../api/HealthAreaService";
 import UserService from "../../api/UserService";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import getLabelText from '../../CommonComponent/getLabelText';
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import classNames from 'classnames';
 
 const entityname = i18n.t('static.healtharea.healtharea');
 
 const initialValues = {
   realmId: '',
-  healthAreaName: ''
+  healthAreaName: '',
+  realmCountryId: [],
 }
 
 const validationSchema = function (values) {
@@ -30,6 +32,9 @@ const validationSchema = function (values) {
     healthAreaCode: Yup.string()
       .max(3, 'Technical Area Code Is 3 Digit')
       .required(i18n.t('static.country.countrycodetext')),
+    realmCountryId: Yup.string()
+      .required(i18n.t('static.program.validcountrytext'))
+
   })
 }
 
@@ -117,6 +122,7 @@ export default class AddHealthAreaComponent extends Component {
       realmId: true,
       healthAreaName: true,
       healthAreaCode: true,
+      realmCountryId: true
     }
     )
     this.validateForm(errors)
@@ -302,7 +308,9 @@ export default class AddHealthAreaComponent extends Component {
                     isSubmitting,
                     isValid,
                     setTouched,
-                    handleReset
+                    handleReset,
+                    setFieldValue,
+                    setFieldTouched
                   }) => (
                       <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='healthAreaForm'>
                         <CardBody>
@@ -324,13 +332,21 @@ export default class AddHealthAreaComponent extends Component {
                           </FormGroup>
 
                           <FormGroup>
-                            <Label htmlFor="select">{i18n.t('static.healtharea.realmcountry')}<span class="red Reqasterisk">*</span></Label>
+                            <Label htmlFor="realmCountryId">{i18n.t('static.healtharea.realmcountry')}<span class="red Reqasterisk">*</span></Label>
                             <Select
+                              className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                { 'is-valid': !errors.realmCountryId && this.state.healthArea.realmCountryArray.length != 0 },
+                                { 'is-invalid': (touched.realmCountryId && !!errors.realmCountryId) }
+                              )}
                               bsSize="sm"
-                              valid={!errors.realmCountryId && this.state.realmCountryId != ''}
-                              invalid={touched.realmCountryId && !!errors.realmCountryId}
-                              onChange={(e) => { handleChange(e); this.updateFieldData(e) }}
-                              onBlur={handleBlur} name="realmCountryId" id="realmCountryId"
+                              name="realmCountryId"
+                              id="realmCountryId"
+                              onChange={(e) => {
+                                handleChange(e);
+                                setFieldValue("realmCountryId", e);
+                                this.updateFieldData(e);
+                              }}
+                              onBlur={() => setFieldTouched("realmCountryId", true)}
                               multi
                               options={this.state.realmCountryList}
                               value={this.state.realmCountryId}

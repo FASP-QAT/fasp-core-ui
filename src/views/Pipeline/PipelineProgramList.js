@@ -255,6 +255,7 @@ export default class PipelineProgramList extends Component {
             pipelineProgramList: [],
             message: '',
             lang: localStorage.getItem('lang'),
+            loading: true
 
         }
         this.getPipelineProgramInfo = this.getPipelineProgramInfo.bind(this);
@@ -365,7 +366,7 @@ export default class PipelineProgramList extends Component {
         var languageEl = jexcel(document.getElementById("tableDiv"), options);
         this.el = languageEl;
         this.setState({
-            languageEl: languageEl
+            languageEl: languageEl, loading: false
         })
     }
 
@@ -391,12 +392,12 @@ export default class PipelineProgramList extends Component {
         PipelineService.getPipelineProgramList().then(response => {
             if (response.status == 200) {
                 this.setState({
-                    pipelineProgramList: response.data,
+                    pipelineProgramList: response.data
                 }, () => {
                     this.buildJExcel();
                 });
             } else {
-                this.setState({ message: response.data.messageCode })
+                this.setState({ message: response.data.messageCode, loading: false })
             }
         })
     }
@@ -504,11 +505,13 @@ export default class PipelineProgramList extends Component {
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
                 }} />
 
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
-                <Card>
+                <Card style={{ display: this.state.loading ? "none" : "block" }}>
                     <div style={{ padding: '4px 20px 2px 20px' }}>
                         {/* <i className="icon-menu"></i><strong>Programs</strong>{' '} */}
 
@@ -523,6 +526,17 @@ export default class PipelineProgramList extends Component {
                         </div>
                     </CardBody>
                 </Card>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }

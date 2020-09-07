@@ -9,6 +9,7 @@ import {
 
 } from 'reactstrap';
 import AuthenticationService from '../Common/AuthenticationService.js';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import ProcurementUnitService from "../../api/ProcurementUnitService";
 import i18n from '../../i18n';
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions';
@@ -807,6 +808,11 @@ export default class AddProcurementAgentProcurementUnit extends Component {
     render() {
         return (
             <div className="animated fadeIn">
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
+                }} />
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
                 <div style={{ display: this.state.loading ? "none" : "block" }}>
 

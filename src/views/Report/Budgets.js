@@ -83,8 +83,8 @@ class Budgets extends Component {
             programLabels: [],
             programs: [],
             versions: [],
-            show: false
-            //loading: true
+            show: false,
+            loading: true
         }
 
 
@@ -327,18 +327,19 @@ class Budgets extends Component {
                 }.bind(this)
 
             } else {
+                this.setState({ loading: true })
                 var inputjson = { "programId": programId, "versionId": versionId }
                 AuthenticationService.setupAxiosInterceptors();
                 ReportService.budgetReport(inputjson)
                     .then(response => {
                         console.log(JSON.stringify(response.data));
                         this.setState({
-                            selBudget: response.data, message: ''
+                            selBudget: response.data, message: '', loading: false
                         })
                     }).catch(
                         error => {
                             this.setState({
-                                selBudget: []
+                                selBudget: [], loading: false
                             })
 
                             if (error.message === "Network Error") {
@@ -350,10 +351,10 @@ class Budgets extends Component {
                                     case 404:
                                     case 406:
                                     case 412:
-                                        this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                        this.setState({loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
                                         break;
                                     default:
-                                        this.setState({ message: 'static.unkownError' });
+                                        this.setState({loading: false, message: 'static.unkownError' });
                                         break;
                                 }
                             }
@@ -385,15 +386,15 @@ class Budgets extends Component {
                 .then(response => {
                     console.log(JSON.stringify(response.data))
                     this.setState({
-                        programs: response.data
+                        programs: response.data, loading: false
                     }, () => { this.consolidatedProgramList() })
                 }).catch(
                     error => {
                         this.setState({
-                            programs: []
+                            programs: [], loading: false
                         }, () => { this.consolidatedProgramList() })
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
+                            this.setState({ message: error.message, loading: false });
                         } else {
                             switch (error.response ? error.response.status : "") {
                                 case 500:
@@ -401,10 +402,10 @@ class Budgets extends Component {
                                 case 404:
                                 case 406:
                                 case 412:
-                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                    this.setState({loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
                                     break;
                                 default:
-                                    this.setState({ message: 'static.unkownError' });
+                                    this.setState({loading: false, message: 'static.unkownError' });
                                     break;
                             }
                         }
@@ -414,6 +415,7 @@ class Budgets extends Component {
         } else {
             console.log('offline')
             this.consolidatedProgramList()
+            this.setState({ loading: false })
         }
 
     }
@@ -871,6 +873,11 @@ class Budgets extends Component {
         }
         return (
             <div className="animated">
+                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
+                }} />
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>

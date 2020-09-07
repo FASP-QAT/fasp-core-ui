@@ -58,20 +58,18 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             }.bind(this);
             rcpuRequest.onsuccess = function (event) {
                 var rcpuResult = [];
-                rcpuResult = rcpuRequest.result.filter(c => (c.active).toString() == "true");
+                rcpuResult = rcpuRequest.result;
                 for (var k = 0; k < rcpuResult.length; k++) {
                     if (rcpuResult[k].realmCountry.id == programJson.realmCountry.realmCountryId && rcpuResult[k].planningUnit.id == document.getElementById("planningUnitId").value) {
                         var rcpuJson = {
                             name: getLabelText(rcpuResult[k].label, this.props.items.lang),
                             id: rcpuResult[k].realmCountryPlanningUnitId,
-                            multiplier: rcpuResult[k].multiplier
+                            multiplier: rcpuResult[k].multiplier,
+                            active: rcpuResult[k].active
                         }
                         realmCountryPlanningUnitList.push(rcpuJson);
                     }
                 }
-                this.setState({
-                    realmCountryPlanningUnitList: realmCountryPlanningUnitList
-                })
 
                 var dataSourceTransaction = db1.transaction(['dataSource'], 'readwrite');
                 var dataSourceOs = dataSourceTransaction.objectStore('dataSource');
@@ -83,11 +81,12 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     var dataSourceResult = [];
                     dataSourceResult = dataSourceRequest.result;
                     for (var k = 0; k < dataSourceResult.length; k++) {
-                        if (dataSourceResult[k].program.id == programJson.programId || dataSourceResult[k].program.id == 0 && (dataSourceResult[k].active).toString() == "true") {
+                        if (dataSourceResult[k].program.id == programJson.programId || dataSourceResult[k].program.id == 0) {
                             if (dataSourceResult[k].realm.id == programJson.realmCountry.realm.realmId && dataSourceResult[k].dataSourceType.id == INVENTORY_DATA_SOURCE_TYPE) {
                                 var dataSourceJson = {
                                     name: getLabelText(dataSourceResult[k].label, this.props.items.lang),
-                                    id: dataSourceResult[k].dataSourceId
+                                    id: dataSourceResult[k].dataSourceId,
+                                    active: dataSourceResult[k].active
                                 }
                                 dataSourceList.push(dataSourceJson);
                             }
@@ -99,6 +98,10 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     if (this.state.inventoryBatchInfoTableEl != "" && this.state.inventoryBatchInfoTableEl != undefined) {
                         this.state.inventoryBatchInfoTableEl.destroy();
                     }
+                    this.setState({
+                        realmCountryPlanningUnitList: realmCountryPlanningUnitList,
+                        dataSourceList: dataSourceList
+                    })
                     var data = [];
                     var inventoryDataArr = [];
                     var adjustmentType = this.props.items.inventoryType;
@@ -194,8 +197,8 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         columns: [
                             { title: i18n.t('static.inventory.inventoryDate'), type: 'calendar', options: { format: 'MM-YYYY' }, width: 80, readOnly: readonlyRegionAndMonth },
                             { title: i18n.t('static.region.region'), type: 'dropdown', readOnly: readonlyRegionAndMonth, source: this.props.items.regionList, width: 100 },
-                            { title: i18n.t('static.inventory.dataSource'), type: 'dropdown', source: dataSourceList, width: 180 },
-                            { title: i18n.t('static.supplyPlan.alternatePlanningUnit'), type: 'dropdown', source: realmCountryPlanningUnitList, width: 180 },
+                            { title: i18n.t('static.inventory.dataSource'), type: 'dropdown', source: dataSourceList, width: 180, filter: this.filterDataSource },
+                            { title: i18n.t('static.supplyPlan.alternatePlanningUnit'), type: 'dropdown', source: realmCountryPlanningUnitList, filter: this.filterRealmCountryPlanningUnit, width: 180 },
                             { title: i18n.t('static.supplyPlan.inventoryType'), type: 'dropdown', source: [{ id: 1, name: i18n.t('static.inventory.inventory') }, { id: 2, name: i18n.t('static.inventoryType.adjustment') }], readOnly: true, width: 100 },
                             { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: adjustmentColumnType, mask: '[-]#,##', width: 80 },
                             { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: actualColumnType, mask: '#,##.00', decimal: '.', width: 80 },
@@ -464,7 +467,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                                 data[6] = ""; //G
                                                 data[7] = ""; //H
                                                 data[8] = `=F${parseInt(json.length) + 1}*H${parseInt(json.length) + 1}`; //I
-                                                data[9] = `=G${parseInt(0) + 1}*H${parseInt(0) + 1}`; //J
+                                                data[9] = `=G${parseInt(json.length) + 1}*H${parseInt(json.length) + 1}`; //J
                                                 data[10] = "";
                                                 data[11] = true;
                                                 if (this.props.inventoryPage != "inventoryDataEntry") {
@@ -505,6 +508,17 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             }.bind(this)
         }.bind(this);
     }
+
+    filterDataSource = function (instance, cell, c, r, source) {
+        return this.state.dataSourceList.filter(c => c.active.toString() == "true");
+    }.bind(this)
+
+    filterRealmCountryPlanningUnit = function (instance, cell, c, r, source) {
+        return this.state.realmCountryPlanningUnitList.filter(c => c.active.toString() == "true");
+    }.bind(this)
+
+
+
 
     loadedInventory = function (instance, cell, x, y, value) {
         if (this.props.inventoryPage != "inventoryDataEntry") {

@@ -16,7 +16,7 @@ import i18n from '../../i18n';
 import * as Yup from 'yup';
 import { Formik } from "formik";
 import getLabelText from '../../CommonComponent/getLabelText';
-
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import CryptoJS from 'crypto-js';
 import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
@@ -940,7 +940,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                     var options = {
                                                         data: data,
                                                         columnDrag: true,
-                                                        colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+                                                        colWidths: [200, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
                                                         columns: [
 
                                                             {
@@ -1357,7 +1357,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                         this.props.history.push(`/procurementAgent/listProcurementAgent/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                     } else {
                         this.setState({
-                            message: response.data.messageCode,loading:false
+                            message: response.data.messageCode, loading: false
                         },
                             () => {
                                 this.hideSecondComponent();
@@ -1367,7 +1367,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                 }).catch(
                     error => {
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message,loading:false });
+                            this.setState({ message: error.message, loading: false });
                         } else {
                             switch (error.response ? error.response.status : "") {
                                 case 500:
@@ -1375,10 +1375,10 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                 case 404:
                                 case 406:
                                 case 412:
-                                    this.setState({ message: error.response.data.messageCode,loading:false });
+                                    this.setState({ message: error.response.data.messageCode, loading: false });
                                     break;
                                 default:
-                                    this.setState({ message: 'static.unkownError',loading:false });
+                                    this.setState({ message: 'static.unkownError', loading: false });
                                     console.log("Error code unkown");
                                     break;
                             }
@@ -1818,6 +1818,12 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                 {/* <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
                 }} /> */}
+
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
+                }} />
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <div style={{ display: this.state.loading ? "none" : "block" }}>

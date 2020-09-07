@@ -14,7 +14,8 @@ import HealthAreaService from "../../api/HealthAreaService";
 import getLabelText from '../../CommonComponent/getLabelText'
 import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import classNames from 'classnames';
 
 const entityname = i18n.t('static.program.programMaster');
 const initialValues = {
@@ -32,7 +33,8 @@ const initialValues = {
     shippedToArrivedBySeaLeadTime: '',
     arrivedToDeliveredLeadTime: '',
     healthAreaId: '',
-    programNotes: ''
+    programNotes: '',
+    regionId: []
 
 }
 
@@ -86,6 +88,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.program.validhealthareatext')),
         // programNotes: Yup.string()
         //     .required(i18n.t('static.program.validnotestext')),
+        regionId: Yup.string()
+            .required(i18n.t('static.common.regiontext'))
+
 
     })
 }
@@ -364,6 +369,7 @@ export default class AddProgram extends Component {
             arrivedToDeliveredLeadTime: true,
             healthAreaId: true,
             // programNotes: true,
+            regionId: true
 
         }
         )
@@ -484,7 +490,9 @@ export default class AddProgram extends Component {
                                         isSubmitting,
                                         isValid,
                                         setTouched,
-                                        handleReset
+                                        handleReset,
+                                        setFieldValue,
+                                        setFieldTouched
                                     }) => (
 
                                             <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='programForm'>
@@ -548,11 +556,17 @@ export default class AddProgram extends Component {
                                                         <Label htmlFor="select">{i18n.t('static.program.region')}<span class="red Reqasterisk">*</span><span class="red Reqasterisk">*</span></Label>
 
                                                         <Select
-                                                            valid={!errors.regionId && this.state.regionId != ''}
                                                             bsSize="sm"
-                                                            invalid={touched.reagonId && !!errors.regionId}
-                                                            onChange={(e) => { handleChange(e); this.updateFieldData(e) }}
-                                                            onBlur={handleBlur}
+                                                            className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                                { 'is-valid': !errors.regionId && this.state.program.regionArray.length != 0 },
+                                                                { 'is-invalid': (touched.regionId && !!errors.regionId) }
+                                                            )}
+                                                            onChange={(e) => {
+                                                                handleChange(e);
+                                                                setFieldValue("regionId", e);
+                                                                this.updateFieldData(e);
+                                                            }}
+                                                            onBlur={() => setFieldTouched("regionId", true)}
                                                             name="regionId"
                                                             id="regionId"
                                                             multi

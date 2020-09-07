@@ -70,6 +70,13 @@ export default class ImportProgram extends Component {
         this.formSubmit = this.formSubmit.bind(this)
         this.importFile = this.importFile.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
+    }
+
+    hideSecondComponent() {
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
     }
 
     componentDidMount() {
@@ -236,7 +243,12 @@ export default class ImportProgram extends Component {
                                     programDataJson = JSON.parse(fileData);
                                 }
                                 catch (err) {
-                                    this.setState({ message: i18n.t('static.program.zipfilereaderror') })
+                                    this.setState({ message: i18n.t('static.program.zipfilereaderror') },
+                                    () => {
+                                        this.hideSecondComponent();
+                                    })
+                                    
+                                    
                                 }
                                 var bytes = CryptoJS.AES.decrypt(programDataJson.programData, SECRET_KEY);
                                 var plaintext = bytes.toString(CryptoJS.enc.Utf8);

@@ -562,7 +562,7 @@ class ListTracerCategoryComponent extends Component {
             // console.log("HEADER SELECTION--------------------------");
         } else {
             // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
-            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_COUNTRY')) {
+            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_TRACER_CATEGORY')) {
                 this.props.history.push({
                     pathname: `/tracerCategory/editTracerCategory/${this.el.getValueFromCoords(0, x)}`,
                 });

@@ -1119,5 +1119,6 @@
     "static.commitVersion.acceptCurrentVersion": " Accept current version",
     "static.commitVersion.acceptLatestVersion": " Accept latest version",
     "static.common.max23digittext": "Maximum 23 characters only",
-    "static.program.zipfilereaderror": "Error occured while reading zip file"
+    "static.program.zipfilereaderror": "Error occured while reading zip file",
+    "static.common.regiontext": "Please select Region"
 }

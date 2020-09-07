@@ -13,6 +13,7 @@ import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import { LABEL_REGEX } from '../../Constants.js';
+import classNames from 'classnames';
 
 const initialValues = {
     username: "",
@@ -40,7 +41,9 @@ const validationSchema = function (values) {
             .min(4, i18n.t('static.user.validphonemindigit'))
             .max(15, i18n.t('static.user.validphonemaxdigit'))
             .matches(/^[0-9]*$/, i18n.t('static.user.validnumber'))
-            .required(i18n.t('static.user.validphone'))
+            .required(i18n.t('static.user.validphone')),
+        roleId: Yup.string()
+            .required(i18n.t('static.user.validrole')),
     })
 }
 
@@ -163,7 +166,8 @@ class EditUserComponent extends Component {
             realmId: true,
             emailId: true,
             phoneNumber: true,
-            languageId: true
+            languageId: true,
+            roleId: true
         }
         )
         this.validateForm(errors)
@@ -422,7 +426,9 @@ class EditUserComponent extends Component {
                                         handleSubmit,
                                         isSubmitting,
                                         isValid,
-                                        setTouched
+                                        setTouched,
+                                        setFieldValue,
+                                        setFieldTouched
                                     }) => (
                                             <Form onSubmit={handleSubmit} noValidate name='userForm'>
                                                 <CardBody className="pt-2 pb-0">
@@ -484,11 +490,17 @@ class EditUserComponent extends Component {
                                                     <FormGroup>
                                                         <Label htmlFor="roleId">{i18n.t('static.role.role')}<span class="red Reqasterisk">*</span></Label>
                                                         <Select
-                                                            valid={!errors.roleId}
+                                                            className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                                { 'is-valid': !errors.roleId },
+                                                                { 'is-invalid': (touched.roleId && !!errors.roleId || this.state.user.roles.length == 0) }
+                                                            )}
                                                             bsSize="sm"
-                                                            invalid={touched.roleId && !!errors.roleId || this.state.user.roleId == ''}
-                                                            onChange={(e) => { handleChange(e); this.roleChange(e) }}
-                                                            onBlur={handleBlur}
+                                                            onChange={(e) => {
+                                                                handleChange(e);
+                                                                setFieldValue("roleId", e);
+                                                                this.roleChange(e);
+                                                            }}
+                                                            onBlur={() => setFieldTouched("roleId", true)}
                                                             name="roleId"
                                                             id="roleId"
                                                             multi

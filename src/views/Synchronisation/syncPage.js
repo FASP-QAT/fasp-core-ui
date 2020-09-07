@@ -2110,15 +2110,15 @@ export default class syncPage extends Component {
                           />
                         </div>
                       </FormGroup>
-                     
-                    </div>
-                    <div className="col-md-12">
+                      <div className="col-md-10 pt-2">
                         <ul className="legendcommitversion">
                           <li><span className="lightpinklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.commitVersion.conflicts')}</span></li>
                           <li><span className=" greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.commitVersion.changedInCurrentVersion')} </span></li>
                           <li><span className="notawesome legendcolor"></span > <span className="legendcommitversionText">{i18n.t('static.commitVersion.changedInLatestVersion')}</span></li>
                         </ul>
                       </div>
+                    </div>
+                   
                   </Col>
                 </Form>
                 <div id="detailsDiv">
