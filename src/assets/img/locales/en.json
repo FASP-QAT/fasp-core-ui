@@ -1109,7 +1109,7 @@
     "static.technicalArea.technicalAreaCodeText": "Please enter technical area code",
     "static.technicalArea.productcategorynametext": "Please enter product category name",
     "static.common.notes": "Notes",
-    "static.common.bugreport": "Bug Report",
+    "static.common.bugreport": "Report a bug",
     "static.report.procurmentAgentLeadTimeReport": "Procurement Agent Lead Times",
     "static.dashboard.linkShipment": "Link shipment",
     "static.commitVersion.conflicts": "Conflicts",
@@ -1119,5 +1119,8 @@
     "static.commitVersion.acceptCurrentVersion": " Accept current version",
     "static.commitVersion.acceptLatestVersion": " Accept latest version",
     "static.common.max23digittext": "Maximum 23 characters only",
-    "static.program.zipfilereaderror": "Error occured while reading zip file"
+    "static.program.zipfilereaderror": "Error occured while reading zip file",
+    "static.ticket.ticketcreated": "Ticket has been created",
+    "static.ticket.ticketcode": "Ticket Code",
+    "static.ticket.addUpdateMasterData": "Add / Update Master Data"
 }

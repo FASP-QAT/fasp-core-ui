@@ -9,7 +9,7 @@ import * as Yup from 'yup';
 import JiraTikcetService from '../../api/JiraTikcetService';
 
 const initialValues = {
-    summary: "Bug Report",
+    summary: "Report a bug",
     description: ""
 }
 const entityname = i18n.t('static.program.realmcountry');
@@ -18,7 +18,9 @@ const validationSchema = function (values) {
         summary: Yup.string()
             .required(i18n.t('static.common.summarytext')),
         description: Yup.string()
-            .required(i18n.t('static.common.descriptiontext'))
+            .required(i18n.t('static.common.descriptiontext')),
+        attachFile: Yup.string()
+            .required(i18n.t('static.program.selectfile'))
     })
 }
 
@@ -50,8 +52,10 @@ export default class BugReportTicketComponent extends Component {
         super(props);
         this.state = {
             bugReport: {
-                summary: 'Bug Report',
-                description: ''
+                summary: 'Report a bug',
+                description: '',
+                file: '',
+                attachFile: ''
             },
             message: ''
         }
@@ -67,6 +71,10 @@ export default class BugReportTicketComponent extends Component {
         }
         if (event.target.name == "description") {
             bugReport.description = event.target.value;
+        }
+        if (event.target.name == "attachFile") {
+            bugReport.file = event.target.files[0];
+            bugReport.attachFile = event.target.files[0].name;
         }
         this.setState({
             bugReport
@@ -114,6 +122,8 @@ export default class BugReportTicketComponent extends Component {
         let { bugReport } = this.state;
         bugReport.summary = '';
         bugReport.description = '';
+        bugReport.file= '';
+        bugReport.attachFile= '';
         this.setState({
             bugReport
         },
@@ -131,17 +141,21 @@ export default class BugReportTicketComponent extends Component {
                     initialValues={initialValues}
                     validate={validate(validationSchema)}
                     onSubmit={(values, { setSubmitting, setErrors }) => {
-                        JiraTikcetService.addBugReportIssue(values).then(response => {             
-                            var msg = "Your query has been raised. ID: "+response.data.id+"\n Key: "+response.data.key+"\n Url: "+response.data.self;
+                        JiraTikcetService.addBugReportIssue(this.state.bugReport).then(response => { 
+                            console.log("Response :",response.status, ":" ,JSON.stringify(response.data));
                             if (response.status == 200 || response.status == 201) {
+                                var msg = response.data.key;
+                                JiraTikcetService.addIssueAttachment(this.state.bugReport, response.data.id).then(response => {
+                                    
+                                });
+
                                 this.setState({
                                     message: msg
                                 },
                                     () => {
                                         this.resetClicked();
                                         this.hideSecondComponent();
-                                    })
-                                alert(this.state.message);
+                                    })                                
                             } else {
                                 this.setState({
                                     // message: response.data.messageCode
@@ -150,29 +164,29 @@ export default class BugReportTicketComponent extends Component {
                                     () => {
                                         this.resetClicked();
                                         this.hideSecondComponent();
-                                    })
-                                alert(this.state.message);
-                            }                            
-                            this.props.togglehelp();
-                        })
-                        .catch(
-                            error => {
-                                switch (error.message) {
-                                    case "Network Error":
-                                        this.setState({
-                                            message: 'Network Error'
-                                        })
-                                        break
-                                    default:
-                                        this.setState({
-                                            message: 'Error'
-                                        })
-                                        break
-                                }
-                                alert(this.state.message);
-                                this.props.togglehelp();
+                                    })                                
                             }
-                        );
+                            this.props.togglehelp();
+                            this.props.toggleSmall(this.state.message);
+                        })
+                        // .catch(
+                        //         error => {
+                        //             switch (error.message) {
+                        //                 case "Network Error":
+                        //                     this.setState({
+                        //                         message: 'Network Error'
+                        //                     })
+                        //                     break
+                        //                 default:
+                        //                     this.setState({
+                        //                         message: 'Error'
+                        //                     })
+                        //                     break
+                        //             }
+                        //             alert(this.state.message);
+                        //             this.props.togglehelp();
+                        //         }
+                        //     );
                     }}
                     render={
                         ({
@@ -214,12 +228,17 @@ export default class BugReportTicketComponent extends Component {
                                     </FormGroup>
                                     <FormGroup className="pr-1 pl-1" >
                                         <Col>
-                                            <Label className="uploadfilelable" htmlFor="file-input">Upload Screenshot</Label>
+                                            <Label className="uploadfilelable" htmlFor="attachFile">Upload Screenshot<span class="red Reqasterisk">*</span></Label>
                                         </Col>
-                                        <Col xs="12" className="custom-file">
-                                            {/* <Input type="file" id="file-input" name="file-input" /> */}
-                                            <Input type="file" className="custom-file-input" id="file-input" name="file-input" accept=".zip,.png" />
-                                            <label className="custom-file-label" id="file-input">Choose file</label>
+                                        <Col xs="12" className="custom-file">                                            
+                                            <Input type="file" className="custom-file-input" id="attachFile" name="attachFile" accept=".zip,.png"
+                                                valid={!errors.attachFile && this.state.bugReport.attachFile != ''}
+                                                invalid={touched.attachFile && !!errors.attachFile}
+                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                onBlur={handleBlur}                                            
+                                            />
+                                            <label className="custom-file-label" id="attachFile">{this.state.bugReport.attachFile}</label>                                            
+                                            <FormFeedback className="red">{errors.attachFile}</FormFeedback>
                                         </Col>
                                     </FormGroup>
                                     <ModalFooter>
