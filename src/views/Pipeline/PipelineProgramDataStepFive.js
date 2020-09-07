@@ -131,7 +131,11 @@ export default class PipelineProgramDataStepFive extends Component {
             <>
 
                 <Formik
-                    initialValues={initialValuesFour}
+                    enableReinitialize={true}
+                    initialValues={{
+                        regionId: this.props.items.program.regionArray,
+                    }}
+                    // initialValues={initialValuesFour}
                     validate={validateFour(validationSchemaFour)}
                     onSubmit={(values, { setSubmitting, setErrors }) => {
                         this.props.endProgramInfoStepFour && this.props.endProgramInfoStepFour();
