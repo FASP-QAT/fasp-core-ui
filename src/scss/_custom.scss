@@ -979,7 +979,13 @@ font-size: 14px;
 
  .expiredInventorySearchposition{
   position: absolute;
-  top: 60px;
+  top: 45px;
+  right: 2%;
+ } 
+
+ .ShipmentdelinkingSearchposition{
+  position: absolute;
+  top: 45px;
   right: 2%;
  } 
 
@@ -3220,6 +3226,9 @@ border-radius: 2em;
 .ReportSearchMarginTop{
   margin-top: -51px;
 }
+.ShipmentdeletailsSearchposition{
+  top: -59px;
+ } 
 .TextWhite{
   color:#fff!important;
 }
@@ -3239,7 +3248,9 @@ border-radius: 2em;
 {
   cursor: pointer!important;
 }
-
+.shipmentOverviewgraphheight{
+  height: 450px;
+}
 // .Select-control.form-control-sm:invalid, .form-control-sm.is-invalid {
 //   border-color: #f86c6b!important;
 //   padding-right: calc(1.5em + 0.75rem);

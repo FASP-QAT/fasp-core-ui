@@ -1441,7 +1441,10 @@ class ShipmentSummery extends Component {
             if (program.length == 1) {
                 if (navigator.onLine) {
                     this.setState({
-                        versions: []
+                        versions: [],
+                        planningUnits: [],
+                        planningUnitValues: []
+
                     }, () => {
                         this.setState({
                             versions: program[0].versionList.filter(function (x, i, a) {
@@ -1465,7 +1468,9 @@ class ShipmentSummery extends Component {
             }
         } else {
             this.setState({
-                versions: []
+                versions: [],
+                planningUnits: [],
+                planningUnitValues: []
             })
         }
         this.fetchData();
@@ -1529,7 +1534,8 @@ class ShipmentSummery extends Component {
         let programId = document.getElementById("programId").value;
         let versionId = document.getElementById("versionId").value;
         this.setState({
-            planningUnits: []
+            planningUnits: [],
+            planningUnitValues: []
         }, () => {
             if (versionId.includes('Local')) {
                 const lan = 'en';
@@ -1682,7 +1688,7 @@ class ShipmentSummery extends Component {
                         // const activeFilter = shipmentList;
 
                         // let dateFilter = activeFilter.filter(c => moment(c.deliveredDate).isBetween(startDate, endDate, null, '[)'))
-                        let dateFilter = activeFilter.filter(c => moment((c.receivedDate==null || c.receivedDate=="") ? c.expectedDeliveryDate : c.receivedDate).isBetween(startDate, endDate, null, '[)'))
+                        let dateFilter = activeFilter.filter(c => moment((c.receivedDate == null || c.receivedDate == "") ? c.expectedDeliveryDate : c.receivedDate).isBetween(startDate, endDate, null, '[)'))
 
                         let data = [];
                         let planningUnitFilter = [];
@@ -1879,26 +1885,29 @@ class ShipmentSummery extends Component {
 
         //Graph start
         let shipmentStatus = [...new Set(this.state.data.map(ele => (getLabelText(ele.shipmentStatus.label, this.state.lang))))];
-        console.log("shipmentStatus=======>>>",shipmentStatus.sort());
-       
+        console.log("shipmentStatus=======>>>", shipmentStatus.sort());
+
         let shipmentSummerydata = [];
         let data = [];
         var mainData = this.state.data;
         mainData = mainData.sort(function (a, b) {
             return new Date(a.expectedDeliveryDate) - new Date(b.expectedDeliveryDate);
         });
-        console.log("mainData=======>>>>",mainData);
+        console.log("mainData=======>>>>", mainData);
         let dateArray = [...new Set(mainData.map(ele => (moment(ele.expectedDeliveryDate, 'YYYY-MM-dd').format('MM-YYYY'))))]
 
-        console.log("dateArray=====>",dateArray);
+        console.log("dateArray=====>", dateArray);
 
         for (var i = 0; i < shipmentStatus.length; i++) {
 
-            let data1 = mainData.filter(c => shipmentStatus[i].localeCompare(getLabelText(c.shipmentStatus.label, this.state.lang)) == 0).map((item) => { return { 
-                shipmentId: item.shipmentId, 
-                expectedDeliveryDate: (moment(item.expectedDeliveryDate, 'YYYY-MM-dd').format('MM-YYYY')), 
-                totalCost: item.totalCost, 
-                forecastCost: item.totalCost * item.multiplier } });
+            let data1 = mainData.filter(c => shipmentStatus[i].localeCompare(getLabelText(c.shipmentStatus.label, this.state.lang)) == 0).map((item) => {
+                return {
+                    shipmentId: item.shipmentId,
+                    expectedDeliveryDate: (moment(item.expectedDeliveryDate, 'YYYY-MM-dd').format('MM-YYYY')),
+                    totalCost: item.totalCost,
+                    forecastCost: item.totalCost * item.multiplier
+                }
+            });
 
             //logic for add same date data
             // let result = Object.values(data1.reduce((a, { shipmentId, totalCost, expectedDeliveryDate, forecastCost }) => {
@@ -1924,7 +1933,7 @@ class ShipmentSummery extends Component {
             var result = result1.filter(function (itm, i, a) {
                 return i == a.indexOf(itm);
             });
-            console.log("result====>",result);
+            console.log("result====>", result);
             let tempdata = [];
             for (var j = 0; j < dateArray.length; j++) {
                 let hold = 0
@@ -1940,12 +1949,12 @@ class ShipmentSummery extends Component {
                 tempdata.push(hold);
 
             }
-            console.log("tempdata==>",tempdata);
+            console.log("tempdata==>", tempdata);
             shipmentSummerydata.push(tempdata);
 
         }
 
-        console.log("shipmentSummeryData===>",shipmentSummerydata);
+        console.log("shipmentSummeryData===>", shipmentSummerydata);
         const bar = {
             labels: [...new Set(mainData.map(ele => (moment(ele.expectedDeliveryDate, 'YYYY-MM-dd').format('MMM YYYY'))))],
             datasets: shipmentSummerydata.map((item, index) => ({ label: shipmentStatus[index], data: item, backgroundColor: backgroundColor[index] })),
@@ -1954,12 +1963,15 @@ class ShipmentSummery extends Component {
 
         //Table-1 start
 
-        let tempDataTable = mainData.map((item) => { return { 
-            shipmentId: item.shipmentId, 
-            fundingSource: item.fundingSource, 
-            shipmentQty: item.shipmentQty, 
-            totalCost: item.totalCost, 
-            forecastCost: item.totalCost * item.multiplier } });
+        let tempDataTable = mainData.map((item) => {
+            return {
+                shipmentId: item.shipmentId,
+                fundingSource: item.fundingSource,
+                shipmentQty: item.shipmentQty,
+                totalCost: item.totalCost,
+                forecastCost: item.totalCost * item.multiplier
+            }
+        });
 
         console.log("tempDataTable------>>", tempDataTable);
 
@@ -2263,7 +2275,7 @@ class ShipmentSummery extends Component {
                                                 <Table id="mytable1" responsive className="table-bordered table-striped table-hover  text-center mt-2">
                                                     <thead>
                                                         <tr>
-                                                            <th style={{ width: '225px', cursor: 'pointer','text-align': 'right' }}>{i18n.t('static.report.procurementAgentName')}</th>
+                                                            <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'right' }}>{i18n.t('static.budget.fundingsource')}</th>
                                                             <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'right' }}>{i18n.t('static.report.orders')}</th>
                                                             <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'right' }}>{i18n.t('static.report.qtyBaseUnit')}</th>
                                                             <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'right' }}>{i18n.t('static.report.costUsd')}</th>

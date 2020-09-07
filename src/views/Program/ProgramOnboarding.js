@@ -21,6 +21,7 @@ import StepOne from './StepOne.js';
 import StepTwo from './StepTwo.js';
 import StepThree from './StepThree.js';
 import StepFour from './StepFour.js';
+import StepFive from './StepFive';
 import StepSix from './StepSix.js'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 const entityname = i18n.t('static.program.programMaster');
@@ -318,7 +319,7 @@ export default class ProgramOnboarding extends Component {
             this.refs.sixChild.getProgramManagerList();
         } if (event.target.name == 'realmCountryId') {
             program.realmCountry.realmCountryId = event.target.value;
-            // this.refs.regionChild.getRegionList();
+            this.refs.regionChild.getRegionList();
         } if (event.target.name == 'organisationId') {
             program.organisation.id = event.target.value;
         } if (event.target.name == 'airFreightPerc') {
@@ -722,8 +723,8 @@ export default class ProgramOnboarding extends Component {
                                     </FormGroup> */}
                                 </div>
                                 <div id="stepFive">
-                                    {/* <StepFive ref='regionChild' finishedStepFive={this.finishedStepFive} previousToStepFour={this.previousToStepFour} updateFieldData={this.updateFieldData}></StepFive> */}
-                                    <FormGroup className="col-md-4 pl-0">
+                                    <StepFive ref='regionChild' finishedStepFive={this.finishedStepFive} previousToStepFour={this.previousToStepFour} updateFieldData={this.updateFieldData} items={this.state}></StepFive>
+                                    {/* <FormGroup className="col-md-4 pl-0">
                                         <Label htmlFor="select">{i18n.t('static.program.region')}<span class="red Reqasterisk">*</span><span class="red Reqasterisk">*</span></Label>
                                         <Select
                                             onChange={(e) => { this.updateFieldData(e) }}
@@ -735,16 +736,16 @@ export default class ProgramOnboarding extends Component {
                                             options={this.state.regionList}
                                             value={this.state.regionId}
                                         />
-                                    </FormGroup>
+                                    </FormGroup> */}
 
-                                    <FormGroup>
+                                    {/* <FormGroup>
 
                                         <Button color="info" size="md" className="float-left mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.previousToStepFour} > <i className="fa fa-angle-double-left"></i> Back</Button>
                                         &nbsp;
                                         <Button color="info" size="md" className="float-left mr-1 nextbtn" type="button" name="regionSub" id="regionSub" onClick={this.finishedStepFive}>Next <i className="fa fa-angle-double-right"></i></Button>
                                         &nbsp;
 
-                                    </FormGroup>
+                                    </FormGroup> */}
                                 </div>
                                 <div id="stepSix">
                                     <StepSix ref='sixChild' dataChange={this.dataChange} Capitalize={this.Capitalize} finishedStepSix={this.finishedStepSix} previousToStepFive={this.previousToStepFive} items={this.state}></StepSix>

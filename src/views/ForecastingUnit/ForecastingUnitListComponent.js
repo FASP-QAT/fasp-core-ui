@@ -808,7 +808,8 @@ export default class ForecastingUnitListComponent extends Component {
                 if (response.status == 200) {
                     this.setState({
                         realms: response.data,
-                        realmId: response.data[0].realmId, loading: false
+                        realmId: response.data[0].realmId,
+                        // loading: false
                     })
                     // this.getProductCategories();
                     // ForecastingUnitService.getForcastingUnitByRealmId(this.state.realmId).then(response => {
@@ -846,7 +847,7 @@ export default class ForecastingUnitListComponent extends Component {
                 if (response.status == 200) {
                     this.setState({
                         tracerCategories: response.data,
-                        loading: false
+                        // loading: false
                     })
                 } else {
                     this.setState({
@@ -865,7 +866,7 @@ export default class ForecastingUnitListComponent extends Component {
                 this.setState({
                     forecastingUnitList: response.data,
                     selSource: response.data,
-                    loading: false
+                    // loading: false
                 })
             } else {
                 this.setState({
@@ -878,6 +879,7 @@ export default class ForecastingUnitListComponent extends Component {
 
 
         })
+        this.filterDataForRealm();
 
     }
     loaded = function (instance, cell, x, y, value) {
@@ -983,15 +985,15 @@ export default class ForecastingUnitListComponent extends Component {
                                                 name="realmId"
                                                 id="realmId"
                                                 bsSize="sm"
-                                            // onChange={this.filterDataForRealm}
+                                                onChange={this.filterDataForRealm}
                                             >
                                                 <option value="-1">{i18n.t('static.common.all')}</option>
 
                                                 {realmList}
                                             </Input>
-                                            <InputGroupAddon addonType="append">
+                                            {/* <InputGroupAddon addonType="append">
                                                 <Button color="secondary Gobtn btn-sm" onClick={this.filterDataForRealm}>{i18n.t('static.common.go')}</Button>
-                                            </InputGroupAddon>
+                                            </InputGroupAddon> */}
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
@@ -1005,6 +1007,7 @@ export default class ForecastingUnitListComponent extends Component {
                                                 name="productCategoryId"
                                                 id="productCategoryId"
                                                 bsSize="sm"
+                                                onChange={this.filterData}
                                             >
                                                 {/* <option value="0">{i18n.t('static.common.all')}</option> */}
                                                 {productCategoryList}
@@ -1022,13 +1025,14 @@ export default class ForecastingUnitListComponent extends Component {
                                                 name="tracerCategoryId"
                                                 id="tracerCategoryId"
                                                 bsSize="sm"
+                                                onChange={this.filterData}
                                             >
                                                 <option value="0">{i18n.t('static.common.all')}</option>
                                                 {tracercategoryList}
                                             </Input>
-                                            <InputGroupAddon addonType="append">
+                                            {/* <InputGroupAddon addonType="append">
                                                 <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
-                                            </InputGroupAddon>
+                                            </InputGroupAddon> */}
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
