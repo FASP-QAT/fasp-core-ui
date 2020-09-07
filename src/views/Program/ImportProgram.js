@@ -66,6 +66,7 @@ export default class ImportProgram extends Component {
         this.state = {
             programList: [],
             message: '',
+            loading: true,
         }
         this.formSubmit = this.formSubmit.bind(this)
         this.importFile = this.importFile.bind(this);
@@ -78,11 +79,14 @@ export default class ImportProgram extends Component {
         document.getElementById("formSubmitButton").style.display = "none";
         document.getElementById("fileImportDiv").style.display = "block";
         document.getElementById("fileImportButton").style.display = "block";
+        this.setState({ loading: false })
     }
 
     formSubmit() {
+        this.setState({ loading: true })
         if (window.File && window.FileReader && window.FileList && window.Blob) {
             if (document.querySelector('input[type=file]').files[0] == undefined) {
+                this.setState({ loading: false })
                 alert(i18n.t('static.program.selectfile'));
             } else {
                 var file = document.querySelector('input[type=file]').files[0];
@@ -148,7 +152,8 @@ export default class ImportProgram extends Component {
                                 })
                             })
                             this.setState({
-                                message: i18n.t('static.program.dataimportsuccess')
+                                message: i18n.t('static.program.dataimportsuccess'),
+                                loading: false
                             })
                             this.props.history.push(`/dashboard/` + 'green/' + i18n.t('static.program.dataimportsuccess'))
                         } else {
@@ -183,7 +188,8 @@ export default class ImportProgram extends Component {
                                                 })
                                             })
                                             this.setState({
-                                                message: i18n.t('static.program.dataimportsuccess')
+                                                message: i18n.t('static.program.dataimportsuccess'),
+                                                loading: false
                                             })
                                             this.props.history.push(`/dashboard/` + 'green/' + i18n.t('static.program.dataimportsuccess'))
                                         }
@@ -192,7 +198,8 @@ export default class ImportProgram extends Component {
                                         label: i18n.t('static.program.no'),
                                         onClick: () => {
                                             this.setState({
-                                                message: i18n.t('static.program.actioncancelled')
+                                                message: i18n.t('static.program.actioncancelled'),
+                                                loading: false
                                             })
                                             let id = AuthenticationService.displayDashboardBasedOnRole();
                                             this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.program.actioncancelled'))
@@ -210,6 +217,7 @@ export default class ImportProgram extends Component {
     }
 
     importFile() {
+        this.setState({ loading: true })
         if (window.File && window.FileReader && window.FileList && window.Blob) {
             if (document.querySelector('input[type=file]').files[0] == undefined) {
                 alert(i18n.t('static.program.selectfile'));
@@ -236,7 +244,7 @@ export default class ImportProgram extends Component {
                                     programDataJson = JSON.parse(fileData);
                                 }
                                 catch (err) {
-                                    this.setState({ message: i18n.t('static.program.zipfilereaderror') })
+                                    this.setState({ message: i18n.t('static.program.zipfilereaderror'),loading:false })
                                 }
                                 var bytes = CryptoJS.AES.decrypt(programDataJson.programData, SECRET_KEY);
                                 var plaintext = bytes.toString(CryptoJS.enc.Utf8);
@@ -254,7 +262,8 @@ export default class ImportProgram extends Component {
                                 if (i === size) {
                                     this.setState({
                                         programList: fileName,
-                                        programListArray: programListArray
+                                        programListArray: programListArray,
+                                        loading: false
                                     })
                                     console.log("programList", fileName)
                                     console.log("programDataArrayList after state set", programListArray)
@@ -270,6 +279,7 @@ export default class ImportProgram extends Component {
 
                     }.bind(this))
                 } else {
+                    this.setState({ loading: false })
                     alert(i18n.t('static.program.selectzipfile'))
                 }
             }
@@ -316,8 +326,10 @@ export default class ImportProgram extends Component {
                     {i18n.t(this.state.message, { entityname })}</h5>
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
                 }} />
-                <Card className="mt-2">
+                <Card className="mt-2" style={{ display: this.state.loading ? "none" : "block" }}>
                     <Formik
                         initialValues={initialValues}
                         render={
@@ -371,6 +383,18 @@ export default class ImportProgram extends Component {
                                     </Form>
                                 )} />
                 </Card>
+
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
             </>
         )
