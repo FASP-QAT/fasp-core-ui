@@ -1529,109 +1529,54 @@ export default class InventoryTurns extends Component {
                         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         var programJson = JSON.parse(programData);
-                        var inventoryList = ((programJson.inventoryList).filter(c => c.active == true && moment(c.inventoryDate).isBetween(startDate, endDate, null, '[]')));
-                        var planningUnitIds = new Set(inventoryList.map(ele => ele.planningUnit.id))
+                       var proList = []
+                        var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+                        var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
+                        var planningunitRequest = planningunitOs.getAll();
+                        planningunitRequest.onerror = function (event) {
+                            // Handle errors!
+                        };
+                        planningunitRequest.onsuccess = function (e) {
+                            var myResult = [];
+                            myResult = planningunitRequest.result;
+
+                            for (var i = 0, j = 0; i < myResult.length; i++) {
+                                if (myResult[i].program.id == programId) {
+                                    proList[j++] = myResult[i]
+                                }
+                            }
+                       
                         var data = []
 
                         var TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN = 12
                         var m = this.getMonthArray(startDate)
-                        console.log('programjson', programJson)
-                        planningUnitIds.map(planningUnitId => {
-                            var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && c.active == true);
-                            var inventoryList = (programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnitId);
-                            var shipmentList = []
-                            if (document.getElementById("includePlanningShipments").selectedOptions[0].value.toString() == 'true') {
-                                shipmentList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != 8 && c.accountFlag == true);
-                            } else {
-                                shipmentList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != 8 && c.shipmentStatus.id != 1 && c.shipmentStatus.id != 2 && c.shipmentStatus.id != 9 && c.accountFlag == true);
-
-                            }
-                            console.log('shipmentList', shipmentList)
-                            console.log(' startDate ', startDate, ' endDate', endDate)
-                            var monthcnt = 0
-                            var endingBalanceArray = []
-                            var openingBalance = 0;
+                        console.log('proList', proList)
+                        proList.map(planningUnit => {
+                            var endingBalanceArray = [];
+                            var monthcnt = 0;
                             var totalConsumption = 0;
-                            var totalAdjustments = 0;
-                            var totalShipments = 0;
-                            console.log('startDate', startDate)
-
-                            var consumptionRemainingList = consumptionList.filter(c => c.consumptionDate < startDate);
-                            console.log('consumptionRemainingList', consumptionRemainingList)
-                            for (var j = 0; j < consumptionRemainingList.length; j++) {
-                                var count = 0;
-                                for (var k = 0; k < consumptionRemainingList.length; k++) {
-                                    if (consumptionRemainingList[j].consumptionDate == consumptionRemainingList[k].consumptionDate && consumptionRemainingList[j].region.id == consumptionRemainingList[k].region.id && j != k) {
-                                        count++;
-                                    } else {
-
-                                    }
-                                }
-                                if (count == 0) {
-                                    totalConsumption += parseInt((consumptionRemainingList[j].consumptionQty));
-                                } else {
-                                    if (consumptionRemainingList[j].actualFlag.toString() == 'true') {
-                                        totalConsumption += parseInt((consumptionRemainingList[j].consumptionQty));
-                                    }
-                                }
-                            }
-
-                            var adjustmentsRemainingList = inventoryList.filter(c => c.inventoryDate < startDate);
-                            for (var j = 0; j < adjustmentsRemainingList.length; j++) {
-                                totalAdjustments += parseFloat((adjustmentsRemainingList[j].adjustmentQty * adjustmentsRemainingList[j].multiplier));
-                            }
-
-                            var shipmentsRemainingList = shipmentList.filter(c => c.expectedDeliveryDate < startDate);
-                            for (var j = 0; j < shipmentsRemainingList.length; j++) {
-                                totalShipments += parseInt((shipmentsRemainingList[j].shipmentQty));
-                            }
-                            openingBalance = totalAdjustments - totalConsumption + totalShipments;
-                            totalConsumption = 0;
                             for (var n = 0; n < 12; n++) {
-                                console.log(totalConsumption)
-                                var dtstr = m[n].startDate
+                               var dtstr = m[n].startDate
                                 var enddtStr = m[n].endDate
-                                console.log(dtstr, ' ', enddtStr)
+                               
                                 var dt = dtstr
-                                console.log(openingBalance)
-                                var invlist = inventoryList.filter(c => c.inventoryDate === enddtStr)
-                                var adjustment = 0;
-                                invlist.map(ele => adjustment = adjustment + (ele.adjustmentQty * ele.multiplier));
-                                var conlist = consumptionList.filter(c => c.consumptionDate === dt)
-                                var consumption = 0;
-                                console.log(programJson.regionList)
-
-
-                                for (var i = 0; i < programJson.regionList.length; i++) {
-
-                                    var list = conlist.filter(c => c.region.id == programJson.regionList[i].regionId)
-                                    console.log(list)
-                                    if (list.length > 1) {
-                                        list.map(ele => ele.actualFlag.toString() == 'true' ? consumption = consumption + ele.consumptionQty : consumption)
-                                    } else {
-                                        consumption = list.length == 0 ? consumption : consumption = consumption + parseInt(list[0].consumptionQty)
-                                    }
-                                }
-                                totalConsumption = totalConsumption + consumption
-
-
-                                var shiplist = shipmentList.filter(c => c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr)
-                                console.log('shiplist', shiplist)
-                                var shipment = 0;
-                                shiplist.map(ele => shipment = shipment + ele.shipmentQty);
-                                if (adjustment != 0 || shipment > 0 || consumption > 0) {
+                                var list = programJson.supplyPlan.filter(c => c.planningUnitId ==planningUnit.planningUnit.id && c.transDate == dt)
+                                console.log(dtstr, ' ', enddtStr,' list',list)
+                            if(list.length>0){
+                                endingBalanceArray[n] = list[0].closingBalance
+                                totalConsumption = totalConsumption + list[0].consumptionQty
+                                if(list[0].consumptionQty>0|| list[0].shipmentQty>0 ||list[0].adjustmentQty!=0){
                                     monthcnt++
                                 }
-                                console.log('adjustment', adjustment, ' shipment', shipment, ' consumption', consumption)
-                                var endingBalance = openingBalance + adjustment + shipment - consumption
-                                console.log('endingBalance', endingBalance)
-                                endingBalance = endingBalance >= 0 ? endingBalance : 0
-                                openingBalance = endingBalance
-                                endingBalanceArray[n] = endingBalance
+                            }else{
+                                endingBalanceArray[n] = ''
+                            }
+                          
+                                
 
                             }
 
-
+                             
                             var totalClosingBalance = 0;
                             var totalmonthincalculation = 0
                             console.log(endingBalanceArray)
@@ -1644,21 +1589,19 @@ export default class InventoryTurns extends Component {
                             }
 
 
-                            var avergeStock = totalClosingBalance / (monthcnt)
+                            var avergeStock = totalClosingBalance / (totalmonthincalculation)
 
-                            if (monthcnt > 0) {
+                          
                                 var json = {
                                     totalConsumption: totalConsumption,
-                                    planningUnit: inventoryList[0].planningUnit,
+                                    planningUnit: planningUnit.planningUnit,
                                     avergeStock: avergeStock,
-                                    noOfMonths: monthcnt,
+                                    noOfMonths: totalmonthincalculation,
                                     inventoryTurns: this.roundN(totalConsumption / avergeStock)
 
                                 }
                                 data.push(json)
-                            } else {
-
-                            }
+                           
 
                         })
                         console.log(data)
@@ -1668,6 +1611,7 @@ export default class InventoryTurns extends Component {
                         }, () => {
                             this.buildJExcel();
                         });
+                    }.bind(this)
                     }.bind(this)
                 }.bind(this)
             } else {
