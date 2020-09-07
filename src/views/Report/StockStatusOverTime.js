@@ -244,8 +244,7 @@ class StockStatusOverTime extends Component {
     getPrograms = () => {
         if (navigator.onLine) {
             AuthenticationService.setupAxiosInterceptors();
-            let realmId = AuthenticationService.getRealmId();
-            ProgramService.getProgramByRealmId(realmId)
+            ProgramService.getProgramList()
                 .then(response => {
                     this.setState({
                         programs: response.data, loading: false
