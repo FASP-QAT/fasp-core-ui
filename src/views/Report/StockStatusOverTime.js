@@ -1191,7 +1191,7 @@ class StockStatusOverTime extends Component {
 
                         <div >
                             <Form >
-                                <Col md="12 pl-0">
+                                <div className="pl-0">
                                     <div className="row">
                                         <FormGroup className="col-md-3">
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
@@ -1339,7 +1339,7 @@ class StockStatusOverTime extends Component {
                                         </FormGroup>
 
                                     </div>
-                                </Col>
+                                </div>
                             </Form>
                         </div>
                         <div className="row">

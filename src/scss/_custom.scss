@@ -979,7 +979,13 @@ font-size: 14px;
 
  .expiredInventorySearchposition{
   position: absolute;
-  top: 60px;
+  top: 45px;
+  right: 2%;
+ } 
+
+ .ShipmentdelinkingSearchposition{
+  position: absolute;
+  top: 45px;
   right: 2%;
  } 
 
@@ -3220,6 +3226,9 @@ border-radius: 2em;
 .ReportSearchMarginTop{
   margin-top: -51px;
 }
+.ShipmentdeletailsSearchposition{
+  top: -59px;
+ } 
 .TextWhite{
   color:#fff!important;
 }

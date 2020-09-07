@@ -2351,7 +2351,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                             </a>
                         </div>
                     </div>
-                    <CardBody className="pb-lg-2 pt-lg-0 ">
+                    <CardBody className="pb-lg-5 pt-lg-0 ">
                         <div className="TableCust" >
                             <div ref={ref}>
 
@@ -2431,7 +2431,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
-                                            <FormGroup className="col-md-12 mt-2 " style={{ display: this.state.display }}>
+                                            <FormGroup className="col-md-10 mt-2 " style={{ display: this.state.display }}>
                       <ul className="legendcommitversion list-group">
                         {
                           legendcolor.map(item1 => (
@@ -2474,8 +2474,10 @@ class StockStatusAcrossPlanningUnits extends Component {
                             }
                         </ToolkitProvider>}
  */}
-                        <div id="tableDiv" className="jexcelremoveReadonlybackground">
+                    <div className="ReportSearchMarginTop">
+                        <div id="tableDiv" className="jexcelremoveReadonlybackground ">
                         </div>
+                    </div>
                     </CardBody>
                 </Card>
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
