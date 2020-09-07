@@ -1032,8 +1032,7 @@ class StockAdjustmentComponent extends Component {
     getPrograms = () => {
         if (navigator.onLine) {
             AuthenticationService.setupAxiosInterceptors();
-            let realmId = AuthenticationService.getRealmId();
-            ProgramService.getProgramByRealmId(realmId)
+            ProgramService.getProgramList()
                 .then(response => {
                     // console.log(JSON.stringify(response.data))
                     this.setState({
@@ -1627,36 +1626,26 @@ class StockAdjustmentComponent extends Component {
                         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         var programJson = JSON.parse(programData);
-                        var inventoryList = []
-                        // &&( c.inventoryDate>=startDate&& c.inventoryDate<=endDate)
-                        planningUnitIds.map(planningUnitId =>
-                            inventoryList = [...inventoryList, ...((programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && (c.inventoryDate >= startDate && c.inventoryDate <= endDate)))]);
-                        var dates = new Set(inventoryList.map(ele => ele.inventoryDate))
-                        var data = []
-                        planningUnitIds.map(planningUnitId => {
-                            dates.map(dt => {
+                        console.log(programJson)
+                       var data=[]
+                        planningUnitIds.map(planningUnitId =>{
+                           var inventoryList = ((programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && (c.inventoryDate >= startDate && c.inventoryDate <= endDate)&& c.adjustmentQty != 0));
+                          console.log(inventoryList.length)
 
-                                var list = inventoryList.filter(c => c.inventoryDate === dt && c.planningUnit.id == planningUnitId && c.actualQty == 0)
-                                console.log("3--->", list)
-                                if (list.length > 0) {
-                                    var adjustment = 0;
-                                    list.map(ele => adjustment = adjustment + ele.adjustmentQty);
-
+                            inventoryList.map(ele=>{
+                                   
                                     var json = {
                                         program: programJson,
-                                        inventoryDate: moment(dt).format('MMM YYYY'),
-                                        planningUnit: list[0].planningUnit,
-                                        stockAdjustemntQty: adjustment,
+                                        inventoryDate: moment(ele.inventoryDate).format('MMM YYYY'),
+                                        planningUnit: ele.planningUnit,
+                                        stockAdjustemntQty:  ele.adjustmentQty,
                                         lastModifiedBy: programJson.currentVersion.lastModifiedBy,
                                         lastModifiedDate: programJson.currentVersion.lastModifiedDate,
-                                        notes: list[0].notes,
-                                        dataSource: list[0].dataSource
+                                        notes: ele.notes,
+                                        dataSource: ele.dataSource
                                     }
                                     data.push(json)
-                                } else {
-
-                                }
-                            })
+                               })
                         })
                         console.log(data)
                         this.setState({

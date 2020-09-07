@@ -244,8 +244,7 @@ class StockStatusOverTime extends Component {
     getPrograms = () => {
         if (navigator.onLine) {
             AuthenticationService.setupAxiosInterceptors();
-            let realmId = AuthenticationService.getRealmId();
-            ProgramService.getProgramByRealmId(realmId)
+            ProgramService.getProgramList()
                 .then(response => {
                     this.setState({
                         programs: response.data, loading: false
@@ -1009,7 +1008,7 @@ class StockStatusOverTime extends Component {
         const headers = [[i18n.t('static.report.month'), i18n.t('static.program.program'), i18n.t('static.planningunit.planningunit'), i18n.t('static.report.stock'), i18n.t('static.report.consupmtionqty'), i18n.t('static.report.amc'), i18n.t('static.report.noofmonth'), i18n.t('static.report.mos')]];
 
         const data = [];
-        this.state.matricsList.map(elt => data.push([this.dateFormatter(elt.dt), getLabelText(elt.program.label, this.state.lang), getLabelText(elt.planningUnit.label, this.state.lang), elt.stock, elt.consumptionQty, this.formatter(this.formatAmc(elt.amc)), elt.amcMonthCount, this.roundN(elt.mos)]));
+        this.state.matricsList.map(elt => data.push([this.dateFormatter(elt.dt), getLabelText(elt.program.label, this.state.lang), getLabelText(elt.planningUnit.label, this.state.lang), this.formatter(elt.stock), this.formatter(elt.consumptionQty), this.formatter(this.formatAmc(elt.amc)), elt.amcMonthCount, this.roundN(elt.mos)]));
         doc.addPage()
         startYtable = 80
         let content = {
@@ -1192,7 +1191,7 @@ class StockStatusOverTime extends Component {
 
                         <div >
                             <Form >
-                                <Col md="12 pl-0">
+                                <div className="pl-0">
                                     <div className="row">
                                         <FormGroup className="col-md-3">
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
@@ -1340,7 +1339,7 @@ class StockStatusOverTime extends Component {
                                         </FormGroup>
 
                                     </div>
-                                </Col>
+                                </div>
                             </Form>
                         </div>
                         <div className="row">

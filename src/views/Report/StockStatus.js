@@ -1953,6 +1953,7 @@ const options = {
       id: 'A',
       position: 'left',
       scaleLabel: {
+        labelString:i18n.t('static.shipment.qty'),
         display: true,
         fontSize: "12",
         fontColor: 'blue'
@@ -1966,6 +1967,7 @@ const options = {
       id: 'B',
       position: 'right',
       scaleLabel: {
+        labelString:i18n.t('static.report.month'),
         display: true,
 
       },
@@ -2435,8 +2437,7 @@ class StockStatus extends Component {
   getPrograms = () => {
     if (navigator.onLine) {
       AuthenticationService.setupAxiosInterceptors();
-      let realmId = AuthenticationService.getRealmId();
-      ProgramService.getProgramByRealmId(realmId)
+      ProgramService.getProgramList()
         .then(response => {
           console.log(JSON.stringify(response.data))
           this.setState({

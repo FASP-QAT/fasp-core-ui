@@ -167,7 +167,7 @@ export default class PipelineProgramSetup extends Component {
         PipelineService.addProgramToQatTempTable(this.state.program, this.props.match.params.pipelineId).then(response => {
             if (response.status == "200") {
                 this.setState({
-                    pipelineProgramSetupPer: 14, planningUnitStatus: true, consumptionStatus: false, inventoryStatus: false,
+                    pipelineProgramSetupPer: 15, planningUnitStatus: true, consumptionStatus: false, inventoryStatus: false,
                     shipmentStatus: false
                 });
                 document.getElementById('stepOne').style.display = 'none';
@@ -217,7 +217,7 @@ export default class PipelineProgramSetup extends Component {
                     //     if (response.status == "200") {
                     if (checkValidation == true) {
                         this.setState({
-                            pipelineProgramSetupPer: 28.56, planningUnitStatus: false, consumptionStatus: false, inventoryStatus: false,
+                            pipelineProgramSetupPer: 29.56, planningUnitStatus: false, consumptionStatus: false, inventoryStatus: false,
                             shipmentStatus: false,
                             dataSourceStatus: true,
                             fundingSourceStatus: false,
@@ -267,7 +267,7 @@ export default class PipelineProgramSetup extends Component {
                 if (response.status == "200") {
                     if (checkValidation == true) {
                         this.setState({
-                            pipelineProgramSetupPer: 42.48, planningUnitStatus: false, consumptionStatus: false, inventoryStatus: false,
+                            pipelineProgramSetupPer: 43.48, planningUnitStatus: false, consumptionStatus: false, inventoryStatus: false,
                             shipmentStatus: false,
                             dataSourceStatus: false,
                             fundingSourceStatus: true,
@@ -304,7 +304,7 @@ export default class PipelineProgramSetup extends Component {
                 if (response.status == "200") {
                     if (checkValidation == true) {
                         this.setState({
-                            pipelineProgramSetupPer: 57.12, planningUnitStatus: false, consumptionStatus: false, inventoryStatus: false,
+                            pipelineProgramSetupPer: 58.12, planningUnitStatus: false, consumptionStatus: false, inventoryStatus: false,
                             shipmentStatus: false,
                             dataSourceStatus: false,
                             fundingSourceStatus: false,
@@ -349,7 +349,7 @@ export default class PipelineProgramSetup extends Component {
 
                     if (checkValidation == true) {
                         this.setState({
-                            pipelineProgramSetupPer: 71.4, planningUnitStatus: false, consumptionStatus: true, inventoryStatus: false,
+                            pipelineProgramSetupPer: 72.4, planningUnitStatus: false, consumptionStatus: true, inventoryStatus: false,
                             shipmentStatus: false,
                             dataSourceStatus: false,
                             fundingSourceStatus: false,
@@ -386,7 +386,7 @@ export default class PipelineProgramSetup extends Component {
 
                     if (checkValidation == true) {
                         this.setState({
-                            pipelineProgramSetupPer: 85.68, planningUnitStatus: false, consumptionStatus: false, inventoryStatus: true,
+                            pipelineProgramSetupPer: 86.68, planningUnitStatus: false, consumptionStatus: false, inventoryStatus: true,
                             shipmentStatus: false,
                             dataSourceStatus: false,
                             fundingSourceStatus: false,
@@ -423,7 +423,7 @@ export default class PipelineProgramSetup extends Component {
                     console.log("save indentory date====>", response);
                     if (checkValidation == true) {
                         this.setState({
-                            pipelineProgramSetupPer: 100, planningUnitStatus: false, consumptionStatus: false, inventoryStatus: false,
+                            pipelineProgramSetupPer: 101, planningUnitStatus: false, consumptionStatus: false, inventoryStatus: false,
                             shipmentStatus: true,
                             dataSourceStatus: false,
                             fundingSourceStatus: false,
@@ -528,7 +528,7 @@ export default class PipelineProgramSetup extends Component {
 
     previousToStepTwo() {
         this.setState({
-            pipelineProgramSetupPer: 14.28, planningUnitStatus: true, consumptionStatus: false, inventoryStatus: false,
+            pipelineProgramSetupPer: 15.28, planningUnitStatus: true, consumptionStatus: false, inventoryStatus: false,
             shipmentStatus: false,
             dataSourceStatus: false,
             fundingSourceStatus: false,
@@ -547,7 +547,7 @@ export default class PipelineProgramSetup extends Component {
 
     previousToStepThree() {
         this.setState({
-            pipelineProgramSetupPer: 28.56, planningUnitStatus: false, consumptionStatus: false, inventoryStatus: false,
+            pipelineProgramSetupPer: 29.56, planningUnitStatus: false, consumptionStatus: false, inventoryStatus: false,
             shipmentStatus: false,
             dataSourceStatus: true,
             fundingSourceStatus: false,
@@ -566,7 +566,7 @@ export default class PipelineProgramSetup extends Component {
 
     previousToStepFour() {
         this.setState({
-            pipelineProgramSetupPer: 42.84, planningUnitStatus: false, consumptionStatus: false, inventoryStatus: false,
+            pipelineProgramSetupPer: 43.84, planningUnitStatus: false, consumptionStatus: false, inventoryStatus: false,
             shipmentStatus: false,
             dataSourceStatus: false,
             fundingSourceStatus: true,
@@ -584,7 +584,7 @@ export default class PipelineProgramSetup extends Component {
     }
     previousToStepFive = () => {
         this.setState({
-            pipelineProgramSetupPer: 57.12, planningUnitStatus: false, consumptionStatus: false, inventoryStatus: false,
+            pipelineProgramSetupPer: 58.12, planningUnitStatus: false, consumptionStatus: false, inventoryStatus: false,
             shipmentStatus: false,
             dataSourceStatus: false,
             fundingSourceStatus: false,
@@ -602,7 +602,7 @@ export default class PipelineProgramSetup extends Component {
     }
     previousToStepSix = () => {
         this.setState({
-            pipelineProgramSetupPer: 71.4, planningUnitStatus: false, consumptionStatus: true, inventoryStatus: false,
+            pipelineProgramSetupPer: 72.4, planningUnitStatus: false, consumptionStatus: true, inventoryStatus: false,
             shipmentStatus: false,
             dataSourceStatus: false,
             fundingSourceStatus: false,
@@ -620,7 +620,7 @@ export default class PipelineProgramSetup extends Component {
     }
     previousToStepSeven = () => {
         this.setState({
-            pipelineProgramSetupPer: 85.68, planningUnitStatus: false, consumptionStatus: false, inventoryStatus: true,
+            pipelineProgramSetupPer: 86.68, planningUnitStatus: false, consumptionStatus: false, inventoryStatus: true,
             shipmentStatus: false,
             dataSourceStatus: false,
             fundingSourceStatus: false,
