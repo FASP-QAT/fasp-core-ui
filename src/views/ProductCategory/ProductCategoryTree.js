@@ -151,6 +151,7 @@ export default class ProductCategoryTree extends Component {
         if (event.target.name === "realmId") {
             this.state.realmId = event.target.value;
         }
+        this.getProductCategoryListByRealmId();
     };
     nodeNameChange(event) {
         this.setState({ nodename: event.target.value });
@@ -598,9 +599,9 @@ export default class ProductCategoryTree extends Component {
                                                     <option value="0">{i18n.t('static.common.select')}</option>
                                                     {realms}
                                                 </Input>
-                                                <InputGroupAddon addonType="append">
+                                                {/* <InputGroupAddon addonType="append">
                                                     <Button color="secondary Gobtn btn-sm" onClick={this.getProductCategoryListByRealmId}>{i18n.t('static.common.go')}</Button>
-                                                </InputGroupAddon>
+                                                </InputGroupAddon> */}
                                             </InputGroup>
                                         </div>
                                     </FormGroup>
