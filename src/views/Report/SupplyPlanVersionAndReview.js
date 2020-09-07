@@ -1157,8 +1157,7 @@ class SupplyPlanVersionAndReview extends Component {
 
     getPrograms() {
         AuthenticationService.setupAxiosInterceptors();
-        let realmId = AuthenticationService.getRealmId();
-        ProgramService.getProgramByRealmId(realmId)
+        ProgramService.getProgramList()
             .then(response => {
                 console.log(JSON.stringify(response.data))
                 this.setState({
@@ -1749,7 +1748,7 @@ class SupplyPlanVersionAndReview extends Component {
                                                         id="versionTypeId"
                                                         bsSize="sm"
                                                         onChange={(e) => { this.fetchData(e) }}
-                                                    >  <option value="-1">{i18n.t('static.common.select')}</option>
+                                                    >  <option value="-1">{i18n.t('static.common.all')}</option>
                                                         {versionTypes}</Input>
                                                 </InputGroup>    </div></FormGroup>
                                         <FormGroup className="col-md-3">

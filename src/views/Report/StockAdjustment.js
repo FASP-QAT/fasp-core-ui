@@ -1032,8 +1032,7 @@ class StockAdjustmentComponent extends Component {
     getPrograms = () => {
         if (navigator.onLine) {
             AuthenticationService.setupAxiosInterceptors();
-            let realmId = AuthenticationService.getRealmId();
-            ProgramService.getProgramByRealmId(realmId)
+            ProgramService.getProgramList()
                 .then(response => {
                     // console.log(JSON.stringify(response.data))
                     this.setState({
@@ -1630,7 +1629,7 @@ class StockAdjustmentComponent extends Component {
                         console.log(programJson)
                        var data=[]
                         planningUnitIds.map(planningUnitId =>{
-                           var inventoryList = ((programJson.inventoryList).filter(c =>  c.planningUnit.id == planningUnitId && (c.inventoryDate >= startDate && c.inventoryDate <= endDate)&& c.adjustmentQty != 0));
+                           var inventoryList = ((programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && (c.inventoryDate >= startDate && c.inventoryDate <= endDate)&& c.adjustmentQty != 0));
                           console.log(inventoryList.length)
 
                             inventoryList.map(ele=>{
