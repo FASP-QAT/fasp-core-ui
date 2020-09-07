@@ -63,7 +63,8 @@ export default class ExportProgram extends Component {
         this.state = {
             programList: [],
             message: '',
-            selectProgramMessage: ''
+            selectProgramMessage: '',
+            loading: true,
         }
         this.formSubmit = this.formSubmit.bind(this)
         this.cancelClicked = this.cancelClicked.bind(this);
@@ -102,7 +103,8 @@ export default class ExportProgram extends Component {
             transaction.oncomplete = function (event) {
                 console.log("ProgramList", prgList)
                 this.setState({
-                    programList: prgList
+                    programList: prgList,
+                    loading: false
                 })
                 console.log("ProgramList", this.state.programList);
             }.bind(this)
@@ -110,6 +112,7 @@ export default class ExportProgram extends Component {
     }
 
     formSubmit() {
+        this.setState({ loading: true });
         var zip = new JSZip();
         var programId = this.state.programId;
         console.log("ProgramId", programId)
@@ -149,6 +152,7 @@ export default class ExportProgram extends Component {
                             }).then(function (content) {
                                 FileSaver.saveAs(content, "download.zip");
                                 let id = AuthenticationService.displayDashboardBasedOnRole();
+                                this.setState({ loading: false });
                                 this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.program.dataexportsuccess'))
 
                             }.bind(this));
@@ -161,6 +165,7 @@ export default class ExportProgram extends Component {
             this.setState({
                 selectProgramMessage: i18n.t('static.program.validselectprogramtext')
             })
+            this.setState({ loading: false });
         }
     }
 
@@ -205,11 +210,14 @@ export default class ExportProgram extends Component {
 
     render() {
         return (
-            <>
+            <div className="animated fadeIn">
+                {/* <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5> */}
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
                 }} />
-                <Card className="mt-2">
+                <Card className="mt-2" style={{ display: this.state.loading ? "none" : "block" }}>
                     <Formik
                         initialValues={initialValues}
                         render={
@@ -251,8 +259,18 @@ export default class ExportProgram extends Component {
                                     </Form>
                                 )} />
                 </Card>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
 
-            </>
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         )
     }
 

@@ -6,7 +6,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import DataSourceService from '../../api/DataSourceService.js';
 import PlanningUnitService from '../../api/PlanningUnitService';
 import moment from 'moment';
-import { jExcelLoadedFunction, jExcelLoadedFunctionWithoutPagination } from '../../CommonComponent/JExcelCommonFunctions';
+import { jExcelLoadedFunction, jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunctionPipeline } from '../../CommonComponent/JExcelCommonFunctions';
 import { ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE } from '../../Constants';
 import RealmCountryService from '../../api/RealmCountryService';
 
@@ -18,6 +18,9 @@ export default class PipelineProgramConsumption extends Component {
         this.saveConsumption = this.saveConsumption.bind(this);
         this.changed = this.changed.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
+        this.state = {
+            loading:true
+        }
     }
 
     checkValidation() {
@@ -386,7 +389,7 @@ console.log('consumptionDataArr',consumptionDataArr)
                                     paginationOptions: [10, 25, 50],
                                     position: 'top',
                                     text: {
-                                        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                                        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
                                         show: '',
                                         entries: '',
                                     },
@@ -395,6 +398,10 @@ console.log('consumptionDataArr',consumptionDataArr)
 
                                 this.el = jexcel(document.getElementById("consumptiontableDiv"), options);
                                 this.loaded();
+                                this.setState({
+                                    loading: false
+                                })
+
                             }
                             // else {
                             //     console.log("in else==================");
@@ -512,16 +519,27 @@ console.log('consumptionDataArr',consumptionDataArr)
     });
     }
     loadedJexcelCommonFunctionTwo = function (instance, cell, x, y, value) {
-        // jExcelLoadedFunctionWithoutPagination(instance);
+        jExcelLoadedFunctionPipeline(instance,0);
     }
 
     render() {
         return (
             <>
                 <h4 className="red">{this.props.message}</h4>
-                <div className="table-responsive" >
+                <div className="table-responsive" style={{ display: this.state.loading ? "none" : "block" }}>
 
                     <div id="consumptiontableDiv">
+                    </div>
+                </div>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
                     </div>
                 </div>
             </>

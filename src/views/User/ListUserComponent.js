@@ -663,7 +663,7 @@ class ListUserComponent extends Component {
         } else {
             // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
             if (this.state.selUserList.length != 0) {
-                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_LANGUAGE')) {
+                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_USER')) {
                     this.props.history.push({
                         pathname: `/user/editUser/${this.el.getValueFromCoords(0, x)}`,
                     });

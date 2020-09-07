@@ -7,7 +7,7 @@ import FundingSourceService from '../../api/FundingSourceService'
 import i18n from '../../i18n';
 import ProductCategoryServcie from '../../api/PoroductCategoryService.js';
 import { textFilter } from 'react-bootstrap-table2-filter';
-import { jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
+import { jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunction, jExcelLoadedFunctionPipeline } from '../../CommonComponent/JExcelCommonFunctions.js'
 
 export default class PipelineProgramFundingSource extends Component {
     constructor(props) {
@@ -222,8 +222,8 @@ export default class PipelineProgramFundingSource extends Component {
                                                     show: '',
                                                     entries: '',
                                                 },
-                                                // onload: this.loadedJexcelCommonFunction,
-                                                onload: this.loaded
+                                                onload: this.loadedJexcelCommonFunction,
+                                                // onload: this.loaded
 
                                             };
                                             var elVar = jexcel(document.getElementById("mapFundingSource"), options);
@@ -248,7 +248,7 @@ export default class PipelineProgramFundingSource extends Component {
     }
 
     loadedJexcelCommonFunction = function (instance, cell, x, y, value) {
-        jExcelLoadedFunction(instance);
+        jExcelLoadedFunctionPipeline(instance,0);
     }
 
     render() {

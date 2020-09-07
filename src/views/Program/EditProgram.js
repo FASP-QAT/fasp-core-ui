@@ -15,7 +15,8 @@ import i18n from "../../i18n"
 import HealthAreaService from "../../api/HealthAreaService";
 import getLabelText from '../../CommonComponent/getLabelText'
 import AuthenticationService from '../Common/AuthenticationService.js';
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import classNames from 'classnames';
 
 
 const entityname = i18n.t('static.program.programMaster');
@@ -35,7 +36,8 @@ let initialValues = {
     shippedToArrivedBySeaLeadTime: '',
     arrivedToDeliveredLeadTime: '',
     healthAreaId: '',
-    programNotes: ''
+    programNotes: '',
+    regionId: []
 }
 
 const validationSchema = function (values) {
@@ -88,6 +90,8 @@ const validationSchema = function (values) {
             .required(i18n.t('static.program.validhealthareatext')),
         // programNotes: Yup.string()
         //     .required(i18n.t('static.program.validnotestext'))
+        regionId: Yup.string()
+            .required(i18n.t('static.common.regiontext'))
     })
 }
 
@@ -369,7 +373,8 @@ export default class EditProgram extends Component {
             shippedToArrivedByAirLeadTime: true,
             shippedToArrivedBySeaLeadTime: true,
             arrivedToDeliveredLeadTime: true,
-            healthAreaId: true
+            healthAreaId: true,
+            regionId: true
         }
         )
         this.validateForm(errors)
@@ -427,7 +432,8 @@ export default class EditProgram extends Component {
                                     arrivedToDeliveredLeadTime: this.state.program.arrivedToDeliveredLeadTime,
                                     healthAreaId: this.state.program.healthArea.id,
                                     programNotes: this.state.program.programNotes,
-                                    regionArray: this.state.program.regionArray
+                                    regionArray: this.state.program.regionArray,
+                                    regionId: this.state.program.regionArray
                                 }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -461,7 +467,9 @@ export default class EditProgram extends Component {
                                         handleSubmit,
                                         isSubmitting,
                                         isValid,
-                                        setTouched
+                                        setTouched,
+                                        setFieldValue,
+                                        setFieldTouched
                                     }) => (
 
                                             <Form onSubmit={handleSubmit} noValidate name='programForm'>
@@ -537,11 +545,17 @@ export default class EditProgram extends Component {
                                                     <FormGroup >
                                                         <Label htmlFor="select">{i18n.t('static.program.region')}<span class="red Reqasterisk">*</span></Label>
                                                         <Select
-                                                            valid={!errors.regionId}
+                                                            className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                                { 'is-valid': !errors.regionId },
+                                                                { 'is-invalid': (touched.regionId && !!errors.regionId || this.state.program.regionArray.length == 0) }
+                                                            )}
                                                             bsSize="sm"
-                                                            invalid={touched.reagonId && !!errors.regionId || this.state.program.regionArray == ''}
-                                                            onChange={(e) => { handleChange(e); this.updateFieldData(e) }}
-                                                            onBlur={handleBlur} name="regionId" id="regionId"
+                                                            onChange={(e) => {
+                                                                handleChange(e);
+                                                                setFieldValue("regionId", e);
+                                                                this.updateFieldData(e);
+                                                            }}
+                                                            onBlur={() => setFieldTouched("regionId", true)}
                                                             multi
                                                             options={this.state.regionList}
                                                             value={this.state.program.regionArray}

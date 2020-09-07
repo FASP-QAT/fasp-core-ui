@@ -11,13 +11,14 @@ import OrganisationService from "../../api/OrganisationService";
 import UserService from "../../api/UserService";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import getLabelText from '../../CommonComponent/getLabelText';
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import classNames from 'classnames';
 
 const entityname = i18n.t('static.organisation.organisation');
 
 const initialValues = {
     realmId: '',
-    realmCountryId: '',
+    realmCountryId: [],
     organisationCode: '',
     organisationName: ''
 }
@@ -31,7 +32,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.organisation.organisationtext')),
         organisationCode: Yup.string()
             .required(i18n.t('static.organisation.organisationcodetext'))
-            .max(4, i18n.t('static.organisation.organisationcodemax4digittext'))
+            .max(4, i18n.t('static.organisation.organisationcodemax4digittext')),
+        realmCountryId: Yup.string()
+            .required(i18n.t('static.program.validcountrytext'))
     })
 }
 
@@ -115,7 +118,8 @@ export default class AddOrganisationComponent extends Component {
         setTouched({
             realmId: true,
             organisationName: true,
-            organisationCode: true
+            organisationCode: true,
+            realmCountryId: true
         }
         )
         this.validateForm(errors)
@@ -282,7 +286,9 @@ export default class AddOrganisationComponent extends Component {
                                         isSubmitting,
                                         isValid,
                                         setTouched,
-                                        handleReset
+                                        handleReset,
+                                        setFieldValue,
+                                        setFieldTouched
                                     }) => (
                                             <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='organisationForm'>
                                                 <CardBody>
@@ -307,10 +313,18 @@ export default class AddOrganisationComponent extends Component {
                                                         <Label htmlFor="realmCountryId">{i18n.t('static.organisation.realmcountry')}<span class="red Reqasterisk">*</span></Label>
                                                         <Select
                                                             bsSize="sm"
-                                                            valid={!errors.realmCountryId && this.state.realmCountryId != ''}
-                                                            invalid={touched.realmCountryId && !!errors.realmCountryId}
-                                                            onChange={(e) => { handleChange(e); this.updateFieldData(e) }}
-                                                            onBlur={handleBlur} name="realmCountryId" id="realmCountryId"
+                                                            className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                                { 'is-valid': !errors.realmCountryId && this.state.organisation.realmCountryArray.length != 0 },
+                                                                { 'is-invalid': (touched.realmCountryId && !!errors.realmCountryId) }
+                                                            )}
+                                                            name="realmCountryId"
+                                                            id="realmCountryId"
+                                                            onChange={(e) => {
+                                                                handleChange(e);
+                                                                setFieldValue("realmCountryId", e);
+                                                                this.updateFieldData(e);
+                                                            }}
+                                                            onBlur={() => setFieldTouched("realmCountryId", true)}
                                                             multi
                                                             options={this.state.realmCountryList}
                                                             value={this.state.realmCountryId}

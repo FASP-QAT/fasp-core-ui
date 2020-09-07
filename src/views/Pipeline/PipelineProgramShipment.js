@@ -13,7 +13,7 @@ import ShipmentStatusService from '../../api/ShipmentStatusService';
 import { Button } from 'reactstrap';
 import FundingSourceService from '../../api/FundingSourceService';
 import { Link } from 'react-router-dom';
-import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
+import { jExcelLoadedFunction, jExcelLoadedFunctionPipeline } from '../../CommonComponent/JExcelCommonFunctions.js'
 import { CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS } from '../../Constants.js'
 
 
@@ -32,7 +32,8 @@ export default class PipelineProgramShipment extends Component {
             shipmentStatusList: [],
             lang: localStorage.getItem('lang'),
             isValidData: false,
-            changedData: false
+            changedData: false,
+            loading:true
 
         }
 
@@ -987,7 +988,7 @@ export default class PipelineProgramShipment extends Component {
             oneditionend: this.onedit,
             copyCompatibility: true,
             text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
                 show: '',
                 entries: '',
             },
@@ -997,10 +998,13 @@ export default class PipelineProgramShipment extends Component {
 
         this.el = jexcel(document.getElementById("shipmenttableDiv"), options);
         this.loaded();
+        this.setState({
+            loading: false
+        })
     }
 
     loadedCommonFunctionJExcel = function (instance, cell, x, y, value) {
-        // jExcelLoadedFunction(instance);
+        jExcelLoadedFunctionPipeline(instance,0);
     }
 
 
@@ -1130,17 +1134,28 @@ export default class PipelineProgramShipment extends Component {
 
         return (
             <>
-                <div className="table-responsive" >
+                <div className="table-responsive" style={{ display: this.state.loading ? "none" : "block" }}>
                     <h5>{i18n.t(this.state.message)}</h5>
                     <div id="shipmenttableDiv">
                     </div>
-                    <div>
+                    <div className="ml-2" >
                         <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.props.previousToStepFour} > <i className="fa fa-angle-double-left"></i> Back</Button>
                         &nbsp;
                                        {this.state.changedData && <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.SubmitShipment}>Save<i className="fa fa-angle-double-right"></i></Button>}
                         {this.state.isValidData && !this.state.changedData && <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.SubmitProgram}>Submit Program</Button>}
                         &nbsp;
                                         </div>
+                </div>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </>
         );

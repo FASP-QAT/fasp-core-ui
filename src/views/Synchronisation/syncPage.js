@@ -34,7 +34,8 @@ export default class syncPage extends Component {
       lang: localStorage.getItem('lang'),
       versionTypeList: [],
       isChanged: false,
-      conflictsCount: 0
+      conflictsCount: 0,
+      loading: true
     }
     this.toggle = this.toggle.bind(this);
     this.getDataForCompare = this.getDataForCompare.bind(this);
@@ -146,7 +147,8 @@ export default class syncPage extends Component {
     var resolveConflict = jexcel(document.getElementById("resolveConflictsTable"), options);
     this.el = resolveConflict;
     this.setState({
-      resolveConflict: resolveConflict
+      resolveConflict: resolveConflict,
+      loading: false
     })
     document.getElementById("index").value = index;
 
@@ -189,6 +191,7 @@ export default class syncPage extends Component {
   }
 
   acceptCurrentChanges() {
+    this.setState({ loading: true });
     var resolveConflictsInstance = this.state.resolveConflict;
     var consumptionInstance = this.state.mergedConsumptionJexcel;
     var index = document.getElementById("index").value;
@@ -223,9 +226,11 @@ export default class syncPage extends Component {
     })
     consumptionInstance.orderBy(18, 0);
     this.toggleLarge('', '', 0, '');
+    this.setState({ loading: false })
   }
 
   acceptIncomingChanges() {
+    this.setState({ loading: true })
     var resolveConflictsInstance = this.state.resolveConflict;
     var consumptionInstance = this.state.mergedConsumptionJexcel;
     var index = document.getElementById("index").value;
@@ -260,6 +265,7 @@ export default class syncPage extends Component {
       conflictsCount: this.state.conflictsCount - 1
     })
     this.toggleLarge('', '', 0, '');
+    this.setState({ loading: false })
   }
 
   // Inventory functions
@@ -311,7 +317,8 @@ export default class syncPage extends Component {
     var resolveConflictInventory = jexcel(document.getElementById("resolveConflictsInventoryTable"), options);
     this.el = resolveConflictInventory;
     this.setState({
-      resolveConflictInventory: resolveConflictInventory
+      resolveConflictInventory: resolveConflictInventory,
+      loading: false
     })
     document.getElementById("indexInventory").value = index;
 
@@ -354,6 +361,7 @@ export default class syncPage extends Component {
   }
 
   acceptCurrentChangesInventory() {
+    this.setState({ loading: true })
     var resolveConflictsInstance = this.state.resolveConflictInventory;
     var inventoryInstance = this.state.mergedInventoryJexcel;
     var index = document.getElementById("indexInventory").value;
@@ -388,9 +396,11 @@ export default class syncPage extends Component {
       conflictsCount: this.state.conflictsCount - 1
     })
     this.toggleLargeInventory('', '', 0, '');
+    this.setState({ loading: false })
   }
 
   acceptIncomingChangesInventory() {
+    this.setState({ loading: true })
     var resolveConflictsInstance = this.state.resolveConflictInventory;
     var inventoryInstance = this.state.mergedInventoryJexcel;
     var index = document.getElementById("indexInventory").value;
@@ -425,6 +435,7 @@ export default class syncPage extends Component {
       conflictsCount: this.state.conflictsCount - 1
     })
     this.toggleLargeInventory('', '', 0, '');
+    this.setState({ loading: false })
   }
 
   // Shipment functions
@@ -488,7 +499,8 @@ export default class syncPage extends Component {
     var resolveConflictShipment = jexcel(document.getElementById("resolveConflictsShipmentTable"), options);
     this.el = resolveConflictShipment;
     this.setState({
-      resolveConflictShipment: resolveConflictShipment
+      resolveConflictShipment: resolveConflictShipment,
+      loading: false
     })
     document.getElementById("indexShipment").value = index;
 
@@ -531,6 +543,7 @@ export default class syncPage extends Component {
   }
 
   acceptCurrentChangesShipment() {
+    this.setState({ loading: true })
     var resolveConflictsInstance = this.state.resolveConflictShipment;
     var shipmentInstance = this.state.mergedShipmentJexcel;
     var index = document.getElementById("indexShipment").value;
@@ -565,9 +578,11 @@ export default class syncPage extends Component {
       conflictsCount: this.state.conflictsCount - 1
     })
     this.toggleLargeShipment('', '', 0, '');
+    this.setState({ loading: false })
   }
 
   acceptIncomingChangesShipment() {
+    this.setState({ loading: true })
     var resolveConflictsInstance = this.state.resolveConflictShipment;
     var shipmentInstance = this.state.mergedShipmentJexcel;
     var index = document.getElementById("indexShipment").value;
@@ -602,6 +617,7 @@ export default class syncPage extends Component {
       conflictsCount: this.state.conflictsCount - 1
     })
     this.toggleLargeShipment('', '', 0, '');
+    this.setState({ loading: false })
   }
 
   componentDidMount() {
@@ -610,7 +626,8 @@ export default class syncPage extends Component {
     var openRequest = indexedDB.open('fasp', 1);
     openRequest.onerror = function (event) {
       this.setState({
-        commitVersionError: i18n.t('static.program.errortext')
+        commitVersionError: i18n.t('static.program.errortext'),
+        loading: false
       })
     }.bind(this);
     openRequest.onsuccess = function (e) {
@@ -622,7 +639,8 @@ export default class syncPage extends Component {
 
       getRequest.onerror = function (event) {
         this.setState({
-          commitVersionError: i18n.t('static.program.errortext')
+          commitVersionError: i18n.t('static.program.errortext'),
+          loading: false
         })
       }.bind(this);
       getRequest.onsuccess = function (event) {
@@ -642,20 +660,19 @@ export default class syncPage extends Component {
             proList[i] = programJson
           }
         }
-        this.setState({
-          programList: proList
-        })
-
         AuthenticationService.setupAxiosInterceptors();
         ProgramService.getVersionTypeList().then(response => {
           this.setState({
             versionTypeList: response.data,
+            programList: proList,
+            loading: false
           })
         })
           .catch(
             error => {
               this.setState({
                 statuses: [],
+                loading: false
               })
               if (error.message === "Network Error") {
                 this.setState({ message: error.message });
@@ -683,8 +700,26 @@ export default class syncPage extends Component {
   getDataForCompare(value) {
     document.getElementById("detailsDiv").style.display = "block";
     this.setState({
-      programId: value
+      programId: value,
+      loading: true,
+      mergedConsumptionJexcel: "",
+      mergedInventoryJexcel: "",
+      mergedShipmentJexcel: "",
+      mergedProblemListJexcel: ""
     })
+    if (this.state.mergedConsumptionJexcel != "" && this.state.mergedConsumptionJexcel != undefined) {
+      this.state.mergedConsumptionJexcel.destroy();
+    }
+    if (this.state.mergedInventoryJexcel != "" && this.state.mergedInventoryJexcel != undefined) {
+      this.state.mergedInventoryJexcel.destroy();
+    }
+    if (this.state.mergedShipmentJexcel != "" && this.state.mergedShipmentJexcel != undefined) {
+      this.state.mergedShipmentJexcel.destroy();
+    }
+    if (this.state.mergedProblemListJexcel != "" && this.state.mergedProblemListJexcel != undefined) {
+      this.state.mergedProblemListJexcel.destroy();
+    }
+
     var programId = value != "" && value != undefined ? value.value : 0;
     AuthenticationService.setupAxiosInterceptors();
     var programRequestJson = { programId: (programId.split("_"))[0], versionId: -1 }
@@ -706,7 +741,8 @@ export default class syncPage extends Component {
           var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
           openRequest.onerror = function (event) {
             this.setState({
-              commitVersionError: i18n.t('static.program.errortext')
+              commitVersionError: i18n.t('static.program.errortext'),
+              loading: false
             })
           }.bind(this);
           openRequest.onsuccess = function (e) {
@@ -716,7 +752,8 @@ export default class syncPage extends Component {
             var programRequest = programDataOs.get(value != "" && value != undefined ? value.value : 0);
             programRequest.onerror = function (event) {
               this.setState({
-                commitVersionError: i18n.t('static.program.errortext')
+                commitVersionError: i18n.t('static.program.errortext'),
+                loading: false
               })
             }.bind(this);
             programRequest.onsuccess = function (e) {
@@ -729,7 +766,8 @@ export default class syncPage extends Component {
               var dProgramRequest = dProgramDataOs.get(value != "" && value != undefined ? value.value : 0);
               dProgramRequest.onerror = function (event) {
                 this.setState({
-                  commitVersionError: i18n.t('static.program.errortext')
+                  commitVersionError: i18n.t('static.program.errortext'),
+                  loading: false
                 })
               }.bind(this);
               dProgramRequest.onsuccess = function (e) {
@@ -741,7 +779,8 @@ export default class syncPage extends Component {
                 var rcpuRequest = rcpuOs.getAll();
                 rcpuRequest.onerror = function (event) {
                   this.setState({
-                    commitVersionError: i18n.t('static.program.errortext')
+                    commitVersionError: i18n.t('static.program.errortext'),
+                    loading: false
                   })
                 }.bind(this);
                 rcpuRequest.onsuccess = function (event) {
@@ -761,7 +800,8 @@ export default class syncPage extends Component {
                   var dataSourceRequest = dataSourceOs.getAll();
                   dataSourceRequest.onerror = function (event) {
                     this.setState({
-                      commitVersionError: i18n.t('static.program.errortext')
+                      commitVersionError: i18n.t('static.program.errortext'),
+                      loading: false
                     })
                   }.bind(this);
                   dataSourceRequest.onsuccess = function (event) {
@@ -783,7 +823,8 @@ export default class syncPage extends Component {
                     planningUnitList = []
                     puRequest.onerror = function (event) {
                       this.setState({
-                        supplyPlanError: i18n.t('static.program.errortext')
+                        supplyPlanError: i18n.t('static.program.errortext'),
+                        loading: false
                       })
                     }.bind(this);
                     puRequest.onsuccess = function (e) {
@@ -803,7 +844,8 @@ export default class syncPage extends Component {
                       var shipmentStatusRequest = shipmentStatusOs.getAll();
                       shipmentStatusRequest.onerror = function (event) {
                         this.setState({
-                          commitVersionError: i18n.t('static.program.errortext')
+                          commitVersionError: i18n.t('static.program.errortext'),
+                          loading: false
                         })
                       }.bind(this);
                       shipmentStatusRequest.onsuccess = function (event) {
@@ -821,7 +863,8 @@ export default class syncPage extends Component {
                         var papuRequest = papuOs.getAll();
                         papuRequest.onerror = function (event) {
                           this.setState({
-                            commitVersionError: i18n.t('static.program.errortext')
+                            commitVersionError: i18n.t('static.program.errortext'),
+                            loading: false
                           })
                         }.bind(this);
                         papuRequest.onsuccess = function (event) {
@@ -843,7 +886,8 @@ export default class syncPage extends Component {
                           var fsRequest = fsOs.getAll();
                           fsRequest.onerror = function (event) {
                             this.setState({
-                              commitVersionError: i18n.t('static.program.errortext')
+                              commitVersionError: i18n.t('static.program.errortext'),
+                              loading: false
                             })
                           }.bind(this);
                           fsRequest.onsuccess = function (event) {
@@ -865,7 +909,8 @@ export default class syncPage extends Component {
                             var budgetListAll = []
                             bRequest.onerror = function (event) {
                               this.setState({
-                                commitVersionError: i18n.t('static.program.errortext')
+                                commitVersionError: i18n.t('static.program.errortext'),
+                                loading: false
                               })
                             }.bind(this);
                             bRequest.onsuccess = function (event) {
@@ -895,7 +940,8 @@ export default class syncPage extends Component {
                               var currencyRequest = currencyOs.getAll();
                               currencyRequest.onerror = function (event) {
                                 this.setState({
-                                  commitVersionError: i18n.t('static.program.errortext')
+                                  commitVersionError: i18n.t('static.program.errortext'),
+                                  loading: false
                                 })
                               }.bind(this);
                               currencyRequest.onsuccess = function (event) {
@@ -975,9 +1021,9 @@ export default class syncPage extends Component {
                                   data[3] = mergedConsumptionData[cd].region.id; //B                        
                                   data[4] = mergedConsumptionData[cd].dataSource.id; //C
                                   data[5] = mergedConsumptionData[cd].realmCountryPlanningUnit.id; //D
-                                  data[6] = mergedConsumptionData[cd].consumptionRcpuQty; //E
+                                  data[6] = parseInt(mergedConsumptionData[cd].consumptionRcpuQty); //E
                                   data[7] = mergedConsumptionData[cd].multiplier; //F
-                                  data[8] = mergedConsumptionData[cd].consumptionRcpuQty * mergedConsumptionData[cd].multiplier; //I
+                                  data[8] = parseInt(mergedConsumptionData[cd].consumptionRcpuQty) * mergedConsumptionData[cd].multiplier; //I
                                   data[9] = mergedConsumptionData[cd].dayOfStockOut;
                                   if (mergedConsumptionData[cd].notes === null || ((mergedConsumptionData[cd].notes).trim() == "NULL")) {
                                     data[10] = "";
@@ -991,19 +1037,19 @@ export default class syncPage extends Component {
                                   var oldDataList = oldProgramDataConsumption.filter(c => c.consumptionId == mergedConsumptionData[cd].consumptionId);
                                   var oldData = ""
                                   if (oldDataList.length > 0) {
-                                    oldData = [oldDataList[0].consumptionId, oldDataList[0].planningUnit.id, oldDataList[0].consumptionDate, oldDataList[0].region.id, oldDataList[0].dataSource.id, oldDataList[0].realmCountryPlanningUnit.id, oldDataList[0].consumptionRcpuQty, oldDataList[0].multiplier, oldDataList[0].consumptionRcpuQty * oldDataList[0].multiplier, oldDataList[0].dayOfStockOut, oldDataList[0].notes, (oldDataList[0].actualFlag.toString() == "true" ? 1 : 0), oldDataList[0].active, JSON.stringify(oldDataList[0].batchInfoList != "" ? ((oldDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.consumptionQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
+                                    oldData = [oldDataList[0].consumptionId, oldDataList[0].planningUnit.id, oldDataList[0].consumptionDate, oldDataList[0].region.id, oldDataList[0].dataSource.id, oldDataList[0].realmCountryPlanningUnit.id, parseInt(oldDataList[0].consumptionRcpuQty), oldDataList[0].multiplier, parseInt(oldDataList[0].consumptionRcpuQty) * oldDataList[0].multiplier, oldDataList[0].dayOfStockOut, oldDataList[0].notes, (oldDataList[0].actualFlag.toString() == "true" ? 1 : 0), oldDataList[0].active, JSON.stringify(oldDataList[0].batchInfoList != "" ? ((oldDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.consumptionQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
                                   }
                                   data[15] = oldData;//Old data
                                   var latestDataList = latestProgramDataConsumption.filter(c => c.consumptionId == mergedConsumptionData[cd].consumptionId);
                                   var latestData = ""
                                   if (latestDataList.length > 0) {
-                                    latestData = [latestDataList[0].consumptionId, latestDataList[0].planningUnit.id, latestDataList[0].consumptionDate, latestDataList[0].region.id, latestDataList[0].dataSource.id, latestDataList[0].realmCountryPlanningUnit.id, latestDataList[0].consumptionRcpuQty, latestDataList[0].multiplier, latestDataList[0].consumptionRcpuQty * latestDataList[0].multiplier, latestDataList[0].dayOfStockOut, latestDataList[0].notes, (latestDataList[0].actualFlag.toString() == "true" ? 1 : 0), latestDataList[0].active, JSON.stringify(latestDataList[0].batchInfoList != "" ? ((latestDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.consumptionQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
+                                    latestData = [latestDataList[0].consumptionId, latestDataList[0].planningUnit.id, latestDataList[0].consumptionDate, latestDataList[0].region.id, latestDataList[0].dataSource.id, latestDataList[0].realmCountryPlanningUnit.id, parseInt(latestDataList[0].consumptionRcpuQty), latestDataList[0].multiplier, parseInt(latestDataList[0].consumptionRcpuQty) * latestDataList[0].multiplier, latestDataList[0].dayOfStockOut, latestDataList[0].notes, (latestDataList[0].actualFlag.toString() == "true" ? 1 : 0), latestDataList[0].active, JSON.stringify(latestDataList[0].batchInfoList != "" ? ((latestDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.consumptionQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
                                   }
                                   data[16] = latestData;//Latest data
                                   var downloadedDataList = downloadedProgramDataConsumption.filter(c => c.consumptionId == mergedConsumptionData[cd].consumptionId);
                                   var downloadedData = "";
                                   if (downloadedDataList.length > 0) {
-                                    downloadedData = [downloadedDataList[0].consumptionId, downloadedDataList[0].planningUnit.id, downloadedDataList[0].consumptionDate, downloadedDataList[0].region.id, downloadedDataList[0].dataSource.id, downloadedDataList[0].realmCountryPlanningUnit.id, downloadedDataList[0].consumptionRcpuQty, downloadedDataList[0].multiplier, downloadedDataList[0].consumptionRcpuQty * downloadedDataList[0].multiplier, downloadedDataList[0].dayOfStockOut, downloadedDataList[0].notes, (downloadedDataList[0].actualFlag.toString() == "true" ? 1 : 0), downloadedDataList[0].active, JSON.stringify(downloadedDataList[0].batchInfoList != "" ? ((downloadedDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.consumptionQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
+                                    downloadedData = [downloadedDataList[0].consumptionId, downloadedDataList[0].planningUnit.id, downloadedDataList[0].consumptionDate, downloadedDataList[0].region.id, downloadedDataList[0].dataSource.id, downloadedDataList[0].realmCountryPlanningUnit.id, parseInt(downloadedDataList[0].consumptionRcpuQty), downloadedDataList[0].multiplier, parseInt(downloadedDataList[0].consumptionRcpuQty) * downloadedDataList[0].multiplier, downloadedDataList[0].dayOfStockOut, downloadedDataList[0].notes, (downloadedDataList[0].actualFlag.toString() == "true" ? 1 : 0), downloadedDataList[0].active, JSON.stringify(downloadedDataList[0].batchInfoList != "" ? ((downloadedDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.consumptionQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
                                   }
                                   data[17] = downloadedData;//Downloaded data
                                   data[18] = 4;
@@ -1057,6 +1103,7 @@ export default class syncPage extends Component {
                                       items.push({
                                         title: "Resolve conflicts",
                                         onclick: function () {
+                                          this.setState({ loading: true })
                                           this.toggleLarge(rowData[15], rowData[16], y, 'consumption');
                                         }.bind(this)
                                       })
@@ -1136,11 +1183,11 @@ export default class syncPage extends Component {
                                     data[4] = mergedInventoryData[cd].dataSource.id;
                                     data[5] = mergedInventoryData[cd].realmCountryPlanningUnit.id;
                                     data[6] = mergedInventoryData[cd].adjustmentQty != "" && mergedInventoryData[cd].adjustmentQty != null && mergedInventoryData[cd].adjustmentQty != 0 ? 2 : 1;
-                                    data[7] = mergedInventoryData[cd].adjustmentQty;
-                                    data[8] = mergedInventoryData[cd].actualQty;
+                                    data[7] = parseInt(mergedInventoryData[cd].adjustmentQty);
+                                    data[8] = parseInt(mergedInventoryData[cd].actualQty);
                                     data[9] = mergedInventoryData[cd].multiplier;
-                                    data[10] = mergedInventoryData[cd].adjustmentQty * mergedInventoryData[cd].multiplier;
-                                    data[11] = mergedInventoryData[cd].actualQty * mergedInventoryData[cd].multiplier;
+                                    data[10] = parseInt(mergedInventoryData[cd].adjustmentQty) * mergedInventoryData[cd].multiplier;
+                                    data[11] = parseInt(mergedInventoryData[cd].actualQty) * mergedInventoryData[cd].multiplier;
                                     data[12] = mergedInventoryData[cd].notes;
                                     data[13] = mergedInventoryData[cd].active;
                                     data[14] = JSON.stringify(mergedInventoryData[cd].batchInfoList != "" ? ((mergedInventoryData[cd].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty1": parseInt(a.adjustmentQty), "qty2": parseInt(a.actualQty) } })).sort(function (a, b) { return a.qty1 - b.qty1; }) : "");
@@ -1148,19 +1195,19 @@ export default class syncPage extends Component {
                                     var oldDataList = oldProgramDataInventory.filter(c => c.inventoryId == mergedInventoryData[cd].inventoryId && c.region != null && c.region.id != 0);
                                     var oldData = ""
                                     if (oldDataList.length > 0) {
-                                      oldData = [oldDataList[0].inventoryId, oldDataList[0].planningUnit.id, oldDataList[0].inventoryDate, oldDataList[0].region.id, oldDataList[0].dataSource.id, oldDataList[0].realmCountryPlanningUnit.id, oldDataList[0].adjustmentQty != "" && oldDataList[0].adjustmentQty != null && oldDataList[0].adjustmentQty != 0 ? 2 : 1, oldDataList[0].adjustmentQty, oldDataList[0].actualQty, oldDataList[0].multiplier, oldDataList[0].adjustmentQty * oldDataList[0].multiplier, oldDataList[0].actualQty * oldDataList[0].multiplier, oldDataList[0].notes, oldDataList[0].active, JSON.stringify(oldDataList[0].batchInfoList != "" ? ((oldDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty1": parseInt(a.adjustmentQty), "qty2": parseInt(a.actualQty) } })).sort(function (a, b) { return a.qty1 - b.qty1; }) : ""), "", "", "", "", 4];
+                                      oldData = [oldDataList[0].inventoryId, oldDataList[0].planningUnit.id, oldDataList[0].inventoryDate, oldDataList[0].region.id, oldDataList[0].dataSource.id, oldDataList[0].realmCountryPlanningUnit.id, oldDataList[0].adjustmentQty != "" && oldDataList[0].adjustmentQty != null && oldDataList[0].adjustmentQty != 0 ? 2 : 1, parseInt(oldDataList[0].adjustmentQty), parseInt(oldDataList[0].actualQty), oldDataList[0].multiplier, parseInt(oldDataList[0].adjustmentQty) * oldDataList[0].multiplier, parseInt(oldDataList[0].actualQty) * oldDataList[0].multiplier, oldDataList[0].notes, oldDataList[0].active, JSON.stringify(oldDataList[0].batchInfoList != "" ? ((oldDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty1": parseInt(a.adjustmentQty), "qty2": parseInt(a.actualQty) } })).sort(function (a, b) { return a.qty1 - b.qty1; }) : ""), "", "", "", "", 4];
                                     }
                                     data[16] = oldData;//Old data
                                     var latestDataList = latestProgramDataInventory.filter(c => c.inventoryId == mergedInventoryData[cd].inventoryId && c.region != null && c.region.id != 0);
                                     var latestData = ""
                                     if (latestDataList.length > 0) {
-                                      latestData = [latestDataList[0].inventoryId, latestDataList[0].planningUnit.id, latestDataList[0].inventoryDate, latestDataList[0].region.id, latestDataList[0].dataSource.id, latestDataList[0].realmCountryPlanningUnit.id, latestDataList[0].adjustmentQty != "" && latestDataList[0].adjustmentQty != null && latestDataList[0].adjustmentQty != 0 ? 2 : 1, latestDataList[0].adjustmentQty, latestDataList[0].actualQty, latestDataList[0].multiplier, latestDataList[0].adjustmentQty * latestDataList[0].multiplier, latestDataList[0].actualQty * latestDataList[0].multiplier, latestDataList[0].notes, latestDataList[0].active, JSON.stringify(latestDataList[0].batchInfoList != "" ? ((latestDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty1": parseInt(a.adjustmentQty), "qty2": parseInt(a.actualQty) } })).sort(function (a, b) { return a.qty1 - b.qty1; }) : ""), "", "", "", "", 4];
+                                      latestData = [latestDataList[0].inventoryId, latestDataList[0].planningUnit.id, latestDataList[0].inventoryDate, latestDataList[0].region.id, latestDataList[0].dataSource.id, latestDataList[0].realmCountryPlanningUnit.id, latestDataList[0].adjustmentQty != "" && latestDataList[0].adjustmentQty != null && latestDataList[0].adjustmentQty != 0 ? 2 : 1, parseInt(latestDataList[0].adjustmentQty), parseInt(latestDataList[0].actualQty), latestDataList[0].multiplier, parseInt(latestDataList[0].adjustmentQty) * latestDataList[0].multiplier, parseInt(latestDataList[0].actualQty) * latestDataList[0].multiplier, latestDataList[0].notes, latestDataList[0].active, JSON.stringify(latestDataList[0].batchInfoList != "" ? ((latestDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty1": parseInt(a.adjustmentQty), "qty2": parseInt(a.actualQty) } })).sort(function (a, b) { return a.qty1 - b.qty1; }) : ""), "", "", "", "", 4];
                                     }
                                     data[17] = latestData;//Latest data
                                     var downloadedDataList = downloadedProgramDataInventory.filter(c => c.inventoryId == mergedInventoryData[cd].inventoryId && c.region != null && c.region.id != 0);
                                     var downloadedData = "";
                                     if (downloadedDataList.length > 0) {
-                                      downloadedData = [downloadedDataList[0].inventoryId, downloadedDataList[0].planningUnit.id, downloadedDataList[0].inventoryDate, downloadedDataList[0].region.id, downloadedDataList[0].dataSource.id, downloadedDataList[0].realmCountryPlanningUnit.id, downloadedDataList[0].adjustmentQty != "" && downloadedDataList[0].adjustmentQty != null && downloadedDataList[0].adjustmentQty != 0 ? 2 : 1, downloadedDataList[0].adjustmentQty, downloadedDataList[0].actualQty, downloadedDataList[0].multiplier, downloadedDataList[0].adjustmentQty * downloadedDataList[0].multiplier, downloadedDataList[0].actualQty * downloadedDataList[0].multiplier, downloadedDataList[0].notes, downloadedDataList[0].active, JSON.stringify(downloadedDataList[0].batchInfoList != "" ? ((downloadedDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty1": parseInt(a.adjustmentQty), "qty2": parseInt(a.actualQty) } })).sort(function (a, b) { return a.qty1 - b.qty1; }) : ""), "", "", "", "", 4];
+                                      downloadedData = [downloadedDataList[0].inventoryId, downloadedDataList[0].planningUnit.id, downloadedDataList[0].inventoryDate, downloadedDataList[0].region.id, downloadedDataList[0].dataSource.id, downloadedDataList[0].realmCountryPlanningUnit.id, downloadedDataList[0].adjustmentQty != "" && downloadedDataList[0].adjustmentQty != null && downloadedDataList[0].adjustmentQty != 0 ? 2 : 1, parseInt(downloadedDataList[0].adjustmentQty), parseInt(downloadedDataList[0].actualQty), downloadedDataList[0].multiplier, parseInt(downloadedDataList[0].adjustmentQty) * downloadedDataList[0].multiplier, parseInt(downloadedDataList[0].actualQty) * downloadedDataList[0].multiplier, downloadedDataList[0].notes, downloadedDataList[0].active, JSON.stringify(downloadedDataList[0].batchInfoList != "" ? ((downloadedDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty1": parseInt(a.adjustmentQty), "qty2": parseInt(a.actualQty) } })).sort(function (a, b) { return a.qty1 - b.qty1; }) : ""), "", "", "", "", 4];
                                     }
                                     data[18] = downloadedData;//Downloaded data
                                     data[19] = 4;
@@ -1216,6 +1263,7 @@ export default class syncPage extends Component {
                                       items.push({
                                         title: "Resolve conflicts",
                                         onclick: function () {
+                                          this.setState({ loading: true })
                                           this.toggleLargeInventory(rowData[16], rowData[17], y, 'inventory');
                                         }.bind(this)
                                       })
@@ -1378,6 +1426,7 @@ export default class syncPage extends Component {
                                       items.push({
                                         title: "Resolve conflicts",
                                         onclick: function () {
+                                          this.setState({ loading: true })
                                           this.toggleLargeShipment(rowData[28], rowData[29], y, 'shipment');
                                         }.bind(this)
                                       })
@@ -1580,7 +1629,8 @@ export default class syncPage extends Component {
                                   latestProgramDataProblemList: latestProgramDataProblemList,
                                   mergedProblemListData: mergedProblemListData,
                                   oldProgramDataBatchInfo: oldProgramDataBatchInfo,
-                                  latestProgramDataBatchInfo: latestProgramDataBatchInfo
+                                  latestProgramDataBatchInfo: latestProgramDataBatchInfo,
+                                  loading: false
                                 })
                               }.bind(this)
                             }.bind(this)
@@ -1595,7 +1645,8 @@ export default class syncPage extends Component {
           }.bind(this)
         } else {
           this.setState({
-            message: response.data.messageCode
+            message: response.data.messageCode,
+            loading: false
           },
             () => {
             })
@@ -1967,8 +2018,8 @@ export default class syncPage extends Component {
       } else if ((jsonData[c])[17] == "") {
         for (var i = 0; i < colArr.length; i++) {
           var col = (colArr[i]).concat(parseInt(c) + 1);
-          elInstance.setStyle(col[i], "background-color", "transparent");
-          elInstance.setStyle(col[i], "background-color", LATEST_VERSION_COLOUR);
+          elInstance.setStyle(col, "background-color", "transparent");
+          elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
           elInstance.setValueFromCoords(20, c, 3, true);
         }
         this.setState({
@@ -2085,10 +2136,12 @@ export default class syncPage extends Component {
       <div className="animated fadeIn">
         <AuthenticationServiceComponent history={this.props.history} message={(message) => {
           this.setState({ message: message })
+        }} loading={(loading) => {
+          this.setState({ loading: loading })
         }} />
         <h5>{i18n.t(this.state.message, { entityname })}</h5>
         <h6 className="red">{this.state.commitVersionError}</h6>
-        <Row>
+        <Row style={{ display: this.state.loading ? "none" : "block" }}>
           <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
             <Card>
               <CardBody>
@@ -2110,15 +2163,15 @@ export default class syncPage extends Component {
                           />
                         </div>
                       </FormGroup>
-                     
+
                     </div>
-                    <div className="col-md-12">
-                        <ul className="legendcommitversion">
-                          <li><span className="lightpinklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.commitVersion.conflicts')}</span></li>
-                          <li><span className=" greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.commitVersion.changedInCurrentVersion')} </span></li>
-                          <li><span className="notawesome legendcolor"></span > <span className="legendcommitversionText">{i18n.t('static.commitVersion.changedInLatestVersion')}</span></li>
-                        </ul>
-                      </div>
+                    <div className="col-md-10 pt-2">
+                      <ul className="legendcommitversion">
+                        <li><span className="lightpinklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.commitVersion.conflicts')}</span></li>
+                        <li><span className=" greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.commitVersion.changedInCurrentVersion')} </span></li>
+                        <li><span className="notawesome legendcolor"></span > <span className="legendcommitversionText">{i18n.t('static.commitVersion.changedInLatestVersion')}</span></li>
+                      </ul>
+                    </div>
                   </Col>
                 </Form>
                 <div id="detailsDiv">
@@ -2205,9 +2258,20 @@ export default class syncPage extends Component {
             </Card>
           </Col>
         </Row>
+        <div style={{ display: this.state.loading ? "block" : "none" }}>
+          <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+            <div class="align-items-center">
+              <div ><h4> <strong>Loading...</strong></h4></div>
+
+              <div class="spinner-border blue ml-4" role="status">
+
+              </div>
+            </div>
+          </div>
+        </div>
         {/* Resolve conflicts modal */}
         <Modal isOpen={this.state.conflicts}
-          className={'modal-lg ' + this.props.className, "modalWidth"}>
+          className={'modal-lg ' + this.props.className, "modalWidth"} style={{ display: this.state.loading ? "none" : "block" }}>
           <ModalHeader toggle={() => this.toggleLarge()} className="modalHeaderSupplyPlan">
             <strong>{i18n.t('static.commitVersion.resolveConflicts')}</strong>
             <ul className="legendcommitversion">
@@ -2231,7 +2295,7 @@ export default class syncPage extends Component {
 
         {/* Resolve conflicts modal */}
         <Modal isOpen={this.state.conflictsInventory}
-          className={'modal-lg ' + this.props.className, "modalWidth"}>
+          className={'modal-lg ' + this.props.className, "modalWidth"} style={{ display: this.state.loading ? "none" : "block" }}>
           <ModalHeader toggle={() => this.toggleLargeInventory()} className="modalHeaderSupplyPlan">
             <strong>{i18n.t('static.commitVersion.resolveConflicts')}</strong>
             <ul className="legendcommitversion">
@@ -2254,7 +2318,7 @@ export default class syncPage extends Component {
 
         {/* Resolve conflicts modal */}
         <Modal isOpen={this.state.conflictsShipment}
-          className={'modal-lg ' + this.props.className, "modalWidth"}>
+          className={'modal-lg ' + this.props.className, "modalWidth"} style={{ display: this.state.loading ? "none" : "block" }}>
           <ModalHeader toggle={() => this.toggleLargeShipment()} className="modalHeaderSupplyPlan">
             <strong>{i18n.t('static.commitVersion.resolveConflicts')}</strong>
             <ul className="legendcommitversion">
@@ -2279,6 +2343,7 @@ export default class syncPage extends Component {
   };
 
   synchronize() {
+    this.setState({ loading: true });
     var db1;
     var storeOS;
     getDatabase();
@@ -2406,8 +2471,9 @@ export default class syncPage extends Component {
   }
 
   redirectToDashbaord() {
+    this.setState({ loading: false })
     let id = AuthenticationService.displayDashboardBasedOnRole();
-    this.props.history.push(`/ApplicationDashboard/`+`${id}` + '/green/' + i18n.t('static.message.commitSuccess'))
+    this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.message.commitSuccess'))
   }
 
   hideSecondComponent() {

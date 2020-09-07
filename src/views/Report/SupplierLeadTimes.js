@@ -1791,8 +1791,7 @@ class SupplierLeadTimes extends Component {
     getPrograms() {
         if (navigator.onLine) {
             AuthenticationService.setupAxiosInterceptors();
-            let realmId = AuthenticationService.getRealmId();
-            ProgramService.getProgramByRealmId(realmId)
+            ProgramService.getProgramList()
                 .then(response => {
                     console.log(JSON.stringify(response.data))
                     this.setState({
@@ -1963,11 +1962,15 @@ class SupplierLeadTimes extends Component {
     getPlanningUnit = () => {
 
         let programId = document.getElementById("programId").value;
-        alert(programId);
+        // alert(programId);
         // let versionId = document.getElementById("versionId").value;
         if (programId > 0) {
             this.setState({
-                planningUnits: []
+                planningUnits: [],
+                planningUnitValues: [],
+                // procurementAgents: [],
+                // procurementAgenttValues:[]
+
             }, () => {
                 // if (versionId.includes('Local')) {
                 if (!navigator.onLine) {
@@ -2009,12 +2012,14 @@ class SupplierLeadTimes extends Component {
                 }
                 else {
                     AuthenticationService.setupAxiosInterceptors();
-
+                    // this.setState({planningUnits:[]});
                     //let productCategoryId = document.getElementById("productCategoryId").value;
                     ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
-                        console.log('**' + JSON.stringify(response.data))
+                        console.log('**' + JSON.stringify(response.data));
+
                         this.setState({
-                            planningUnits: response.data, message: ''
+                            planningUnits: response.data,
+                            message: ''
                         }, () => {
                             this.fetchData();
                         })
@@ -2045,7 +2050,10 @@ class SupplierLeadTimes extends Component {
                 }
             });
         } else {
-            this.setState({ message: i18n.t('static.common.selectProgram'), outPutList: [] },
+            this.setState({
+                message: i18n.t('static.common.selectProgram'), outPutList: [], planningUnits: [],
+                planningUnitValues: []
+            },
                 () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
                     this.el.destroy();

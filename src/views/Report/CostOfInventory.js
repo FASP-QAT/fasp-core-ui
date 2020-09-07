@@ -1014,8 +1014,8 @@ export default class CostOfInventory extends Component {
     getPrograms = () => {
         if (navigator.onLine) {
             AuthenticationService.setupAxiosInterceptors();
-            let realmId = AuthenticationService.getRealmId();
-            ProgramService.getProgramByRealmId(realmId)
+            //let realmId = AuthenticationService.getRealmId();
+            ProgramService.getProgramList()
                 .then(response => {
                     console.log(JSON.stringify(response.data))
                     this.setState({
@@ -1411,8 +1411,8 @@ export default class CostOfInventory extends Component {
         for (var j = 0; j < costOfInventory.length; j++) {
             data = [];
             data[0] = getLabelText(costOfInventory[j].planningUnit.label, this.state.lang)
-            data[1] = costOfInventory[j].stock
-            data[2] = costOfInventory[j].catalogPrice;
+            data[1] = this.formatter(costOfInventory[j].stock)
+            data[2] = this.formatterDouble(costOfInventory[j].catalogPrice);
             data[3] = this.formatterDouble(costOfInventory[j].cost);
 
             costOfInventoryArray[count] = data;
@@ -1551,124 +1551,21 @@ export default class CostOfInventory extends Component {
                             var data = []
 
                             proList.map(planningUnit => {
-                                console.log('planningunit', planningUnit.planningUnit.id)
-                                var inventoryList = []
-
-
-                                var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnit.planningUnit.id && c.active == true);
-                                var inventoryList = (programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnit.planningUnit.id);
-                                var shipmentList = []
-                                if (document.getElementById("includePlanningShipments").value.toString() == 'true') {
-                                    shipmentList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnit.planningUnit.id && c.shipmentStatus.id != 8 && c.accountFlag == true);
-                                } else {
-                                    shipmentList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnit.planningUnit.id && c.shipmentStatus.id != 8 && c.shipmentStatus.id != 1 && c.shipmentStatus.id != 2 && c.shipmentStatus.id != 9 && c.accountFlag == true);
-
-                                }
-                                // calculate openingBalance
-
-                                let invmin = moment.min(inventoryList.map(d => moment(d.inventoryDate)))
-                                let shipmin = moment.min(shipmentList.map(d => moment(d.expectedDeliveryDate)))
-                                let conmin = moment.min(consumptionList.map(d => moment(d.consumptionDate)))
-                                var minDate = invmin.isBefore(shipmin) && invmin.isBefore(conmin) ? invmin : shipmin.isBefore(invmin) && shipmin.isBefore(conmin) ? shipmin : conmin
-
-                                var openingBalance = 0;
-                                if (minDate.isBefore(startDate)) {
-                                    var totalConsumption = 0;
-                                    var totalAdjustments = 0;
-                                    var totalShipments = 0;
-                                    console.log('startDate', startDate)
-                                    console.log('programJson', programJson)
-                                    var consumptionRemainingList = consumptionList.filter(c => moment(c.consumptionDate).isBefore(minDate));
-                                    console.log('consumptionRemainingList', consumptionRemainingList)
-                                    for (var j = 0; j < consumptionRemainingList.length; j++) {
-                                        var count = 0;
-                                        for (var k = 0; k < consumptionRemainingList.length; k++) {
-                                            if (consumptionRemainingList[j].consumptionDate == consumptionRemainingList[k].consumptionDate && consumptionRemainingList[j].region.id == consumptionRemainingList[k].region.id && j != k) {
-                                                count++;
-                                            } else {
-
-                                            }
-                                        }
-                                        if (count == 0) {
-                                            totalConsumption += parseInt((consumptionRemainingList[j].consumptionQty));
-                                        } else {
-                                            if (consumptionRemainingList[j].actualFlag.toString() == 'true') {
-                                                totalConsumption += parseInt((consumptionRemainingList[j].consumptionQty));
-                                            }
-                                        }
-                                    }
-
-                                    var adjustmentsRemainingList = inventoryList.filter(c => moment(c.inventoryDate).isBefore(minDate));
-                                    for (var j = 0; j < adjustmentsRemainingList.length; j++) {
-                                        totalAdjustments += parseFloat((adjustmentsRemainingList[j].adjustmentQty * adjustmentsRemainingList[j].multiplier));
-                                    }
-
-                                    var shipmentsRemainingList = shipmentList.filter(c => moment(c.expectedDeliveryDate).isBefore(minDate) && c.accountFlag == true);
-                                    console.log('shipmentsRemainingList', shipmentsRemainingList)
-                                    for (var j = 0; j < shipmentsRemainingList.length; j++) {
-                                        totalShipments += parseInt((shipmentsRemainingList[j].shipmentQty));
-                                    }
-                                    openingBalance = totalAdjustments - totalConsumption + totalShipments;
-                                    for (i = 1; ; i++) {
-                                        var dtstr = minDate.startOf('month').format('YYYY-MM-DD')
-                                        var enddtStr = minDate.endOf('month').format('YYYY-MM-DD')
-                                        console.log(dtstr, ' ', enddtStr)
-                                        var dt = dtstr
-                                        console.log(openingBalance)
-                                        console.log(inventoryList)
-                                        var invlist = inventoryList.filter(c => c.inventoryDate === enddtStr)
-                                        var adjustment = 0;
-                                        invlist.map(ele => adjustment = adjustment + (ele.adjustmentQty * ele.multiplier));
-                                        console.log(consumptionList)
-                                        var conlist = consumptionList.filter(c => c.consumptionDate === dt)
-                                        var consumption = 0;
-                                        console.log(programJson.regionList)
-
-                                        var actualFlag = false
-                                        for (var i = 0; i < programJson.regionList.length; i++) {
-
-                                            var list = conlist.filter(c => c.region.id == programJson.regionList[i].regionId)
-                                            console.log(list)
-                                            if (list.length > 1) {
-                                                for (var l = 0; l < list.length; l++) {
-                                                    if (list[l].actualFlag.toString() == 'true') {
-                                                        actualFlag = true;
-                                                        consumption = consumption + list[l].consumptionQty
-                                                    }
-                                                }
-                                            } else {
-                                                consumption = list.length == 0 ? consumption : consumption = consumption + parseInt(list[0].consumptionQty)
-                                            }
-                                        }
-
-
-                                        console.log(shipmentList)
-                                        var shiplist = shipmentList.filter(c => c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr)
-                                        var shipment = 0;
-                                        shiplist.map(ele => shipment = shipment + ele.shipmentQty);
-
-                                        console.log('openingBalance', openingBalance, 'adjustment', adjustment, ' shipment', shipment, ' consumption', consumption)
-                                        var endingBalance = openingBalance + adjustment + shipment - consumption
-                                        console.log('endingBalance', endingBalance)
-
-                                        endingBalance = endingBalance < 0 ? 0 : endingBalance
-                                        openingBalance = endingBalance
-                                        minDate = minDate.add(1, 'month')
-
-                                        if (minDate.startOf('month').isAfter(startDate)) {
-                                            break;
-                                        }
-                                    }
-                                }
-
+                              
+                                 var dtstr = this.state.singleValue2.year + "-" + String(this.state.singleValue2.month).padStart(2, '0') + "-01"
+                               var list = programJson.supplyPlan.filter(c => c.planningUnitId == planningUnit.planningUnit.id && c.transDate == dtstr)
+                                console.log('planningunit', planningUnit.planningUnit)
+                                if (list.length > 0) {
                                 var json = {
                                     planningUnit: planningUnit.planningUnit,
-                                    stock: endingBalance,
+                                    stock: document.getElementById("includePlanningShipments").value.toString() == 'true'?list[0].closingBalance:list[0].closingBalanceWPS,
                                     catalogPrice: planningUnit.catalogPrice,
-                                    cost: this.roundN(endingBalance * planningUnit.catalogPrice)
+                                    cost: this.roundN(document.getElementById("includePlanningShipments").value.toString() == 'true'?list[0].closingBalance  * planningUnit.catalogPrice:list[0].closingBalanceWPS * planningUnit.catalogPrice)
                                 }
                                 data.push(json)
-
+                            }else{
+                              
+                            }
                             })
 
 

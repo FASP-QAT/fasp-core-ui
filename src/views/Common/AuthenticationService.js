@@ -404,16 +404,17 @@ class AuthenticationService {
 
     getLoggedInUserRoleBusinessFunctionArray() {
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-        console.log("decryptedCurUser---", decryptedCurUser);
+        // console.log("decryptedCurUser---", decryptedCurUser);
         let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
-        console.log("decryptedUser---", decryptedUser);
+        // console.log("decryptedUser---", decryptedUser);
         let businessFunctionList = decryptedUser.businessFunctionList;
-        console.log("decryptedUser.businessfunctions---" + decryptedUser.businessFunctionList);
+        // console.log("decryptedUser.businessfunctions---" + decryptedUser.businessFunctionList);
 
         var bfunction = [];
         for (let i = 0; i < businessFunctionList.length; i++) {
             bfunction.push(businessFunctionList[i]);
         }
+        console.log("bfuntion---",bfunction);
         return bfunction;
     }
     authenticatedRoute(route) {
@@ -1042,7 +1043,7 @@ class AuthenticationService {
                 case "/report/supplyPlanVersionAndReview":
                 case "/report/editStatus/:programId/:versionId":
                 case "/report/supplyPlanVersionAndReview/:message":
-                    if (bfunction.includes("ROLE_BF_SUPPLY_PLAN_REPORT")) {
+                    if (bfunction.includes("ROLE_BF_SUPPLY_PLAN_VERSION_AND_REVIEW")) {
                         return true;
                     }
                     break;

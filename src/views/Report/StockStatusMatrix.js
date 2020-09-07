@@ -35,6 +35,8 @@ const pickerLang = {
   months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
   from: 'From', to: 'To',
 }
+const legendcolor = [
+  { text: "Low stock", color: '#edb944' }];
 const { ExportCSVButton } = CSVExport;
 const entityname = i18n.t('static.dashboard.productCatalog');
 export default class StockStatusMatrix extends React.Component {
@@ -426,8 +428,7 @@ export default class StockStatusMatrix extends React.Component {
   getPrograms = () => {
     if (navigator.onLine) {
       AuthenticationService.setupAxiosInterceptors();
-      let realmId = AuthenticationService.getRealmId();
-      ProgramService.getProgramByRealmId(realmId)
+      ProgramService.getProgramList()
         .then(response => {
           console.log(JSON.stringify(response.data))
           this.setState({
@@ -886,12 +887,12 @@ export default class StockStatusMatrix extends React.Component {
   cellStyle = (min, value) => {
     if (value != '')
       if (min > value) {
-        return { backgroundColor: '#f48282' }
+        return { backgroundColor: legendcolor[0].color }
       } else {
         return {}
       }
     else {
-      return { backgroundColor: '#f48282' }
+      return { backgroundColor: legendcolor[0].color }
     }
   }
   render() {
@@ -1249,7 +1250,15 @@ export default class StockStatusMatrix extends React.Component {
                     </InputGroup>
                   </div>
                 </FormGroup>
-
+                <FormGroup className="col-md-12 mt-2 " style={{ display: this.state.display }}>
+                      <ul className="legendcommitversion list-group">
+                        {
+                          legendcolor.map(item1 => (
+                            <li><span className="legendcolor" style={{ backgroundColor: item1.color }}></span> <span className="legendcommitversionText">{item1.text}</span></li>
+                          ))
+                        }
+                      </ul>
+                    </FormGroup>
               </div>
             </div>
             <div class="TableCust">

@@ -12,13 +12,15 @@ import UserService from "../../api/UserService";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n'
 import getLabelText from '../../CommonComponent/getLabelText';
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import classNames from 'classnames';
 
 
 let initialValues = {
     realmId: '',
     healthAreaName: '',
     healthAreaCode: '',
+    realmCountryId: [],
 }
 const entityname = i18n.t('static.healtharea.healtharea');
 const validationSchema = function (values) {
@@ -31,6 +33,8 @@ const validationSchema = function (values) {
         healthAreaCode: Yup.string()
             .max(3, 'Technical Area Code Is 3 Digit')
             .required(i18n.t('static.country.countrycodetext')),
+        realmCountryId: Yup.string()
+            .required(i18n.t('static.program.validcountrytext'))
     })
 }
 
@@ -147,6 +151,7 @@ export default class EditHealthAreaComponent extends Component {
             realmId: true,
             healthAreaName: true,
             healthAreaCode: true,
+            realmCountryId: true
         }
         )
         this.validateForm(errors)
@@ -276,7 +281,8 @@ export default class EditHealthAreaComponent extends Component {
                                 initialValues={{
                                     healthAreaName: this.state.healthArea.label.label_en,
                                     healthAreaCode: this.state.healthArea.healthAreaCode,
-                                    realmId: this.state.healthArea.realm.id
+                                    realmId: this.state.healthArea.realm.id,
+                                    realmCountryId: this.state.healthArea.realmCountryArray
                                 }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -311,7 +317,9 @@ export default class EditHealthAreaComponent extends Component {
                                         handleSubmit,
                                         isSubmitting,
                                         isValid,
-                                        setTouched
+                                        setTouched,
+                                        setFieldValue,
+                                        setFieldTouched
                                     }) => (
                                             <Form onSubmit={handleSubmit} noValidate name='healthAreaForm'>
                                                 <CardBody className="pb-0">
@@ -335,11 +343,19 @@ export default class EditHealthAreaComponent extends Component {
                                                     <FormGroup>
                                                         <Label htmlFor="select">{i18n.t('static.healtharea.realmcountry')}<span class="red Reqasterisk">*</span></Label>
                                                         <Select
+                                                            className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                                { 'is-valid': !errors.realmCountryId },
+                                                                { 'is-invalid': (touched.realmCountryId && !!errors.realmCountryId || this.state.healthArea.realmCountryArray.length == 0) }
+                                                            )}
                                                             bsSize="sm"
-                                                            valid={!errors.realmCountryId}
-                                                            invalid={touched.realmCountryId && !!errors.realmCountryId || this.state.healthArea.realmCountryArray == ''}
-                                                            onChange={(e) => { handleChange(e); this.updateFieldData(e) }}
-                                                            onBlur={handleBlur} name="realmCountryId" id="realmCountryId"
+                                                            name="realmCountryId"
+                                                            id="realmCountryId"
+                                                            onChange={(e) => {
+                                                                handleChange(e);
+                                                                setFieldValue("realmCountryId", e);
+                                                                this.updateFieldData(e);
+                                                            }}
+                                                            onBlur={() => setFieldTouched("realmCountryId", true)}
                                                             multi
                                                             options={this.state.realmCountryList}
                                                             value={this.state.healthArea.realmCountryArray}

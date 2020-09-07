@@ -859,7 +859,7 @@ export default class DataSourceListComponent extends Component {
         if ((x == 0 && value != 0) || (y == 0)) {
             // console.log("HEADER SELECTION--------------------------");
         } else {
-            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_CURRENCY')) {
+            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_DATA_SOURCE')) {
                 this.props.history.push({
                     pathname: `/dataSource/editDataSource/${this.el.getValueFromCoords(0, x)}`,
                     // state: { currency: currency }

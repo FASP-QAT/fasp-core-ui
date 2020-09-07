@@ -12,12 +12,14 @@ import UserService from "../../api/UserService";
 import i18n from '../../i18n'
 import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationService from '../Common/AuthenticationService.js';
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import classNames from 'classnames';
 
 let initialValues = {
     realmId: '',
     organisationName: '',
     organisationCode: '',
+    realmCountryId: [],
 }
 const entityname = i18n.t('static.organisation.organisation');
 const validationSchema = function (values) {
@@ -29,7 +31,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.organisation.organisationtext')),
         organisationCode: Yup.string()
             .required(i18n.t('static.organisation.organisationcodetext'))
-            .max(4, i18n.t('static.organisation.organisationcodemax4digittext'))
+            .max(4, i18n.t('static.organisation.organisationcodemax4digittext')),
+        realmCountryId: Yup.string()
+            .required(i18n.t('static.program.validcountrytext'))
     })
 }
 
@@ -142,7 +146,8 @@ export default class EditOrganisationComponent extends Component {
         setTouched({
             realmId: true,
             organisationName: true,
-            organisationCode: true
+            organisationCode: true,
+            realmCountryId: true
         }
         )
         this.validateForm(errors)
@@ -274,7 +279,8 @@ export default class EditOrganisationComponent extends Component {
                                     // label: this.props.location.state.healthArea.label.label_en,
                                     organisationName: this.state.organisation.label.label_en,
                                     organisationCode: this.state.organisation.organisationCode,
-                                    realmId: this.state.organisation.realm.id
+                                    realmId: this.state.organisation.realm.id,
+                                    realmCountryId: this.state.organisation.realmCountryArray
 
                                 }}
                                 validate={validate(validationSchema)}
@@ -309,7 +315,9 @@ export default class EditOrganisationComponent extends Component {
                                         handleSubmit,
                                         isSubmitting,
                                         isValid,
-                                        setTouched
+                                        setTouched,
+                                        setFieldValue,
+                                        setFieldTouched
                                     }) => (
                                             <Form onSubmit={handleSubmit} noValidate name='organisationForm'>
                                                 <CardBody className="pb-0">
@@ -335,10 +343,18 @@ export default class EditOrganisationComponent extends Component {
                                                         <Label htmlFor="realmCountryId">{i18n.t('static.organisation.realmcountry')}</Label>
                                                         <Select
                                                             bsSize="sm"
-                                                            valid={!errors.realmCountryId}
-                                                            invalid={touched.realmCountryId && !!errors.realmCountryId || this.state.organisation.realmCountryArray == ''}
-                                                            onChange={(e) => { handleChange(e); this.updateFieldData(e) }}
-                                                            onBlur={handleBlur} name="realmCountryId" id="realmCountryId"
+                                                            className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                                { 'is-valid': !errors.realmCountryId },
+                                                                { 'is-invalid': (touched.realmCountryId && !!errors.realmCountryId || this.state.organisation.realmCountryArray.length == 0) }
+                                                            )}
+                                                            name="realmCountryId"
+                                                            id="realmCountryId"
+                                                            onChange={(e) => {
+                                                                handleChange(e);
+                                                                setFieldValue("realmCountryId", e);
+                                                                this.updateFieldData(e);
+                                                            }}
+                                                            onBlur={() => setFieldTouched("realmCountryId", true)}
                                                             multi
                                                             options={this.state.realmCountryList}
                                                             value={this.state.organisation.realmCountryArray}

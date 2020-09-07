@@ -336,7 +336,13 @@ import paginationFactory from 'react-bootstrap-table2-paginator';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
+import pdfIcon from '../../assets/img/pdf.png';
+import csvicon from '../../assets/img/csv.png';
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
+import { LOGO } from '../../CommonComponent/Logo.js';
+import { getStyle } from '@coreui/coreui-pro/dist/js/coreui-utilities';
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 
 
 const entityname = i18n.t('static.region.region');
@@ -358,6 +364,139 @@ class RegionListComponent extends Component {
         this.formatLabel = this.formatLabel.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
+    }
+
+    formatter = value => {
+
+        var cell1 = value
+        cell1 += '';
+        var x = cell1.split('.');
+        var x1 = x[0];
+        var x2 = x.length > 1 ? '.' + x[1] : '';
+        var rgx = /(\d+)(\d{3})/;
+        while (rgx.test(x1)) {
+            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+        }
+        return x1 + x2;
+    }
+
+    exportPDF = () => {
+        const addFooters = doc => {
+            const pageCount = doc.internal.getNumberOfPages()
+
+            for (var i = 1; i <= pageCount; i++) {
+                doc.setFont('helvetica', 'bold')
+                doc.setFontSize(6)
+                doc.setPage(i)
+                doc.setPage(i)
+                doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
+                    align: 'center'
+                })
+
+                doc.text('Copyright © 2020 Quantification Analytics Tool', doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+                    align: 'center'
+                })
+            }
+        }
+        const addHeaders = doc => {
+            const pageCount = doc.internal.getNumberOfPages()
+
+            for (var i = 1; i <= pageCount; i++) {
+                doc.setFont('helvetica', 'bold')
+                doc.setFontSize(12)
+                doc.setFont('helvetica', 'bold')
+                doc.setPage(i)
+                doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
+                doc.setTextColor("#002f6c");
+                doc.text(i18n.t('static.region.region'), doc.internal.pageSize.width / 2, 60, {
+                    align: 'center'
+                })
+                if (i == 1) {
+                    doc.setFontSize(8)
+                    doc.setFont('helvetica', 'normal')
+                    doc.text(i18n.t('static.region.country') + ' : ' + document.getElementById("realmCountryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
+                        align: 'left'
+                    })
+
+                }
+
+
+
+            }
+        }
+        const unit = "pt";
+        const size = "A4"; // Use A1, A2, A3 or A4
+        const orientation = "landscape"; // portrait or landscape
+        const marginLeft = 10;
+        const doc = new jsPDF(orientation, unit, size, true);
+        doc.setFontSize(8);
+        const title = i18n.t('static.region.region');
+        var width = doc.internal.pageSize.width;
+        var height = doc.internal.pageSize.height;
+        var h1 = 50;
+
+        const headers = [];
+        headers.push(i18n.t('static.region.country'));
+        headers.push(i18n.t('static.region.region'));
+        headers.push(i18n.t('static.region.capacitycbm'));
+        headers.push(i18n.t('static.region.gln'));
+        headers.push(i18n.t('static.common.status'));
+
+        // columns.map((item, idx) => { headers[idx] = (item.text) });
+
+        let data = this.state.selRegion.map(ele => [
+            getLabelText(ele.realmCountry.country.label, this.state.lang),
+            getLabelText(ele.label, this.state.lang),
+            this.formatter(ele.capacityCbm),
+            ele.gln,
+            ele.active ? i18n.t('static.common.active') : i18n.t('static.common.disabled')
+        ]);
+
+        let content = {
+            margin: { top: 90, bottom: 70 },
+            startY: 200,
+            head: [headers],
+            body: data,
+            styles: { lineWidth: 1, fontSize: 8, cellWidth: 55, halign: 'center' },
+        };
+        doc.autoTable(content);
+        addHeaders(doc)
+        addFooters(doc)
+        doc.save(i18n.t('static.region.region') + '.pdf')
+    }
+
+    exportCSV() {
+
+        var csvRow = [];
+
+        csvRow.push(i18n.t('static.region.country') + ' , ' + (document.getElementById("realmCountryId").selectedOptions[0].text).replaceAll(' ', '%20'))
+        csvRow.push('')
+        csvRow.push('')
+
+        const headers = [];
+        // columns.map((item, idx) => { headers[idx] = ((item.text).replaceAll(' ', '%20')) });
+        headers.push(i18n.t('static.region.country'));
+        headers.push(i18n.t('static.region.region'));
+        headers.push(i18n.t('static.region.capacitycbm'));
+        headers.push(i18n.t('static.region.gln'));
+        headers.push(i18n.t('static.common.status'));
+
+        var A = [headers]
+        this.state.selRegion.map(ele => A.push([(getLabelText(ele.realmCountry.country.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.capacityCbm, ele.gln, (ele.active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'))]));
+        for (var i = 0; i < A.length; i++) {
+            // console.log(A[i])
+            csvRow.push(A[i].join(","))
+
+        }
+
+        var csvString = csvRow.join("%0A")
+        // console.log('csvString' + csvString)
+        var a = document.createElement("a")
+        a.href = 'data:attachment/csv,' + csvString
+        a.target = "_Blank"
+        a.download = i18n.t('static.region.region') + ".csv"
+        document.body.appendChild(a)
+        a.click()
     }
 
     hideSecondComponent() {
@@ -626,13 +765,19 @@ class RegionListComponent extends Component {
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
                 }} />
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 className="red" id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
                     <div className="Card-header-reporticon">
-                        {/* <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.regionreport')}</strong>{' '} */}
-
+                        {this.state.selRegion.length > 0 &&
+                            <div className="card-header-actions">
+                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF()} />
+                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
+                            </div>
+                        }
                     </div>
                     <CardBody className="pb-lg-0">
                         <Col md="3 pl-0">

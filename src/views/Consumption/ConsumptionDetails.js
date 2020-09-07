@@ -295,7 +295,7 @@ export default class ConsumptionDetails extends React.Component {
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 className={this.state.color} id="div1">{i18n.t(this.state.message, { entityname })}</h5>
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
-                    <CardBody className="pb-lg-1 pt-lg-2">
+                    <CardBody className="pb-lg-0 pt-lg-2">
                         <Formik
                             render={
                                 ({
@@ -336,7 +336,7 @@ export default class ConsumptionDetails extends React.Component {
                                         </Form>
                                     )} />
 
-                        <Col xs="12" sm="12" className="p-0">
+                        <Col xs="12" sm="12" className="p-0 ShipmentdeletailsSearchposition">
                             {this.state.showConsumption == 1 && <ConsumptionInSupplyPlanComponent ref="consumptionChild" items={this.state} toggleLarge={this.toggleLarge} updateState={this.updateState} formSubmit={this.formSubmit} consumptionPage="consumptionDataEntry" />}
                             <h6 className="red">{this.state.consumptionDuplicateError || this.state.consumptionNoStockError || this.state.consumptionError}</h6>
                             <div className="table-responsive">
