@@ -344,7 +344,7 @@ export default class ShipmentDelinking extends Component {
                             {
                                 props => (
                                     <div className="TableCust">
-                                        <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
+                                        <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left ShipmentdelinkingSearchposition">
                                             <SearchBar {...props.searchProps} />
                                             <ClearSearchButton {...props.searchProps} />
                                         </div>
