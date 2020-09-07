@@ -12,8 +12,40 @@ import {
 import getLabelText from '../../CommonComponent/getLabelText';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
+import classNames from 'classnames';
 
+const initialValuesFour = {
+    regionId: []
+}
 
+const validationSchemaFour = function (values) {
+    return Yup.object().shape({
+        regionId: Yup.string()
+            .required(i18n.t('static.common.regiontext')),
+    })
+}
+
+const validateFour = (getValidationSchema) => {
+    return (values) => {
+        const validationSchema = getValidationSchema(values)
+        try {
+            validationSchema.validateSync(values, { abortEarly: false })
+            return {}
+        } catch (error) {
+            return getErrorsFromValidationErrorFour(error)
+        }
+    }
+}
+
+const getErrorsFromValidationErrorFour = (validationError) => {
+    const FIRST_ERROR = 0
+    return validationError.inner.reduce((errors, error) => {
+        return {
+            ...errors,
+            [error.path]: error.errors[FIRST_ERROR],
+        }
+    }, {})
+}
 
 export default class PipelineProgramDataStepFive extends Component {
     constructor(props) {
@@ -23,6 +55,30 @@ export default class PipelineProgramDataStepFive extends Component {
             regionId: ''
         }
     }
+
+    touchAllFour(setTouched, errors) {
+        setTouched({
+            regionId: true
+        }
+        )
+        this.validateFormFour(errors)
+    }
+    validateFormFour(errors) {
+        this.findFirstErrorFour('regionForm', (fieldName) => {
+            return Boolean(errors[fieldName])
+        })
+    }
+    findFirstErrorFour(formName, hasError) {
+        const form = document.forms[formName]
+        for (let i = 0; i < form.length; i++) {
+            if (hasError(form[i].name)) {
+                form[i].focus()
+                break
+            }
+        }
+    }
+
+
     componentDidMount() {
 
         // AuthenticationService.setupAxiosInterceptors();
@@ -73,7 +129,87 @@ export default class PipelineProgramDataStepFive extends Component {
     render() {
         return (
             <>
-                <FormGroup className="col-md-4 pl-0">
+
+                <Formik
+                    initialValues={initialValuesFour}
+                    validate={validateFour(validationSchemaFour)}
+                    onSubmit={(values, { setSubmitting, setErrors }) => {
+                        this.props.endProgramInfoStepFour && this.props.endProgramInfoStepFour();
+
+                    }}
+                    render={
+                        ({
+                            values,
+                            errors,
+                            touched,
+                            handleChange,
+                            handleBlur,
+                            handleSubmit,
+                            isSubmitting,
+                            isValid,
+                            setTouched,
+                            setFieldValue,
+                            setFieldTouched
+                        }) => (
+                                <Form className="needs-validation" onSubmit={handleSubmit} noValidate name='regionForm'>
+                                    <FormGroup>
+                                        {/* <Label htmlFor="select">{i18n.t('static.program.region')}<span class="red Reqasterisk">*</span></Label>
+                                        <Select
+                                            className={classNames('form-control', 'col-md-4', 'd-block', 'w-100', 'bg-light',
+                                                { 'is-valid': !errors.regionId && this.props.items.program.regionArray.length != 0 },
+                                                { 'is-invalid': (touched.regionId && !!errors.regionId) }
+                                            )}
+                                            onChange={(e) => {
+                                                handleChange(e);
+                                                setFieldValue("regionId", e);
+                                                this.props.updateFieldData(e);
+                                            }}
+                                            onBlur={() => setFieldTouched("regionId", true)}
+                                            // onChange={(e) => { this.props.updateFieldData(e) }}
+                                            // className="col-md-4"
+                                            bsSize="sm"
+                                            name="regionId"
+                                            id="regionId"
+                                            multi
+                                            options={this.state.regionList}
+                                            // value={this.state.regionId}
+                                            value={this.props.items.program.regionArray}
+                                        // onChange={(e) => { handleChange(e); this.props.updateFieldData(e) }}
+                                        /> */}
+                                        <Label htmlFor="select">{i18n.t('static.program.region')}<span class="red Reqasterisk">*</span><span class="red Reqasterisk">*</span></Label>
+                                        <Select
+                                            className={classNames('form-control', 'col-md-4', 'd-block', 'w-100', 'bg-light',
+                                                { 'is-valid': !errors.regionId && this.props.items.program.regionArray.length != 0 },
+                                                { 'is-invalid': (touched.regionId && !!errors.regionId) }
+                                            )}
+                                            onChange={(e) => {
+                                                handleChange(e);
+                                                setFieldValue("regionId", e);
+                                                this.props.updateFieldData(e);
+                                            }}
+                                            onBlur={() => setFieldTouched("regionId", true)}
+                                            // onChange={(e) => { this.props.updateFieldData(e) }}
+                                            // className="col-md-4 ml-field"
+                                            bsSize="sm"
+                                            name="regionId"
+                                            id="regionId"
+                                            multi
+                                            options={this.props.items.regionList}
+                                            value={this.props.items.program.regionArray}
+                                        />
+
+                                        <FormFeedback className="red">{errors.regionId}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.props.backToprogramInfoStepThree} > <i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
+                                        &nbsp;
+                                        <Button color="info" size="md" className="float-left mr-1" type="submit" name="regionSub" id="regionSub" onClick={() => this.touchAllFour(setTouched, errors)}>{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
+                                        &nbsp;
+                                    </FormGroup>
+                                </Form>
+                            )} />
+
+                {/* <FormGroup className="col-md-4 pl-0">
                     <Label htmlFor="select">{i18n.t('static.program.region')}<span class="red Reqasterisk">*</span><span class="red Reqasterisk">*</span></Label>
                     <Select
                         onChange={(e) => { this.props.updateFieldData(e) }}
@@ -92,7 +228,7 @@ export default class PipelineProgramDataStepFive extends Component {
                     &nbsp;
                     <Button color="info" size="md" className="float-left mr-1" type="button" name="regionSub" id="regionSub" onClick={this.props.endProgramInfoStepFour}>{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
                     &nbsp;
-                    </FormGroup>
+                    </FormGroup> */}
 
 
             </>
