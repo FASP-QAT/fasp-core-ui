@@ -784,7 +784,7 @@ class AddRoleComponent extends Component {
                                                             value={this.Capitalize(this.state.role.label.label_en)}
                                                         /><FormFeedback className="red">{errors.roleName}</FormFeedback>
                                                     </FormGroup>
-                                                    <FormGroup>
+                                                    <FormGroup className="Selectcontrol-bdrNone">
                                                         <Label htmlFor="businessFunctions">{i18n.t('static.role.businessfunction')}<span className="red Reqasterisk">*</span> </Label>
                                                         <Select
                                                             className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
@@ -808,8 +808,9 @@ class AddRoleComponent extends Component {
                                                         />
                                                         <FormFeedback className="red">{errors.businessFunctions}</FormFeedback>
                                                     </FormGroup>
-                                                    <FormGroup>
+                                                    <FormGroup className="Selectcontrol-bdrNone">
                                                         <Label htmlFor="canCreateRoles">{i18n.t('static.role.cancreaterole')}<span className="red Reqasterisk">*</span> </Label>
+                                            
                                                         <Select
                                                             className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
                                                                 { 'is-valid': !errors.canCreateRoles && this.state.role.canCreateRoles.length != 0 },

@@ -115,7 +115,7 @@ export default class SupplyPlanComponent extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            loading: true,
+            // loading: true,
             monthsArray: [],
             programList: [],
             planningUnitList: [],
@@ -1447,7 +1447,7 @@ export default class SupplyPlanComponent extends React.Component {
         document.getElementById("planningUnitId").value = 0;
         document.getElementById("planningUnit").value = "";
         this.setState({
-            loading: true,
+            // loading: true,
             display: 'none',
             planningUnitChange: false,
             programSelect: value,
@@ -1610,7 +1610,7 @@ export default class SupplyPlanComponent extends React.Component {
                 display: 'none'
             })
         }
-        this.setState({ loading: true });
+        // this.setState({ loading: true });
         var m = this.getMonthArray(moment(Date.now()).add(monthCount, 'months').utcOffset('-0500'));
         var planningUnitId = value != "" && value != undefined ? value.value : 0;
         var planningUnitName = value.label;
@@ -1698,6 +1698,7 @@ export default class SupplyPlanComponent extends React.Component {
                         if (programJson.supplyPlan != undefined) {
                             supplyPlanData = (programJson.supplyPlan).filter(c => c.planningUnitId == planningUnitId);
                         }
+                        console.log("SupplyPlanData--------------->", supplyPlanData);
                         if (supplyPlanData.length > 0) {
                             var lastClosingBalance = 0;
                             for (var n = 0; n < m.length; n++) {
@@ -2233,9 +2234,11 @@ export default class SupplyPlanComponent extends React.Component {
                                 closingBalanceArray: closingBalanceArray,
                                 loading: false
                             })
+                            console.log("Opening balance array", openingBalanceArray);
                         } else {
-                            this.setState({loading: false})
-                            calculateSupplyPlan(document.getElementById("programId").value, document.getElementById("planningUnitId").value, 'programData', 'supplyPlan', this);
+                            console.log("In else")
+                            this.setState({ loading: false })
+                            // calculateSupplyPlan(document.getElementById("programId").value, document.getElementById("planningUnitId").value, 'programData', 'supplyPlan', this);
                         }
                     }.bind(this)
                 }.bind(this)
@@ -2662,6 +2665,7 @@ export default class SupplyPlanComponent extends React.Component {
                         <div className="card-header-actions">
                             <a className="card-header-action">
                                 <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggle() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span>
+                                {/* <Link to='/supplyPlanFormulas' target="_blank"><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></Link> */}
                             </a>
                         </div>
                     </div>

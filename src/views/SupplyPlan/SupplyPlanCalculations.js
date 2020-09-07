@@ -37,7 +37,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                 var programPlanningUnitList = myResult;
                 var programJsonForStoringTheResult = programJson;
                 var inventoryListForNationalAdjustments = programJson.inventoryList;
-                var supplyPlanData = programJsonForStoringTheResult.supplyPlanData;
+                var supplyPlanData = programJsonForStoringTheResult.supplyPlan;
                 if (supplyPlanData == undefined) {
                     supplyPlanData = []
                 }
@@ -718,6 +718,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     supplyPlanData.push(json);
                                 }
                             }
+                            console.log("Supply plan data", supplyPlanData);
                             programJsonForStoringTheResult.supplyPlan = supplyPlanData;
                             programJsonForStoringTheResult.inventoryList = inventoryListForNationalAdjustments;
                             programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJsonForStoringTheResult), SECRET_KEY)).toString();
