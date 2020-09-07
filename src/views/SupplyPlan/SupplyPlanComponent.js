@@ -2686,7 +2686,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 ({
                                 }) => (
                                         <Form name='simpleForm'>
-                                            <Col md="12 pl-0">
+                                            <div className=" pl-0">
                                                 <div className="row">
                                                     <FormGroup className="col-md-4">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
@@ -2741,7 +2741,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                         <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.shelfLife")} - {this.state.shelfLife}</span></li>
                                                     </ul>
                                                 </FormGroup>
-                                            </Col>
+                                            </div>
                                         </Form>
                                     )} />
                         <div className="animated fadeIn" style={{ display: this.state.display }}>

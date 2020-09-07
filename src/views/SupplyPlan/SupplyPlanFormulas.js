@@ -150,15 +150,15 @@ Ending balance = 22,000</p><br></br>
                     Months in future = 3(Based on program planning unit)<br></br>
                     Current month = May 2020<br></br>
 Consumption in Feb 2020 = 5,000<br></br>
-Consumption in Mar 2020 = 6,890<br></br>
-Consumption in Apr 2020 = 6,907<br></br>
+Consumption in March 2020 = 6,890<br></br>
+Consumption in April 2020 = 6,907<br></br>
 Consumption in May 2020 = 7,087<br></br>
 Consumption in Jun 2020 = 5,678<br></br>
-Consumption in Jul 2020 = 6,789<br></br>
+Consumption in July 2020 = 6,789<br></br>
 
 <br></br>
 AMC =  Consumption in No. of MONTHS_IN_PAST + Consumption in No. of MONTHS_IN_FUTURE/ number of months<br></br>
-AMC = (Consumption for Feb,Mar,Apr,May 2020 + June & Jul 2020) / 6<br></br>
+AMC = (Consumption for Feb,March,April,May 2020 + June & July 2020) / 6<br></br>
 AMC = (5,000+6,890+6,907+7,087+5,678+6,789) / 6<br></br>
 AMC = 6,392</p>
                     {/* AMC = AVG(Consumption in last 3 months, current month,future 2 months)(Not based on program) */}
@@ -344,15 +344,15 @@ Months Of Stock = 3.54</p>
                     Months in future = 3(Based on program planning unit)<br></br>
                     Current month = May 2020<br></br>
 Consumption in Feb 2020 = 5,000<br></br>
-Consumption in Mar 2020 = 6,890<br></br>
-Consumption in Apr 2020 = 6,907<br></br>
+Consumption in March 2020 = 6,890<br></br>
+Consumption in April 2020 = 6,907<br></br>
 Consumption in May 2020 = 7,087<br></br>
 Consumption in Jun 2020 = 5,678<br></br>
-Consumption in Jul 2020 = 6,789<br></br>
+Consumption in July 2020 = 6,789<br></br>
 
 <br></br>
 AMC =  Consumption in No. of MONTHS_IN_PAST + Consumption in No. of MONTHS_IN_FUTURE/ number of months<br></br>
-AMC = (Consumption for Feb,Mar,Apr,May 2020 + June & Jul 2020) / 6<br></br>
+AMC = (Consumption for Feb,March,April,May 2020 + June & July 2020) / 6<br></br>
 AMC = (5,000+6,890+6,907+7,087+5,678+6,789) / 6<br></br>
 AMC = 6,392</p>
                     {/* AMC = AVG(Consumption in last 3 months, current month,future 2 months)(Not based on program) */}
@@ -390,15 +390,15 @@ Months Of Stock = 3.54</p>
                     Months in future = 3(Based on program planning unit)<br></br>
                     Current month = May 2020<br></br>
 Consumption in Feb 2020 = 5,000<br></br>
-Consumption in Mar 2020 = 6,890<br></br>
-Consumption in Apr 2020 = 6,907<br></br>
+Consumption in March 2020 = 6,890<br></br>
+Consumption in April 2020 = 6,907<br></br>
 Consumption in May 2020 = 7,087<br></br>
 Consumption in Jun 2020 = 5,678<br></br>
-Consumption in Jul 2020 = 6,789<br></br>
+Consumption in July 2020 = 6,789<br></br>
 
 <br></br>
 AMC =  Consumption in No. of MONTHS_IN_PAST + Consumption in No. of MONTHS_IN_FUTURE/ number of months<br></br>
-AMC = (Consumption for Feb,Mar,Apr,May 2020 + June & Jul 2020) / 6<br></br>
+AMC = (Consumption for Feb,March,April,May 2020 + June & July 2020) / 6<br></br>
 AMC = (5,000+6,890+6,907+7,087+5,678+6,789) / 6<br></br>
 AMC = 6,392</p>
                     {/* AMC = AVG(Consumption in last 3 months, current month,future 2 months)(Not based on program) */}
@@ -458,15 +458,15 @@ Max = 44,744</p>
                     Months in future = 3(Based on program planning unit)<br></br>
                     Current month = May 2020<br></br>
 Consumption in Feb 2020 = 5,000<br></br>
-Consumption in Mar 2020 = 6,890<br></br>
-Consumption in Apr 2020 = 6,907<br></br>
+Consumption in March 2020 = 6,890<br></br>
+Consumption in April 2020 = 6,907<br></br>
 Consumption in May 2020 = 7,087<br></br>
 Consumption in Jun 2020 = 5,678<br></br>
-Consumption in Jul 2020 = 6,789<br></br>
+Consumption in July 2020 = 6,789<br></br>
 
 <br></br>
 AMC =  Consumption in No. of MONTHS_IN_PAST + Consumption in No. of MONTHS_IN_FUTURE/ number of months<br></br>
-AMC = (Consumption for Feb,Mar,Apr,May 2020 + June & Jul 2020) / 6<br></br>
+AMC = (Consumption for Feb,March,April,May 2020 + June & July 2020) / 6<br></br>
 AMC = (5,000+6,890+6,907+7,087+5,678+6,789) / 6<br></br>
 AMC = 6,392</p>
                     {/* AMC = AVG(Consumption in last 3 months, current month,future 2 months)(Not based on program) */}
