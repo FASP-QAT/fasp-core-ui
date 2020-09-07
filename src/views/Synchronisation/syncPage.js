@@ -34,7 +34,8 @@ export default class syncPage extends Component {
       lang: localStorage.getItem('lang'),
       versionTypeList: [],
       isChanged: false,
-      conflictsCount: 0
+      conflictsCount: 0,
+      loading: true
     }
     this.toggle = this.toggle.bind(this);
     this.getDataForCompare = this.getDataForCompare.bind(this);
@@ -146,7 +147,8 @@ export default class syncPage extends Component {
     var resolveConflict = jexcel(document.getElementById("resolveConflictsTable"), options);
     this.el = resolveConflict;
     this.setState({
-      resolveConflict: resolveConflict
+      resolveConflict: resolveConflict,
+      loading: false
     })
     document.getElementById("index").value = index;
 
@@ -189,6 +191,7 @@ export default class syncPage extends Component {
   }
 
   acceptCurrentChanges() {
+    this.setState({ loading: true });
     var resolveConflictsInstance = this.state.resolveConflict;
     var consumptionInstance = this.state.mergedConsumptionJexcel;
     var index = document.getElementById("index").value;
@@ -223,9 +226,11 @@ export default class syncPage extends Component {
     })
     consumptionInstance.orderBy(18, 0);
     this.toggleLarge('', '', 0, '');
+    this.setState({ loading: false })
   }
 
   acceptIncomingChanges() {
+    this.setState({ loading: true })
     var resolveConflictsInstance = this.state.resolveConflict;
     var consumptionInstance = this.state.mergedConsumptionJexcel;
     var index = document.getElementById("index").value;
@@ -260,6 +265,7 @@ export default class syncPage extends Component {
       conflictsCount: this.state.conflictsCount - 1
     })
     this.toggleLarge('', '', 0, '');
+    this.setState({ loading: false })
   }
 
   // Inventory functions
@@ -311,7 +317,8 @@ export default class syncPage extends Component {
     var resolveConflictInventory = jexcel(document.getElementById("resolveConflictsInventoryTable"), options);
     this.el = resolveConflictInventory;
     this.setState({
-      resolveConflictInventory: resolveConflictInventory
+      resolveConflictInventory: resolveConflictInventory,
+      loading: false
     })
     document.getElementById("indexInventory").value = index;
 
@@ -354,6 +361,7 @@ export default class syncPage extends Component {
   }
 
   acceptCurrentChangesInventory() {
+    this.setState({ loading: true })
     var resolveConflictsInstance = this.state.resolveConflictInventory;
     var inventoryInstance = this.state.mergedInventoryJexcel;
     var index = document.getElementById("indexInventory").value;
@@ -388,9 +396,11 @@ export default class syncPage extends Component {
       conflictsCount: this.state.conflictsCount - 1
     })
     this.toggleLargeInventory('', '', 0, '');
+    this.setState({ loading: false })
   }
 
   acceptIncomingChangesInventory() {
+    this.setState({ loading: true })
     var resolveConflictsInstance = this.state.resolveConflictInventory;
     var inventoryInstance = this.state.mergedInventoryJexcel;
     var index = document.getElementById("indexInventory").value;
@@ -425,6 +435,7 @@ export default class syncPage extends Component {
       conflictsCount: this.state.conflictsCount - 1
     })
     this.toggleLargeInventory('', '', 0, '');
+    this.setState({ loading: false })
   }
 
   // Shipment functions
@@ -488,7 +499,8 @@ export default class syncPage extends Component {
     var resolveConflictShipment = jexcel(document.getElementById("resolveConflictsShipmentTable"), options);
     this.el = resolveConflictShipment;
     this.setState({
-      resolveConflictShipment: resolveConflictShipment
+      resolveConflictShipment: resolveConflictShipment,
+      loading: false
     })
     document.getElementById("indexShipment").value = index;
 
@@ -531,6 +543,7 @@ export default class syncPage extends Component {
   }
 
   acceptCurrentChangesShipment() {
+    this.setState({ loading: true })
     var resolveConflictsInstance = this.state.resolveConflictShipment;
     var shipmentInstance = this.state.mergedShipmentJexcel;
     var index = document.getElementById("indexShipment").value;
@@ -565,9 +578,11 @@ export default class syncPage extends Component {
       conflictsCount: this.state.conflictsCount - 1
     })
     this.toggleLargeShipment('', '', 0, '');
+    this.setState({ loading: false })
   }
 
   acceptIncomingChangesShipment() {
+    this.setState({ loading: true })
     var resolveConflictsInstance = this.state.resolveConflictShipment;
     var shipmentInstance = this.state.mergedShipmentJexcel;
     var index = document.getElementById("indexShipment").value;
@@ -602,6 +617,7 @@ export default class syncPage extends Component {
       conflictsCount: this.state.conflictsCount - 1
     })
     this.toggleLargeShipment('', '', 0, '');
+    this.setState({ loading: false })
   }
 
   componentDidMount() {
@@ -610,7 +626,8 @@ export default class syncPage extends Component {
     var openRequest = indexedDB.open('fasp', 1);
     openRequest.onerror = function (event) {
       this.setState({
-        commitVersionError: i18n.t('static.program.errortext')
+        commitVersionError: i18n.t('static.program.errortext'),
+        loading: false
       })
     }.bind(this);
     openRequest.onsuccess = function (e) {
@@ -622,7 +639,8 @@ export default class syncPage extends Component {
 
       getRequest.onerror = function (event) {
         this.setState({
-          commitVersionError: i18n.t('static.program.errortext')
+          commitVersionError: i18n.t('static.program.errortext'),
+          loading: false
         })
       }.bind(this);
       getRequest.onsuccess = function (event) {
@@ -642,20 +660,19 @@ export default class syncPage extends Component {
             proList[i] = programJson
           }
         }
-        this.setState({
-          programList: proList
-        })
-
         AuthenticationService.setupAxiosInterceptors();
         ProgramService.getVersionTypeList().then(response => {
           this.setState({
             versionTypeList: response.data,
+            programList: proList,
+            loading: false
           })
         })
           .catch(
             error => {
               this.setState({
                 statuses: [],
+                loading: false
               })
               if (error.message === "Network Error") {
                 this.setState({ message: error.message });
@@ -683,8 +700,26 @@ export default class syncPage extends Component {
   getDataForCompare(value) {
     document.getElementById("detailsDiv").style.display = "block";
     this.setState({
-      programId: value
+      programId: value,
+      loading: true,
+      mergedConsumptionJexcel: "",
+      mergedInventoryJexcel: "",
+      mergedShipmentJexcel: "",
+      mergedProblemListJexcel: ""
     })
+    if (this.state.mergedConsumptionJexcel != "" && this.state.mergedConsumptionJexcel != undefined) {
+      this.state.mergedConsumptionJexcel.destroy();
+    }
+    if (this.state.mergedInventoryJexcel != "" && this.state.mergedInventoryJexcel != undefined) {
+      this.state.mergedInventoryJexcel.destroy();
+    }
+    if (this.state.mergedShipmentJexcel != "" && this.state.mergedShipmentJexcel != undefined) {
+      this.state.mergedShipmentJexcel.destroy();
+    }
+    if (this.state.mergedProblemListJexcel != "" && this.state.mergedProblemListJexcel != undefined) {
+      this.state.mergedProblemListJexcel.destroy();
+    }
+
     var programId = value != "" && value != undefined ? value.value : 0;
     AuthenticationService.setupAxiosInterceptors();
     var programRequestJson = { programId: (programId.split("_"))[0], versionId: -1 }
@@ -706,7 +741,8 @@ export default class syncPage extends Component {
           var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
           openRequest.onerror = function (event) {
             this.setState({
-              commitVersionError: i18n.t('static.program.errortext')
+              commitVersionError: i18n.t('static.program.errortext'),
+              loading: false
             })
           }.bind(this);
           openRequest.onsuccess = function (e) {
@@ -716,7 +752,8 @@ export default class syncPage extends Component {
             var programRequest = programDataOs.get(value != "" && value != undefined ? value.value : 0);
             programRequest.onerror = function (event) {
               this.setState({
-                commitVersionError: i18n.t('static.program.errortext')
+                commitVersionError: i18n.t('static.program.errortext'),
+                loading: false
               })
             }.bind(this);
             programRequest.onsuccess = function (e) {
@@ -729,7 +766,8 @@ export default class syncPage extends Component {
               var dProgramRequest = dProgramDataOs.get(value != "" && value != undefined ? value.value : 0);
               dProgramRequest.onerror = function (event) {
                 this.setState({
-                  commitVersionError: i18n.t('static.program.errortext')
+                  commitVersionError: i18n.t('static.program.errortext'),
+                  loading: false
                 })
               }.bind(this);
               dProgramRequest.onsuccess = function (e) {
@@ -741,7 +779,8 @@ export default class syncPage extends Component {
                 var rcpuRequest = rcpuOs.getAll();
                 rcpuRequest.onerror = function (event) {
                   this.setState({
-                    commitVersionError: i18n.t('static.program.errortext')
+                    commitVersionError: i18n.t('static.program.errortext'),
+                    loading: false
                   })
                 }.bind(this);
                 rcpuRequest.onsuccess = function (event) {
@@ -761,7 +800,8 @@ export default class syncPage extends Component {
                   var dataSourceRequest = dataSourceOs.getAll();
                   dataSourceRequest.onerror = function (event) {
                     this.setState({
-                      commitVersionError: i18n.t('static.program.errortext')
+                      commitVersionError: i18n.t('static.program.errortext'),
+                      loading: false
                     })
                   }.bind(this);
                   dataSourceRequest.onsuccess = function (event) {
@@ -783,7 +823,8 @@ export default class syncPage extends Component {
                     planningUnitList = []
                     puRequest.onerror = function (event) {
                       this.setState({
-                        supplyPlanError: i18n.t('static.program.errortext')
+                        supplyPlanError: i18n.t('static.program.errortext'),
+                        loading: false
                       })
                     }.bind(this);
                     puRequest.onsuccess = function (e) {
@@ -803,7 +844,8 @@ export default class syncPage extends Component {
                       var shipmentStatusRequest = shipmentStatusOs.getAll();
                       shipmentStatusRequest.onerror = function (event) {
                         this.setState({
-                          commitVersionError: i18n.t('static.program.errortext')
+                          commitVersionError: i18n.t('static.program.errortext'),
+                          loading: false
                         })
                       }.bind(this);
                       shipmentStatusRequest.onsuccess = function (event) {
@@ -821,7 +863,8 @@ export default class syncPage extends Component {
                         var papuRequest = papuOs.getAll();
                         papuRequest.onerror = function (event) {
                           this.setState({
-                            commitVersionError: i18n.t('static.program.errortext')
+                            commitVersionError: i18n.t('static.program.errortext'),
+                            loading: false
                           })
                         }.bind(this);
                         papuRequest.onsuccess = function (event) {
@@ -843,7 +886,8 @@ export default class syncPage extends Component {
                           var fsRequest = fsOs.getAll();
                           fsRequest.onerror = function (event) {
                             this.setState({
-                              commitVersionError: i18n.t('static.program.errortext')
+                              commitVersionError: i18n.t('static.program.errortext'),
+                              loading: false
                             })
                           }.bind(this);
                           fsRequest.onsuccess = function (event) {
@@ -865,7 +909,8 @@ export default class syncPage extends Component {
                             var budgetListAll = []
                             bRequest.onerror = function (event) {
                               this.setState({
-                                commitVersionError: i18n.t('static.program.errortext')
+                                commitVersionError: i18n.t('static.program.errortext'),
+                                loading: false
                               })
                             }.bind(this);
                             bRequest.onsuccess = function (event) {
@@ -895,7 +940,8 @@ export default class syncPage extends Component {
                               var currencyRequest = currencyOs.getAll();
                               currencyRequest.onerror = function (event) {
                                 this.setState({
-                                  commitVersionError: i18n.t('static.program.errortext')
+                                  commitVersionError: i18n.t('static.program.errortext'),
+                                  loading: false
                                 })
                               }.bind(this);
                               currencyRequest.onsuccess = function (event) {
@@ -1057,6 +1103,7 @@ export default class syncPage extends Component {
                                       items.push({
                                         title: "Resolve conflicts",
                                         onclick: function () {
+                                          this.setState({ loading: true })
                                           this.toggleLarge(rowData[15], rowData[16], y, 'consumption');
                                         }.bind(this)
                                       })
@@ -1216,6 +1263,7 @@ export default class syncPage extends Component {
                                       items.push({
                                         title: "Resolve conflicts",
                                         onclick: function () {
+                                          this.setState({ loading: true })
                                           this.toggleLargeInventory(rowData[16], rowData[17], y, 'inventory');
                                         }.bind(this)
                                       })
@@ -1378,6 +1426,7 @@ export default class syncPage extends Component {
                                       items.push({
                                         title: "Resolve conflicts",
                                         onclick: function () {
+                                          this.setState({ loading: true })
                                           this.toggleLargeShipment(rowData[28], rowData[29], y, 'shipment');
                                         }.bind(this)
                                       })
@@ -1580,7 +1629,8 @@ export default class syncPage extends Component {
                                   latestProgramDataProblemList: latestProgramDataProblemList,
                                   mergedProblemListData: mergedProblemListData,
                                   oldProgramDataBatchInfo: oldProgramDataBatchInfo,
-                                  latestProgramDataBatchInfo: latestProgramDataBatchInfo
+                                  latestProgramDataBatchInfo: latestProgramDataBatchInfo,
+                                  loading: false
                                 })
                               }.bind(this)
                             }.bind(this)
@@ -1595,7 +1645,8 @@ export default class syncPage extends Component {
           }.bind(this)
         } else {
           this.setState({
-            message: response.data.messageCode
+            message: response.data.messageCode,
+            loading: false
           },
             () => {
             })
@@ -1967,8 +2018,8 @@ export default class syncPage extends Component {
       } else if ((jsonData[c])[17] == "") {
         for (var i = 0; i < colArr.length; i++) {
           var col = (colArr[i]).concat(parseInt(c) + 1);
-          elInstance.setStyle(col[i], "background-color", "transparent");
-          elInstance.setStyle(col[i], "background-color", LATEST_VERSION_COLOUR);
+          elInstance.setStyle(col, "background-color", "transparent");
+          elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
           elInstance.setValueFromCoords(20, c, 3, true);
         }
         this.setState({
@@ -2085,10 +2136,12 @@ export default class syncPage extends Component {
       <div className="animated fadeIn">
         <AuthenticationServiceComponent history={this.props.history} message={(message) => {
           this.setState({ message: message })
+        }} loading={(loading) => {
+          this.setState({ loading: loading })
         }} />
         <h5>{i18n.t(this.state.message, { entityname })}</h5>
         <h6 className="red">{this.state.commitVersionError}</h6>
-        <Row>
+        <Row style={{ display: this.state.loading ? "none" : "block" }}>
           <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
             <Card>
               <CardBody>
@@ -2110,15 +2163,15 @@ export default class syncPage extends Component {
                           />
                         </div>
                       </FormGroup>
-                      <div className="col-md-10 pt-2">
-                        <ul className="legendcommitversion">
-                          <li><span className="lightpinklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.commitVersion.conflicts')}</span></li>
-                          <li><span className=" greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.commitVersion.changedInCurrentVersion')} </span></li>
-                          <li><span className="notawesome legendcolor"></span > <span className="legendcommitversionText">{i18n.t('static.commitVersion.changedInLatestVersion')}</span></li>
-                        </ul>
-                      </div>
+
                     </div>
-                   
+                    <div className="col-md-10 pt-2">
+                      <ul className="legendcommitversion">
+                        <li><span className="lightpinklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.commitVersion.conflicts')}</span></li>
+                        <li><span className=" greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.commitVersion.changedInCurrentVersion')} </span></li>
+                        <li><span className="notawesome legendcolor"></span > <span className="legendcommitversionText">{i18n.t('static.commitVersion.changedInLatestVersion')}</span></li>
+                      </ul>
+                    </div>
                   </Col>
                 </Form>
                 <div id="detailsDiv">
@@ -2205,9 +2258,20 @@ export default class syncPage extends Component {
             </Card>
           </Col>
         </Row>
+        <div style={{ display: this.state.loading ? "block" : "none" }}>
+          <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+            <div class="align-items-center">
+              <div ><h4> <strong>Loading...</strong></h4></div>
+
+              <div class="spinner-border blue ml-4" role="status">
+
+              </div>
+            </div>
+          </div>
+        </div>
         {/* Resolve conflicts modal */}
         <Modal isOpen={this.state.conflicts}
-          className={'modal-lg ' + this.props.className, "modalWidth"}>
+          className={'modal-lg ' + this.props.className, "modalWidth"} style={{ display: this.state.loading ? "none" : "block" }}>
           <ModalHeader toggle={() => this.toggleLarge()} className="modalHeaderSupplyPlan">
             <strong>{i18n.t('static.commitVersion.resolveConflicts')}</strong>
             <ul className="legendcommitversion">
@@ -2231,7 +2295,7 @@ export default class syncPage extends Component {
 
         {/* Resolve conflicts modal */}
         <Modal isOpen={this.state.conflictsInventory}
-          className={'modal-lg ' + this.props.className, "modalWidth"}>
+          className={'modal-lg ' + this.props.className, "modalWidth"} style={{ display: this.state.loading ? "none" : "block" }}>
           <ModalHeader toggle={() => this.toggleLargeInventory()} className="modalHeaderSupplyPlan">
             <strong>{i18n.t('static.commitVersion.resolveConflicts')}</strong>
             <ul className="legendcommitversion">
@@ -2254,7 +2318,7 @@ export default class syncPage extends Component {
 
         {/* Resolve conflicts modal */}
         <Modal isOpen={this.state.conflictsShipment}
-          className={'modal-lg ' + this.props.className, "modalWidth"}>
+          className={'modal-lg ' + this.props.className, "modalWidth"} style={{ display: this.state.loading ? "none" : "block" }}>
           <ModalHeader toggle={() => this.toggleLargeShipment()} className="modalHeaderSupplyPlan">
             <strong>{i18n.t('static.commitVersion.resolveConflicts')}</strong>
             <ul className="legendcommitversion">
@@ -2279,6 +2343,7 @@ export default class syncPage extends Component {
   };
 
   synchronize() {
+    this.setState({ loading: true });
     var db1;
     var storeOS;
     getDatabase();
@@ -2406,8 +2471,9 @@ export default class syncPage extends Component {
   }
 
   redirectToDashbaord() {
+    this.setState({ loading: false })
     let id = AuthenticationService.displayDashboardBasedOnRole();
-    this.props.history.push(`/ApplicationDashboard/`+`${id}` + '/green/' + i18n.t('static.message.commitSuccess'))
+    this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.message.commitSuccess'))
   }
 
   hideSecondComponent() {
