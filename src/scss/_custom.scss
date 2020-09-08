@@ -3211,10 +3211,10 @@ border-radius: 2em;
   margin-top: -4%;
 }
 .SearchMarginTop{
-  margin-top: -1%;;
+  margin-top: -1%;
 }
 .SearchMarginTopLarge{
-  margin-top: -5%;;
+  margin-top: -5%;
 }
 .SelectField {
   width: 210px;
@@ -3249,13 +3249,13 @@ border-radius: 2em;
   cursor: pointer!important;
 }
 
-// .Select-control.form-control-sm:invalid, .form-control-sm.is-invalid {
-//   border-color: #f86c6b!important;
-//   padding-right: calc(1.5em + 0.75rem);
+.month-picker > .rmp-container .rmp-popup.dark {
+  color: #666!important;
+  background-color: rgba(255, 255, 255, 0.96)!important;
+}
+@media screen and (min-width: 768px){
+.month-picker > .rmp-container .rmp-popup .rmp-pad {
   
-// }
-// .Select-control .form-control-sm:valid, .form-control-sm.is-valid {
-//   border-color: #4dbd74;
-//   padding-right: calc(1.5em + 0.75rem);
- 
-// }
+    background: rgba(238, 238, 238, 0.9)!important;
+}
+}
