@@ -586,7 +586,7 @@ export default class InitialTicketPageComponent extends Component {
                                         <ListGroupItem className="list-group-item-help" tag="a" onClick={()=>{this.toggleRealmChangeAdditional(8)}} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.organisation.organisation')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                                         <ListGroupItem className="list-group-item-help" tag="a" onClick={()=>{this.toggleRealmChangeAdditional(9)}} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.dashboad.regioncountry')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                                     </ListGroup>
-                                    <ModalFooter class="pb-0 pr-0">
+                                    <ModalFooter className="pb-0 pr-0">
                                         <Button color="info" onClick={()=>{this.toggleMasterInitial(2)}}><i className="fa fa-angle-double-left "></i> Back</Button>
                                         {/* <Button color="success" onClick={this.togglebugreport}>Submit</Button> */}
                                     </ModalFooter>
