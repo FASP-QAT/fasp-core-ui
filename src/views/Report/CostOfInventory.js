@@ -1721,10 +1721,9 @@ export default class CostOfInventory extends Component {
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
                 <SupplyPlanFormulas ref="formulaeChild" />
+
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
                     <div className="Card-header-reporticon">
-                        {/* <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.costOfInventory')}</strong> */}
-
                         <div className="card-header-actions">
                             <a className="card-header-action">
                                 <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.togglecostOfInventory() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span>
@@ -1737,12 +1736,12 @@ export default class CostOfInventory extends Component {
                             </a>
                         </div>
                     </div>
-                    <CardBody className="pb-lg-2 pt-lg-1 ">
-                        <div className="" >
+                    <CardBody className="pb-lg-5 pt-lg-1 ">
+                        {/* <div className="" > */}
                             <div ref={ref}>
 
                                 <Form >
-                                    <div className="pl-0">
+                                    <div className=" pl-0">
                                         <div className="row ">
                                         <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.report.month')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
@@ -1840,8 +1839,10 @@ export default class CostOfInventory extends Component {
                                     </div>
                                 </Form>
                             </div>
-                        </div>
+                        {/* </div> */}
+                        <div className="ReportSearchMarginTop">
                         <div id="tableDiv" className="jexcelremoveReadonlybackground">
+                        </div>
                         </div>
 
 

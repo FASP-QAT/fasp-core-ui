@@ -1,5 +1,6 @@
 {
     "static.common.realmtext": "Please select Realm",
+    "static.common.roleinvalidtext": "You can't select other roles in combination with application level admin role",
     "static.program.programwithsameversion": "Program with same version already exists in the local machine you want to overwirte that program with the new data?",
     "static.dashboard.subfundingsource": "Sub Funding Source",
     "static.common.select": "Please select",
@@ -632,6 +633,7 @@
     "static.footer": "Quantification Analytics Tool",
     "static.unknown": "Unknown",
     "static.forgotPassword.offline": "You need to be online to reset the password",
+    "static.helpTicket.offline": "You need to be online to raise the ticket",
     "static.common.close": "Close",
     "static.inventory.inventory": "Inventory",
     "static.inventory.program": "Program",
@@ -1119,7 +1121,7 @@
     "static.commitVersion.acceptLatestVersion": " Accept latest version",
     "static.common.max23digittext": "Maximum 23 characters only",
     "static.program.zipfilereaderror": "Error occured while reading zip file",
-    "static.ticket.ticketcreated": "Ticket has been created",
+    "static.ticket.ticketcreated": "Ticket has been created.",
     "static.ticket.ticketcode": "Ticket Code",
     "static.ticket.addUpdateMasterData": "Add / Update Master Data",
     "static.common.regiontext": "Please select Region",
