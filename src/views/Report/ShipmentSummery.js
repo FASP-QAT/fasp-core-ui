@@ -963,7 +963,7 @@ const options = {
         yAxes: [{
             scaleLabel: {
                 display: true,
-                labelString: "Amount (USD)",
+                labelString: i18n.t('static.graph.costInUSD'),
                 fontColor: 'black'
             },
             stacked: true,
@@ -1095,10 +1095,14 @@ class ShipmentSummery extends Component {
 
         var csvRow = [];
         csvRow.push((i18n.t('static.report.dateRange') + ' , ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20'))
+        csvRow.push('')
         csvRow.push(i18n.t('static.program.program') + ' , ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20'))
+        csvRow.push('')
         csvRow.push(i18n.t('static.report.version').replaceAll(' ', '%20') + '  ,  ' + (document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20'))
+        csvRow.push('')
         this.state.planningUnitLabels.map(ele =>
             csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
+        csvRow.push('')
         csvRow.push(i18n.t('static.common.display').replaceAll(' ', '%20') + '  ,  ' + (document.getElementById("viewById").selectedOptions[0].text).replaceAll(' ', '%20'))
         csvRow.push('')
         csvRow.push('')
@@ -1107,7 +1111,7 @@ class ShipmentSummery extends Component {
 
 
         var re;
-        var A = [['', (i18n.t('static.report.orders')).replaceAll(' ', '%20'), (i18n.t('static.report.qtyBaseUnit')).replaceAll(' ', '%20'), (i18n.t('static.report.costUsd')).replaceAll(' ', '%20')]]
+        var A = [[(i18n.t('static.budget.fundingsource')).replaceAll(' ', '%20'), (i18n.t('static.report.orders')).replaceAll(' ', '%20'), (i18n.t('static.report.qtyBaseUnit')).replaceAll(' ', '%20'), (i18n.t('static.report.costUsd')).replaceAll(' ', '%20')]]
 
 
         let mainData = this.state.data;

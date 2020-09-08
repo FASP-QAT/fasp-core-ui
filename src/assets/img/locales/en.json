@@ -1122,5 +1122,6 @@
     "static.ticket.ticketcreated": "Ticket has been created",
     "static.ticket.ticketcode": "Ticket Code",
     "static.ticket.addUpdateMasterData": "Add / Update Master Data",
-    "static.common.regiontext": "Please select Region"
+    "static.common.regiontext": "Please select Region",
+    "static.graph.costInUSD":"Cost (USD)"
 }
