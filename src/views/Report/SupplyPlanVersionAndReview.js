@@ -1045,8 +1045,12 @@ class SupplyPlanVersionAndReview extends Component {
 
             let programId = document.getElementById("programId").value;
             // let countryId = document.getElementById("countryId").value;
-            let versionStatusId = this.el.getValueFromCoords(5, x);
-            let versionTypeId =this.el.getValueFromCoords(2, x);
+            // let versionStatusId = this.el.getValueFromCoords(5, x);
+            // let versionTypeId =this.el.getValueFromCoords(2, x);
+
+            var rowData = elInstance.getRowData(y);
+            let versionStatusId = rowData[5];
+            let versionTypeId =rowData[2];
             console.log("====>",versionStatusId,"====>",versionTypeId);
             if (versionStatusId == 1 && versionTypeId == 2) {
                 this.props.history.push({
@@ -1101,7 +1105,7 @@ class SupplyPlanVersionAndReview extends Component {
 
     }
 
-    _handleClickRangeBox(e) {
+    _handleClickRangeBox(e) { 
         this.refs.pickRange.show()
     }
 
