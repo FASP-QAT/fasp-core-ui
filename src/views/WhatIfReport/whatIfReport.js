@@ -1,6 +1,5 @@
 import React from "react";
 
-
 import {
     Card, CardBody, CardHeader, CardFooter,
     Col, Table, Modal, ModalBody, ModalFooter, ModalHeader, Button,
@@ -1082,138 +1081,146 @@ export default class WhatIfReportComponent extends React.Component {
             programId: value != "" && value != undefined ? value.value : 0,
             planningUnit: ""
         })
-        var db1;
-        var storeOS;
-        getDatabase();
-        var regionList = [];
-        var dataSourceList = [];
-        var dataSourceListAll = [];
-        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function (event) {
-            this.setState({
-                supplyPlanError: i18n.t('static.program.errortext'),
-                loading: false
-            })
-        }.bind(this);
-        openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-            var programDataTransaction = db1.transaction(['programData'], 'readwrite');
-            var programDataOs = programDataTransaction.objectStore('programData');
-            var programRequest = programDataOs.get(value != "" && value != undefined ? value.value : 0);
-            programRequest.onerror = function (event) {
+        var programId = value != "" && value != undefined ? value.value : 0;
+        if (programId != 0) {
+            var db1;
+            var storeOS;
+            getDatabase();
+            var regionList = [];
+            var dataSourceList = [];
+            var dataSourceListAll = [];
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            openRequest.onerror = function (event) {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext'),
                     loading: false
                 })
             }.bind(this);
-            programRequest.onsuccess = function (e) {
-                var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                var programJson = JSON.parse(programData);
-
-                var whatIfProgramDataTransaction = db1.transaction(['whatIfProgramData'], 'readwrite');
-                var whatIfProgramDataOs = whatIfProgramDataTransaction.objectStore('whatIfProgramData');
-                var item = {
-                    id: programRequest.result.id,
-                    programId: programRequest.result.programId,
-                    version: programRequest.result.version,
-                    programName: (CryptoJS.AES.encrypt(JSON.stringify((programRequest.result.label)), SECRET_KEY)).toString(),
-                    programData: programRequest.result.programData,
-                    userId: programRequest.result.userId
-                }
-                var whatIfRequest = whatIfProgramDataOs.put(item);
-                whatIfRequest.onerror = function (event) {
+            openRequest.onsuccess = function (e) {
+                db1 = e.target.result;
+                var programDataTransaction = db1.transaction(['programData'], 'readwrite');
+                var programDataOs = programDataTransaction.objectStore('programData');
+                var programRequest = programDataOs.get(value != "" && value != undefined ? value.value : 0);
+                programRequest.onerror = function (event) {
                     this.setState({
                         supplyPlanError: i18n.t('static.program.errortext'),
                         loading: false
                     })
                 }.bind(this);
-                whatIfRequest.onsuccess = function (e) {
-                    for (var i = 0; i < programJson.regionList.length; i++) {
-                        var regionJson = {
-                            // name: // programJson.regionList[i].regionId,
-                            name: getLabelText(programJson.regionList[i].label, this.state.lang),
-                            id: programJson.regionList[i].regionId
-                        }
-                        regionList.push(regionJson)
+                programRequest.onsuccess = function (e) {
+                    var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                    var programJson = JSON.parse(programData);
+
+                    var whatIfProgramDataTransaction = db1.transaction(['whatIfProgramData'], 'readwrite');
+                    var whatIfProgramDataOs = whatIfProgramDataTransaction.objectStore('whatIfProgramData');
+                    var item = {
+                        id: programRequest.result.id,
+                        programId: programRequest.result.programId,
+                        version: programRequest.result.version,
+                        programName: (CryptoJS.AES.encrypt(JSON.stringify((programRequest.result.label)), SECRET_KEY)).toString(),
+                        programData: programRequest.result.programData,
+                        userId: programRequest.result.userId
                     }
-                    var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
-                    var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
-                    var planningunitRequest = planningunitOs.getAll();
-                    var planningList = []
-                    planningunitRequest.onerror = function (event) {
+                    var whatIfRequest = whatIfProgramDataOs.put(item);
+                    whatIfRequest.onerror = function (event) {
                         this.setState({
                             supplyPlanError: i18n.t('static.program.errortext'),
                             loading: false
                         })
                     }.bind(this);
-                    planningunitRequest.onsuccess = function (e) {
-                        var myResult = [];
-                        myResult = planningunitRequest.result;
-                        var programId = (value != "" && value != undefined ? value.value : 0).split("_")[0];
-                        var proList = []
-                        for (var i = 0; i < myResult.length; i++) {
-                            if (myResult[i].program.id == programId && myResult[i].active == true) {
-                                var productJson = {
-                                    label: getLabelText(myResult[i].planningUnit.label, this.state.lang),
-                                    value: myResult[i].planningUnit.id
-                                }
-                                proList.push(productJson);
-                                planningList.push(myResult[i]);
+                    whatIfRequest.onsuccess = function (e) {
+                        for (var i = 0; i < programJson.regionList.length; i++) {
+                            var regionJson = {
+                                // name: // programJson.regionList[i].regionId,
+                                name: getLabelText(programJson.regionList[i].label, this.state.lang),
+                                id: programJson.regionList[i].regionId
                             }
+                            regionList.push(regionJson)
                         }
-
-                        var puTransaction = db1.transaction(['planningUnit'], 'readwrite');
-                        var puOs = puTransaction.objectStore('planningUnit');
-                        var puRequest = puOs.getAll();
-                        var planningUnitListForConsumption = []
-                        puRequest.onerror = function (event) {
+                        var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+                        var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
+                        var planningunitRequest = planningunitOs.getAll();
+                        var planningList = []
+                        planningunitRequest.onerror = function (event) {
                             this.setState({
                                 supplyPlanError: i18n.t('static.program.errortext'),
                                 loading: false
                             })
                         }.bind(this);
-                        puRequest.onsuccess = function (e) {
-                            var puResult = [];
-                            puResult = puRequest.result;
-                            planningUnitListForConsumption = puResult;
+                        planningunitRequest.onsuccess = function (e) {
+                            var myResult = [];
+                            myResult = planningunitRequest.result;
+                            var programId = (value != "" && value != undefined ? value.value : 0).split("_")[0];
+                            var proList = []
+                            for (var i = 0; i < myResult.length; i++) {
+                                if (myResult[i].program.id == programId && myResult[i].active == true) {
+                                    var productJson = {
+                                        label: getLabelText(myResult[i].planningUnit.label, this.state.lang),
+                                        value: myResult[i].planningUnit.id
+                                    }
+                                    proList.push(productJson);
+                                    planningList.push(myResult[i]);
+                                }
+                            }
 
-
-                            var dataSourceTransaction = db1.transaction(['dataSource'], 'readwrite');
-                            var dataSourceOs = dataSourceTransaction.objectStore('dataSource');
-                            var dataSourceRequest = dataSourceOs.getAll();
-                            dataSourceRequest.onerror = function (event) {
+                            var puTransaction = db1.transaction(['planningUnit'], 'readwrite');
+                            var puOs = puTransaction.objectStore('planningUnit');
+                            var puRequest = puOs.getAll();
+                            var planningUnitListForConsumption = []
+                            puRequest.onerror = function (event) {
                                 this.setState({
                                     supplyPlanError: i18n.t('static.program.errortext'),
                                     loading: false
                                 })
                             }.bind(this);
-                            dataSourceRequest.onsuccess = function (event) {
-                                var dataSourceResult = [];
-                                dataSourceResult = dataSourceRequest.result;
-                                for (var k = 0; k < dataSourceResult.length; k++) {
-                                    if (dataSourceResult[k].program.id == programJson.programId || dataSourceResult[k].program.id == 0 && dataSourceResult[k].active == true) {
-                                        if (dataSourceResult[k].realm.id == programJson.realmCountry.realm.realmId) {
-                                            dataSourceListAll.push(dataSourceResult[k]);
+                            puRequest.onsuccess = function (e) {
+                                var puResult = [];
+                                puResult = puRequest.result;
+                                planningUnitListForConsumption = puResult;
 
+
+                                var dataSourceTransaction = db1.transaction(['dataSource'], 'readwrite');
+                                var dataSourceOs = dataSourceTransaction.objectStore('dataSource');
+                                var dataSourceRequest = dataSourceOs.getAll();
+                                dataSourceRequest.onerror = function (event) {
+                                    this.setState({
+                                        supplyPlanError: i18n.t('static.program.errortext'),
+                                        loading: false
+                                    })
+                                }.bind(this);
+                                dataSourceRequest.onsuccess = function (event) {
+                                    var dataSourceResult = [];
+                                    dataSourceResult = dataSourceRequest.result;
+                                    for (var k = 0; k < dataSourceResult.length; k++) {
+                                        if (dataSourceResult[k].program.id == programJson.programId || dataSourceResult[k].program.id == 0 && dataSourceResult[k].active == true) {
+                                            if (dataSourceResult[k].realm.id == programJson.realmCountry.realm.realmId) {
+                                                dataSourceListAll.push(dataSourceResult[k]);
+
+                                            }
                                         }
                                     }
-                                }
-                                this.setState({
-                                    planningUnitList: proList,
-                                    programPlanningUnitList: myResult,
-                                    regionList: regionList,
-                                    programJson: programJson,
-                                    dataSourceListAll: dataSourceListAll,
-                                    planningUnitListForConsumption: planningUnitListForConsumption,
-                                    loading: false
-                                })
+                                    this.setState({
+                                        planningUnitList: proList,
+                                        programPlanningUnitList: myResult,
+                                        regionList: regionList,
+                                        programJson: programJson,
+                                        dataSourceListAll: dataSourceListAll,
+                                        planningUnitListForConsumption: planningUnitListForConsumption,
+                                        loading: false
+                                    })
+                                }.bind(this);
                             }.bind(this);
                         }.bind(this);
-                    }.bind(this);
+                    }.bind(this)
                 }.bind(this)
             }.bind(this)
-        }.bind(this)
+        } else {
+            this.setState({
+                loading: false,
+                planningUnitList: []
+            })
+        }
     }
 
     getMonthArray(currentDate) {
@@ -1243,18 +1250,22 @@ export default class WhatIfReportComponent extends React.Component {
         if (value != "" && value != undefined ? value.value : 0 != 0) {
             this.setState({
                 planningUnitChange: true,
-                display: 'block'
+                display: 'block',
+                loading: true
             })
         } else {
             this.setState({
                 planningUnitChange: true,
-                display: 'none'
+                display: 'none',
+                loading: false
             })
         }
-        this.setState({ loading: true });
         var m = this.getMonthArray(moment(Date.now()).add(monthCount, 'months').utcOffset('-0500'));
         var planningUnitId = value != "" && value != undefined ? value.value : 0;
-        var planningUnitName = value.label;
+        var planningUnitName = "";
+        if (planningUnitId != 0) {
+            planningUnitName = value.label;
+        }
 
         var programPlanningUnit = ((this.state.programPlanningUnitList).filter(p => p.planningUnit.id == planningUnitId))[0];
         var regionListFiltered = this.state.regionList;

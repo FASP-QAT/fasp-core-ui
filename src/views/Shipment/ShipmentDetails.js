@@ -121,6 +121,7 @@ export default class ShipmentDetails extends React.Component {
     getPlanningUnitList(value) {
         document.getElementById("planningUnitId").value = 0;
         document.getElementById("planningUnit").value = "";
+        document.getElementById("shipmentsDetailsTable").style.display = "none";
         this.setState({
             programSelect: value,
             programId: value != "" && value != undefined ? value != "" && value != undefined ? value.value : 0 : 0,
@@ -128,63 +129,71 @@ export default class ShipmentDetails extends React.Component {
             planningUnitId: "",
             loading: true
         })
-        var db1;
-        var storeOS;
-        getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function (event) {
-            this.setState({
-                message: i18n.t('static.program.errortext'),
-                color: 'red'
-            })
-        }.bind(this);
-        openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-            var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
-            var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
-            var planningunitRequest = planningunitOs.getAll();
-            var planningList = []
-            planningunitRequest.onerror = function (event) {
+        var programId = value != "" && value != undefined ? value.value : 0;
+        if (programId != 0) {
+            var db1;
+            var storeOS;
+            getDatabase();
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            openRequest.onerror = function (event) {
                 this.setState({
                     message: i18n.t('static.program.errortext'),
                     color: 'red'
                 })
             }.bind(this);
-            planningunitRequest.onsuccess = function (e) {
-                var myResult = [];
-                myResult = planningunitRequest.result;
-                console.log("myResult", myResult);
-                var programId = (value != "" && value != undefined ? value.value : 0).split("_")[0];
-                console.log('programId----->>>', programId)
-                console.log(myResult);
-                var proList = []
-                for (var i = 0; i < myResult.length; i++) {
-                    if (myResult[i].program.id == programId && myResult[i].active == true) {
-                        var productJson = {
-                            label: getLabelText(myResult[i].planningUnit.label, this.state.lang),
-                            value: myResult[i].planningUnit.id
-                        }
-                        proList.push(productJson)
-                    }
-                }
-                console.log("proList---" + proList);
-                this.setState({
-                    planningUnitList: proList,
-                    planningUnitListAll: myResult,
-                    loading: false
-                })
-                var planningUnitIdProp = this.props.match.params.planningUnitId;
-                console.log("planningUnitIdProp===>", planningUnitIdProp);
-                if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
-                    var planningUnit = { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label };
+            openRequest.onsuccess = function (e) {
+                db1 = e.target.result;
+                var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+                var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
+                var planningunitRequest = planningunitOs.getAll();
+                var planningList = []
+                planningunitRequest.onerror = function (event) {
                     this.setState({
-                        planningUnit: planningUnit,
-                        planningUnitId: planningUnitIdProp
+                        message: i18n.t('static.program.errortext'),
+                        color: 'red'
                     })
-                    this.formSubmit(planningUnit);
-                }
-            }.bind(this);
-        }.bind(this)
+                }.bind(this);
+                planningunitRequest.onsuccess = function (e) {
+                    var myResult = [];
+                    myResult = planningunitRequest.result;
+                    console.log("myResult", myResult);
+                    var programId = (value != "" && value != undefined ? value.value : 0).split("_")[0];
+                    console.log('programId----->>>', programId)
+                    console.log(myResult);
+                    var proList = []
+                    for (var i = 0; i < myResult.length; i++) {
+                        if (myResult[i].program.id == programId && myResult[i].active == true) {
+                            var productJson = {
+                                label: getLabelText(myResult[i].planningUnit.label, this.state.lang),
+                                value: myResult[i].planningUnit.id
+                            }
+                            proList.push(productJson)
+                        }
+                    }
+                    console.log("proList---" + proList);
+                    this.setState({
+                        planningUnitList: proList,
+                        planningUnitListAll: myResult,
+                        loading: false
+                    })
+                    var planningUnitIdProp = this.props.match.params.planningUnitId;
+                    console.log("planningUnitIdProp===>", planningUnitIdProp);
+                    if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
+                        var planningUnit = { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label };
+                        this.setState({
+                            planningUnit: planningUnit,
+                            planningUnitId: planningUnitIdProp
+                        })
+                        this.formSubmit(planningUnit);
+                    }
+                }.bind(this);
+            }.bind(this)
+        } else {
+            this.setState({
+                loading: false,
+                planningUnitList: []
+            })
+        }
     }
 
     formSubmit(value) {
@@ -193,49 +202,55 @@ export default class ShipmentDetails extends React.Component {
         this.setState({ programId: programId, planningUnitId: value != "" && value != undefined ? value.value : 0, planningUnit: value });
         var planningUnitId = value != "" && value != undefined ? value.value : 0;
         var programId = document.getElementById("programId").value;
-        var db1;
-        getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function (event) {
-            this.setState({
-                message: i18n.t('static.program.errortext'),
-                color: 'red'
-            })
-        }.bind(this);
-        openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-            var transaction = db1.transaction(['programData'], 'readwrite');
-            var programTransaction = transaction.objectStore('programData');
-            var programRequest = programTransaction.get(programId);
-            programRequest.onerror = function (event) {
+        if (planningUnitId != 0) {
+            document.getElementById("shipmentsDetailsTable").style.display = "block";
+            var db1;
+            getDatabase();
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            openRequest.onerror = function (event) {
                 this.setState({
                     message: i18n.t('static.program.errortext'),
                     color: 'red'
                 })
             }.bind(this);
-            programRequest.onsuccess = function (event) {
-                var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                var programJson = JSON.parse(programData);
+            openRequest.onsuccess = function (e) {
+                db1 = e.target.result;
+                var transaction = db1.transaction(['programData'], 'readwrite');
+                var programTransaction = transaction.objectStore('programData');
+                var programRequest = programTransaction.get(programId);
+                programRequest.onerror = function (event) {
+                    this.setState({
+                        message: i18n.t('static.program.errortext'),
+                        color: 'red'
+                    })
+                }.bind(this);
+                programRequest.onsuccess = function (event) {
+                    var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                    var programJson = JSON.parse(programData);
 
-                console.log("this.state.planningUnitListAll", this.state.planningUnitListAll);
-                var programPlanningUnit = ((this.state.planningUnitListAll).filter(p => p.planningUnit.id == planningUnitId))[0];
-                var shipmentListUnFiltered = programJson.shipmentList;
-                this.setState({
-                    shipmentListUnFiltered: shipmentListUnFiltered
-                })
-                var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == (value != "" && value != undefined ? value.value : 0));
-                console.log("Shipment list", shipmentList);
-                this.setState({
-                    shelfLife: programPlanningUnit.shelfLife,
-                    programJson: programJson,
-                    shipmentListUnFiltered: shipmentListUnFiltered,
-                    shipmentList: shipmentList,
-                    showShipments: 1,
-                })
-                this.refs.shipmentChild.showShipmentData();
+                    console.log("this.state.planningUnitListAll", this.state.planningUnitListAll);
+                    var programPlanningUnit = ((this.state.planningUnitListAll).filter(p => p.planningUnit.id == planningUnitId))[0];
+                    var shipmentListUnFiltered = programJson.shipmentList;
+                    this.setState({
+                        shipmentListUnFiltered: shipmentListUnFiltered
+                    })
+                    var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == (value != "" && value != undefined ? value.value : 0));
+                    console.log("Shipment list", shipmentList);
+                    this.setState({
+                        shelfLife: programPlanningUnit.shelfLife,
+                        programJson: programJson,
+                        shipmentListUnFiltered: shipmentListUnFiltered,
+                        shipmentList: shipmentList,
+                        showShipments: 1,
+                    })
+                    this.refs.shipmentChild.showShipmentData();
+                }.bind(this)
             }.bind(this)
-        }.bind(this)
+        } else {
+            document.getElementById("shipmentsDetailsTable").style.display = "none";
+            this.setState({ loading: false });
+        }
     }
 
     cancelClicked() {
@@ -313,7 +328,7 @@ export default class ShipmentDetails extends React.Component {
                                                                 value={this.state.planningUnit}
                                                                 onChange={(e) => { this.formSubmit(e); }}
                                                             />
-                                                      </div>
+                                                        </div>
                                                     </FormGroup>
                                                     <input type="hidden" id="planningUnitId" name="planningUnitId" value={this.state.planningUnitId} />
                                                     <input type="hidden" id="programId" name="programId" value={this.state.programId} />

@@ -527,6 +527,8 @@ export default class SupplyPlanComponent extends React.Component {
 
     getPlanningUnitList(event) {
         this.setState({ loading: true })
+        var programId = value != "" && value != undefined ? value.value : 0;
+        if (programId != 0) {
         var db1;
         var storeOS;
         getDatabase();
@@ -636,6 +638,12 @@ export default class SupplyPlanComponent extends React.Component {
                 }.bind(this);
             }.bind(this)
         }.bind(this)
+    } else {
+        this.setState({
+            loading: false,
+            planningUnitList: []
+        })
+    }
     }
 
     getMonthArray(currentDate) {
