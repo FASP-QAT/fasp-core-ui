@@ -788,12 +788,14 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     props.updateState("loading", false);
                                 } else if (page == "whatIf") {
                                     props.formSubmit(props.state.planningUnit, props.state.monthCount);
+                                    props.updateState("loading", false);
                                 } else if (page == "supplyPlan") {
                                     props.formSubmit(props.state.planningUnit, props.state.monthCount);
                                 } else if (page == "supplyPlanCompare") {
                                     props.formSubmit(props.state.monthCount);
                                 } else if (page == "whatIfFormSubmit") {
                                     props.formSubmit(props.state.planningUnit, props.state.monthCount);
+                                    props.updateState("loading", false);
                                 } else if (page == 'syncPage') {
                                     console.log("ProgramJsonForSToring the result", programJsonForStoringTheResult);
                                     ProgramService.saveProgramData(programJsonForStoringTheResult).then(response => {
