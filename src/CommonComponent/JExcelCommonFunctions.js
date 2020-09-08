@@ -7,7 +7,7 @@ export function jExcelLoadedFunction(instance, number) {
     var obj = {};
     obj.options = {};
     var elInstance = instance.jexcel;
-    elInstance.hideIndex(0);    
+    elInstance.hideIndex(0);
     var pagignation = document.getElementsByClassName('jexcel_pagination')[number];
     pagignation.classList.add('row');
     var searchContainer = document.getElementsByClassName('jexcel_filter')[number];
@@ -71,23 +71,17 @@ export function jExcelLoadedFunction(instance, number) {
 }
 
 
-export function jExcelLoadedFunctionPipeline(instance,number) {
-    // console.log("number====>",number);
-    // console.log("class name and number =====>",document.getElementsByClassName('resizable'));
+export function jExcelLoadedFunctionPipeline(instance, number) {
     var obj = {};
     obj.options = {};
     var elInstance = instance.jexcel;
     elInstance.hideIndex(0);
-    console.log("In loaded function hide method");
     var pagignation = document.getElementsByClassName('jexcel_pagination')[number];
     pagignation.classList.add('row');
     var searchContainer = document.getElementsByClassName('jexcel_filter')[number];
     var searchDiv = (document.getElementsByClassName('jexcel_filter')[number]).childNodes[1];
-    console.log("Search div", searchDiv);
     searchDiv.removeChild(((document.getElementsByClassName('jexcel_filter')[number]).childNodes[1]).childNodes[0]);
     document.getElementsByClassName("jexcel_search")[number].placeholder = "Search";
-    // searchContainer.classList.add('TableCust');
-    console.log('searchContainer', searchContainer);
     var clearBtn = document.createElement('button');
     clearBtn.type = "button";
     clearBtn.classList.add('btn-default');
@@ -105,7 +99,6 @@ export function jExcelLoadedFunctionPipeline(instance,number) {
 
     var jexcel_pagination = document.getElementsByClassName('jexcel_pagination')[number];
     jexcel_pagination.lastChild.classList.add('order-3');
-    console.log(obj.show, '....................in show');
     jexcel_pagination.firstChild.classList.add('order-2');
     jexcel_pagination.firstChild.classList.add('mr-auto');
     jexcel_pagination.firstChild.classList.add('pl-0');
@@ -178,7 +171,7 @@ export function checkValidtion(type, colName, rowNo, value, elInstance, reg, gre
             elInstance.setStyle(col, "background-color", "yellow");
             elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
             return false;
-        } else {
+        } else {            
             if (isNaN(Number.parseInt(value)) || !(reg.test(value)) || (greaterThan0 == 1 && (equalTo0 == 1 ? value < 0 : value <= 0)) || (greaterThan0 == 0 && (equalTo0 == 1 ? value != 0 : value == 0))) {
                 elInstance.setStyle(col, "background-color", "transparent");
                 elInstance.setStyle(col, "background-color", "yellow");

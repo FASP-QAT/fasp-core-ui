@@ -29,6 +29,7 @@ export default class InitialTicketPageComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            message: '',
             modal: false,
             large: false,
             small: false,
@@ -123,9 +124,10 @@ export default class InitialTicketPageComponent extends Component {
         });
     }
 
-    toggleSmall() {
+    toggleSmall(msg) {
         this.setState({
-            small: !this.state.small,
+            message : msg,
+            small: !this.state.small
         });
     }
 
@@ -501,6 +503,21 @@ export default class InitialTicketPageComponent extends Component {
             <Dropdown nav  >
 
                 <img src={imageHelp} className="HelpIcon" title="Help" onClick={this.togglehelp} />
+
+                <Modal isOpen={this.state.small} toggle={this.toggleSmall}
+                       className={'modal-sm modal-dialog-center'} aria-labelledby="contained-modal-title-vcenter"
+                       centered>
+                  <ModalHeader toggle={this.toggleSmall} className="ModalHead modal-info-Headher"><b>Message!</b></ModalHeader>
+                  <ModalBody>
+                     {i18n.t('static.ticket.ticketcreated')}
+                     <br></br><br></br>
+                     {i18n.t('static.ticket.ticketcode')}: {this.state.message}
+                  </ModalBody>
+                  <ModalFooter>
+                    <Button color="primary" onClick={()=>{this.toggleSmall('')}}>OK</Button>{' '}                    
+                  </ModalFooter>
+                </Modal>
+
                 <Modal isOpen={this.state.help} toggle={this.togglehelp} className={this.props.className}>
                     {/* className={'modal-info ' + this.props.className}> */}
                     <ModalHeader toggle={this.togglehelp} className="ModalHead modal-info-Headher"><strong>Help</strong></ModalHeader>
@@ -511,7 +528,7 @@ export default class InitialTicketPageComponent extends Component {
 
                                 <ListGroup>
                                     <ListGroupItem className="list-group-item-help" tag="a" onClick={this.togglebugreport} action>  <i className="icon-list icons helpclickicon mr-2"></i>{i18n.t('static.common.bugreport')}</ListGroupItem>
-                                    <ListGroupItem className="list-group-item-help" tag="a" onClick={this.togglechangemaster} action><i className="icon-list  icons helpclickicon mr-2"></i> Add/Update Master Data <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
+                                    <ListGroupItem className="list-group-item-help" tag="a" onClick={this.togglechangemaster} action><i className="icon-list  icons helpclickicon mr-2"></i> {i18n.t('static.ticket.addUpdateMasterData')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
 
                                 </ListGroup>
                             </div>
@@ -521,7 +538,7 @@ export default class InitialTicketPageComponent extends Component {
                         {/* Bug Report modal */}
                         {this.state.initialPage == 0 && this.state.showBugReport == 1 && <div isOpen={this.state.bugreport} toggle={this.togglebugreport}>
                             {/* <ModalHeader toggle={this.togglebugreport} className="ModalHead modal-info-Headher"><strong>Bug Report</strong></ModalHeader> */}
-                            <BugReportTicketComponent toggleMain={this.toggleMain} togglehelp={this.togglehelp}/>
+                            <BugReportTicketComponent toggleMain={this.toggleMain} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall}/>
                         </div>}
 
 
@@ -592,30 +609,30 @@ export default class InitialTicketPageComponent extends Component {
                                 </div>}
 
                                 {/* Application Master */}
-                                {this.state.showUserData == 1 && <UserTicketComponent toggleMaster={()=>this.toggleApplicationMasterForm(1)} togglehelp={this.togglehelp}/>}
-                                {this.state.showCountryData == 1 && <CountryTicketComponent toggleMaster={()=>this.toggleApplicationMasterForm(2)} togglehelp={this.togglehelp}/>}
-                                {this.state.showCurrencyData == 1 && <CurrencyTicketComponent toggleMaster={()=>this.toggleApplicationMasterForm(3)} togglehelp={this.togglehelp}/>}
-                                {this.state.showUnitData == 1 && <UnitsTicketComponent toggleMaster={()=>this.toggleApplicationMasterForm(4)} togglehelp={this.togglehelp}/>}
+                                {this.state.showUserData == 1 && <UserTicketComponent toggleMaster={()=>this.toggleApplicationMasterForm(1)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall}/>}
+                                {this.state.showCountryData == 1 && <CountryTicketComponent toggleMaster={()=>this.toggleApplicationMasterForm(2)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall}/>}
+                                {this.state.showCurrencyData == 1 && <CurrencyTicketComponent toggleMaster={()=>this.toggleApplicationMasterForm(3)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall}/>}
+                                {this.state.showUnitData == 1 && <UnitsTicketComponent toggleMaster={()=>this.toggleApplicationMasterForm(4)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall}/>}
 
                                 {/* Realm Master */}
-                                {this.state.showRealmData == 1 && <RealmTicketComponent toggleMaster={()=>this.toggleRealmMasterForm(1)} togglehelp={this.togglehelp}/>}
-                                {this.state.showRealmCountryData == 1 && <RealmCountryTicketComponent toggleMaster={()=>this.toggleRealmMasterForm(2)} togglehelp={this.togglehelp}/>}
-                                {this.state.showDataSourceData == 1 && <DataSourceTicketComponent toggleMaster={()=>this.toggleRealmMasterForm(3)} togglehelp={this.togglehelp}/>}
-                                {this.state.showFundingSourceData == 1 && <FundingSourceTicketComponent toggleMaster={()=>this.toggleRealmMasterForm(4)} togglehelp={this.togglehelp}/>}
-                                {this.state.showProcurementAgentData == 1 && <ProcurementAgentTicketComponent toggleMaster={()=>this.toggleRealmMasterForm(5)} togglehelp={this.togglehelp}/>}
-                                {this.state.showSupplierData == 1 && <SuppliersTicketComponent toggleMaster={()=>this.toggleRealmMasterForm(6)} togglehelp={this.togglehelp}/>}
-                                {this.state.showTechnicalAreaData == 1 && <TechnicalAreaTicketComponent toggleMaster={()=>this.toggleRealmMasterForm(7)} togglehelp={this.togglehelp}/>}
-                                {this.state.showOrganizationData == 1 && <OrganisationTicketComponent toggleMaster={()=>this.toggleRealmMasterForm(8)} togglehelp={this.togglehelp}/>}
-                                {this.state.showRealmCountryRegionData == 1 && <RealmCountryRegionTicketComponent toggleMaster={()=>this.toggleRealmMasterForm(9)} togglehelp={this.togglehelp}/>}
+                                {this.state.showRealmData == 1 && <RealmTicketComponent toggleMaster={()=>this.toggleRealmMasterForm(1)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall}/>}
+                                {this.state.showRealmCountryData == 1 && <RealmCountryTicketComponent toggleMaster={()=>this.toggleRealmMasterForm(2)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall}/>}
+                                {this.state.showDataSourceData == 1 && <DataSourceTicketComponent toggleMaster={()=>this.toggleRealmMasterForm(3)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall}/>}
+                                {this.state.showFundingSourceData == 1 && <FundingSourceTicketComponent toggleMaster={()=>this.toggleRealmMasterForm(4)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall}/>}
+                                {this.state.showProcurementAgentData == 1 && <ProcurementAgentTicketComponent toggleMaster={()=>this.toggleRealmMasterForm(5)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall}/>}
+                                {this.state.showSupplierData == 1 && <SuppliersTicketComponent toggleMaster={()=>this.toggleRealmMasterForm(6)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall}/>}
+                                {this.state.showTechnicalAreaData == 1 && <TechnicalAreaTicketComponent toggleMaster={()=>this.toggleRealmMasterForm(7)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall}/>}
+                                {this.state.showOrganizationData == 1 && <OrganisationTicketComponent toggleMaster={()=>this.toggleRealmMasterForm(8)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall}/>}
+                                {this.state.showRealmCountryRegionData == 1 && <RealmCountryRegionTicketComponent toggleMaster={()=>this.toggleRealmMasterForm(9)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall}/>}
 
                                 {/* Program Master */}
-                                {this.state.showProgramData == 1 && <ProgramTicketComponent toggleMaster={()=>this.toggleProgramMasterForm(1)} togglehelp={this.togglehelp}/>}
-                                {this.state.showBudgetData == 1 && <BudgetTicketComponent toggleMaster={()=>this.toggleProgramMasterForm(2)} togglehelp={this.togglehelp}/>}
-                                {this.state.showTracerCategoryData == 1 && <TracerCategoryTicketComponent toggleMaster={()=>this.toggleProgramMasterForm(3)} togglehelp={this.togglehelp}/>}
-                                {this.state.showProductCategoryData == 1 && <ProductCategoryTicketComponent toggleMaster={()=>this.toggleProgramMasterForm(4)} togglehelp={this.togglehelp}/>}
-                                {this.state.showForecastingUnitData == 1 && <ForecastingUnitTicketComponent toggleMaster={()=>this.toggleProgramMasterForm(5)} togglehelp={this.togglehelp}/>}
-                                {this.state.showPlanningUnitData == 1 && <PlanningUnitTicketComponent toggleMaster={()=>this.toggleProgramMasterForm(6)} togglehelp={this.togglehelp}/>}
-                                {this.state.showProcurementUnitData == 1 && <ProcurementUnitTicketComponent toggleMaster={()=>this.toggleProgramMasterForm(7)} togglehelp={this.togglehelp}/>}
+                                {this.state.showProgramData == 1 && <ProgramTicketComponent toggleMaster={()=>this.toggleProgramMasterForm(1)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall}/>}
+                                {this.state.showBudgetData == 1 && <BudgetTicketComponent toggleMaster={()=>this.toggleProgramMasterForm(2)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall}/>}
+                                {this.state.showTracerCategoryData == 1 && <TracerCategoryTicketComponent toggleMaster={()=>this.toggleProgramMasterForm(3)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall}/>}
+                                {this.state.showProductCategoryData == 1 && <ProductCategoryTicketComponent toggleMaster={()=>this.toggleProgramMasterForm(4)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall}/>}
+                                {this.state.showForecastingUnitData == 1 && <ForecastingUnitTicketComponent toggleMaster={()=>this.toggleProgramMasterForm(5)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall}/>}
+                                {this.state.showPlanningUnitData == 1 && <PlanningUnitTicketComponent toggleMaster={()=>this.toggleProgramMasterForm(6)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall}/>}
+                                {this.state.showProcurementUnitData == 1 && <ProcurementUnitTicketComponent toggleMaster={()=>this.toggleProgramMasterForm(7)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall}/>}
                             </ModalBody>
 
                         </div>

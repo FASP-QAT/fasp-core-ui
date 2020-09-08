@@ -3248,14 +3248,17 @@ border-radius: 2em;
 {
   cursor: pointer!important;
 }
+.shipmentOverviewgraphheight{
+  height: 450px;
+}
 
 .month-picker > .rmp-container .rmp-popup.dark {
   color: #666!important;
   background-color: rgba(255, 255, 255, 0.96)!important;
 }
 @media screen and (min-width: 768px){
-.month-picker > .rmp-container .rmp-popup .rmp-pad {
-  
+.month-picker > .rmp-container .rmp-popup .rmp-pad 
+{
     background: rgba(238, 238, 238, 0.9)!important;
 }
-}
+} 

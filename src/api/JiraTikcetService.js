@@ -43,8 +43,18 @@ class JiraTicketService {
         );
     }
 
+    addIssueAttachment(json, issueId) {
+        if(issueId != '') {                        
+            let formData = new FormData();
+            formData.append("file", json.file);
+            return axios.post(`${API_URL}/api/ticket/addIssueAttachment/${issueId}`, formData, {headers : { "Content-Type": "multipart/form-data",}}
+            );
+        }
+    }
+
     getDataInFormat(json) {
         json.createdBy = AuthenticationService.getLoggedInUsername();
+        json.createdDate = new Date();
         var str = JSON.stringify(json);        
         var formatStr = ""; 
         var dataKey;
@@ -54,6 +64,7 @@ class JiraTicketService {
             dataValue = json[key];
             formatStr = formatStr.concat(dataKey.charAt(0).toUpperCase()).concat(dataKey.slice(1)).concat(" = ").concat(dataValue).concat("\n");
          }       
+         console.log("Format String :",formatStr);
         return formatStr;
     }
     
