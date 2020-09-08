@@ -1119,7 +1119,7 @@
     "static.commitVersion.acceptLatestVersion": " Accept latest version",
     "static.common.max23digittext": "Maximum 23 characters only",
     "static.program.zipfilereaderror": "Error occured while reading zip file",
-    "static.ticket.ticketcreated": "Ticket has been created",
+    "static.ticket.ticketcreated": "Ticket has been created.",
     "static.ticket.ticketcode": "Ticket Code",
     "static.ticket.addUpdateMasterData": "Add / Update Master Data",
     "static.common.regiontext": "Please select Region"
