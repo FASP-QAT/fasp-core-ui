@@ -255,10 +255,11 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
 
                                             var totalShipmentQty = 0;
                                             var shipmentBatchInfoList = shipmentList[i].batchInfoList;
+                                            console.log("Shipment batch info list", shipmentBatchInfoList);
                                             for (var sb = 0; sb < shipmentBatchInfoList.length; sb++) {
                                                 totalShipmentQty += parseInt(shipmentBatchInfoList[sb].shipmentQty);
                                             }
-
+                                            console.log("Total shipment qty", totalShipmentQty);
                                             var shipmentDatesJson = {
                                                 plannedDate: shipmentList[i].plannedDate,
                                                 submittedDate: shipmentList[i].submittedDate,
@@ -1511,6 +1512,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 var procurementAgentPlanningUnit = this.state.procurementAgentPlanningUnitListAll.filter(c => c.procurementAgent.id == rowData[2] && c.planningUnit.id == planningUnitId);
                 console.log("RowData------------------>", rowData)
                 var pricePerUnit = rowData[10];
+                // if (pricePerUnit.toString() == "") {
                 console.log("Price per unit", pricePerUnit);
                 if (procurementAgentPlanningUnit.length > 0) {
                     console.log("in length greater than 0")
@@ -1521,6 +1523,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     pricePerUnit = parseFloat(pricePerUnit / conversionRateToUsd).toFixed(2);
                     elInstance.setValueFromCoords(10, y, pricePerUnit, true);
                 }
+                // }
                 this.calculateLeadTimesOnChange(y)
             }
         }
@@ -1528,9 +1531,10 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         if (x == 9) {
             var valid = checkValidtion("text", "J", y, rowData[9], elInstance);
             if (valid == true) {
-                if (rowData[2] != "") {
-                    var procurementAgentPlanningUnit = this.state.procurementAgentPlanningUnitListAll.filter(c => c.procurementAgent.id == rowData[2] && c.planningUnit.id == planningUnitId);
-                    var pricePerUnit = rowData[10];
+                // if (rowData[2] != "") {
+                var procurementAgentPlanningUnit = this.state.procurementAgentPlanningUnitListAll.filter(c => c.procurementAgent.id == rowData[2] && c.planningUnit.id == planningUnitId);
+                var pricePerUnit = rowData[10];
+                if (pricePerUnit.toString() == "") {
                     console.log("Price per unit", pricePerUnit);
                     if (procurementAgentPlanningUnit.length > 0) {
                         console.log("in length greater than 0")
@@ -1540,6 +1544,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     pricePerUnit = parseFloat(pricePerUnit / conversionRateToUsd).toFixed(2);
                     elInstance.setValueFromCoords(10, y, pricePerUnit, true);
                 }
+                // }
             }
         }
 
@@ -1566,32 +1571,38 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             var valid = checkValidtion("text", "H", y, rowData[7], elInstance);
             if (valid == true) {
                 var rate = ((elInstance.getCell(`L${parseInt(y) + 1}`)).innerHTML).toString().replaceAll("\,", "");
+                // if (rowData[12].toString() == "") {
                 var freightCost = 0;
                 if (rowData[7] == 1) {
                     var seaFreightPercentage = this.props.items.programJson.seaFreightPerc;
                     freightCost = parseFloat(rate) * (parseFloat(parseFloat(seaFreightPercentage) / 100));
-                    elInstance.setValueFromCoords(12, y, freightCost, true);
+                    elInstance.setValueFromCoords(12, y, freightCost.toFixed(2), true);
                 } else {
                     var airFreightPercentage = this.props.items.programJson.airFreightPerc;
                     freightCost = parseFloat(rate) * (parseFloat(parseFloat(airFreightPercentage) / 100));
-                    elInstance.setValueFromCoords(12, y, freightCost, true);
+                    elInstance.setValueFromCoords(12, y, freightCost.toFixed(2), true);
                 }
+                // }
                 this.calculateLeadTimesOnChange(y);
             }
         }
 
         if (x == 11) {
             var rate = ((elInstance.getCell(`L${parseInt(y) + 1}`)).innerHTML).toString().replaceAll("\,", "");
+            console.log("RowData[12]", rowData[12]);
+            // if (rowData[12].toString() == "") {
+            console.log("In if");
             var freightCost = 0;
             if (rowData[7] == 1) {
                 var seaFreightPercentage = this.props.items.programJson.seaFreightPerc;
                 freightCost = parseFloat(rate) * (parseFloat(parseFloat(seaFreightPercentage) / 100));
-                elInstance.setValueFromCoords(12, y, freightCost, true);
+                elInstance.setValueFromCoords(12, y, freightCost.toFixed(2), true);
             } else {
                 var airFreightPercentage = this.props.items.programJson.airFreightPerc;
                 freightCost = parseFloat(rate) * (parseFloat(parseFloat(airFreightPercentage) / 100));
-                elInstance.setValueFromCoords(12, y, freightCost, true);
+                elInstance.setValueFromCoords(12, y, freightCost.toFixed(2), true);
             }
+            // }
         }
 
         if (x == 8) {
@@ -2760,6 +2771,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         elInstance.setStyle(col, "background-color", "yellow");
                         elInstance.setComments(col, i18n.t('static.supplyPlan.batchNumberMissing'));
                         inValid("I", y, i18n.t('static.supplyPlan.batchNumberMissing'), elInstance);
+                        console.log("TotalShipment Qty", totalShipmentQty, "Adjusted order qty", adjustedOrderQty);
                         if (totalShipmentQty != 0 && totalShipmentQty != adjustedOrderQty) {
                             valid = false;
                             this.props.updateState("shipmentBatchError", i18n.t('static.supplyPlan.batchNumberMissing'));
@@ -2860,7 +2872,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
 
                             if (shipmentStatusId == DELIVERED_SHIPMENT_STATUS) {
                                 var shipmentBatchInfoList = map.get("17");
-                                if (shipmentBatchInfoList != "" && shipmentBatchInfoList.length == 0) {
+                                console.log("Shipment Batcg info list", shipmentBatchInfoList);
+                                if (shipmentBatchInfoList == "" && shipmentBatchInfoList.length == 0) {
+                                    console.log("In if")
                                     var programId = (document.getElementById("programId").value).split("_")[0];
                                     var planningUnitId = document.getElementById("planningUnitId").value;
                                     var batchNo = (paddingZero(programId, 0, 6)).concat(paddingZero(planningUnitId, 0, 8)).concat(moment(Date.now()).format("YYMMDD")).concat(generateRandomAplhaNumericCode(3));
@@ -2874,7 +2888,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             batchId: 0,
                                             autoGenerated: true
                                         },
-                                        shipmentQty: shipmentQty,
+                                        shipmentQty: shipmentQty.toString().replaceAll("\,", ""),
                                         createdDate: moment(Date.now()).format("YYYY-MM-DD")
                                     }
                                     var batchArr = [];
@@ -2901,9 +2915,11 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                     }
                                     batchInfoList.push(batchDetails);
                                 }
+                                console.log("Batch info list", batchInfoList);
                                 programJson.batchInfoList = batchInfoList;
                             }
                         } else {
+                            console.log("In else")
                             var shipmentJson = {
                                 accountFlag: true,
                                 active: true,
@@ -2955,7 +2971,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
 
                             if (shipmentStatusId == DELIVERED_SHIPMENT_STATUS) {
                                 var shipmentBatchInfoList = map.get("17");
-                                if (shipmentBatchInfoList != "" && shipmentBatchInfoList.length == 0) {
+                                console.log("Shipment byach info list", shipmentBatchInfoList);
+                                if (shipmentBatchInfoList == "" && shipmentBatchInfoList.length == 0) {
                                     var programId = (document.getElementById("programId").value).split("_")[0];
                                     var planningUnitId = document.getElementById("planningUnitId").value;
                                     var batchNo = (paddingZero(programId, 0, 6)).concat(paddingZero(planningUnitId, 0, 8)).concat(moment(Date.now()).format("YYMMDD")).concat(generateRandomAplhaNumericCode(3));
@@ -2969,7 +2986,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             batchId: 0,
                                             autoGenerated: true
                                         },
-                                        shipmentQty: shipmentQty,
+                                        shipmentQty: shipmentQty.toString().replaceAll("\,", ""),
                                         createdDate: moment(Date.now()).format("YYYY-MM-DD")
                                     }
                                     var batchArr = [];
@@ -2996,6 +3013,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                     }
                                     batchInfoList.push(batchDetails);
                                 }
+                                console.log("Batch info list", batchInfoList);
                                 programJson.batchInfoList = batchInfoList;
                             }
                             shipmentDataList.push(shipmentJson);

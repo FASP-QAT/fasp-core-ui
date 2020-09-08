@@ -1,5 +1,6 @@
 {
     "static.common.realmtext": "Please select Realm",
+    "static.common.roleinvalidtext": "You can't select other roles in combination with application level admin role",
     "static.program.programwithsameversion": "Program with same version already exists in the local machine you want to overwirte that program with the new data?",
     "static.dashboard.subfundingsource": "Sub Funding Source",
     "static.common.select": "Please select",
@@ -209,7 +210,7 @@
     "static.currency.currencyconversiontext": "Please enter Conversion Rate to USD",
     "static.dashboard.program": "Programs",
     "static.dashboard.programheader": "Program",
-    "static.program.dataexportsuccess": "Data exported successfully",
+    "static.program.dataexportsuccess": "Program exported successfully",
     "static.dashboard.datasync": "Master Data Sync",
     "static.supplier.supplier": "Supplier",
     "static.product.productcategory": "Product Category",
@@ -632,6 +633,7 @@
     "static.footer": "Quantification Analytics Tool",
     "static.unknown": "Unknown",
     "static.forgotPassword.offline": "You need to be online to reset the password",
+    "static.helpTicket.offline": "You need to be online to raise the ticket",
     "static.common.close": "Close",
     "static.inventory.inventory": "Inventory",
     "static.inventory.program": "Program",
@@ -1108,7 +1110,7 @@
     "static.technicalArea.technicalAreaCodeText": "Please enter technical area code",
     "static.technicalArea.productcategorynametext": "Please enter product category name",
     "static.common.notes": "Notes",
-    "static.common.bugreport": "Bug Report",
+    "static.common.bugreport": "Report a bug",
     "static.report.procurmentAgentLeadTimeReport": "Procurement Agent Lead Times",
     "static.dashboard.linkShipment": "Link shipment",
     "static.commitVersion.conflicts": "Conflicts",
@@ -1119,5 +1121,9 @@
     "static.commitVersion.acceptLatestVersion": " Accept latest version",
     "static.common.max23digittext": "Maximum 23 characters only",
     "static.program.zipfilereaderror": "Error occured while reading zip file",
-    "static.common.regiontext": "Please select Region"
+    "static.ticket.ticketcreated": "Ticket has been created.",
+    "static.ticket.ticketcode": "Ticket Code",
+    "static.ticket.addUpdateMasterData": "Add / Update Master Data",
+    "static.common.regiontext": "Please select Region",
+    "static.graph.costInUSD":"Cost (USD)"
 }

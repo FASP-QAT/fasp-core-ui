@@ -7,7 +7,7 @@ import ProductCategoryServcie from '../../api/PoroductCategoryService.js';
 import { jExcelLoadedFunction, jExcelLoadedFunctionPipeline } from '../../CommonComponent/JExcelCommonFunctions.js';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
-
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 export default class PipelineProgramPlanningUnits extends Component {
     constructor(props) {
         super(props);
@@ -867,6 +867,11 @@ export default class PipelineProgramPlanningUnits extends Component {
     render() {
         return (
             <>
+             <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
+                }} />
                 <h4 className="red">{this.props.message}</h4>
                 <div className="table-responsive" style={{ display: this.state.loading ? "none" : "block" }} >
 
