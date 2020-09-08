@@ -796,6 +796,9 @@ export default class AddProcurementAgentPlanningUnit extends Component {
         }, 8000);
     }
 
+    filterProduct = function (instance, cell, c, r, source) {
+        return this.state.products.filter(c => c.active.toString() == "true");
+    }.bind(this);
 
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
@@ -817,7 +820,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                     procurementAgentList: response.data
                                 });
 
-                                PlanningUnitService.getActivePlanningUnitList()
+                                PlanningUnitService.getAllPlanningUnitList()
                                     .then(response => {
                                         // console.log(response.data.data);
                                         if (response.status == 200) {
@@ -865,7 +868,8 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                             tempPlanningUnitArrayList[i] = planningUnitList[i].planningUnitId;
                                                             var puJson = {
                                                                 name: getLabelText(planningUnitList[i].label, this.state.lang),
-                                                                id: parseInt(planningUnitList[i].planningUnitId)
+                                                                id: parseInt(planningUnitList[i].planningUnitId),
+                                                                active: planningUnitList[i].active
                                                             }
                                                             products[i] = puJson;
 
@@ -873,7 +877,8 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                     }
 
                                                     this.setState({
-                                                        tempPlanningUnitArrayList: tempPlanningUnitArrayList
+                                                        tempPlanningUnitArrayList: tempPlanningUnitArrayList,
+                                                        products: products
                                                     })
 
                                                     // console.log("tempPlanningUnitArrayList-----",tempPlanningUnitArrayList);
@@ -952,7 +957,8 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                             {
                                                                 title: "Planing Unit",
                                                                 type: 'autocomplete',
-                                                                source: products
+                                                                source: products,
+                                                                filter: this.filterProduct
 
                                                             },
                                                             {
@@ -1452,6 +1458,19 @@ export default class AddProcurementAgentPlanningUnit extends Component {
 
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
+        var asterisk = document.getElementsByClassName("resizable")[0];
+        var tr = asterisk.firstChild;
+
+        tr.children[2].classList.add('AsteriskTheadtrTd');
+        tr.children[3].classList.add('AsteriskTheadtrTd');
+        tr.children[4].classList.add('AsteriskTheadtrTd');
+        tr.children[5].classList.add('AsteriskTheadtrTd');
+        tr.children[6].classList.add('AsteriskTheadtrTd');
+        tr.children[7].classList.add('AsteriskTheadtrTd');
+        tr.children[8].classList.add('AsteriskTheadtrTd');
+        tr.children[9].classList.add('AsteriskTheadtrTd');
+        tr.children[10].classList.add('AsteriskTheadtrTd');
+        tr.children[11].classList.add('AsteriskTheadtrTd');
     }
 
     // -----------start of changed function

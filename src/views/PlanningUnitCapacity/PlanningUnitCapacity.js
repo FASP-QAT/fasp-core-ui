@@ -720,7 +720,7 @@ class PlanningUnitCapacity extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            loading:true,
+            loading: true,
             lang: localStorage.getItem('lang'),
             planningUnitCapacity: {},
             planningUnitCapacityId: '',
@@ -878,7 +878,8 @@ class PlanningUnitCapacity extends Component {
                                                 for (var i = 0; i < suppliers.length; i++) {
                                                     var paJson = {
                                                         name: getLabelText(suppliers[i].label, this.state.lang),
-                                                        id: parseInt(suppliers[i].supplierId)
+                                                        id: parseInt(suppliers[i].supplierId),
+                                                        active: suppliers[i].active
                                                     }
                                                     supplierList[i] = paJson
                                                 }
@@ -1164,7 +1165,7 @@ class PlanningUnitCapacity extends Component {
 
                                 } else {
                                     this.setState({
-                                        message: response.data.messageCode,loading:false
+                                        message: response.data.messageCode, loading: false
                                     },
                                         () => {
                                             this.hideSecondComponent();
@@ -1182,10 +1183,10 @@ class PlanningUnitCapacity extends Component {
                                             case 404:
                                             case 406:
                                             case 412:
-                                                this.setState({loading:false, message: error.response.messageCode });
+                                                this.setState({ loading: false, message: error.response.messageCode });
                                                 break;
                                             default:
-                                                this.setState({loading:false, message: 'static.unkownError' });
+                                                this.setState({ loading: false, message: 'static.unkownError' });
                                                 break;
                                         }
                                     }
@@ -1194,7 +1195,7 @@ class PlanningUnitCapacity extends Component {
 
                     } else {
                         this.setState({
-                            message: response.data.messageCode,loading:false
+                            message: response.data.messageCode, loading: false
                         },
                             () => {
                                 this.hideSecondComponent();
@@ -1204,7 +1205,7 @@ class PlanningUnitCapacity extends Component {
                 }).catch(
                     error => {
                         if (error.message === "Network Error") {
-                            this.setState({loading:false, message: error.message });
+                            this.setState({ loading: false, message: error.message });
                         } else {
                             switch (error.response ? error.response.status : "") {
                                 case 500:
@@ -1212,10 +1213,10 @@ class PlanningUnitCapacity extends Component {
                                 case 404:
                                 case 406:
                                 case 412:
-                                    this.setState({loading:false, message: error.response.data.messageCode });
+                                    this.setState({ loading: false, message: error.response.data.messageCode });
                                     break;
                                 default:
-                                    this.setState({loading:false, message: 'static.unkownError' });
+                                    this.setState({ loading: false, message: 'static.unkownError' });
                                     console.log("Error code unkown");
                                     break;
                             }
@@ -1392,6 +1393,13 @@ class PlanningUnitCapacity extends Component {
 
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
+        var asterisk = document.getElementsByClassName("resizable")[0];
+        var tr = asterisk.firstChild;
+        tr.children[2].classList.add('AsteriskTheadtrTd');
+        tr.children[3].classList.add('AsteriskTheadtrTd');
+        tr.children[4].classList.add('AsteriskTheadtrTd');
+        tr.children[5].classList.add('AsteriskTheadtrTd');
+        tr.children[6].classList.add('AsteriskTheadtrTd');
     }
 
     checkValidation() {
@@ -1493,7 +1501,7 @@ class PlanningUnitCapacity extends Component {
         return (
 
             <div className="animated fadeIn">
-                   <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
                 }} loading={(loading) => {
                     this.setState({ loading: loading })
@@ -1512,19 +1520,19 @@ class PlanningUnitCapacity extends Component {
                     <CardBody className="p-0">
 
                         <Col xs="12" sm="12">
-                            <div className="table-responsive"style={{ display: this.state.loading ? "none" : "block" }}>
+                            <div className="table-responsive" style={{ display: this.state.loading ? "none" : "block" }}>
                                 <div id="paputableDiv" >
                                 </div>
                             </div>
                             <div style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>Loading...</strong></h4></div>
-                            <div class="spinner-border blue ml-4" role="status">
+                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                    <div class="align-items-center">
+                                        <div ><h4> <strong>Loading...</strong></h4></div>
+                                        <div class="spinner-border blue ml-4" role="status">
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
                         </Col>
                     </CardBody>
                     <CardFooter>
