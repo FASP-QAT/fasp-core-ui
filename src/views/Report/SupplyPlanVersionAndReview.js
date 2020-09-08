@@ -1048,7 +1048,7 @@ class SupplyPlanVersionAndReview extends Component {
             // let versionStatusId = this.el.getValueFromCoords(5, x);
             // let versionTypeId =this.el.getValueFromCoords(2, x);
 
-            var rowData = elInstance.getRowData(y);
+            var rowData = instance.getRowData(y);
             let versionStatusId = rowData[5];
             let versionTypeId =rowData[2];
             console.log("====>",versionStatusId,"====>",versionTypeId);
