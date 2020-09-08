@@ -192,7 +192,7 @@ the distributor make the software available in source code format. The Software
       </p>
 
       <p>
-      <h4 className="UserTitle">Miscellanea </h4>
+      <h4 className="UserTitle">Miscellaneous </h4>
       <div className="rounded-list list-group">
         <ol className="list-group">
     <li class=""> &nbsp;&nbsp;<p>If you configure the Software to work with one or more accounts 
