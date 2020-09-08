@@ -720,7 +720,7 @@ class PlanningUnitCapacity extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            loading:true,
+            loading: true,
             lang: localStorage.getItem('lang'),
             planningUnitCapacity: {},
             planningUnitCapacityId: '',
@@ -749,6 +749,7 @@ class PlanningUnitCapacity extends Component {
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.addRow = this.addRow.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
+        this.buildJExcel = this.buildJExcel.bind(this);
     }
 
     hideSecondComponent() {
@@ -845,6 +846,309 @@ class PlanningUnitCapacity extends Component {
 
 
     }
+
+    filterSupplier = function (instance, cell, c, r, source) {
+        return this.state.supplierList.filter(c => c.active.toString() == "true");
+    }.bind(this);
+
+    buildJExcel() {
+        const { suppliers } = this.state;
+        let supplierList = [];
+        if (suppliers.length > 0) {
+            for (var i = 0; i < suppliers.length; i++) {
+                var paJson = {
+                    name: getLabelText(suppliers[i].label, this.state.lang),
+                    id: parseInt(suppliers[i].supplierId),
+                    active: suppliers[i].active
+                }
+                supplierList[i] = paJson
+            }
+        }
+
+        this.setState({
+            supplierList: supplierList
+        })
+
+        var papuList = this.state.rows;
+        var data = [];
+        var papuDataArr = []
+
+        var count = 0;
+        if (papuList.length != 0) {
+            for (var j = 0; j < papuList.length; j++) {
+
+
+                data = [];
+                data[0] = getLabelText(this.state.planningUnit.label, this.state.lang);
+                data[1] = parseInt(papuList[j].supplier.id);
+                data[2] = papuList[j].startDate;
+                data[3] = papuList[j].stopDate;
+                data[4] = papuList[j].capacity;
+                data[5] = papuList[j].active;
+                data[6] = papuList[j].planningUnitCapacityId;
+                data[7] = 0;
+                papuDataArr[count] = data;
+                count++;
+
+
+            }
+        }
+
+        // console.log("inventory Data Array-->", papuDataArr);
+        if (papuDataArr.length == 0) {
+            data = [];
+            // data[0] = getLabelText(this.state.planningUnit.label, this.state.lang);
+            // data[5] = true;
+
+            data[0] = getLabelText(this.state.planningUnit.label, this.state.lang);
+            data[1] = "";
+            data[2] = "";
+            data[3] = "";
+            data[4] = "";
+            data[5] = true;
+            data[6] = 0;
+            data[7] = 1;
+
+            papuDataArr[0] = data;
+        }
+        this.el = jexcel(document.getElementById("paputableDiv"), '');
+        this.el.destroy();
+        var json = [];
+        var data = papuDataArr;
+
+        var options = {
+            data: data,
+            columnDrag: true,
+            colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+            columns: [
+
+                {
+                    title: "Planning Unit",
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: "Supplier",
+                    type: 'autocomplete',
+                    source: supplierList,
+                    filter: this.filterSupplier
+
+                },
+                {
+                    title: "Start Date",
+                    type: 'calendar',
+                    options: {
+                        format: 'YYYY-MM-DD'
+                    }
+
+                },
+                {
+                    title: "End Date",
+                    type: 'calendar',
+                    options: {
+                        format: 'YYYY-MM-DD'
+                    }
+                },
+                {
+                    title: "Capacity",
+                    type: 'number',
+                },
+                {
+                    title: "Is Active",
+                    type: 'checkbox'
+                },
+                {
+                    title: 'planningUnitId',
+                    type: 'hidden'
+                },
+                {
+                    title: 'isChange',
+                    type: 'hidden'
+                }
+
+            ],
+            pagination: 10,
+            search: true,
+            columnSorting: true,
+            tableOverflow: true,
+            wordWrap: true,
+            paginationOptions: [10, 25, 50],
+            position: 'top',
+            allowInsertColumn: false,
+            allowManualInsertColumn: false,
+            allowDeleteRow: true,
+            onchange: this.changed,
+            oneditionend: this.onedit,
+            copyCompatibility: true,
+            text: {
+                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                show: '',
+                entries: '',
+            },
+            onload: this.loaded,
+            contextMenu: function (obj, x, y, e) {
+                var items = [];
+                //Add consumption batch info
+
+
+                if (y == null) {
+                    // Insert a new column
+                    if (obj.options.allowInsertColumn == true) {
+                        items.push({
+                            title: obj.options.text.insertANewColumnBefore,
+                            onclick: function () {
+                                obj.insertColumn(1, parseInt(x), 1);
+                            }
+                        });
+                    }
+
+                    if (obj.options.allowInsertColumn == true) {
+                        items.push({
+                            title: obj.options.text.insertANewColumnAfter,
+                            onclick: function () {
+                                obj.insertColumn(1, parseInt(x), 0);
+                            }
+                        });
+                    }
+
+                    // Delete a column
+                    // if (obj.options.allowDeleteColumn == true) {
+                    //     items.push({
+                    //         title: obj.options.text.deleteSelectedColumns,
+                    //         onclick: function () {
+                    //             obj.deleteColumn(obj.getSelectedColumns().length ? undefined : parseInt(x));
+                    //         }
+                    //     });
+                    // }
+
+                    // Rename column
+                    // if (obj.options.allowRenameColumn == true) {
+                    //     items.push({
+                    //         title: obj.options.text.renameThisColumn,
+                    //         onclick: function () {
+                    //             obj.setHeader(x);
+                    //         }
+                    //     });
+                    // }
+
+                    // Sorting
+                    if (obj.options.columnSorting == true) {
+                        // Line
+                        items.push({ type: 'line' });
+
+                        items.push({
+                            title: obj.options.text.orderAscending,
+                            onclick: function () {
+                                obj.orderBy(x, 0);
+                            }
+                        });
+                        items.push({
+                            title: obj.options.text.orderDescending,
+                            onclick: function () {
+                                obj.orderBy(x, 1);
+                            }
+                        });
+                    }
+                } else {
+                    // Insert new row before
+                    if (obj.options.allowInsertRow == true) {
+                        items.push({
+                            title: i18n.t('static.common.insertNewRowBefore'),
+                            onclick: function () {
+                                var data = [];
+                                data[0] = getLabelText(this.state.planningUnit.label, this.state.lang);
+                                data[1] = "";
+                                data[2] = "";
+                                data[3] = "";
+                                data[4] = "";
+                                data[5] = true;
+                                data[6] = 0;
+                                data[7] = 1;
+                                obj.insertRow(data, parseInt(y), 1);
+                            }.bind(this)
+                        });
+                    }
+                    // after
+                    if (obj.options.allowInsertRow == true) {
+                        items.push({
+                            title: i18n.t('static.common.insertNewRowAfter'),
+                            onclick: function () {
+                                var data = [];
+                                data[0] = getLabelText(this.state.planningUnit.label, this.state.lang);
+                                data[1] = "";
+                                data[2] = "";
+                                data[3] = "";
+                                data[4] = "";
+                                data[5] = true;
+                                data[6] = 0;
+                                data[7] = 1;
+                                obj.insertRow(data, parseInt(y));
+                            }.bind(this)
+                        });
+                    }
+                    // Delete a row
+                    if (obj.options.allowDeleteRow == true) {
+                        // region id
+                        if (obj.getRowData(y)[6] == 0) {
+                            items.push({
+                                title: obj.options.text.deleteSelectedRows,
+                                onclick: function () {
+                                    obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y));
+                                }
+                            });
+                        }
+                    }
+
+                    if (x) {
+                        if (obj.options.allowComments == true) {
+                            items.push({ type: 'line' });
+
+                            var title = obj.records[y][x].getAttribute('title') || '';
+
+                            items.push({
+                                title: title ? obj.options.text.editComments : obj.options.text.addComments,
+                                onclick: function () {
+                                    obj.setComments([x, y], prompt(obj.options.text.comments, title));
+                                }
+                            });
+
+                            if (title) {
+                                items.push({
+                                    title: obj.options.text.clearComments,
+                                    onclick: function () {
+                                        obj.setComments([x, y], '');
+                                    }
+                                });
+                            }
+                        }
+                    }
+                }
+
+                // Line
+                items.push({ type: 'line' });
+
+                // Save
+                if (obj.options.allowExport) {
+                    items.push({
+                        title: i18n.t('static.supplyPlan.exportAsCsv'),
+                        shortcut: 'Ctrl + S',
+                        onclick: function () {
+                            obj.download(true);
+                        }
+                    });
+                }
+
+                return items;
+            }.bind(this)
+        };
+
+        this.el = jexcel(document.getElementById("paputableDiv"), options);
+        this.setState({
+            loading: false
+        })
+    }
+
+
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
         PlanningUnitService.getPlanningUnitById(this.props.match.params.planningUnitId).then(response => {
@@ -872,299 +1176,12 @@ class PlanningUnitCapacity extends Component {
                                         suppliers: response.data
                                     },
                                         () => {
-                                            const { suppliers } = this.state;
-                                            let supplierList = [];
-                                            if (suppliers.length > 0) {
-                                                for (var i = 0; i < suppliers.length; i++) {
-                                                    var paJson = {
-                                                        name: getLabelText(suppliers[i].label, this.state.lang),
-                                                        id: parseInt(suppliers[i].supplierId)
-                                                    }
-                                                    supplierList[i] = paJson
-                                                }
-                                            }
-
-                                            var papuList = this.state.rows;
-                                            var data = [];
-                                            var papuDataArr = []
-
-                                            var count = 0;
-                                            if (papuList.length != 0) {
-                                                for (var j = 0; j < papuList.length; j++) {
-
-
-                                                    data = [];
-                                                    data[0] = getLabelText(this.state.planningUnit.label, this.state.lang);
-                                                    data[1] = parseInt(papuList[j].supplier.id);
-                                                    data[2] = papuList[j].startDate;
-                                                    data[3] = papuList[j].stopDate;
-                                                    data[4] = papuList[j].capacity;
-                                                    data[5] = papuList[j].active;
-                                                    data[6] = papuList[j].planningUnitCapacityId;
-                                                    data[7] = 0;
-                                                    papuDataArr[count] = data;
-                                                    count++;
-
-
-                                                }
-                                            }
-
-                                            // console.log("inventory Data Array-->", papuDataArr);
-                                            if (papuDataArr.length == 0) {
-                                                data = [];
-                                                // data[0] = getLabelText(this.state.planningUnit.label, this.state.lang);
-                                                // data[5] = true;
-
-                                                data[0] = getLabelText(this.state.planningUnit.label, this.state.lang);
-                                                data[1] = "";
-                                                data[2] = "";
-                                                data[3] = "";
-                                                data[4] = "";
-                                                data[5] = true;
-                                                data[6] = 0;
-                                                data[7] = 1;
-
-                                                papuDataArr[0] = data;
-                                            }
-                                            this.el = jexcel(document.getElementById("paputableDiv"), '');
-                                            this.el.destroy();
-                                            var json = [];
-                                            var data = papuDataArr;
-
-                                            var options = {
-                                                data: data,
-                                                columnDrag: true,
-                                                colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
-                                                columns: [
-
-                                                    {
-                                                        title: "Planning Unit",
-                                                        type: 'text',
-                                                        readOnly: true
-                                                    },
-                                                    {
-                                                        title: "Supplier",
-                                                        type: 'autocomplete',
-                                                        source: supplierList
-
-                                                    },
-                                                    {
-                                                        title: "Start Date",
-                                                        type: 'calendar',
-                                                        options: {
-                                                            format: 'YYYY-MM-DD'
-                                                        }
-
-                                                    },
-                                                    {
-                                                        title: "End Date",
-                                                        type: 'calendar',
-                                                        options: {
-                                                            format: 'YYYY-MM-DD'
-                                                        }
-                                                    },
-                                                    {
-                                                        title: "Capacity",
-                                                        type: 'number',
-                                                    },
-                                                    {
-                                                        title: "Is Active",
-                                                        type: 'checkbox'
-                                                    },
-                                                    {
-                                                        title: 'planningUnitId',
-                                                        type: 'hidden'
-                                                    },
-                                                    {
-                                                        title: 'isChange',
-                                                        type: 'hidden'
-                                                    }
-
-                                                ],
-                                                pagination: 10,
-                                                search: true,
-                                                columnSorting: true,
-                                                tableOverflow: true,
-                                                wordWrap: true,
-                                                paginationOptions: [10, 25, 50],
-                                                position: 'top',
-                                                allowInsertColumn: false,
-                                                allowManualInsertColumn: false,
-                                                allowDeleteRow: true,
-                                                onchange: this.changed,
-                                                oneditionend: this.onedit,
-                                                copyCompatibility: true,
-                                                text: {
-                                                    showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                                                    show: '',
-                                                    entries: '',
-                                                },
-                                                onload: this.loaded,
-                                                contextMenu: function (obj, x, y, e) {
-                                                    var items = [];
-                                                    //Add consumption batch info
-
-
-                                                    if (y == null) {
-                                                        // Insert a new column
-                                                        if (obj.options.allowInsertColumn == true) {
-                                                            items.push({
-                                                                title: obj.options.text.insertANewColumnBefore,
-                                                                onclick: function () {
-                                                                    obj.insertColumn(1, parseInt(x), 1);
-                                                                }
-                                                            });
-                                                        }
-
-                                                        if (obj.options.allowInsertColumn == true) {
-                                                            items.push({
-                                                                title: obj.options.text.insertANewColumnAfter,
-                                                                onclick: function () {
-                                                                    obj.insertColumn(1, parseInt(x), 0);
-                                                                }
-                                                            });
-                                                        }
-
-                                                        // Delete a column
-                                                        // if (obj.options.allowDeleteColumn == true) {
-                                                        //     items.push({
-                                                        //         title: obj.options.text.deleteSelectedColumns,
-                                                        //         onclick: function () {
-                                                        //             obj.deleteColumn(obj.getSelectedColumns().length ? undefined : parseInt(x));
-                                                        //         }
-                                                        //     });
-                                                        // }
-
-                                                        // Rename column
-                                                        // if (obj.options.allowRenameColumn == true) {
-                                                        //     items.push({
-                                                        //         title: obj.options.text.renameThisColumn,
-                                                        //         onclick: function () {
-                                                        //             obj.setHeader(x);
-                                                        //         }
-                                                        //     });
-                                                        // }
-
-                                                        // Sorting
-                                                        if (obj.options.columnSorting == true) {
-                                                            // Line
-                                                            items.push({ type: 'line' });
-
-                                                            items.push({
-                                                                title: obj.options.text.orderAscending,
-                                                                onclick: function () {
-                                                                    obj.orderBy(x, 0);
-                                                                }
-                                                            });
-                                                            items.push({
-                                                                title: obj.options.text.orderDescending,
-                                                                onclick: function () {
-                                                                    obj.orderBy(x, 1);
-                                                                }
-                                                            });
-                                                        }
-                                                    } else {
-                                                        // Insert new row before
-                                                        if (obj.options.allowInsertRow == true) {
-                                                            items.push({
-                                                                title: i18n.t('static.common.insertNewRowBefore'),
-                                                                onclick: function () {
-                                                                    var data = [];
-                                                                    data[0] = getLabelText(this.state.planningUnit.label, this.state.lang);
-                                                                    data[1] = "";
-                                                                    data[2] = "";
-                                                                    data[3] = "";
-                                                                    data[4] = "";
-                                                                    data[5] = true;
-                                                                    data[6] = 0;
-                                                                    data[7] = 1;
-                                                                    obj.insertRow(data, parseInt(y), 1);
-                                                                }.bind(this)
-                                                            });
-                                                        }
-                                                        // after
-                                                        if (obj.options.allowInsertRow == true) {
-                                                            items.push({
-                                                                title: i18n.t('static.common.insertNewRowAfter'),
-                                                                onclick: function () {
-                                                                    var data = [];
-                                                                    data[0] = getLabelText(this.state.planningUnit.label, this.state.lang);
-                                                                    data[1] = "";
-                                                                    data[2] = "";
-                                                                    data[3] = "";
-                                                                    data[4] = "";
-                                                                    data[5] = true;
-                                                                    data[6] = 0;
-                                                                    data[7] = 1;
-                                                                    obj.insertRow(data, parseInt(y));
-                                                                }.bind(this)
-                                                            });
-                                                        }
-                                                        // Delete a row
-                                                        if (obj.options.allowDeleteRow == true) {
-                                                            // region id
-                                                            if (obj.getRowData(y)[6] == 0) {
-                                                                items.push({
-                                                                    title: obj.options.text.deleteSelectedRows,
-                                                                    onclick: function () {
-                                                                        obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y));
-                                                                    }
-                                                                });
-                                                            }
-                                                        }
-
-                                                        if (x) {
-                                                            if (obj.options.allowComments == true) {
-                                                                items.push({ type: 'line' });
-
-                                                                var title = obj.records[y][x].getAttribute('title') || '';
-
-                                                                items.push({
-                                                                    title: title ? obj.options.text.editComments : obj.options.text.addComments,
-                                                                    onclick: function () {
-                                                                        obj.setComments([x, y], prompt(obj.options.text.comments, title));
-                                                                    }
-                                                                });
-
-                                                                if (title) {
-                                                                    items.push({
-                                                                        title: obj.options.text.clearComments,
-                                                                        onclick: function () {
-                                                                            obj.setComments([x, y], '');
-                                                                        }
-                                                                    });
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-
-                                                    // Line
-                                                    items.push({ type: 'line' });
-
-                                                    // Save
-                                                    if (obj.options.allowExport) {
-                                                        items.push({
-                                                            title: i18n.t('static.supplyPlan.exportAsCsv'),
-                                                            shortcut: 'Ctrl + S',
-                                                            onclick: function () {
-                                                                obj.download(true);
-                                                            }
-                                                        });
-                                                    }
-
-                                                    return items;
-                                                }.bind(this)
-                                            };
-
-                                            this.el = jexcel(document.getElementById("paputableDiv"), options);
-                                            this.setState({
-                                                loading: false
-                                            })
+                                            this.buildJExcel();
                                         })
 
                                 } else {
                                     this.setState({
-                                        message: response.data.messageCode,loading:false
+                                        message: response.data.messageCode, loading: false
                                     },
                                         () => {
                                             this.hideSecondComponent();
@@ -1182,10 +1199,10 @@ class PlanningUnitCapacity extends Component {
                                             case 404:
                                             case 406:
                                             case 412:
-                                                this.setState({loading:false, message: error.response.messageCode });
+                                                this.setState({ loading: false, message: error.response.messageCode });
                                                 break;
                                             default:
-                                                this.setState({loading:false, message: 'static.unkownError' });
+                                                this.setState({ loading: false, message: 'static.unkownError' });
                                                 break;
                                         }
                                     }
@@ -1194,7 +1211,7 @@ class PlanningUnitCapacity extends Component {
 
                     } else {
                         this.setState({
-                            message: response.data.messageCode,loading:false
+                            message: response.data.messageCode, loading: false
                         },
                             () => {
                                 this.hideSecondComponent();
@@ -1204,7 +1221,7 @@ class PlanningUnitCapacity extends Component {
                 }).catch(
                     error => {
                         if (error.message === "Network Error") {
-                            this.setState({loading:false, message: error.message });
+                            this.setState({ loading: false, message: error.message });
                         } else {
                             switch (error.response ? error.response.status : "") {
                                 case 500:
@@ -1212,10 +1229,10 @@ class PlanningUnitCapacity extends Component {
                                 case 404:
                                 case 406:
                                 case 412:
-                                    this.setState({loading:false, message: error.response.data.messageCode });
+                                    this.setState({ loading: false, message: error.response.data.messageCode });
                                     break;
                                 default:
-                                    this.setState({loading:false, message: 'static.unkownError' });
+                                    this.setState({ loading: false, message: 'static.unkownError' });
                                     console.log("Error code unkown");
                                     break;
                             }
@@ -1392,6 +1409,13 @@ class PlanningUnitCapacity extends Component {
 
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
+        var asterisk = document.getElementsByClassName("resizable")[0];
+        var tr = asterisk.firstChild;
+        tr.children[2].classList.add('AsteriskTheadtrTd');
+        tr.children[3].classList.add('AsteriskTheadtrTd');
+        tr.children[4].classList.add('AsteriskTheadtrTd');
+        tr.children[5].classList.add('AsteriskTheadtrTd');
+        tr.children[6].classList.add('AsteriskTheadtrTd');
     }
 
     checkValidation() {
@@ -1493,7 +1517,7 @@ class PlanningUnitCapacity extends Component {
         return (
 
             <div className="animated fadeIn">
-                   <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
                 }} loading={(loading) => {
                     this.setState({ loading: loading })
@@ -1512,19 +1536,19 @@ class PlanningUnitCapacity extends Component {
                     <CardBody className="p-0">
 
                         <Col xs="12" sm="12">
-                            <div className="table-responsive"style={{ display: this.state.loading ? "none" : "block" }}>
+                            <div className="table-responsive" style={{ display: this.state.loading ? "none" : "block" }}>
                                 <div id="paputableDiv" >
                                 </div>
                             </div>
                             <div style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>Loading...</strong></h4></div>
-                            <div class="spinner-border blue ml-4" role="status">
+                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                    <div class="align-items-center">
+                                        <div ><h4> <strong>Loading...</strong></h4></div>
+                                        <div class="spinner-border blue ml-4" role="status">
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
                         </Col>
                     </CardBody>
                     <CardFooter>

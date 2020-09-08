@@ -177,7 +177,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
 
                     } else {
                         this.setState({
-                            message: response.data.messageCode,loading:false
+                            message: response.data.messageCode, loading: false
                         },
                             () => {
                                 this.hideSecondComponent();
@@ -187,7 +187,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                 }).catch(
                     error => {
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message,loading:false });
+                            this.setState({ message: error.message, loading: false });
                         } else {
                             switch (error.response ? error.response.status : "") {
                                 case 500:
@@ -195,10 +195,10 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                 case 404:
                                 case 406:
                                 case 412:
-                                    this.setState({ message: error.response.data.messageCode,loading:false });
+                                    this.setState({ message: error.response.data.messageCode, loading: false });
                                     break;
                                 default:
-                                    this.setState({ message: 'static.unkownError',loading:false });
+                                    this.setState({ message: 'static.unkownError', loading: false });
                                     console.log("Error code unkown");
                                     break;
                             }
@@ -414,6 +414,10 @@ export default class AddProcurementAgentProcurementUnit extends Component {
         this.el.setValueFromCoords(7, y, 1, true);
     }.bind(this);
 
+    filterProcurmentUnitList = function (instance, cell, c, r, source) {
+        return this.state.procurmentUnitListJexcel.filter(c => c.active.toString() == "true");
+    }.bind(this);
+
     componentDidMount() {
         var procurmentAgentListJexcel = [];
         var procurmentUnitListJexcel = [];
@@ -442,20 +446,23 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                 procurmentAgentListJexcel.push(procurementAgentJson);
                             }
                             AuthenticationService.setupAxiosInterceptors();
-                            ProcurementUnitService.getProcurementUnitListActive().then(response => {
+                            ProcurementUnitService.getProcurementUnitList().then(response => {
                                 if (response.status == 200) {
                                     // console.log("third ffff---->", response.data);
-                                    this.setState({
-                                        procurementUnitList: response.data
-                                    });
 
                                     for (var k = 0; k < (response.data).length; k++) {
                                         var procurementUnitListJson = {
                                             name: response.data[k].label.label_en,
-                                            id: response.data[k].procurementUnitId
+                                            id: response.data[k].procurementUnitId,
+                                            active: response.data[k].active
                                         }
                                         procurmentUnitListJexcel.push(procurementUnitListJson);
                                     }
+
+                                    this.setState({
+                                        procurementUnitList: response.data,
+                                        procurmentUnitListJexcel: procurmentUnitListJexcel
+                                    });
 
                                     var procurmentAgentProcurmentUnitList = this.state.rows;
                                     var data = [];
@@ -500,7 +507,8 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                             {
                                                 title: i18n.t('static.procurementUnit.procurementUnit'),
                                                 type: 'dropdown',
-                                                source: procurmentUnitListJexcel
+                                                source: procurmentUnitListJexcel,
+                                                filter: this.filterProcurmentUnitList
                                             },
                                             {
                                                 title: i18n.t('static.procurementAgentProcurementUnit.skuCode'),
@@ -803,6 +811,12 @@ export default class AddProcurementAgentProcurementUnit extends Component {
 
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
+        var asterisk = document.getElementsByClassName("resizable")[0];
+        var tr = asterisk.firstChild;
+        tr.children[2].classList.add('AsteriskTheadtrTd');
+        tr.children[3].classList.add('AsteriskTheadtrTd');
+        tr.children[4].classList.add('AsteriskTheadtrTd');
+        tr.children[5].classList.add('AsteriskTheadtrTd');
     }
 
     render() {
