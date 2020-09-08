@@ -1681,7 +1681,7 @@ export default class InventoryTurns extends Component {
 
             {
                 dataField: 'planningUnit.label',
-                text: 'Planning Unit',
+                text:  i18n.t('static.planningunit.planningunit'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -1785,6 +1785,23 @@ export default class InventoryTurns extends Component {
                                 <Form >
                                     <div className="pl-0">
                                         <div className="row">
+                                        <FormGroup className="col-md-3">
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.month')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                                                <div className="controls edit">
+                                                    <Picker
+                                                        ref="pickAMonth2"
+                                                        years={{ min: { year: 2010, month: 1 }, max: { year: 2021, month: 12 } }}
+                                                        value={singleValue2}
+                                                        lang={pickerLang.months}
+                                                        theme="dark"
+                                                        onChange={this.handleAMonthChange2}
+                                                        onDismiss={this.handleAMonthDissmis2}
+                                                    >
+                                                        <MonthBox value={this.makeText(singleValue2)} onClick={this.handleClickMonthBox2} />
+                                                    </Picker>
+                                                </div>
+
+                                            </FormGroup>
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.program.programMaster')}</Label>
                                                 <div className="controls ">
@@ -1843,23 +1860,7 @@ export default class InventoryTurns extends Component {
                                             </FormGroup>
 
 
-                                            <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.month')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
-                                                <div className="controls edit">
-                                                    <Picker
-                                                        ref="pickAMonth2"
-                                                        years={{ min: { year: 2010, month: 1 }, max: { year: 2021, month: 12 } }}
-                                                        value={singleValue2}
-                                                        lang={pickerLang.months}
-                                                        theme="dark"
-                                                        onChange={this.handleAMonthChange2}
-                                                        onDismiss={this.handleAMonthDissmis2}
-                                                    >
-                                                        <MonthBox value={this.makeText(singleValue2)} onClick={this.handleClickMonthBox2} />
-                                                    </Picker>
-                                                </div>
-
-                                            </FormGroup>
+                                           
                                         </div>
                                     </div>
                                 </Form>

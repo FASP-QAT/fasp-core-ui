@@ -1897,7 +1897,7 @@ class StockAdjustmentComponent extends Component {
                             </div>
                         }
                     </div>
-                    <CardBody className="pt-1">
+                    <CardBody className="pt-1 pb-lg-0">
 
                         <div className="pl-0">
                             <div className="row">

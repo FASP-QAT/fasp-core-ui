@@ -23,6 +23,7 @@ import ProgramTicketComponent from './ProgramTicketComponent';
 import RealmCountryTicketComponent from './RealmCountryTicketComponent';
 import RealmCountryRegionTicketComponent from './RealmCountryRegionTicketComponent';
 import i18n from '../../i18n';
+import { Online } from 'react-detect-offline';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 
@@ -89,7 +90,6 @@ export default class InitialTicketPageComponent extends Component {
   }
 
   togglehelp() {
-    console.log("anchal--------------------------");
     if (navigator.onLine) {
       this.setState({
         help: !this.state.help,

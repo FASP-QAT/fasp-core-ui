@@ -40,7 +40,6 @@ export default class ConsumptionDetails extends React.Component {
         this.formSubmit = this.formSubmit.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this)
-        this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.updateState = this.updateState.bind(this);
         this.toggleLarge = this.toggleLarge.bind(this);
     }
@@ -51,6 +50,16 @@ export default class ConsumptionDetails extends React.Component {
         clearTimeout(this.state.timeout);
         this.state.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
+        }, 8000);
+        document.getElementById('div2').style.display = 'block';
+        clearTimeout(this.state.timeout);
+        this.state.timeout = setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
+        document.getElementById('div3').style.display = 'block';
+        clearTimeout(this.state.timeout);
+        this.state.timeout = setTimeout(function () {
+            document.getElementById('div3').style.display = 'none';
         }, 8000);
 
     }
@@ -292,10 +301,9 @@ export default class ConsumptionDetails extends React.Component {
                 }} loading={(loading) => {
                     this.setState({ loading: loading })
                 }} />
-                <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 className={this.state.color} id="div1">{i18n.t(this.state.message, { entityname })}</h5>
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
-                    <CardBody className="pb-lg-0 pt-lg-2">
+                    <CardBody className="pb-lg-5 pt-lg-2">
                         <Formik
                             render={
                                 ({
@@ -336,13 +344,13 @@ export default class ConsumptionDetails extends React.Component {
                                         </Form>
                                     )} />
 
-                        <Col xs="12" sm="12" className="p-0 ShipmentdeletailsSearchposition">
+                        <div className=" ReportSearchMarginTop">
                             {this.state.showConsumption == 1 && <ConsumptionInSupplyPlanComponent ref="consumptionChild" items={this.state} toggleLarge={this.toggleLarge} updateState={this.updateState} formSubmit={this.formSubmit} consumptionPage="consumptionDataEntry" />}
-                            <h6 className="red">{this.state.consumptionDuplicateError || this.state.consumptionNoStockError || this.state.consumptionError}</h6>
+                            <h6 id="div2" className="red">{this.state.consumptionDuplicateError || this.state.consumptionNoStockError || this.state.consumptionError}</h6>
                             <div className="table-responsive">
                                 <div id="consumptionTable" />
                             </div>
-                        </Col>
+                        </div>
                     </CardBody>
                     <CardFooter>
                         <FormGroup>
@@ -361,7 +369,7 @@ export default class ConsumptionDetails extends React.Component {
                         <strong>{i18n.t('static.dataEntry.batchDetails')}</strong>
                     </ModalHeader>
                     <ModalBody>
-                        <h6 className="red">{this.state.consumptionBatchInfoDuplicateError || this.state.consumptionBatchInfoNoStockError || this.state.consumptionBatchError}</h6>
+                        <h6 className="red" id="div3">{this.state.consumptionBatchInfoDuplicateError || this.state.consumptionBatchInfoNoStockError || this.state.consumptionBatchError}</h6>
                         <div className="table-responsive">
                             <div id="consumptionBatchInfoTable" className="AddListbatchtrHeight"></div>
                         </div>
