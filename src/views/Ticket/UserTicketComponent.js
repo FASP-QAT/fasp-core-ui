@@ -354,17 +354,17 @@ export default class UserTicketComponent extends Component {
                     initialValues={initialValues}
                     validate={validate(validationSchema)}
                     onSubmit={(values, { setSubmitting, setErrors }) => {   
-                        JiraTikcetService.addEmailRequestIssue(this.state.user).then(response => {             
-                            var msg = "Your query has been raised. Ticket Code: "+response.data.key;
+                        JiraTikcetService.addEmailRequestIssue(this.state.user).then(response => {                                         
+                            console.log("Response :",response.status, ":" ,JSON.stringify(response.data));
                             if (response.status == 200 || response.status == 201) {
+                                var msg = response.data.key;
                                 this.setState({
                                     message: msg
                                 },
                                     () => {
                                         this.resetClicked();
                                         this.hideSecondComponent();
-                                    })
-                                alert(this.state.message);
+                                    })                                
                             } else {
                                 this.setState({
                                     // message: response.data.messageCode
@@ -373,29 +373,29 @@ export default class UserTicketComponent extends Component {
                                     () => {
                                         this.resetClicked();
                                         this.hideSecondComponent();
-                                    })
-                                alert(this.state.message);
+                                    })                                
                             }                            
                             this.props.togglehelp();
+                            this.props.toggleSmall(this.state.message);
                         })
-                        .catch(
-                            error => {
-                                switch (error.message) {
-                                    case "Network Error":
-                                        this.setState({
-                                            message: 'Network Error'
-                                        })
-                                        break
-                                    default:
-                                        this.setState({
-                                            message: 'Error'
-                                        })
-                                        break
-                                }
-                                alert(this.state.message);
-                                this.props.togglehelp();
-                            }
-                        );  
+                        // .catch(
+                        //     error => {
+                        //         switch (error.message) {
+                        //             case "Network Error":
+                        //                 this.setState({
+                        //                     message: 'Network Error'
+                        //                 })
+                        //                 break
+                        //             default:
+                        //                 this.setState({
+                        //                     message: 'Error'
+                        //                 })
+                        //                 break
+                        //         }
+                        //         alert(this.state.message);
+                        //         this.props.togglehelp();
+                        //     }
+                        // );  
                     }}
                     render={
                         ({

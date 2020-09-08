@@ -708,5 +708,8 @@
     "static.technicalArea.technicalAreaCodeText": "Veuillez saisir le code de zone technique",
     "static.technicalArea.productcategorynametext": "Veuillez saisir le nom de la catégorie de produit",
     "static.common.notes": "Remarques",
-    "static.common.bugreport": "Rapport d'erreur"
+    "static.common.bugreport": "Signaler un bug",
+    "static.ticket.ticketcreated": "Le ticket a été créé",
+    "static.ticket.ticketcode": "Code de billet",
+    "static.ticket.addUpdateMasterData": "Ajouter / mettre à jour les données de base"
 }
