@@ -303,24 +303,24 @@ export default class BudgetTicketComponent extends Component {
 
         return (
             <div className="col-md-12">
-                <h5 style={{ color: "green" }} id="div2">{i18n.t(this.state.message)}</h5>
+                {/* <h5 style={{ color: "green" }} id="div2">{i18n.t(this.state.message)}</h5> */}
                 <h4>{i18n.t('static.dashboard.budget')}</h4>
                 <br></br>
                 <Formik
                     initialValues={initialValues}
                     validate={validate(validationSchema)}
                     onSubmit={(values, { setSubmitting, setErrors }) => {
-                        JiraTikcetService.addEmailRequestIssue(this.state.budget).then(response => {             
-                            var msg = "Your query has been raised. ID: "+response.data.id+"\n Key: "+response.data.key+"\n Url: "+response.data.self;
+                        JiraTikcetService.addEmailRequestIssue(this.state.budget).then(response => {                                         
+                            console.log("Response :",response.status, ":" ,JSON.stringify(response.data));
                             if (response.status == 200 || response.status == 201) {
+                                var msg = response.data.key;
                                 this.setState({
                                     message: msg
                                 },
                                     () => {
                                         this.resetClicked();
                                         this.hideSecondComponent();
-                                    })
-                                alert(this.state.message);
+                                    })                                
                             } else {
                                 this.setState({
                                     // message: response.data.messageCode
@@ -329,29 +329,29 @@ export default class BudgetTicketComponent extends Component {
                                     () => {
                                         this.resetClicked();
                                         this.hideSecondComponent();
-                                    })
-                                alert(this.state.message);
+                                    })                                
                             }                            
                             this.props.togglehelp();
+                            this.props.toggleSmall(this.state.message);
                         })
-                        .catch(
-                            error => {
-                                switch (error.message) {
-                                    case "Network Error":
-                                        this.setState({
-                                            message: 'Network Error'
-                                        })
-                                        break
-                                    default:
-                                        this.setState({
-                                            message: 'Error'
-                                        })
-                                        break
-                                }
-                                alert(this.state.message);
-                                this.props.togglehelp();
-                            }
-                        );  
+                        // .catch(
+                        //     error => {
+                        //         switch (error.message) {
+                        //             case "Network Error":
+                        //                 this.setState({
+                        //                     message: 'Network Error'
+                        //                 })
+                        //                 break
+                        //             default:
+                        //                 this.setState({
+                        //                     message: 'Error'
+                        //                 })
+                        //                 break
+                        //         }
+                        //         alert(this.state.message);
+                        //         this.props.togglehelp();
+                        //     }
+                        // );  
                     }}
                     render={
                         ({
