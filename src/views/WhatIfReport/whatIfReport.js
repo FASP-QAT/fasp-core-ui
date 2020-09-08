@@ -3325,7 +3325,7 @@ export default class WhatIfReportComponent extends React.Component {
                         </div>
                     </div>
                     <CardBody className="pt-lg-0 pb-lg-0">
-                        <Col md="12 pl-0">
+                        <div className=" pl-0">
                             <div className="row">
                                 <FormGroup className="col-md-4">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
@@ -3379,7 +3379,7 @@ export default class WhatIfReportComponent extends React.Component {
                                     <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.shelfLife")} - {this.state.shelfLife}</span></li>
                                 </ul>
                             </FormGroup>
-                        </Col>
+                        </div>
                         <div className="animated fadeIn" style={{ display: this.state.display }}>
                             <Row>
                                 <Col xs="12" md="12" className="mb-4">
@@ -3406,7 +3406,7 @@ export default class WhatIfReportComponent extends React.Component {
                             </Row>
                         </div>
                     </CardBody>
-                    <CardFooter>
+                    <CardFooter className="pb-5">
                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                         <Button style={{ display: this.state.display }} type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                         <Button style={{ display: this.state.display }} type="submit" size="md" color="success" className="float-right mr-1" onClick={this.saveSupplyPlan}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>

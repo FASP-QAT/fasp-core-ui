@@ -43,6 +43,15 @@ const validationSchema = function (values) {
             .matches(/^[0-9]*$/, i18n.t('static.user.validnumber'))
             .required(i18n.t('static.user.validphone')),
         roleId: Yup.string()
+            .test('roleValid', i18n.t('static.common.roleinvalidtext'),
+                function (value) {
+                    console.log("value---", value);
+                    console.log("condition---", document.getElementById("roleValid").value);
+                    if (document.getElementById("roleValid").value == "false") {
+                        console.log("inside if ---", value);
+                        return true;
+                    }
+                })
             .required(i18n.t('static.user.validrole')),
     })
 }
@@ -72,6 +81,7 @@ class EditUserComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            appAdminRole: false,
             lang: localStorage.getItem('lang'),
             realms: [],
             languages: [],
@@ -146,20 +156,6 @@ class EditUserComponent extends Component {
             () => { });
     };
 
-    roleChange(roleId) {
-        let { user } = this.state;
-        this.setState({ roleId });
-        var roleIdArray = [];
-        for (var i = 0; i < roleId.length; i++) {
-            roleIdArray[i] = roleId[i].value;
-        }
-        user.roles = roleIdArray;
-        this.setState({
-            user
-        },
-            () => { });
-    }
-
     touchAll(setTouched, errors) {
         setTouched({
             username: true,
@@ -187,6 +183,48 @@ class EditUserComponent extends Component {
         }
     }
 
+    roleChange(roleId) {
+        let { user } = this.state;
+        let count = 0;
+        let count1 = 0;
+        this.setState({ roleId });
+        var roleIdArray = [];
+        for (var i = 0; i < roleId.length; i++) {
+            roleIdArray[i] = roleId[i].value;
+            if (roleId[i].value != 'ROLE_APPLICATION_ADMIN') {
+                count++;
+                // showRealm
+
+            } else {
+                count1++;
+            }
+        }
+
+        if (count > 0) {
+            if (count1 > 0) {
+                this.setState({
+                    appAdminRole: true
+                })
+                document.getElementById("roleValid").value = true;
+            } else {
+                this.setState({
+                    appAdminRole: false
+                })
+                document.getElementById("roleValid").value = false;
+            }
+        } else {
+            this.setState({
+                appAdminRole: false
+            })
+            document.getElementById("roleValid").value = false;
+        }
+        user.roles = roleIdArray;
+        this.setState({
+            user,
+            validateRealm: (count > 0 ? true : false)
+        },
+            () => { });
+    }
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
         // console.log("USERID --> ", this.props.match.params.userId);
@@ -432,6 +470,11 @@ class EditUserComponent extends Component {
                                     }) => (
                                             <Form onSubmit={handleSubmit} noValidate name='userForm'>
                                                 <CardBody className="pt-2 pb-0">
+                                                    <Input
+                                                        type="hidden"
+                                                        name="roleValid"
+                                                        id="roleValid"
+                                                    />
                                                     <FormGroup>
                                                         <Label htmlFor="realmId">{i18n.t('static.realm.realm')}</Label><Input
                                                             type="text"
@@ -492,7 +535,7 @@ class EditUserComponent extends Component {
                                                         <Select
                                                             className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
                                                                 { 'is-valid': !errors.roleId },
-                                                                { 'is-invalid': (touched.roleId && !!errors.roleId || this.state.user.roles.length == 0) }
+                                                                { 'is-invalid': (touched.roleId && !!errors.roleId || this.state.user.roles.length == 0 || this.state.appAdminRole) }
                                                             )}
                                                             bsSize="sm"
                                                             onChange={(e) => {

@@ -846,7 +846,7 @@ export default class ExpiredInventory extends Component {
                         <div className="TableCust" >
                             <div ref={ref}>
                                 {/* <Form > */}
-                                <Col md="12 pl-0">
+                                <Col md="10 pl-0">
                                     <div className="row">
                                         <FormGroup className="col-md-3">
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
