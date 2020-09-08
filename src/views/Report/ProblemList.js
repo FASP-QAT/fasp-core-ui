@@ -665,7 +665,7 @@ export default class ConsumptionDetails extends React.Component {
             message: '',
             planningUnitId: '',
             lang: localStorage.getItem('lang'),
-            loading: true
+            loading: false
         }
 
         this.fetchData = this.fetchData.bind(this);
@@ -677,6 +677,7 @@ export default class ConsumptionDetails extends React.Component {
         this.getNote = this.getNote.bind(this);
         this.buildJExcel = this.buildJExcel.bind(this);
         this.updateState = this.updateState.bind(this);
+        this.getProblemListAfterCalculation = this.getProblemListAfterCalculation.bind(this);
 
     }
 
@@ -891,41 +892,8 @@ export default class ConsumptionDetails extends React.Component {
                 entries: '',
             },
 
-            updateTable: function (el, cell, x, y, source, value, id) {
-
-                var elInstance = el.jexcel;
-                var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P']
-                var rowData = elInstance.getRowData(y);
-
-                var criticalityId = rowData[16];
-                var problemStatusId = rowData[12];
-
-                if (criticalityId == 3 && problemStatusId == 1) {
-                    for (var i = 0; i < colArr.length; i++) {
-                        elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
-                        elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', '#f48282');
-                        let textColor = contrast('#f48282');
-                        elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'color', textColor);
-                    }
-                } else if (criticalityId == 2 && problemStatusId == 1) {
-                    for (var i = 0; i < colArr.length; i++) {
-                        elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
-                        elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'orange');
-                        let textColor = contrast('orange');
-                        elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'color', textColor);
-                    }
-                } else if (criticalityId == 1 && problemStatusId == 1) {
-                    for (var i = 0; i < colArr.length; i++) {
-                        elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
-                        elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'yellow');
-                        let textColor = contrast('yellow');
-                        elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'color', textColor);
-                    }
-                }
-
-
-
-            }.bind(this),
+            // updateTable: function (el, cell, x, y, source, value, id) {
+            // }.bind(this),
 
             onload: this.loaded,
             pagination: 10,
@@ -979,7 +947,7 @@ export default class ConsumptionDetails extends React.Component {
         var languageEl = jexcel(document.getElementById("tableDiv"), options);
         this.el = languageEl;
         this.setState({
-          loading:false,languageEl: languageEl
+            loading: false, languageEl: languageEl
         })
     }
 
@@ -1004,13 +972,65 @@ export default class ConsumptionDetails extends React.Component {
     }.bind(this);
 
     loaded = function (instance, cell, x, y, value) {
+
         jExcelLoadedFunction(instance);
+
+        var elInstance = instance.jexcel;
+        var json = elInstance.getJson();
+        for (var j = 0; j < json.length; j++) {
+            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P']
+            var rowData = elInstance.getRowData(j);
+            var criticalityId = rowData[16];
+            var problemStatusId = rowData[12];
+            if (criticalityId == 3 && problemStatusId == 1) {
+                for (var i = 0; i < colArr.length; i++) {
+                    elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
+                    elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', '#f48282');
+                    let textColor = contrast('#f48282');
+                    elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'color', textColor);
+                }
+            } else if (criticalityId == 2 && problemStatusId == 1) {
+                for (var i = 0; i < colArr.length; i++) {
+                    elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
+                    elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'orange');
+                    let textColor = contrast('orange');
+                    elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'color', textColor);
+                }
+            } else if (criticalityId == 1 && problemStatusId == 1) {
+                for (var i = 0; i < colArr.length; i++) {
+                    elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
+                    elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'yellow');
+                    let textColor = contrast('yellow');
+                    elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'color', textColor);
+                }
+            }
+        }
     }
 
-    fetchData() {
+    getProblemListAfterCalculation() {
         this.setState({
             data: [],
-            message: '',loading:true
+            message: '',
+            loading: true
+        },
+            () => {
+                this.el = jexcel(document.getElementById("tableDiv"), '');
+                this.el.destroy();
+            });
+        // alert("hello");
+        
+        let programId = document.getElementById('programId').value;
+        this.setState({ programId: programId });
+        this.refs.problemListChild.qatProblemActions(programId);
+        
+       
+    }
+    fetchData() {
+        // alert("hi 2");
+        this.setState({
+            data: [],
+            message: '',
+            loading: true
         },
             () => {
                 this.el = jexcel(document.getElementById("tableDiv"), '');
@@ -1030,7 +1050,7 @@ export default class ConsumptionDetails extends React.Component {
             var fundingSourceList = [];
             var budgetList = [];
             openRequest.onerror = function (event) {
-                this.setState({ loading:false });
+                this.setState({ loading: false });
             };
             openRequest.onsuccess = function (e) {
                 db1 = e.target.result;
@@ -1039,12 +1059,12 @@ export default class ConsumptionDetails extends React.Component {
                 var programTransaction = transaction.objectStore('programData');
                 var programRequest = programTransaction.get(programId);
                 programRequest.onerror = function (event) {
-                    this.setState({ loading:false });
+                    this.setState({ loading: false });
                 };
                 programRequest.onsuccess = function (event) {
-                     this.setState({loading:true},
+                    this.setState({ loading: true },
                         () => {
-                           console.log("callback")
+                            console.log("callback")
                         })
                     var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
@@ -1340,13 +1360,14 @@ export default class ConsumptionDetails extends React.Component {
         return (
 
             <div className="animated">
-                <QatProblemActions updateState={this.updateState}></QatProblemActions>
+                <QatProblemActions ref="problemListChild" updateState={this.updateState} fetchData={this.fetchData}></QatProblemActions>
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
                 }} />
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
-                <Card style={{ display: this.state.loading ? "none" : "block" }}>
+                {/* <Card style={{ display: this.state.loading ? "none" : "block" }}> */}
+                <Card>
                     <div className="Card-header-addicon">
                         <div className="card-header-actions">
                             <div className="card-header-action">
@@ -1366,7 +1387,7 @@ export default class ConsumptionDetails extends React.Component {
                                                 bsSize="sm"
                                                 value={this.state.programId}
                                                 name="programId" id="programId"
-                                                onChange={this.fetchData}
+                                                onChange={(e) => { this.getProblemListAfterCalculation() }}
                                             >
                                                 {/* <option value="0">Please select</option> */}
                                                 <option value="0">{i18n.t('static.common.select')}</option>
@@ -1413,7 +1434,7 @@ export default class ConsumptionDetails extends React.Component {
                             </div>
                         </Col>
                         {/* <div className="ProgramListSearch"> */}
-                        <div id="tableDiv" className="jexcelremoveReadonlybackground">
+                        <div id="tableDiv" style={{ display: this.state.loading ? "none" : "block" }} className="jexcelremoveReadonlybackground">
                         </div>
                         {/* </div> */}
                     </CardBody>

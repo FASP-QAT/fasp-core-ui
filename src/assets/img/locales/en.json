@@ -210,7 +210,7 @@
     "static.currency.currencyconversiontext": "Please enter Conversion Rate to USD",
     "static.dashboard.program": "Programs",
     "static.dashboard.programheader": "Program",
-    "static.program.dataexportsuccess": "Data exported successfully",
+    "static.program.dataexportsuccess": "Program exported successfully",
     "static.dashboard.datasync": "Master Data Sync",
     "static.supplier.supplier": "Supplier",
     "static.product.productcategory": "Product Category",
@@ -1125,5 +1125,6 @@
     "static.ticket.ticketcode": "Ticket Code",
     "static.ticket.addUpdateMasterData": "Add / Update Master Data",
     "static.common.regiontext": "Please select Region",
-    "static.supplyPlan.addNewInventory":"Add New Inventory"
+    "static.supplyPlan.addNewInventory":"Add New Inventory",
+    "static.graph.costInUSD":"Cost (USD)"
 }

@@ -27,7 +27,7 @@ export default class QatProblemActions extends Component {
     }
 
     componentDidMount() {
-        this.qatProblemActions();
+        // this.qatProblemActions();
 
     }
     render() {
@@ -36,7 +36,9 @@ export default class QatProblemActions extends Component {
         );
     }
 
-    qatProblemActions() {
+    qatProblemActions(programId) {
+        // alert(programId);
+        // console.log("program id===>",programId);
         var problemActionList = [];
         var db1;
         var storeOS;
@@ -52,7 +54,7 @@ export default class QatProblemActions extends Component {
             db1 = e.target.result;
             var transaction = db1.transaction(['programData'], 'readwrite');
             var program = transaction.objectStore('programData');
-            var getRequest = program.getAll();
+            var getRequest = program.get(programId.toString());
             getRequest.onerror = function (event) {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext')
@@ -60,7 +62,7 @@ export default class QatProblemActions extends Component {
                 this.props.updateState(false);
             };
             getRequest.onsuccess = function (event) {
-
+                // console.log("get request===>",getRequest.result);
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
 
@@ -70,20 +72,20 @@ export default class QatProblemActions extends Component {
 
                 var latestVersionProgramList = [];
 
-                for (var i = 0; i < getRequest.result.length; i++) {
+                // for (var i = 0; i < getRequest.result.length; i++) {
                     // console.log("QPA 2=====>  in for");
-                    if (getRequest.result[i].userId == userId) {
-                        var programDataBytes = CryptoJS.AES.decrypt(getRequest.result[i].programData, SECRET_KEY);
+                    // if (getRequest.result[i].userId == userId) {
+                        var programDataBytes = CryptoJS.AES.decrypt(getRequest.result.programData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         var programJson = JSON.parse(programData);
                         // console.log("QPA 2====>", programJson);
                         programList.push(programJson);
-                        programRequestList.push(getRequest.result[i]);
-                        versionIDs.push(getRequest.result[i].version);
-                    }
+                        programRequestList.push(getRequest.result);
+                        versionIDs.push(getRequest.result.version);
+                    // }
 
-                }
-
+                // }
+                // console.log("program list=====>",programList)
 
                 // for (var d = 0; d < programList.length; d++) {
                 //     var index = latestVersionProgramList.findIndex(c => c.programId == programList[d].programId);
@@ -146,12 +148,13 @@ export default class QatProblemActions extends Component {
                             this.props.updateState(false);
                         }.bind(this);
                         puRequest.onsuccess = function (e) {
-                            // console.log("+++++++++++++", puRequest.result);
+                            console.log("+++++++++++++", puRequest.result);
                             var planningUnitListAll = puRequest.result;
                             if (programList.length == 0) {
                                 this.props.updateState(false);
                             }
                             for (var pp = 0; pp < programList.length; pp++) {
+                                console.log("=====>in for====>",programList[pp]);
                                 var versionID = versionIDs[pp];
                                 var problemActionIndex = 0;
                                 problemActionList = programList[pp].problemReportList;
@@ -3560,6 +3563,7 @@ export default class QatProblemActions extends Component {
                                     // return executionStatus;
                                     console.log("time taken in sec===>", performance.now());
                                     this.props.updateState(false);
+                                    this.props.fetchData(false);
 
                                 }.bind(this);
 

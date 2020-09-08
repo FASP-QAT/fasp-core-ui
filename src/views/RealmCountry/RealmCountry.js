@@ -93,6 +93,15 @@ class RealmCountry extends Component {
             document.getElementById('div2').style.display = 'none';
         }, 8000);
     }
+
+    filterCountry = function (instance, cell, c, r, source) {
+        return this.state.countryArr.filter(c => c.active.toString() == "true");
+    }.bind(this);
+
+    filterCurrency = function (instance, cell, c, r, source) {
+        return this.state.currencyArr.filter(c => c.active.toString() == "true");
+    }.bind(this);
+
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
         RealmCountryService.getRealmCountryrealmIdById(this.props.match.params.realmId).then(response => {
@@ -131,7 +140,8 @@ class RealmCountry extends Component {
                                                 for (var i = 0; i < countries.length; i++) {
                                                     var paJson = {
                                                         name: getLabelText(countries[i].label, this.state.lang),
-                                                        id: parseInt(countries[i].countryId)
+                                                        id: parseInt(countries[i].countryId),
+                                                        active: countries[i].active
                                                     }
                                                     countryArr[i] = paJson
                                                 }
@@ -140,11 +150,16 @@ class RealmCountry extends Component {
                                                 for (var i = 0; i < currencies.length; i++) {
                                                     var paJson = {
                                                         name: getLabelText(currencies[i].label, this.state.lang),
-                                                        id: parseInt(currencies[i].currencyId)
+                                                        id: parseInt(currencies[i].currencyId),
+                                                        active: currencies[i].active
                                                     }
                                                     currencyArr[i] = paJson
                                                 }
                                             }
+                                            this.setState({
+                                                countryArr: countryArr,
+                                                currencyArr: currencyArr
+                                            })
                                             // Jexcel starts
                                             var papuList = this.state.rows;
                                             var data = [];
@@ -195,13 +210,15 @@ class RealmCountry extends Component {
                                                     {
                                                         title: i18n.t('static.dashboard.country'),
                                                         type: 'autocomplete',
-                                                        source: countryArr
+                                                        source: countryArr,
+                                                        filter: this.filterCountry
 
                                                     },
                                                     {
                                                         title: i18n.t('static.dashboard.currency'),
                                                         type: 'autocomplete',
-                                                        source: currencyArr
+                                                        source: currencyArr,
+                                                        filter: this.filterCurrency
                                                     },
 
                                                     {
@@ -534,6 +551,11 @@ class RealmCountry extends Component {
     }
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
+        var asterisk = document.getElementsByClassName("resizable")[0];
+        var tr = asterisk.firstChild;
+        tr.children[2].classList.add('AsteriskTheadtrTd');
+        tr.children[3].classList.add('AsteriskTheadtrTd');
+        tr.children[4].classList.add('AsteriskTheadtrTd');
     }
 
     blur = function (instance) {
@@ -625,7 +647,7 @@ class RealmCountry extends Component {
     render() {
         return (
             <div className="animated fadeIn">
-                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
                 }} loading={(loading) => {
                     this.setState({ loading: loading })

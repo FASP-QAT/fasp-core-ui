@@ -1214,7 +1214,7 @@ class AccessControlComponent extends Component {
     filterProgram() {
         let realmId = this.state.user.realm.realmId;
         if (realmId != 0 && realmId != null) {
-            const selProgram = this.state.programs.filter(c => c.realmCountry.realm.realmId == realmId)
+            const selProgram = this.state.programs.filter(c => c.realmCountry.realm.realmId == realmId && c.active.toString() == "true")
             this.setState({
                 selProgram
             });
@@ -1227,7 +1227,7 @@ class AccessControlComponent extends Component {
     filterHealthArea() {
         let realmId = this.state.user.realm.realmId;
         if (realmId != 0 && realmId != null) {
-            const selHealthArea = this.state.healthAreas.filter(c => c.realm.realmId == realmId)
+            const selHealthArea = this.state.healthAreas.filter(c => c.realm.realmId == realmId && c.active.toString() == "true")
             this.setState({
                 selHealthArea
             });
@@ -1240,7 +1240,7 @@ class AccessControlComponent extends Component {
     filterOrganisation() {
         let realmId = this.state.user.realm.realmId;
         if (realmId != 0 && realmId != null) {
-            const selOrganisation = this.state.organisations.filter(c => c.realm.realmId == realmId)
+            const selOrganisation = this.state.organisations.filter(c => c.realm.realmId == realmId && c.active.toString() == "true")
             this.setState({
                 selOrganisation
             });
@@ -1253,7 +1253,7 @@ class AccessControlComponent extends Component {
     filterData() {
         let realmId = this.state.user.realm.realmId;
         if (realmId != 0 && realmId != null) {
-            const selRealmCountry = this.state.realmCountryList.filter(c => c.realm.realmId == realmId)
+            const selRealmCountry = this.state.realmCountryList.filter(c => c.realm.realmId == realmId && c.active.toString() == "true")
             this.setState({
                 selRealmCountry
             });
@@ -1277,13 +1277,15 @@ class AccessControlComponent extends Component {
             for (var i = 0; i < selProgram.length; i++) {
                 var paJson = {
                     name: getLabelText(selProgram[i].label, this.state.lang),
-                    id: parseInt(selProgram[i].programId)
+                    id: parseInt(selProgram[i].programId),
+                    active: selProgram[i].active
                 }
                 programList[i] = paJson
             }
             var paJson = {
                 name: "All",
-                id: -1
+                id: -1,
+                active: true
             }
             programList.unshift(paJson);
         }
@@ -1292,13 +1294,15 @@ class AccessControlComponent extends Component {
             for (var i = 0; i < selRealmCountry.length; i++) {
                 var paJson = {
                     name: getLabelText(selRealmCountry[i].country.label, this.state.lang),
-                    id: parseInt(selRealmCountry[i].realmCountryId)
+                    id: parseInt(selRealmCountry[i].realmCountryId),
+                    active: selRealmCountry[i].active
                 }
                 countryList[i] = paJson
             }
             var paJson = {
                 name: "All",
-                id: -1
+                id: -1,
+                active: true
             }
             countryList.unshift(paJson);
         }
@@ -1307,13 +1311,15 @@ class AccessControlComponent extends Component {
             for (var i = 0; i < selOrganisation.length; i++) {
                 var paJson = {
                     name: getLabelText(selOrganisation[i].label, this.state.lang),
-                    id: parseInt(selOrganisation[i].organisationId)
+                    id: parseInt(selOrganisation[i].organisationId),
+                    active: selOrganisation[i].active
                 }
                 organisationList[i] = paJson
             }
             var paJson = {
                 name: "All",
-                id: -1
+                id: -1,
+                active: true
             }
             organisationList.unshift(paJson);
         }
@@ -1322,13 +1328,15 @@ class AccessControlComponent extends Component {
             for (var i = 0; i < selHealthArea.length; i++) {
                 var paJson = {
                     name: getLabelText(selHealthArea[i].label, this.state.lang),
-                    id: parseInt(selHealthArea[i].healthAreaId)
+                    id: parseInt(selHealthArea[i].healthAreaId),
+                    active: selHealthArea[i].active
                 }
                 healthAreaList[i] = paJson
             }
             var paJson = {
                 name: "All",
-                id: -1
+                id: -1,
+                active: true
             }
             healthAreaList.unshift(paJson);
         }
@@ -1386,25 +1394,29 @@ class AccessControlComponent extends Component {
                 {
                     title: "Country",
                     type: 'autocomplete',
-                    source: countryList
+                    source: countryList,
+                    // filter: this.filterCountry
 
                 },
                 {
                     title: "Technical Area",
                     type: 'autocomplete',
-                    source: healthAreaList
+                    source: healthAreaList,
+                    // filter: this.filterHealthArea
 
                 },
                 {
                     title: "Organisation",
                     type: 'autocomplete',
-                    source: organisationList
+                    source: organisationList,
+                    // filter: this.filterOrganisation
 
                 },
                 {
                     title: "Program",
                     type: 'autocomplete',
-                    source: programList
+                    source: programList,
+                    // filter: this.filterProgram
 
                 },
 
@@ -1527,12 +1539,12 @@ class AccessControlComponent extends Component {
                     if (obj.options.allowDeleteRow == true) {
                         // region id
                         // if (obj.getRowData(y)[8] == 0) {
-                            items.push({
-                                title: obj.options.text.deleteSelectedRows,
-                                onclick: function () {
-                                    obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y));
-                                }
-                            });
+                        items.push({
+                            title: obj.options.text.deleteSelectedRows,
+                            onclick: function () {
+                                obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y));
+                            }
+                        });
                         // }
                     }
 
@@ -1953,6 +1965,13 @@ class AccessControlComponent extends Component {
 
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
+        var asterisk = document.getElementsByClassName("resizable")[0];
+        var tr = asterisk.firstChild;
+        // tr.children[1].classList.add('AsteriskTheadtrTd');
+        tr.children[2].classList.add('AsteriskTheadtrTd');
+        tr.children[3].classList.add('AsteriskTheadtrTd');
+        tr.children[4].classList.add('AsteriskTheadtrTd');
+        tr.children[5].classList.add('AsteriskTheadtrTd');
     }
 
     render() {
@@ -1973,9 +1992,9 @@ class AccessControlComponent extends Component {
                     <CardBody className="p-0">
 
                         <Col xs="12" sm="12">
-                          
-                                <div id="paputableDiv" >
-                              
+
+                            <div id="paputableDiv" >
+
                             </div>
                         </Col>
                     </CardBody>
