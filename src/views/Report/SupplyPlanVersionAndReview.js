@@ -1776,7 +1776,7 @@ class SupplyPlanVersionAndReview extends Component {
                         <div className="ReportSearchMarginTop">
                             <div id="tableDiv" className="jexcelremoveReadonlybackground">
                             </div>
-                        </div>
+                        </div> 
 
                     </CardBody>
                 </Card>
