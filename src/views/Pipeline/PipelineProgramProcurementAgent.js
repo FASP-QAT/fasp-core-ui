@@ -8,7 +8,7 @@ import i18n from '../../i18n';
 import ProductCategoryServcie from '../../api/PoroductCategoryService.js';
 import { textFilter } from 'react-bootstrap-table2-filter';
 import { jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunction, jExcelLoadedFunctionPipeline } from '../../CommonComponent/JExcelCommonFunctions.js'
-
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 export default class PipelineProgramProcurementAgent extends Component {
     constructor(props) {
         super(props);
@@ -255,6 +255,11 @@ export default class PipelineProgramProcurementAgent extends Component {
     render() {
         return (
             <>
+             <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
+                }} />
                 <h4 className="red">{this.props.message}</h4>
                 <div className="table-responsive" style={{ display: this.state.loading ? "none" : "block" }}>
 

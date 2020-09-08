@@ -9,7 +9,7 @@ import moment from 'moment';
 import { jExcelLoadedFunction, jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunctionPipeline } from '../../CommonComponent/JExcelCommonFunctions';
 import { ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE } from '../../Constants';
 import RealmCountryService from '../../api/RealmCountryService';
-
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 export default class PipelineProgramConsumption extends Component {
 
     constructor(props) {
@@ -525,6 +525,11 @@ console.log('consumptionDataArr',consumptionDataArr)
     render() {
         return (
             <>
+             <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
+                }} />
                 <h4 className="red">{this.props.message}</h4>
                 <div className="table-responsive" style={{ display: this.state.loading ? "none" : "block" }}>
 
