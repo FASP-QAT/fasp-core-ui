@@ -60,7 +60,7 @@ class RealmCountryRegion extends Component {
             gln: '',
             rows: [], isNew: true,
             updateRowStatus: 0,
-        
+
 
         }
         // this.setTextAndValue = this.setTextAndValue.bind(this);
@@ -111,7 +111,7 @@ class RealmCountryRegion extends Component {
                                 data = [];
                                 data[0] = this.state.realmCountry.realm.label.label_en + "-" + this.state.realmCountry.country.label.label_en;
                                 data[1] = papuList[j].label.label_en;
-                                data[2] = papuList[j].capacityCbm;
+                                data[2] = (papuList[j].capacityCbm).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
                                 data[3] = papuList[j].gln;
                                 data[4] = papuList[j].active;
                                 data[5] = this.props.match.params.realmCountryId;
@@ -197,7 +197,7 @@ class RealmCountryRegion extends Component {
                             copyCompatibility: true,
                             text: {
                                 // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                                 showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
+                                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
                                 show: '',
                                 entries: '',
                             },
@@ -624,7 +624,7 @@ class RealmCountryRegion extends Component {
     render() {
         return (
             <div className="animated fadeIn">
-                  <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
                 }} loading={(loading) => {
                     this.setState({ loading: loading })
@@ -636,10 +636,10 @@ class RealmCountryRegion extends Component {
                         <CardBody className="p-0">
 
                             <Col xs="12" sm="12">
-                                
-                                    <div id="paputableDiv" >
-                                    </div>
-                              
+
+                                <div id="paputableDiv" >
+                                </div>
+
                             </Col>
                         </CardBody>
                         <CardFooter>

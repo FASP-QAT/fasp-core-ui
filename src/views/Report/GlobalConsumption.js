@@ -169,7 +169,7 @@ class GlobalConsumption extends Component {
       programs: [],
       realmList: [],
       message: '',
-      rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+      rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
       minDate:{year:  new Date().getFullYear()-3, month: new Date().getMonth()},
       maxDate:{year:  new Date().getFullYear()+3, month: new Date().getMonth()+1},
       loading: true
@@ -216,7 +216,7 @@ class GlobalConsumption extends Component {
     csvRow.push('')
     var re;
 
-    var A = [[(i18n.t('static.dashboard.country')).replaceAll(' ', '%20'), (i18n.t('static.report.month')).replaceAll(' ', '%20'), (i18n.t('static.consumption.consumptionqty')).replaceAll(' ', '%20')]]
+    var A = [[(i18n.t('static.dashboard.country')).replaceAll(' ', '%20'), (i18n.t('static.report.month')).replaceAll(' ', '%20'), (i18n.t('static.consumption.consumptionqty')+' '+i18n.t('static.report.inmillions')).replaceAll(' ', '%20')]]
 
     re = this.state.consumptions
 
@@ -395,7 +395,7 @@ class GlobalConsumption extends Component {
   }
     doc.addImage(canvasImg, 'png', 50, startYtable, 750, 260, 'CANVAS');
 
-    const headers = [[i18n.t('static.dashboard.country'), i18n.t('static.report.month'), i18n.t('static.consumption.consumptionqty')]]
+    const headers = [[i18n.t('static.dashboard.country'), i18n.t('static.report.month'), i18n.t('static.consumption.consumptionqty')+' '+i18n.t('static.report.inmillions')]]
     const data = this.state.consumptions.map(elt => [getLabelText(elt.realmCountry.label, this.state.lang), elt.consumptionDateString, this.formatter(elt.planningUnitQty)]);
     doc.addPage()
     startYtable = 80
@@ -1185,7 +1185,7 @@ class GlobalConsumption extends Component {
                               <tr>
                                 <th className="text-center" style={{ width: '34%' }}> {i18n.t('static.dashboard.country')} </th>
                                 <th className="text-center " style={{ width: '34%' }}> {i18n.t('static.report.month')} </th>
-                                <th className="text-center" style={{ width: '34%' }}>Consumption Qty ( Million )</th>
+                                <th className="text-center" style={{ width: '34%' }}>{i18n.t('static.report.consupmtionqty') } {i18n.t('static.report.inmillions') } </th>
                               </tr>
                             </thead>
 

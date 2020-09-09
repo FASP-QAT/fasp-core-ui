@@ -3,35 +3,45 @@ import CryptoJS from 'crypto-js'
 import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION } from '../Constants.js'
 
 export function getDatabase() {
+    console.log("inside get databases----------------------")
     var db1;
     var storeOS;
     var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
     openRequest.onupgradeneeded = function (e) {
+        console.log("indexed db 1----------------------")
         db1 = e.target.result;
         if (!db1.objectStoreNames.contains('programData')) {
             storeOS = db1.createObjectStore('programData', { keyPath: 'id' });
         }
+        console.log("indexed db 2----------------------")
         if (!db1.objectStoreNames.contains('downloadedProgramData')) {
             storeOS = db1.createObjectStore('downloadedProgramData', { keyPath: 'id' });
         }
+        console.log("indexed db 3----------------------")
         if (!db1.objectStoreNames.contains('whatIfProgramData')) {
             storeOS = db1.createObjectStore('whatIfProgramData', { keyPath: 'id' });
         }
+        console.log("indexed db 4----------------------")
         if (!db1.objectStoreNames.contains('program')) {
             storeOS = db1.createObjectStore('program', { keyPath: 'programId', autoIncrement: true });
         }
+        console.log("indexed db 5----------------------")
         if (!db1.objectStoreNames.contains('realmCountry')) {
             storeOS = db1.createObjectStore('realmCountry', { keyPath: 'realmCountryId', autoIncrement: true });
         }
+        console.log("indexed db 6----------------------")
         if (!db1.objectStoreNames.contains('realm')) {
             storeOS = db1.createObjectStore('realm', { keyPath: 'realmId', autoIncrement: true });
         }
+        console.log("indexed db 7----------------------")
         if (!db1.objectStoreNames.contains('lastSyncDate')) {
             storeOS = db1.createObjectStore('lastSyncDate', { keyPath: 'id', autoIncrement: true });
         }
+        console.log("indexed db 8----------------------")
         if (!db1.objectStoreNames.contains('language')) {
             storeOS = db1.createObjectStore('language', { keyPath: 'languageId', autoIncrement: true });
         }
+        console.log("indexed db 9----------------------")
         if (!db1.objectStoreNames.contains('country')) {
             storeOS = db1.createObjectStore('country', { keyPath: 'countryId', autoIncrement: true });
         }
@@ -44,6 +54,7 @@ export function getDatabase() {
         if (!db1.objectStoreNames.contains('unit')) {
             storeOS = db1.createObjectStore('unit', { keyPath: 'unitId', autoIncrement: true });
         }
+        console.log("indexed db 10----------------------")
         if (!db1.objectStoreNames.contains('organisation')) {
             storeOS = db1.createObjectStore('organisation', { keyPath: 'organisationId', autoIncrement: true });
         }
@@ -65,6 +76,7 @@ export function getDatabase() {
         if (!db1.objectStoreNames.contains('fundingSource')) {
             storeOS = db1.createObjectStore('fundingSource', { keyPath: 'fundingSourceId', autoIncrement: true });
         }
+        console.log("indexed db 11----------------------")
         if (!db1.objectStoreNames.contains('subFundingSource')) {
             storeOS = db1.createObjectStore('subFundingSource', { keyPath: 'subFundingSourceId', autoIncrement: true });
         }
@@ -95,6 +107,7 @@ export function getDatabase() {
         if (!db1.objectStoreNames.contains('logisticsUnit')) {
             storeOS = db1.createObjectStore('logisticsUnit', { keyPath: 'logisticsUnitId', autoIncrement: true });
         }
+        console.log("indexed db 13----------------------")
         if (!db1.objectStoreNames.contains('planningUnit')) {
             storeOS = db1.createObjectStore('planningUnit', { keyPath: 'planningUnitId', autoIncrement: true });
         }
@@ -119,9 +132,11 @@ export function getDatabase() {
         if (!db1.objectStoreNames.contains('problem')) {
             storeOS = db1.createObjectStore('problem', { keyPath: 'problemId', autoIncrement: true });
         }
+        console.log("indexed db 14----------------------")
         if (!db1.objectStoreNames.contains('problemStatus')) {
             storeOS = db1.createObjectStore('problemStatus', { keyPath: 'id', autoIncrement: true });
         }
+        console.log("indexed db completed----------------------")
     };
 }
 

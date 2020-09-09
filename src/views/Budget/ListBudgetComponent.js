@@ -717,27 +717,27 @@ class ListBudgetComponent extends Component {
       },
 
       updateTable: function (el, cell, x, y, source, value, id) {
-        console.log("INSIDE UPDATE TABLE");
-        var elInstance = el.jexcel;
-        var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
-        var rowData = elInstance.getRowData(y);
-        // console.log("elInstance---->", elInstance);
-        var stopDate = rowData[12];
-        var budgetAmt = rowData[10];
-        var usedUsdAmt = rowData[11];
+        // console.log("INSIDE UPDATE TABLE");
+        // var elInstance = el.jexcel;
+        // var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
+        // var rowData = elInstance.getRowData(y);
+        // // console.log("elInstance---->", elInstance);
+        // var stopDate = rowData[12];
+        // var budgetAmt = rowData[10];
+        // var usedUsdAmt = rowData[11];
 
-        if (((moment(stopDate)).isBefore(moment(Date.now())) || ((budgetAmt - usedUsdAmt) <= 0))) {
-          for (var i = 0; i < colArr.length; i++) {
-            elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
-            elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', '#f48282');
-            let textColor = contrast('#f48282');
-            elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'color', textColor);
-          }
-        } else {
-          for (var i = 0; i < colArr.length; i++) {
-            elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
-          }
-        }
+        // if (((moment(stopDate)).isBefore(moment(Date.now())) || ((budgetAmt - usedUsdAmt) <= 0))) {
+        //   for (var i = 0; i < colArr.length; i++) {
+        //     elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
+        //     elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', '#f48282');
+        //     let textColor = contrast('#f48282');
+        //     elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'color', textColor);
+        //   }
+        // } else {
+        //   for (var i = 0; i < colArr.length; i++) {
+        //     elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
+        //   }
+        // }
 
       }.bind(this),
 
@@ -785,6 +785,33 @@ class ListBudgetComponent extends Component {
 
   loaded = function (instance, cell, x, y, value) {
     jExcelLoadedFunction(instance);
+    console.log("INSIDE UPDATE TABLE");
+    var elInstance = instance.jexcel;
+    var json = elInstance.getJson();
+
+    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
+    for (var j = 0; j < json.length; j++) {
+
+
+      var rowData = elInstance.getRowData(j);
+      // console.log("elInstance---->", elInstance);
+      var stopDate = rowData[12];
+      var budgetAmt = rowData[10];
+      var usedUsdAmt = rowData[11];
+
+      if (((moment(stopDate)).isBefore(moment(Date.now())) || ((budgetAmt - usedUsdAmt) <= 0))) {
+        for (var i = 0; i < colArr.length; i++) {
+          elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
+          elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', '#f48282');
+          let textColor = contrast('#f48282');
+          elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'color', textColor);
+        }
+      } else {
+        for (var i = 0; i < colArr.length; i++) {
+          elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
+        }
+      }
+    }
   }
 
 
