@@ -724,7 +724,7 @@ export default class ManualTagging extends Component {
         } else {
             this.setState({
                 artmisList: [],
-                result: "Please enter order no. and prime line no."
+                result: i18n.t('static.manualtagging.result')
             })
         }
     }
