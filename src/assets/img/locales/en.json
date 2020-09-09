@@ -649,7 +649,7 @@
     "static.inventory.batchNumber": "Batch Number",
     "static.inventory.expireDate": "Expiry Date",
     "static.inventory.active": "Active",
-    "static.dashboard.inventorydetails": "Inventory Details",
+    "static.dashboard.inventorydetails": "Adjustments and Inventory Details",
     "static.message.consumptionSaved": "Consumption Data Saved",
     "static.message.consumptionSuccess": "Consumption Data Added Successfully",
     "static.consumption.consumptionadd": "Consumption Details",
@@ -761,7 +761,7 @@
     "static.supplyPlan.planningUnitQty": "Planning Unit Qty",
     "static.supplyPlan.addNewAdjustments": "Add new adjustments",
     "static.supplyPlan.duplicateAdjustments": "Duplicate adjustments",
-    "static.message.adjustmentsSaved": "Adjustments Data Saved",
+    "static.message.adjustmentsSaved": "Adjustments and Inventory Data Saved",
     "static.supplyPlan.suggested": "Suggested",
     "static.supplyPlan.shipmentStatus": "Shipment Status",
     "static.supplyPlan.suggestedOrderQty": "Suggested Order Qty",
@@ -1009,7 +1009,7 @@
     "static.whatIf.scenarioAdded": "Scenario added successfully",
     "static.report.shipmentCostReport": "Shipment Cost",
     "static.dashboard.shipmentdetails": "Shipment Details",
-    "static.inventory.inventorydetils": "Inventory Details",
+    "static.inventory.inventorydetils": "Adjustments and Inventory Details",
     "static.report.shipmentDetailReport": "Shipment Details",
     "static.report.totalUnit": "Total Units",
     "static.report.selectProblemStatus": "Please select Problem Status",
@@ -1126,5 +1126,7 @@
     "static.ticket.addUpdateMasterData": "Add / Update Master Data",
     "static.common.regiontext": "Please select Region",
     "static.graph.costInUSD": "Cost (USD)",
-    "static.commit.shipmentTransId": "Shipment trans id"
+    "static.commit.shipmentTransId": "Shipment trans id",
+    "static.supplyPlan.addNewInventory":"Add New Inventory",
+    "static.manualtagging.result":"Please enter order no. and prime line no."
 }

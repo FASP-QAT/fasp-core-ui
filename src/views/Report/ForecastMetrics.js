@@ -1124,7 +1124,9 @@ class ForecastMetrics extends Component {
       programLabels: [],
       message: '',
       singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
-      rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+      rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+      minDate:{year:  new Date().getFullYear()-3, month: new Date().getMonth()},
+      maxDate:{year:  new Date().getFullYear()+3, month: new Date().getMonth()+1},
       loading: true
 
 
@@ -1998,7 +2000,7 @@ class ForecastMetrics extends Component {
                       <div className="controls edit">
                         <Picker
                           ref="pickAMonth2"
-                          years={{ min: { year: 2010, month: 1 }, max: { year: 2021, month: 12 } }}
+                          years={{min: this.state.minDate, max: this.state.maxDate}}
                           value={singleValue2}
                           lang={pickerLang.months}
                           theme="dark"

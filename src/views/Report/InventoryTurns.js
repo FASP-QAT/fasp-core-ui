@@ -976,7 +976,9 @@ export default class InventoryTurns extends Component {
             versions: [],
             message: '',
             singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
-            loading: true
+            minDate:{year:  new Date().getFullYear()-3, month: new Date().getMonth()},
+            maxDate:{year:  new Date().getFullYear()+3, month: new Date().getMonth()+1},
+           loading: true
 
         }
         this.formSubmit = this.formSubmit.bind(this);
@@ -1353,7 +1355,7 @@ export default class InventoryTurns extends Component {
     }
     handleAMonthDissmis2 = (value) => {
         let costOfInventoryInput = this.state.CostOfInventoryInput;
-        var dt = new Date(`${value.year}`, `${value.month}`, 1)
+        var dt = new Date(`${value.year}`, `${value.month-1}`, 1)
         costOfInventoryInput.dt = dt
         this.setState({ singleValue2: value, costOfInventoryInput }, () => {
             this.formSubmit();
@@ -1554,6 +1556,7 @@ export default class InventoryTurns extends Component {
                             var endingBalanceArray = [];
                             var monthcnt = 0;
                             var totalConsumption = 0;
+                            var totalClosingBalance = 0;
                             for (var n = 0; n < 12; n++) {
                                var dtstr = m[n].startDate
                                 var enddtStr = m[n].endDate
@@ -1562,41 +1565,51 @@ export default class InventoryTurns extends Component {
                                 var list = programJson.supplyPlan.filter(c => c.planningUnitId ==planningUnit.planningUnit.id && c.transDate == dt)
                                 console.log(dtstr, ' ', enddtStr,' list',list)
                             if(list.length>0){
+                                if(document.getElementById("includePlanningShipments").value.toString() == 'true'){
                                 endingBalanceArray[n] = list[0].closingBalance
                                 totalConsumption = totalConsumption + list[0].consumptionQty
-                                if(list[0].consumptionQty>0|| list[0].shipmentQty>0 ||list[0].adjustmentQty!=0){
+                                if(list[0].consumptionQty>0){
                                     monthcnt++
+                                    totalClosingBalance=totalClosingBalance+list[0].closingBalance
                                 }
                             }else{
+                                endingBalanceArray[n] = list[0].closingBalanceWps
+                                totalConsumption = totalConsumption + list[0].consumptionQty
+                                if(list[0].consumptionQty>0){
+                                    monthcnt++
+                                    totalClosingBalance=totalClosingBalance+list[0].closingBalanceWps
+                                }
+                            }}else{
                                 endingBalanceArray[n] = ''
-                            }
+                            }  
+                            
                           
                                 
 
                             }
 
                              
-                            var totalClosingBalance = 0;
-                            var totalmonthincalculation = 0
-                            console.log(endingBalanceArray)
+                          
+                            // var totalmonthincalculation = 0
+                            // console.log(endingBalanceArray)
 
-                            for (var i = 0; i < endingBalanceArray.length; i++) {
-                                totalClosingBalance += endingBalanceArray[i]
-                                if (endingBalanceArray[i] != '') {
-                                    totalmonthincalculation++;
-                                }
-                            }
+                            // for (var i = 0; i < endingBalanceArray.length; i++) {
+                            //     totalClosingBalance += endingBalanceArray[i]
+                            //     if (endingBalanceArray[i] != '') {
+                            //         totalmonthincalculation++;
+                            //     }
+                            // }
 
 
-                            var avergeStock = totalClosingBalance / (totalmonthincalculation)
+                            var avergeStock =monthcnt>0? totalClosingBalance / (monthcnt):0
 
                           
                                 var json = {
                                     totalConsumption: totalConsumption,
                                     planningUnit: planningUnit.planningUnit,
                                     avergeStock: avergeStock,
-                                    noOfMonths: totalmonthincalculation,
-                                    inventoryTurns: this.roundN(totalConsumption / avergeStock)
+                                    noOfMonths: monthcnt,
+                                    inventoryTurns: avergeStock>0?this.roundN(totalConsumption / avergeStock):0
 
                                 }
                                 data.push(json)
@@ -1615,9 +1628,14 @@ export default class InventoryTurns extends Component {
                 }.bind(this)
             } else {
                 this.setState({ loading: true })
-
+var inputJson={
+    "programId":this.state.CostOfInventoryInput.programId,
+    "versionId":this.state.CostOfInventoryInput.versionId,
+    "dt":moment(this.state.CostOfInventoryInput.dt).startOf('month').format('YYYY-MM-DD'),
+    "includePlanningShipments":this.state.CostOfInventoryInput.includePlanningShipments.toString()=="true"?1:0
+}
                 AuthenticationService.setupAxiosInterceptors();
-                ReportService.inventoryTurns(this.state.CostOfInventoryInput).then(response => {
+                ReportService.inventoryTurns(inputJson).then(response => {
                     console.log("costOfInentory=====>", response.data);
                     this.setState({
                         costOfInventory: response.data, message: ''
@@ -1790,7 +1808,7 @@ export default class InventoryTurns extends Component {
                                                 <div className="controls edit">
                                                     <Picker
                                                         ref="pickAMonth2"
-                                                        years={{ min: { year: 2010, month: 1 }, max: { year: 2021, month: 12 } }}
+                                                        years={{ min: this.state.minDate, max: this.state.maxDate }}
                                                         value={singleValue2}
                                                         lang={pickerLang.months}
                                                         theme="dark"
