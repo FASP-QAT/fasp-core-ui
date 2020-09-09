@@ -1126,5 +1126,6 @@
     "static.ticket.addUpdateMasterData": "Add / Update Master Data",
     "static.common.regiontext": "Please select Region",
     "static.supplyPlan.addNewInventory":"Add New Inventory",
-    "static.graph.costInUSD":"Cost (USD)"
+    "static.graph.costInUSD":"Cost (USD)",
+    "static.manualtagging.result":"Please enter order no. and prime line no."
 }

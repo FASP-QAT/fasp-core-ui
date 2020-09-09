@@ -1515,7 +1515,7 @@ class ShipmentGlobalView extends Component {
             table1Body: [],
             table1Headers: [],
             viewby: 1,
-            rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
             minDate:{year:  new Date().getFullYear()-3, month: new Date().getMonth()},
             maxDate:{year:  new Date().getFullYear()+3, month: new Date().getMonth()+1},
             loading: true

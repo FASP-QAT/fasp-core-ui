@@ -134,7 +134,7 @@ export default class PipelineProgramImport extends Component {
                                 <FormGroup>
 
                                     <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                    <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white"><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                    <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                     <Button onClick={this.showPipelineProgramInfo} type="button" id="formSubmitButton" size="md" color="success" className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                     &nbsp;
                                     </FormGroup>
@@ -147,5 +147,9 @@ export default class PipelineProgramImport extends Component {
     }
     cancelClicked() {
         this.props.history.push(`/pipeline/pieplineProgramList/` + 'red/' + i18n.t('static.message.cancelled', { entityname }));
+    }
+    resetClicked=()=>{
+        const file =  document.getElementById('file-input'); 
+    file.value = ''; 
     }
 }
