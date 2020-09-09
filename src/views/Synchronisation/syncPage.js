@@ -1427,21 +1427,46 @@ export default class syncPage extends Component {
                                   var downloadedProgramDataProblemList = downloadedProgramData.problemReportList;
                                   var mergedProblemListData = [];
                                   var existingProblemReportId = [];
+                                  console.log("oldProgramDataProblemList", oldProgramDataProblemList);
                                   for (var c = 0; c < oldProgramDataProblemList.length; c++) {
                                     if (oldProgramDataProblemList[c].problemReportId != 0) {
                                       mergedProblemListData.push(oldProgramDataProblemList[c]);
                                       existingProblemReportId.push(oldProgramDataProblemList[c].problemReportId);
                                     } else {
                                       // If 0 check whether that exists in latest version or not
-                                      mergedProblemListData.push(oldProgramDataProblemList[c]);
+                                      var index = 0;
+                                      if (oldProgramDataProblemList[c].problem.problemId == 1 || oldProgramDataProblemList[c].problem.problemId == 2) {
+                                        index = latestProgramDataProblemList.findIndex(
+                                          f => moment(f.dt).format("YYYY-MM") == moment(oldProgramDataProblemList[c].dt).format("YYYY-MM")
+                                            && f.region.id == oldProgramDataProblemList[c].region.id
+                                            && f.planningUnit.id == oldProgramDataProblemList[c].planningUnit.id
+                                            && f.realmProblem.problem.problemId == oldProgramDataProblemList[c].problem.problemId);
+                                      } else if (oldProgramDataProblemList[c].problem.problemId == 9) {
+                                        index = latestProgramDataProblemList.findIndex(
+                                          f => f.planningUnit.id == oldProgramDataProblemList[c].planningUnit.id
+                                            && f.realmProblem.problem.problemId == oldProgramDataProblemList[c].problem.problemId);
+                                      }
+                                      console.log("Index", index);
+                                      if (index == -1) {
+                                        mergedProblemListData.push(oldProgramDataProblemList[c]);
+                                      } else {
+                                        oldProgramDataProblemList[c].problemReportId = latestProgramDataProblemList[index].problemReportId;
+                                        existingProblemReportId.push(latestProgramDataProblemList[index].problemReportId);
+                                        mergedProblemListData.push(oldProgramDataProblemList[c]);
+                                      }
                                     }
                                   }
+                                  console.log("Merged problem list data", mergedProblemListData);
                                   // Getting other entries of latest problemList data
                                   var latestOtherProblemListEntries = latestProgramDataProblemList.filter(c => !(existingProblemReportId.includes(c.problemReportId)));
+                                  console.log("Latset other problem data ", latestOtherProblemListEntries);
                                   mergedProblemListData = mergedProblemListData.concat(latestOtherProblemListEntries);
+                                  console.log("Merged problem list data", mergedProblemListData);
+
                                   var data = [];
                                   var mergedProblemListJexcel = [];
                                   for (var cd = 0; cd < mergedProblemListData.length; cd++) {
+                                    data = []
                                     data[0] = mergedProblemListData[cd].problemReportId
                                     data[1] = mergedProblemListData[cd].problemActionIndex
                                     data[2] = mergedProblemListData[cd].program.programCode
@@ -1465,13 +1490,15 @@ export default class syncPage extends Component {
                                       oldData = [oldDataList[0].problemReportId, oldDataList[0].problemActionIndex, oldDataList[0].program.programCode, oldDataList[0].versionId, (oldDataList[0].region.label != null) ? (getLabelText(oldDataList[0].region.label, this.state.lang)) : '', getLabelText(oldDataList[0].planningUnit.label, this.state.lang), (oldDataList[0].dt != null) ? (moment(oldDataList[0].dt).format('MMM-YY')) : '', moment(oldDataList[0].createdDate).format('MMM-YY'), getProblemDesc(oldDataList[0], this.state.lang), getSuggestion(oldDataList[0], this.state.lang), getLabelText(oldDataList[0].problemStatus.label, this.state.lang), this.getNote(oldDataList[0], this.state.lang), oldDataList[0].problemStatus.id, oldDataList[0].planningUnit.id, oldDataList[0].realmProblem.problem.problemId, oldDataList[0].realmProblem.problem.actionUrl, oldDataList[0].realmProblem.criticality.id, "", "", "", 4];
                                     }
                                     data[17] = oldData;//Old data
-                                    var latestDataList = latestProgramDataProblemList.filter(c => c.problemReportId == mergedProblemListData[cd].problemReportId);
+                                    console.log("mergedProblemListData[cd].problemReportId", mergedProblemListData[cd].problemReportId);
+                                    var latestDataList = latestProgramDataProblemList.filter(c => mergedProblemListData[cd].problemReportId != 0 && c.problemReportId == mergedProblemListData[cd].problemReportId);
+                                    console.log("Latest data list", latestDataList);
                                     var latestData = ""
                                     if (latestDataList.length > 0) {
                                       latestData = [latestDataList[0].problemReportId, latestDataList[0].problemActionIndex, latestDataList[0].program.programCode, latestDataList[0].versionId, (latestDataList[0].region.label != null) ? (getLabelText(latestDataList[0].region.label, this.state.lang)) : '', getLabelText(latestDataList[0].planningUnit.label, this.state.lang), (latestDataList[0].dt != null) ? (moment(latestDataList[0].dt).format('MMM-YY')) : '', moment(latestDataList[0].createdDate).format('MMM-YY'), getProblemDesc(latestDataList[0], this.state.lang), getSuggestion(latestDataList[0], this.state.lang), getLabelText(latestDataList[0].problemStatus.label, this.state.lang), this.getNote(latestDataList[0], this.state.lang), latestDataList[0].problemStatus.id, latestDataList[0].planningUnit.id, latestDataList[0].realmProblem.problem.problemId, latestDataList[0].realmProblem.problem.actionUrl, latestDataList[0].realmProblem.criticality.id, "", "", "", 4];
                                     }
                                     data[18] = latestData;//Latest data
-                                    var downloadedDataList = downloadedProgramDataProblemList.filter(c => c.problemListId == mergedProblemListData[cd].problemListId);
+                                    var downloadedDataList = downloadedProgramDataProblemList.filter(c => mergedProblemListData[cd].problemListId != 0 && c.problemListId == mergedProblemListData[cd].problemListId);
                                     var downloadedData = "";
                                     if (downloadedDataList.length > 0) {
                                       downloadedData = [downloadedDataList[0].problemReportId, downloadedDataList[0].problemActionIndex, downloadedDataList[0].program.programCode, downloadedDataList[0].versionId, (downloadedDataList[0].region.label != null) ? (getLabelText(downloadedDataList[0].region.label, this.state.lang)) : '', getLabelText(downloadedDataList[0].planningUnit.label, this.state.lang), (downloadedDataList[0].dt != null) ? (moment(downloadedDataList[0].dt).format('MMM-YY')) : '', moment(downloadedDataList[0].createdDate).format('MMM-YY'), getProblemDesc(downloadedDataList[0], this.state.lang), getSuggestion(downloadedDataList[0], this.state.lang), getLabelText(downloadedDataList[0].problemStatus.label, this.state.lang), this.getNote(downloadedDataList[0], this.state.lang), downloadedDataList[0].problemStatus.id, downloadedDataList[0].planningUnit.id, downloadedDataList[0].realmProblem.problem.problemId, downloadedDataList[0].realmProblem.problem.actionUrl, downloadedDataList[0].realmProblem.criticality.id, "", "", "", 4];
@@ -1489,7 +1516,7 @@ export default class syncPage extends Component {
                                     columns: [
                                       {
                                         title: 'problemReportId',
-                                        type: 'hidden',
+                                        type: 'text',
                                       },
                                       {
                                         title: 'problemActionIndex',
@@ -1953,6 +1980,7 @@ export default class syncPage extends Component {
     var jsonData = elInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T']
     for (var c = 0; c < jsonData.length; c++) {
+      console.log("jsonData[c])[18]", jsonData[c][18])
       if ((jsonData[c])[18] == "") {
         for (var i = 0; i < colArr.length; i++) {
           var col = (colArr[i]).concat(parseInt(c) + 1);
