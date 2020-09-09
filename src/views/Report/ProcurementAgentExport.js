@@ -1883,6 +1883,8 @@ class ProcurementAgentExport extends Component {
             data: [],
             lang: localStorage.getItem('lang'),
             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            minDate:{year:  new Date().getFullYear()-3, month: new Date().getMonth()},
+            maxDate:{year:  new Date().getFullYear()+3, month: new Date().getMonth()+1},
             loading: true
         }
         this.formatLabel = this.formatLabel.bind(this);
@@ -2467,13 +2469,24 @@ class ProcurementAgentExport extends Component {
             startY: startY,
             head: [headers],
             body: data,
-            styles: { lineWidth: 1, fontSize: 8, cellWidth: 80, halign: 'center' },
+            styles: { lineWidth: 1, fontSize: 8, cellWidth: 76, halign: 'center' },
             columnStyles: {
-                0: { cellWidth: 150 },
-                1: { cellWidth: 50 },
-                2: { cellWidth: 160 },
+                0: { cellWidth: 148 },
+                2: { cellWidth: 157.89 },
             }
         };
+        if(viewby!=2 && viewby!=1){
+            content = {
+                margin: { top: 80, bottom: 70 },
+                startY: startY,
+                head: [headers],
+                body: data,
+                styles: { lineWidth: 1, fontSize: 8, cellWidth: 108, halign: 'center' },
+                columnStyles: {
+                    0: { cellWidth: 221.89 },
+                }
+            }; 
+        }
 
         doc.autoTable(content);
         addHeaders(doc)
@@ -2492,7 +2505,7 @@ class ProcurementAgentExport extends Component {
         for (var j = 0; j < shipmentCosttList.length; j++) {
             data = [];
             data[0] = (viewby == 1) ? (getLabelText(shipmentCosttList[j].procurementAgent.label, this.state.lang)) : ((viewby == 2) ? (getLabelText(shipmentCosttList[j].fundingSource.label, this.state.lang)) : ({}))
-            data[1] = (viewby == 1) ? (shipmentCosttList[j].procurementAgent.code, this.state.lang) : ((viewby == 2) ? (shipmentCosttList[j].fundingSource.code, this.state.lang) : ({}))
+            data[1] = (viewby == 1) ? shipmentCosttList[j].procurementAgent.code : ((viewby == 2) ? shipmentCosttList[j].fundingSource.code : {})
             data[2] = getLabelText(shipmentCosttList[j].planningUnit.label, this.state.lang)
             data[3] = this.addCommas(shipmentCosttList[j].qty)
             data[4] = this.addCommas(shipmentCosttList[j].productCost)
@@ -3802,7 +3815,7 @@ class ProcurementAgentExport extends Component {
 
                                         <Picker
                                             ref="pickRange"
-                                            years={{ min: 2013 }}
+                                            years={{min: this.state.minDate, max: this.state.maxDate}}
                                             value={rangeValue}
                                             lang={pickerLang}
                                             //theme="light"

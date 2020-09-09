@@ -2045,6 +2045,9 @@ class StockStatus extends Component {
       versions: [],
       show: false,
       rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+      minDate:{year:  new Date().getFullYear()-3, month: new Date().getMonth()},
+      maxDate:{year:  new Date().getFullYear()+3, month: new Date().getMonth()+1},
+      
     };
     this.filterData = this.filterData.bind(this);
     this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
@@ -2989,7 +2992,7 @@ class StockStatus extends Component {
 
                           <Picker
                             ref="pickRange"
-                            years={{ min: 2013, max: 2022 }}
+                            years={{min: this.state.minDate, max: this.state.maxDate}}
                             value={rangeValue}
                             lang={pickerLang}
                             //theme="light"
