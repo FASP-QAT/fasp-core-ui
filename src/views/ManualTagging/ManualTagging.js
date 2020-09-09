@@ -1211,6 +1211,13 @@ export default class ManualTagging extends Component {
                 headerAlign: 'center'
             },
             {
+                dataField: 'recipentCountry',
+                text: 'Recipient Country',
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
                 dataField: 'price',
                 text: 'Price',
                 sort: true,
