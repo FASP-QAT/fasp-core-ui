@@ -32,57 +32,43 @@ const validationSchema = function (values) {
             .matches(LABEL_REGEX, i18n.t('static.message.rolenamevalidtext')),
         showRealm: Yup.boolean(),
         realmId: Yup.string()
-            .test('showRealm', i18n.t('static.common.realmtext'),
-                function (value) {
-                    // let realmValid = document.getElementById("showRealm").value;
-                    if (value != '0' && value != '' && document.getElementById("showRealm").value == "true") {
-                        console.log("inside if ---",document.getElementById("showRealm").value);
-                        return false;
-                    }else{
-                        console.log("else-------------",value);
-                        return true;
-                    }
-                    return true;
-                    console.log("out-------------");
-                }),
-            // .when("showRealm", (showRealm, schema) => {
-            //     if (document.getElementById("showRealm").value == "true") {
-            //         console.log("show realm inside if---------------------------");
-            //         return schema.required(i18n.t('static.common.realmtext'))
-            //     } else {
-            //         return schema;
-            //     }
-            //     return schema;
-            // }),
-        // roleValid: Yup.boolean(),
+            .when("showRealm", {
+                is: val => {
+                    console.log("validation---------" + document.getElementById("showRealm").value)
+                    console.log("result---", (document.getElementById("showRealm").value === "true"));
+                    return document.getElementById("showRealm").value === "true";
+                },
+                then: Yup.string().required(i18n.t('static.common.realmtext')),
+                otherwise: Yup.string().notRequired()
+            }),
+        // .test('showRealm', i18n.t('static.common.realmtext'),
+        //     function (value) {
+        //         if (document.getElementById("showRealm").value === "true") {
+        //             console.log("inside if ---", value);
+        //             return true;
+        //         }
+        //     }),
+        // .test('showRealm', i18n.t('static.common.realmtext'),
+        //     function (value) {
+        //         if (document.getElementById("showRealm").value == "true") {
+        //             console.log("inside if ---", document.getElementById("showRealm").value);
+        //             return true;
+        //         } else {
+        //             console.log("else-------------", value);
+        //             return false;
+        //         }
+        //         return true;
+        //         console.log("out-------------");
+        //     }),
         roleId: Yup.string()
             .test('roleValid', i18n.t('static.common.roleinvalidtext'),
                 function (value) {
-                    // console.log("value---", value);
-                    // console.log("condition---", document.getElementById("roleValid").value);
                     if (document.getElementById("roleValid").value == "false") {
                         console.log("inside if ---", value);
                         return true;
                     }
                 })
             .required(i18n.t('static.user.validrole')),
-        // .when("roleValid", (roleValid, schema) => {
-        //     console.log("roleValid 1---",document.getElementById("roleValid").value)
-        //     if (document.getElementById("roleValid").value == "true") {
-        //         return schema.required(i18n.t('static.common.roleinvalidtext'))
-        //     } else {
-        //         return schema;
-        //     }
-        //     return schema;
-        // }),
-        // roleId: Yup.array()
-        // .min(3, 'Pick at least 3 tags')
-        // .of(
-        // Yup.object().shape({
-        // label: Yup.string().required(),
-        // value: Yup.string().required(),
-        // })
-        // ),
         languageId: Yup.string()
             .required(i18n.t('static.user.validlanguage')),
         emailId: Yup.string()
@@ -128,7 +114,7 @@ class AddUserComponent extends Component {
             languages: [],
             user: {
                 realm: {
-                    realmId: '0'
+                    realmId: ''
                 },
                 language: {
                     languageId: ''
@@ -148,6 +134,7 @@ class AddUserComponent extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.roleChange = this.roleChange.bind(this);
+        this.realmChange = this.realmChange.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
     hideSecondComponent() {
@@ -155,6 +142,39 @@ class AddUserComponent extends Component {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 8000);
+    }
+    realmChange() {
+        let { user } = this.state;
+        let count = 0;
+        let count1 = 0;
+        // this.setState({ roleId });
+        // var roleIdArray = [];
+        console.log("roles---",this.state.user.roles);
+        for (var i = 0; i < this.state.user.roles.length; i++) {
+            if (this.state.user.roles[i] != 'ROLE_APPLICATION_ADMIN') {
+                count++;
+                // showRealm
+            } else {
+                count1++;
+            }
+        }
+        if (count > 0) {
+            console.log("--------1-----------")
+            this.setState({
+                showRealmValidation: (this.state.user.realm.realmId != '' ? false : true)
+            },
+                () => { console.log("show--------------" + this.state.showRealmValidation) });
+
+            document.getElementById("showRealm").value = true;
+        } else {
+            console.log("--------2-----------")
+            this.setState({
+                showRealmValidation: false
+            },
+                () => { console.log("show--------------" + this.state.showRealmValidation) });
+
+            document.getElementById("showRealm").value = false;
+        }
     }
 
     dataChange(event) {
@@ -171,6 +191,7 @@ class AddUserComponent extends Component {
 
         if (event.target.name == "realmId") {
             user.realm.realmId = event.target.value;
+
         }
         if (event.target.name == "languageId") {
             user.language.languageId = event.target.value;
@@ -192,23 +213,21 @@ class AddUserComponent extends Component {
             if (roleId[i].value != 'ROLE_APPLICATION_ADMIN') {
                 count++;
                 // showRealm
-
             } else {
                 count1++;
             }
         }
 
         if (count > 0) {
+            console.log("realm id---", this.state.user.realm.realmId);
+            // if (this.state.user.realm.realmId != '0') {
             this.setState({
-                showRealmValidation: true
-            })
-            if (this.state.user.realm.realmId != '') {
-                console.log("inside 1");
-                document.getElementById("showRealm").value = false;
-            }else{
-                console.log("inside 2");
-                document.getElementById("showRealm").value = true;
-            }
+                showRealmValidation: (this.state.user.realm.realmId != '' ? false : true)
+            },
+                () => { console.log("show--------------" + this.state.showRealmValidation) });
+            // }
+            console.log("inside if");
+            document.getElementById("showRealm").value = true;
             if (count1 > 0) {
                 this.setState({
                     appAdminRole: true
@@ -224,13 +243,14 @@ class AddUserComponent extends Component {
             this.setState({
                 showRealmValidation: false,
                 appAdminRole: false
-            })
+            },
+                () => { console.log("show--------------" + this.state.showRealmValidation) });
+            console.log("inside else");
             document.getElementById("showRealm").value = false;
             document.getElementById("roleValid").value = false;
         }
         user.roles = roleIdArray;
-        console.log("role valid 2---", document.getElementById("roleValid").value);
-        console.log("showRealmValidation---", this.state.showRealmValidation);
+
         this.setState({
             user,
             validateRealm: (count > 0 ? true : false)
@@ -480,14 +500,16 @@ class AddUserComponent extends Component {
                                                             name="realmId"
                                                             id="realmId"
                                                             bsSize="sm"
-                                                            valid={!errors.realmId && !this.state.showRealmValidation && this.state.user.realm.realmId != ''}
-                                                            invalid={(touched.realmId && !!errors.realmId) || this.state.showRealmValidation}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            // valid={!errors.realmId && !this.state.showRealmValidation && this.state.user.realm.realmId != ''}
+                                                            // invalid={(touched.realmId && !!errors.realmId) || this.state.showRealmValidation}
+                                                            valid={!errors.realmId && this.state.user.realm.realmId != '' && this.state.showRealmValidation === false}
+                                                            invalid={(touched.realmId && !!errors.realmId) || this.state.showRealmValidation === true}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.realmChange(e) }}
                                                             onBlur={handleBlur}
                                                             required
                                                             value={this.state.user.realm.realmId}
                                                         >
-                                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                                            <option value="">{i18n.t('static.common.select')}</option>
                                                             {realmList}
                                                         </Input>
                                                         <FormFeedback className="red">{errors.realmId}</FormFeedback>
