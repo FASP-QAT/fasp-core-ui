@@ -2208,9 +2208,9 @@ class ShipmentGlobalView extends Component {
         let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
         let fundingSourceProcurementAgentIds = [];
         if (viewby == 1) {
-            fundingSourceProcurementAgentIds = procurementAgentIds;
-        } else {
             fundingSourceProcurementAgentIds = fundingSourceIds;
+        } else {
+            fundingSourceProcurementAgentIds = procurementAgentIds;
         }
         // console.log("planningUnitId-------", planningUnitId);
         // console.log("productCategoryId------", productCategoryId);
@@ -2236,7 +2236,7 @@ class ShipmentGlobalView extends Component {
                 reportView: viewby,
                 fundingSourceProcurementAgentIds: fundingSourceProcurementAgentIds
             }
-            // console.log("INPUTJSON--------->", inputjson);
+            console.log("INPUTJSON--------->", inputjson);
             AuthenticationService.setupAxiosInterceptors();
             ReportService.ShipmentGlobalView(inputjson)
                 .then(response => {
@@ -2312,7 +2312,7 @@ class ShipmentGlobalView extends Component {
                                     this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
                                     break;
                                 default:
-                                    this.setState({ message: 'static.unkownError' });
+                                    this.setState({ message: ''});
                                     break;
                             }
                         }
