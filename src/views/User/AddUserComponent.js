@@ -28,37 +28,38 @@ const validationSchema = function (values) {
     return Yup.object().shape({
 
         username: Yup.string()
-            // .min(6, i18n.t('static.user.valid6char'))
-            // .max(30, i18n.t('static.user.validpasswordlength'))
-            // .matches(/^(?=.*[a-zA-Z]).*$/, i18n.t('static.user.alleast1alpha'))
-            // .matches(/^\S*$/, i18n.t('static.user.nospace'))
             .required(i18n.t('static.user.validusername'))
             .matches(LABEL_REGEX, i18n.t('static.message.rolenamevalidtext')),
-        // showRealm: Yup.boolean(),
+        showRealm: Yup.boolean(),
         realmId: Yup.string()
             .test('showRealm', i18n.t('static.common.realmtext'),
                 function (value) {
-                    console.log("value---", value);
-                    console.log("condition---", document.getElementById("roleValid").value);
-                    if (document.getElementById("showRealm").value == "false") {
-                        console.log("inside if ---", value);
+                    // let realmValid = document.getElementById("showRealm").value;
+                    if (value != '0' && value != '' && document.getElementById("showRealm").value == "true") {
+                        console.log("inside if ---",document.getElementById("showRealm").value);
+                        return false;
+                    }else{
+                        console.log("else-------------",value);
                         return true;
                     }
+                    return true;
+                    console.log("out-------------");
                 }),
-        // .when("showRealm", (showRealm, schema) => {
-        //     if (document.getElementById("showRealm").value == "true") {
-        //         return schema.required(i18n.t('static.common.realmtext'))
-        //     } else {
-        //         return schema;
-        //     }
-        //     return schema;
-        // }),
+            // .when("showRealm", (showRealm, schema) => {
+            //     if (document.getElementById("showRealm").value == "true") {
+            //         console.log("show realm inside if---------------------------");
+            //         return schema.required(i18n.t('static.common.realmtext'))
+            //     } else {
+            //         return schema;
+            //     }
+            //     return schema;
+            // }),
         // roleValid: Yup.boolean(),
         roleId: Yup.string()
             .test('roleValid', i18n.t('static.common.roleinvalidtext'),
                 function (value) {
-                    console.log("value---", value);
-                    console.log("condition---", document.getElementById("roleValid").value);
+                    // console.log("value---", value);
+                    // console.log("condition---", document.getElementById("roleValid").value);
                     if (document.getElementById("roleValid").value == "false") {
                         console.log("inside if ---", value);
                         return true;
@@ -201,7 +202,13 @@ class AddUserComponent extends Component {
             this.setState({
                 showRealmValidation: true
             })
-            document.getElementById("showRealm").value = true;
+            if (this.state.user.realm.realmId != '') {
+                console.log("inside 1");
+                document.getElementById("showRealm").value = false;
+            }else{
+                console.log("inside 2");
+                document.getElementById("showRealm").value = true;
+            }
             if (count1 > 0) {
                 this.setState({
                     appAdminRole: true
@@ -223,6 +230,7 @@ class AddUserComponent extends Component {
         }
         user.roles = roleIdArray;
         console.log("role valid 2---", document.getElementById("roleValid").value);
+        console.log("showRealmValidation---", this.state.showRealmValidation);
         this.setState({
             user,
             validateRealm: (count > 0 ? true : false)
@@ -472,8 +480,8 @@ class AddUserComponent extends Component {
                                                             name="realmId"
                                                             id="realmId"
                                                             bsSize="sm"
-                                                            valid={!errors.realmId && !this.state.showRealmValidation}
-                                                            invalid={touched.realmId && !!errors.realmId || this.state.showRealmValidation}
+                                                            valid={!errors.realmId && !this.state.showRealmValidation && this.state.user.realm.realmId != ''}
+                                                            invalid={(touched.realmId && !!errors.realmId) || this.state.showRealmValidation}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             required
