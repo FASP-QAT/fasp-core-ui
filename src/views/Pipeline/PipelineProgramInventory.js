@@ -7,7 +7,7 @@ import DataSourceService from '../../api/DataSourceService.js';
 import PlanningUnitService from '../../api/PlanningUnitService'
 import { jExcelLoadedFunction, jExcelLoadedFunctionPipeline } from '../../CommonComponent/JExcelCommonFunctions.js'
 import RealmCountryService from '../../api/RealmCountryService'
-
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 export default class PipelineProgramInventory extends Component {
 
     constructor(props) {
@@ -357,6 +357,11 @@ export default class PipelineProgramInventory extends Component {
     render() {
         return (
             <>
+               <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
+                }} />
                 <div className="table-responsive" style={{ display: this.state.loading ? "none" : "block" }}>
 
                     <div id="inventorytableDiv">

@@ -139,9 +139,13 @@ export default class InitialTicketPageComponent extends Component {
   }
 
   toggleSmall(msg) {
-    this.setState({
-      message: msg,
-      small: !this.state.small
+    confirmAlert({
+      message: i18n.t('static.ticket.ticketcreated') + " " + i18n.t('static.ticket.ticketcode') + ": " + msg,
+      buttons: [
+        {
+          label: 'OK'              
+        }
+      ]
     });
   }
 
@@ -518,7 +522,7 @@ export default class InitialTicketPageComponent extends Component {
 
         <img src={imageHelp} className="HelpIcon" title="Help" onClick={this.togglehelp} />
 
-        <Modal isOpen={this.state.small} toggle={this.toggleSmall}
+        {/* <Modal isOpen={this.state.small} toggle={this.toggleSmall}
           className={'modal-sm modal-dialog-center'} aria-labelledby="contained-modal-title-vcenter"
           centered>
           <ModalHeader toggle={this.toggleSmall} className="ModalHead modal-info-Headher"><b>Message!</b></ModalHeader>
@@ -530,7 +534,7 @@ export default class InitialTicketPageComponent extends Component {
           <ModalFooter>
             <Button color="primary" onClick={() => { this.toggleSmall('') }}>OK</Button>{' '}
           </ModalFooter>
-        </Modal>
+        </Modal> */}
 
         <Modal isOpen={this.state.help} toggle={this.togglehelp} className={this.props.className}>
           {/* className={'modal-info ' + this.props.className}> */}
@@ -569,8 +573,8 @@ export default class InitialTicketPageComponent extends Component {
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleSubMaster(3) }} action><i className="icon-note  icons helpclickicon mr-2"></i> {i18n.t('static.dashboard.programmaster')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
 
                   </ListGroup>
-                  <ModalFooter>
-                    <Button color="success" onClick={this.toggleMain1}>Back</Button>
+                  <ModalFooter className="pb-0 pr-0">
+                    <Button color="info" onClick={this.toggleMain1}><i className="fa fa-angle-double-left "></i>  Back</Button>
                     {/* <Button color="success" onClick={this.togglebugreport}>Submit</Button> */}
                   </ModalFooter>
                 </div>}
@@ -582,8 +586,8 @@ export default class InitialTicketPageComponent extends Component {
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleApplicationChangeAdditional(3) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.currency.currencyMaster')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleApplicationChangeAdditional(4) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.unit.unit')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                   </ListGroup>
-                  <ModalFooter>
-                    <Button color="success" onClick={() => { this.toggleMasterInitial(1) }}>Back</Button>
+                  <ModalFooter className="pb-0 pr-0">
+                    <Button color="info" onClick={() => { this.toggleMasterInitial(1) }}><i className="fa fa-angle-double-left "></i>  Back</Button>
                     {/* <Button color="success" onClick={this.togglebugreport}>Submit</Button> */}
                   </ModalFooter>
                 </div>}
@@ -600,8 +604,8 @@ export default class InitialTicketPageComponent extends Component {
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleRealmChangeAdditional(8) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.organisation.organisation')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleRealmChangeAdditional(9) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.dashboad.regioncountry')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                   </ListGroup>
-                  <ModalFooter>
-                    <Button color="success" onClick={() => { this.toggleMasterInitial(2) }}>Back</Button>
+                  <ModalFooter className="pb-0 pr-0">
+                    <Button color="info" onClick={() => { this.toggleMasterInitial(2) }}><i className="fa fa-angle-double-left "></i>  Back</Button>
                     {/* <Button color="success" onClick={this.togglebugreport}>Submit</Button> */}
                   </ModalFooter>
                 </div>}
@@ -616,8 +620,8 @@ export default class InitialTicketPageComponent extends Component {
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleProgramChangeAdditional(6) }} action><i className="icon-note  icons helpclickicon mr-2"></i> {i18n.t('static.planningunit.planningunit')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleProgramChangeAdditional(7) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.procurementUnit.procurementUnit')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                   </ListGroup>
-                  <ModalFooter>
-                    <Button color="success" onClick={() => { this.toggleMasterInitial(3) }}>Back</Button>
+                  <ModalFooter className="pb-0 pr-0">
+                    <Button color="info" onClick={() => { this.toggleMasterInitial(3) }}><i className="fa fa-angle-double-left "></i>  Back</Button>
                     {/* <Button color="success" onClick={this.togglebugreport}>Submit</Button> */}
                   </ModalFooter>
                 </div>}

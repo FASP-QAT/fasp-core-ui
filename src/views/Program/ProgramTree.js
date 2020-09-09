@@ -253,6 +253,7 @@ class Program extends Component {
         if (event.target.name === "realmId") {
             this.state.realmId = event.target.value;
         }
+        this.getTree();
     };
 
     onRadioBtnClick(radioSelected) {
@@ -303,9 +304,9 @@ class Program extends Component {
                                                     <option value="">{i18n.t('static.common.select')}</option>
                                                     {realms}
                                                 </Input>
-                                                <InputGroupAddon addonType="append">
+                                                {/* <InputGroupAddon addonType="append">
                                                     <Button color="secondary Gobtn btn-sm" onClick={this.getTree}>{i18n.t('static.common.go')}</Button>
-                                                </InputGroupAddon>
+                                                </InputGroupAddon> */}
                                             </InputGroup>
                                         </div>
                                     </FormGroup>
@@ -474,7 +475,7 @@ class Program extends Component {
                 })
             // this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errorSelectAtleastOneProgram'))
         } else if (programInvalidCheckedCount > 0) {
-            this.setState({loading:false})
+            this.setState({ loading: false })
             this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errorSelectProgramIfYouSelectVersion'))
         } else {
             console.log("Checl boxes checked array", checkboxesChecked)
@@ -541,14 +542,14 @@ class Program extends Component {
                                         var putRequest = programSaveData.put(item);
                                         programThenCount++;
                                         putRequest.onerror = function (error) {
-                                            this.setState({loading:false})
+                                            this.setState({ loading: false })
                                             this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errortext'))
                                         }.bind(this);
 
                                         var putRequestDownloadedProgramData = downloadedProgramSaveData.put(item);
                                         // programThenCount++;
                                         putRequestDownloadedProgramData.onerror = function (error) {
-                                            this.setState({loading:false})
+                                            this.setState({ loading: false })
                                             this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errortext'))
                                         }.bind(this);
                                         // }
@@ -558,11 +559,11 @@ class Program extends Component {
                                             // this.props.history.push(`/dashboard/` + i18n.t('static.program.downloadsuccess'))
                                         }.bind(this);
                                         transactionForSavingData.onerror = function (event) {
-                                            this.setState({loading:false})
+                                            this.setState({ loading: false })
                                             this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errortext'))
                                         }.bind(this);
                                         programSaveData.onerror = function (event) {
-                                            this.setState({loading:false})
+                                            this.setState({ loading: false })
                                             this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errortext'))
                                         }.bind(this)
 
@@ -576,15 +577,15 @@ class Program extends Component {
                                             })
                                             this.hideFirstComponent();
                                             // this.props.history.push(`/dashboard/`+'green/' + i18n.t('static.program.downloadsuccess'))
-                                            this.setState({loading:false})
+                                            this.setState({ loading: false })
                                             this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.downloadsuccess'))
                                         }.bind(this);
                                         transactionForSavingDownloadedProgramData.onerror = function (event) {
-                                            this.setState({loading:false})
+                                            this.setState({ loading: false })
                                             this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errortext'))
                                         }.bind(this);
                                         downloadedProgramSaveData.onerror = function (event) {
-                                            this.setState({loading:false})
+                                            this.setState({ loading: false })
                                             this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errortext'))
                                         }.bind(this)
                                     } else {
@@ -617,7 +618,7 @@ class Program extends Component {
                                                         var putRequest = programOverWrite.put(item);
                                                         programThenCount++;
                                                         putRequest.onerror = function (error) {
-                                                            this.setState({loading:false})
+                                                            this.setState({ loading: false })
                                                             this.props.history.push(`/program/downloadProgram/` + "An error occured please try again.")
                                                         }.bind(this);
 
@@ -626,14 +627,14 @@ class Program extends Component {
                                                             // this.props.history.push(`/dashboard/` + "Program downloaded successfully.")
                                                         }.bind(this);
                                                         transactionForOverwrite.onerror = function (event) {
-                                                            this.setState({loading:false})
+                                                            this.setState({ loading: false })
                                                             this.props.history.push(`/program/downloadProgram/` + "An error occured please try again.")
                                                         }.bind(this);
 
                                                         var putRequestDownloadedProgramData = programOverWriteForDownloadedProgramData.put(item);
                                                         // programThenCount++;
                                                         putRequestDownloadedProgramData.onerror = function (error) {
-                                                            this.setState({loading:false})
+                                                            this.setState({ loading: false })
                                                             this.props.history.push(`/program/downloadProgram/` + "An error occured please try again.")
                                                         }.bind(this);
 
@@ -650,7 +651,7 @@ class Program extends Component {
 
                                                         }.bind(this);
                                                         transactionForOverwriteDownloadedProgramData.onerror = function (event) {
-                                                            this.setState({loading:false})
+                                                            this.setState({ loading: false })
                                                             this.props.history.push(`/program/downloadProgram/` + "An error occured please try again.")
                                                         }.bind(this);
                                                     }
@@ -661,7 +662,7 @@ class Program extends Component {
                                                         this.setState({
                                                             message: i18n.t('static.program.actioncancelled'), loading: false
                                                         })
-                                                        this.setState({loading:false})
+                                                        this.setState({ loading: false })
                                                         this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.actioncancelled'))
                                                     }
                                                 }
@@ -673,7 +674,7 @@ class Program extends Component {
                         })
                         .catch(
                             error => {
-                                this.setState({loading:false})
+                                this.setState({ loading: false })
                                 if (error.message === "Network Error") {
                                     this.setState({ message: error.message, loading: false });
                                 } else {

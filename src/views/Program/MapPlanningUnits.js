@@ -6,13 +6,14 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';
 import ProductCategoryServcie from '../../api/PoroductCategoryService.js';
 import { jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination } from '../../CommonComponent/JExcelCommonFunctions.js'
-
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 export default class MapPlanningUnits extends Component {
     constructor(props) {
         super(props);
         this.state = {
             planningUnitList: [],
             mapPlanningUnitEl: '',
+            loading:true
         }
         this.changed = this.changed.bind(this);
         this.myFunction = this.myFunction.bind(this);
@@ -481,7 +482,7 @@ export default class MapPlanningUnits extends Component {
                                 var options = {
                                     data: data,
                                     columnDrag: true,
-                                    colWidths: [290, 290, 170, 170, 170, 170, 170, 170],
+                                    colWidths: [290, 290, 170, 170, 170, 170, 170, 170,190],
                                     columns: [
 
                                         {
@@ -711,7 +712,7 @@ export default class MapPlanningUnits extends Component {
                                 };
                                 var elVar = jexcel(document.getElementById("mapPlanningUnit"), options);
                                 this.el = elVar;
-                                this.setState({ mapPlanningUnitEl: elVar });
+                                this.setState({ mapPlanningUnitEl: elVar , loading: false});
                             } else {
                                 list = [];
                             }
@@ -722,7 +723,7 @@ export default class MapPlanningUnits extends Component {
                 } else {
                     productCategoryList = []
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode, loading: false
                     })
                 }
             });
@@ -767,10 +768,26 @@ export default class MapPlanningUnits extends Component {
     render() {
         return (
             <>
+             <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
+                }} />
                 <h4 className="red">{this.props.message}</h4>
-                <div className="table-responsive" >
+                <div className="table-responsive" style={{ display: this.state.loading ? "none" : "block" }} >
 
                     <div id="mapPlanningUnit" className="RowheightForjexceladdRow">
+                    </div>
+                </div>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
                     </div>
                 </div>
             </>
