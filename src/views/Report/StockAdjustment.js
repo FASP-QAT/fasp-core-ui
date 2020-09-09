@@ -1015,6 +1015,8 @@ class StockAdjustmentComponent extends Component {
             data: [],
             lang: localStorage.getItem('lang'),
             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            minDate:{year:  new Date().getFullYear()-3, month: new Date().getMonth()},
+            maxDate:{year:  new Date().getFullYear()+3, month: new Date().getMonth()+1},
             loading: true
         }
         this.formatLabel = this.formatLabel.bind(this);
@@ -1593,7 +1595,9 @@ class StockAdjustmentComponent extends Component {
         if (programId > 0 && versionId != -1 && this.state.planningUnitValues.length > 0) {
             console.log("INSIDE IF-----------------");
             if (versionId.includes('Local')) {
-
+                startDate = this.state.rangeValue.from.year + '-' + String(this.state.rangeValue.from.month).padStart(2, '0') + '-01';
+                endDate = this.state.rangeValue.to.year + '-' + String(this.state.rangeValue.to.month).padStart(2, '0') + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
+        
                 planningUnitIds = this.state.planningUnitValues.map(ele => (ele.value).toString())
                 var db1;
                 var storeOS;
@@ -1627,10 +1631,11 @@ class StockAdjustmentComponent extends Component {
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         var programJson = JSON.parse(programData);
                         console.log(programJson)
+                        console.log(startDate,endDate)
                        var data=[]
                         planningUnitIds.map(planningUnitId =>{
                            var inventoryList = ((programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && (c.inventoryDate >= startDate && c.inventoryDate <= endDate)&& c.adjustmentQty != 0));
-                          console.log(inventoryList.length)
+                          console.log(inventoryList)
 
                             inventoryList.map(ele=>{
                                    
@@ -1907,7 +1912,7 @@ class StockAdjustmentComponent extends Component {
 
                                         <Picker
                                             ref="pickRange"
-                                            years={{ min: 2013 }}
+                                            years={{min: this.state.minDate, max: this.state.maxDate}}
                                             value={rangeValue}
                                             lang={pickerLang}
                                             //theme="light"

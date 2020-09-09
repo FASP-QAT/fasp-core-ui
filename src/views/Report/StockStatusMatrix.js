@@ -198,7 +198,8 @@ export default class StockStatusMatrix extends React.Component {
                   var list = programJson.supplyPlan.filter(c => c.planningUnitId == planningUnitId && c.transDate == dt)
                   console.log(list)
                   if (list.length > 0) {
-                    if (includePlannedShipments == true) {
+                    console.log(includePlannedShipments)
+                    if (includePlannedShipments.toString() == "true") {
                       monthlydata.push(list[0].mos)
                     }
                     else {
