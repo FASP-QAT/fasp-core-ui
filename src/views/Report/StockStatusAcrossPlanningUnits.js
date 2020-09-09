@@ -1853,42 +1853,42 @@ class StockStatusAcrossPlanningUnits extends Component {
 
             updateTable: function (el, cell, x, y, source, value, id) {
 
-                var elInstance = el.jexcel;
-                var colArrB = ['B', 'C'];
-                var colArrC = ['C'];
-                var colArrD = ['D'];
-                var colArrE = ['E'];
-                var rowData = elInstance.getRowData(y);
+                // var elInstance = el.jexcel;
+                // var colArrB = ['B', 'C'];
+                // var colArrC = ['C'];
+                // var colArrD = ['D'];
+                // var colArrE = ['E'];
+                // var rowData = elInstance.getRowData(y);
 
-                var mos = parseFloat(rowData[2]);
-                var minMos = parseFloat(rowData[3]);
-                var maxMos = parseFloat(rowData[4]);
-                //------------B--------------
-                if (mos < minMos) {
-                    console.log('1')
-                    for (var i = 0; i < colArrB.length; i++) {
-                        elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
-                        elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'background-color', legendcolor[1].color);
-                        let textColor = contrast(legendcolor[1].color);
-                        elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'color', textColor);
-                    }
-                } else if (mos > maxMos) {
-                    console.log('2')
-                    for (var i = 0; i < colArrB.length; i++) {
-                        elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
-                        elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'background-color', legendcolor[0].color);
-                        let textColor = contrast(legendcolor[0].color);
-                        elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'color', textColor);
-                    }
-                } else {
-                    console.log('3')
-                    for (var i = 0; i < colArrB.length; i++) {
-                        elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
-                        elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'background-color', legendcolor[2].color);
-                        let textColor = contrast(legendcolor[2].color);
-                        elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'color', textColor);
-                    }
-                }
+                // var mos = parseFloat(rowData[2]);
+                // var minMos = parseFloat(rowData[3]);
+                // var maxMos = parseFloat(rowData[4]);
+                // //------------B--------------
+                // if (mos < minMos) {
+                //     console.log('1')
+                //     for (var i = 0; i < colArrB.length; i++) {
+                //         elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
+                //         elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'background-color', legendcolor[1].color);
+                //         let textColor = contrast(legendcolor[1].color);
+                //         elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'color', textColor);
+                //     }
+                // } else if (mos > maxMos) {
+                //     console.log('2')
+                //     for (var i = 0; i < colArrB.length; i++) {
+                //         elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
+                //         elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'background-color', legendcolor[0].color);
+                //         let textColor = contrast(legendcolor[0].color);
+                //         elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'color', textColor);
+                //     }
+                // } else {
+                //     console.log('3')
+                //     for (var i = 0; i < colArrB.length; i++) {
+                //         elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
+                //         elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'background-color', legendcolor[2].color);
+                //         let textColor = contrast(legendcolor[2].color);
+                //         elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'color', textColor);
+                //     }
+                // }
 
                 // //-------------C----------------
                 // if (mos < minMos) {
@@ -1964,6 +1964,48 @@ class StockStatusAcrossPlanningUnits extends Component {
 
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
+
+        var elInstance = instance.jexcel;
+        var json = elInstance.getJson();
+        var colArrB = ['B', 'C'];
+        var colArrC = ['C'];
+        var colArrD = ['D'];
+        var colArrE = ['E'];
+
+        for (var j = 0; j < json.length; j++) {
+
+            var rowData = elInstance.getRowData(j);
+
+            var mos = parseFloat(rowData[2]);
+            var minMos = parseFloat(rowData[3]);
+            var maxMos = parseFloat(rowData[4]);
+            //------------B--------------
+            if (mos < minMos) {
+                console.log('1')
+                for (var i = 0; i < colArrB.length; i++) {
+                    elInstance.setStyle(`${colArrB[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
+                    elInstance.setStyle(`${colArrB[i]}${parseInt(j) + 1}`, 'background-color', legendcolor[1].color);
+                    let textColor = contrast(legendcolor[1].color);
+                    elInstance.setStyle(`${colArrB[i]}${parseInt(j) + 1}`, 'color', textColor);
+                }
+            } else if (mos > maxMos) {
+                console.log('2')
+                for (var i = 0; i < colArrB.length; i++) {
+                    elInstance.setStyle(`${colArrB[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
+                    elInstance.setStyle(`${colArrB[i]}${parseInt(j) + 1}`, 'background-color', legendcolor[0].color);
+                    let textColor = contrast(legendcolor[0].color);
+                    elInstance.setStyle(`${colArrB[i]}${parseInt(j) + 1}`, 'color', textColor);
+                }
+            } else {
+                console.log('3')
+                for (var i = 0; i < colArrB.length; i++) {
+                    elInstance.setStyle(`${colArrB[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
+                    elInstance.setStyle(`${colArrB[i]}${parseInt(j) + 1}`, 'background-color', legendcolor[2].color);
+                    let textColor = contrast(legendcolor[2].color);
+                    elInstance.setStyle(`${colArrB[i]}${parseInt(j) + 1}`, 'color', textColor);
+                }
+            }
+        }
     }
 
 
@@ -2079,6 +2121,7 @@ class StockStatusAcrossPlanningUnits extends Component {
 
 
             } else {
+                this.setState({ loading: true });
                 var inputjson = {
                     "programId": programId,
                     "versionId": versionId,
