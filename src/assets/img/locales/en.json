@@ -1125,5 +1125,6 @@
     "static.ticket.ticketcode": "Ticket Code",
     "static.ticket.addUpdateMasterData": "Add / Update Master Data",
     "static.common.regiontext": "Please select Region",
-    "static.graph.costInUSD":"Cost (USD)"
+    "static.graph.costInUSD": "Cost (USD)",
+    "static.commit.shipmentTransId": "Shipment trans id"
 }
