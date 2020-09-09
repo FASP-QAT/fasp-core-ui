@@ -3356,7 +3356,7 @@ export default class WhatIfReportComponent extends React.Component {
                                 <input type="hidden" id="planningUnitId" name="planningUnitId" value={this.state.planningUnitId} />
                                 <input type="hidden" id="programId" name="programId" value={this.state.programId} />
                             </div>
-                            <FormGroup className="col-md-12 mt-2 pl-0" style={{ display: this.state.display }}>
+                            <FormGroup className="col-md-12 mt-2 " style={{ display: this.state.display }}>
                                 <ul className="legendcommitversion list-group">
                                     {
                                         this.state.paColors.map(item1 => (
