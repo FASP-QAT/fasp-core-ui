@@ -1393,7 +1393,7 @@ class Consumption extends Component {
       offlineProductCategoryList: [],
       show: false,
       message: '',
-      rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+      rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
       minDate:{year:  new Date().getFullYear()-3, month: new Date().getMonth()},
       maxDate:{year:  new Date().getFullYear()+3, month: new Date().getMonth()+1},
       loading: true
@@ -2246,79 +2246,86 @@ class Consumption extends Component {
   }
 
   getPlanningUnit() {
-    if (navigator.onLine) {
+    let programId = document.getElementById("programId").value;
+    let versionId = document.getElementById("versionId").value;
+    this.setState({
+        planningUnits: [],
+        planningUnitValues: [],
+        planningUnitLabels: []
+    }, () => {
+        if (versionId.includes('Local')) {
+            const lan = 'en';
+            var db1;
+            var storeOS;
+            getDatabase();
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            openRequest.onsuccess = function (e) {
+                db1 = e.target.result;
+                var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+                var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
+                var planningunitRequest = planningunitOs.getAll();
+                var planningList = []
+                planningunitRequest.onerror = function (event) {
+                    // Handle errors!
+                };
+                planningunitRequest.onsuccess = function (e) {
+                    var myResult = [];
+                    myResult = planningunitRequest.result;
+                    var programId = (document.getElementById("programId").value).split("_")[0];
+                    var proList = []
+                    console.log(myResult)
+                    for (var i = 0; i < myResult.length; i++) {
+                        if (myResult[i].program.id == programId) {
 
-      let programId = document.getElementById("programId").value;
-      let versionId = document.getElementById("versionId").value;
-      // let productCategoryId = document.getElementById("productCategoryId").value;
-      ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
-        // console.log('RESP----------', response.data);
-        this.setState({
-          planningUnits: response.data
-        }, () => {
-          this.filterData();
-        })
-      })
-        .catch(
-          error => {
-            this.setState({
-              planningUnits: [],
+                            proList[i] = myResult[i]
+                        }
+                    }
+                    this.setState({
+                        planningUnits: proList, message: ''
+                    }, () => {
+                        this.filterData();
+                    })
+                }.bind(this);
+            }.bind(this)
+
+
+        }
+        else {
+            AuthenticationService.setupAxiosInterceptors();
+
+            ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
+                console.log('**' + JSON.stringify(response.data))
+                this.setState({
+                    planningUnits: response.data, message: ''
+                }, () => {
+                    this.filterData();
+                })
             })
-            if (error.message === "Network Error") {
-              this.setState({ message: error.message });
-            } else {
-              switch (error.response ? error.response.status : "") {
-                case 500:
-                case 401:
-                case 404:
-                case 406:
-                case 412:
-                  this.setState({ message: error.response.data.messageCode });
-                  break;
-                default:
-                  this.setState({ message: 'static.unkownError' });
-                  break;
-              }
-            }
-          }
-        );
-    } else {
-      const lan = 'en';
-      var db1;
-      var storeOS;
-      getDatabase();
-      var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-      openRequest.onsuccess = function (e) {
-        db1 = e.target.result;
-        var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
-        var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
-        var planningunitRequest = planningunitOs.getAll();
-        var planningList = []
-        planningunitRequest.onerror = function (event) {
-          // Handle errors!
-        };
-        planningunitRequest.onsuccess = function (e) {
-          var myResult = [];
-          myResult = planningunitRequest.result;
-          var programId = (document.getElementById("programId").value).split("_")[0];
-          var proList = []
-          for (var i = 0; i < myResult.length; i++) {
-            if (myResult[i].program.id == programId) {
-              var productJson = {
-                name: getLabelText(myResult[i].planningUnit.label, lan),
-                id: myResult[i].planningUnit.id
-              }
-              proList[i] = productJson
-            }
-          }
-          this.setState({
-            offlinePlanningUnitList: proList,
-          })
-        }.bind(this);
-      }.bind(this)
-
-    }
-    this.filterData();
+                .catch(
+                    error => {
+                        this.setState({
+                            planningUnits: [],
+                        })
+                        if (error.message === "Network Error") {
+                            this.setState({ message: error.message });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+                                case 500:
+                                case 401:
+                                case 404:
+                                case 406:
+                                case 412:
+                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
+                                    break;
+                                default:
+                                    this.setState({ message: 'static.unkownError' });
+                                    break;
+                            }
+                        }
+                    }
+                );
+        }
+    });
   }
   // getProductCategories() {
   //   let programId = document.getElementById("programId").value;
@@ -2417,7 +2424,10 @@ class Consumption extends Component {
       if (program.length == 1) {
         if (navigator.onLine) {
           this.setState({
-            versions: []
+            versions: [],
+            planningUnits: [],
+            planningUnitValues: [],
+            planningUnitLabels: []
           }, () => {
             this.setState({
               versions: program[0].versionList.filter(function (x, i, a) {
@@ -2429,19 +2439,28 @@ class Consumption extends Component {
 
         } else {
           this.setState({
-            versions: []
+            versions: [],
+            planningUnits: [],
+            planningUnitValues: [],
+            planningUnitLabels: []
           }, () => { this.consolidatedVersionList(programId) })
         }
       } else {
 
         this.setState({
-          versions: []
+          versions: [],
+          planningUnits: [],
+          planningUnitValues: [],
+          planningUnitLabels: []
         })
 
       }
     } else {
       this.setState({
-        versions: []
+        versions: [],
+        planningUnits: [],
+        planningUnitValues: [],
+        planningUnitLabels: []
       })
     }
     this.filterData();

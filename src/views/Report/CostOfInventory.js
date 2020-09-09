@@ -1448,7 +1448,7 @@ export default class CostOfInventory extends Component {
                     readOnly: true
                 },
                 {
-                    title: i18n.t('static.shipment.rate'),
+                    title:  i18n.t('static.procurementAgentPlanningUnit.catalogPrice'),
                     type: 'text',
                     readOnly: true
                 },
