@@ -1101,7 +1101,7 @@ export default class ManualTagging extends Component {
             },
             {
                 dataField: 'expectedDeliveryDate',
-                text: 'Expected Delivery Date',
+                text: 'Expected Receieved Date',
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -1195,7 +1195,7 @@ export default class ManualTagging extends Component {
             },
             {
                 dataField: 'currentEstimatedDeliveryDate',
-                text: 'Current Estimated Delivery Date',
+                text: 'Current Estimated Receieved Date',
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',

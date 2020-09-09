@@ -1394,6 +1394,8 @@ class Consumption extends Component {
       show: false,
       message: '',
       rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+      minDate:{year:  new Date().getFullYear()-3, month: new Date().getMonth()},
+      maxDate:{year:  new Date().getFullYear()+3, month: new Date().getMonth()+1},
       loading: true
 
 
@@ -1683,7 +1685,7 @@ class Consumption extends Component {
     const headers = [[i18n.t('static.report.consumptionDate'),
     i18n.t('static.report.forecasted'),
     i18n.t('static.report.actual')]];
-    const data = navigator.onLine ? this.state.consumptions.map(elt => [elt.transDate, this.formatter(elt.forecastedConsumption), this.formatter(elt.actualConsumption)]) : this.state.offlineConsumptionList.map(elt => [elt.transDate, this.formatter(elt.forecastedConsumption), this.formatter(elt.actualConsumption)]);
+    const data = navigator.onLine ? this.state.consumptions.map(elt => [moment(elt.transDate, 'yyyy-MM-dd').format('MMM YYYY'), this.formatter(elt.forecastedConsumption), this.formatter(elt.actualConsumption)]) : this.state.offlineConsumptionList.map(elt => [elt.transDate, this.formatter(elt.forecastedConsumption), this.formatter(elt.actualConsumption)]);
     // let content = {
     //   margin: { top: 80 },
     //   startY: height,
@@ -1728,8 +1730,8 @@ class Consumption extends Component {
     let content = {
       margin: { top: 80, bottom: 50 },
       startY: height,
-      head: head1,
-      body: row3,
+      head: headers,
+      body: data,
       styles: { lineWidth: 1, fontSize: 8, halign: 'center' }
 
     };
@@ -2722,7 +2724,7 @@ class Consumption extends Component {
 
                           <Picker
                             ref="pickRange"
-                            years={{ min: 2013 }}
+                            years={{min: this.state.minDate, max: this.state.maxDate}}
                             value={rangeValue}
                             lang={pickerLang}
                             //theme="light"

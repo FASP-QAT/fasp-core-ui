@@ -996,7 +996,9 @@ export default class CostOfInventory extends Component {
             versions: [],
             message: '',
             singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
-            loading: true
+            minDate:{year:  new Date().getFullYear()-3, month: new Date().getMonth()},
+            maxDate:{year:  new Date().getFullYear()+3, month: new Date().getMonth()+1},
+           loading: true
 
         }
         this.formSubmit = this.formSubmit.bind(this);
@@ -1554,13 +1556,13 @@ export default class CostOfInventory extends Component {
                               
                                  var dtstr = this.state.singleValue2.year + "-" + String(this.state.singleValue2.month).padStart(2, '0') + "-01"
                                var list = programJson.supplyPlan.filter(c => c.planningUnitId == planningUnit.planningUnit.id && c.transDate == dtstr)
-                                console.log('planningunit', planningUnit.planningUnit)
                                 if (list.length > 0) {
+                                    console.log(list)
                                 var json = {
                                     planningUnit: planningUnit.planningUnit,
-                                    stock: document.getElementById("includePlanningShipments").value.toString() == 'true'?list[0].closingBalance:list[0].closingBalanceWPS,
+                                    stock: document.getElementById("includePlanningShipments").value.toString() == 'true'?list[0].closingBalance:list[0].closingBalanceWps,
                                     catalogPrice: planningUnit.catalogPrice,
-                                    cost: this.roundN(document.getElementById("includePlanningShipments").value.toString() == 'true'?list[0].closingBalance  * planningUnit.catalogPrice:list[0].closingBalanceWPS * planningUnit.catalogPrice)
+                                    cost: this.roundN(document.getElementById("includePlanningShipments").value.toString() == 'true'?list[0].closingBalance  * planningUnit.catalogPrice:list[0].closingBalanceWps * planningUnit.catalogPrice)
                                 }
                                 data.push(json)
                             }else{
@@ -1585,7 +1587,7 @@ export default class CostOfInventory extends Component {
                     "programId": programId,
                     "versionId": versionId,
                     "dt": moment(new Date(this.state.singleValue2.year, (this.state.singleValue2.month - 1), 1)).startOf('month').format('YYYY-MM-DD'),
-                    "includePlannedShipments": document.getElementById("includePlanningShipments").value ? 1 : 0
+                    "includePlannedShipments": document.getElementById("includePlanningShipments").value.toString()=="true" ? 1 : 0
                 }
                 AuthenticationService.setupAxiosInterceptors();
                 ReportService.costOfInventory(inputjson).then(response => {
@@ -1748,7 +1750,7 @@ export default class CostOfInventory extends Component {
                                                 <div className="controls edit">
                                                     <Picker
                                                         ref="pickAMonth2"
-                                                        years={{ min: { year: 2010, month: 1 }, max: { year: 2021, month: 12 } }}
+                                                        years={{min: this.state.minDate, max: this.state.maxDate}}
                                                         value={singleValue2}
                                                         lang={pickerLang.months}
                                                         theme="dark"
@@ -1818,23 +1820,7 @@ export default class CostOfInventory extends Component {
                                             </FormGroup>
 
 
-                                            <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.month')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
-                                                <div className="controls edit">
-                                                    <Picker
-                                                        ref="pickAMonth2"
-                                                        years={{ min: { year: 2010, month: 1 }, max: { year: 2021, month: 12 } }}
-                                                        value={singleValue2}
-                                                        lang={pickerLang.months}
-                                                        theme="dark"
-                                                        onChange={this.handleAMonthChange2}
-                                                        onDismiss={this.handleAMonthDissmis2}
-                                                    >
-                                                        <MonthBox value={this.makeText(singleValue2)} onClick={this.handleClickMonthBox2} />
-                                                    </Picker>
-                                                </div>
-
-                                            </FormGroup>
+                                           
                                         </div>
                                     </div>
                                 </Form>
