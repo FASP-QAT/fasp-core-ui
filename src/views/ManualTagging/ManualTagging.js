@@ -1103,7 +1103,7 @@ export default class ManualTagging extends Component {
             },
             {
                 dataField: 'expectedDeliveryDate',
-                text: 'Expected Receieved Date',
+                text: i18n.t('static.supplyPlan.expectedDeliveryDate'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -1197,7 +1197,7 @@ export default class ManualTagging extends Component {
             },
             {
                 dataField: 'currentEstimatedDeliveryDate',
-                text: 'Current Estimated Receieved Date',
+                text: 'Current Estimated Received Date',
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',

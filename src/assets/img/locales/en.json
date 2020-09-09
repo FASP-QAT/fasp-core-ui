@@ -768,7 +768,7 @@
     "static.supplyPlan.adjustesOrderQty": "Order Qty",
     "static.supplyPlan.shipmentMode": "Shipment Mode",
     "static.supplyPlan.orderDate": "Order Date",
-    "static.supplyPlan.expectedDeliveryDate": "Estimated Received Date",
+    "static.supplyPlan.expectedDeliveryDate": "Expected Received Date",
     "static.supplyPlan.emergencyOrder": "Emergency Order",
     "static.supplyPlan.addNewShipment": "Add New Shipment",
     "static.supplyPlan.duplicateShipment": "Duplicate Shipment",
