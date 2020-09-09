@@ -454,10 +454,13 @@ class RegionListComponent extends Component {
 
         let content = {
             margin: { top: 90, bottom: 70 },
-            startY: 200,
+            startY: 130,
             head: [headers],
             body: data,
-            styles: { lineWidth: 1, fontSize: 8, cellWidth: 55, halign: 'center' },
+            styles: { lineWidth: 1, fontSize: 8, cellWidth: 152, halign: 'center' },
+            columnStyles: {
+                4: { cellWidth: 153.89 },
+            }
         };
         doc.autoTable(content);
         addHeaders(doc)
