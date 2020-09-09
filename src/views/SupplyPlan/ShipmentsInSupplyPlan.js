@@ -1512,18 +1512,18 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 var procurementAgentPlanningUnit = this.state.procurementAgentPlanningUnitListAll.filter(c => c.procurementAgent.id == rowData[2] && c.planningUnit.id == planningUnitId);
                 console.log("RowData------------------>", rowData)
                 var pricePerUnit = rowData[10];
-                // if (pricePerUnit.toString() == "") {
-                console.log("Price per unit", pricePerUnit);
-                if (procurementAgentPlanningUnit.length > 0) {
-                    console.log("in length greater than 0")
-                    pricePerUnit = parseFloat(procurementAgentPlanningUnit[0].catalogPrice);
+                if (rowData[16] == -1) {
+                    console.log("Price per unit", pricePerUnit);
+                    if (procurementAgentPlanningUnit.length > 0) {
+                        console.log("in length greater than 0")
+                        pricePerUnit = parseFloat(procurementAgentPlanningUnit[0].catalogPrice);
+                    }
+                    if (rowData[9] != "") {
+                        var conversionRateToUsd = parseFloat((this.state.currencyListAll.filter(c => c.currencyId == rowData[9])[0]).conversionRateToUsd);
+                        pricePerUnit = parseFloat(pricePerUnit / conversionRateToUsd).toFixed(2);
+                        elInstance.setValueFromCoords(10, y, pricePerUnit, true);
+                    }
                 }
-                if (rowData[9] != "") {
-                    var conversionRateToUsd = parseFloat((this.state.currencyListAll.filter(c => c.currencyId == rowData[9])[0]).conversionRateToUsd);
-                    pricePerUnit = parseFloat(pricePerUnit / conversionRateToUsd).toFixed(2);
-                    elInstance.setValueFromCoords(10, y, pricePerUnit, true);
-                }
-                // }
                 this.calculateLeadTimesOnChange(y)
             }
         }
@@ -1531,10 +1531,10 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         if (x == 9) {
             var valid = checkValidtion("text", "J", y, rowData[9], elInstance);
             if (valid == true) {
-                // if (rowData[2] != "") {
-                var procurementAgentPlanningUnit = this.state.procurementAgentPlanningUnitListAll.filter(c => c.procurementAgent.id == rowData[2] && c.planningUnit.id == planningUnitId);
-                var pricePerUnit = rowData[10];
-                if (pricePerUnit.toString() == "") {
+                if (rowData[16] == -1) {
+                    var procurementAgentPlanningUnit = this.state.procurementAgentPlanningUnitListAll.filter(c => c.procurementAgent.id == rowData[2] && c.planningUnit.id == planningUnitId);
+                    var pricePerUnit = rowData[10];
+                    // if (pricePerUnit.toString() == "") {
                     console.log("Price per unit", pricePerUnit);
                     if (procurementAgentPlanningUnit.length > 0) {
                         console.log("in length greater than 0")
@@ -1571,7 +1571,27 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             var valid = checkValidtion("text", "H", y, rowData[7], elInstance);
             if (valid == true) {
                 var rate = ((elInstance.getCell(`L${parseInt(y) + 1}`)).innerHTML).toString().replaceAll("\,", "");
-                // if (rowData[12].toString() == "") {
+                if (rowData[16] == -1) {
+                    var freightCost = 0;
+                    if (rowData[7] == 1) {
+                        var seaFreightPercentage = this.props.items.programJson.seaFreightPerc;
+                        freightCost = parseFloat(rate) * (parseFloat(parseFloat(seaFreightPercentage) / 100));
+                        elInstance.setValueFromCoords(12, y, freightCost.toFixed(2), true);
+                    } else {
+                        var airFreightPercentage = this.props.items.programJson.airFreightPerc;
+                        freightCost = parseFloat(rate) * (parseFloat(parseFloat(airFreightPercentage) / 100));
+                        elInstance.setValueFromCoords(12, y, freightCost.toFixed(2), true);
+                    }
+                }
+                this.calculateLeadTimesOnChange(y);
+            }
+        }
+
+        if (x == 11) {
+            var rate = ((elInstance.getCell(`L${parseInt(y) + 1}`)).innerHTML).toString().replaceAll("\,", "");
+            console.log("RowData[12]", rowData[12]);
+            if (rowData[16] == -1) {
+                console.log("In if");
                 var freightCost = 0;
                 if (rowData[7] == 1) {
                     var seaFreightPercentage = this.props.items.programJson.seaFreightPerc;
@@ -1582,27 +1602,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     freightCost = parseFloat(rate) * (parseFloat(parseFloat(airFreightPercentage) / 100));
                     elInstance.setValueFromCoords(12, y, freightCost.toFixed(2), true);
                 }
-                // }
-                this.calculateLeadTimesOnChange(y);
             }
-        }
-
-        if (x == 11) {
-            var rate = ((elInstance.getCell(`L${parseInt(y) + 1}`)).innerHTML).toString().replaceAll("\,", "");
-            console.log("RowData[12]", rowData[12]);
-            // if (rowData[12].toString() == "") {
-            console.log("In if");
-            var freightCost = 0;
-            if (rowData[7] == 1) {
-                var seaFreightPercentage = this.props.items.programJson.seaFreightPerc;
-                freightCost = parseFloat(rate) * (parseFloat(parseFloat(seaFreightPercentage) / 100));
-                elInstance.setValueFromCoords(12, y, freightCost.toFixed(2), true);
-            } else {
-                var airFreightPercentage = this.props.items.programJson.airFreightPerc;
-                freightCost = parseFloat(rate) * (parseFloat(parseFloat(airFreightPercentage) / 100));
-                elInstance.setValueFromCoords(12, y, freightCost.toFixed(2), true);
-            }
-            // }
         }
 
         if (x == 8) {
