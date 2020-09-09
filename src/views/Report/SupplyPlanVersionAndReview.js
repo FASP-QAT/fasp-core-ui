@@ -947,6 +947,8 @@ class SupplyPlanVersionAndReview extends Component {
             data[6] = (matricsList[j].versionStatus.id == 2) ? (matricsList[j].lastModifiedBy.username) : ''
             data[7] = (matricsList[j].versionStatus.id == 2) ? (matricsList[j].lastModifiedDate ? moment(matricsList[j].lastModifiedDate).format(`${DATE_FORMAT_CAP} hh:mm A`) : null) : null
             data[8] = matricsList[j].notes
+            data[9] = matricsList[j].versionType.id
+            data[10] = matricsList[j].versionStatus.id
             matricsArray[count] = data;
             count++;
         }
@@ -1006,6 +1008,16 @@ class SupplyPlanVersionAndReview extends Component {
                     title: i18n.t('static.report.comment'),
                     type: 'text',
                     readOnly: true
+                },
+                {
+                    title: 'versionTypeId',
+                    type: 'hidden',
+                    readOnly: true
+                },
+                {
+                    title: 'versionStatusId',
+                    type: 'hidden',
+                    readOnly: true
                 }
             ],
             text: {
@@ -1048,10 +1060,13 @@ class SupplyPlanVersionAndReview extends Component {
             // let versionStatusId = this.el.getValueFromCoords(5, x);
             // let versionTypeId =this.el.getValueFromCoords(2, x);
 
-            var rowData = instance.getRowData(y);
-            let versionStatusId = rowData[5];
-            let versionTypeId =rowData[2];
-            console.log("====>",versionStatusId,"====>",versionTypeId);
+            console.log("instance----->",instance.jexcel,"----------->",x);
+            var elInstance = instance.jexcel;
+            var rowData = elInstance.getRowData(x);
+            console.log("rowData==>", rowData);
+            let versionStatusId = rowData[10];
+            let versionTypeId = rowData[9];
+            console.log("====>", versionStatusId, "====>", versionTypeId);
             if (versionStatusId == 1 && versionTypeId == 2) {
                 this.props.history.push({
                     pathname: `/report/editStatus/${programId}/${this.el.getValueFromCoords(1, x)}`,
@@ -1105,7 +1120,7 @@ class SupplyPlanVersionAndReview extends Component {
 
     }
 
-    _handleClickRangeBox(e) { 
+    _handleClickRangeBox(e) {
         this.refs.pickRange.show()
     }
 
@@ -1776,7 +1791,7 @@ class SupplyPlanVersionAndReview extends Component {
                         <div className="ReportSearchMarginTop">
                             <div id="tableDiv" className="jexcelremoveReadonlybackground">
                             </div>
-                        </div> 
+                        </div>
 
                     </CardBody>
                 </Card>
