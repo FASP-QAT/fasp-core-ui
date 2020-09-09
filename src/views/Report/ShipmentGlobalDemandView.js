@@ -1586,6 +1586,8 @@ class ShipmentGlobalDemandView extends Component {
             show: false,
             message: '',
             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            minDate:{year:  new Date().getFullYear()-3, month: new Date().getMonth()},
+            maxDate:{year:  new Date().getFullYear()+3, month: new Date().getMonth()+1},
             loading: true
         };
 
@@ -1609,24 +1611,32 @@ class ShipmentGlobalDemandView extends Component {
 
         var csvRow = [];
         csvRow.push((i18n.t('static.report.dateRange') + ' , ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20'))
+        csvRow.push('')
         if (navigator.onLine) {
             csvRow.push((i18n.t('static.dashboard.productcategory')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("productCategoryId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'));
-
+            csvRow.push('')
             this.state.planningUnitLabels.map(ele =>
                 csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')));
+            csvRow.push('')
             this.state.fundingSourceLabels.map(ele =>
                 csvRow.push((i18n.t('static.budget.fundingsource')).replaceAll(' ', '%20') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')));
+            csvRow.push('')
             this.state.shipmentStatusLabels.map(ele =>
                 csvRow.push((i18n.t('static.common.status')).replaceAll(' ', '%20') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
+
 
         } else {
 
             csvRow.push(i18n.t('static.program.program') + ' , ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20'))
+            csvRow.push('')
             csvRow.push(i18n.t('static.report.version').replaceAll(' ', '%20') + '  ,  ' + (document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20'))
+            csvRow.push('')
             this.state.planningUnitLabels.map(ele =>
                 csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')));
+            csvRow.push('')
             this.state.fundingSourceLabels.map(ele =>
                 csvRow.push((i18n.t('static.budget.fundingsource')).replaceAll(' ', '%20') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')));
+            csvRow.push('')
             this.state.shipmentStatusLabels.map(ele =>
                 csvRow.push((i18n.t('static.common.status')).replaceAll(' ', '%20') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
         }
@@ -1642,9 +1652,11 @@ class ShipmentGlobalDemandView extends Component {
 
             let tableHead = this.state.table1Headers;
             let tableHeadTemp = [];
+            tableHeadTemp.push("Planning Unit");
             for (var i = 0; i < tableHead.length; i++) {
                 tableHeadTemp.push((tableHead[i].replaceAll(',', ' ')).replaceAll(' ', '%20'));
             }
+            tableHeadTemp.push("Total");
 
             A[0] = tableHeadTemp;
             re = this.state.procurementAgentSplit;
@@ -1661,7 +1673,7 @@ class ShipmentGlobalDemandView extends Component {
         var a = document.createElement("a")
         a.href = 'data:attachment/csv,' + csvString
         a.target = "_Blank"
-        a.download = i18n.t('static.dashboard.shipmentGlobalDemandView') + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to) + ".csv"
+        a.download = i18n.t('static.dashboard.shipmentGlobalDemandViewheader') + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to) + ".csv"
         document.body.appendChild(a)
         a.click()
     }
@@ -1718,7 +1730,7 @@ class ShipmentGlobalDemandView extends Component {
                   align: 'justify'
                 });*/
                 doc.setTextColor("#002f6c");
-                doc.text(i18n.t('static.dashboard.shipmentGlobalDemandView'), doc.internal.pageSize.width / 2, 60, {
+                doc.text(i18n.t('static.dashboard.shipmentGlobalDemandViewheader'), doc.internal.pageSize.width / 2, 60, {
                     align: 'center'
                 })
                 if (i == 1) {
@@ -1881,10 +1893,10 @@ class ShipmentGlobalDemandView extends Component {
 
         canvasImg = canvas.toDataURL("image/png", 1.0);
 
-        doc.addImage(canvasImg, 'png',500, startYtable, 340, 170, 'b', 'CANVAS');
+        doc.addImage(canvasImg, 'png', 500, startYtable, 340, 170, 'b', 'CANVAS');
 
         // let tableHeadLength = this.state.table1Headers.length;
-        let length = this.state.table1Headers.length + 1;
+        let length = this.state.table1Headers.length + 3;
         doc.addPage()
         startYtable = 80
         //Tables
@@ -1893,7 +1905,7 @@ class ShipmentGlobalDemandView extends Component {
             startY: startYtable,
             styles: { lineWidth: 1, fontSize: 8, cellWidth: 50, halign: 'center' },
             columnStyles: {
-                 0: { cellWidth: 61.89 },
+                0: { cellWidth: 61.89 },
                 // 1: { cellWidth: 100 },
                 // 2: { cellWidth: 200 },
                 // 3: { cellWidth: 100 },
@@ -1917,7 +1929,7 @@ class ShipmentGlobalDemandView extends Component {
         // doc.autoTable(content);
         addHeaders(doc)
         addFooters(doc)
-        doc.save(i18n.t('static.dashboard.shipmentGlobalDemandView') + ".pdf")
+        doc.save(i18n.t('static.dashboard.shipmentGlobalDemandViewheader') + ".pdf")
         //creates PDF from img
         /*  var doc = new jsPDF('landscape');
           doc.setFontSize(20);
@@ -1972,8 +1984,8 @@ class ShipmentGlobalDemandView extends Component {
 
                         var table1Headers = [];
                         table1Headers = Object.keys(response.data.procurementAgentSplit[0].procurementAgentQty);
-                        table1Headers.unshift(i18n.t('static.planningunit.planningunit'));
-                        table1Headers.push(i18n.t('static.report.totalUnit'));
+                        // table1Headers.unshift(i18n.t('static.planningunit.planningunit'));
+                        // table1Headers.push(i18n.t('static.report.totalUnit'));
                         this.setState({
                             data: response.data,
                             fundingSourceSplit: response.data.fundingSourceSplit,
@@ -2240,8 +2252,8 @@ class ShipmentGlobalDemandView extends Component {
                             console.log("procurementAgentSplit->", procurementAgentSplit);
                             var table1Headers = [];
                             table1Headers = (procurementAgentSplit.length == 0) ? [] : Object.keys(procurementAgentSplit[0].procurementAgentQty);
-                            table1Headers.unshift(i18n.t('static.planningunit.planningunit'));
-                            table1Headers.push(i18n.t('static.report.totalUnit'));
+                            // table1Headers.unshift(i18n.t('static.planningunit.planningunit'));
+                            // table1Headers.push(i18n.t('static.report.totalUnit'));
 
 
 
@@ -2988,12 +3000,12 @@ class ShipmentGlobalDemandView extends Component {
             datasets: [{
                 data: this.state.fundingSourceSplit.map(ele => (ele.amount)),
                 backgroundColor: ['#4dbd74', '#f86c6b', '#8aa9e6', '#EDB944', '#20a8d8',
-                '#042e6a',
-                '#59cacc','#118b70',
-                '#EDB944',
-                '#F48521',
-                '#ED5626',
-                '#3fe488'],
+                    '#042e6a',
+                    '#59cacc', '#118b70',
+                    '#EDB944',
+                    '#F48521',
+                    '#ED5626',
+                    '#3fe488'],
                 legend: {
                     position: 'bottom'
                 }
@@ -3047,7 +3059,7 @@ class ShipmentGlobalDemandView extends Component {
 
                                                 <Picker
                                                     ref="pickRange"
-                                                    years={{ min: 2013 }}
+                                                    years={{min: this.state.minDate, max: this.state.maxDate}}
                                                     value={rangeValue}
                                                     lang={pickerLang}
                                                     //theme="light"
@@ -3223,7 +3235,7 @@ class ShipmentGlobalDemandView extends Component {
 
 
                                     </div>
-                                {/* </Col> */}
+                                    {/* </Col> */}
                                 </div>
                             </Form>
                             <Col md="12 pl-0  ">
@@ -3271,6 +3283,11 @@ class ShipmentGlobalDemandView extends Component {
                                                     <Table id="mytable1" responsive className="table-striped  table-fixed table-hover table-bordered text-center mt-2">
 
                                                         <thead>
+                                                            <tr>
+                                                                <th rowSpan={2}>{i18n.t('static.dashboard.planningunitheader')}</th>
+                                                                <th colSpan={this.state.table1Headers.length} align='center'>{i18n.t('static.report.procurementAgentName')}</th>
+                                                                <th rowSpan={2}>{i18n.t('static.report.totalUnit')}</th>
+                                                            </tr>
                                                             <tr>
                                                                 {
                                                                     this.state.table1Headers.map((item, idx) =>

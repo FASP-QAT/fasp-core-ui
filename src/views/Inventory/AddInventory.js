@@ -136,93 +136,104 @@ export default class AddInventory extends Component {
     getPlanningUnitList(value) {
         document.getElementById("planningUnitId").value = 0;
         document.getElementById("planningUnit").value = "";
+        document.getElementById("adjustmentsTable").style.display = "none";
         this.setState({
             programSelect: value,
             programId: value != "" && value != undefined ? value.value : 0,
-            loading: true
+            loading: true,
+            planningUnit: "",
+            planningUnitId: 0
         })
-        var db1;
-        var storeOS;
-        var regionList = [];
-        getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function (event) {
-            this.setState({
-                message: i18n.t('static.program.errortext'),
-                color: 'red'
-            })
-        }.bind(this);
-        openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-            var programDataTransaction = db1.transaction(['programData'], 'readwrite');
-            var programDataOs = programDataTransaction.objectStore('programData');
-            var programRequest = programDataOs.get(value != "" && value != undefined ? value.value : 0);
-            programRequest.onerror = function (event) {
+        var programId = value != "" && value != undefined ? value.value : 0;
+        if (programId != 0) {
+            var db1;
+            var storeOS;
+            var regionList = [];
+            getDatabase();
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            openRequest.onerror = function (event) {
                 this.setState({
-                    supplyPlanError: i18n.t('static.program.errortext')
+                    message: i18n.t('static.program.errortext'),
+                    color: 'red'
                 })
             }.bind(this);
-            programRequest.onsuccess = function (e) {
-                var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                var programJson = JSON.parse(programData);
-                for (var i = 0; i < programJson.regionList.length; i++) {
-                    var regionJson = {
-                        name: getLabelText(programJson.regionList[i].label, this.state.lang),
-                        id: programJson.regionList[i].regionId
-                    }
-                    regionList.push(regionJson)
-
-                }
-
-                var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
-                var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
-                var planningunitRequest = planningunitOs.getAll();
-                var planningList = []
-                planningunitRequest.onerror = function (event) {
+            openRequest.onsuccess = function (e) {
+                db1 = e.target.result;
+                var programDataTransaction = db1.transaction(['programData'], 'readwrite');
+                var programDataOs = programDataTransaction.objectStore('programData');
+                var programRequest = programDataOs.get(value != "" && value != undefined ? value.value : 0);
+                programRequest.onerror = function (event) {
                     this.setState({
-                        message: i18n.t('static.program.errortext'),
-                        color: 'red'
+                        supplyPlanError: i18n.t('static.program.errortext')
                     })
                 }.bind(this);
-                planningunitRequest.onsuccess = function (e) {
-                    var myResult = [];
-                    myResult = planningunitRequest.result;
-                    console.log("myResult", myResult);
-                    var programId = (value != "" && value != undefined ? value.value : 0).split("_")[0];
-                    console.log('programId----->>>', programId)
-                    console.log(myResult);
-                    var proList = []
-                    for (var i = 0; i < myResult.length; i++) {
-                        if (myResult[i].program.id == programId && myResult[i].active == true) {
-                            var productJson = {
-                                label: getLabelText(myResult[i].planningUnit.label, this.state.lang),
-                                value: myResult[i].planningUnit.id
-                            }
-                            proList.push(productJson)
+                programRequest.onsuccess = function (e) {
+                    var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                    var programJson = JSON.parse(programData);
+                    for (var i = 0; i < programJson.regionList.length; i++) {
+                        var regionJson = {
+                            name: getLabelText(programJson.regionList[i].label, this.state.lang),
+                            id: programJson.regionList[i].regionId
                         }
-                    }
-                    console.log("proList---" + proList);
-                    this.setState({
-                        planningUnitList: proList,
-                        planningUnitListAll: myResult,
-                        regionList: regionList,
-                        loading: false
-                    })
+                        regionList.push(regionJson)
 
-                    var planningUnitIdProp = this.props.match.params.planningUnitId;
-                    console.log("planningUnitIdProp===>", planningUnitIdProp);
-                    if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
-                        var planningUnit = { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label };
-                        this.setState({
-                            planningUnit: planningUnit,
-                            planningUnitId: planningUnitIdProp
-                        })
-                        this.formSubmit(planningUnit);
                     }
-                }.bind(this);
+
+                    var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+                    var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
+                    var planningunitRequest = planningunitOs.getAll();
+                    var planningList = []
+                    planningunitRequest.onerror = function (event) {
+                        this.setState({
+                            message: i18n.t('static.program.errortext'),
+                            color: 'red'
+                        })
+                    }.bind(this);
+                    planningunitRequest.onsuccess = function (e) {
+                        var myResult = [];
+                        myResult = planningunitRequest.result;
+                        console.log("myResult", myResult);
+                        var programId = (value != "" && value != undefined ? value.value : 0).split("_")[0];
+                        console.log('programId----->>>', programId)
+                        console.log(myResult);
+                        var proList = []
+                        for (var i = 0; i < myResult.length; i++) {
+                            if (myResult[i].program.id == programId && myResult[i].active == true) {
+                                var productJson = {
+                                    label: getLabelText(myResult[i].planningUnit.label, this.state.lang),
+                                    value: myResult[i].planningUnit.id
+                                }
+                                proList.push(productJson)
+                            }
+                        }
+                        console.log("proList---" + proList);
+                        this.setState({
+                            planningUnitList: proList,
+                            planningUnitListAll: myResult,
+                            regionList: regionList,
+                            loading: false
+                        })
+
+                        var planningUnitIdProp = this.props.match.params.planningUnitId;
+                        console.log("planningUnitIdProp===>", planningUnitIdProp);
+                        if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
+                            var planningUnit = { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label };
+                            this.setState({
+                                planningUnit: planningUnit,
+                                planningUnitId: planningUnitIdProp
+                            })
+                            this.formSubmit(planningUnit);
+                        }
+                    }.bind(this);
+                }.bind(this)
             }.bind(this)
-        }.bind(this)
+        } else {
+            this.setState({
+                loading: false,
+                planningUnitList: []
+            })
+        }
     }
 
     formSubmit(value) {
@@ -232,56 +243,62 @@ export default class AddInventory extends Component {
         this.setState({ programId: programId, planningUnitId: value != "" && value != undefined ? value.value : 0, planningUnit: value });
         var planningUnitId = value != "" && value != undefined ? value.value : 0;
         var programId = document.getElementById("programId").value;
-        var db1;
-        getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function (event) {
-            this.setState({
-                message: i18n.t('static.program.errortext'),
-                color: 'red'
-            })
-        }.bind(this);
-        openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-            var transaction = db1.transaction(['programData'], 'readwrite');
-            var programTransaction = transaction.objectStore('programData');
-            var programRequest = programTransaction.get(programId);
-            programRequest.onerror = function (event) {
+        if (planningUnitId != 0) {
+            document.getElementById("adjustmentsTable").style.display = "block";
+            var db1;
+            getDatabase();
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            openRequest.onerror = function (event) {
                 this.setState({
                     message: i18n.t('static.program.errortext'),
                     color: 'red'
                 })
             }.bind(this);
-            programRequest.onsuccess = function (event) {
-                var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                var programJson = JSON.parse(programData);
-                var batchList = []
-                var batchInfoList = programJson.batchInfoList;
-                console.log("Batch info list from program json", batchInfoList);
-                var inventoryListUnFiltered = (programJson.inventoryList);
-                var inventoryList = (programJson.inventoryList).filter(c =>
-                    c.planningUnit.id == planningUnitId &&
-                    c.region != null && c.region.id != 0);
-                if (this.state.inventoryType == 1) {
-                    inventoryList = inventoryList.filter(c => c.actualQty != "" && c.actualQty != 0 && c.actualQty != null);
-                } else {
-                    inventoryList = inventoryList.filter(c => c.adjustmentQty != "" && c.adjustmentQty != 0 && c.adjustmentQty != null);
-                }
-                this.setState({
-                    batchInfoList: batchInfoList,
-                    programJson: programJson,
-                    inventoryListUnFiltered: inventoryListUnFiltered,
-                    inventoryList: inventoryList,
-                    showInventory: 1,
-                    inventoryType: this.state.inventoryType,
-                    inventoryMonth: "",
-                    inventoryEndDate: "",
-                    inventoryRegion: ""
-                })
-                this.refs.inventoryChild.showInventoryData();
+            openRequest.onsuccess = function (e) {
+                db1 = e.target.result;
+                var transaction = db1.transaction(['programData'], 'readwrite');
+                var programTransaction = transaction.objectStore('programData');
+                var programRequest = programTransaction.get(programId);
+                programRequest.onerror = function (event) {
+                    this.setState({
+                        message: i18n.t('static.program.errortext'),
+                        color: 'red'
+                    })
+                }.bind(this);
+                programRequest.onsuccess = function (event) {
+                    var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                    var programJson = JSON.parse(programData);
+                    var batchList = []
+                    var batchInfoList = programJson.batchInfoList;
+                    console.log("Batch info list from program json", batchInfoList);
+                    var inventoryListUnFiltered = (programJson.inventoryList);
+                    var inventoryList = (programJson.inventoryList).filter(c =>
+                        c.planningUnit.id == planningUnitId &&
+                        c.region != null && c.region.id != 0);
+                    if (this.state.inventoryType == 1) {
+                        inventoryList = inventoryList.filter(c => c.actualQty != "" && c.actualQty != 0 && c.actualQty != null);
+                    } else {
+                        inventoryList = inventoryList.filter(c => c.adjustmentQty != "" && c.adjustmentQty != 0 && c.adjustmentQty != null);
+                    }
+                    this.setState({
+                        batchInfoList: batchInfoList,
+                        programJson: programJson,
+                        inventoryListUnFiltered: inventoryListUnFiltered,
+                        inventoryList: inventoryList,
+                        showInventory: 1,
+                        inventoryType: this.state.inventoryType,
+                        inventoryMonth: "",
+                        inventoryEndDate: "",
+                        inventoryRegion: ""
+                    })
+                    this.refs.inventoryChild.showInventoryData();
+                }.bind(this)
             }.bind(this)
-        }.bind(this)
+        } else {
+            document.getElementById("adjustmentsTable").style.display = "none";
+            this.setState({ loading: false });
+        }
     }
 
     updateState(parameterName, value) {
@@ -297,7 +314,8 @@ export default class AddInventory extends Component {
             inventoryType: value != "" && value != undefined ? value.value : 0,
             inventoryDataType: value
         })
-        if (this.state.planningUnit != 0) {
+        document.getElementById("adjustmentsTable").style.display = "none";
+        if (this.state.planningUnit != 0 && (value != "" && value != undefined ? value.value : 0) != 0) {
             this.formSubmit(this.state.planningUnit);
         }
     }
@@ -421,7 +439,7 @@ export default class AddInventory extends Component {
 
     cancelClicked() {
         let id = AuthenticationService.displayDashboardBasedOnRole();
-        this.props.history.push(`/ApplicationDashboard/`+`${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
     actionCanceled() {

@@ -141,90 +141,98 @@ export default class ConsumptionDetails extends React.Component {
         this.setState({
             loading: true
         })
+        var programId = value != "" && value != undefined ? value.value : 0;
         document.getElementById("planningUnitId").value = 0;
         document.getElementById("planningUnit").value = "";
+        document.getElementById("consumptionTable").style.display = "none";
         this.setState({
             programSelect: value,
             programId: value != "" && value != undefined ? value.value : 0,
             planningUnit: "",
-            showConsumption: 0,
         })
-        var db1;
-        var storeOS;
-        var regionList = [];
-        getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function (event) {
-            this.setState({
-                message: i18n.t('static.program.errortext'),
-                color: 'red'
-            })
-        }.bind(this);
-        openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-            var programDataTransaction = db1.transaction(['programData'], 'readwrite');
-            var programDataOs = programDataTransaction.objectStore('programData');
-            var programRequest = programDataOs.get(value != "" && value != undefined ? value.value : 0);
-            programRequest.onerror = function (event) {
+        if (programId != 0) {
+            var db1;
+            var storeOS;
+            var regionList = [];
+            getDatabase();
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            openRequest.onerror = function (event) {
                 this.setState({
-                    supplyPlanError: i18n.t('static.program.errortext')
+                    message: i18n.t('static.program.errortext'),
+                    color: 'red'
                 })
             }.bind(this);
-            programRequest.onsuccess = function (e) {
-                var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                var programJson = JSON.parse(programData);
-                for (var i = 0; i < programJson.regionList.length; i++) {
-                    var regionJson = {
-                        name: getLabelText(programJson.regionList[i].label, this.state.lang),
-                        id: programJson.regionList[i].regionId
-                    }
-                    regionList.push(regionJson)
-
-                }
-
-                var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
-                var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
-                var planningunitRequest = planningunitOs.getAll();
-                var planningList = []
-                planningunitRequest.onerror = function (event) {
+            openRequest.onsuccess = function (e) {
+                db1 = e.target.result;
+                var programDataTransaction = db1.transaction(['programData'], 'readwrite');
+                var programDataOs = programDataTransaction.objectStore('programData');
+                var programRequest = programDataOs.get(value != "" && value != undefined ? value.value : 0);
+                programRequest.onerror = function (event) {
                     this.setState({
-                        message: i18n.t('static.program.errortext'),
-                        color: 'red'
+                        supplyPlanError: i18n.t('static.program.errortext')
                     })
                 }.bind(this);
-                planningunitRequest.onsuccess = function (e) {
-                    var myResult = [];
-                    myResult = planningunitRequest.result;
-                    var programId = (value != "" && value != undefined ? value.value : 0).split("_")[0];
-                    var proList = []
-                    for (var i = 0; i < myResult.length; i++) {
-                        if (myResult[i].program.id == programId && myResult[i].active == true) {
-                            var productJson = {
-                                label: getLabelText(myResult[i].planningUnit.label, this.state.lang),
-                                value: myResult[i].planningUnit.id
-                            }
-                            proList.push(productJson)
+                programRequest.onsuccess = function (e) {
+                    var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                    var programJson = JSON.parse(programData);
+                    for (var i = 0; i < programJson.regionList.length; i++) {
+                        var regionJson = {
+                            name: getLabelText(programJson.regionList[i].label, this.state.lang),
+                            id: programJson.regionList[i].regionId
                         }
-                    }
-                    this.setState({
-                        planningUnitList: proList,
-                        planningUnitListAll: myResult,
-                        regionList: regionList, loading: false
-                    })
+                        regionList.push(regionJson)
 
-                    var planningUnitIdProp = this.props.match.params.planningUnitId;
-                    if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
-                        var planningUnit = { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label };
-                        this.setState({
-                            planningUnit: planningUnit,
-                            planningUnitId: planningUnitIdProp
-                        })
-                        this.formSubmit(planningUnit);
                     }
-                }.bind(this);
+
+                    var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+                    var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
+                    var planningunitRequest = planningunitOs.getAll();
+                    var planningList = []
+                    planningunitRequest.onerror = function (event) {
+                        this.setState({
+                            message: i18n.t('static.program.errortext'),
+                            color: 'red'
+                        })
+                    }.bind(this);
+                    planningunitRequest.onsuccess = function (e) {
+                        var myResult = [];
+                        myResult = planningunitRequest.result;
+                        var programId = (value != "" && value != undefined ? value.value : 0).split("_")[0];
+                        var proList = []
+                        for (var i = 0; i < myResult.length; i++) {
+                            if (myResult[i].program.id == programId && myResult[i].active == true) {
+                                var productJson = {
+                                    label: getLabelText(myResult[i].planningUnit.label, this.state.lang),
+                                    value: myResult[i].planningUnit.id
+                                }
+                                proList.push(productJson)
+                            }
+                        }
+                        this.setState({
+                            planningUnitList: proList,
+                            planningUnitListAll: myResult,
+                            regionList: regionList, loading: false
+                        })
+
+                        var planningUnitIdProp = this.props.match.params.planningUnitId;
+                        if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
+                            var planningUnit = { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label };
+                            this.setState({
+                                planningUnit: planningUnit,
+                                planningUnitId: planningUnitIdProp
+                            })
+                            this.formSubmit(planningUnit);
+                        }
+                    }.bind(this);
+                }.bind(this)
             }.bind(this)
-        }.bind(this)
+        } else {
+            this.setState({
+                planningUnitList: [],
+                loading: false
+            })
+        }
     }
 
     formSubmit(value) {
@@ -233,48 +241,54 @@ export default class ConsumptionDetails extends React.Component {
         this.setState({ programId: programId, planningUnitId: value != "" && value != undefined ? value.value : 0, planningUnit: value });
         var planningUnitId = value != "" && value != undefined ? value.value : 0;
         var programId = document.getElementById("programId").value;
-        var db1;
-        getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function (event) {
-            this.setState({
-                message: i18n.t('static.program.errortext'),
-                color: 'red'
-            })
-        }.bind(this);
-        openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-            var transaction = db1.transaction(['programData'], 'readwrite');
-            var programTransaction = transaction.objectStore('programData');
-            var programRequest = programTransaction.get(programId);
-            programRequest.onerror = function (event) {
+        if (planningUnitId != 0) {
+            document.getElementById("consumptionTable").style.display = "block";
+            var db1;
+            getDatabase();
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            openRequest.onerror = function (event) {
                 this.setState({
                     message: i18n.t('static.program.errortext'),
                     color: 'red'
                 })
             }.bind(this);
-            programRequest.onsuccess = function (event) {
-                var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                var programJson = JSON.parse(programData);
-                var batchInfoList = programJson.batchInfoList;
-                var consumptionListUnFiltered = (programJson.consumptionList);
-                var consumptionList = (programJson.consumptionList).filter(c =>
-                    c.planningUnit.id == planningUnitId &&
-                    c.region != null && c.region.id != 0);
-                this.setState({
-                    batchInfoList: batchInfoList,
-                    programJson: programJson,
-                    consumptionListUnFiltered: consumptionListUnFiltered,
-                    consumptionList: consumptionList,
-                    showConsumption: 1,
-                    consumptionMonth: "",
-                    consumptionStartDate: "",
-                    consumptionRegion: ""
-                })
-                this.refs.consumptionChild.showConsumptionData();
+            openRequest.onsuccess = function (e) {
+                db1 = e.target.result;
+                var transaction = db1.transaction(['programData'], 'readwrite');
+                var programTransaction = transaction.objectStore('programData');
+                var programRequest = programTransaction.get(programId);
+                programRequest.onerror = function (event) {
+                    this.setState({
+                        message: i18n.t('static.program.errortext'),
+                        color: 'red'
+                    })
+                }.bind(this);
+                programRequest.onsuccess = function (event) {
+                    var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                    var programJson = JSON.parse(programData);
+                    var batchInfoList = programJson.batchInfoList;
+                    var consumptionListUnFiltered = (programJson.consumptionList);
+                    var consumptionList = (programJson.consumptionList).filter(c =>
+                        c.planningUnit.id == planningUnitId &&
+                        c.region != null && c.region.id != 0);
+                    this.setState({
+                        batchInfoList: batchInfoList,
+                        programJson: programJson,
+                        consumptionListUnFiltered: consumptionListUnFiltered,
+                        consumptionList: consumptionList,
+                        showConsumption: 1,
+                        consumptionMonth: "",
+                        consumptionStartDate: "",
+                        consumptionRegion: ""
+                    })
+                    this.refs.consumptionChild.showConsumptionData();
+                }.bind(this)
             }.bind(this)
-        }.bind(this)
+        } else {
+            document.getElementById("consumptionTable").style.display = "none";
+            this.setState({ loading: false });
+        }
     }
 
     updateState(parameterName, value) {

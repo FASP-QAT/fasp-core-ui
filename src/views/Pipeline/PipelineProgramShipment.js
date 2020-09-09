@@ -15,7 +15,7 @@ import FundingSourceService from '../../api/FundingSourceService';
 import { Link } from 'react-router-dom';
 import { jExcelLoadedFunction, jExcelLoadedFunctionPipeline } from '../../CommonComponent/JExcelCommonFunctions.js'
 import { CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS } from '../../Constants.js'
-
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 
 export default class PipelineProgramShipment extends Component {
 
@@ -33,7 +33,7 @@ export default class PipelineProgramShipment extends Component {
             lang: localStorage.getItem('lang'),
             isValidData: false,
             changedData: false,
-            loading:true
+            loading: true
 
         }
 
@@ -866,7 +866,7 @@ export default class PipelineProgramShipment extends Component {
         this.el = jexcel(document.getElementById("shipmenttableDiv"), '');
         this.el.destroy();
 
-        var data = this.state.pipelineShipmentData.map((item, index) => [item.planningUnit, item.dataSource, item.procurementAgent, item.fundingSource, item.shipmentStatus, item.shipmentMode == '' ? this.state.shipModes[1] : item.shipmentMode, item.quantity, item.rate, item.freightCost==0?item.quantity*this.props.items.program.seaFreightPerc:item.freightCost, item.quantity * item.rate, moment(item.expectedDeliveryDate).format("YYYY-MM-DD"), moment(item.orderedDate).format("YYYY-MM-DD"), moment(item.plannedDate).format("YYYY-MM-DD"), moment(item.submittedDate).format("YYYY-MM-DD"), moment(item.approvedDate).format("YYYY-MM-DD"), moment(item.shippedDate).format("YYYY-MM-DD"), moment(item.arrivedDate).format("YYYY-MM-DD"), moment(item.receivedDate).format("YYYY-MM-DD"), item.notes]);
+        var data = this.state.pipelineShipmentData.map((item, index) => [item.planningUnit, item.dataSource, item.procurementAgent, item.fundingSource, item.shipmentStatus, item.shipmentMode == '' ? this.state.shipModes[1] : item.shipmentMode, item.quantity, item.rate, item.freightCost == 0 ? item.quantity * this.props.items.program.seaFreightPerc : item.freightCost, item.quantity * item.rate, moment(item.expectedDeliveryDate).format("YYYY-MM-DD"), moment(item.orderedDate).format("YYYY-MM-DD"), moment(item.plannedDate).format("YYYY-MM-DD"), moment(item.submittedDate).format("YYYY-MM-DD"), moment(item.approvedDate).format("YYYY-MM-DD"), moment(item.shippedDate).format("YYYY-MM-DD"), moment(item.arrivedDate).format("YYYY-MM-DD"), moment(item.receivedDate).format("YYYY-MM-DD"), item.notes]);
         // json[0] = data;
         var options = {
             data: data,
@@ -1004,7 +1004,7 @@ export default class PipelineProgramShipment extends Component {
     }
 
     loadedCommonFunctionJExcel = function (instance, cell, x, y, value) {
-        jExcelLoadedFunctionPipeline(instance,0);
+        jExcelLoadedFunctionPipeline(instance, 0);
     }
 
 
@@ -1092,7 +1092,7 @@ export default class PipelineProgramShipment extends Component {
                             console.log(response.data.messageCode)
                             this.setState({
                                 message: response.data.messageCode,
-                                changedData: false
+                                changedData: false,loading:false
                             })
                             this.props.history.push({
                                 pathname: `/pipeline/pieplineProgramList`
@@ -1101,7 +1101,7 @@ export default class PipelineProgramShipment extends Component {
                         ).catch(
                             error => {
                                 if (error.message === "Network Error") {
-                                    this.setState({ message: error.message });
+                                    this.setState({ message: error.message ,loading:false});
                                 } else {
                                     switch (error.response ? error.response.status : "") {
                                         case 500:
@@ -1109,10 +1109,10 @@ export default class PipelineProgramShipment extends Component {
                                         case 404:
                                         case 406:
                                         case 412:
-                                            this.setState({ message: error.response.data.messageCode });
+                                            this.setState({ message: error.response.data.messageCode ,loading:false});
                                             break;
                                         default:
-                                            this.setState({ message: 'static.unkownError' });
+                                            this.setState({ message: 'static.unkownError',loading:false });
                                             break;
                                     }
                                 }
@@ -1134,6 +1134,12 @@ export default class PipelineProgramShipment extends Component {
 
         return (
             <>
+
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
+                }} />
                 <div className="table-responsive" style={{ display: this.state.loading ? "none" : "block" }}>
                     <h5>{i18n.t(this.state.message)}</h5>
                     <div id="shipmenttableDiv">

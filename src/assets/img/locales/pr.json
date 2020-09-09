@@ -700,7 +700,7 @@
     "static.technicalArea.productcategorynametext": "Insira o nome da categoria do produto",
     "static.common.notes": "Notas",
     "static.common.bugreport": "Reportar um erro",
-    "static.ticket.ticketcreated": "O ingresso foi criado",
+    "static.ticket.ticketcreated": "O ingresso foi criado.",
     "static.ticket.ticketcode": "Código de Ingresso",
     "static.ticket.addUpdateMasterData": "Adicionar / atualizar dados mestre"
 }

@@ -198,7 +198,8 @@ export default class StockStatusMatrix extends React.Component {
                   var list = programJson.supplyPlan.filter(c => c.planningUnitId == planningUnitId && c.transDate == dt)
                   console.log(list)
                   if (list.length > 0) {
-                    if (includePlannedShipments == true) {
+                    console.log(includePlannedShipments)
+                    if (includePlannedShipments.toString() == "true") {
                       monthlydata.push(list[0].mos)
                     }
                     else {
@@ -833,7 +834,7 @@ export default class StockStatusMatrix extends React.Component {
     let header = []
 
     header = [[{ content: i18n.t('static.planningunit.planningunit'), rowSpan: 2, styles: { halign: 'center' } },
-    { content: i18n.t('static.dashboard.unit'), rowSpan: 2, styles: { halign: 'center' } },
+    { content: i18n.t('static.dashboard.unit'), rowSpan: 2, styles: { halign: 'center',cellWidth:80 } },
     { content: i18n.t('static.common.min'), rowSpan: 2, styles: { halign: 'center' } },
     { content: i18n.t('static.program.reorderFrequencyInMonths'), rowSpan: 2, styles: { halign: 'center' } },
     { content: i18n.t('static.common.year'), rowSpan: 2, styles: { halign: 'center' } },

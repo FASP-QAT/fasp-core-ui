@@ -139,9 +139,13 @@ export default class InitialTicketPageComponent extends Component {
   }
 
   toggleSmall(msg) {
-    this.setState({
-      message: msg,
-      small: !this.state.small
+    confirmAlert({
+      message: i18n.t('static.ticket.ticketcreated') + " " + i18n.t('static.ticket.ticketcode') + ": " + msg,
+      buttons: [
+        {
+          label: 'OK'              
+        }
+      ]
     });
   }
 
@@ -518,7 +522,7 @@ export default class InitialTicketPageComponent extends Component {
 
         <img src={imageHelp} className="HelpIcon" title="Help" onClick={this.togglehelp} />
 
-        <Modal isOpen={this.state.small} toggle={this.toggleSmall}
+        {/* <Modal isOpen={this.state.small} toggle={this.toggleSmall}
           className={'modal-sm modal-dialog-center'} aria-labelledby="contained-modal-title-vcenter"
           centered>
           <ModalHeader toggle={this.toggleSmall} className="ModalHead modal-info-Headher"><b>Message!</b></ModalHeader>
@@ -530,7 +534,7 @@ export default class InitialTicketPageComponent extends Component {
           <ModalFooter>
             <Button color="primary" onClick={() => { this.toggleSmall('') }}>OK</Button>{' '}
           </ModalFooter>
-        </Modal>
+        </Modal> */}
 
         <Modal isOpen={this.state.help} toggle={this.togglehelp} className={this.props.className}>
           {/* className={'modal-info ' + this.props.className}> */}

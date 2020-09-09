@@ -702,7 +702,7 @@
     "static.technicalArea.productcategorynametext": "Ingrese el nombre de la categoría de producto",
     "static.common.notes": "Notas",
     "static.common.bugreport": "Reportar un error",
-    "static.ticket.ticketcreated": "Se ha creado el ticket",
+    "static.ticket.ticketcreated": "Se ha creado el ticket.",
     "static.ticket.ticketcode": "Código de entrada",
     "static.ticket.addUpdateMasterData": "Agregar / actualizar datos maestros"
 }
