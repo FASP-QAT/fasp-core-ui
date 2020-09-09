@@ -55,7 +55,7 @@ export default class StockStatusMatrix extends React.Component {
       message: '',
       planningUnitValues: [],
       planningUnitLabels: [],
-      rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+      rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
       startYear: new Date().getFullYear() - 1,
       endYear: new Date().getFullYear(),
       loading: true
@@ -198,7 +198,8 @@ export default class StockStatusMatrix extends React.Component {
                   var list = programJson.supplyPlan.filter(c => c.planningUnitId == planningUnitId && c.transDate == dt)
                   console.log(list)
                   if (list.length > 0) {
-                    if (includePlannedShipments == true) {
+                    console.log(includePlannedShipments)
+                    if (includePlannedShipments.toString() == "true") {
                       monthlydata.push(list[0].mos)
                     }
                     else {

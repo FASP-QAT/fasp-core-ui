@@ -60,7 +60,9 @@ export default class ExpiredInventory extends Component {
             outPutList: [],
             programs: [],
             versions: [],
-            rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            minDate:{year:  new Date().getFullYear()-3, month: new Date().getMonth()},
+            maxDate:{year:  new Date().getFullYear()+3, month: new Date().getMonth()+1},
         }
     }
 
@@ -854,7 +856,7 @@ export default class ExpiredInventory extends Component {
 
                                                 <Picker
                                                     ref="pickRange"
-                                                    years={{ min: 2013 }}
+                                                    years={{min: this.state.minDate, max: this.state.maxDate}}
                                                     value={rangeValue}
                                                     lang={pickerLang}
                                                     //theme="light"

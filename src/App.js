@@ -6,6 +6,7 @@ import './App.scss';
 import ResetPasswordComponent from './views/Pages/Login/ResetPasswordComponent';
 import UpdateExpiredPasswordComponent from './views/Pages/Login/UpdateExpiredPasswordComponent';
 import i18n from './i18n'
+import 'react-app-polyfill/stable';
 
 const loading = () => <div className="animated fadeIn pt-3 text-center"><div className="sk-spinner sk-spinner-pulse"></div></div>;
 

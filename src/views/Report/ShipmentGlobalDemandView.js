@@ -1585,7 +1585,9 @@ class ShipmentGlobalDemandView extends Component {
             table1Headers: [],
             show: false,
             message: '',
-            rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            minDate:{year:  new Date().getFullYear()-3, month: new Date().getMonth()},
+            maxDate:{year:  new Date().getFullYear()+3, month: new Date().getMonth()+1},
             loading: true
         };
 
@@ -2672,8 +2674,9 @@ class ShipmentGlobalDemandView extends Component {
         ProductService.getProductCategoryList(realmId)
             .then(response => {
                 // console.log(response.data)
+                var list = response.data.slice(1);
                 this.setState({
-                    productCategories: response.data, loading: false
+                    productCategories: list, loading: false
                 })
             }).catch(
                 error => {
@@ -3057,7 +3060,7 @@ class ShipmentGlobalDemandView extends Component {
 
                                                 <Picker
                                                     ref="pickRange"
-                                                    years={{ min: 2013 }}
+                                                    years={{min: this.state.minDate, max: this.state.maxDate}}
                                                     value={rangeValue}
                                                     lang={pickerLang}
                                                     //theme="light"
