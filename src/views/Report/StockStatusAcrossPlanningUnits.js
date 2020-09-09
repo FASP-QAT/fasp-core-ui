@@ -1379,8 +1379,8 @@ class StockStatusAcrossPlanningUnits extends Component {
             lang: localStorage.getItem('lang'),
             loading: true,
             singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
-            minDate:{year:  new Date().getFullYear()-3, month: new Date().getMonth()},
-            maxDate:{year:  new Date().getFullYear()+3, month: new Date().getMonth()+1},
+            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() },
+            maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() + 1 },
 
         }
         this.buildJExcel = this.buildJExcel.bind(this);
@@ -1853,42 +1853,42 @@ class StockStatusAcrossPlanningUnits extends Component {
 
             updateTable: function (el, cell, x, y, source, value, id) {
 
-                // var elInstance = el.jexcel;
-                // var colArrB = ['B','C'];
-                // var colArrC = ['C'];
-                // var colArrD = ['D'];
-                // var colArrE = ['E'];
-                // var rowData = elInstance.getRowData(y);
+                var elInstance = el.jexcel;
+                var colArrB = ['B', 'C'];
+                var colArrC = ['C'];
+                var colArrD = ['D'];
+                var colArrE = ['E'];
+                var rowData = elInstance.getRowData(y);
 
-                // var mos = parseFloat(rowData[2]);
-                // var minMos = parseFloat(rowData[3]);
-                // var maxMos = parseFloat(rowData[4]);
-                // //------------B--------------
-                // if (mos < minMos) {
-                //     console.log('1')
-                //     for (var i = 0; i < colArrB.length; i++) {
-                //         elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
-                //         elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'background-color', legendcolor[1].color);
-                //         let textColor = contrast(legendcolor[1].color);
-                //         elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'color', textColor);
-                //     }
-                // } else if (mos > maxMos) {
-                //     console.log('2')
-                //     for (var i = 0; i < colArrB.length; i++) {
-                //         elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
-                //         elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'background-color', legendcolor[0].color);
-                //         let textColor = contrast(legendcolor[0].color);
-                //         elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'color', textColor);
-                //     }
-                // } else {
-                //     console.log('3')
-                //     for (var i = 0; i < colArrB.length; i++) {
-                //     elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
-                //     elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'background-color',legendcolor[2].color);
-                //     let textColor = contrast(legendcolor[2].color);
-                //     elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'color', textColor);
-                //     }
-                // }
+                var mos = parseFloat(rowData[2]);
+                var minMos = parseFloat(rowData[3]);
+                var maxMos = parseFloat(rowData[4]);
+                //------------B--------------
+                if (mos < minMos) {
+                    console.log('1')
+                    for (var i = 0; i < colArrB.length; i++) {
+                        elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
+                        elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'background-color', legendcolor[1].color);
+                        let textColor = contrast(legendcolor[1].color);
+                        elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'color', textColor);
+                    }
+                } else if (mos > maxMos) {
+                    console.log('2')
+                    for (var i = 0; i < colArrB.length; i++) {
+                        elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
+                        elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'background-color', legendcolor[0].color);
+                        let textColor = contrast(legendcolor[0].color);
+                        elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'color', textColor);
+                    }
+                } else {
+                    console.log('3')
+                    for (var i = 0; i < colArrB.length; i++) {
+                        elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
+                        elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'background-color', legendcolor[2].color);
+                        let textColor = contrast(legendcolor[2].color);
+                        elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'color', textColor);
+                    }
+                }
 
                 // //-------------C----------------
                 // if (mos < minMos) {
@@ -1964,49 +1964,6 @@ class StockStatusAcrossPlanningUnits extends Component {
 
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
-
-
-        var elInstance = instance.jexcel;
-        var json = elInstance.getJson();
-        var colArrB = ['B', 'C'];
-        var colArrC = ['C'];
-        var colArrD = ['D'];
-        var colArrE = ['E'];
-
-        for (var j = 0; j < json.length; j++) {
-
-            var rowData = elInstance.getRowData(j);
-
-            var mos = parseFloat(rowData[2]);
-            var minMos = parseFloat(rowData[3]);
-            var maxMos = parseFloat(rowData[4]);
-            //------------B--------------
-            if (mos < minMos) {
-                console.log('1')
-                for (var i = 0; i < colArrB.length; i++) {
-                    elInstance.setStyle(`${colArrB[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
-                    elInstance.setStyle(`${colArrB[i]}${parseInt(j) + 1}`, 'background-color', legendcolor[1].color);
-                    let textColor = contrast(legendcolor[1].color);
-                    elInstance.setStyle(`${colArrB[i]}${parseInt(j) + 1}`, 'color', textColor);
-                }
-            } else if (mos > maxMos) {
-                console.log('2')
-                for (var i = 0; i < colArrB.length; i++) {
-                    elInstance.setStyle(`${colArrB[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
-                    elInstance.setStyle(`${colArrB[i]}${parseInt(j) + 1}`, 'background-color', legendcolor[0].color);
-                    let textColor = contrast(legendcolor[0].color);
-                    elInstance.setStyle(`${colArrB[i]}${parseInt(j) + 1}`, 'color', textColor);
-                }
-            } else {
-                console.log('3')
-                for (var i = 0; i < colArrB.length; i++) {
-                    elInstance.setStyle(`${colArrB[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
-                    elInstance.setStyle(`${colArrB[i]}${parseInt(j) + 1}`, 'background-color', legendcolor[2].color);
-                    let textColor = contrast(legendcolor[2].color);
-                    elInstance.setStyle(`${colArrB[i]}${parseInt(j) + 1}`, 'color', textColor);
-                }
-            }
-        }
     }
 
 
@@ -2070,14 +2027,13 @@ class StockStatusAcrossPlanningUnits extends Component {
                                 var dtstr = startDate.startOf('month').format('YYYY-MM-DD')
                                 var list = programJson.supplyPlan.filter(c => c.planningUnitId == planningUnit.planningUnit.id && c.transDate == dtstr)
                                 if (list.length > 0) {
-<<<<<<< HEAD
                                     var json = {
                                         planningUnit: planningUnit.planningUnit,
                                         lastStockCount: maxDate == '' ? '' : maxDate.format('MMM-DD-YYYY'),
-                                        mos: includePlanningShipments == true ? this.roundN(list[0].mos) : (list[0].amc > 0) ? (list[0].closingBalanceWps / list[0].amc) : 0,//planningUnit.planningUnit.id==157?12:planningUnit.planningUnit.id==156?6:mos),
+                                        mos: includePlanningShipments.toString() == 'true' ? this.roundN(list[0].mos) : (list[0].amc > 0) ? (list[0].closingBalanceWps / list[0].amc) : 0,//planningUnit.planningUnit.id==157?12:planningUnit.planningUnit.id==156?6:mos),
                                         minMos: list[0].minStockMoS,
                                         maxMos: list[0].maxStockMoS,
-                                        stock: includePlanningShipments == true ? list[0].closingBalance : list[0].closingBalanceWps,
+                                        stock: includePlanningShipments.toString() == 'true' ? list[0].closingBalance : list[0].closingBalanceWps,
                                         amc: list[0].amc
                                     }
                                     data.push(json)
@@ -2093,28 +2049,6 @@ class StockStatusAcrossPlanningUnits extends Component {
                                         amc: 0
                                     }
                                     data.push(json)
-=======
-                                var json = {
-                                    planningUnit: planningUnit.planningUnit,
-                                    lastStockCount: maxDate == '' ? '' : maxDate.format('MMM-DD-YYYY'),
-                                    mos: includePlanningShipments.toString() == 'true'?this.roundN(list[0].mos): (list[0].amc > 0)?(list[0].closingBalanceWps /list[0].amc):0,//planningUnit.planningUnit.id==157?12:planningUnit.planningUnit.id==156?6:mos),
-                                    minMos: list[0].minStockMoS,
-                                    maxMos:  list[0].maxStockMoS,
-                                    stock: includePlanningShipments.toString() == 'true' ?list[0].closingBalance:list[0].closingBalanceWps,
-                                    amc: list[0].amc
-                                }
-                                data.push(json)
-
-                            }else{
-                                var json = {
-                                    planningUnit: planningUnit.planningUnit,
-                                    lastStockCount: maxDate == '' ? '' : maxDate.format('MMM-DD-YYYY'),
-                                    mos: '',
-                                    minMos: '',
-                                    maxMos: '',
-                                    stock: 0,
-                                    amc: 0
->>>>>>> dev
                                 }
 
                             })
@@ -2145,12 +2079,11 @@ class StockStatusAcrossPlanningUnits extends Component {
 
 
             } else {
-                this.setState({ loading: true })
                 var inputjson = {
                     "programId": programId,
                     "versionId": versionId,
                     "dt": startDate.startOf('month').format('YYYY-MM-DD'),
-                    "includePlannedShipments": includePlanningShipments.toString()=="true" ? 1 : 0
+                    "includePlannedShipments": includePlanningShipments.toString() == "true" ? 1 : 0
 
                 }
                 /*  this.setState({
@@ -2433,7 +2366,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                                                 <div className="controls edit">
                                                     <Picker
                                                         ref="pickAMonth2"
-                                                        years={{min: this.state.minDate, max: this.state.maxDate}}
+                                                        years={{ min: this.state.minDate, max: this.state.maxDate }}
                                                         value={singleValue2}
                                                         lang={pickerLang.months}
                                                         theme="dark"
