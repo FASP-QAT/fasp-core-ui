@@ -7,7 +7,7 @@ import {
   Nav, NavItem, NavLink, TabContent, TabPane, CardFooter, Modal, ModalBody, ModalFooter, ModalHeader
 } from 'reactstrap';
 import CryptoJS from 'crypto-js';
-import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, LOCAL_VERSION_COLOUR, LATEST_VERSION_COLOUR, PENDING_APPROVAL_VERSION_STATUS } from '../../Constants.js';
+import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, LOCAL_VERSION_COLOUR, LATEST_VERSION_COLOUR, PENDING_APPROVAL_VERSION_STATUS, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE } from '../../Constants.js';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import getLabelText from '../../CommonComponent/getLabelText';
 import i18n from '../../i18n';
@@ -109,7 +109,7 @@ export default class syncPage extends Component {
       columns: [
         { title: i18n.t('static.commit.consumptionId'), type: 'hidden', },
         { title: i18n.t('static.planningunit.planningunit'), type: 'dropdown', source: this.state.planningUnitList, width: 200 },
-        { title: i18n.t('static.pipeline.consumptionDate'), type: 'calendar', options: { format: 'MM-YYYY' }, width: 85 },
+        { title: i18n.t('static.pipeline.consumptionDate'), type: 'text', width: 85 },
         { title: i18n.t('static.region.region'), type: 'dropdown', source: this.state.regionList, width: 100 },
         { title: i18n.t('static.inventory.dataSource'), type: 'dropdown', source: this.state.dataSourceList, width: 100 },
         { title: i18n.t('static.supplyPlan.alternatePlanningUnit'), type: 'dropdown', source: this.state.realmCountryPlanningUnitList, width: 150 },
@@ -270,7 +270,7 @@ export default class syncPage extends Component {
       columns: [
         { title: i18n.t('static.commit.inventoryId'), type: 'hidden', },
         { title: i18n.t('static.planningunit.planningunit'), type: 'dropdown', source: this.state.planningUnitList, width: 200 },
-        { title: i18n.t('static.inventory.inventoryDate'), type: 'calendar', options: { format: 'MM-YYYY' }, width: 85 },
+        { title: i18n.t('static.inventory.inventoryDate'), type: 'text', width: 85 },
         { title: i18n.t('static.region.region'), type: 'dropdown', source: this.state.regionList, width: 100 },
         { title: i18n.t('static.inventory.dataSource'), type: 'dropdown', source: this.state.dataSourceList, width: 100 },
         { title: i18n.t('static.supplyPlan.alternatePlanningUnit'), type: 'dropdown', source: this.state.realmCountryPlanningUnitList, width: 150 },
@@ -433,7 +433,7 @@ export default class syncPage extends Component {
         { title: i18n.t('static.commit.shipmentId'), type: 'hidden', },
         { title: i18n.t('static.planningunit.planningunit'), type: 'dropdown', source: this.state.planningUnitList, width: 200 },
         { type: 'dropdown', title: i18n.t('static.supplyPlan.shipmentStatus'), source: this.state.shipmentStatusList, width: 100 },
-        { type: 'calendar', title: i18n.t('static.supplyPlan.expectedDeliveryDate'), options: { format: 'MM-DD-YYYY' }, width: 100, },
+        { type: 'text', title: i18n.t('static.supplyPlan.expectedDeliveryDate'), width: 100, },
         { type: 'dropdown', title: i18n.t('static.procurementagent.procurementagent'), source: this.state.procurementAgentList, width: 120 },
         { type: 'dropdown', title: i18n.t('static.subfundingsource.fundingsource'), source: this.state.fundingSourceList, width: 120 },
         { type: 'dropdown', title: i18n.t('static.dashboard.budget'), source: this.state.budgetList, width: 120 },
@@ -446,12 +446,12 @@ export default class syncPage extends Component {
         { type: 'numeric', title: i18n.t('static.supplyPlan.pricePerPlanningUnit'), width: 80, mask: '#,##.00', decimal: '.' },
         { type: 'numeric', title: i18n.t('static.shipment.productcost'), width: 80, mask: '#,##.00', decimal: '.' },
         { type: 'numeric', title: i18n.t('static.shipment.freightcost'), width: 80, mask: '#,##.00', decimal: '.' },
-        { type: 'calendar', title: i18n.t('static.supplyPlan.plannedDate'), options: { format: 'MM-DD-YYYY' }, width: 100, },
-        { type: 'calendar', title: i18n.t('static.supplyPlan.submittedDate'), options: { format: 'MM-DD-YYYY' }, width: 100, },
-        { type: 'calendar', title: i18n.t('static.supplyPlan.approvedDate'), options: { format: 'MM-DD-YYYY' }, width: 100, },
-        { type: 'calendar', title: i18n.t('static.supplyPlan.shippedDate'), options: { format: 'MM-DD-YYYY' }, width: 100, },
-        { type: 'calendar', title: i18n.t('static.supplyPlan.arrivedDate'), options: { format: 'MM-DD-YYYY' }, width: 100, },
-        { type: 'calendar', title: i18n.t('static.shipment.receiveddate'), options: { format: 'MM-DD-YYYY' }, width: 100, },
+        { type: 'text', title: i18n.t('static.supplyPlan.plannedDate'), width: 100, },
+        { type: 'text', title: i18n.t('static.supplyPlan.submittedDate'), width: 100, },
+        { type: 'text', title: i18n.t('static.supplyPlan.approvedDate'), width: 100, },
+        { type: 'text', title: i18n.t('static.supplyPlan.shippedDate'), width: 100, },
+        { type: 'text', title: i18n.t('static.supplyPlan.arrivedDate'), width: 100, },
+        { type: 'text', title: i18n.t('static.shipment.receiveddate'), width: 100, },
         { type: 'text', title: i18n.t('static.program.notes'), width: 200 },
         { type: 'hidden', title: i18n.t('static.supplyPlan.erpFlag'), width: 0 },
         { type: 'hidden', title: i18n.t('static.supplyPlan.emergencyOrder'), width: 0 },
@@ -994,7 +994,7 @@ export default class syncPage extends Component {
                                     data = [];
                                     data[0] = mergedConsumptionData[cd].consumptionId;
                                     data[1] = mergedConsumptionData[cd].planningUnit.id;
-                                    data[2] = mergedConsumptionData[cd].consumptionDate; //A
+                                    data[2] = moment(mergedConsumptionData[cd].consumptionDate).format(DATE_FORMAT_CAP_WITHOUT_DATE); //A
                                     data[3] = mergedConsumptionData[cd].region.id; //B                        
                                     data[4] = mergedConsumptionData[cd].dataSource.id; //C
                                     data[5] = mergedConsumptionData[cd].realmCountryPlanningUnit.id; //D
@@ -1014,19 +1014,19 @@ export default class syncPage extends Component {
                                     var oldDataList = oldProgramDataConsumption.filter(c => c.consumptionId == mergedConsumptionData[cd].consumptionId);
                                     var oldData = ""
                                     if (oldDataList.length > 0) {
-                                      oldData = [oldDataList[0].consumptionId, oldDataList[0].planningUnit.id, oldDataList[0].consumptionDate, oldDataList[0].region.id, oldDataList[0].dataSource.id, oldDataList[0].realmCountryPlanningUnit.id, parseInt(oldDataList[0].consumptionRcpuQty), oldDataList[0].multiplier, parseInt(oldDataList[0].consumptionRcpuQty) * oldDataList[0].multiplier, oldDataList[0].dayOfStockOut, oldDataList[0].notes, (oldDataList[0].actualFlag.toString() == "true" ? 1 : 0), oldDataList[0].active, JSON.stringify(oldDataList[0].batchInfoList != "" ? ((oldDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.consumptionQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
+                                      oldData = [oldDataList[0].consumptionId, oldDataList[0].planningUnit.id, moment(oldDataList[0].consumptionDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), oldDataList[0].region.id, oldDataList[0].dataSource.id, oldDataList[0].realmCountryPlanningUnit.id, parseInt(oldDataList[0].consumptionRcpuQty), oldDataList[0].multiplier, parseInt(oldDataList[0].consumptionRcpuQty) * oldDataList[0].multiplier, oldDataList[0].dayOfStockOut, oldDataList[0].notes, (oldDataList[0].actualFlag.toString() == "true" ? 1 : 0), oldDataList[0].active, JSON.stringify(oldDataList[0].batchInfoList != "" ? ((oldDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.consumptionQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
                                     }
                                     data[15] = oldData;//Old data
                                     var latestDataList = latestProgramDataConsumption.filter(c => c.consumptionId == mergedConsumptionData[cd].consumptionId);
                                     var latestData = ""
                                     if (latestDataList.length > 0) {
-                                      latestData = [latestDataList[0].consumptionId, latestDataList[0].planningUnit.id, latestDataList[0].consumptionDate, latestDataList[0].region.id, latestDataList[0].dataSource.id, latestDataList[0].realmCountryPlanningUnit.id, parseInt(latestDataList[0].consumptionRcpuQty), latestDataList[0].multiplier, parseInt(latestDataList[0].consumptionRcpuQty) * latestDataList[0].multiplier, latestDataList[0].dayOfStockOut, latestDataList[0].notes, (latestDataList[0].actualFlag.toString() == "true" ? 1 : 0), latestDataList[0].active, JSON.stringify(latestDataList[0].batchInfoList != "" ? ((latestDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.consumptionQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
+                                      latestData = [latestDataList[0].consumptionId, latestDataList[0].planningUnit.id, moment(latestDataList[0].consumptionDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), latestDataList[0].region.id, latestDataList[0].dataSource.id, latestDataList[0].realmCountryPlanningUnit.id, parseInt(latestDataList[0].consumptionRcpuQty), latestDataList[0].multiplier, parseInt(latestDataList[0].consumptionRcpuQty) * latestDataList[0].multiplier, latestDataList[0].dayOfStockOut, latestDataList[0].notes, (latestDataList[0].actualFlag.toString() == "true" ? 1 : 0), latestDataList[0].active, JSON.stringify(latestDataList[0].batchInfoList != "" ? ((latestDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.consumptionQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
                                     }
                                     data[16] = latestData;//Latest data
                                     var downloadedDataList = downloadedProgramDataConsumption.filter(c => c.consumptionId == mergedConsumptionData[cd].consumptionId);
                                     var downloadedData = "";
                                     if (downloadedDataList.length > 0) {
-                                      downloadedData = [downloadedDataList[0].consumptionId, downloadedDataList[0].planningUnit.id, downloadedDataList[0].consumptionDate, downloadedDataList[0].region.id, downloadedDataList[0].dataSource.id, downloadedDataList[0].realmCountryPlanningUnit.id, parseInt(downloadedDataList[0].consumptionRcpuQty), downloadedDataList[0].multiplier, parseInt(downloadedDataList[0].consumptionRcpuQty) * downloadedDataList[0].multiplier, downloadedDataList[0].dayOfStockOut, downloadedDataList[0].notes, (downloadedDataList[0].actualFlag.toString() == "true" ? 1 : 0), downloadedDataList[0].active, JSON.stringify(downloadedDataList[0].batchInfoList != "" ? ((downloadedDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.consumptionQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
+                                      downloadedData = [downloadedDataList[0].consumptionId, downloadedDataList[0].planningUnit.id, moment(downloadedDataList[0].consumptionDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), downloadedDataList[0].region.id, downloadedDataList[0].dataSource.id, downloadedDataList[0].realmCountryPlanningUnit.id, parseInt(downloadedDataList[0].consumptionRcpuQty), downloadedDataList[0].multiplier, parseInt(downloadedDataList[0].consumptionRcpuQty) * downloadedDataList[0].multiplier, downloadedDataList[0].dayOfStockOut, downloadedDataList[0].notes, (downloadedDataList[0].actualFlag.toString() == "true" ? 1 : 0), downloadedDataList[0].active, JSON.stringify(downloadedDataList[0].batchInfoList != "" ? ((downloadedDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.consumptionQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
                                     }
                                     data[17] = downloadedData;//Downloaded data
                                     data[18] = 4;
@@ -1039,7 +1039,7 @@ export default class syncPage extends Component {
                                     columns: [
                                       { title: i18n.t('static.commit.consumptionId'), type: 'text', },
                                       { title: i18n.t('static.planningunit.planningunit'), type: 'dropdown', source: planningUnitList, width: 200 },
-                                      { title: i18n.t('static.pipeline.consumptionDate'), type: 'calendar', options: { format: 'MM-YYYY' }, width: 85 },
+                                      { title: i18n.t('static.pipeline.consumptionDate'), type: 'text', width: 85 },
                                       { title: i18n.t('static.region.region'), type: 'dropdown', source: regionList, width: 100 },
                                       { title: i18n.t('static.inventory.dataSource'), type: 'dropdown', source: dataSourceList, width: 100 },
                                       { title: i18n.t('static.supplyPlan.alternatePlanningUnit'), type: 'dropdown', source: realmCountryPlanningUnitList, width: 150 },
@@ -1152,7 +1152,7 @@ export default class syncPage extends Component {
                                       data = [];
                                       data[0] = mergedInventoryData[cd].inventoryId;
                                       data[1] = mergedInventoryData[cd].planningUnit.id;
-                                      data[2] = mergedInventoryData[cd].inventoryDate;
+                                      data[2] = moment(mergedInventoryData[cd].inventoryDate).format(DATE_FORMAT_CAP_WITHOUT_DATE);
                                       data[3] = mergedInventoryData[cd].region.id;
                                       data[4] = mergedInventoryData[cd].dataSource.id;
                                       data[5] = mergedInventoryData[cd].realmCountryPlanningUnit.id;
@@ -1169,19 +1169,19 @@ export default class syncPage extends Component {
                                       var oldDataList = oldProgramDataInventory.filter(c => c.inventoryId == mergedInventoryData[cd].inventoryId && c.region != null && c.region.id != 0);
                                       var oldData = ""
                                       if (oldDataList.length > 0) {
-                                        oldData = [oldDataList[0].inventoryId, oldDataList[0].planningUnit.id, oldDataList[0].inventoryDate, oldDataList[0].region.id, oldDataList[0].dataSource.id, oldDataList[0].realmCountryPlanningUnit.id, oldDataList[0].adjustmentQty != "" && oldDataList[0].adjustmentQty != null && oldDataList[0].adjustmentQty != 0 ? 2 : 1, parseInt(oldDataList[0].adjustmentQty), parseInt(oldDataList[0].actualQty), oldDataList[0].multiplier, parseInt(oldDataList[0].adjustmentQty) * oldDataList[0].multiplier, parseInt(oldDataList[0].actualQty) * oldDataList[0].multiplier, oldDataList[0].notes, oldDataList[0].active, JSON.stringify(oldDataList[0].batchInfoList != "" ? ((oldDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty1": parseInt(a.adjustmentQty), "qty2": parseInt(a.actualQty) } })).sort(function (a, b) { return a.qty1 - b.qty1; }) : ""), "", "", "", "", 4];
+                                        oldData = [oldDataList[0].inventoryId, oldDataList[0].planningUnit.id, moment(oldDataList[0].inventoryDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), oldDataList[0].region.id, oldDataList[0].dataSource.id, oldDataList[0].realmCountryPlanningUnit.id, oldDataList[0].adjustmentQty != "" && oldDataList[0].adjustmentQty != null && oldDataList[0].adjustmentQty != 0 ? 2 : 1, parseInt(oldDataList[0].adjustmentQty), parseInt(oldDataList[0].actualQty), oldDataList[0].multiplier, parseInt(oldDataList[0].adjustmentQty) * oldDataList[0].multiplier, parseInt(oldDataList[0].actualQty) * oldDataList[0].multiplier, oldDataList[0].notes, oldDataList[0].active, JSON.stringify(oldDataList[0].batchInfoList != "" ? ((oldDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty1": parseInt(a.adjustmentQty), "qty2": parseInt(a.actualQty) } })).sort(function (a, b) { return a.qty1 - b.qty1; }) : ""), "", "", "", "", 4];
                                       }
                                       data[16] = oldData;//Old data
                                       var latestDataList = latestProgramDataInventory.filter(c => c.inventoryId == mergedInventoryData[cd].inventoryId && c.region != null && c.region.id != 0);
                                       var latestData = ""
                                       if (latestDataList.length > 0) {
-                                        latestData = [latestDataList[0].inventoryId, latestDataList[0].planningUnit.id, latestDataList[0].inventoryDate, latestDataList[0].region.id, latestDataList[0].dataSource.id, latestDataList[0].realmCountryPlanningUnit.id, latestDataList[0].adjustmentQty != "" && latestDataList[0].adjustmentQty != null && latestDataList[0].adjustmentQty != 0 ? 2 : 1, parseInt(latestDataList[0].adjustmentQty), parseInt(latestDataList[0].actualQty), latestDataList[0].multiplier, parseInt(latestDataList[0].adjustmentQty) * latestDataList[0].multiplier, parseInt(latestDataList[0].actualQty) * latestDataList[0].multiplier, latestDataList[0].notes, latestDataList[0].active, JSON.stringify(latestDataList[0].batchInfoList != "" ? ((latestDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty1": parseInt(a.adjustmentQty), "qty2": parseInt(a.actualQty) } })).sort(function (a, b) { return a.qty1 - b.qty1; }) : ""), "", "", "", "", 4];
+                                        latestData = [latestDataList[0].inventoryId, latestDataList[0].planningUnit.id, moment(latestDataList[0].inventoryDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), latestDataList[0].region.id, latestDataList[0].dataSource.id, latestDataList[0].realmCountryPlanningUnit.id, latestDataList[0].adjustmentQty != "" && latestDataList[0].adjustmentQty != null && latestDataList[0].adjustmentQty != 0 ? 2 : 1, parseInt(latestDataList[0].adjustmentQty), parseInt(latestDataList[0].actualQty), latestDataList[0].multiplier, parseInt(latestDataList[0].adjustmentQty) * latestDataList[0].multiplier, parseInt(latestDataList[0].actualQty) * latestDataList[0].multiplier, latestDataList[0].notes, latestDataList[0].active, JSON.stringify(latestDataList[0].batchInfoList != "" ? ((latestDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty1": parseInt(a.adjustmentQty), "qty2": parseInt(a.actualQty) } })).sort(function (a, b) { return a.qty1 - b.qty1; }) : ""), "", "", "", "", 4];
                                       }
                                       data[17] = latestData;//Latest data
                                       var downloadedDataList = downloadedProgramDataInventory.filter(c => c.inventoryId == mergedInventoryData[cd].inventoryId && c.region != null && c.region.id != 0);
                                       var downloadedData = "";
                                       if (downloadedDataList.length > 0) {
-                                        downloadedData = [downloadedDataList[0].inventoryId, downloadedDataList[0].planningUnit.id, downloadedDataList[0].inventoryDate, downloadedDataList[0].region.id, downloadedDataList[0].dataSource.id, downloadedDataList[0].realmCountryPlanningUnit.id, downloadedDataList[0].adjustmentQty != "" && downloadedDataList[0].adjustmentQty != null && downloadedDataList[0].adjustmentQty != 0 ? 2 : 1, parseInt(downloadedDataList[0].adjustmentQty), parseInt(downloadedDataList[0].actualQty), downloadedDataList[0].multiplier, parseInt(downloadedDataList[0].adjustmentQty) * downloadedDataList[0].multiplier, parseInt(downloadedDataList[0].actualQty) * downloadedDataList[0].multiplier, downloadedDataList[0].notes, downloadedDataList[0].active, JSON.stringify(downloadedDataList[0].batchInfoList != "" ? ((downloadedDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty1": parseInt(a.adjustmentQty), "qty2": parseInt(a.actualQty) } })).sort(function (a, b) { return a.qty1 - b.qty1; }) : ""), "", "", "", "", 4];
+                                        downloadedData = [downloadedDataList[0].inventoryId, downloadedDataList[0].planningUnit.id, moment(downloadedDataList[0].inventoryDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), downloadedDataList[0].region.id, downloadedDataList[0].dataSource.id, downloadedDataList[0].realmCountryPlanningUnit.id, downloadedDataList[0].adjustmentQty != "" && downloadedDataList[0].adjustmentQty != null && downloadedDataList[0].adjustmentQty != 0 ? 2 : 1, parseInt(downloadedDataList[0].adjustmentQty), parseInt(downloadedDataList[0].actualQty), downloadedDataList[0].multiplier, parseInt(downloadedDataList[0].adjustmentQty) * downloadedDataList[0].multiplier, parseInt(downloadedDataList[0].actualQty) * downloadedDataList[0].multiplier, downloadedDataList[0].notes, downloadedDataList[0].active, JSON.stringify(downloadedDataList[0].batchInfoList != "" ? ((downloadedDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty1": parseInt(a.adjustmentQty), "qty2": parseInt(a.actualQty) } })).sort(function (a, b) { return a.qty1 - b.qty1; }) : ""), "", "", "", "", 4];
                                       }
                                       data[18] = downloadedData;//Downloaded data
                                       data[19] = 4;
@@ -1195,7 +1195,7 @@ export default class syncPage extends Component {
                                     columns: [
                                       { title: i18n.t('static.commit.inventoryId'), type: 'text', },
                                       { title: i18n.t('static.planningunit.planningunit'), type: 'dropdown', source: planningUnitList, width: 200 },
-                                      { title: i18n.t('static.inventory.inventoryDate'), type: 'calendar', options: { format: 'MM-YYYY' }, width: 85 },
+                                      { title: i18n.t('static.inventory.inventoryDate'), type: 'text', width: 85 },
                                       { title: i18n.t('static.region.region'), type: 'dropdown', source: regionList, width: 100 },
                                       { title: i18n.t('static.inventory.dataSource'), type: 'dropdown', source: dataSourceList, width: 100 },
                                       { title: i18n.t('static.supplyPlan.alternatePlanningUnit'), type: 'dropdown', source: realmCountryPlanningUnitList, width: 150 },
@@ -1290,7 +1290,7 @@ export default class syncPage extends Component {
                                     data[0] = mergedShipmentData[cd].shipmentId;
                                     data[1] = mergedShipmentData[cd].planningUnit.id;
                                     data[2] = mergedShipmentData[cd].shipmentStatus.id;
-                                    data[3] = mergedShipmentData[cd].expectedDeliveryDate;
+                                    data[3] = moment(mergedShipmentData[cd].expectedDeliveryDate).format(DATE_FORMAT_CAP);
                                     data[4] = mergedShipmentData[cd].procurementAgent.id;
                                     data[5] = mergedShipmentData[cd].fundingSource.id;
                                     data[6] = mergedShipmentData[cd].budget.id;
@@ -1303,12 +1303,12 @@ export default class syncPage extends Component {
                                     data[13] = mergedShipmentData[cd].rate;
                                     data[14] = mergedShipmentData[cd].rate * mergedShipmentData[cd].shipmentQty;
                                     data[15] = mergedShipmentData[cd].freightCost;
-                                    data[16] = mergedShipmentData[cd].plannedDate;
-                                    data[17] = mergedShipmentData[cd].submittedDate;
-                                    data[18] = mergedShipmentData[cd].approvedDate;
-                                    data[19] = mergedShipmentData[cd].shippedDate;
-                                    data[20] = mergedShipmentData[cd].arrivedDate;
-                                    data[21] = mergedShipmentData[cd].deliveredDate;
+                                    data[16] = moment(mergedShipmentData[cd].plannedDate).format(DATE_FORMAT_CAP);
+                                    data[17] = moment(mergedShipmentData[cd].submittedDate).format(DATE_FORMAT_CAP);
+                                    data[18] = moment(mergedShipmentData[cd].approvedDate).format(DATE_FORMAT_CAP);
+                                    data[19] = moment(mergedShipmentData[cd].shippedDate).format(DATE_FORMAT_CAP);
+                                    data[20] = moment(mergedShipmentData[cd].arrivedDate).format(DATE_FORMAT_CAP);
+                                    data[21] = moment(mergedShipmentData[cd].deliveredDate).format(DATE_FORMAT_CAP);
                                     data[22] = mergedShipmentData[cd].notes;
                                     data[23] = mergedShipmentData[cd].erpFlag;
                                     data[24] = mergedShipmentData[cd].emergencyOrder;
@@ -1318,19 +1318,19 @@ export default class syncPage extends Component {
                                     var oldDataList = oldProgramDataShipment.filter(c => c.shipmentId == mergedShipmentData[cd].shipmentId);
                                     var oldData = ""
                                     if (oldDataList.length > 0) {
-                                      oldData = [oldDataList[0].shipmentId, oldDataList[0].planningUnit.id, oldDataList[0].shipmentStatus.id, oldDataList[0].expectedDeliveryDate, oldDataList[0].procurementAgent.id, oldDataList[0].fundingSource.id, oldDataList[0].budget.id, oldDataList[0].orderNo != "" && oldDataList[0].orderNo != null ? oldDataList[0].orderNo.concat("~").concat(oldDataList[0].primeLineNo) : "", oldDataList[0].dataSource.id, oldDataList[0].shipmentMode == "Air" ? 2 : 1, oldDataList[0].suggestedQty, oldDataList[0].shipmentQty, oldDataList[0].currency.currencyId, oldDataList[0].rate, oldDataList[0].rate * oldDataList[0].shipmentQty, oldDataList[0].freightCost, oldDataList[0].plannedDate, oldDataList[0].submittedDate, oldDataList[0].approvedDate, oldDataList[0].shippedDate, oldDataList[0].arrivedDate, oldDataList[0].deliveredDate, oldDataList[0].notes, oldDataList[0].erpFlag, oldDataList[0].emergencyOrder, oldDataList[0].accountFlag, JSON.stringify(oldDataList[0].batchInfoList != "" ? ((oldDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.shipmentQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
+                                      oldData = [oldDataList[0].shipmentId, oldDataList[0].planningUnit.id, oldDataList[0].shipmentStatus.id, moment(oldDataList[0].expectedDeliveryDate).format(DATE_FORMAT_CAP), oldDataList[0].procurementAgent.id, oldDataList[0].fundingSource.id, oldDataList[0].budget.id, oldDataList[0].orderNo != "" && oldDataList[0].orderNo != null ? oldDataList[0].orderNo.concat("~").concat(oldDataList[0].primeLineNo) : "", oldDataList[0].dataSource.id, oldDataList[0].shipmentMode == "Air" ? 2 : 1, oldDataList[0].suggestedQty, oldDataList[0].shipmentQty, oldDataList[0].currency.currencyId, oldDataList[0].rate, oldDataList[0].rate * oldDataList[0].shipmentQty, oldDataList[0].freightCost, moment(oldDataList[0].plannedDate).format(DATE_FORMAT_CAP), moment(oldDataList[0].submittedDate).format(DATE_FORMAT_CAP), moment(oldDataList[0].approvedDate).format(DATE_FORMAT_CAP), moment(oldDataList[0].shippedDate).format(DATE_FORMAT_CAP), moment(oldDataList[0].arrivedDate).format(DATE_FORMAT_CAP), moment(oldDataList[0].deliveredDate).format(DATE_FORMAT_CAP), oldDataList[0].notes, oldDataList[0].erpFlag, oldDataList[0].emergencyOrder, oldDataList[0].accountFlag, JSON.stringify(oldDataList[0].batchInfoList != "" ? ((oldDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.shipmentQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
                                     }
                                     data[28] = oldData;//Old data
                                     var latestDataList = latestProgramDataShipment.filter(c => c.shipmentId == mergedShipmentData[cd].shipmentId);
                                     var latestData = ""
                                     if (latestDataList.length > 0) {
-                                      latestData = [latestDataList[0].shipmentId, latestDataList[0].planningUnit.id, latestDataList[0].shipmentStatus.id, latestDataList[0].expectedDeliveryDate, latestDataList[0].procurementAgent.id, latestDataList[0].fundingSource.id, latestDataList[0].budget.id, latestDataList[0].orderNo != "" && latestDataList[0].orderNo != null ? latestDataList[0].orderNo.concat("~").concat(latestDataList[0].primeLineNo) : "", latestDataList[0].dataSource.id, latestDataList[0].shipmentMode == "Air" ? 2 : 1, latestDataList[0].suggestedQty, latestDataList[0].shipmentQty, latestDataList[0].currency.currencyId, latestDataList[0].rate, latestDataList[0].rate * latestDataList[0].shipmentQty, latestDataList[0].freightCost, latestDataList[0].plannedDate, latestDataList[0].submittedDate, latestDataList[0].approvedDate, latestDataList[0].shippedDate, latestDataList[0].arrivedDate, latestDataList[0].deliveredDate, latestDataList[0].notes, latestDataList[0].erpFlag, latestDataList[0].emergencyOrder, latestDataList[0].accountFlag, JSON.stringify(latestDataList[0].batchInfoList != "" ? ((latestDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.shipmentQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
+                                      latestData = [latestDataList[0].shipmentId, latestDataList[0].planningUnit.id, latestDataList[0].shipmentStatus.id, moment(latestDataList[0].expectedDeliveryDate).format(DATE_FORMAT_CAP), latestDataList[0].procurementAgent.id, latestDataList[0].fundingSource.id, latestDataList[0].budget.id, latestDataList[0].orderNo != "" && latestDataList[0].orderNo != null ? latestDataList[0].orderNo.concat("~").concat(latestDataList[0].primeLineNo) : "", latestDataList[0].dataSource.id, latestDataList[0].shipmentMode == "Air" ? 2 : 1, latestDataList[0].suggestedQty, latestDataList[0].shipmentQty, latestDataList[0].currency.currencyId, latestDataList[0].rate, latestDataList[0].rate * latestDataList[0].shipmentQty, latestDataList[0].freightCost, moment(latestDataList[0].plannedDate).format(DATE_FORMAT_CAP), moment(latestDataList[0].submittedDate).format(DATE_FORMAT_CAP), moment(latestDataList[0].approvedDate).format(DATE_FORMAT_CAP), moment(latestDataList[0].shippedDate).format(DATE_FORMAT_CAP), moment(latestDataList[0].arrivedDate).format(DATE_FORMAT_CAP), moment(latestDataList[0].deliveredDate).format(DATE_FORMAT_CAP), latestDataList[0].notes, latestDataList[0].erpFlag, latestDataList[0].emergencyOrder, latestDataList[0].accountFlag, JSON.stringify(latestDataList[0].batchInfoList != "" ? ((latestDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.shipmentQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
                                     }
                                     data[29] = latestData;//Latest data
                                     var downloadedDataList = downloadedProgramDataShipment.filter(c => c.shipmentId == mergedShipmentData[cd].shipmentId);
                                     var downloadedData = "";
                                     if (downloadedDataList.length > 0) {
-                                      downloadedData = [downloadedDataList[0].shipmentId, downloadedDataList[0].planningUnit.id, downloadedDataList[0].shipmentStatus.id, downloadedDataList[0].expectedDeliveryDate, downloadedDataList[0].procurementAgent.id, downloadedDataList[0].fundingSource.id, downloadedDataList[0].budget.id, downloadedDataList[0].orderNo != "" && downloadedDataList[0].orderNo != null ? downloadedDataList[0].orderNo.concat("~").concat(downloadedDataList[0].primeLineNo) : "", downloadedDataList[0].dataSource.id, downloadedDataList[0].shipmentMode == "Air" ? 2 : 1, downloadedDataList[0].suggestedQty, downloadedDataList[0].shipmentQty, downloadedDataList[0].currency.currencyId, downloadedDataList[0].rate, downloadedDataList[0].rate * downloadedDataList[0].shipmentQty, downloadedDataList[0].freightCost, downloadedDataList[0].plannedDate, downloadedDataList[0].submittedDate, downloadedDataList[0].approvedDate, downloadedDataList[0].shippedDate, downloadedDataList[0].arrivedDate, downloadedDataList[0].deliveredDate, downloadedDataList[0].notes, downloadedDataList[0].erpFlag, downloadedDataList[0].emergencyOrder, downloadedDataList[0].accountFlag, JSON.stringify(downloadedDataList[0].batchInfoList != "" ? ((downloadedDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.shipmentQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
+                                      downloadedData = [downloadedDataList[0].shipmentId, downloadedDataList[0].planningUnit.id, downloadedDataList[0].shipmentStatus.id, moment(downloadedDataList[0].expectedDeliveryDate).format(DATE_FORMAT_CAP), downloadedDataList[0].procurementAgent.id, downloadedDataList[0].fundingSource.id, downloadedDataList[0].budget.id, downloadedDataList[0].orderNo != "" && downloadedDataList[0].orderNo != null ? downloadedDataList[0].orderNo.concat("~").concat(downloadedDataList[0].primeLineNo) : "", downloadedDataList[0].dataSource.id, downloadedDataList[0].shipmentMode == "Air" ? 2 : 1, downloadedDataList[0].suggestedQty, downloadedDataList[0].shipmentQty, downloadedDataList[0].currency.currencyId, downloadedDataList[0].rate, downloadedDataList[0].rate * downloadedDataList[0].shipmentQty, downloadedDataList[0].freightCost, moment(downloadedDataList[0].plannedDate).format(DATE_FORMAT_CAP), moment(downloadedDataList[0].submittedDate).format(DATE_FORMAT_CAP), moment(downloadedDataList[0].approvedDate).format(DATE_FORMAT_CAP), moment(downloadedDataList[0].shippedDate).format(DATE_FORMAT_CAP), moment(downloadedDataList[0].arrivedDate).format(DATE_FORMAT_CAP), moment(downloadedDataList[0].deliveredDate).format(DATE_FORMAT_CAP), downloadedDataList[0].notes, downloadedDataList[0].erpFlag, downloadedDataList[0].emergencyOrder, downloadedDataList[0].accountFlag, JSON.stringify(downloadedDataList[0].batchInfoList != "" ? ((downloadedDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.shipmentQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
                                     }
                                     data[30] = downloadedData;//Downloaded data
                                     data[31] = 4;
@@ -1344,7 +1344,7 @@ export default class syncPage extends Component {
                                       { title: i18n.t('static.commit.shipmentId'), type: 'text', },
                                       { title: i18n.t('static.planningunit.planningunit'), type: 'dropdown', source: planningUnitList, width: 200 },
                                       { type: 'dropdown', title: i18n.t('static.supplyPlan.shipmentStatus'), source: shipmentStatusList, width: 100 },
-                                      { type: 'calendar', title: i18n.t('static.supplyPlan.expectedDeliveryDate'), options: { format: 'MM-DD-YYYY' }, width: 100, },
+                                      { type: 'text', title: i18n.t('static.supplyPlan.expectedDeliveryDate'), width: 100, },
                                       { type: 'dropdown', title: i18n.t('static.procurementagent.procurementagent'), source: procurementAgentList, width: 120 },
                                       { type: 'dropdown', title: i18n.t('static.subfundingsource.fundingsource'), source: fundingSourceList, width: 120 },
                                       { type: 'dropdown', title: i18n.t('static.dashboard.budget'), source: budgetList, width: 120 },
@@ -1357,12 +1357,12 @@ export default class syncPage extends Component {
                                       { type: 'numeric', title: i18n.t('static.supplyPlan.pricePerPlanningUnit'), width: 80, mask: '#,##.00', decimal: '.' },
                                       { type: 'numeric', title: i18n.t('static.shipment.productcost'), width: 80, mask: '#,##.00', decimal: '.' },
                                       { type: 'numeric', title: i18n.t('static.shipment.freightcost'), width: 80, mask: '#,##.00', decimal: '.' },
-                                      { type: 'calendar', title: i18n.t('static.supplyPlan.plannedDate'), options: { format: 'MM-DD-YYYY' }, width: 100, },
-                                      { type: 'calendar', title: i18n.t('static.supplyPlan.submittedDate'), options: { format: 'MM-DD-YYYY' }, width: 100, },
-                                      { type: 'calendar', title: i18n.t('static.supplyPlan.approvedDate'), options: { format: 'MM-DD-YYYY' }, width: 100, },
-                                      { type: 'calendar', title: i18n.t('static.supplyPlan.shippedDate'), options: { format: 'MM-DD-YYYY' }, width: 100, },
-                                      { type: 'calendar', title: i18n.t('static.supplyPlan.arrivedDate'), options: { format: 'MM-DD-YYYY' }, width: 100, },
-                                      { type: 'calendar', title: i18n.t('static.shipment.receiveddate'), options: { format: 'MM-DD-YYYY' }, width: 100, },
+                                      { type: 'text', title: i18n.t('static.supplyPlan.plannedDate'), width: 100, },
+                                      { type: 'text', title: i18n.t('static.supplyPlan.submittedDate'), width: 100, },
+                                      { type: 'text', title: i18n.t('static.supplyPlan.approvedDate'), width: 100, },
+                                      { type: 'text', title: i18n.t('static.supplyPlan.shippedDate'), width: 100, },
+                                      { type: 'text', title: i18n.t('static.supplyPlan.arrivedDate'), width: 100, },
+                                      { type: 'text', title: i18n.t('static.shipment.receiveddate'), width: 100, },
                                       { type: 'text', title: i18n.t('static.program.notes'), width: 200 },
                                       { type: 'hidden', title: i18n.t('static.supplyPlan.erpFlag'), width: 0 },
                                       { type: 'hidden', title: i18n.t('static.supplyPlan.emergencyOrder'), width: 0 },

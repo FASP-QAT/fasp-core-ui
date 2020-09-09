@@ -850,7 +850,7 @@ export default class WhatIfReportComponent extends React.Component {
 
 
         A.push(openningArr)
-        A.push(consumptionArr)
+        A.push(consumptionArr.map((c, item) => item != 0 ? c.consumptionQty : c));
         A.push(shipmentArr)
         A.push(suggestedArr)
         A.push(manualEntryShipmentsArr)
@@ -878,7 +878,7 @@ export default class WhatIfReportComponent extends React.Component {
         var a = document.createElement("a")
         a.href = 'data:attachment/csv,' + csvString
         a.target = "_Blank"
-        a.download = i18n.t('static.dashboard.supplyPlan') + ".csv"
+        a.download = i18n.t('static.dashboard.whatIf') + ".csv"
         document.body.appendChild(a)
         a.click()
     }
@@ -924,7 +924,7 @@ export default class WhatIfReportComponent extends React.Component {
                 align: 'justify'
                 });*/
                 doc.setTextColor("#002f6c");
-                doc.text(i18n.t('static.dashboard.supplyPlan'), doc.internal.pageSize.width / 2, 60, {
+                doc.text(i18n.t('static.dashboard.whatIf'), doc.internal.pageSize.width / 2, 60, {
                     align: 'center'
                 })
                 if (i == 1) {
@@ -991,7 +991,7 @@ export default class WhatIfReportComponent extends React.Component {
         var maxStockArr = [...[(i18n.t('static.supplyPlan.maxStockMos'))], ...this.state.maxStockMoS]
         var unmetDemandArr = [...[(i18n.t('static.supplyPlan.unmetDemandStr'))], ...this.state.unmetDemand]
 
-        const data = [openningArr.map(c => this.formatter(c)), consumptionArr.map(c => this.formatter(c)), shipmentArr.map(c => this.formatter(c)), suggestedArr.map(c => this.formatter(c)), manualEntryShipmentsArr.map(c => this.formatter(c)), deliveredShipmentArr.map(c => this.formatter(c)), shippedShipmentArr.map(c => this.formatter(c)), orderedShipmentArr.map(c => this.formatter(c)), plannedShipmentArr.map(c => this.formatter(c)), erpShipmentsArr.map(c => this.formatter(c)), deliveredErpShipmentArr.map(c => this.formatter(c)), shippedErpShipmentArr.map(c => this.formatter(c)), orderedErpShipmentArr.map(c => this.formatter(c)), plannedErpShipmentArr.map(c => this.formatter(c)), inventoryArr.map(c => this.formatter(c)), closingBalanceArr.map(c => this.formatter(c)), monthsOfStockArr.map(c => this.formatterDouble(c)), amcgArr.map(c => this.formatter(c)), minStocArr.map(c => this.formatter(c)), maxStockArr.map(c => this.formatter(c)), unmetDemandArr.map(c => this.formatter(c))];
+        const data = [openningArr.map(c => this.formatter(c)), consumptionArr.map((c, item) => item != 0 ? this.formatter(c.consumptionQty) : c), shipmentArr.map(c => this.formatter(c)), suggestedArr.map(c => this.formatter(c)), manualEntryShipmentsArr.map(c => this.formatter(c)), deliveredShipmentArr.map(c => this.formatter(c)), shippedShipmentArr.map(c => this.formatter(c)), orderedShipmentArr.map(c => this.formatter(c)), plannedShipmentArr.map(c => this.formatter(c)), erpShipmentsArr.map(c => this.formatter(c)), deliveredErpShipmentArr.map(c => this.formatter(c)), shippedErpShipmentArr.map(c => this.formatter(c)), orderedErpShipmentArr.map(c => this.formatter(c)), plannedErpShipmentArr.map(c => this.formatter(c)), inventoryArr.map(c => this.formatter(c)), closingBalanceArr.map(c => this.formatter(c)), monthsOfStockArr.map(c => this.formatterDouble(c)), amcgArr.map(c => this.formatter(c)), minStocArr.map(c => this.formatter(c)), maxStockArr.map(c => this.formatter(c)), unmetDemandArr.map(c => this.formatter(c))];
 
         let content = {
             margin: { top: 80, bottom: 50 },
@@ -1003,7 +1003,7 @@ export default class WhatIfReportComponent extends React.Component {
         doc.autoTable(content);
         addHeaders(doc)
         addFooters(doc)
-        doc.save(i18n.t('static.dashboard.supplyPlan') + ".pdf")
+        doc.save(i18n.t('static.dashboard.whatIf') + ".pdf")
 
     }
 
@@ -1663,8 +1663,8 @@ export default class WhatIfReportComponent extends React.Component {
 
                                     inventoryTotalData.push(jsonList[0].adjustmentQty == 0 ? "" : jsonList[0].adjustmentQty);
                                     totalExpiredStockArr.push({ qty: jsonList[0].expiredStock, details: jsonList[0].batchDetails, month: m[n] });
-                                    monthsOfStockArray.push(jsonList[0].mos);
-                                    amcTotalData.push(jsonList[0].amc)
+                                    monthsOfStockArray.push(parseFloat(jsonList[0].mos).toFixed(2));
+                                    amcTotalData.push(parseFloat(jsonList[0].amc).toFixed(2))
                                     minStockMoS.push(jsonList[0].minStockMoS)
                                     maxStockMoS.push(jsonList[0].maxStockMoS)
                                     unmetDemand.push(jsonList[0].unmetDemand == 0 ? "" : jsonList[0].unmetDemand);
@@ -1808,7 +1808,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         delivered: deliveredShipmentsTotalData.qty + deliveredErpShipmentsTotalData.qty,
                                         shipped: shippedShipmentsTotalData.qty + shippedErpShipmentsTotalData.qty,
                                         ordered: orderedShipmentsTotalData.qty + orderedErpShipmentsTotalData.qty,
-                                        mos: jsonList[0].mos,
+                                        mos: parseFloat(jsonList[0].mos).toFixed(2),
                                         minMos: jsonList[0].minStockMoS,
                                         maxMos: jsonList[0].maxStockMoS
                                     }

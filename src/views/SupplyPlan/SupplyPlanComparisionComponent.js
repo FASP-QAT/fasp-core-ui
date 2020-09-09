@@ -527,123 +527,123 @@ export default class SupplyPlanComponent extends React.Component {
 
     getPlanningUnitList(event) {
         this.setState({ loading: true })
-        var programId = value != "" && value != undefined ? value.value : 0;
+        var programId = document.getElementById("programId").value;
         if (programId != 0) {
-        var db1;
-        var storeOS;
-        getDatabase();
-        var regionList = [];
-        var dataSourceList = [];
-        var dataSourceListAll = [];
-        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function (event) {
-            this.setState({
-                supplyPlanError: i18n.t('static.program.errortext')
-            })
-        }.bind(this);
-        openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-            var programDataTransaction = db1.transaction(['downloadedProgramData'], 'readwrite');
-            var programDataOs = programDataTransaction.objectStore('downloadedProgramData');
-            var programRequest = programDataOs.get(document.getElementById("programId").value);
-            programRequest.onerror = function (event) {
+            var db1;
+            var storeOS;
+            getDatabase();
+            var regionList = [];
+            var dataSourceList = [];
+            var dataSourceListAll = [];
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            openRequest.onerror = function (event) {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext')
                 })
             }.bind(this);
-            programRequest.onsuccess = function (e) {
-                var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                var programJson = JSON.parse(programData);
-                for (var i = 0; i < programJson.regionList.length; i++) {
-                    var regionJson = {
-                        // name: // programJson.regionList[i].regionId,
-                        name: getLabelText(programJson.regionList[i].label, this.state.lang),
-                        id: programJson.regionList[i].regionId
-                    }
-                    regionList.push(regionJson)
-
-                }
-                var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
-                var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
-                var planningunitRequest = planningunitOs.getAll();
-                var planningList = []
-                planningunitRequest.onerror = function (event) {
+            openRequest.onsuccess = function (e) {
+                db1 = e.target.result;
+                var programDataTransaction = db1.transaction(['downloadedProgramData'], 'readwrite');
+                var programDataOs = programDataTransaction.objectStore('downloadedProgramData');
+                var programRequest = programDataOs.get(document.getElementById("programId").value);
+                programRequest.onerror = function (event) {
                     this.setState({
                         supplyPlanError: i18n.t('static.program.errortext')
                     })
                 }.bind(this);
-                planningunitRequest.onsuccess = function (e) {
-                    var myResult = [];
-                    myResult = planningunitRequest.result;
-                    var programId = (document.getElementById("programId").value).split("_")[0];
-                    var proList = []
-                    for (var i = 0; i < myResult.length; i++) {
-                        if (myResult[i].program.id == programId && myResult[i].active == true) {
-                            var productJson = {
-                                name: getLabelText(myResult[i].planningUnit.label, this.state.lang),
-                                id: myResult[i].planningUnit.id
-                            }
-                            proList.push(productJson);
-                            planningList.push(myResult[i]);
+                programRequest.onsuccess = function (e) {
+                    var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                    var programJson = JSON.parse(programData);
+                    for (var i = 0; i < programJson.regionList.length; i++) {
+                        var regionJson = {
+                            // name: // programJson.regionList[i].regionId,
+                            name: getLabelText(programJson.regionList[i].label, this.state.lang),
+                            id: programJson.regionList[i].regionId
                         }
-                    }
+                        regionList.push(regionJson)
 
-                    var puTransaction = db1.transaction(['planningUnit'], 'readwrite');
-                    var puOs = puTransaction.objectStore('planningUnit');
-                    var puRequest = puOs.getAll();
-                    var planningUnitListForConsumption = []
-                    puRequest.onerror = function (event) {
+                    }
+                    var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+                    var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
+                    var planningunitRequest = planningunitOs.getAll();
+                    var planningList = []
+                    planningunitRequest.onerror = function (event) {
                         this.setState({
                             supplyPlanError: i18n.t('static.program.errortext')
                         })
                     }.bind(this);
-                    puRequest.onsuccess = function (e) {
-                        var puResult = [];
-                        puResult = puRequest.result;
-                        planningUnitListForConsumption = puResult;
+                    planningunitRequest.onsuccess = function (e) {
+                        var myResult = [];
+                        myResult = planningunitRequest.result;
+                        var programId = (document.getElementById("programId").value).split("_")[0];
+                        var proList = []
+                        for (var i = 0; i < myResult.length; i++) {
+                            if (myResult[i].program.id == programId && myResult[i].active == true) {
+                                var productJson = {
+                                    name: getLabelText(myResult[i].planningUnit.label, this.state.lang),
+                                    id: myResult[i].planningUnit.id
+                                }
+                                proList.push(productJson);
+                                planningList.push(myResult[i]);
+                            }
+                        }
 
-
-                        var dataSourceTransaction = db1.transaction(['dataSource'], 'readwrite');
-                        var dataSourceOs = dataSourceTransaction.objectStore('dataSource');
-                        var dataSourceRequest = dataSourceOs.getAll();
-                        dataSourceRequest.onerror = function (event) {
+                        var puTransaction = db1.transaction(['planningUnit'], 'readwrite');
+                        var puOs = puTransaction.objectStore('planningUnit');
+                        var puRequest = puOs.getAll();
+                        var planningUnitListForConsumption = []
+                        puRequest.onerror = function (event) {
                             this.setState({
                                 supplyPlanError: i18n.t('static.program.errortext')
                             })
                         }.bind(this);
-                        dataSourceRequest.onsuccess = function (event) {
-                            var dataSourceResult = [];
-                            dataSourceResult = dataSourceRequest.result;
-                            for (var k = 0; k < dataSourceResult.length; k++) {
-                                if (dataSourceResult[k].program.id == programJson.programId || dataSourceResult[k].program.id == 0 && dataSourceResult[k].active == true) {
-                                    if (dataSourceResult[k].realm.id == programJson.realmCountry.realm.realmId) {
-                                        dataSourceListAll.push(dataSourceResult[k]);
+                        puRequest.onsuccess = function (e) {
+                            var puResult = [];
+                            puResult = puRequest.result;
+                            planningUnitListForConsumption = puResult;
 
+
+                            var dataSourceTransaction = db1.transaction(['dataSource'], 'readwrite');
+                            var dataSourceOs = dataSourceTransaction.objectStore('dataSource');
+                            var dataSourceRequest = dataSourceOs.getAll();
+                            dataSourceRequest.onerror = function (event) {
+                                this.setState({
+                                    supplyPlanError: i18n.t('static.program.errortext')
+                                })
+                            }.bind(this);
+                            dataSourceRequest.onsuccess = function (event) {
+                                var dataSourceResult = [];
+                                dataSourceResult = dataSourceRequest.result;
+                                for (var k = 0; k < dataSourceResult.length; k++) {
+                                    if (dataSourceResult[k].program.id == programJson.programId || dataSourceResult[k].program.id == 0 && dataSourceResult[k].active == true) {
+                                        if (dataSourceResult[k].realm.id == programJson.realmCountry.realm.realmId) {
+                                            dataSourceListAll.push(dataSourceResult[k]);
+
+                                        }
                                     }
                                 }
-                            }
-                            this.setState({
-                                planningUnitList: proList,
-                                programPlanningUnitList: myResult,
-                                regionList: regionList,
-                                programJson: programJson,
-                                dataSourceListAll: dataSourceListAll,
-                                planningUnitListForConsumption: planningUnitListForConsumption,
-                                loading: false
-                            })
-                            this.formSubmit(this.state.monthCount)
+                                this.setState({
+                                    planningUnitList: proList,
+                                    programPlanningUnitList: myResult,
+                                    regionList: regionList,
+                                    programJson: programJson,
+                                    dataSourceListAll: dataSourceListAll,
+                                    planningUnitListForConsumption: planningUnitListForConsumption,
+                                    loading: false
+                                })
+                                this.formSubmit(this.state.monthCount)
+                            }.bind(this);
                         }.bind(this);
                     }.bind(this);
-                }.bind(this);
+                }.bind(this)
             }.bind(this)
-        }.bind(this)
-    } else {
-        this.setState({
-            loading: false,
-            planningUnitList: []
-        })
-    }
+        } else {
+            this.setState({
+                loading: false,
+                planningUnitList: []
+            })
+        }
     }
 
     getMonthArray(currentDate) {
@@ -1068,8 +1068,8 @@ export default class SupplyPlanComponent extends React.Component {
 
                                     inventoryTotalData.push(jsonList[0].adjustmentQty == 0 ? "" : jsonList[0].adjustmentQty);
                                     totalExpiredStockArr.push({ qty: jsonList[0].expiredStock, details: jsonList[0].batchDetails, month: m[n] });
-                                    monthsOfStockArray.push(jsonList[0].mos);
-                                    amcTotalData.push(jsonList[0].amc)
+                                    monthsOfStockArray.push(parseFloat(jsonList[0].mos).toFixed(2));
+                                    amcTotalData.push((jsonList[0].amc).toFixed(2))
                                     minStockMoS.push(jsonList[0].minStockMoS)
                                     maxStockMoS.push(jsonList[0].maxStockMoS)
                                     unmetDemand.push(jsonList[0].unmetDemand == 0 ? "" : jsonList[0].unmetDemand);
@@ -1213,7 +1213,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         delivered: deliveredShipmentsTotalData.qty + deliveredErpShipmentsTotalData.qty,
                                         shipped: shippedShipmentsTotalData.qty + shippedErpShipmentsTotalData.qty,
                                         ordered: orderedShipmentsTotalData.qty + orderedErpShipmentsTotalData.qty,
-                                        mos: jsonList[0].mos,
+                                        mos: parseFloat(jsonList[0].mos).toFixed(2),
                                         minMos: jsonList[0].minStockMoS,
                                         maxMos: jsonList[0].maxStockMoS
                                     }

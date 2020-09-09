@@ -32,6 +32,7 @@ export const INVENTORY_DATA_SOURCE_TYPE = 3
 export const SHIPMENT_DATA_SOURCE_TYPE = 4
 export const DATE_FORMAT_SM = "dd-MMM-yy"
 export const DATE_FORMAT_CAP = "DD-MMM-YY"
+export const DATE_FORMAT_CAP_WITHOUT_DATE = "MMM-YY"
 export const DATE_PLACEHOLDER_TEXT = "dd-mmm-yy"
 export const QAT_DATA_SOURCE_ID = 13
 export const FIRST_DATA_ENTRY_DATE = '2017-01-01'
