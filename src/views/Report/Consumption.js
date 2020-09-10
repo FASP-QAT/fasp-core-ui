@@ -2112,8 +2112,8 @@ class Consumption extends Component {
         let realmId = AuthenticationService.getRealmId();
 
         var inputjson = {
-          startDate: new moment(startDate),
-          stopDate: new moment(endDate),
+          startDate: startDate,
+          stopDate:endDate,
           programId: programId,
           versionId: versionId,
           planningUnitId: planningUnitId,

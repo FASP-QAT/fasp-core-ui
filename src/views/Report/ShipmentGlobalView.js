@@ -1741,7 +1741,7 @@ class ShipmentGlobalView extends Component {
         let content1 = {
             margin: { top: 80, bottom: 50 },
             startY: height,
-            styles: { lineWidth: 1, fontSize: 8, cellWidth: 70, halign: 'center' },
+            styles: { lineWidth: 1, fontSize: 8, cellWidth: 700/displaylabel.length, halign: 'center' },
             columnStyles: {
                 // 0: { cellWidth: 100 },
                 // 1: { cellWidth: 100 },
@@ -1767,12 +1767,12 @@ class ShipmentGlobalView extends Component {
             margin: { top: 80, left: 100, bottom: 50 },
             startY: doc.autoTableEndPosY() + 50,
             pageBreak: 'auto',
-            styles: { lineWidth: 1, fontSize: 8, cellWidth: 100, halign: 'center' },
+            styles: { lineWidth: 1, fontSize: 8, cellWidth: 120, halign: 'center' },
             columnStyles: {
                 // 0: { cellWidth: 100 },
                 // 1: { cellWidth: 100 },
                 // 2: { cellWidth: 200 },
-                3: { cellWidth: 250 },
+                3: { cellWidth: 281.89 },
                 // 4: { cellWidth: 100 },
             },
             html: '#mytable2',
