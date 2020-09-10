@@ -40,7 +40,7 @@ export default class PipelineProgramPlanningUnits extends Component {
             puList = (this.state.activePlanningUnitList).filter(c => pcIdArray.includes(c.forecastingUnit.productCategory.id) && c.active.toString() == "true");
         } else {
             console.log("in else=====>");
-            puList = this.state.planningUnitList
+            puList = this.state.activePlanningUnitList
         }
 
         // var puList = (this.state.activePlanningUnitList).filter(c => c.forecastingUnit.productCategory.id == value);

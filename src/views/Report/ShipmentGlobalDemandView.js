@@ -2674,7 +2674,8 @@ class ShipmentGlobalDemandView extends Component {
         ProductService.getProductCategoryList(realmId)
             .then(response => {
                 // console.log(response.data)
-                var list = response.data.slice(1);
+                // var list = response.data.slice(1);
+                var list = response.data;
                 this.setState({
                     productCategories: list, loading: false
                 })
@@ -2707,7 +2708,8 @@ class ShipmentGlobalDemandView extends Component {
     getPlanningUnit = () => {
 
         this.setState({
-            planningUnits: []
+            planningUnits: [],
+            planningUnitValues:[]
         }, () => {
             if (!navigator.onLine) {
                 let programId = document.getElementById("programId").value;

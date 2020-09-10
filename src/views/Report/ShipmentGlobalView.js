@@ -1958,6 +1958,7 @@ class ShipmentGlobalView extends Component {
                     error => {
                         this.setState({
                             planningUnits: [],
+                            planningUnitValues:[]
                         })
                         if (error.message === "Network Error") {
                             this.setState({ message: error.message });
@@ -2128,7 +2129,8 @@ class ShipmentGlobalView extends Component {
         ProductService.getProductCategoryList(realmId)
             .then(response => {
                 // console.log(response.data)
-                var list = response.data.slice(1);
+                // var list = response.data.slice(1);
+                var list = response.data;
                 this.setState({
                     productCategories: list, loading: false
                 })
