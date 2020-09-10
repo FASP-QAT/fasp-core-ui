@@ -4,6 +4,7 @@ import i18n from '../../i18n';
 import PipelineService from "../../api/PipelineService.js";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import { confirmAlert } from 'react-confirm-alert';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 
 
 const entityname = i18n.t('static.dashboard.pipelineProgramImport');
@@ -50,9 +51,11 @@ export default class PipelineProgramImport extends Component {
                                 console.log("messageCode-->", response.data.messageCode)
                                 if (response.status == 200) {
                                     this.props.history.push('/pipeline/pieplineProgramList/' + 'green/' + i18n.t('static.message.pipelineProgramImportSuccess'))
-                                } else {
+                                }
+                                else {
+                                    // alert("in else");
                                     this.setState({
-                                        message: i18n.t('static.program.errortext')
+                                        message: response.data.messageCode
                                     },
                                         () => {
                                             this.hideSecondComponent();
@@ -91,7 +94,12 @@ export default class PipelineProgramImport extends Component {
     render() {
         return (
             <div className="animated fadeIn">
-                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
+                }} />
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
                 {/* <h6></h6> */}
                 <Row>
                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
@@ -148,8 +156,8 @@ export default class PipelineProgramImport extends Component {
     cancelClicked() {
         this.props.history.push(`/pipeline/pieplineProgramList/` + 'red/' + i18n.t('static.message.cancelled', { entityname }));
     }
-    resetClicked=()=>{
-        const file =  document.getElementById('file-input'); 
-    file.value = ''; 
+    resetClicked = () => {
+        const file = document.getElementById('file-input');
+        file.value = '';
     }
 }
