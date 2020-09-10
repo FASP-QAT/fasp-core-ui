@@ -253,7 +253,7 @@ export default class CurrencyTicketComponent extends Component {
                                     </FormGroup>
                                     <FormGroup>
                                         <Label for="conversionRatetoUSD">{i18n.t('static.currency.conversionrateusd')}<span class="red Reqasterisk">*</span></Label>
-                                        <Input type="text" name="conversionRatetoUSD" id="conversionRatetoUSD"
+                                        <Input type="number" name="conversionRatetoUSD" id="conversionRatetoUSD"
                                         bsSize="sm"
                                         valid={!errors.conversionRatetoUSD && this.state.currency.conversionRatetoUSD != ''}
                                         invalid={touched.conversionRatetoUSD && !!errors.conversionRatetoUSD}
