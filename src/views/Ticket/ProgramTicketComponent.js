@@ -12,6 +12,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import HealthAreaService from '../../api/HealthAreaService';
+import classNames from 'classnames';
 
 const initialValues = {
     summary: "Add / Update Program",
@@ -43,8 +44,8 @@ const validationSchema = function (values) {
             .required(i18n.t('static.common.realmtext')),
         realmCountryId: Yup.string()
             .required(i18n.t('static.healtharea.countrytext')),
-        // regionId: Yup.string()
-        //     .required(i18n.t('static.region.validregion')),
+        regionId: Yup.string()
+            .required(i18n.t('static.common.regiontext')),
         organisationId: Yup.string()
             .required(i18n.t('static.program.validorganisationtext')),
         healthAreaId: Yup.string()
@@ -524,7 +525,9 @@ export default class ProgramTicketComponent extends Component {
                             isSubmitting,
                             isValid,
                             setTouched,
-                            handleReset
+                            handleReset,
+                            setFieldValue,
+                            setFieldTouched
                         }) => (
                                 <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm'>
                                     < FormGroup >
@@ -583,12 +586,15 @@ export default class ProgramTicketComponent extends Component {
                                     </FormGroup>
                                     < FormGroup >
                                         <Label for="regionId">{i18n.t('static.program.region')}<span class="red Reqasterisk">*</span></Label>
-                                        <Select name="regionId" id="regionId"
-                                            bsSize="sm"
-                                            valid={!errors.regionId && this.state.program.regionId != ''}
-                                            invalid={touched.regionId && !!errors.regionId}
-                                            onChange={(e) => { handleChange(e); this.updateFieldData(e)}}
-                                            onBlur={handleBlur}
+                                        <Select 
+                                            className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                { 'is-valid': !errors.regionId && this.state.program.regionId.length != 0 },
+                                                { 'is-invalid': (touched.regionId && !!errors.regionId) }
+                                            )}
+                                            name="regionId" id="regionId"
+                                            bsSize="sm"                                            
+                                            onChange={(e) => { handleChange(e); setFieldValue("regionId", e); this.updateFieldData(e)}}
+                                            onBlur={() => setFieldTouched("regionId", true)}
                                             multi
                                             options={this.state.regionList}
                                             value={this.state.regionId}

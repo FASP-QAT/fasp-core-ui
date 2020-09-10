@@ -12,6 +12,7 @@ import CountryService from '../../api/CountryService';
 import HealthAreaService from '../../api/HealthAreaService';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
+import classNames from 'classnames';
 
 const initialValues = {
     summary: 'Add / Update Organization',
@@ -28,8 +29,8 @@ const validationSchema = function (values) {
             .required(i18n.t('static.common.summarytext')),
         realmId: Yup.string()
             .required(i18n.t('static.common.realmtext')),
-        // realmCountryId: Yup.string()
-        //     .required(i18n.t('static.country.countrytext')),
+        realmCountryId: Yup.string()
+            .required(i18n.t('static.program.validcountrytext')),
         organisationName: Yup.string()            
             .required(i18n.t('static.organisation.organisationtext')),
         organisationCode: Yup.string()
@@ -306,7 +307,9 @@ export default class OrganisationTicketComponent extends Component {
                             isSubmitting,
                             isValid,
                             setTouched,
-                            handleReset
+                            handleReset,
+                            setFieldValue,
+                            setFieldTouched
                         }) => (
                                 <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm'>
                                     < FormGroup >
@@ -338,12 +341,15 @@ export default class OrganisationTicketComponent extends Component {
                                     </FormGroup>
                                     < FormGroup >
                                         <Label for="realmCountryId">{i18n.t('static.organisation.realmcountry')}<span class="red Reqasterisk">*</span></Label>
-                                        <Select type="text" name="realmCountryId" id="realmCountryId"
-                                        bsSize="sm"
-                                        valid={!errors.realmCountryId && this.state.organisation.realmCountryId != ''}
-                                        invalid={touched.realmCountryId && !!errors.realmCountryId}
-                                        onChange={(e) => { handleChange(e); this.updateFieldData(e)}}
-                                        onBlur={handleBlur}
+                                        <Select 
+                                        className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                            { 'is-valid': !errors.realmCountryId && this.state.organisation.realmCountryId.length != 0 },
+                                            { 'is-invalid': (touched.realmCountryId && !!errors.realmCountryId) }
+                                        )}
+                                        name="realmCountryId" id="realmCountryId"
+                                        bsSize="sm"                                        
+                                        onChange={(e) => { handleChange(e); setFieldValue("realmCountryId", e); this.updateFieldData(e)}}
+                                        onBlur={() => setFieldTouched("realmCountryId", true)}
                                         multi
                                         options={this.state.realmCountryList}
                                         value={this.state.countryId}

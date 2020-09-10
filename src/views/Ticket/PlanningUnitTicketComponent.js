@@ -334,7 +334,7 @@ export default class PlanningUnitTicketComponent extends Component {
                                     </FormGroup>                                    
                                     <FormGroup>
                                         <Label for="multiplier">{i18n.t('static.unit.multiplier')}<span class="red Reqasterisk">*</span></Label>
-                                        <Input type="text" name="multiplier" id="multiplier"
+                                        <Input type="number" name="multiplier" id="multiplier"
                                         bsSize="sm"
                                         valid={!errors.multiplier && this.state.planningUnit.multiplier != ''}
                                         invalid={touched.multiplier && !!errors.multiplier}

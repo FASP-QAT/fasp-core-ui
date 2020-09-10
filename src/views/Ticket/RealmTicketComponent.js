@@ -271,7 +271,7 @@ export default class RealmTicketComponent extends Component {
                                     </FormGroup>
                                     <FormGroup>
                                         <Label for="minMosMinGaurdrail">{i18n.t('static.realm.minMosMinGaurdraillabel')}<span class="red Reqasterisk">*</span></Label>
-                                        <Input type="text" name="minMosMinGaurdrail" id="minMosMinGaurdrail"
+                                        <Input type="number" name="minMosMinGaurdrail" id="minMosMinGaurdrail"
                                         bsSize="sm"
                                         valid={!errors.minMosMinGaurdrail && this.state.realm.minMosMinGaurdrail != ''}
                                         invalid={touched.minMosMinGaurdrail && !!errors.minMosMinGaurdrail}
@@ -283,7 +283,7 @@ export default class RealmTicketComponent extends Component {
                                     </FormGroup>                                    
                                     <FormGroup>
                                         <Label for="minMosMaxGaurdrail">{i18n.t('static.realm.minMosMaxGaurdraillabel')}<span class="red Reqasterisk">*</span></Label>
-                                        <Input type="text" name="minMosMaxGaurdrail" id="minMosMaxGaurdrail"
+                                        <Input type="number" name="minMosMaxGaurdrail" id="minMosMaxGaurdrail"
                                         bsSize="sm"
                                         valid={!errors.minMosMaxGaurdrail && this.state.realm.minMosMaxGaurdrail != ''}
                                         invalid={touched.minMosMaxGaurdrail && !!errors.minMosMaxGaurdrail}
@@ -295,7 +295,7 @@ export default class RealmTicketComponent extends Component {
                                     </FormGroup>
                                     <FormGroup>
                                         <Label for="maxMosMaxGaurdrail">{i18n.t('static.realm.maxMosMaxGaurdraillabel')}<span class="red Reqasterisk">*</span></Label>
-                                        <Input type="text" name="maxMosMaxGaurdrail" id="maxMosMaxGaurdrail"
+                                        <Input type="number" name="maxMosMaxGaurdrail" id="maxMosMaxGaurdrail"
                                         bsSize="sm"
                                         valid={!errors.maxMosMaxGaurdrail && this.state.realm.maxMosMaxGaurdrail != ''}
                                         invalid={touched.maxMosMaxGaurdrail && !!errors.maxMosMaxGaurdrail}

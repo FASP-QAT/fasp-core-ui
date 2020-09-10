@@ -1956,11 +1956,11 @@ const options = {
         labelString:i18n.t('static.shipment.qty'),
         display: true,
         fontSize: "12",
-        fontColor: 'blue'
+        fontColor: 'black'
       },
       ticks: {
         beginAtZero: true,
-        fontColor: 'blue'
+        fontColor: 'black'
       },
 
     }, {

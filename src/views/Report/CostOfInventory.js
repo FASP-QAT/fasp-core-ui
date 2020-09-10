@@ -1738,7 +1738,7 @@ export default class CostOfInventory extends Component {
                             </a>
                         </div>
                     </div>
-                    <CardBody className="pb-lg-5 pt-lg-1 ">
+                    <CardBody className="pb-lg-1 pt-lg-1 ">
                         {/* <div className="" > */}
                             <div ref={ref}>
 
@@ -1826,7 +1826,7 @@ export default class CostOfInventory extends Component {
                                 </Form>
                             </div>
                         {/* </div> */}
-                        <div className="ReportSearchMarginTop">
+                        <div className="">
                         <div id="tableDiv" className="jexcelremoveReadonlybackground">
                         </div>
                         </div>
