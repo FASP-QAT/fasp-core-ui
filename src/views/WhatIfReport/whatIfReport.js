@@ -2505,10 +2505,9 @@ export default class WhatIfReportComponent extends React.Component {
 
                                             <Col md="12 pl-0">
                                                 <div className="d-md-flex">
-                                                    <FormGroup className="">
-                                                        <Label htmlFor="select">{i18n.t('static.whatIf.scenario')}</Label>
-                                                        <div className="controls WhatifInputFeild">
-                                                            {/* <InputGroup> */}
+                                                    <div className="controls WhatifInputFeild">
+                                                        <FormGroup className="">
+                                                            <Label htmlFor="select">{i18n.t('static.whatIf.scenario')}</Label>
                                                             <Input
                                                                 type="select"
                                                                 name="scenarioId"
@@ -2527,17 +2526,14 @@ export default class WhatIfReportComponent extends React.Component {
                                                                 <option value="4">{i18n.t('static.whatIf.removePlannedShipmentsNotInLeadTimes')}</option>
                                                                 <option value="5">{i18n.t('static.whatIf.removeApprovedShipmentsNotInLeadTimes')}</option>
                                                                 <option value="6">{i18n.t('static.whatIf.removeShippedShipmentsNotInLeadTimes')}</option>
-
                                                             </Input>
-                                                            {/* </InputGroup> */}
-                                                        </div>
-                                                        <FormFeedback className="red">{errors.scenarioId}</FormFeedback>
-                                                    </FormGroup>
+                                                            <FormFeedback className="red">{errors.scenarioId}</FormFeedback>
+                                                        </FormGroup>
+                                                    </div>
                                                     <div id="consumptionScenariosFields" style={{ display: 'none' }}>
-                                                        <FormGroup className="tab-ml-1">
-                                                            <Label htmlFor="select">{i18n.t('static.whatIf.percentage')}</Label>
-                                                            <div className="controls WhatifInputFeild">
-                                                                {/* <InputGroup> */}
+                                                        <div className="controls WhatifInputFeild">
+                                                            <FormGroup className="tab-ml-1">
+                                                                <Label htmlFor="select">{i18n.t('static.whatIf.percentage')}</Label>
                                                                 <Input
                                                                     type="number"
                                                                     name="percentage"
@@ -2550,14 +2546,12 @@ export default class WhatIfReportComponent extends React.Component {
                                                                     onChange={event => { handleChange(event); this.setTextAndValue(event) }}
                                                                 >
                                                                 </Input>
-                                                                {/* </InputGroup> */}
-                                                            </div>
-                                                            <FormFeedback className="red">{errors.percentage}</FormFeedback>
-                                                        </FormGroup>
-                                                        <FormGroup className="tab-ml-1">
-                                                            <Label for="startDate">{i18n.t('static.common.startdate')}</Label>
-                                                            <div className="controls WhatifInputFeild">
-                                                                {/* <InputGroup> */}
+                                                                <FormFeedback className="red">{errors.percentage}</FormFeedback>
+                                                            </FormGroup>
+                                                        </div>
+                                                        <div className="controls WhatifInputFeild">
+                                                            <FormGroup className="tab-ml-1">
+                                                                <Label for="startDate">{i18n.t('static.common.startdate')}</Label>
                                                                 <DatePicker
                                                                     id="startDate"
                                                                     name="startDate"
@@ -2571,13 +2565,11 @@ export default class WhatIfReportComponent extends React.Component {
                                                                     autoComplete={"off"}
                                                                     dateFormat={DATE_FORMAT_SM}
                                                                 />
-                                                                {/* </InputGroup> */}
-                                                            </div>
-                                                        </FormGroup>
-                                                        <FormGroup className="tab-ml-1">
-                                                            <Label for="stopDate">{i18n.t('static.common.stopdate')}</Label>
-                                                            <div className="controls WhatifInputFeild">
-                                                                {/* <InputGroup> */}
+                                                            </FormGroup>
+                                                        </div>
+                                                        <div className="controls WhatifInputFeild">
+                                                            <FormGroup className="tab-ml-1">
+                                                                <Label for="stopDate">{i18n.t('static.common.stopdate')}</Label>
                                                                 <DatePicker
                                                                     id="stopDate"
                                                                     name="stopDate"
@@ -2591,9 +2583,8 @@ export default class WhatIfReportComponent extends React.Component {
                                                                     autoComplete={"off"}
                                                                     dateFormat={DATE_FORMAT_SM}
                                                                 />
-                                                                {/* </InputGroup> */}
-                                                            </div>
-                                                        </FormGroup>
+                                                            </FormGroup>
+                                                        </div>
                                                     </div>
                                                     <FormGroup className="tab-ml-1 mt-4">
                                                         <Button type="submit" size="md" color="success" onClick={() => this.touchAll(errors)} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>

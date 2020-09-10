@@ -8,6 +8,7 @@ import PlanningUnitService from '../../api/PlanningUnitService'
 import { jExcelLoadedFunction, jExcelLoadedFunctionPipeline } from '../../CommonComponent/JExcelCommonFunctions.js'
 import RealmCountryService from '../../api/RealmCountryService'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { JEXCEL_DATE_FORMAT_WITHOUT_DATE } from '../../Constants';
 export default class PipelineProgramInventory extends Component {
 
     constructor(props) {
@@ -297,7 +298,7 @@ export default class PipelineProgramInventory extends Component {
                                         {
                                             title: i18n.t('static.inventory.inventoryDate'),
                                             type: 'calendar',
-                                            options: { format: 'MM-YYYY' }
+                                            options: { format: JEXCEL_DATE_FORMAT_WITHOUT_DATE }
 
                                         },
                                         {

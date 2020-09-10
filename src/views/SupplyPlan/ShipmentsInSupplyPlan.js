@@ -5,7 +5,7 @@ import i18n from '../../i18n';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunctionOnlyHideRow, checkValidtion, inValid, positiveValidation, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { SECRET_KEY, SHIPMENT_DATA_SOURCE_TYPE, DELIVERED_SHIPMENT_STATUS, TBD_PROCUREMENT_AGENT_ID, TBD_FUNDING_SOURCE, SUBMITTED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, DECIMAL_NO_REGEX, INTEGER_NO_REGEX, CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, INDEXED_DB_VERSION, INDEXED_DB_NAME, ALPHABET_NUMBER_REGEX } from "../../Constants";
+import { SECRET_KEY, SHIPMENT_DATA_SOURCE_TYPE, DELIVERED_SHIPMENT_STATUS, TBD_PROCUREMENT_AGENT_ID, TBD_FUNDING_SOURCE, SUBMITTED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, DECIMAL_NO_REGEX, INTEGER_NO_REGEX, CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, INDEXED_DB_VERSION, INDEXED_DB_NAME, ALPHABET_NUMBER_REGEX, JEXCEL_DATE_FORMAT } from "../../Constants";
 import moment from "moment";
 import { paddingZero, generateRandomAplhaNumericCode } from "../../CommonComponent/JavascriptCommonFunctions";
 import CryptoJS from 'crypto-js'
@@ -306,7 +306,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             data: shipmentsArr,
                                             columns: [
                                                 { type: 'dropdown', title: i18n.t('static.supplyPlan.shipmentStatus'), source: shipmentStatusList, filter: this.filterShipmentStatus, width: 100 },
-                                                { type: 'calendar', title: i18n.t('static.supplyPlan.expectedDeliveryDate'), options: { format: 'MM-DD-YYYY' }, width: 100, readOnly: true },
+                                                { type: 'calendar', title: i18n.t('static.supplyPlan.expectedDeliveryDate'), options: { format: JEXCEL_DATE_FORMAT }, width: 100, readOnly: true },
                                                 { type: 'dropdown', title: i18n.t('static.procurementagent.procurementagent'), source: procurementAgentList, filter: this.filterProcurementAgent, width: 120 },
                                                 { type: 'dropdown', title: i18n.t('static.subfundingsource.fundingsource'), source: fundingSourceList, filter: this.filterFundingSource, width: 120 },
                                                 { type: 'dropdown', title: i18n.t('static.dashboard.budget'), source: budgetList, filter: this.budgetDropdownFilter, width: 120 },
@@ -738,7 +738,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                         title: i18n.t('static.supplyPlan.plannedDate'),
                                                                         type: 'calendar',
                                                                         options: {
-                                                                            format: 'MM-DD-YYYY',
+                                                                            format: JEXCEL_DATE_FORMAT,
                                                                             validRange: [moment(Date.now()).subtract(1, 'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
                                                                         }
                                                                     },
@@ -746,7 +746,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                         title: i18n.t('static.supplyPlan.submittedDate'),
                                                                         type: 'calendar',
                                                                         options: {
-                                                                            format: 'MM-DD-YYYY',
+                                                                            format: JEXCEL_DATE_FORMAT,
                                                                             validRange: [moment(Date.now()).subtract(1, 'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
                                                                         }
                                                                     },
@@ -754,7 +754,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                         title: i18n.t('static.supplyPlan.approvedDate'),
                                                                         type: 'calendar',
                                                                         options: {
-                                                                            format: 'MM-DD-YYYY',
+                                                                            format: JEXCEL_DATE_FORMAT,
                                                                             validRange: [moment(Date.now()).subtract(1, 'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
                                                                         }
                                                                     },
@@ -762,7 +762,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                         title: i18n.t('static.supplyPlan.shippedDate'),
                                                                         type: 'calendar',
                                                                         options: {
-                                                                            format: 'MM-DD-YYYY',
+                                                                            format: JEXCEL_DATE_FORMAT,
                                                                             validRange: [moment(Date.now()).subtract(1, 'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
                                                                         }
                                                                     },
@@ -770,7 +770,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                         title: i18n.t('static.supplyPlan.arrivedDate'),
                                                                         type: 'calendar',
                                                                         options: {
-                                                                            format: 'MM-DD-YYYY',
+                                                                            format: JEXCEL_DATE_FORMAT,
                                                                             validRange: [moment(Date.now()).subtract(1, 'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
                                                                         }
                                                                     },
@@ -778,7 +778,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                         title: i18n.t('static.shipment.receiveddate'),
                                                                         type: 'calendar',
                                                                         options: {
-                                                                            format: 'MM-DD-YYYY',
+                                                                            format: JEXCEL_DATE_FORMAT,
                                                                             validRange: [moment(Date.now()).subtract(1, 'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
                                                                         }
                                                                     },
@@ -1217,7 +1217,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                         title: i18n.t('static.supplyPlan.expiryDate'),
                                                                         type: 'calendar',
                                                                         options: {
-                                                                            format: 'MM-DD-YYYY',
+                                                                            format: JEXCEL_DATE_FORMAT,
                                                                             validRange: [moment(Date.now()).format("YYYY-MM-DD"), null]
                                                                         }
                                                                     },
@@ -2870,7 +2870,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             }
 
 
-                            if (shipmentStatusId == DELIVERED_SHIPMENT_STATUS) {
+                            // if (shipmentStatusId == DELIVERED_SHIPMENT_STATUS) {
                                 var shipmentBatchInfoList = map.get("17");
                                 console.log("Shipment Batcg info list", shipmentBatchInfoList);
                                 if (shipmentBatchInfoList == "" && shipmentBatchInfoList.length == 0) {
@@ -2917,7 +2917,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                 }
                                 console.log("Batch info list", batchInfoList);
                                 programJson.batchInfoList = batchInfoList;
-                            }
+                            // }
                         } else {
                             console.log("In else")
                             var shipmentJson = {
@@ -2969,7 +2969,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                 shipmentJson.batchInfoList = map.get("17");
                             }
 
-                            if (shipmentStatusId == DELIVERED_SHIPMENT_STATUS) {
+                            // if (shipmentStatusId == DELIVERED_SHIPMENT_STATUS) {
                                 var shipmentBatchInfoList = map.get("17");
                                 console.log("Shipment byach info list", shipmentBatchInfoList);
                                 if (shipmentBatchInfoList == "" && shipmentBatchInfoList.length == 0) {
@@ -3015,7 +3015,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                 }
                                 console.log("Batch info list", batchInfoList);
                                 programJson.batchInfoList = batchInfoList;
-                            }
+                            // }
                             shipmentDataList.push(shipmentJson);
                         }
                     }

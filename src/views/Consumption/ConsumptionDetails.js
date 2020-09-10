@@ -51,17 +51,14 @@ export default class ConsumptionDetails extends React.Component {
         this.state.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
         }, 8000);
+    }
+
+    hideSecondComponent() {
         document.getElementById('div2').style.display = 'block';
         clearTimeout(this.state.timeout);
         this.state.timeout = setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 8000);
-        document.getElementById('div3').style.display = 'block';
-        clearTimeout(this.state.timeout);
-        this.state.timeout = setTimeout(function () {
-            document.getElementById('div3').style.display = 'none';
-        }, 8000);
-
     }
 
     // componentWillUnmount() {
@@ -316,6 +313,7 @@ export default class ConsumptionDetails extends React.Component {
                     this.setState({ loading: loading })
                 }} />
                 <h5 className={this.state.color} id="div1">{i18n.t(this.state.message, { entityname })}</h5>
+                <h5 id="div2" className="red">{this.state.consumptionDuplicateError || this.state.consumptionNoStockError || this.state.consumptionError}</h5>
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
                     <CardBody className="pb-lg-4 pt-lg-2">
                         <Formik
@@ -359,8 +357,7 @@ export default class ConsumptionDetails extends React.Component {
                                     )} />
 
                         <div className="shipmentconsumptionSearchMarginTop">
-                            {this.state.showConsumption == 1 && <ConsumptionInSupplyPlanComponent ref="consumptionChild" items={this.state} toggleLarge={this.toggleLarge} updateState={this.updateState} formSubmit={this.formSubmit} consumptionPage="consumptionDataEntry" />}
-                            <h6 id="div2" className="red">{this.state.consumptionDuplicateError || this.state.consumptionNoStockError || this.state.consumptionError}</h6>
+                            {this.state.showConsumption == 1 && <ConsumptionInSupplyPlanComponent ref="consumptionChild" items={this.state} toggleLarge={this.toggleLarge} updateState={this.updateState} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} consumptionPage="consumptionDataEntry" />}
                             <div className="table-responsive">
                                 <div id="consumptionTable" />
                             </div>
