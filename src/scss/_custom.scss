@@ -3266,3 +3266,12 @@ border-radius: 2em;
     background: rgba(238, 238, 238, 0.9)!important;
 }
 } 
+.was-validated .form-control:valid, .form-control.is-valid {
+  background-size: calc(0.75em + 30px) calc(0.75em + 0.375rem)!important;
+}
+.was-validated .form-control:invalid, .form-control.is-invalid {
+  background-size: calc(0.75em + 30px) calc(0.75em + 0.375rem)!important;
+}
+.Select-clear {
+  padding-right: 14px;
+}

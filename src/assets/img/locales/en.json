@@ -768,7 +768,7 @@
     "static.supplyPlan.adjustesOrderQty": "Order Qty",
     "static.supplyPlan.shipmentMode": "Shipment Mode",
     "static.supplyPlan.orderDate": "Order Date",
-    "static.supplyPlan.expectedDeliveryDate": "Estimated Received Date",
+    "static.supplyPlan.expectedDeliveryDate": "Expected Received Date",
     "static.supplyPlan.emergencyOrder": "Emergency Order",
     "static.supplyPlan.addNewShipment": "Add New Shipment",
     "static.supplyPlan.duplicateShipment": "Duplicate Shipment",
@@ -1125,7 +1125,8 @@
     "static.ticket.ticketcode": "Ticket Code",
     "static.ticket.addUpdateMasterData": "Add / Update Master Data",
     "static.common.regiontext": "Please select Region",
+    "static.graph.costInUSD": "Cost (USD)",
+    "static.commit.shipmentTransId": "Shipment trans id",
     "static.supplyPlan.addNewInventory":"Add New Inventory",
-    "static.graph.costInUSD":"Cost (USD)",
     "static.manualtagging.result":"Please enter order no. and prime line no."
 }
