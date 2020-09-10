@@ -55,7 +55,7 @@ export default class StockStatusMatrix extends React.Component {
       message: '',
       planningUnitValues: [],
       planningUnitLabels: [],
-      rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+      rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
       startYear: new Date().getFullYear() - 1,
       endYear: new Date().getFullYear(),
       loading: true

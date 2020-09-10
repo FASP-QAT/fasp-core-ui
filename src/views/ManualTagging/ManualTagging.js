@@ -723,7 +723,8 @@ export default class ManualTagging extends Component {
                 })
         } else {
             this.setState({
-                result: "Please enter order no. and prime line no."
+                artmisList: [],
+                result: i18n.t('static.manualtagging.result')
             })
         }
     }
@@ -1035,6 +1036,7 @@ export default class ManualTagging extends Component {
         this.setState({
             artmisList: [],
             reason: "1",
+            result: '',
             manualTag: !this.state.manualTag,
         })
     }
@@ -1101,7 +1103,7 @@ export default class ManualTagging extends Component {
             },
             {
                 dataField: 'expectedDeliveryDate',
-                text: 'Expected Receieved Date',
+                text: i18n.t('static.supplyPlan.expectedDeliveryDate'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -1195,7 +1197,7 @@ export default class ManualTagging extends Component {
             },
             {
                 dataField: 'currentEstimatedDeliveryDate',
-                text: 'Current Estimated Receieved Date',
+                text: 'Current Estimated Received Date',
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -1204,6 +1206,13 @@ export default class ManualTagging extends Component {
             {
                 dataField: 'supplierName',
                 text: 'Supplier Name',
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'recipentCountry',
+                text: 'Recipient Country',
                 sort: true,
                 align: 'center',
                 headerAlign: 'center'
@@ -1386,11 +1395,12 @@ export default class ManualTagging extends Component {
                                                         name="primeLineNo"
                                                         id="primeLineNo"
                                                         bsSize="sm"
+                                                        onChange={this.getOrderDetails}
                                                     >
                                                     </Input>
-                                                    <InputGroupAddon addonType="append">
-                                                        <Button color="secondary Gobtn btn-sm" onClick={this.getOrderDetails}>{i18n.t('static.common.go')}</Button>
-                                                    </InputGroupAddon>
+                                                    {/* <InputGroupAddon addonType="append"> */}
+                                                    {/* <Button color="secondary Gobtn btn-sm" onClick={this.getOrderDetails}>{i18n.t('static.common.go')}</Button> */}
+                                                    {/* </InputGroupAddon> */}
                                                 </InputGroup>
                                             </div>
                                         </FormGroup>
@@ -1452,7 +1462,7 @@ export default class ManualTagging extends Component {
                                     {this.state.result}</div>
                             </ModalBody>
                             <ModalFooter>
-                                
+
                                 {this.state.reason == "" &&
                                     <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.link}> <i className="fa fa-check"></i> Link</Button>
                                 }

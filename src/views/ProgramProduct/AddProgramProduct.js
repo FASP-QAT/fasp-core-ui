@@ -46,7 +46,8 @@ class AddprogramPlanningUnit extends Component {
             batchNoRequired: false,
             localProcurementLeadTime: '',
             isValidData: true,
-            loading: true
+            loading: true,
+            productCategoryList: []
 
         }
         // this.addRow = this.addRow.bind(this);
@@ -76,8 +77,21 @@ class AddprogramPlanningUnit extends Component {
         //     planningUnitList: response.data
         // });
 
-        var puList = (this.state.planningUnitList).filter(c => c.forecastingUnit.productCategory.id == value && c.active.toString() == "true");
-
+        var puList = []
+        if (value != 0) {
+            console.log("in if=====>");
+            var pc = this.state.productCategoryList.filter(c => c.payload.productCategoryId == value)[0]
+            var pcList = this.state.productCategoryList.filter(c => c.payload.productCategoryId == pc.payload.productCategoryId || c.parentId == pc.id);
+            var pcIdArray = [];
+            for (var pcu = 0; pcu < pcList.length; pcu++) {
+                pcIdArray.push(pcList[pcu].payload.productCategoryId);
+            }
+            puList = (this.state.planningUnitList).filter(c => pcIdArray.includes(c.forecastingUnit.productCategory.id) && c.active.toString() == "true");
+        } else {
+            console.log("in else=====>");
+            puList = this.state.planningUnitList
+        }
+       
         for (var k = 0; k < puList.length; k++) {
             var planningUnitJson = {
                 name: puList[k].label.label_en,
@@ -124,6 +138,7 @@ class AddprogramPlanningUnit extends Component {
                         productCategoryList.push(productCategoryJson);
 
                     }
+                    this.setState({ productCategoryList: response.data });
 
                     PlanningUnitService.getAllPlanningUnitList()
                         .then(response => {

@@ -140,17 +140,29 @@ export default class ImportProgram extends Component {
                                     zip.files[filename].async('string').then(function (fileData) {
                                         for (var j = 0; j < selectedPrgArr.length; j++) {
                                             if (selectedPrgArr[j].value == filename) {
-                                                var json = JSON.parse(fileData);
                                                 db1 = e.target.result;
                                                 var transaction2 = db1.transaction(['programData'], 'readwrite');
                                                 var program2 = transaction2.objectStore('programData');
-                                                var json = JSON.parse(fileData);
+                                                var json = JSON.parse(fileData.split("@~-~@")[0]);
                                                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                                                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                                                 json.userId = userId;
                                                 json.id = json.programId + "_v" + json.version + "_uId_" + userId
                                                 var addProgramDataRequest = program2.put(json);
                                                 addProgramDataRequest.onerror = function (event) {
+                                                };
+
+                                                // Adding data in downloaded program data
+
+                                                var transaction3 = db1.transaction(['downloadedProgramData'], 'readwrite');
+                                                var program3 = transaction3.objectStore('downloadedProgramData');
+                                                var json1 = JSON.parse(fileData.split("@~-~@")[1]);
+                                                var userBytes1 = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                                                var userId1 = userBytes1.toString(CryptoJS.enc.Utf8);
+                                                json1.userId = userId1;
+                                                json1.id = json1.programId + "_v" + json1.version + "_uId_" + userId1
+                                                var addProgramDataRequest1 = program3.put(json1);
+                                                addProgramDataRequest1.onerror = function (event) {
                                                 };
                                             }
 
@@ -176,17 +188,28 @@ export default class ImportProgram extends Component {
                                                     zip.files[filename].async('string').then(function (fileData) {
                                                         for (var j = 0; j < selectedPrgArr.length; j++) {
                                                             if (selectedPrgArr[j].value == filename) {
-                                                                var json = JSON.parse(fileData);
                                                                 db1 = e.target.result;
                                                                 var transaction2 = db1.transaction(['programData'], 'readwrite');
                                                                 var program2 = transaction2.objectStore('programData');
-                                                                var json = JSON.parse(fileData);
+                                                                var json = JSON.parse(fileData.split("@~-~@")[0]);
                                                                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                                                                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                                                                 json.userId = userId;
                                                                 json.id = json.programId + "_v" + json.version + "_uId_" + userId
                                                                 var addProgramDataRequest = program2.put(json);
                                                                 addProgramDataRequest.onerror = function (event) {
+                                                                };
+
+                                                                // Entry in downloaded program data
+                                                                var transaction3 = db1.transaction(['downloadedProgramData'], 'readwrite');
+                                                                var program3 = transaction3.objectStore('downloadedProgramData');
+                                                                var json1 = JSON.parse(fileData.split("@~-~@")[1]);
+                                                                var userBytes1 = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                                                                var userId1 = userBytes1.toString(CryptoJS.enc.Utf8);
+                                                                json1.userId = userId1;
+                                                                json1.id = json1.programId + "_v" + json1.version + "_uId_" + userId1
+                                                                var addProgramDataRequest1 = program3.put(json1);
+                                                                addProgramDataRequest1.onerror = function (event) {
                                                                 };
                                                             }
 
@@ -246,17 +269,17 @@ export default class ImportProgram extends Component {
                             zip.files[filename].async('string').then(function (fileData) {
 
                                 var programDataJson;
-
+                                console.log("File Data", fileData.split("@~-~@")[0]);
                                 try {
-                                    programDataJson = JSON.parse(fileData);
+                                    programDataJson = JSON.parse(fileData.split("@~-~@")[0]);
                                 }
                                 catch (err) {
-                                    this.setState({ message: i18n.t('static.program.zipfilereaderror'),loading:false },
-                                    () => {
-                                        this.hideSecondComponent();
-                                    })
-                                    
-                                    
+                                    this.setState({ message: i18n.t('static.program.zipfilereaderror'), loading: false },
+                                        () => {
+                                            this.hideSecondComponent();
+                                        })
+
+
                                 }
                                 var bytes = CryptoJS.AES.decrypt(programDataJson.programData, SECRET_KEY);
                                 var plaintext = bytes.toString(CryptoJS.enc.Utf8);

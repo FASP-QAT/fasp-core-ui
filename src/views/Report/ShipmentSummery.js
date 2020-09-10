@@ -1060,7 +1060,7 @@ class ShipmentSummery extends Component {
             data: [],
             message: '',
             viewById: 1,
-            rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
             minDate:{year:  new Date().getFullYear()-3, month: new Date().getMonth()},
             maxDate:{year:  new Date().getFullYear()+3, month: new Date().getMonth()+1},
             loading: true
@@ -1287,11 +1287,11 @@ class ShipmentSummery extends Component {
 
         //Table1
         let content1 = {
-            margin: { top: 80, bottom: 70 },
+            margin: { top: 80, bottom: 100 },
             startY: height,
-            styles: { lineWidth: 1, fontSize: 8, cellWidth: 190.5, halign: 'center' },
+            styles: { lineWidth: 1, fontSize: 8, cellWidth: 190, halign: 'center' },
             columnStyles: {
-                // 0: { cellWidth: 100 },
+                 0: { cellWidth: 191.89 },
             },
             html: '#mytable1',
 
@@ -1309,12 +1309,12 @@ class ShipmentSummery extends Component {
 
         //Table2
         let content2 = {
-            margin: { top: 80, bottom: 50 },
+            margin: { top: 80, bottom: 100 },
             startY: doc.autoTableEndPosY() + 50,
             pageBreak: 'auto',
-            styles: { lineWidth: 1, fontSize: 8, cellWidth: 69.75, halign: 'center' },
+            styles: { lineWidth: 1, fontSize: 8, cellWidth: 65, halign: 'center' },
             columnStyles: {
-                10: { cellWidth: 100 },
+                10: { cellWidth: 111.89 },
             },
             html: '#mytable2',
 
@@ -2281,7 +2281,7 @@ class ShipmentSummery extends Component {
                                                 <Table id="mytable1" responsive className="table-bordered table-striped table-hover  text-center mt-2">
                                                     <thead>
                                                         <tr>
-                                                            <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'right' }}>{i18n.t('static.budget.fundingsource')}</th>
+                                                            <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'left' }}>{i18n.t('static.budget.fundingsource')}</th>
                                                             <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'right' }}>{i18n.t('static.report.orders')}</th>
                                                             <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'right' }}>{i18n.t('static.report.qtyBaseUnit')}</th>
                                                             <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'right' }}>{i18n.t('static.report.costUsd')}</th>

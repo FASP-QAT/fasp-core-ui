@@ -14,7 +14,8 @@ export default class PipelineProgramPlanningUnits extends Component {
         this.state = {
             planningUnitList: [],
             mapPlanningUnitEl: '',
-            loading:true
+            loading:true,
+            productCategoryList: []
         }
         this.loaded = this.loaded.bind(this);
         this.changed = this.changed.bind(this);
@@ -26,7 +27,23 @@ export default class PipelineProgramPlanningUnits extends Component {
     dropdownFilter = function (instance, cell, c, r, source) {
         var mylist = [];
         var value = (instance.jexcel.getJson()[r])[c - 1];
-        var puList = (this.state.activePlanningUnitList).filter(c => c.forecastingUnit.productCategory.id == value);
+
+        var puList = []
+        if (value != 0) {
+            console.log("in if=====>");
+            var pc = this.state.productCategoryList.filter(c => c.payload.productCategoryId == value)[0]
+            var pcList = this.state.productCategoryList.filter(c => c.payload.productCategoryId == pc.payload.productCategoryId || c.parentId == pc.id);
+            var pcIdArray = [];
+            for (var pcu = 0; pcu < pcList.length; pcu++) {
+                pcIdArray.push(pcList[pcu].payload.productCategoryId);
+            }
+            puList = (this.state.activePlanningUnitList).filter(c => pcIdArray.includes(c.forecastingUnit.productCategory.id) && c.active.toString() == "true");
+        } else {
+            console.log("in else=====>");
+            puList = this.state.planningUnitList
+        }
+
+        // var puList = (this.state.activePlanningUnitList).filter(c => c.forecastingUnit.productCategory.id == value);
 
         for (var k = 0; k < puList.length; k++) {
             var planningUnitJson = {
@@ -556,7 +573,7 @@ export default class PipelineProgramPlanningUnits extends Component {
                     productCategoryList.push(productCategoryJson);
 
                 }
-
+                this.setState({ productCategoryList: response.data });
                 console.log("category response---->", productCategoryList);
 
 
@@ -638,7 +655,7 @@ export default class PipelineProgramPlanningUnits extends Component {
                                             var options = {
                                                 data: data,
                                                 columnDrag: true,
-                                                colWidths: [160, 190, 190, 190, 80, 80, 80, 80, 80, 80, 80, 80, 80,80],
+                                                colWidths: [160, 190, 190, 190, 80, 80, 80, 80, 80, 80, 120, 120, 80,80],
                                                 columns: [
 
                                                     {
