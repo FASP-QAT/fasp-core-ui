@@ -13,6 +13,7 @@ import LanguageService from '../../api/LanguageService';
 import getLabelText from '../../CommonComponent/getLabelText';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
+import classNames from 'classnames';
 
 const initialValues = {
     summary: "Add / Update User",
@@ -26,7 +27,7 @@ const initialValues = {
 }
 
 const validationSchema = function (values) {
-    return Yup.object().shape({        
+    return Yup.object().shape({
         summary: Yup.string()
             .required(i18n.t('static.common.summarytext')),
         realm: Yup.string()
@@ -34,11 +35,23 @@ const validationSchema = function (values) {
         name: Yup.string()
             .required(i18n.t('static.user.validusername')),
         emailId: Yup.string()
+            .email(i18n.t('static.user.invalidemail'))
             .required(i18n.t('static.user.validemail')),
         phoneNumber: Yup.string()
+            .min(4, i18n.t('static.user.validphonemindigit'))
+            .max(15, i18n.t('static.user.validphonemaxdigit'))
+            .matches(/^[0-9]*$/, i18n.t('static.user.validnumber'))
             .required(i18n.t('static.user.validphone')),
-        // role: Yup.string()
-        //     .required(i18n.t('static.role.roletext')),
+        role: Yup.string()
+            .test('roleValid', i18n.t('static.common.roleinvalidtext'),
+                function (value) {
+                    if (document.getElementById("roleValid").value == "false") {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                })
+            .required(i18n.t('static.user.validrole')),
         language: Yup.string()
             .required(i18n.t('static.user.validlanguage')),
         // notes: Yup.string()
@@ -87,72 +100,83 @@ export default class UserTicketComponent extends Component {
             realms: [],
             languages: [],
             roleList: [],
-            message : '',
-            realmId : '',
+            message: '',
+            realmId: '',
             roleId: '',
             languageId: ''
-        }        
-        this.dataChange = this.dataChange.bind(this);        
+        }
+        this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.roleChange = this.roleChange.bind(this);
-    }  
+    }
 
-    dataChange(event) {        
+    dataChange(event) {
         let { user } = this.state
-        if(event.target.name == "summary") {
+        if (event.target.name == "summary") {
             user.summary = event.target.value;
         }
-        if(event.target.name == "realm") {            
+        if (event.target.name == "realm") {
             user.realm = event.target.options[event.target.selectedIndex].innerHTML;
             this.setState({
-                realmId : event.target.value
-            })            
-        }
-        if(event.target.name == "name") {
-            user.name = event.target.value;
-        }
-        if(event.target.name == "emailId") {
-            user.emailId = event.target.value;
-        }
-        if(event.target.name == "phoneNumber") {
-            user.phoneNumber = event.target.value;
-        }        
-        if(event.target.name == "language") {
-            user.language = event.target.options[event.target.selectedIndex].innerHTML;
-            this.setState({
-                languageId : event.target.value
+                realmId: event.target.value
             })
         }
-        if(event.target.name == "notes") {
+        if (event.target.name == "name") {
+            user.name = event.target.value;
+        }
+        if (event.target.name == "emailId") {
+            user.emailId = event.target.value;
+        }
+        if (event.target.name == "phoneNumber") {
+            user.phoneNumber = event.target.value;
+        }
+        if (event.target.name == "language") {
+            user.language = event.target.options[event.target.selectedIndex].innerHTML;
+            this.setState({
+                languageId: event.target.value
+            })
+        }
+        if (event.target.name == "notes") {
             user.notes = event.target.value;
         }
-        this.setState({       
+        this.setState({
             user
-        }, () => {})
+        }, () => { })
     };
 
     roleChange(roleId) {
         let { user } = this.state;
         let count = 0;
+        let count1 = 0;
         this.setState({ roleId });
         var roleIdArray = [];
         for (var i = 0; i < roleId.length; i++) {
             roleIdArray[i] = roleId[i].value;
-            if (roleId[i].value != 'ROLE_APPL_ADMIN') {
-                count++;                
+            if (roleId[i].value != 'ROLE_APPLICATION_ADMIN') {
+                count++;
+            } else {
+                count1++;
             }
-        }        
+        }
+        if (count > 0) {
+            if (count1 > 0) {
+                document.getElementById("roleValid").value = true;
+            } else {
+                document.getElementById("roleValid").value = false;
+            }
+        } else {
+            document.getElementById("roleValid").value = false;
+        }
         user.role = roleIdArray;
         this.setState({
-            user,
-            validateRealm: (count > 0 ? true : false)
+            user
         },
             () => { });
     }
 
     touchAll(setTouched, errors) {
-        setTouched({            
+        setTouched({
             summary: true,
             realm: true,
             name: true,
@@ -297,7 +321,7 @@ export default class UserTicketComponent extends Component {
 
     hideSecondComponent() {
         setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';            
+            document.getElementById('div2').style.display = 'none';
         }, 8000);
     }
 
@@ -306,7 +330,7 @@ export default class UserTicketComponent extends Component {
         event.target.className += " was-validated";
     }
 
-    resetClicked() {        
+    resetClicked() {
         let { user } = this.state;
         user.summary = '';
         user.realm = '';
@@ -315,7 +339,7 @@ export default class UserTicketComponent extends Component {
         user.phoneNumber = '';
         user.role = '';
         user.language = '';
-        user.notes = '';   
+        user.notes = '';
         this.setState({
             user
         },
@@ -347,15 +371,15 @@ export default class UserTicketComponent extends Component {
 
         return (
             <div className="col-md-12">
-                <h5 style={{ color: "green" }} id="div2">{i18n.t(this.state.message)}</h5>                
+                <h5 style={{ color: "green" }} id="div2">{i18n.t(this.state.message)}</h5>
                 <h4>{i18n.t('static.user.user')}</h4>
                 <br></br>
                 <Formik
                     initialValues={initialValues}
                     validate={validate(validationSchema)}
-                    onSubmit={(values, { setSubmitting, setErrors }) => {   
-                        JiraTikcetService.addEmailRequestIssue(this.state.user).then(response => {                                         
-                            console.log("Response :",response.status, ":" ,JSON.stringify(response.data));
+                    onSubmit={(values, { setSubmitting, setErrors }) => {
+                        JiraTikcetService.addEmailRequestIssue(this.state.user).then(response => {
+                            console.log("Response :", response.status, ":", JSON.stringify(response.data));
                             if (response.status == 200 || response.status == 201) {
                                 var msg = response.data.key;
                                 this.setState({
@@ -364,7 +388,7 @@ export default class UserTicketComponent extends Component {
                                     () => {
                                         this.resetClicked();
                                         this.hideSecondComponent();
-                                    })                                
+                                    })
                             } else {
                                 this.setState({
                                     // message: response.data.messageCode
@@ -373,8 +397,8 @@ export default class UserTicketComponent extends Component {
                                     () => {
                                         this.resetClicked();
                                         this.hideSecondComponent();
-                                    })                                
-                            }                            
+                                    })
+                            }
                             this.props.togglehelp();
                             this.props.toggleSmall(this.state.message);
                         })
@@ -408,32 +432,39 @@ export default class UserTicketComponent extends Component {
                             isSubmitting,
                             isValid,
                             setTouched,
-                            handleReset
+                            handleReset,
+                            setFieldValue,
+                            setFieldTouched
                         }) => (
                                 <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm'>
+                                    <Input
+                                        type="hidden"
+                                        name="roleValid"
+                                        id="roleValid"
+                                    />
                                     < FormGroup >
                                         <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
                                         <Input type="text" name="summary" id="summary"
-                                        bsSize="sm"
-                                        valid={!errors.summary && this.state.user.summary != ''}
-                                        invalid={touched.summary && !!errors.summary}
-                                        onChange={(e) => { handleChange(e); this.dataChange(e);}}
-                                        onBlur={handleBlur}
-                                        value={this.state.user.summary}
-                                        required>                                            
+                                            bsSize="sm"
+                                            valid={!errors.summary && this.state.user.summary != ''}
+                                            invalid={touched.summary && !!errors.summary}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                            onBlur={handleBlur}
+                                            value={this.state.user.summary}
+                                            required>
                                         </Input>
                                         <FormFeedback className="red">{errors.summary}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup>
                                         <Label for="realm">{i18n.t('static.realm.realmName')}<span class="red Reqasterisk">*</span></Label>
                                         <Input type="select" name="realm" id="realm"
-                                        bsSize="sm"
-                                        valid={!errors.realm && this.state.user.realm != ''}
-                                        invalid={touched.realm && !!errors.realm}
-                                        onChange={(e) => { handleChange(e); this.dataChange(e);}}
-                                        onBlur={handleBlur}
-                                        value={this.state.realmId}
-                                        required>
+                                            bsSize="sm"
+                                            valid={!errors.realm && this.state.user.realm != ''}
+                                            invalid={touched.realm && !!errors.realm}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                            onBlur={handleBlur}
+                                            value={this.state.realmId}
+                                            required>
                                             <option value="0">{i18n.t('static.common.select')}</option>
                                             {realmList}
                                         </Input>
@@ -442,66 +473,70 @@ export default class UserTicketComponent extends Component {
                                     < FormGroup >
                                         <Label for="name">{i18n.t('static.user.username')}<span class="red Reqasterisk">*</span></Label>
                                         <Input type="text" name="name" id="name"
-                                        bsSize="sm"
-                                        valid={!errors.name && this.state.user.name != ''}
-                                        invalid={touched.name && !!errors.name}
-                                        onChange={(e) => { handleChange(e); this.dataChange(e);}}
-                                        onBlur={handleBlur}
-                                        value={this.state.user.name}
-                                        required />
+                                            bsSize="sm"
+                                            valid={!errors.name && this.state.user.name != ''}
+                                            invalid={touched.name && !!errors.name}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                            onBlur={handleBlur}
+                                            value={this.state.user.name}
+                                            required />
                                         <FormFeedback className="red">{errors.name}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup>
                                         <Label for="emailId">{i18n.t('static.user.emailid')}<span class="red Reqasterisk">*</span></Label>
                                         <Input type="text" name="emailId" id="emailId"
-                                        bsSize="sm"
-                                        valid={!errors.emailId && this.state.user.emailId != ''}
-                                        invalid={touched.emailId && !!errors.emailId}
-                                        onChange={(e) => { handleChange(e); this.dataChange(e);}}
-                                        onBlur={handleBlur}
-                                        value={this.state.user.emailId}
-                                        required />
+                                            bsSize="sm"
+                                            valid={!errors.emailId && this.state.user.emailId != ''}
+                                            invalid={touched.emailId && !!errors.emailId}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                            onBlur={handleBlur}
+                                            value={this.state.user.emailId}
+                                            required />
                                         <FormFeedback className="red">{errors.emailId}</FormFeedback>
-                                    </FormGroup>                                    
+                                    </FormGroup>
                                     <FormGroup>
                                         <Label for="phoneNumber">{i18n.t('static.user.phoneNumber')}<span class="red Reqasterisk">*</span></Label>
                                         <Input type="text" name="phoneNumber" id="phoneNumber"
-                                        bsSize="sm"
-                                        valid={!errors.phoneNumber && this.state.user.phoneNumber != ''}
-                                        invalid={touched.phoneNumber && !!errors.phoneNumber}
-                                        onChange={(e) => { handleChange(e); this.dataChange(e);}}
-                                        onBlur={handleBlur}
-                                        value={this.state.user.phoneNumber}
-                                        required />
+                                            bsSize="sm"
+                                            valid={!errors.phoneNumber && this.state.user.phoneNumber != ''}
+                                            invalid={touched.phoneNumber && !!errors.phoneNumber}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                            onBlur={handleBlur}
+                                            value={this.state.user.phoneNumber}
+                                            required />
                                         <FormFeedback className="red">{errors.phoneNumber}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup>
                                         <Label for="role">{i18n.t('static.role.role')}<span class="red Reqasterisk">*</span></Label>
-                                        <Select name="role" id="role"
-                                        bsSize="sm"                                        
-                                        invalid={touched.role && !!errors.role}
-                                        onChange={(e) => { handleChange(e); this.roleChange(e);}}
-                                        onBlur={handleBlur}
-                                        multi
-                                        required
-                                        min={1}
-                                        options={this.state.roleList}
-                                        value={this.state.roleId}
-                                        error={errors.roleId}
-                                        touched={touched.roleId}                                           
+                                        <Select
+                                            className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                { 'is-valid': !errors.role && this.state.user.role.length != 0 },
+                                                { 'is-invalid': (touched.role && !!errors.role) }
+                                            )}
+                                            name="role" id="role"
+                                            bsSize="sm"
+                                            onChange={(e) => { handleChange(e); setFieldValue("role", e); this.roleChange(e); }}
+                                            onBlur={() => setFieldTouched("role", true)}
+                                            multi
+                                            required
+                                            min={1}
+                                            options={this.state.roleList}
+                                            value={this.state.roleId}
+                                            error={errors.role}
+                                            touched={touched.role}
                                         />
                                         <FormFeedback className="red">{errors.role}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup>
                                         <Label for="language">{i18n.t('static.language.language')}<span class="red Reqasterisk">*</span></Label>
                                         <Input type="select" name="language" id="language"
-                                        bsSize="sm"
-                                        valid={!errors.language && this.state.user.language != ''}
-                                        invalid={touched.language && !!errors.language}
-                                        onChange={(e) => { handleChange(e); this.dataChange(e);}}
-                                        onBlur={handleBlur}
-                                        value={this.state.languageId}
-                                        required>
+                                            bsSize="sm"
+                                            valid={!errors.language && this.state.user.language != ''}
+                                            invalid={touched.language && !!errors.language}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                            onBlur={handleBlur}
+                                            value={this.state.languageId}
+                                            required>
                                             <option value="0">{i18n.t('static.common.select')}</option>
                                             {languageList}
                                         </Input>
@@ -510,19 +545,19 @@ export default class UserTicketComponent extends Component {
                                     <FormGroup>
                                         <Label for="notes">{i18n.t('static.common.notes')}</Label>
                                         <Input type="textarea" name="notes" id="notes"
-                                        bsSize="sm"
-                                        valid={!errors.notes && this.state.user.notes != ''}
-                                        invalid={touched.notes && !!errors.notes}
-                                        onChange={(e) => { handleChange(e); this.dataChange(e);}}
-                                        onBlur={handleBlur}
-                                        value={this.state.user.notes}
+                                            bsSize="sm"
+                                            valid={!errors.notes && this.state.user.notes != ''}
+                                            invalid={touched.notes && !!errors.notes}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                            onBlur={handleBlur}
+                                            value={this.state.user.notes}
                                         // required 
                                         />
                                         <FormFeedback className="red">{errors.notes}</FormFeedback>
                                     </FormGroup>
                                     <ModalFooter className="pb-0 pr-0">
-                                    <Button type="button" size="md" color="info" className=" mr-1" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
-                                        <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>                                        
+                                        <Button type="button" size="md" color="info" className=" mr-1" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
+                                        <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                         <Button type="submit" size="md" color="success" className=" mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                     </ModalFooter>
                                 </Form>

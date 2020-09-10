@@ -143,7 +143,7 @@ export default class InitialTicketPageComponent extends Component {
       message: i18n.t('static.ticket.ticketcreated') + " " + i18n.t('static.ticket.ticketcode') + ": " + msg,
       buttons: [
         {
-          label: 'OK'              
+          label: i18n.t('static.common.close')              
         }
       ]
     });

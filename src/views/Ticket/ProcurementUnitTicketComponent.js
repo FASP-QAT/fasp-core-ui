@@ -47,7 +47,7 @@ const validationSchema = function (values) {
             .required(i18n.t('static.procurementUnit.validProcurementUnitText')),
         planningUnitId: Yup.string()
             .required(i18n.t('static.procurementUnit.validPlanningUnitText')),
-        multiplier: Yup.number()
+        multiplier: Yup.string()
             .required(i18n.t('static.procurementUnit.validMultiplierText')).min(0, i18n.t('static.procurementUnit.validValueText')),
         unitId: Yup.string()
             .required(i18n.t('static.procurementUnit.validUnitIdText')),

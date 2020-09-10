@@ -475,8 +475,7 @@ export default class BudgetTicketComponent extends Component {
                                             valid={!errors.budgetAmount && this.state.budget.budgetAmount != ''}
                                             invalid={touched.budgetAmount && !!errors.budgetAmount}
                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                            onBlur={handleBlur}
-                                            type="text"
+                                            onBlur={handleBlur}                                            
                                             value={this.state.budget.budgetAmount}
                                             required />
                                         <FormFeedback className="red">{errors.budgetAmount}</FormFeedback>
