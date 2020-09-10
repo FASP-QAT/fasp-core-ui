@@ -1515,7 +1515,9 @@ class ShipmentGlobalView extends Component {
             table1Body: [],
             table1Headers: [],
             viewby: 1,
-            rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            minDate:{year:  new Date().getFullYear()-3, month: new Date().getMonth()},
+            maxDate:{year:  new Date().getFullYear()+3, month: new Date().getMonth()+1},
             loading: true
 
 
@@ -1739,7 +1741,7 @@ class ShipmentGlobalView extends Component {
         let content1 = {
             margin: { top: 80, bottom: 50 },
             startY: height,
-            styles: { lineWidth: 1, fontSize: 8, cellWidth: 70, halign: 'center' },
+            styles: { lineWidth: 1, fontSize: 8, cellWidth: 700/displaylabel.length, halign: 'center' },
             columnStyles: {
                 // 0: { cellWidth: 100 },
                 // 1: { cellWidth: 100 },
@@ -1765,12 +1767,12 @@ class ShipmentGlobalView extends Component {
             margin: { top: 80, left: 100, bottom: 50 },
             startY: doc.autoTableEndPosY() + 50,
             pageBreak: 'auto',
-            styles: { lineWidth: 1, fontSize: 8, cellWidth: 100, halign: 'center' },
+            styles: { lineWidth: 1, fontSize: 8, cellWidth: 120, halign: 'center' },
             columnStyles: {
                 // 0: { cellWidth: 100 },
                 // 1: { cellWidth: 100 },
                 // 2: { cellWidth: 200 },
-                3: { cellWidth: 250 },
+                3: { cellWidth: 281.89 },
                 // 4: { cellWidth: 100 },
             },
             html: '#mytable2',
@@ -1956,6 +1958,7 @@ class ShipmentGlobalView extends Component {
                     error => {
                         this.setState({
                             planningUnits: [],
+                            planningUnitValues:[]
                         })
                         if (error.message === "Network Error") {
                             this.setState({ message: error.message });
@@ -2126,8 +2129,10 @@ class ShipmentGlobalView extends Component {
         ProductService.getProductCategoryList(realmId)
             .then(response => {
                 // console.log(response.data)
+                // var list = response.data.slice(1);
+                var list = response.data;
                 this.setState({
-                    productCategories: response.data, loading: false
+                    productCategories: list, loading: false
                 })
             }).catch(
                 error => {
@@ -2205,9 +2210,9 @@ class ShipmentGlobalView extends Component {
         let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
         let fundingSourceProcurementAgentIds = [];
         if (viewby == 1) {
-            fundingSourceProcurementAgentIds = procurementAgentIds;
-        } else {
             fundingSourceProcurementAgentIds = fundingSourceIds;
+        } else {
+            fundingSourceProcurementAgentIds = procurementAgentIds;
         }
         // console.log("planningUnitId-------", planningUnitId);
         // console.log("productCategoryId------", productCategoryId);
@@ -2233,7 +2238,7 @@ class ShipmentGlobalView extends Component {
                 reportView: viewby,
                 fundingSourceProcurementAgentIds: fundingSourceProcurementAgentIds
             }
-            // console.log("INPUTJSON--------->", inputjson);
+            console.log("INPUTJSON--------->", inputjson);
             AuthenticationService.setupAxiosInterceptors();
             ReportService.ShipmentGlobalView(inputjson)
                 .then(response => {
@@ -2309,7 +2314,7 @@ class ShipmentGlobalView extends Component {
                                     this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
                                     break;
                                 default:
-                                    this.setState({ message: 'static.unkownError' });
+                                    this.setState({ message: ''});
                                     break;
                             }
                         }
@@ -2667,7 +2672,7 @@ class ShipmentGlobalView extends Component {
 
                                                 <Picker
                                                     ref="pickRange"
-                                                    years={{ min: 2013 }}
+                                                    years={{min: this.state.minDate, max: this.state.maxDate}}
                                                     value={rangeValue}
                                                     lang={pickerLang}
                                                     //theme="light"

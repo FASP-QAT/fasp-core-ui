@@ -1400,8 +1400,9 @@ class ForcastMatrixOverTime extends Component {
       countries: [],
       show: false,
       singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
-      rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-
+      rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+      minDate:{year:  new Date().getFullYear()-3, month: new Date().getMonth()},
+      maxDate:{year:  new Date().getFullYear()+3, month: new Date().getMonth()+1},
 
 
     };
@@ -1882,8 +1883,8 @@ class ForcastMatrixOverTime extends Component {
     let versionId = document.getElementById("versionId").value;
     let planningUnitId = document.getElementById("planningUnitId").value;
     let monthInCalc = document.getElementById("viewById").value;
-    let startDate = this.state.rangeValue.from.year + '-' + ("00" + this.state.rangeValue.from.month).substr(-2) + '-01';
-    let stopDate = this.state.rangeValue.to.year + '-' + ("00" + this.state.rangeValue.to.month).substr(-2) + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
+    let startDate = this.state.rangeValue.from.year + '-' +  this.state.rangeValue.from.month+ '-01';
+    let stopDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month+ '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
 
     var input = { "programId": programId, "versionId": versionId, "planningUnitId": planningUnitId, "startDate": startDate, "stopDate": stopDate, "previousMonths": monthInCalc }
     if (programId > 0 && planningUnitId > 0 && versionId != 0) {
@@ -2194,7 +2195,7 @@ class ForcastMatrixOverTime extends Component {
 
                               <Picker
                                 ref="pickRange"
-                                years={{ min: 2013, max: 2022 }}
+                                years={{min: this.state.minDate, max: this.state.maxDate}}
                                 value={rangeValue}
                                 lang={pickerLang}
                                 //theme="light"

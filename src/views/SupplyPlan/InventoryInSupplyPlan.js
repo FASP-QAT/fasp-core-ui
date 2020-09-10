@@ -448,7 +448,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                     var json = obj.getJson();
                                     if (inventoryEditable) {
                                         items.push({
-                                            title: i18n.t('static.supplyPlan.addNewAdjustments'),
+                                            title: this.props.items.inventoryType == 1 ? i18n.t('static.supplyPlan.addNewInventory') : i18n.t('static.supplyPlan.addNewAdjustments'),
                                             onclick: function () {
                                                 var json = obj.getJson();
                                                 var map = new Map(Object.entries(json[0]));

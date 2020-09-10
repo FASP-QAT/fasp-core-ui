@@ -216,7 +216,7 @@
 //     i18n.t('static.supplyPlan.shipmentQty').replaceAll(' ', '%20'),
 //     (i18n.t('static.budget.fundingsource') + "-" + i18n.t('static.supplyPlan.shipmentStatus')).replaceAll(' ', '%20'),
 //     i18n.t('static.report.adjustmentQty').replaceAll(' ', '%20'),
-//     i18n.t('static.report.closingbalance').replaceAll(' ', '%20'),
+//     i18n.t('static.supplyPlan.endingBalance').replaceAll(' ', '%20'),
 //     i18n.t('static.report.mos').replaceAll(' ', '%20'),
 //     i18n.t('static.report.minmonth').replaceAll(' ', '%20'),
 //     i18n.t('static.report.maxmonth').replaceAll(' ', '%20')]];
@@ -325,7 +325,7 @@
 //     i18n.t('static.supplyPlan.shipmentQty'),
 //     (i18n.t('static.budget.fundingsource') + " : " + i18n.t('static.supplyPlan.shipmentStatus')),
 //     i18n.t('static.report.adjustmentQty'),
-//     i18n.t('static.report.closingbalance'),
+//     i18n.t('static.supplyPlan.endingBalance'),
 //     i18n.t('static.report.mos'),
 //     i18n.t('static.report.minmonth'),
 //     i18n.t('static.report.maxmonth')]];
@@ -1809,7 +1809,7 @@
 //                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyPlan.shipmentQty')}</th>
 //                         <th className="text-center" style={{ width: "200px" }}>{(i18n.t('static.budget.fundingsource') + " : " + i18n.t('static.supplyPlan.shipmentStatus'))}</th>
 //                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.adjustmentQty')}</th>
-//                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.closingbalance')}</th>
+//                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyPlan.endingBalance')}</th>
 //                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.mos')}</th>
 //                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.minmonth')}</th>
 //                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.maxmonth')}</th>
@@ -1981,8 +1981,18 @@ const options = {
       }
     }],
     xAxes: [{
+
+      scaleLabel: {
+        display: true,
+        labelString: i18n.t('static.report.month'),
+        fontColor: 'black',
+        fontStyle: "normal",
+        fontSize: "12"
+      },
       ticks: {
-        fontColor: 'black'
+        fontColor: 'black',
+        fontStyle: "normal",
+        fontSize: "12"
       }
     }]
   },
@@ -2044,7 +2054,10 @@ class StockStatus extends Component {
       stockStatusList: [],
       versions: [],
       show: false,
-      rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+      rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+      minDate:{year:  new Date().getFullYear()-3, month: new Date().getMonth()},
+      maxDate:{year:  new Date().getFullYear()+3, month: new Date().getMonth()+1},
+      
     };
     this.filterData = this.filterData.bind(this);
     this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
@@ -2102,7 +2115,7 @@ class StockStatus extends Component {
     i18n.t('static.supplyPlan.shipmentQty').replaceAll(' ', '%20'),
     (i18n.t('static.budget.fundingsource') + "-" + i18n.t('static.supplyPlan.shipmentStatus')).replaceAll(' ', '%20'),
     i18n.t('static.report.adjustmentQty').replaceAll(' ', '%20'),
-    i18n.t('static.report.closingbalance').replaceAll(' ', '%20'),
+    i18n.t('static.supplyPlan.endingBalance').replaceAll(' ', '%20'),
     i18n.t('static.report.mos').replaceAll(' ', '%20'),
     i18n.t('static.report.minmonth').replaceAll(' ', '%20'),
     i18n.t('static.report.maxmonth').replaceAll(' ', '%20')]];
@@ -2211,7 +2224,7 @@ class StockStatus extends Component {
     i18n.t('static.supplyPlan.shipmentQty'),
     (i18n.t('static.budget.fundingsource') + " : " + i18n.t('static.supplyPlan.shipmentStatus')),
     i18n.t('static.report.adjustmentQty'),
-    i18n.t('static.report.closingbalance'),
+    i18n.t('static.supplyPlan.endingBalance'),
     i18n.t('static.report.mos'),
     i18n.t('static.report.minmonth'),
     i18n.t('static.report.maxmonth')]];
@@ -2989,7 +3002,7 @@ class StockStatus extends Component {
 
                           <Picker
                             ref="pickRange"
-                            years={{ min: 2013, max: 2022 }}
+                            years={{min: this.state.minDate, max: this.state.maxDate}}
                             value={rangeValue}
                             lang={pickerLang}
                             //theme="light"
@@ -3099,7 +3112,7 @@ class StockStatus extends Component {
                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyPlan.shipmentQty')}</th>
                         <th className="text-center" style={{ width: "200px" }}>{(i18n.t('static.budget.fundingsource') + " : " + i18n.t('static.supplyPlan.shipmentStatus'))}</th>
                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.adjustmentQty')}</th>
-                        <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.closingbalance')}</th>
+                        <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyPlan.endingBalance')}</th>
                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.mos')}</th>
                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.minmonth')}</th>
                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.maxmonth')}</th>

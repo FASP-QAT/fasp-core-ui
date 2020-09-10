@@ -135,30 +135,44 @@ export default class ExportProgram extends Component {
                 getRequest.onsuccess = function (event) {
                     var myResult = [];
                     myResult = getRequest.result;
-                    for (var i = 0; i < myResult.length; i++) {
-                        for (var j = 0; j < programId.length; j++) {
-                            if (myResult[i].id == programId[j].value) {
-                                var txt = JSON.stringify(myResult[i]);
-                                // var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
-                                // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                                var labelName = (programId[j].label).replace("/", "-")
-                                // zip.file(labelName + "_" + parseInt(j + 1) + ".txt", programData);
-                                zip.file(labelName + "_" + parseInt(j + 1) + ".txt", txt);
+                    var dTransaction = db1.transaction(['downloadedProgramData'], 'readwrite');
+                    var dProgram = dTransaction.objectStore('downloadedProgramData');
+                    var dGetRequest = dProgram.getAll();
+                    dGetRequest.onerror = function (event) {
+                        // Handle errors!
+                    };
+                    dGetRequest.onsuccess = function (event) {
+                        var dMyResult = [];
+                        dMyResult = dGetRequest.result;
+                        for (var i = 0; i < myResult.length; i++) {
+                            for (var j = 0; j < programId.length; j++) {
+                                if (myResult[i].id == programId[j].value) {
+                                    var txt = JSON.stringify(myResult[i]);
+                                    var dArray = dMyResult.filter(c => c.id == programId[j].value)[0];
+                                    var txt1 = JSON.stringify(dArray)
+                                    // var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                                    // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                                    var labelName = (programId[j].label).replace("/", "-")
+                                    // zip.file(labelName + "_" + parseInt(j + 1) + ".txt", programData);
+                                    console.log("Txt ", txt);
+                                    console.log("Txt 1", txt1);
+                                    zip.file(labelName + "_" + parseInt(j + 1) + ".txt",   txt + "@~-~@" + txt1  );
+                                }
+                            }
+                            if (i == myResult.length - 1) {
+                                zip.generateAsync({
+                                    type: "blob"
+                                }).then(function (content) {
+                                    FileSaver.saveAs(content, "download.zip");
+                                    let id = AuthenticationService.displayDashboardBasedOnRole();
+                                    this.setState({ loading: false });
+                                    this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.program.dataexportsuccess'))
+
+                                }.bind(this));
                             }
                         }
-                        if (i == myResult.length - 1) {
-                            zip.generateAsync({
-                                type: "blob"
-                            }).then(function (content) {
-                                FileSaver.saveAs(content, "download.zip");
-                                let id = AuthenticationService.displayDashboardBasedOnRole();
-                                this.setState({ loading: false });
-                                this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.program.dataexportsuccess'))
-
-                            }.bind(this));
-                        }
-                    }
-                }.bind(this);
+                    }.bind(this);
+                }.bind(this)
             }.bind(this)
         } else {
             console.log("in ekse")
