@@ -1911,7 +1911,8 @@ class ProductCatalog extends Component {
             ProductService.getProductCategoryList(realmId)
                 .then(response => {
                     console.log(response.data);
-                    var list = response.data.slice(1);
+                    // var list = response.data.slice(1);
+                    var list = response.data;
                     console.log("my list=======", list);
 
                     this.setState({
@@ -2578,7 +2579,7 @@ class ProductCatalog extends Component {
                                                 onChange={this.fetchData}
                                             // onChange={(e) => { this.getPlanningUnit(); }}
                                             >
-                                                <option value="-1">{i18n.t('static.common.all')}</option>
+                                                {/* <option value="-1">{i18n.t('static.common.all')}</option> */}
                                                 {productCategories.length > 0
                                                     && productCategories.map((item, i) => {
                                                         return (
