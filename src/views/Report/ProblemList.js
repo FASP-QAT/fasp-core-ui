@@ -679,14 +679,27 @@ export default class ConsumptionDetails extends React.Component {
         this.updateState = this.updateState.bind(this);
         this.getProblemListAfterCalculation = this.getProblemListAfterCalculation.bind(this);
 
+        this.hideFirstComponent = this.hideFirstComponent.bind(this);
+        
+
     }
 
     updateState(ekValue) {
         this.setState({ loading: ekValue });
     }
 
+    hideFirstComponent() {
+        this.timeout = setTimeout(function () {
+            document.getElementById('div1').style.display = 'none';
+        }, 8000);
+    }
+    componentWillUnmount() {
+        clearTimeout(this.timeout);
+    }
+
     componentDidMount = function () {
         // qatProblemActions();
+        this.hideFirstComponent();
         let problemStatusId = document.getElementById('problemStatusId').value;
         console.log("problemStatusId ---------> ", problemStatusId);
         const lan = 'en';
@@ -731,6 +744,7 @@ export default class ConsumptionDetails extends React.Component {
 
                 problemStatusRequest.onerror = function (event) {
                     // Handle errors!
+                    // this.hideSecondComponent();
                 };
                 problemStatusRequest.onsuccess = function (e) {
                     var myResult = [];
@@ -1018,12 +1032,12 @@ export default class ConsumptionDetails extends React.Component {
                 this.el.destroy();
             });
         // alert("hello");
-        
+
         let programId = document.getElementById('programId').value;
         this.setState({ programId: programId });
         this.refs.problemListChild.qatProblemActions(programId);
-        
-       
+
+
     }
     fetchData() {
         // alert("hi 2");

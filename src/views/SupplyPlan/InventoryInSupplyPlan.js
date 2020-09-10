@@ -47,6 +47,8 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
             this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+            this.props.updateState("color", "red");
+            this.props.hideFirstComponent();
         }.bind(this);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
@@ -55,6 +57,8 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             var rcpuRequest = rcpuOs.getAll();
             rcpuRequest.onerror = function (event) {
                 this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+                this.props.updateState("color", "red");
+                this.props.hideFirstComponent();
             }.bind(this);
             rcpuRequest.onsuccess = function (event) {
                 var rcpuResult = [];
@@ -76,6 +80,8 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 var dataSourceRequest = dataSourceOs.getAll();
                 dataSourceRequest.onerror = function (event) {
                     this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+                    this.props.updateState("color", "red");
+                    this.props.hideFirstComponent();
                 }.bind(this);
                 dataSourceRequest.onsuccess = function (event) {
                     var dataSourceResult = [];
@@ -652,6 +658,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 }
                 valid = false;
                 this.props.updateState("inventoryBatchInfoDuplicateError", i18n.t('static.supplyPlan.duplicateBatchNumber'));
+                this.props.hideThirdComponent();
             } else {
                 // var programJson = this.props.items.programJsonAfterAdjustmentClicked;
                 // var shipmentList = programJson.shipmentList;
@@ -840,6 +847,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             })
             this.props.updateState("inventoryBatchError", i18n.t('static.supplyPlan.validationFailed'));
             this.props.updateState("loading", false);
+            this.props.hideThirdComponent();
         }
     }
 
@@ -869,6 +877,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 }
                 valid = false;
                 this.props.updateState("inventoryDuplicateError", i18n.t('static.supplyPlan.duplicateAdjustments'));
+                this.props.hideSecondComponent()
             } else {
                 // openingBalance = (this.state.openingBalanceRegionWise.filter(c => c.month.month == map.get("0") && c.region.id == map.get("1"))[0]).balance;
                 // consumptionQty = (this.state.consumptionFilteredArray.filter(c => c.month.month == map.get("0") && c.region.id == map.get("1"))[0]).consumptionQty;
@@ -937,9 +946,9 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             getDatabase();
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
             openRequest.onerror = function (event) {
-                this.setState({
-                    supplyPlanError: i18n.t('static.program.errortext')
-                })
+                this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+                this.props.updateState("color", "red");
+                this.props.hideFirstComponent();
             }.bind(this);
             openRequest.onsuccess = function (e) {
                 console.log("in success")
@@ -958,9 +967,9 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
 
                 var programRequest = programTransaction.get(programId);
                 programRequest.onerror = function (event) {
-                    this.setState({
-                        supplyPlanError: i18n.t('static.program.errortext')
-                    })
+                    this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+                    this.props.updateState("color", "red");
+                    this.props.hideFirstComponent();
                 }.bind(this);
                 programRequest.onsuccess = function (event) {
                     var programDataBytes = CryptoJS.AES.decrypt((programRequest.result).programData, SECRET_KEY);
@@ -1027,6 +1036,8 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
 
                     putRequest.onerror = function (event) {
                         this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+                        this.props.updateState("color", "red");
+                        this.props.hideFirstComponent();
                     }.bind(this);
                     putRequest.onsuccess = function (event) {
                         var programId = (document.getElementById("programId").value)
@@ -1044,6 +1055,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         } else {
             this.props.updateState("inventoryError", i18n.t('static.supplyPlan.validationFailed'));
             this.props.updateState("loading", false);
+            this.props.hideSecondComponent();
         }
     }
 

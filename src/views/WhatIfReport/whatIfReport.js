@@ -250,7 +250,6 @@ export default class WhatIfReportComponent extends React.Component {
         this.toggleAccordionTotalShipments = this.toggleAccordionTotalShipments.bind(this);
         this.toggleAccordionManualShipments = this.toggleAccordionManualShipments.bind(this);
         this.toggleAccordionErpShipments = this.toggleAccordionErpShipments.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.addRow = this.addRow.bind(this);
         this.setTextAndValue = this.setTextAndValue.bind(this);
         this.toggle = this.toggle.bind(this);
@@ -262,6 +261,50 @@ export default class WhatIfReportComponent extends React.Component {
         this.updateFieldData = this.updateFieldData.bind(this);
         this.saveSupplyPlan = this.saveSupplyPlan.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
+        this.hideFirstComponent = this.hideFirstComponent.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.hideThirdComponent = this.hideThirdComponent.bind(this);
+        this.hideFourthComponent = this.hideFourthComponent.bind(this);
+        this.hideFifthComponent = this.hideFifthComponent.bind(this);
+    }
+
+    hideFirstComponent() {
+        document.getElementById('div1').style.display = 'block';
+        this.state.timeout = setTimeout(function () {
+            document.getElementById('div1').style.display = 'none';
+        }, 8000);
+    }
+
+    hideSecondComponent() {
+        document.getElementById('div2').style.display = 'block';
+        this.state.timeout = setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
+    }
+
+    hideThirdComponent() {
+        document.getElementById('div3').style.display = 'block';
+        this.state.timeout = setTimeout(function () {
+            document.getElementById('div3').style.display = 'none';
+        }, 8000);
+    }
+
+    hideFourthComponent() {
+        document.getElementById('div4').style.display = 'block';
+        this.state.timeout = setTimeout(function () {
+            document.getElementById('div4').style.display = 'none';
+        }, 8000);
+    }
+
+    hideFifthComponent() {
+        document.getElementById('div5').style.display = 'block';
+        this.state.timeout = setTimeout(function () {
+            document.getElementById('div5').style.display = 'none';
+        }, 8000);
+    }
+
+    componentWillUnmount() {
+        clearTimeout(this.timeout);
     }
 
     roundN = num => {
@@ -327,8 +370,11 @@ export default class WhatIfReportComponent extends React.Component {
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
             this.setState({
-                supplyPlanError: i18n.t('static.program.errortext')
+                supplyPlanError: i18n.t('static.program.errortext'),
+                loading: false,
+                color: "red"
             })
+            this.hideFirstComponent()
         }.bind(this);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
@@ -337,8 +383,11 @@ export default class WhatIfReportComponent extends React.Component {
             var programRequest = programDataOs.get(document.getElementById("programId").value);
             programRequest.onerror = function (event) {
                 this.setState({
-                    supplyPlanError: i18n.t('static.program.errortext')
+                    supplyPlanError: i18n.t('static.program.errortext'),
+                    loading: false,
+                    color: "red"
                 })
+                this.hideFirstComponent()
             }.bind(this);
             programRequest.onsuccess = function (e) {
                 var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
@@ -358,8 +407,11 @@ export default class WhatIfReportComponent extends React.Component {
                 var whatIfRequest = whatIfProgramDataOs.put(item);
                 whatIfRequest.onerror = function (event) {
                     this.setState({
-                        supplyPlanError: i18n.t('static.program.errortext')
+                        supplyPlanError: i18n.t('static.program.errortext'),
+                        loading: false,
+                        color: "red",
                     })
+                    this.hideFirstComponent()
                 }.bind(this);
                 whatIfRequest.onsuccess = function (e) {
                     this.formSubmit(this.state.planningUnit, this.state.monthCount);
@@ -388,8 +440,11 @@ export default class WhatIfReportComponent extends React.Component {
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
             this.setState({
-                supplyPlanError: i18n.t('static.program.errortext')
+                supplyPlanError: i18n.t('static.program.errortext'),
+                loading: false,
+                color: "red"
             })
+            this.hideFirstComponent()
         }.bind(this);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
@@ -398,8 +453,11 @@ export default class WhatIfReportComponent extends React.Component {
             var programRequest = programDataOs.get(document.getElementById("programId").value);
             programRequest.onerror = function (event) {
                 this.setState({
-                    supplyPlanError: i18n.t('static.program.errortext')
+                    supplyPlanError: i18n.t('static.program.errortext'),
+                    loading: false,
+                    color: "red"
                 })
+                this.hideFirstComponent()
             }.bind(this);
             programRequest.onsuccess = function (e) {
                 var whatIfProgramDataTransaction = db1.transaction(['programData'], 'readwrite');
@@ -415,8 +473,11 @@ export default class WhatIfReportComponent extends React.Component {
                 var whatIfRequest = whatIfProgramDataOs.put(item);
                 whatIfRequest.onerror = function (event) {
                     this.setState({
-                        supplyPlanError: i18n.t('static.program.errortext')
+                        supplyPlanError: i18n.t('static.program.errortext'),
+                        loading: false,
+                        color: "red"
                     })
+                    this.hideFirstComponent()
                 }.bind(this);
                 whatIfRequest.onsuccess = function (e) {
                     this.formSubmit(this.state.planningUnit, this.state.monthCount);
@@ -473,8 +534,11 @@ export default class WhatIfReportComponent extends React.Component {
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
             this.setState({
-                supplyPlanError: i18n.t('static.program.errortext')
+                supplyPlanError: i18n.t('static.program.errortext'),
+                loading: false,
+                color: "red"
             })
+            this.hideFirstComponent()
         }.bind(this);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
@@ -483,8 +547,11 @@ export default class WhatIfReportComponent extends React.Component {
             var programRequest = programTransaction.get(programId);
             programRequest.onerror = function (event) {
                 this.setState({
-                    supplyPlanError: i18n.t('static.program.errortext')
+                    supplyPlanError: i18n.t('static.program.errortext'),
+                    loading: false,
+                    color: "red"
                 })
+                this.hideFirstComponent()
             }.bind(this);
             programRequest.onsuccess = function (event) {
                 var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
@@ -508,8 +575,11 @@ export default class WhatIfReportComponent extends React.Component {
                     var putRequest = programTransaction.put(programRequest.result);
                     putRequest.onerror = function (event) {
                         this.setState({
-                            supplyPlanError: i18n.t('static.program.errortext')
+                            supplyPlanError: i18n.t('static.program.errortext'),
+                            loading: false,
+                            color: "red"
                         })
+                        this.hideFirstComponent()
                     }.bind(this);
                     putRequest.onsuccess = function (event) {
                         this.state.rows.push({
@@ -552,8 +622,11 @@ export default class WhatIfReportComponent extends React.Component {
                     var putRequest = programTransaction.put(programRequest.result);
                     putRequest.onerror = function (event) {
                         this.setState({
-                            supplyPlanError: i18n.t('static.program.errortext')
+                            supplyPlanError: i18n.t('static.program.errortext'),
+                            loading: false,
+                            color: "red"
                         })
+                        this.hideFirstComponent()
                     }.bind(this);
                     putRequest.onsuccess = function (event) {
                         this.state.rows.push({
@@ -595,8 +668,11 @@ export default class WhatIfReportComponent extends React.Component {
                     var putRequest = programTransaction.put(programRequest.result);
                     putRequest.onerror = function (event) {
                         this.setState({
-                            supplyPlanError: i18n.t('static.program.errortext')
+                            supplyPlanError: i18n.t('static.program.errortext'),
+                            loading: false,
+                            color: "red"
                         })
+                        this.hideFirstComponent()
                     }.bind(this);
                     putRequest.onsuccess = function (event) {
                         this.state.rows.push({
@@ -628,8 +704,11 @@ export default class WhatIfReportComponent extends React.Component {
                     var putRequest = programTransaction.put(programRequest.result);
                     putRequest.onerror = function (event) {
                         this.setState({
-                            supplyPlanError: i18n.t('static.program.errortext')
+                            supplyPlanError: i18n.t('static.program.errortext'),
+                            loading: false,
+                            color: "red"
                         })
+                        this.hideFirstComponent()
                     }.bind(this);
                     putRequest.onsuccess = function (event) {
                         this.state.rows.push({
@@ -663,8 +742,11 @@ export default class WhatIfReportComponent extends React.Component {
                     var putRequest = programTransaction.put(programRequest.result);
                     putRequest.onerror = function (event) {
                         this.setState({
-                            supplyPlanError: i18n.t('static.program.errortext')
+                            supplyPlanError: i18n.t('static.program.errortext'),
+                            loading: false,
+                            color: "red"
                         })
+                        this.hideFirstComponent()
                     }.bind(this);
                     putRequest.onsuccess = function (event) {
                         this.state.rows.push({
@@ -699,8 +781,11 @@ export default class WhatIfReportComponent extends React.Component {
                     var putRequest = programTransaction.put(programRequest.result);
                     putRequest.onerror = function (event) {
                         this.setState({
-                            supplyPlanError: i18n.t('static.program.errortext')
+                            supplyPlanError: i18n.t('static.program.errortext'),
+                            loading: false,
+                            color: "red"
                         })
+                        this.hideFirstComponent()
                     }.bind(this);
                     putRequest.onsuccess = function (event) {
                         this.state.rows.push({
@@ -739,12 +824,6 @@ export default class WhatIfReportComponent extends React.Component {
         }
     }
 
-    hideSecondComponent() {
-        document.getElementById('div2').style.display = 'block';
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 8000);
-    }
     toggleAccordionTotalShipments() {
         this.setState({
             showTotalShipment: !this.state.showTotalShipment
@@ -1028,8 +1107,10 @@ export default class WhatIfReportComponent extends React.Component {
         openRequest.onerror = function (event) {
             this.setState({
                 supplyPlanError: i18n.t('static.program.errortext'),
-                loading: false
+                loading: false,
+                color: "red",
             })
+            this.hideFirstComponent()
         }.bind(this);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
@@ -1040,8 +1121,10 @@ export default class WhatIfReportComponent extends React.Component {
             getRequest.onerror = function (event) {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext'),
-                    loading: false
+                    loading: false,
+                    color: "red",
                 })
+                this.hideFirstComponent()
             };
             getRequest.onsuccess = function (event) {
                 var myResult = [];
@@ -1093,8 +1176,10 @@ export default class WhatIfReportComponent extends React.Component {
             openRequest.onerror = function (event) {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext'),
-                    loading: false
+                    loading: false,
+                    color: "red",
                 })
+                this.hideFirstComponent()
             }.bind(this);
             openRequest.onsuccess = function (e) {
                 db1 = e.target.result;
@@ -1104,8 +1189,10 @@ export default class WhatIfReportComponent extends React.Component {
                 programRequest.onerror = function (event) {
                     this.setState({
                         supplyPlanError: i18n.t('static.program.errortext'),
-                        loading: false
+                        loading: false,
+                        color: "red",
                     })
+                    this.hideFirstComponent()
                 }.bind(this);
                 programRequest.onsuccess = function (e) {
                     var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
@@ -1126,8 +1213,10 @@ export default class WhatIfReportComponent extends React.Component {
                     whatIfRequest.onerror = function (event) {
                         this.setState({
                             supplyPlanError: i18n.t('static.program.errortext'),
-                            loading: false
+                            loading: false,
+                            color: "red",
                         })
+                        this.hideFirstComponent()
                     }.bind(this);
                     whatIfRequest.onsuccess = function (e) {
                         for (var i = 0; i < programJson.regionList.length; i++) {
@@ -1145,8 +1234,10 @@ export default class WhatIfReportComponent extends React.Component {
                         planningunitRequest.onerror = function (event) {
                             this.setState({
                                 supplyPlanError: i18n.t('static.program.errortext'),
-                                loading: false
+                                loading: false,
+                                color: "red",
                             })
+                            this.hideFirstComponent()
                         }.bind(this);
                         planningunitRequest.onsuccess = function (e) {
                             var myResult = [];
@@ -1171,8 +1262,10 @@ export default class WhatIfReportComponent extends React.Component {
                             puRequest.onerror = function (event) {
                                 this.setState({
                                     supplyPlanError: i18n.t('static.program.errortext'),
-                                    loading: false
+                                    loading: false,
+                                    color: "red",
                                 })
+                                this.hideFirstComponent()
                             }.bind(this);
                             puRequest.onsuccess = function (e) {
                                 var puResult = [];
@@ -1186,8 +1279,10 @@ export default class WhatIfReportComponent extends React.Component {
                                 dataSourceRequest.onerror = function (event) {
                                     this.setState({
                                         supplyPlanError: i18n.t('static.program.errortext'),
-                                        loading: false
+                                        loading: false,
+                                        color: "red",
                                     })
+                                    this.hideFirstComponent()
                                 }.bind(this);
                                 dataSourceRequest.onsuccess = function (event) {
                                     var dataSourceResult = [];
@@ -1304,8 +1399,10 @@ export default class WhatIfReportComponent extends React.Component {
         openRequest.onerror = function (event) {
             this.setState({
                 supplyPlanError: i18n.t('static.program.errortext'),
-                loading: false
+                loading: false,
+                color: "red",
             })
+            this.hideFirstComponent()
         }.bind(this);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
@@ -1315,8 +1412,10 @@ export default class WhatIfReportComponent extends React.Component {
             programRequest.onerror = function (event) {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext'),
-                    loading: false
+                    loading: false,
+                    color: "red",
                 })
+                this.hideFirstComponent()
             }.bind(this);
             programRequest.onsuccess = function (e) {
                 var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
@@ -1337,8 +1436,10 @@ export default class WhatIfReportComponent extends React.Component {
                 shipmentStatusRequest.onerror = function (event) {
                     this.setState({
                         supplyPlanError: i18n.t('static.program.errortext'),
-                        loading: false
+                        loading: false,
+                        color: "red",
                     })
+                    this.hideFirstComponent()
                 }.bind(this);
                 shipmentStatusRequest.onsuccess = function (event) {
                     var shipmentStatusResult = [];
@@ -1349,8 +1450,10 @@ export default class WhatIfReportComponent extends React.Component {
                     papuRequest.onerror = function (event) {
                         this.setState({
                             supplyPlanError: i18n.t('static.program.errortext'),
-                            loading: false
+                            loading: false,
+                            color: "red",
                         })
+                        this.hideFirstComponent()
                     }.bind(this);
                     papuRequest.onsuccess = function (event) {
                         var papuResult = [];
@@ -1996,6 +2099,7 @@ export default class WhatIfReportComponent extends React.Component {
             message: i18n.t('static.message.cancelled'),
             color: 'red',
         })
+        this.hideFirstComponent();
     }
 
     actionCanceled(supplyPlanType) {
@@ -2045,11 +2149,12 @@ export default class WhatIfReportComponent extends React.Component {
             shipmentQtyChangedFlag: 0,
             qtyCalculatorValidationError: "",
             showShipments: 0,
-            showInventory: 0
+            showInventory: 0,
+            loading:false
 
         },
             () => {
-                this.hideSecondComponent();
+                this.hideFirstComponent()
             })
         this.toggleLarge(supplyPlanType);
     }
@@ -2119,8 +2224,11 @@ export default class WhatIfReportComponent extends React.Component {
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
             this.setState({
-                supplyPlanError: i18n.t('static.program.errortext')
+                supplyPlanError: i18n.t('static.program.errortext'),
+                loading: false,
+                color: "red"
             })
+            this.hideFirstComponent()
         }.bind(this);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
@@ -2129,8 +2237,11 @@ export default class WhatIfReportComponent extends React.Component {
             var programRequest = programDataOs.get(programId);
             programRequest.onerror = function (event) {
                 this.setState({
-                    supplyPlanError: i18n.t('static.program.errortext')
+                    supplyPlanError: i18n.t('static.program.errortext'),
+                    loading: false,
+                    color: "red"
                 })
+                this.hideFirstComponent()
             }.bind(this);
             programRequest.onsuccess = function (e) {
                 var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
@@ -2174,8 +2285,11 @@ export default class WhatIfReportComponent extends React.Component {
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
             this.setState({
-                supplyPlanError: i18n.t('static.program.errortext')
+                supplyPlanError: i18n.t('static.program.errortext'),
+                loading: false,
+                color: "red"
             })
+            this.hideFirstComponent()
         }.bind(this);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
@@ -2184,8 +2298,11 @@ export default class WhatIfReportComponent extends React.Component {
             var programRequest = programTransaction.get(programId);
             programRequest.onerror = function (event) {
                 this.setState({
-                    supplyPlanError: i18n.t('static.program.errortext')
+                    supplyPlanError: i18n.t('static.program.errortext'),
+                    loading: false,
+                    color: "red"
                 })
+                this.hideFirstComponent()
             }.bind(this);
             programRequest.onsuccess = function (event) {
                 var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
@@ -2232,8 +2349,11 @@ export default class WhatIfReportComponent extends React.Component {
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
             this.setState({
-                supplyPlanError: i18n.t('static.program.errortext')
+                supplyPlanError: i18n.t('static.program.errortext'),
+                loading: false,
+                color: "red"
             })
+            this.hideFirstComponent()
         }.bind(this);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
@@ -2244,8 +2364,11 @@ export default class WhatIfReportComponent extends React.Component {
             var filteredArray = [];
             programRequest.onerror = function (event) {
                 this.setState({
-                    supplyPlanError: i18n.t('static.program.errortext')
+                    supplyPlanError: i18n.t('static.program.errortext'),
+                    loading: false,
+                    color: "red"
                 })
+                this.hideFirstComponent()
             }.bind(this);
             programRequest.onsuccess = function (event) {
                 var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
@@ -2918,7 +3041,7 @@ export default class WhatIfReportComponent extends React.Component {
                             </ul>
                         </ModalHeader>
                         <ModalBody>
-                            <h6 className="red">{this.state.consumptionDuplicateError || this.state.consumptionNoStockError || this.state.consumptionError}</h6>
+                            <h6 className="red" id="div2">{this.state.consumptionDuplicateError || this.state.consumptionNoStockError || this.state.consumptionError}</h6>
                             <div className="col-md-12">
                                 <span className="supplyplan-larrow-dataentry" onClick={this.leftClickedConsumption}> <i className="cui-arrow-left icons " > </i> {i18n.t('static.supplyPlan.scrollToLeft')} </span>
                                 <span className="supplyplan-rarrow-dataentry" onClick={this.rightClickedConsumption}> {i18n.t('static.supplyPlan.scrollToRight')} <i className="cui-arrow-right icons" ></i> </span>
@@ -2969,11 +3092,11 @@ export default class WhatIfReportComponent extends React.Component {
                                     </tr>
                                 </tfoot>
                             </Table>
-                            {this.state.showConsumption == 1 && <ConsumptionInSupplyPlanComponent ref="consumptionChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} consumptionPage="whatIf" />}
+                            {this.state.showConsumption == 1 && <ConsumptionInSupplyPlanComponent ref="consumptionChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} consumptionPage="whatIf" />}
                             <div className="table-responsive mt-3">
                                 <div id="consumptionTable" />
                             </div>
-                            <h6 className="red">{this.state.consumptionBatchInfoDuplicateError || this.state.consumptionBatchInfoNoStockError || this.state.consumptionBatchError}</h6>
+                            <h6 className="red" id="div3">{this.state.consumptionBatchInfoDuplicateError || this.state.consumptionBatchInfoNoStockError || this.state.consumptionBatchError}</h6>
                             <div className="table-responsive">
                                 <div id="consumptionBatchInfoTable" className="AddListbatchtrHeight"></div>
                             </div>
@@ -2994,7 +3117,7 @@ export default class WhatIfReportComponent extends React.Component {
                         className={'modal-lg ' + this.props.className, "modalWidth"} style={{ display: this.state.loading ? "none" : "block" }}>
                         <ModalHeader toggle={() => this.toggleLarge('Adjustments')} className="modalHeaderSupplyPlan">{i18n.t('static.supplyPlan.adjustmentsDetails')}</ModalHeader>
                         <ModalBody>
-                            <h6 className="red">{this.state.inventoryDuplicateError || this.state.inventoryNoStockError || this.state.inventoryError}</h6>
+                            <h6 className="red" id="div2">{this.state.inventoryDuplicateError || this.state.inventoryNoStockError || this.state.inventoryError}</h6>
                             <div className="col-md-12">
                                 <span className="supplyplan-larrow-dataentry-adjustment" onClick={this.leftClickedAdjustments}> <i className="cui-arrow-left icons " > </i> {i18n.t('static.supplyPlan.scrollToLeft')} </span>
                                 <span className="supplyplan-rarrow-dataentry" onClick={this.rightClickedAdjustments}> {i18n.t('static.supplyPlan.scrollToRight')} <i className="cui-arrow-right icons" ></i> </span>
@@ -3155,11 +3278,11 @@ export default class WhatIfReportComponent extends React.Component {
                                     </tr>
                                 </tbody>
                             </Table>
-                            {this.state.showInventory == 1 && <InventoryInSupplyPlanComponent ref="inventoryChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} inventoryPage="whatIf" />}
+                            {this.state.showInventory == 1 && <InventoryInSupplyPlanComponent ref="inventoryChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} inventoryPage="whatIf" />}
                             <div className="table-responsive">
                                 <div id="adjustmentsTable" className="table-responsive" />
                             </div>
-                            <h6 className="red">{this.state.inventoryBatchInfoDuplicateError || this.state.inventoryBatchInfoNoStockError || this.state.inventoryBatchError}</h6>
+                            <h6 className="red" id="div3">{this.state.inventoryBatchInfoDuplicateError || this.state.inventoryBatchInfoNoStockError || this.state.inventoryBatchError}</h6>
                             <div className="table-responsive">
                                 <div id="inventoryBatchInfoTable" className="AddListbatchtrHeight"></div>
                             </div>
@@ -3182,13 +3305,13 @@ export default class WhatIfReportComponent extends React.Component {
                             <strong>{i18n.t('static.supplyPlan.shipmentsDetails')} -  {i18n.t('static.planningunit.planningunit')} - {this.state.planningUnitName} </strong>
                         </ModalHeader>
                         <ModalBody>
-                            {this.state.showShipments && <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} shipmentPage="whatIf" />}
-                            <h6 className="red">{this.state.noFundsBudgetError || this.state.shipmentBatchError || this.state.shipmentError || this.state.supplyPlanError}</h6>
+                            {this.state.showShipments && <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} hideFourthComponent={this.hideFourthComponent} hideFifthComponent={this.hideFifthComponent} shipmentPage="whatIf" />}
+                            <h6 className="red" id="div2">{this.state.noFundsBudgetError || this.state.shipmentBatchError || this.state.shipmentError}</h6>
                             <div className="table-responsive">
                                 <div id="shipmentsDetailsTable" />
                             </div>
 
-                            <h6 className="red">{this.state.qtyCalculatorValidationError}</h6>
+                            <h6 className="red" id="div3">{this.state.qtyCalculatorValidationError}</h6>
                             <div className="table-responsive">
                                 <div id="qtyCalculatorTable"></div>
                             </div>
@@ -3202,7 +3325,7 @@ export default class WhatIfReportComponent extends React.Component {
                                 {this.state.shipmentQtyChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentQty()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveShipmentQty')}</Button>}
                             </div>
 
-                            <h6 className="red">{this.state.shipmentDatesError}</h6>
+                            <h6 className="red" id="div4">{this.state.shipmentDatesError}</h6>
                             <div className="table-responsive">
                                 <div id="shipmentDatesTable"></div>
                             </div>
@@ -3210,7 +3333,7 @@ export default class WhatIfReportComponent extends React.Component {
                                 <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceledShipments('shipmentDates')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 {this.state.shipmentDatesChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentsDate()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveShipmentDates')}</Button>}
                             </div>
-                            <h6 className="red">{this.state.shipmentBatchInfoDuplicateError || this.state.shipmentValidationBatchError}</h6>
+                            <h6 className="red" id="div5">{this.state.shipmentBatchInfoDuplicateError || this.state.shipmentValidationBatchError}</h6>
                             <div className="table-responsive">
                                 <div id="shipmentBatchInfoTable" className="AddListbatchtrHeight"></div>
                             </div>
@@ -3313,8 +3436,7 @@ export default class WhatIfReportComponent extends React.Component {
                 }} loading={(loading) => {
                     this.setState({ loading: loading })
                 }} />
-                <h5 className={this.state.color} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-                <h5 className="red">{this.state.supplyPlanError}</h5>
+                <h5 className={this.state.color} id="div1">{i18n.t(this.state.message, { entityname }) || this.state.supplyPlanError}</h5>
                 <SupplyPlanFormulas ref="formulaeChild" />
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
                     <div className="Card-header-reporticon">
@@ -3442,8 +3564,11 @@ export default class WhatIfReportComponent extends React.Component {
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
             this.setState({
-                supplyPlanError: i18n.t('static.program.errortext')
+                supplyPlanError: i18n.t('static.program.errortext'),
+                loading: false,
+                color: "red"
             })
+            this.hideFirstComponent()
         }.bind(this);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
@@ -3452,8 +3577,11 @@ export default class WhatIfReportComponent extends React.Component {
             var programRequest = programTransaction.get(programId);
             programRequest.onerror = function (event) {
                 this.setState({
-                    supplyPlanError: i18n.t('static.program.errortext')
+                    supplyPlanError: i18n.t('static.program.errortext'),
+                    loading: false,
+                    color: "red"
                 })
+                this.hideFirstComponent()
             }.bind(this);
             programRequest.onsuccess = function (event) {
                 var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);

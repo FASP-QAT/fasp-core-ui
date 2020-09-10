@@ -1741,7 +1741,7 @@ class ShipmentGlobalView extends Component {
         let content1 = {
             margin: { top: 80, bottom: 50 },
             startY: height,
-            styles: { lineWidth: 1, fontSize: 8, cellWidth: 70, halign: 'center' },
+            styles: { lineWidth: 1, fontSize: 8, cellWidth: 700/displaylabel.length, halign: 'center' },
             columnStyles: {
                 // 0: { cellWidth: 100 },
                 // 1: { cellWidth: 100 },
@@ -1767,12 +1767,12 @@ class ShipmentGlobalView extends Component {
             margin: { top: 80, left: 100, bottom: 50 },
             startY: doc.autoTableEndPosY() + 50,
             pageBreak: 'auto',
-            styles: { lineWidth: 1, fontSize: 8, cellWidth: 100, halign: 'center' },
+            styles: { lineWidth: 1, fontSize: 8, cellWidth: 120, halign: 'center' },
             columnStyles: {
                 // 0: { cellWidth: 100 },
                 // 1: { cellWidth: 100 },
                 // 2: { cellWidth: 200 },
-                3: { cellWidth: 250 },
+                3: { cellWidth: 281.89 },
                 // 4: { cellWidth: 100 },
             },
             html: '#mytable2',
@@ -1958,6 +1958,7 @@ class ShipmentGlobalView extends Component {
                     error => {
                         this.setState({
                             planningUnits: [],
+                            planningUnitValues:[]
                         })
                         if (error.message === "Network Error") {
                             this.setState({ message: error.message });
@@ -2128,7 +2129,8 @@ class ShipmentGlobalView extends Component {
         ProductService.getProductCategoryList(realmId)
             .then(response => {
                 // console.log(response.data)
-                var list = response.data.slice(1);
+                // var list = response.data.slice(1);
+                var list = response.data;
                 this.setState({
                     productCategories: list, loading: false
                 })

@@ -64,6 +64,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
             this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+            this.props.updateState("color", "red");
+            this.props.hideFirstComponent();
         }.bind(this);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
@@ -72,6 +74,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             var shipmentStatusRequest = shipmentStatusOs.getAll();
             shipmentStatusRequest.onerror = function (event) {
                 this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+                this.props.updateState("color", "red");
+                this.props.hideFirstComponent();
             }.bind(this);
             shipmentStatusRequest.onsuccess = function (event) {
                 var shipmentStatusResult = [];
@@ -89,6 +93,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 var paRequest = paOs.getAll();
                 paRequest.onerror = function (event) {
                     this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+                    this.props.updateState("color", "red");
+                    this.props.hideFirstComponent();
                 }.bind(this);
                 paRequest.onsuccess = function (event) {
                     var paResult = [];
@@ -107,6 +113,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     var papuRequest = papuOs.getAll();
                     papuRequest.onerror = function (event) {
                         this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+                        this.props.updateState("color", "red");
+                        this.props.hideFirstComponent();
                     }.bind(this);
                     papuRequest.onsuccess = function (event) {
                         var papuResult = [];
@@ -120,6 +128,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         var fsRequest = fsOs.getAll();
                         fsRequest.onerror = function (event) {
                             this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+                            this.props.updateState("color", "red");
+                            this.props.hideFirstComponent();
                         }.bind(this);
                         fsRequest.onsuccess = function (event) {
                             var fsResult = [];
@@ -141,6 +151,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             var budgetListAll = []
                             bRequest.onerror = function (event) {
                                 this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+                                this.props.updateState("color", "red");
+                                this.props.hideFirstComponent();
                             }.bind(this);
                             bRequest.onsuccess = function (event) {
                                 var bResult = [];
@@ -174,6 +186,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                 var dataSourceRequest = dataSourceOs.getAll();
                                 dataSourceRequest.onerror = function (event) {
                                     this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+                                    this.props.updateState("color", "red");
+                                    this.props.hideFirstComponent();
                                 }.bind(this);
                                 dataSourceRequest.onsuccess = function (event) {
                                     var dataSourceResult = [];
@@ -200,6 +214,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                     var currencyRequest = currencyOs.getAll();
                                     currencyRequest.onerror = function (event) {
                                         this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+                                        this.props.updateState("color", "red");
+                                        this.props.hideFirstComponent();
                                     }.bind(this);
                                     currencyRequest.onsuccess = function (event) {
                                         var currencyResult = [];
@@ -1531,7 +1547,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         if (x == 9) {
             var valid = checkValidtion("text", "J", y, rowData[9], elInstance);
             if (valid == true) {
-                if (rowData[16] == -1) {
+                if (rowData[16] == -1 && rowData[9] != "") {
                     var procurementAgentPlanningUnit = this.state.procurementAgentPlanningUnitListAll.filter(c => c.procurementAgent.id == rowData[2] && c.planningUnit.id == planningUnitId);
                     var pricePerUnit = rowData[10];
                     // if (pricePerUnit.toString() == "") {
@@ -1623,6 +1639,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 if (value != adjustedQty) {
                     inValid("I", y, i18n.t('static.supplyPlan.batchNumberMissing'), elInstance);
                     this.props.updateState("shipmentBatchError", i18n.t('static.supplyPlan.batchNumberMissing'));
+                    this.props.hideSecondComponent()
                 } else {
                     positiveValidation("I", y, elInstance);
                     this.props.updateState("shipmentBatchError", "");
@@ -1711,6 +1728,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         } else {
             this.props.updateState("qtyCalculatorValidationError", i18n.t('static.supplyPlan.validationFailed'));
             this.props.updateState("loading", false);
+            this.props.hideThirdComponent()
         }
     }
 
@@ -1796,6 +1814,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 }
                 valid = false;
                 this.props.updateState("shipmentBatchInfoDuplicateError", i18n.t('static.supplyPlan.duplicateBatchNumber'));
+                this.props.hideFifthComponent()
             } else {
                 var colArr = ['A'];
                 for (var c = 0; c < colArr.length; c++) {
@@ -1890,6 +1909,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         } else {
             this.props.updateState("shipmentValidationBatchError", i18n.t('static.supplyPlan.validationFailed'));
             this.props.updateState("loading", false);
+            this.props.hideFifthComponent()
         }
     }
 
@@ -1922,6 +1942,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
             openRequest.onerror = function (event) {
                 this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+                this.props.updateState("color", "red");
+                this.props.hideFirstComponent();
             }.bind(this);
             openRequest.onsuccess = function (e) {
                 db1 = e.target.result;
@@ -1931,6 +1953,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 var papuRequest = papuOs.get(parseInt(procurementAgent));
                 papuRequest.onerror = function (event) {
                     this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+                    this.props.updateState("color", "red");
+                    this.props.hideFirstComponent();
                 }.bind(this);
                 papuRequest.onsuccess = function (event) {
                     var papuResult = [];
@@ -2327,6 +2351,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
             openRequest.onerror = function (event) {
                 this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+                this.props.updateState("color", "red");
+                this.props.hideFirstComponent();
             }.bind(this);
             openRequest.onsuccess = function (e) {
                 db1 = e.target.result;
@@ -2337,6 +2363,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 var papuRequest = papuOs.get(parseInt(procurementAgent));
                 papuRequest.onerror = function (event) {
                     this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+                    this.props.updateState("color", "red");
+                    this.props.hideFirstComponent();
                 }.bind(this);
                 papuRequest.onsuccess = function (event) {
                     var papuResult = [];
@@ -2630,6 +2658,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         } else {
             this.props.updateState("shipmentDatesError", i18n.t('static.supplyPlan.validationFailed'));
             this.props.updateState("loading", false);
+            this.props.hideFourthComponent()
         }
     }
 
@@ -2641,7 +2670,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         for (var y = 0; y < json.length; y++) {
             var map = new Map(Object.entries(json[y]));
             var rowData = elInstance.getRowData(y);
-            if (map.get("4") != "") {
+            if (map.get("4") != "" && map.get("9") != "") {
                 var budget = this.state.budgetListAll.filter(c => c.id == map.get("4"))[0]
                 var totalBudget = budget.budgetAmt * budget.currency.conversionRateToUsd;
                 var shipmentList = this.props.items.shipmentListUnFiltered.filter(c => c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.active == true && c.budget.id == map.get("4"));
@@ -2668,6 +2697,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     inValid("E", y, i18n.t('static.label.noFundsAvailable'), elInstance);
                     inValid("L", y, i18n.t('static.label.noFundsAvailable'), elInstance);
                     this.props.updateState("noFundsBudgetError", i18n.t('static.label.noFundsAvailable'));
+                    this.props.hideSecondComponent();
                 } else {
                     checkOtherValidation = true;
                 }
@@ -2775,6 +2805,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         if (totalShipmentQty != 0 && totalShipmentQty != adjustedOrderQty) {
                             valid = false;
                             this.props.updateState("shipmentBatchError", i18n.t('static.supplyPlan.batchNumberMissing'));
+                            this.props.hideSecondComponent();
                         } else {
                             positiveValidation("I", y, elInstance);
                         }
@@ -2804,6 +2835,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
             openRequest.onerror = function (event) {
                 this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+                this.props.updateState("color", "red");
+                this.props.hideFirstComponent();
             }.bind(this);
             openRequest.onsuccess = function (e) {
                 db1 = e.target.result;
@@ -2820,6 +2853,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 var programRequest = programTransaction.get(programId);
                 programRequest.onerror = function (event) {
                     this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+                    this.props.updateState("color", "red");
+                    this.props.hideFirstComponent();
                 }.bind(this);
                 programRequest.onsuccess = function (event) {
                     var programDataBytes = CryptoJS.AES.decrypt((programRequest.result).programData, SECRET_KEY);
@@ -2871,52 +2906,52 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
 
 
                             // if (shipmentStatusId == DELIVERED_SHIPMENT_STATUS) {
-                                var shipmentBatchInfoList = map.get("17");
-                                console.log("Shipment Batcg info list", shipmentBatchInfoList);
-                                if (shipmentBatchInfoList == "" && shipmentBatchInfoList.length == 0) {
-                                    console.log("In if")
-                                    var programId = (document.getElementById("programId").value).split("_")[0];
-                                    var planningUnitId = document.getElementById("planningUnitId").value;
-                                    var batchNo = (paddingZero(programId, 0, 6)).concat(paddingZero(planningUnitId, 0, 8)).concat(moment(Date.now()).format("YYMMDD")).concat(generateRandomAplhaNumericCode(3));
-                                    var expectedDeliveryDate = moment(map.get("1")).format("YYYY-MM-DD");
-                                    var expiryDate = moment(expectedDeliveryDate).add(this.props.items.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
-                                    var batchInfoJson = {
-                                        shipmentTransBatchInfoId: 0,
-                                        batch: {
-                                            batchNo: batchNo,
-                                            expiryDate: expiryDate,
-                                            batchId: 0,
-                                            autoGenerated: true
-                                        },
-                                        shipmentQty: shipmentQty.toString().replaceAll("\,", ""),
-                                        createdDate: moment(Date.now()).format("YYYY-MM-DD")
-                                    }
-                                    var batchArr = [];
-                                    batchArr.push(batchInfoJson);
-                                    shipmentDataList[parseInt(map.get("16"))].batchInfoList = batchArr;
-                                    var batchDetails = {
-                                        batchId: 0,
+                            var shipmentBatchInfoList = map.get("17");
+                            console.log("Shipment Batcg info list", shipmentBatchInfoList);
+                            if (shipmentBatchInfoList == "" && shipmentBatchInfoList.length == 0) {
+                                console.log("In if")
+                                var programId = (document.getElementById("programId").value).split("_")[0];
+                                var planningUnitId = document.getElementById("planningUnitId").value;
+                                var batchNo = (paddingZero(programId, 0, 6)).concat(paddingZero(planningUnitId, 0, 8)).concat(moment(Date.now()).format("YYMMDD")).concat(generateRandomAplhaNumericCode(3));
+                                var expectedDeliveryDate = moment(map.get("1")).format("YYYY-MM-DD");
+                                var expiryDate = moment(expectedDeliveryDate).add(this.props.items.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
+                                var batchInfoJson = {
+                                    shipmentTransBatchInfoId: 0,
+                                    batch: {
                                         batchNo: batchNo,
-                                        planningUnitId: parseInt(document.getElementById("planningUnitId").value),
                                         expiryDate: expiryDate,
-                                        createdDate: moment(Date.now()).format("YYYY-MM-DD"),
+                                        batchId: 0,
                                         autoGenerated: true
-                                    }
-                                    batchInfoList.push(batchDetails);
+                                    },
+                                    shipmentQty: shipmentQty.toString().replaceAll("\,", ""),
+                                    createdDate: moment(Date.now()).format("YYYY-MM-DD")
                                 }
-                                for (var bi = 0; bi < shipmentBatchInfoList.length; bi++) {
-                                    var batchDetails = {
-                                        batchId: shipmentBatchInfoList[bi].batch.batchId,
-                                        batchNo: shipmentBatchInfoList[bi].batch.batchNo,
-                                        planningUnitId: parseInt(document.getElementById("planningUnitId").value),
-                                        expiryDate: shipmentBatchInfoList[bi].batch.expiryDate,
-                                        createdDate: moment(Date.now()).format("YYYY-MM-DD"),
-                                        autoGenerated: shipmentBatchInfoList[bi].batch.autoGenerated
-                                    }
-                                    batchInfoList.push(batchDetails);
+                                var batchArr = [];
+                                batchArr.push(batchInfoJson);
+                                shipmentDataList[parseInt(map.get("16"))].batchInfoList = batchArr;
+                                var batchDetails = {
+                                    batchId: 0,
+                                    batchNo: batchNo,
+                                    planningUnitId: parseInt(document.getElementById("planningUnitId").value),
+                                    expiryDate: expiryDate,
+                                    createdDate: moment(Date.now()).format("YYYY-MM-DD"),
+                                    autoGenerated: true
                                 }
-                                console.log("Batch info list", batchInfoList);
-                                programJson.batchInfoList = batchInfoList;
+                                batchInfoList.push(batchDetails);
+                            }
+                            for (var bi = 0; bi < shipmentBatchInfoList.length; bi++) {
+                                var batchDetails = {
+                                    batchId: shipmentBatchInfoList[bi].batch.batchId,
+                                    batchNo: shipmentBatchInfoList[bi].batch.batchNo,
+                                    planningUnitId: parseInt(document.getElementById("planningUnitId").value),
+                                    expiryDate: shipmentBatchInfoList[bi].batch.expiryDate,
+                                    createdDate: moment(Date.now()).format("YYYY-MM-DD"),
+                                    autoGenerated: shipmentBatchInfoList[bi].batch.autoGenerated
+                                }
+                                batchInfoList.push(batchDetails);
+                            }
+                            console.log("Batch info list", batchInfoList);
+                            programJson.batchInfoList = batchInfoList;
                             // }
                         } else {
                             console.log("In else")
@@ -2970,51 +3005,51 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             }
 
                             // if (shipmentStatusId == DELIVERED_SHIPMENT_STATUS) {
-                                var shipmentBatchInfoList = map.get("17");
-                                console.log("Shipment byach info list", shipmentBatchInfoList);
-                                if (shipmentBatchInfoList == "" && shipmentBatchInfoList.length == 0) {
-                                    var programId = (document.getElementById("programId").value).split("_")[0];
-                                    var planningUnitId = document.getElementById("planningUnitId").value;
-                                    var batchNo = (paddingZero(programId, 0, 6)).concat(paddingZero(planningUnitId, 0, 8)).concat(moment(Date.now()).format("YYMMDD")).concat(generateRandomAplhaNumericCode(3));
-                                    var expectedDeliveryDate = moment(map.get("1")).format("YYYY-MM-DD");
-                                    var expiryDate = moment(expectedDeliveryDate).add(this.props.items.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
-                                    var batchInfoJson = {
-                                        shipmentTransBatchInfoId: 0,
-                                        batch: {
-                                            batchNo: batchNo,
-                                            expiryDate: expiryDate,
-                                            batchId: 0,
-                                            autoGenerated: true
-                                        },
-                                        shipmentQty: shipmentQty.toString().replaceAll("\,", ""),
-                                        createdDate: moment(Date.now()).format("YYYY-MM-DD")
-                                    }
-                                    var batchArr = [];
-                                    batchArr.push(batchInfoJson);
-                                    shipmentJson.batchInfoList = batchArr;
-                                    var batchDetails = {
-                                        batchId: 0,
+                            var shipmentBatchInfoList = map.get("17");
+                            console.log("Shipment byach info list", shipmentBatchInfoList);
+                            if (shipmentBatchInfoList == "" && shipmentBatchInfoList.length == 0) {
+                                var programId = (document.getElementById("programId").value).split("_")[0];
+                                var planningUnitId = document.getElementById("planningUnitId").value;
+                                var batchNo = (paddingZero(programId, 0, 6)).concat(paddingZero(planningUnitId, 0, 8)).concat(moment(Date.now()).format("YYMMDD")).concat(generateRandomAplhaNumericCode(3));
+                                var expectedDeliveryDate = moment(map.get("1")).format("YYYY-MM-DD");
+                                var expiryDate = moment(expectedDeliveryDate).add(this.props.items.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
+                                var batchInfoJson = {
+                                    shipmentTransBatchInfoId: 0,
+                                    batch: {
                                         batchNo: batchNo,
-                                        planningUnitId: parseInt(document.getElementById("planningUnitId").value),
                                         expiryDate: expiryDate,
-                                        createdDate: moment(Date.now()).format("YYYY-MM-DD"),
+                                        batchId: 0,
                                         autoGenerated: true
-                                    }
-                                    batchInfoList.push(batchDetails);
+                                    },
+                                    shipmentQty: shipmentQty.toString().replaceAll("\,", ""),
+                                    createdDate: moment(Date.now()).format("YYYY-MM-DD")
                                 }
-                                for (var bi = 0; bi < shipmentBatchInfoList.length; bi++) {
-                                    var batchDetails = {
-                                        batchId: shipmentBatchInfoList[bi].batch.batchId,
-                                        batchNo: shipmentBatchInfoList[bi].batch.batchNo,
-                                        planningUnitId: parseInt(document.getElementById("planningUnitId").value),
-                                        expiryDate: moment(shipmentBatchInfoList[bi].batch.expiryDate).format("YYYY-MM-DD"),
-                                        createdDate: moment(Date.now()).format("YYYY-MM-DD"),
-                                        autoGenerated: shipmentBatchInfoList[bi].batch.autoGenerated
-                                    }
-                                    batchInfoList.push(batchDetails);
+                                var batchArr = [];
+                                batchArr.push(batchInfoJson);
+                                shipmentJson.batchInfoList = batchArr;
+                                var batchDetails = {
+                                    batchId: 0,
+                                    batchNo: batchNo,
+                                    planningUnitId: parseInt(document.getElementById("planningUnitId").value),
+                                    expiryDate: expiryDate,
+                                    createdDate: moment(Date.now()).format("YYYY-MM-DD"),
+                                    autoGenerated: true
                                 }
-                                console.log("Batch info list", batchInfoList);
-                                programJson.batchInfoList = batchInfoList;
+                                batchInfoList.push(batchDetails);
+                            }
+                            for (var bi = 0; bi < shipmentBatchInfoList.length; bi++) {
+                                var batchDetails = {
+                                    batchId: shipmentBatchInfoList[bi].batch.batchId,
+                                    batchNo: shipmentBatchInfoList[bi].batch.batchNo,
+                                    planningUnitId: parseInt(document.getElementById("planningUnitId").value),
+                                    expiryDate: moment(shipmentBatchInfoList[bi].batch.expiryDate).format("YYYY-MM-DD"),
+                                    createdDate: moment(Date.now()).format("YYYY-MM-DD"),
+                                    autoGenerated: shipmentBatchInfoList[bi].batch.autoGenerated
+                                }
+                                batchInfoList.push(batchDetails);
+                            }
+                            console.log("Batch info list", batchInfoList);
+                            programJson.batchInfoList = batchInfoList;
                             // }
                             shipmentDataList.push(shipmentJson);
                         }
@@ -3026,6 +3061,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
 
                     putRequest.onerror = function (event) {
                         this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+                        this.props.updateState("color", "red");
+                        this.props.hideFirstComponent();
                     }.bind(this);
                     putRequest.onsuccess = function (event) {
                         var programId = (document.getElementById("programId").value)
@@ -3043,6 +3080,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         } else {
             this.props.updateState("shipmentError", i18n.t('static.supplyPlan.validationFailed'));
             this.props.updateState("loading", false);
+            this.props.hideSecondComponent()
         }
     }
 

@@ -37,6 +37,8 @@ export default class ConsumptionDetails extends React.Component {
         }
 
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.hideThirdComponent = this.hideThirdComponent.bind(this);
         this.formSubmit = this.formSubmit.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this)
@@ -47,7 +49,6 @@ export default class ConsumptionDetails extends React.Component {
 
     hideFirstComponent() {
         document.getElementById('div1').style.display = 'block';
-        clearTimeout(this.state.timeout);
         this.state.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
         }, 8000);
@@ -55,21 +56,28 @@ export default class ConsumptionDetails extends React.Component {
 
     hideSecondComponent() {
         document.getElementById('div2').style.display = 'block';
-        clearTimeout(this.state.timeout);
         this.state.timeout = setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 8000);
     }
 
-    // componentWillUnmount() {
-    // clearTimeout(this.timeout);
-    // }
+    hideThirdComponent() {
+        document.getElementById('div3').style.display = 'block';
+        this.state.timeout = setTimeout(function () {
+            document.getElementById('div3').style.display = 'none';
+        }, 8000);
+    }
+
+    componentWillUnmount() {
+        clearTimeout(this.timeout);
+    }
 
     toggleLarge() {
         this.setState({
             consumptionBatchInfoChangedFlag: 0,
             consumptionBatchInfoDuplicateError: '',
-            consumptionBatchInfoNoStockError: ''
+            consumptionBatchInfoNoStockError: '',
+            consumptionBatchError: ""
         })
         this.setState({
             consumptionBatchInfo: !this.state.consumptionBatchInfo,
@@ -85,6 +93,7 @@ export default class ConsumptionDetails extends React.Component {
                 message: i18n.t('static.program.errortext'),
                 color: 'red'
             })
+            this.hideFirstComponent()
         }.bind(this);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
@@ -97,6 +106,7 @@ export default class ConsumptionDetails extends React.Component {
                     message: i18n.t('static.program.errortext'),
                     color: 'red'
                 })
+                this.hideFirstComponent()
             }.bind(this);
             getRequest.onsuccess = function (event) {
                 var myResult = [];
@@ -158,6 +168,7 @@ export default class ConsumptionDetails extends React.Component {
                     message: i18n.t('static.program.errortext'),
                     color: 'red'
                 })
+                this.hideFirstComponent()
             }.bind(this);
             openRequest.onsuccess = function (e) {
                 db1 = e.target.result;
@@ -166,8 +177,10 @@ export default class ConsumptionDetails extends React.Component {
                 var programRequest = programDataOs.get(value != "" && value != undefined ? value.value : 0);
                 programRequest.onerror = function (event) {
                     this.setState({
-                        supplyPlanError: i18n.t('static.program.errortext')
+                        message: i18n.t('static.program.errortext'),
+                        color: 'red'
                     })
+                    this.hideFirstComponent()
                 }.bind(this);
                 programRequest.onsuccess = function (e) {
                     var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
@@ -191,6 +204,7 @@ export default class ConsumptionDetails extends React.Component {
                             message: i18n.t('static.program.errortext'),
                             color: 'red'
                         })
+                        this.hideFirstComponent()
                     }.bind(this);
                     planningunitRequest.onsuccess = function (e) {
                         var myResult = [];
@@ -248,6 +262,7 @@ export default class ConsumptionDetails extends React.Component {
                     message: i18n.t('static.program.errortext'),
                     color: 'red'
                 })
+                this.hideFirstComponent()
             }.bind(this);
             openRequest.onsuccess = function (e) {
                 db1 = e.target.result;
@@ -259,6 +274,7 @@ export default class ConsumptionDetails extends React.Component {
                         message: i18n.t('static.program.errortext'),
                         color: 'red'
                     })
+                    this.hideFirstComponent()
                 }.bind(this);
                 programRequest.onsuccess = function (event) {
                     var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
@@ -301,6 +317,11 @@ export default class ConsumptionDetails extends React.Component {
     }
 
     actionCanceled() {
+        this.setState({
+            message: i18n.t('static.actionCancelled'),
+            color: "red"
+        })
+        this.hideFirstComponent();
         this.toggleLarge();
     }
 
@@ -312,7 +333,7 @@ export default class ConsumptionDetails extends React.Component {
                 }} loading={(loading) => {
                     this.setState({ loading: loading })
                 }} />
-                <h5 className={this.state.color} id="div1">{i18n.t(this.state.message, { entityname })}</h5>
+                <h5 className={this.state.color} id="div1">{i18n.t(this.state.message, { entityname }) || this.state.supplyPlanError}</h5>
                 <h5 id="div2" className="red">{this.state.consumptionDuplicateError || this.state.consumptionNoStockError || this.state.consumptionError}</h5>
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
                     <CardBody className="pb-lg-4 pt-lg-2">
@@ -357,7 +378,7 @@ export default class ConsumptionDetails extends React.Component {
                                     )} />
 
                         <div className="shipmentconsumptionSearchMarginTop">
-                            {this.state.showConsumption == 1 && <ConsumptionInSupplyPlanComponent ref="consumptionChild" items={this.state} toggleLarge={this.toggleLarge} updateState={this.updateState} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} consumptionPage="consumptionDataEntry" />}
+                            {this.state.showConsumption == 1 && <ConsumptionInSupplyPlanComponent ref="consumptionChild" items={this.state} toggleLarge={this.toggleLarge} updateState={this.updateState} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} consumptionPage="consumptionDataEntry" />}
                             <div className="table-responsive">
                                 <div id="consumptionTable" />
                             </div>
