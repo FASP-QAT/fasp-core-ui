@@ -1394,8 +1394,8 @@ class Consumption extends Component {
       show: false,
       message: '',
       rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-      minDate:{year:  new Date().getFullYear()-3, month: new Date().getMonth()},
-      maxDate:{year:  new Date().getFullYear()+3, month: new Date().getMonth()+1},
+      minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() },
+      maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() + 1 },
       loading: true
 
 
@@ -1917,7 +1917,7 @@ class Consumption extends Component {
     let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
     let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
 
-    if (planningUnitId > 0 && programId > 0 && versionId != -1) {
+    if (planningUnitId > 0 && programId > 0 && versionId != 0) {
       if (versionId.includes('Local')) {
         console.log("------------OFFLINE PART------------");
         var db1;
@@ -2113,7 +2113,7 @@ class Consumption extends Component {
 
         var inputjson = {
           startDate: startDate,
-          stopDate:endDate,
+          stopDate: endDate,
           programId: programId,
           versionId: versionId,
           planningUnitId: planningUnitId,
@@ -2140,7 +2140,7 @@ class Consumption extends Component {
     } else if (programId == -1) {
       this.setState({ message: i18n.t('static.common.selectProgram'), consumptions: [] });
 
-    } else if (versionId == -1) {
+    } else if (versionId == 0) {
       this.setState({ message: i18n.t('static.program.validversion'), consumptions: [] });
 
     } else {
@@ -2153,7 +2153,7 @@ class Consumption extends Component {
   getPrograms() {
     if (navigator.onLine) {
       AuthenticationService.setupAxiosInterceptors();
-         ProgramService.getProgramList()
+      ProgramService.getProgramList()
         .then(response => {
           console.log(JSON.stringify(response.data))
           this.setState({
@@ -2249,82 +2249,90 @@ class Consumption extends Component {
     let programId = document.getElementById("programId").value;
     let versionId = document.getElementById("versionId").value;
     this.setState({
-        planningUnits: [],
-        planningUnitValues: [],
-        planningUnitLabels: []
+      planningUnits: [],
+      planningUnitValues: [],
+      planningUnitLabels: [],
+      offlinePlanningUnitList:[]
     }, () => {
-        if (versionId.includes('Local')) {
-            const lan = 'en';
-            var db1;
-            var storeOS;
-            getDatabase();
-            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-            openRequest.onsuccess = function (e) {
-                db1 = e.target.result;
-                var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
-                var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
-                var planningunitRequest = planningunitOs.getAll();
-                var planningList = []
-                planningunitRequest.onerror = function (event) {
-                    // Handle errors!
-                };
-                planningunitRequest.onsuccess = function (e) {
-                    var myResult = [];
-                    myResult = planningunitRequest.result;
-                    var programId = (document.getElementById("programId").value).split("_")[0];
-                    var proList = []
-                    console.log(myResult)
-                    for (var i = 0; i < myResult.length; i++) {
-                        if (myResult[i].program.id == programId) {
 
-                            proList[i] = myResult[i]
-                        }
-                    }
-                    this.setState({
-                        planningUnits: proList, message: ''
-                    }, () => {
-                        this.filterData();
-                    })
-                }.bind(this);
-            }.bind(this)
+      if (versionId == 0) {
+        this.setState({ message: i18n.t('static.program.validversion'), consumptions: [],offlineConsumptionList:[] });
+      } else {
+        if (versionId.includes('Local')) {
+          alert("in if");
+          const lan = 'en';
+          var db1;
+          var storeOS;
+          getDatabase();
+          var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+          openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+            var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
+            var planningunitRequest = planningunitOs.getAll();
+            var planningList = []
+            planningunitRequest.onerror = function (event) {
+              // Handle errors!
+            };
+            planningunitRequest.onsuccess = function (e) {
+              var myResult = [];
+              myResult = planningunitRequest.result;
+              var programId = (document.getElementById("programId").value).split("_")[0];
+              var proList = []
+              console.log("myResult===============",myResult)
+              for (var i = 0; i < myResult.length; i++) {
+                if (myResult[i].program.id == programId) {
+
+                  proList[i] = myResult[i]
+                }
+              }
+              this.setState({
+                planningUnits: proList, message: '',
+                offlinePlanningUnitList:proList
+              }, () => {
+                this.filterData();
+              })
+            }.bind(this);
+          }.bind(this)
 
 
         }
         else {
-            AuthenticationService.setupAxiosInterceptors();
+          AuthenticationService.setupAxiosInterceptors();
 
-            ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
-                console.log('**' + JSON.stringify(response.data))
-                this.setState({
-                    planningUnits: response.data, message: ''
-                }, () => {
-                    this.filterData();
-                })
+          ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
+            console.log('**' + JSON.stringify(response.data))
+            this.setState({
+              planningUnits: response.data, message: ''
+            }, () => {
+              this.filterData();
             })
-                .catch(
-                    error => {
-                        this.setState({
-                            planningUnits: [],
-                        })
-                        if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
-                        } else {
-                            switch (error.response ? error.response.status : "") {
-                                case 500:
-                                case 401:
-                                case 404:
-                                case 406:
-                                case 412:
-                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
-                                    break;
-                                default:
-                                    this.setState({ message: 'static.unkownError' });
-                                    break;
-                            }
-                        }
-                    }
-                );
+          })
+            .catch(
+              error => {
+                this.setState({
+                  planningUnits: [],
+                })
+                if (error.message === "Network Error") {
+                  this.setState({ message: error.message });
+                } else {
+                  switch (error.response ? error.response.status : "") {
+                    case 500:
+                    case 401:
+                    case 404:
+                    case 406:
+                    case 412:
+                      this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
+                      break;
+                    default:
+                      this.setState({ message: 'static.unkownError' });
+                      break;
+                  }
+                }
+              }
+            );
         }
+      }
     });
   }
   // getProductCategories() {
@@ -2743,7 +2751,7 @@ class Consumption extends Component {
 
                           <Picker
                             ref="pickRange"
-                            years={{min: this.state.minDate, max: this.state.maxDate}}
+                            years={{ min: this.state.minDate, max: this.state.maxDate }}
                             value={rangeValue}
                             lang={pickerLang}
                             //theme="light"
@@ -2788,7 +2796,7 @@ class Consumption extends Component {
                               // onChange={this.filterData}
                               onChange={this.getPlanningUnit}
                             >
-                              <option value="-1">{i18n.t('static.common.select')}</option>
+                              <option value="0">{i18n.t('static.common.select')}</option>
                               {versionList}
                             </Input>
 
@@ -2896,7 +2904,9 @@ class Consumption extends Component {
                                 {offlinePlanningUnitList.length > 0
                                   && offlinePlanningUnitList.map((item, i) => {
                                     return (
-                                      <option key={i} value={item.id}>{item.name}</option>
+                                      <option key={i} value={item.planningUnit.id}>
+                                        {getLabelText(item.planningUnit.label, this.state.lang)}
+                                      </option>
                                     )
                                   }, this)}
                               </Input>

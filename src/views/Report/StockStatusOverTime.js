@@ -109,8 +109,8 @@ class StockStatusOverTime extends Component {
                 date: []
             },
             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate:{year:  new Date().getFullYear()-3, month: new Date().getMonth()},
-            maxDate:{year:  new Date().getFullYear()+3, month: new Date().getMonth()+1},
+            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() },
+            maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() + 1 },
             loading: true
 
 
@@ -484,77 +484,82 @@ class StockStatusOverTime extends Component {
             planningUnitValues: [],
             planningUnitLabels: []
         }, () => {
-            if (versionId.includes('Local')) {
-                const lan = 'en';
-                var db1;
-                var storeOS;
-                getDatabase();
-                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                openRequest.onsuccess = function (e) {
-                    db1 = e.target.result;
-                    var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
-                    var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
-                    var planningunitRequest = planningunitOs.getAll();
-                    var planningList = []
-                    planningunitRequest.onerror = function (event) {
-                        // Handle errors!
-                    };
-                    planningunitRequest.onsuccess = function (e) {
-                        var myResult = [];
-                        myResult = planningunitRequest.result;
-                        var programId = (document.getElementById("programId").value).split("_")[0];
-                        var proList = []
-                        console.log(myResult)
-                        for (var i = 0; i < myResult.length; i++) {
-                            if (myResult[i].program.id == programId) {
 
-                                proList[i] = myResult[i]
+            if (versionId == 0) {
+                this.setState({ message: i18n.t('static.program.validversion'), matricsList: [] });
+            } else {
+                if (versionId.includes('Local')) {
+                    const lan = 'en';
+                    var db1;
+                    var storeOS;
+                    getDatabase();
+                    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                    openRequest.onsuccess = function (e) {
+                        db1 = e.target.result;
+                        var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+                        var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
+                        var planningunitRequest = planningunitOs.getAll();
+                        var planningList = []
+                        planningunitRequest.onerror = function (event) {
+                            // Handle errors!
+                        };
+                        planningunitRequest.onsuccess = function (e) {
+                            var myResult = [];
+                            myResult = planningunitRequest.result;
+                            var programId = (document.getElementById("programId").value).split("_")[0];
+                            var proList = []
+                            console.log(myResult)
+                            for (var i = 0; i < myResult.length; i++) {
+                                if (myResult[i].program.id == programId) {
+
+                                    proList[i] = myResult[i]
+                                }
                             }
-                        }
+                            this.setState({
+                                planningUnits: proList, message: ''
+                            }, () => {
+                                this.fetchData();
+                            })
+                        }.bind(this);
+                    }.bind(this)
+
+
+                }
+                else {
+                    AuthenticationService.setupAxiosInterceptors();
+
+                    ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
+                        console.log('**' + JSON.stringify(response.data))
                         this.setState({
-                            planningUnits: proList, message: ''
+                            planningUnits: response.data, message: ''
                         }, () => {
                             this.fetchData();
                         })
-                    }.bind(this);
-                }.bind(this)
-
-
-            }
-            else {
-                AuthenticationService.setupAxiosInterceptors();
-
-                ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
-                    console.log('**' + JSON.stringify(response.data))
-                    this.setState({
-                        planningUnits: response.data, message: ''
-                    }, () => {
-                        this.fetchData();
                     })
-                })
-                    .catch(
-                        error => {
-                            this.setState({
-                                planningUnits: [],
-                            })
-                            if (error.message === "Network Error") {
-                                this.setState({ message: error.message });
-                            } else {
-                                switch (error.response ? error.response.status : "") {
-                                    case 500:
-                                    case 401:
-                                    case 404:
-                                    case 406:
-                                    case 412:
-                                        this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
-                                        break;
-                                    default:
-                                        this.setState({ message: 'static.unkownError' });
-                                        break;
+                        .catch(
+                            error => {
+                                this.setState({
+                                    planningUnits: [],
+                                })
+                                if (error.message === "Network Error") {
+                                    this.setState({ message: error.message });
+                                } else {
+                                    switch (error.response ? error.response.status : "") {
+                                        case 500:
+                                        case 401:
+                                        case 404:
+                                        case 406:
+                                        case 412:
+                                            this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
+                                            break;
+                                        default:
+                                            this.setState({ message: 'static.unkownError' });
+                                            break;
+                                    }
                                 }
                             }
-                        }
-                    );
+                        );
+                }
             }
         });
 
@@ -1201,7 +1206,7 @@ class StockStatusOverTime extends Component {
 
                                                 <Picker
                                                     ref="pickRange"
-                                                    years={{min: this.state.minDate, max: this.state.maxDate}}
+                                                    years={{ min: this.state.minDate, max: this.state.maxDate }}
                                                     value={rangeValue}
                                                     lang={pickerLang}
                                                     //theme="light"

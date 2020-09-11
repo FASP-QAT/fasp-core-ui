@@ -1228,6 +1228,12 @@ class StockAdjustmentComponent extends Component {
             planningUnitValues: [],
             planningUnitLabels: []
         }, () => {
+            if (versionId == 0) {
+                this.setState({ message: i18n.t('static.program.validversion'), data: [] }, () => {
+                    this.el = jexcel(document.getElementById("tableDiv"), '');
+                    this.el.destroy();
+                });
+            } else {
             if (versionId.includes('Local')) {
                 const lan = 'en';
                 var db1;
@@ -1301,6 +1307,7 @@ class StockAdjustmentComponent extends Component {
                         }
                     );
             }
+        }
         });
 
     }
@@ -1592,7 +1599,7 @@ class StockAdjustmentComponent extends Component {
         console.log("planningUnitIds---", planningUnitIds);
 
 
-        if (programId > 0 && versionId != -1 && this.state.planningUnitValues.length > 0) {
+        if (programId > 0 && versionId != 0 && this.state.planningUnitValues.length > 0) {
             console.log("INSIDE IF-----------------");
             if (versionId.includes('Local')) {
                 startDate = this.state.rangeValue.from.year + '-' + String(this.state.rangeValue.from.month).padStart(2, '0') + '-01';
@@ -1718,7 +1725,7 @@ class StockAdjustmentComponent extends Component {
                 this.el.destroy();
             });
 
-        } else if (versionId == -1) {
+        } else if (versionId == 0) {
             this.setState({ message: i18n.t('static.program.validversion'), data: [] }, () => {
                 this.el = jexcel(document.getElementById("tableDiv"), '');
                 this.el.destroy();
@@ -1964,7 +1971,7 @@ class StockAdjustmentComponent extends Component {
                                                 bsSize="sm"
                                                 onChange={(e) => { this.getPlanningUnit(); }}
                                             >
-                                                <option value="-1">{i18n.t('static.common.select')}</option>
+                                                <option value="0">{i18n.t('static.common.select')}</option>
                                                 {versionList}
                                             </Input>
 

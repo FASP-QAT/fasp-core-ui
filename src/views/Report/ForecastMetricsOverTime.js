@@ -1401,8 +1401,8 @@ class ForcastMatrixOverTime extends Component {
       show: false,
       singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
       rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-      minDate:{year:  new Date().getFullYear()-3, month: new Date().getMonth()},
-      maxDate:{year:  new Date().getFullYear()+3, month: new Date().getMonth()+1},
+      minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() },
+      maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() + 1 },
 
 
     };
@@ -1724,9 +1724,11 @@ class ForcastMatrixOverTime extends Component {
       } else {
 
         this.setState({
-          versions: []
+          versions: [],
+          planningUnits: [],
+          planningUnitValues: []
         })
-
+        this.fetchData();
       }
     } else {
       this.setState({
@@ -1794,77 +1796,84 @@ class ForcastMatrixOverTime extends Component {
     this.setState({
       planningUnits: []
     }, () => {
-      if (versionId.includes('Local')) {
-        const lan = 'en';
-        var db1;
-        var storeOS;
-        getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onsuccess = function (e) {
-          db1 = e.target.result;
-          var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
-          var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
-          var planningunitRequest = planningunitOs.getAll();
-          var planningList = []
-          planningunitRequest.onerror = function (event) {
-            // Handle errors!
-          };
-          planningunitRequest.onsuccess = function (e) {
-            var myResult = [];
-            myResult = planningunitRequest.result;
-            var programId = (document.getElementById("programId").value).split("_")[0];
-            var proList = []
-            console.log(myResult)
-            for (var i = 0; i < myResult.length; i++) {
-              if (myResult[i].program.id == programId) {
 
-                proList[i] = myResult[i]
+      if (versionId == 0) {
+        this.setState({ message: i18n.t('static.program.validversion'), data: [] }, () => {
+          this.setState({ message: i18n.t('static.program.validversion'), matricsList: [] });
+        })
+      } else {
+        if (versionId.includes('Local')) {
+          const lan = 'en';
+          var db1;
+          var storeOS;
+          getDatabase();
+          var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+          openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+            var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
+            var planningunitRequest = planningunitOs.getAll();
+            var planningList = []
+            planningunitRequest.onerror = function (event) {
+              // Handle errors!
+            };
+            planningunitRequest.onsuccess = function (e) {
+              var myResult = [];
+              myResult = planningunitRequest.result;
+              var programId = (document.getElementById("programId").value).split("_")[0];
+              var proList = []
+              console.log(myResult)
+              for (var i = 0; i < myResult.length; i++) {
+                if (myResult[i].program.id == programId) {
+
+                  proList[i] = myResult[i]
+                }
               }
-            }
+              this.setState({
+                planningUnits: proList, message: ''
+              }, () => {
+                this.fetchData();
+              })
+            }.bind(this);
+          }.bind(this)
+
+
+        }
+        else {
+          AuthenticationService.setupAxiosInterceptors();
+
+          ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
+            console.log('**' + JSON.stringify(response.data))
             this.setState({
-              planningUnits: proList, message: ''
+              planningUnits: response.data, message: ''
             }, () => {
               this.fetchData();
             })
-          }.bind(this);
-        }.bind(this)
-
-
-      }
-      else {
-        AuthenticationService.setupAxiosInterceptors();
-
-        ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
-          console.log('**' + JSON.stringify(response.data))
-          this.setState({
-            planningUnits: response.data, message: ''
-          }, () => {
-            this.fetchData();
           })
-        })
-          .catch(
-            error => {
-              this.setState({
-                planningUnits: [],
-              })
-              if (error.message === "Network Error") {
-                this.setState({ message: error.message });
-              } else {
-                switch (error.response ? error.response.status : "") {
-                  case 500:
-                  case 401:
-                  case 404:
-                  case 406:
-                  case 412:
-                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
-                    break;
-                  default:
-                    this.setState({ message: 'static.unkownError' });
-                    break;
+            .catch(
+              error => {
+                this.setState({
+                  planningUnits: [],
+                })
+                if (error.message === "Network Error") {
+                  this.setState({ message: error.message });
+                } else {
+                  switch (error.response ? error.response.status : "") {
+                    case 500:
+                    case 401:
+                    case 404:
+                    case 406:
+                    case 412:
+                      this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
+                      break;
+                    default:
+                      this.setState({ message: 'static.unkownError' });
+                      break;
+                  }
                 }
               }
-            }
-          );
+            );
+        }
       }
     });
 
@@ -1883,8 +1892,8 @@ class ForcastMatrixOverTime extends Component {
     let versionId = document.getElementById("versionId").value;
     let planningUnitId = document.getElementById("planningUnitId").value;
     let monthInCalc = document.getElementById("viewById").value;
-    let startDate = this.state.rangeValue.from.year + '-' +  this.state.rangeValue.from.month+ '-01';
-    let stopDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month+ '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
+    let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
+    let stopDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
 
     var input = { "programId": programId, "versionId": versionId, "planningUnitId": planningUnitId, "startDate": startDate, "stopDate": stopDate, "previousMonths": monthInCalc }
     if (programId > 0 && planningUnitId > 0 && versionId != 0) {
@@ -2195,7 +2204,7 @@ class ForcastMatrixOverTime extends Component {
 
                               <Picker
                                 ref="pickRange"
-                                years={{min: this.state.minDate, max: this.state.maxDate}}
+                                years={{ min: this.state.minDate, max: this.state.maxDate }}
                                 value={rangeValue}
                                 lang={pickerLang}
                                 //theme="light"
@@ -2304,7 +2313,7 @@ class ForcastMatrixOverTime extends Component {
                                   bsSize="sm"
                                   onChange={(e) => { this.getPlanningUnit(); }}
                                 >
-                                  <option value="-1">{i18n.t('static.common.select')}</option>
+                                  <option value="0">{i18n.t('static.common.select')}</option>
                                   {versionList}
                                 </Input>
 
