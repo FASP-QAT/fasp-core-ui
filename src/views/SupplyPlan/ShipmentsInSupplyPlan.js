@@ -165,16 +165,15 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             active: bResult[k].active
                                         }
                                         budgetList.push(bJson);
-                                        budgetListAll.push({
-                                            name: bResult[k].budgetCode,
-                                            id: bResult[k].budgetId,
-                                            fundingSource: bResult[k].fundingSource,
-                                            currency: bResult[k].currency,
-                                            budgetAmt: bResult[k].budgetAmt,
-                                            active: bResult[k].active
-                                        })
                                     }
-
+                                    budgetListAll.push({
+                                        name: bResult[k].budgetCode,
+                                        id: bResult[k].budgetId,
+                                        fundingSource: bResult[k].fundingSource,
+                                        currency: bResult[k].currency,
+                                        budgetAmt: bResult[k].budgetAmt,
+                                        active: bResult[k].active
+                                    })
                                 }
 
                                 this.setState({
