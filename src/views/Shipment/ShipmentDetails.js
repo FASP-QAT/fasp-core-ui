@@ -43,17 +43,50 @@ export default class ShipmentDetails extends React.Component {
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this)
         this.formSubmit = this.formSubmit.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
-        this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.toggleLarge = this.toggleLarge.bind(this);
         this.updateState = this.updateState.bind(this);
+        this.hideFirstComponent = this.hideFirstComponent.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.hideThirdComponent = this.hideThirdComponent.bind(this);
+        this.hideFourthComponent = this.hideFourthComponent.bind(this);
+        this.hideFifthComponent = this.hideFifthComponent.bind(this);
     }
 
     hideFirstComponent() {
         document.getElementById('div1').style.display = 'block';
-        this.timeout = setTimeout(function () {
+        this.state.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
         }, 8000);
     }
+
+    hideSecondComponent() {
+        document.getElementById('div2').style.display = 'block';
+        this.state.timeout = setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
+    }
+
+    hideThirdComponent() {
+        document.getElementById('div3').style.display = 'block';
+        this.state.timeout = setTimeout(function () {
+            document.getElementById('div3').style.display = 'none';
+        }, 8000);
+    }
+
+    hideFourthComponent() {
+        document.getElementById('div4').style.display = 'block';
+        this.state.timeout = setTimeout(function () {
+            document.getElementById('div4').style.display = 'none';
+        }, 8000);
+    }
+
+    hideFifthComponent(){
+        document.getElementById('div5').style.display = 'block';
+        this.state.timeout = setTimeout(function () {
+            document.getElementById('div5').style.display = 'none';
+        }, 8000);
+    }
+
     componentWillUnmount() {
         clearTimeout(this.timeout);
     }
@@ -67,6 +100,7 @@ export default class ShipmentDetails extends React.Component {
                 message: i18n.t('static.program.errortext'),
                 color: 'red'
             })
+            this.hideFirstComponent()
         }.bind(this);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
@@ -79,6 +113,7 @@ export default class ShipmentDetails extends React.Component {
                     message: i18n.t('static.program.errortext'),
                     color: 'red'
                 })
+                this.hideFirstComponent()
             }.bind(this);
             getRequest.onsuccess = function (event) {
                 var myResult = [];
@@ -140,6 +175,7 @@ export default class ShipmentDetails extends React.Component {
                     message: i18n.t('static.program.errortext'),
                     color: 'red'
                 })
+                this.hideFirstComponent()
             }.bind(this);
             openRequest.onsuccess = function (e) {
                 db1 = e.target.result;
@@ -152,6 +188,7 @@ export default class ShipmentDetails extends React.Component {
                         message: i18n.t('static.program.errortext'),
                         color: 'red'
                     })
+                    this.hideFirstComponent()
                 }.bind(this);
                 planningunitRequest.onsuccess = function (e) {
                     var myResult = [];
@@ -212,6 +249,7 @@ export default class ShipmentDetails extends React.Component {
                     message: i18n.t('static.program.errortext'),
                     color: 'red'
                 })
+                this.hideFirstComponent()
             }.bind(this);
             openRequest.onsuccess = function (e) {
                 db1 = e.target.result;
@@ -223,6 +261,7 @@ export default class ShipmentDetails extends React.Component {
                         message: i18n.t('static.program.errortext'),
                         color: 'red'
                     })
+                    this.hideFirstComponent()
                 }.bind(this);
                 programRequest.onsuccess = function (event) {
                     var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
@@ -262,7 +301,10 @@ export default class ShipmentDetails extends React.Component {
         this.setState({
             shipmentBatchInfoChangedFlag: 0,
             shipmentBatchInfoDuplicateError: '',
-            shipmentValidationBatchError: ''
+            shipmentValidationBatchError: '',
+            qtyCalculatorValidationError: "",
+            shipmentDatesError: "",
+
         })
         this.setState({
             batchInfo: !this.state.batchInfo,
@@ -274,6 +316,7 @@ export default class ShipmentDetails extends React.Component {
             message: i18n.t('static.message.cancelled'),
             color: 'red',
         })
+        this.hideFirstComponent()
         this.toggleLarge();
     }
 
@@ -293,8 +336,8 @@ export default class ShipmentDetails extends React.Component {
                 }} loading={(loading) => {
                     this.setState({ loading: loading })
                 }} />
-                <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
-                <h5 className={this.state.color} id="div1">{i18n.t(this.state.message, { entityname })}</h5>
+                <h5 className={this.state.color} id="div1">{i18n.t(this.state.message, { entityname }) || this.state.supplyPlanError}</h5>
+                <h5 className="red" id="div2">{this.state.noFundsBudgetError || this.state.shipmentBatchError || this.state.shipmentError}</h5>
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
                     <CardBody className="pb-lg-4 pt-lg-2">
                         <Formik
@@ -338,8 +381,7 @@ export default class ShipmentDetails extends React.Component {
                                     )} />
 
                         <div className="shipmentconsumptionSearchMarginTop">
-                            {this.state.showShipments == 1 && <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} updateState={this.updateState} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} shipmentPage="shipmentDataEntry" />}
-                            <h6 className="red">{this.state.noFundsBudgetError || this.state.shipmentBatchError || this.state.shipmentError || this.state.supplyPlanError}</h6>
+                            {this.state.showShipments == 1 && <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} updateState={this.updateState} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} hideFourthComponent={this.hideFourthComponent} hideFifthComponent={this.hideFifthComponent} shipmentPage="shipmentDataEntry" />}
                             <div className="table-responsive">
                                 <div id="shipmentsDetailsTable" />
                             </div>
@@ -360,7 +402,7 @@ export default class ShipmentDetails extends React.Component {
                         <strong>{this.state.shipmentModalTitle}</strong>
                     </ModalHeader>
                     <ModalBody>
-                        <h6 className="red">{this.state.qtyCalculatorValidationError}</h6>
+                        <h6 className="red" id="div3">{this.state.qtyCalculatorValidationError}</h6>
                         <div className="table-responsive">
                             <div id="qtyCalculatorTable"></div>
                         </div>
@@ -368,11 +410,11 @@ export default class ShipmentDetails extends React.Component {
                         <div className="table-responsive">
                             <div id="qtyCalculatorTable1"></div>
                         </div>
-                        <h6 className="red">{this.state.shipmentDatesError}</h6>
+                        <h6 className="red" id="div4">{this.state.shipmentDatesError}</h6>
                         <div className="table-responsive">
                             <div id="shipmentDatesTable"></div>
                         </div>
-                        <h6 className="red">{this.state.shipmentBatchInfoDuplicateError || this.state.shipmentValidationBatchError}</h6>
+                        <h6 className="red" id="div5">{this.state.shipmentBatchInfoDuplicateError || this.state.shipmentValidationBatchError}</h6>
                         <div className="table-responsive">
                             <div id="shipmentBatchInfoTable" className="AddListbatchtrHeight"></div>
                         </div>

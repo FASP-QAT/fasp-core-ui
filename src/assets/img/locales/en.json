@@ -1097,7 +1097,7 @@
     "static.pipeline.programData": "Program Data",
     "static.pipeline.save": "Save",
     "static.pipelineProgram.programId": "Program Id",
-    "static.pipelineProgram.user": "USER",
+    "static.pipelineProgram.user": "User",
     "static.pipelineProgram.fileName": "File Name",
     "static.pipelineProgram.importDate": "Import Date",
     "static.program.fileinputjson": "File Input(File must be .json format)",
@@ -1128,5 +1128,6 @@
     "static.graph.costInUSD": "Cost (USD)",
     "static.commit.shipmentTransId": "Shipment trans id",
     "static.supplyPlan.addNewInventory":"Add New Inventory",
-    "static.manualtagging.result":"Please enter order no. and prime line no."
+    "static.manualtagging.result":"Please enter order no. and prime line no.",
+    "static.message.pipeline.programExists":"File with same program name is already imported ."
 }

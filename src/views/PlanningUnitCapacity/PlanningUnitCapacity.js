@@ -694,6 +694,7 @@ import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
 import moment from "moment";
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
+import { JEXCEL_DATE_FORMAT } from "../../Constants";
 
 let initialValues = {
     startDate: '',
@@ -792,9 +793,9 @@ class PlanningUnitCapacity extends Component {
                             // }
                         }
                         ,
-                        startDate: map1.get("2"),
+                        startDate: moment(map1.get("2")).format("YYYY-MM-DD"),
 
-                        stopDate: map1.get("3"),
+                        stopDate: moment(map1.get("3")).format("YYYY-MM-DD"),
 
                         capacity: map1.get("4"),
                         active: map1.get("5"),
@@ -938,7 +939,7 @@ class PlanningUnitCapacity extends Component {
                     title: "Start Date",
                     type: 'calendar',
                     options: {
-                        format: 'YYYY-MM-DD'
+                        format: JEXCEL_DATE_FORMAT
                     }
 
                 },
@@ -946,7 +947,7 @@ class PlanningUnitCapacity extends Component {
                     title: "End Date",
                     type: 'calendar',
                     options: {
-                        format: 'YYYY-MM-DD'
+                        format: JEXCEL_DATE_FORMAT
                     }
                 },
                 {

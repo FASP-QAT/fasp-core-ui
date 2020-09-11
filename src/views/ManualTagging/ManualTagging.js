@@ -718,7 +718,8 @@ export default class ManualTagging extends Component {
                     // console.log("--------->",response.data[0].reason);
                     this.setState({
                         reason: response.data.reason,
-                        artmisList
+                        artmisList,
+                        result : ''
                     })
                 })
         } else {
@@ -755,7 +756,7 @@ export default class ManualTagging extends Component {
                     console.log("manual tagging response===", response);
                     this.setState({
                         outputList: response.data,
-                        message: ''
+                        // message: ''
                     }, () => {
                         this.buildJExcel();
                     });

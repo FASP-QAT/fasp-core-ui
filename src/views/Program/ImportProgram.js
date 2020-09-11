@@ -174,7 +174,8 @@ export default class ImportProgram extends Component {
                                 message: i18n.t('static.program.dataimportsuccess'),
                                 loading: false
                             })
-                            this.props.history.push(`/dashboard/` + 'green/' + i18n.t('static.program.dataimportsuccess'))
+                            let id = AuthenticationService.displayDashboardBasedOnRole();
+                            this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.program.dataimportsuccess'))
                         } else {
                             confirmAlert({
                                 title: i18n.t('static.program.confirmsubmit'),
@@ -221,7 +222,8 @@ export default class ImportProgram extends Component {
                                                 message: i18n.t('static.program.dataimportsuccess'),
                                                 loading: false
                                             })
-                                            this.props.history.push(`/dashboard/` + 'green/' + i18n.t('static.program.dataimportsuccess'))
+                                            let id = AuthenticationService.displayDashboardBasedOnRole();
+                                            this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.program.dataimportsuccess'))
                                         }
                                     },
                                     {
