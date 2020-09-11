@@ -2259,7 +2259,7 @@ class Consumption extends Component {
         this.setState({ message: i18n.t('static.program.validversion'), consumptions: [],offlineConsumptionList:[] });
       } else {
         if (versionId.includes('Local')) {
-          alert("in if");
+          // alert("in if");
           const lan = 'en';
           var db1;
           var storeOS;
