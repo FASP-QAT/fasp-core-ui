@@ -147,31 +147,26 @@ class AddUserComponent extends Component {
         let { user } = this.state;
         let count = 0;
         let count1 = 0;
-        // this.setState({ roleId });
-        // var roleIdArray = [];
         console.log("roles---",this.state.user.roles);
         for (var i = 0; i < this.state.user.roles.length; i++) {
             if (this.state.user.roles[i] != 'ROLE_APPLICATION_ADMIN') {
                 count++;
-                // showRealm
             } else {
                 count1++;
             }
         }
         if (count > 0) {
-            console.log("--------1-----------")
             this.setState({
                 showRealmValidation: (this.state.user.realm.realmId != '' ? false : true)
             },
-                () => { console.log("show--------------" + this.state.showRealmValidation) });
+                () => {  });
 
             document.getElementById("showRealm").value = true;
         } else {
-            console.log("--------2-----------")
             this.setState({
                 showRealmValidation: false
             },
-                () => { console.log("show--------------" + this.state.showRealmValidation) });
+                () => {  });
 
             document.getElementById("showRealm").value = false;
         }
@@ -219,14 +214,10 @@ class AddUserComponent extends Component {
         }
 
         if (count > 0) {
-            console.log("realm id---", this.state.user.realm.realmId);
-            // if (this.state.user.realm.realmId != '0') {
             this.setState({
                 showRealmValidation: (this.state.user.realm.realmId != '' ? false : true)
             },
-                () => { console.log("show--------------" + this.state.showRealmValidation) });
-            // }
-            console.log("inside if");
+                () => {  });
             document.getElementById("showRealm").value = true;
             if (count1 > 0) {
                 this.setState({
@@ -450,6 +441,7 @@ class AddUserComponent extends Component {
                                     this.setState({
                                         message: ''
                                     })
+                                    console.log("user object---------------------",this.state.user);
                                     UserService.addNewUser(this.state.user)
                                         .then(response => {
                                             if (response.status == 200) {

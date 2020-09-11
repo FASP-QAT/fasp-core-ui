@@ -241,7 +241,7 @@ export default class SupplyPlanComponent extends React.Component {
         }, 8000);
     }
 
-    hideFifthComponent(){
+    hideFifthComponent() {
         document.getElementById('div5').style.display = 'block';
         this.state.timeout = setTimeout(function () {
             document.getElementById('div5').style.display = 'none';
@@ -1314,7 +1314,7 @@ export default class SupplyPlanComponent extends React.Component {
                             <strong>{i18n.t('static.supplyPlan.shipmentsDetails')} -  {i18n.t('static.planningunit.planningunit')} - {this.state.planningUnitName} </strong>
                         </ModalHeader>
                         <ModalBody>
-                            {this.state.showShipments && <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent}  hideFourthComponent={this.hideFourthComponent} hideFifthComponent={this.hideFifthComponent} shipmentPage="supplyPlan" />}
+                            {this.state.showShipments && <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} hideFourthComponent={this.hideFourthComponent} hideFifthComponent={this.hideFifthComponent} shipmentPage="supplyPlan" />}
                             <h6 className="red" id="div2">{this.state.noFundsBudgetError || this.state.shipmentBatchError || this.state.shipmentError}</h6>
                             <div className="table-responsive">
                                 <div id="shipmentsDetailsTable" />
@@ -2475,7 +2475,7 @@ export default class SupplyPlanComponent extends React.Component {
             showShipments: 0,
             showInventory: 0,
             showConsumption: 0,
-            loading:false
+            loading: false
 
         },
             () => {
