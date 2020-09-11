@@ -331,7 +331,7 @@ export default class AddHealthAreaComponent extends Component {
                             <FormFeedback>{errors.realmId}</FormFeedback>
                           </FormGroup>
 
-                          <FormGroup>
+                          <FormGroup className="Selectcontrol-bdrNone">
                             <Label htmlFor="realmCountryId">{i18n.t('static.healtharea.realmcountry')}<span class="red Reqasterisk">*</span></Label>
                             <Select
                               className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
