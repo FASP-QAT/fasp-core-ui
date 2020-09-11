@@ -3821,7 +3821,7 @@ class ProcurementAgentExport extends Component {
                             }
                         </Offline>
                     </div>
-                    <CardBody className="pt-lg-0 pb-lg-5">
+                    <CardBody className="pt-lg-2 pb-lg-5">
 
                         <div className="pl-0">
                             <div className="row ">
