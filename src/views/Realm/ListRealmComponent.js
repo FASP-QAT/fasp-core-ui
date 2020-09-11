@@ -431,7 +431,7 @@ export default class ReactListComponent extends Component {
                                 if (y != null) {
                                     if (obj.options.allowInsertRow == true) {
                                         items.push({
-                                            title: 'map realm country',
+                                            title: 'Map Realm Country',
                                             onclick: function () {
                                                 // console.log("onclick------>", this.el.getValueFromCoords(0, y));
                                                 if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_REALM_COUNTRY')) {

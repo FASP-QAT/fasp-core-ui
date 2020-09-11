@@ -542,7 +542,7 @@ export default class EditProgram extends Component {
                                                         <FormFeedback>{errors.realmCountryId}</FormFeedback>
 
                                                     </FormGroup>
-                                                    <FormGroup >
+                                                    <FormGroup className="Selectcontrol-bdrNone">
                                                         <Label htmlFor="select">{i18n.t('static.program.region')}<span class="red Reqasterisk">*</span></Label>
                                                         <Select
                                                             className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
