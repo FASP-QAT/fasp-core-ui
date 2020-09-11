@@ -644,6 +644,7 @@ class DefaultLayout extends Component {
 
 
   render() {
+    console.log('in I18n defaultlayout')
     return (
       <div className="app">
         <AppHeader fixed>
