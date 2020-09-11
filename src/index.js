@@ -5,8 +5,9 @@ import './polyfill'
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
+//import './i18n';
 import App from './App';
-import './i18n';
+
 import favicon from '../src/assets/img/favicon.ico';
 import manifest from '../src/assets/img/manifest.json';
 import img192 from '../src/assets/img/QAT-logo192x192.png';
