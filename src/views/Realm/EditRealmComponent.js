@@ -152,6 +152,9 @@ export default class UpdateDataSourceComponent extends Component {
         else if (event.target.name === "defaultRealm") {
             realm.defaultRealm = event.target.id === "active2" ? false : true
         }
+        if (event.target.name == "active") {
+            realm.active = event.target.id === "active3" ? false : true;
+        }
         this.setState(
             {
                 realm
@@ -243,7 +246,7 @@ export default class UpdateDataSourceComponent extends Component {
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     this.setState({
                                         loading: true
-                                        })
+                                    })
                                     AuthenticationService.setupAxiosInterceptors();
                                     RealmService.updateRealm(this.state.realm)
                                         .then(response => {
@@ -417,6 +420,41 @@ export default class UpdateDataSourceComponent extends Component {
                                                                 name="defaultRealm"
                                                                 value={false}
                                                                 checked={this.state.realm.defaultRealm === false}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            />
+                                                            <Label
+                                                                className="form-check-label"
+                                                                check htmlFor="inline-radio2">
+                                                                {i18n.t('static.common.disabled')}
+                                                            </Label>
+                                                        </FormGroup>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label className="P-absltRadio">{i18n.t('static.common.status')}  </Label>
+                                                        <FormGroup check inline>
+                                                            <Input
+                                                                className="form-check-input"
+                                                                type="radio"
+                                                                id="active1"
+                                                                name="active"
+                                                                value={true}
+                                                                checked={this.state.realm.active === true}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            />
+                                                            <Label
+                                                                className="form-check-label"
+                                                                check htmlFor="inline-radio1">
+                                                                {i18n.t('static.common.active')}
+                                                            </Label>
+                                                        </FormGroup>
+                                                        <FormGroup check inline>
+                                                            <Input
+                                                                className="form-check-input"
+                                                                type="radio"
+                                                                id="active3"
+                                                                name="active"
+                                                                value={false}
+                                                                checked={this.state.realm.active === false}
                                                                 onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             />
                                                             <Label

@@ -1129,5 +1129,8 @@
     "static.commit.shipmentTransId": "Shipment trans id",
     "static.supplyPlan.addNewInventory":"Add New Inventory",
     "static.manualtagging.result":"Please enter order no. and prime line no.",
-    "static.message.pipeline.programExists":"File with same program name is already imported ."
+    "static.message.pipeline.programExists":"File with same program name is already imported .",
+    "static.dashboard.programimport":"Pipeline Program Import",
+    "static.dashboard.setupprogram":"Setup Program",
+    "static.dashboard.pipelineprogramlist":"Pipeline Program List"
 }

@@ -695,7 +695,6 @@ export default class ManualTagging extends Component {
 
         ManualTaggingService.linkShipmentWithARTMIS(orderNo, primeLineNo, this.state.shipmentId)
             .then(response => {
-                console.log("link response===", response);
                 this.setState({
                     message: i18n.t('static.shipment.linkingsuccess')
                 })
