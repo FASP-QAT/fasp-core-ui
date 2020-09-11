@@ -45,8 +45,6 @@ const validationSchema = function (values) {
         roleId: Yup.string()
             .test('roleValid', i18n.t('static.common.roleinvalidtext'),
                 function (value) {
-                    console.log("value---", value);
-                    console.log("condition---", document.getElementById("roleValid").value);
                     if (document.getElementById("roleValid").value == "false") {
                         console.log("inside if ---", value);
                         return true;
@@ -227,6 +225,7 @@ class EditUserComponent extends Component {
     }
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
+        document.getElementById("roleValid").value = false;
         // console.log("USERID --> ", this.props.match.params.userId);
         UserService.getUserByUserId(this.props.match.params.userId).then(response => {
             if (response.status == 200) {
