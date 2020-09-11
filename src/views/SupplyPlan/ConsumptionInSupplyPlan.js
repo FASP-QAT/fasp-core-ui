@@ -5,7 +5,7 @@ import i18n from '../../i18n';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunctionOnlyHideRow, checkValidtion, inValid, positiveValidation, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { SECRET_KEY, INTEGER_NO_REGEX, INDEXED_DB_VERSION, INDEXED_DB_NAME, DATE_FORMAT_CAP, ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE } from "../../Constants";
+import { SECRET_KEY, INTEGER_NO_REGEX, INDEXED_DB_VERSION, INDEXED_DB_NAME, DATE_FORMAT_CAP, ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE, JEXCEL_DATE_FORMAT_WITHOUT_DATE } from "../../Constants";
 import moment from "moment";
 import CryptoJS from 'crypto-js'
 import { calculateSupplyPlan } from "./SupplyPlanCalculations";
@@ -47,6 +47,8 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
             this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+            this.props.updateState("color", "red");
+            this.props.hideFirstComponent();
         }.bind(this);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
@@ -55,6 +57,8 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             var rcpuRequest = rcpuOs.getAll();
             rcpuRequest.onerror = function (event) {
                 this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+                this.props.updateState("color", "red");
+                this.props.hideFirstComponent();
             }.bind(this);
             rcpuRequest.onsuccess = function (event) {
                 var rcpuResult = [];
@@ -79,6 +83,8 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                 var dataSourceRequest = dataSourceOs.getAll();
                 dataSourceRequest.onerror = function (event) {
                     this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+                    this.props.updateState("color", "red");
+                    this.props.hideFirstComponent();
                 }.bind(this);
                 dataSourceRequest.onsuccess = function (event) {
                     var dataSourceResult = [];
@@ -185,7 +191,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         data: consumptionDataArr,
                         columnDrag: true,
                         columns: [
-                            { title: i18n.t('static.pipeline.consumptionDate'), type: 'calendar', options: { format: 'MM-YYYY' }, width: 85, readOnly: readonlyRegionAndMonth },
+                            { title: i18n.t('static.pipeline.consumptionDate'), type: 'calendar', options: { format: JEXCEL_DATE_FORMAT_WITHOUT_DATE }, width: 85, readOnly: readonlyRegionAndMonth },
                             { title: i18n.t('static.region.region'), type: 'dropdown', readOnly: readonlyRegionAndMonth, source: this.props.items.regionList, width: 100 },
                             { type: 'dropdown', title: i18n.t('static.consumption.consumptionType'), source: [{ id: 1, name: i18n.t('static.consumption.actual') }, { id: 2, name: i18n.t('static.consumption.forcast') }], width: 100 },
                             { title: i18n.t('static.inventory.dataSource'), type: 'dropdown', source: dataSourceList, width: 100, filter: this.filterDataSourceBasedOnConsumptionType },
@@ -585,6 +591,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                 }
                 valid = false;
                 this.props.updateState("consumptionBatchInfoDuplicateError", i18n.t('static.supplyPlan.duplicateBatchNumber'));
+                this.props.hideThirdComponent();
             } else {
                 // var programJson = this.state.programJsonAfterConsumptionClicked;
                 // var shipmentList = programJson.shipmentList;
@@ -727,6 +734,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         } else {
             this.props.updateState("consumptionBatchError", i18n.t('static.supplyPlan.validationFailed'));
             this.props.updateState("loading", false);
+            this.props.hideThirdComponent();
         }
     }
 
@@ -757,6 +765,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                 }
                 valid = false;
                 this.props.updateState("consumptionDuplicateError", i18n.t('static.supplyPlan.duplicateConsumption'));
+                this.props.hideSecondComponent();
             } else {
                 var colArr = ['E'];
                 for (var c = 0; c < colArr.length; c++) {
@@ -824,9 +833,9 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             getDatabase();
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
             openRequest.onerror = function (event) {
-                this.setState({
-                    supplyPlanError: i18n.t('static.program.errortext')
-                })
+                this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+                this.props.updateState("color", "red");
+                this.props.hideFirstComponent();
             }.bind(this);
             openRequest.onsuccess = function (e) {
                 console.log("in success")
@@ -845,9 +854,9 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
 
                 var programRequest = programTransaction.get(programId);
                 programRequest.onerror = function (event) {
-                    this.setState({
-                        supplyPlanError: i18n.t('static.program.errortext')
-                    })
+                    this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+                    this.props.updateState("color", "red");
+                    this.props.hideFirstComponent();
                 }.bind(this);
                 programRequest.onsuccess = function (event) {
                     var programDataBytes = CryptoJS.AES.decrypt((programRequest.result).programData, SECRET_KEY);
@@ -918,6 +927,8 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
 
                     putRequest.onerror = function (event) {
                         this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+                        this.props.updateState("color", "red");
+                        this.props.hideFirstComponent();
                     }.bind(this);
                     putRequest.onsuccess = function (event) {
                         var programId = (document.getElementById("programId").value)
@@ -935,6 +946,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         } else {
             this.props.updateState("consumptionError", i18n.t('static.supplyPlan.validationFailed'));
             this.props.updateState("loading", false);
+            this.props.hideSecondComponent();
         }
     }
 

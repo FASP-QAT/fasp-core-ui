@@ -11,6 +11,9 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
     getDatabase();
     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
     openRequest.onerror = function (event) {
+        this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+        this.props.updateState("color", "red");
+        this.props.hideFirstComponent();
     }.bind(this);
     openRequest.onsuccess = function (e) {
         db1 = e.target.result;
@@ -18,6 +21,9 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
         var programDataOs = programDataTransaction.objectStore(objectStoreName);
         var programRequest = programDataOs.get(programId);
         programRequest.onerror = function (event) {
+            this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+            this.props.updateState("color", "red");
+            this.props.hideFirstComponent();
         }.bind(this);
         programRequest.onsuccess = function (e) {
             var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
@@ -29,6 +35,9 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
             var planningList = []
             var realmCountryPlanningUnitList = []
             planningunitRequest.onerror = function (event) {
+                this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+                this.props.updateState("color", "red");
+                this.props.hideFirstComponent();
             }.bind(this);
             planningunitRequest.onsuccess = function (e) {
                 var myResult = [];
@@ -54,6 +63,9 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                 var shipmentStatusOs = shipmentStatusTransaction.objectStore('shipmentStatus');
                 var shipmentStatusRequest = shipmentStatusOs.getAll();
                 shipmentStatusRequest.onerror = function (event) {
+                    this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+                    this.props.updateState("color", "red");
+                    this.props.hideFirstComponent();
                 }.bind(this);
                 shipmentStatusRequest.onsuccess = function (event) {
                     var shipmentStatusResult = [];
@@ -62,6 +74,9 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                     var papuOs = papuTransaction.objectStore('procurementAgent');
                     var papuRequest = papuOs.getAll();
                     papuRequest.onerror = function (event) {
+                        this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+                        this.props.updateState("color", "red");
+                        this.props.hideFirstComponent();
                     }.bind(this);
                     papuRequest.onsuccess = function (event) {
                         var papuResult = [];
@@ -71,6 +86,8 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                         var rcpuRequest = rcpuOs.getAll();
                         rcpuRequest.onerror = function (event) {
                             this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+                            this.props.updateState("color", "red");
+                            this.props.hideFirstComponent();
                         }.bind(this);
                         rcpuRequest.onsuccess = function (event) {
                             var rcpuResult = [];
@@ -545,7 +562,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                         consumptionType: consumptionType,
                                         textColor: textColor
                                     }
-                                    
+
                                     console.log("Qty after consumption");
 
 
@@ -560,7 +577,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     var unallocatedAdjustmentQty = 0;
                                     var regionsReportingActualInventory = 0;
                                     for (var r = 0; r < totalNoOfRegions; r++) {
-                                        var inventoryListForRegion = inventoryList.filter(c => c.region != null  && c.region.id !=0 && c.region.id == regionList[r].id);
+                                        var inventoryListForRegion = inventoryList.filter(c => c.region != null && c.region.id != 0 && c.region.id == regionList[r].id);
                                         console.log("inventiryListForRegion", inventoryListForRegion);
                                         var noOfEntriesOfActualStockCount = (inventoryListForRegion.filter(c => c.actualQty != 0 && c.actualQty != null && c.actualQty != "")).length;
                                         if (noOfEntriesOfActualStockCount > 0) {
@@ -912,7 +929,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
 
                                         var adjustmentsQtyForRegion = 0;
                                         var actualQtyForRegion = 0;
-                                        var inventoryListForRegionalDetails = inventoryListForRegion.filter(c => c.region != null  && c.region.id !=0 && c.region.id == regionListFiltered[r].id);
+                                        var inventoryListForRegionalDetails = inventoryListForRegion.filter(c => c.region != null && c.region.id != 0 && c.region.id == regionListFiltered[r].id);
                                         var actualCount = 0;
                                         var adjustmentsCount = 0;
                                         for (var cr = 0; cr < inventoryListForRegionalDetails.length; cr++) {
@@ -1002,6 +1019,9 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                             var programDataOs = programDataTransaction.objectStore(objectStoreName);
                             var putRequest = programDataOs.put(programRequest.result);
                             putRequest.onerror = function (event) {
+                                this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+                                this.props.updateState("color", "red");
+                                this.props.hideFirstComponent();
                             }.bind(this);
                             putRequest.onsuccess = function (event) {
                                 console.log("Time taken", performance.now())

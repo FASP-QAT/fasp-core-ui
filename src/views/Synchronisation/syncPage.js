@@ -2113,7 +2113,7 @@ export default class syncPage extends Component {
           this.setState({ loading: loading })
         }} />
         <h5>{i18n.t(this.state.message, { entityname })}</h5>
-        <h6 className="red">{this.state.commitVersionError}</h6>
+        <h5 className="red">{this.state.commitVersionError}</h5>
         <Row style={{ display: this.state.loading ? "none" : "block" }}>
           <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
             <Card>

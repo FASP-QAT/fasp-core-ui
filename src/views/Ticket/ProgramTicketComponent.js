@@ -584,7 +584,7 @@ export default class ProgramTicketComponent extends Component {
                                             </Input>
                                         <FormFeedback className="red">{errors.realmCountryId}</FormFeedback>
                                     </FormGroup>
-                                    < FormGroup >
+                                    < FormGroup className="Selectcontrol-bdrNone">
                                         <Label for="regionId">{i18n.t('static.program.region')}<span class="red Reqasterisk">*</span></Label>
                                         <Select 
                                             className={classNames('form-control', 'd-block', 'w-100', 'bg-light',

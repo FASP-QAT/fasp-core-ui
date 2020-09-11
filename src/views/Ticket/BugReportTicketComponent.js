@@ -226,11 +226,11 @@ export default class BugReportTicketComponent extends Component {
                                             required />
                                         <FormFeedback className="red">{errors.description}</FormFeedback>
                                     </FormGroup>
-                                    <FormGroup className="pr-1 pl-1" >
+                                    <FormGroup >
                                         <Col>
                                             <Label className="uploadfilelable" htmlFor="attachFile">Upload Screenshot<span class="red Reqasterisk">*</span></Label>
                                         </Col>
-                                        <Col xs="12" className="custom-file">                                            
+                                        <div className="custom-file">                                            
                                             <Input type="file" className="custom-file-input" id="attachFile" name="attachFile" accept=".zip,.png"
                                                 valid={!errors.attachFile && this.state.bugReport.attachFile != ''}
                                                 invalid={touched.attachFile && !!errors.attachFile}
@@ -239,7 +239,7 @@ export default class BugReportTicketComponent extends Component {
                                             />
                                             <label className="custom-file-label" id="attachFile">{this.state.bugReport.attachFile}</label>                                            
                                             <FormFeedback className="red">{errors.attachFile}</FormFeedback>
-                                        </Col>
+                                        </div>
                                     </FormGroup>
                                     <ModalFooter className="pr-0 pb-0">
                                         

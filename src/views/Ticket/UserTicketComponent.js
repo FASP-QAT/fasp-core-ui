@@ -506,7 +506,7 @@ export default class UserTicketComponent extends Component {
                                             required />
                                         <FormFeedback className="red">{errors.phoneNumber}</FormFeedback>
                                     </FormGroup>
-                                    <FormGroup>
+                                    <FormGroup className="Selectcontrol-bdrNone">
                                         <Label for="role">{i18n.t('static.role.role')}<span class="red Reqasterisk">*</span></Label>
                                         <Select
                                             className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
