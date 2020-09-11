@@ -552,7 +552,7 @@ export default class AddProgram extends Component {
 
                                                         <FormFeedback>{errors.realmCountryId}</FormFeedback>
                                                     </FormGroup>
-                                                    <FormGroup >
+                                                    <FormGroup className="Selectcontrol-bdrNone">
                                                         <Label htmlFor="select">{i18n.t('static.program.region')}<span class="red Reqasterisk">*</span><span class="red Reqasterisk">*</span></Label>
 
                                                         <Select

@@ -2,10 +2,9 @@ import React, { Component } from 'react';
 import { HashRouter, Route, Switch } from 'react-router-dom';
 // import { renderRoutes } from 'react-router-config';
 import './App.scss';
-//import  './i18n'
+import  './i18n'
 import ResetPasswordComponent from './views/Pages/Login/ResetPasswordComponent';
 import UpdateExpiredPasswordComponent from './views/Pages/Login/UpdateExpiredPasswordComponent';
-import i18n from './i18n'
 import 'react-app-polyfill/stable';
 
 const loading = () => <div className="animated fadeIn pt-3 text-center"><div className="sk-spinner sk-spinner-pulse"></div></div>;
@@ -42,7 +41,7 @@ class App extends Component {
             <Route exact path="/updateExpiredPassword" exact name="Update expired password" render={props => <UpdateExpiredPassword {...props} />} />
             <Route exact path="/resetPassword/:emailId/:token" exact name="Reset password" render={props => <ResetPassword {...props} />} />
             <Route exact path="/userAgreement" exact render={props => <UserAgreement {...props} />} />
-            <Route path="/" name={i18n.t('static.home')} render={props => <DefaultLayout {...props} />} />
+            <Route path="/" name="Home" render={props => <DefaultLayout {...props} />} />
           </Switch>
         </React.Suspense>
       </HashRouter>

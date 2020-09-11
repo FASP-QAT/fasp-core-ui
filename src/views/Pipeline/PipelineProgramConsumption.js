@@ -7,7 +7,7 @@ import DataSourceService from '../../api/DataSourceService.js';
 import PlanningUnitService from '../../api/PlanningUnitService';
 import moment from 'moment';
 import { jExcelLoadedFunction, jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunctionPipeline } from '../../CommonComponent/JExcelCommonFunctions';
-import { ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE } from '../../Constants';
+import { ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE, JEXCEL_DATE_FORMAT_WITHOUT_DATE } from '../../Constants';
 import RealmCountryService from '../../api/RealmCountryService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 export default class PipelineProgramConsumption extends Component {
@@ -348,7 +348,7 @@ console.log('consumptionDataArr',consumptionDataArr)
                                             title: i18n.t('static.pipeline.consumptionDate'),
                                             type: 'calendar',
                                             options: {
-                                                format: 'MM-YYYY'
+                                                format: JEXCEL_DATE_FORMAT_WITHOUT_DATE
                                             }
                                         },
                                         {

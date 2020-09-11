@@ -1543,6 +1543,9 @@ class ShipmentSummery extends Component {
             planningUnits: [],
             planningUnitValues: []
         }, () => {
+            if (versionId == 0) {
+                this.setState({ message: i18n.t('static.program.validversion'), data: [] });
+            } else {
             if (versionId.includes('Local')) {
                 const lan = 'en';
                 var db1;
@@ -1616,6 +1619,7 @@ class ShipmentSummery extends Component {
                         }
                     );
             }
+        }
         });
 
     }
@@ -1822,7 +1826,7 @@ class ShipmentSummery extends Component {
         } else if (programId == 0) {
             this.setState({ message: i18n.t('static.common.selectProgram'), data: [] });
 
-        } else if (versionId == -1) {
+        } else if (versionId == 0) {
             this.setState({ message: i18n.t('static.program.validversion'), data: [] });
 
         } else if (this.state.planningUnitValues.length == 0) {
@@ -2181,7 +2185,7 @@ class ShipmentSummery extends Component {
                                                             bsSize="sm"
                                                             onChange={(e) => { this.getPlanningUnit(); }}
                                                         >
-                                                            <option value="-1">{i18n.t('static.common.select')}</option>
+                                                            <option value="0">{i18n.t('static.common.select')}</option>
                                                             {versionList}
                                                         </Input>
 

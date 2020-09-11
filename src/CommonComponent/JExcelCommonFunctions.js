@@ -236,5 +236,12 @@ export function inValid(colName, rowNo, message, elInstance) {
     elInstance.setComments(col, message);
 }
 
+export function inValidWithColor(colName, rowNo, message, elInstance,color) {
+    var col = (colName).concat(parseInt(rowNo) + 1);
+    elInstance.setStyle(col, "background-color", "transparent");
+    elInstance.setStyle(col, "background-color", color);
+    elInstance.setComments(col, message);
+}
+
 
 

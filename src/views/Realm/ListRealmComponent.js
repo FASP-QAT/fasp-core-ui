@@ -353,6 +353,7 @@ export default class ReactListComponent extends Component {
                             data[3] = realmList[j].minMosMinGaurdrail;
                             data[4] = realmList[j].minMosMaxGaurdrail;
                             data[5] = realmList[j].maxMosMaxGaurdrail;
+                            data[6] = realmList[j].active;
 
                             realmArray[count] = data;
                             count++;
@@ -402,6 +403,15 @@ export default class ReactListComponent extends Component {
                                     type: 'text',
                                     readOnly: true
                                 },
+                                {
+                                    type: 'dropdown',
+                                    title: i18n.t('static.common.status'),
+                                    readOnly: true,
+                                    source: [
+                                        { id: true, name: i18n.t('static.common.active') },
+                                        { id: false, name: i18n.t('static.common.disabled') }
+                                    ]
+                                },
 
                             ],
                             text: {
@@ -431,7 +441,7 @@ export default class ReactListComponent extends Component {
                                 if (y != null) {
                                     if (obj.options.allowInsertRow == true) {
                                         items.push({
-                                            title: 'map realm country',
+                                            title: 'Map Realm Country',
                                             onclick: function () {
                                                 // console.log("onclick------>", this.el.getValueFromCoords(0, y));
                                                 if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_REALM_COUNTRY')) {

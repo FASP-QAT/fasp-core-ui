@@ -328,8 +328,8 @@ Months Of Stock = 3.54</p>
                       <ListGroupItem >
                     <ListGroupItemHeading className="formulasheading">Weighted Absolute Percentage Error (WAPE)</ListGroupItemHeading>
                     <ListGroupItemText className="formulastext">
-                    <img className="formula-img-mr img-fluid" src="../src/assets/img/Formulas/WAPE-Formula.png"/><br></br>
-                    <p>* N is number of months</p>
+                    <img className="formula-img-mr img-fluid" src="../src/assets/img/Formulas/ForecastError-Formula.png"/><br></br>
+                    {/* <p>* N is number of months</p> */}
                    
                     </ListGroupItemText>
                   </ListGroupItem>

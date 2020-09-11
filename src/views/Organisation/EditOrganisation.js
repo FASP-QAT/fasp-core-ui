@@ -339,7 +339,7 @@ export default class EditOrganisationComponent extends Component {
                                                         <FormFeedback>{errors.realmId}</FormFeedback>
                                                     </FormGroup>
 
-                                                    <FormGroup>
+                                                    <FormGroup className="Selectcontrol-bdrNone">
                                                         <Label htmlFor="realmCountryId">{i18n.t('static.organisation.realmcountry')}</Label>
                                                         <Select
                                                             bsSize="sm"
