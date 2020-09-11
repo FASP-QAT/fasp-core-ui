@@ -1128,5 +1128,8 @@
     "static.graph.costInUSD": "Cost (USD)",
     "static.commit.shipmentTransId": "Shipment trans id",
     "static.supplyPlan.addNewInventory":"Add New Inventory",
-    "static.manualtagging.result":"Please enter order no. and prime line no."
+    "static.manualtagging.result":"Please enter order no. and prime line no.",
+    "static.dashboard.programimport":"Pipeline Program Import",
+    "static.dashboard.setupprogram":"Setup Program",
+    "static.dashboard.pipelineprogramlist":"Pipeline Program List"
 }

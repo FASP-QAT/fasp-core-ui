@@ -73,9 +73,17 @@ class AnnualShipmentCost extends Component {
         //this.pickRange = React.createRef()
 
     }
-
+    roundN = num => {
+        if (num != '') {
+          return parseFloat(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
+        } else {
+          return ''
+        }
+      }
     fetchData() {
-
+        this.setState({
+            outPutList: []
+        }, () => {
         let json = {
             "programId": document.getElementById("programId").value,
             "versionId": document.getElementById("versionId").value,
@@ -197,9 +205,10 @@ class AnnualShipmentCost extends Component {
                                                 'planningUnit': list[0].planningUnit.label.label_en
         
                                             };
+                                            var monthstartfrom=this.state.rangeValue.from.month
                                             for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++) {
-                                                var dtstr = from + "-" + String(1).padStart(2, '0') + "-01"
-                                                var enddtStr = from + "-" + String(12).padStart(2, '0') + '-' + new Date(from, 12, 0).getDate()
+                                                var dtstr = from + "-" + String(monthstartfrom).padStart(2, '0') + "-01"
+                                                var enddtStr = from + "-" + String(from==to?this.state.rangeValue.to.month:12).padStart(2, '0') + '-' + new Date(from, 12, 0).getDate()
                                                 console.log(dtstr, ' ', enddtStr)
                                                 var list2=[]
                                                 if (reportbaseValue == 1) {
@@ -210,10 +219,12 @@ class AnnualShipmentCost extends Component {
                                                 console.log(list2)
                                             var cost=0;
                                             for (var k = 0; k < list2.length; k++) {
-                                                cost += parseFloat(list2[k].productCost) + parseFloat(list2[k].freightCost);
+                                                cost += parseFloat(list2[k].productCost*list2[k].currency.conversionRateToUsd) + parseFloat(list2[k].freightCost*list2[k].currency.conversionRateToUsd);
                                             }
-                                            json[from] = cost
+                                            json[from] = this.roundN(cost)
                                             console.log(json)
+                                            monthstartfrom=1;
+                                            
                                         }
                                         outPutList.push(json);
                                     }
@@ -388,15 +399,16 @@ class AnnualShipmentCost extends Component {
                     );
             }
         } else if (programId == 0) {
-            this.setState({ message: i18n.t('static.common.selectProgram'), data: [] });
+            this.setState({ message: i18n.t('static.common.selectProgram'), data: [],outPutList:[] });
 
         } else if (versionId == 0) {
-            this.setState({ message: i18n.t('static.program.validversion'), data: [] });
+            this.setState({ message: i18n.t('static.program.validversion'), data: [],outPutList:[] });
 
         } else {
-            this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [] });
+            this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [],outPutList:[] });
 
         }
+        })
     }
 
     getPrograms() {
@@ -639,6 +651,7 @@ class AnnualShipmentCost extends Component {
         var yindex = 250
         var totalAmount = []
         var GrandTotalAmount = []
+        console.log('data',data)
         for (var j = 0; j < data.length; j++) {
             if (yindex > doc.internal.pageSize.height - 50) { doc.addPage(); yindex = 90 } else { yindex = yindex }
             var record = data[j]
@@ -648,7 +661,7 @@ class AnnualShipmentCost extends Component {
 
             var values = Object.entries(record).map(([key, value]) => (value)
             )
-            var total = 0
+            
             var splittext = doc.splitTextToSize(record.procurementAgent + '\n' + record.fundingsource + '\n' + record.planningUnit + '\n' + '\n', index);
 
             //doc.text(doc.internal.pageSize.width / 8, yindex, splittext)
@@ -664,13 +677,15 @@ class AnnualShipmentCost extends Component {
       
     }
             initalvalue = initalvalue + index
+            var total = 0
             for (var x = 0; x < year.length; x++) {
                 for (var n = 0; n < keys.length; n++) {
                     if (year[x] == keys[n]) {
-                        total = total + values[n]
+                        console.log(values[n])
+                        total =  parseFloat(total) + parseFloat(values[n])
                         initalvalue = initalvalue + index
-                        totalAmount[x] = totalAmount[x] == null ? values[n] : totalAmount[x] + values[n]
-                        GrandTotalAmount[x] = GrandTotalAmount[x] == null ? values[n] : GrandTotalAmount[x] + values[n]
+                        totalAmount[x] = totalAmount[x] == null ?  parseFloat(values[n]) :  parseFloat(totalAmount[x]) +  parseFloat(values[n])
+                        GrandTotalAmount[x] = GrandTotalAmount[x] == null ?  parseFloat(values[n]) :  parseFloat(GrandTotalAmount[x]) +  parseFloat(values[n])
                         doc.setFont('helvetica', 'normal')
                         doc.text(this.formatter(values[n]).toString(), initalvalue, yindex -30, {
                             align: 'left'
@@ -678,8 +693,9 @@ class AnnualShipmentCost extends Component {
                     }
                 }
             }
+            console.log(total)
             doc.setFont('helvetica', 'bold')
-            doc.text(this.formatter(total).toString() , initalvalue + index, yindex-30, {
+            doc.text(this.formatter(this.roundN(total)).toString() , initalvalue + index, yindex-30, {
                 align: 'left',
                 
             });
@@ -700,8 +716,8 @@ class AnnualShipmentCost extends Component {
                     var Gtotal = 0
                     for (var l = 0; l < totalAmount.length; l++) {
                         initalvalue += index;
-                        Gtotal = Gtotal + totalAmount[l]
-                        doc.text(this.formatter(totalAmount[l]).toString(), initalvalue, yindex, {
+                        Gtotal =  parseFloat(Gtotal) +  parseFloat(totalAmount[l])
+                        doc.text(this.formatter(this.roundN(totalAmount[l])).toString(), initalvalue, yindex, {
                             align: 'left'
                         })
                         totalAmount[l] = 0;
@@ -723,8 +739,8 @@ class AnnualShipmentCost extends Component {
                 var Gtotal = 0
                 for (var l = 0; l < totalAmount.length; l++) {
                     initalvalue += index;
-                    Gtotal = Gtotal + totalAmount[l]
-                    doc.text(this.formatter(totalAmount[l]).toString(), initalvalue, yindex, {
+                    Gtotal =  parseFloat(Gtotal) +  parseFloat(totalAmount[l])
+                    doc.text(this.formatter(this.roundN(totalAmount[l])).toString(), initalvalue, yindex, {
                         align: 'left'
                     })
                 }
@@ -745,11 +761,11 @@ class AnnualShipmentCost extends Component {
         for (var l = 0; l < GrandTotalAmount.length; l++) {
             initalvalue += index;
             Gtotal = Gtotal + GrandTotalAmount[l]
-            doc.text(this.formatter(GrandTotalAmount[l]).toString(), initalvalue, yindex, {
+            doc.text(this.formatter(this.roundN(GrandTotalAmount[l])).toString(), initalvalue, yindex, {
                 align: 'left'
             })
         }
-        doc.text(this.formatter(Gtotal).toString(), initalvalue + index, yindex, {
+        doc.text(this.formatter(this.roundN(Gtotal)).toString(), initalvalue + index, yindex, {
             align: 'left'
         });
         doc.setFontSize(8);

@@ -1424,7 +1424,7 @@ class ForcastMatrixOverTime extends Component {
   }
 
   formatter = value => {
-
+if(value!=null){
     var cell1 = value
     cell1 += '';
     var x = cell1.split('.');
@@ -1435,6 +1435,9 @@ class ForcastMatrixOverTime extends Component {
       x1 = x1.replace(rgx, '$1' + ',' + '$2');
     }
     return x1 + x2;
+  }else{
+    return 0;
+  }
   }
   dateFormatter = value => {
     return moment(value).format('MMM YY')
