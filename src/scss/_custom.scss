@@ -3205,7 +3205,7 @@ border-radius: 2em;
   font-size: 20px;
 }
 .WhatifInputFeild {
-  width: 212px;
+  width: 200px;
 }
 .ProgramListSearch{
   margin-top: -4%;
@@ -3227,7 +3227,7 @@ border-radius: 2em;
   margin-top: -51px;
 }
 .shipmentconsumptionSearchMarginTop {
-  margin-top: -28px;
+  margin-top: -23px;
  
 }
 .ShipmentdeletailsSearchposition{
@@ -3265,6 +3265,10 @@ border-radius: 2em;
 {
     background: rgba(238, 238, 238, 0.9)!important;
 }
+}
+
+.modalBackgroundSupplyPlan{
+  background: transparent!important;
 } 
 .was-validated .form-control:valid, .form-control.is-valid {
   background-size: calc(0.75em + 30px) calc(0.75em + 0.375rem)!important;

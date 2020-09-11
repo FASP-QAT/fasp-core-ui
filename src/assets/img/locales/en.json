@@ -588,7 +588,7 @@
     "static.common.download": "Download",
     "static.dashboard.report": "Reports",
     "static.dashboard.productcatalog": "Product Catalog",
-    "static.common.issync": "Sync online coversion rate",
+    "static.common.issync": "Sync online conversion rate",
     "static.message.oldPassword": "Please enter old password",
     "static.message.newPasswordMinLength": "Password has to be at least 6 characters",
     "static.message.newPasswordPassString": "Password should not contain password string",

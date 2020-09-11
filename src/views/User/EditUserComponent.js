@@ -530,7 +530,7 @@ class EditUserComponent extends Component {
                                                         />
                                                         <FormFeedback className="red">{errors.phoneNumber}</FormFeedback>
                                                     </FormGroup>
-                                                    <FormGroup>
+                                                    <FormGroup className="Selectcontrol-bdrNone">
                                                         <Label htmlFor="roleId">{i18n.t('static.role.role')}<span class="red Reqasterisk">*</span></Label>
                                                         <Select
                                                             className={classNames('form-control', 'd-block', 'w-100', 'bg-light',

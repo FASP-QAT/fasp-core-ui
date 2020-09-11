@@ -143,7 +143,7 @@ export default class StockStatusMatrix extends React.Component {
     let planningUnitIds = this.state.planningUnitValues.map(ele => (ele.value).toString())//this.state.planningUnitValues.length == this.state.planningUnits.length ? [] : this.state.planningUnitValues.map(ele => (ele.value).toString());
     let versionId = document.getElementById("versionId").value;
     let includePlannedShipments = document.getElementById("includePlanningShipments").value
-    if (this.state.planningUnitValues.length > 0 && programId > 0) {
+    if (this.state.planningUnitValues.length > 0 && programId > 0 && versionId != 0) {
 
       if (versionId.includes('Local')) {
         var data = [];
@@ -204,7 +204,7 @@ export default class StockStatusMatrix extends React.Component {
                     }
                     else {
                       var mos = 0
-                      if (list[0].amc > 0) { mos = list[0].closingBalanceWps /list[0].amc }
+                      if (list[0].amc > 0) { mos = list[0].closingBalanceWps / list[0].amc }
 
                       monthlydata.push(mos)
                     }
@@ -323,6 +323,9 @@ export default class StockStatusMatrix extends React.Component {
       }
     } else if (programId == 0) {
       this.setState({ message: i18n.t('static.common.selectProgram'), data: [] });
+
+    } else if (versionId == 0) {
+      this.setState({ message: i18n.t('static.program.validversion'), data: [] });
 
     } else {
       this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [] });
@@ -624,78 +627,83 @@ export default class StockStatusMatrix extends React.Component {
       planningUnitValues: [],
       planningUnitLabels: []
     }, () => {
-      if (versionId.includes('Local')) {
-        const lan = 'en';
-        var db1;
-        var storeOS;
-        getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onsuccess = function (e) {
-          db1 = e.target.result;
-          var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
-          var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
-          var planningunitRequest = planningunitOs.getAll();
-          var planningList = []
-          planningunitRequest.onerror = function (event) {
-            // Handle errors!
-          };
-          planningunitRequest.onsuccess = function (e) {
-            var myResult = [];
-            myResult = planningunitRequest.result;
-            var programId = (document.getElementById("programId").value).split("_")[0];
-            var proList = []
-            console.log(myResult)
-            for (var i = 0; i < myResult.length; i++) {
-              if (myResult[i].program.id == programId) {
 
-                proList[i] = myResult[i]
+      if (versionId == 0) {
+        this.setState({ message: i18n.t('static.program.validversion'), data: [] });
+      } else {
+        if (versionId.includes('Local')) {
+          const lan = 'en';
+          var db1;
+          var storeOS;
+          getDatabase();
+          var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+          openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+            var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
+            var planningunitRequest = planningunitOs.getAll();
+            var planningList = []
+            planningunitRequest.onerror = function (event) {
+              // Handle errors!
+            };
+            planningunitRequest.onsuccess = function (e) {
+              var myResult = [];
+              myResult = planningunitRequest.result;
+              var programId = (document.getElementById("programId").value).split("_")[0];
+              var proList = []
+              console.log(myResult)
+              for (var i = 0; i < myResult.length; i++) {
+                if (myResult[i].program.id == programId) {
+
+                  proList[i] = myResult[i]
+                }
               }
-            }
+              this.setState({
+                planningUnits: proList, message: ''
+              }, () => {
+                this.filterData();
+              })
+            }.bind(this);
+          }.bind(this)
+
+
+        }
+        else {
+          AuthenticationService.setupAxiosInterceptors();
+
+          //let productCategoryId = document.getElementById("productCategoryId").value;
+          ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
+            console.log('**' + JSON.stringify(response.data))
             this.setState({
-              planningUnits: proList, message: ''
+              planningUnits: response.data, message: ''
             }, () => {
               this.filterData();
             })
-          }.bind(this);
-        }.bind(this)
-
-
-      }
-      else {
-        AuthenticationService.setupAxiosInterceptors();
-
-        //let productCategoryId = document.getElementById("productCategoryId").value;
-        ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
-          console.log('**' + JSON.stringify(response.data))
-          this.setState({
-            planningUnits: response.data, message: ''
-          }, () => {
-            this.filterData();
           })
-        })
-          .catch(
-            error => {
-              this.setState({
-                planningUnits: [],
-              })
-              if (error.message === "Network Error") {
-                this.setState({ message: error.message });
-              } else {
-                switch (error.response ? error.response.status : "") {
-                  case 500:
-                  case 401:
-                  case 404:
-                  case 406:
-                  case 412:
-                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
-                    break;
-                  default:
-                    this.setState({ message: 'static.unkownError' });
-                    break;
+            .catch(
+              error => {
+                this.setState({
+                  planningUnits: [],
+                })
+                if (error.message === "Network Error") {
+                  this.setState({ message: error.message });
+                } else {
+                  switch (error.response ? error.response.status : "") {
+                    case 500:
+                    case 401:
+                    case 404:
+                    case 406:
+                    case 412:
+                      this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
+                      break;
+                    default:
+                      this.setState({ message: 'static.unkownError' });
+                      break;
+                  }
                 }
               }
-            }
-          );
+            );
+        }
       }
     });
 
@@ -834,7 +842,7 @@ export default class StockStatusMatrix extends React.Component {
     let header = []
 
     header = [[{ content: i18n.t('static.planningunit.planningunit'), rowSpan: 2, styles: { halign: 'center' } },
-    { content: i18n.t('static.dashboard.unit'), rowSpan: 2, styles: { halign: 'center',cellWidth:80 } },
+    { content: i18n.t('static.dashboard.unit'), rowSpan: 2, styles: { halign: 'center', cellWidth: 80 } },
     { content: i18n.t('static.common.min'), rowSpan: 2, styles: { halign: 'center' } },
     { content: i18n.t('static.program.reorderFrequencyInMonths'), rowSpan: 2, styles: { halign: 'center' } },
     { content: i18n.t('static.common.year'), rowSpan: 2, styles: { halign: 'center' } },
@@ -1154,15 +1162,15 @@ export default class StockStatusMatrix extends React.Component {
         <SupplyPlanFormulas ref="formulaeChild" />
         <Card style={{ display: this.state.loading ? "none" : "block" }}>
           <div className="Card-header-reporticon pb-2">
-          <div className="card-header-actions">
-          <a className="card-header-action">
-                                 <span style={{cursor: 'pointer'}} onClick={() => { this.refs.formulaeChild.toggleStockStatusOverTime() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span>
-                                 </a>
-            {/* <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.stockstatusmatrix')}</strong>{' '} */}
-            {this.state.data.length > 0 && <div className="card-header-actions">
-              <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF(columns)} />
-              <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
-            </div>}
+            <div className="card-header-actions">
+              <a className="card-header-action">
+                <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggleStockStatusOverTime() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span>
+              </a>
+              {/* <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.stockstatusmatrix')}</strong>{' '} */}
+              {this.state.data.length > 0 && <div className="card-header-actions">
+                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF(columns)} />
+                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
+              </div>}
             </div>
           </div>
           <CardBody className="pb-md-3 pb-lg-2 pt-lg-0">
@@ -1212,7 +1220,7 @@ export default class StockStatusMatrix extends React.Component {
                         bsSize="sm"
                         onChange={(e) => { this.getPlanningUnit(); }}
                       >
-                        <option value="-1">{i18n.t('static.common.select')}</option>
+                        <option value="0">{i18n.t('static.common.select')}</option>
                         {versionList}
                       </Input>
 
@@ -1252,14 +1260,14 @@ export default class StockStatusMatrix extends React.Component {
                   </div>
                 </FormGroup>
                 <FormGroup className="col-md-12 mt-2 " style={{ display: this.state.display }}>
-                      <ul className="legendcommitversion list-group">
-                        {
-                          legendcolor.map(item1 => (
-                            <li><span className="legendcolor" style={{ backgroundColor: item1.color }}></span> <span className="legendcommitversionText">{item1.text}</span></li>
-                          ))
-                        }
-                      </ul>
-                    </FormGroup>
+                  <ul className="legendcommitversion list-group">
+                    {
+                      legendcolor.map(item1 => (
+                        <li><span className="legendcolor" style={{ backgroundColor: item1.color }}></span> <span className="legendcommitversionText">{item1.text}</span></li>
+                      ))
+                    }
+                  </ul>
+                </FormGroup>
               </div>
             </div>
             <div class="TableCust">

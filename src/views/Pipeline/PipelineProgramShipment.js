@@ -14,7 +14,7 @@ import { Button } from 'reactstrap';
 import FundingSourceService from '../../api/FundingSourceService';
 import { Link } from 'react-router-dom';
 import { jExcelLoadedFunction, jExcelLoadedFunctionPipeline } from '../../CommonComponent/JExcelCommonFunctions.js'
-import { CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS } from '../../Constants.js'
+import { CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, JEXCEL_DATE_FORMAT } from '../../Constants.js'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 
 export default class PipelineProgramShipment extends Component {
@@ -923,7 +923,7 @@ export default class PipelineProgramShipment extends Component {
                 }, {
                     title: i18n.t('static.shipment.edd'),
                     type: 'calendar',
-                    options: { format: 'DD-MMM-YYYY' }
+                    options: { format: JEXCEL_DATE_FORMAT }
 
                 },
                 {
@@ -934,32 +934,32 @@ export default class PipelineProgramShipment extends Component {
                 }, {
                     title: i18n.t('static.supplyPlan.plannedDate'),
                     type: 'calendar',
-                    options: { format: 'MM-DD-YYYY' }
+                    options: { format: JEXCEL_DATE_FORMAT }
 
                 }, {
                     title: i18n.t('static.supplyPlan.submittedDate'),
                     type: 'calendar',
-                    options: { format: 'MM-DD-YYYY' }
+                    options: { format: JEXCEL_DATE_FORMAT }
 
                 }, {
                     title: i18n.t('static.supplyPlan.approvedDate'),
                     type: 'calendar',
-                    options: { format: 'MM-DD-YYYY' }
+                    options: { format: JEXCEL_DATE_FORMAT }
 
                 }, {
                     title: i18n.t('static.shipment.shipdate'),
                     type: 'calendar',
-                    options: { format: 'MM-DD-YYYY' }
+                    options: { format: JEXCEL_DATE_FORMAT }
 
                 }, {
                     title: i18n.t('static.supplyPlan.arrivedDate'),
                     type: 'calendar',
-                    options: { format: 'MM-DD-YYYY' }
+                    options: { format: JEXCEL_DATE_FORMAT }
 
                 }, {
                     title: i18n.t('static.shipment.receiveddate'),
                     type: 'calendar',
-                    options: { format: 'MM-DD-YYYY' }
+                    options: { format: JEXCEL_DATE_FORMAT }
 
                 },
 

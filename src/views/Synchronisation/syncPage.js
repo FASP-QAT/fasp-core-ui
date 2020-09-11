@@ -7,14 +7,14 @@ import {
   Nav, NavItem, NavLink, TabContent, TabPane, CardFooter, Modal, ModalBody, ModalFooter, ModalHeader
 } from 'reactstrap';
 import CryptoJS from 'crypto-js';
-import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, LOCAL_VERSION_COLOUR, LATEST_VERSION_COLOUR, PENDING_APPROVAL_VERSION_STATUS, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE } from '../../Constants.js';
+import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, LOCAL_VERSION_COLOUR, LATEST_VERSION_COLOUR, PENDING_APPROVAL_VERSION_STATUS, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, CANCELLED_SHIPMENT_STATUS } from '../../Constants.js';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import getLabelText from '../../CommonComponent/getLabelText';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import ProgramService from '../../api/ProgramService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import { jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
+import { jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunctionOnlyHideRow, inValid, inValidWithColor } from '../../CommonComponent/JExcelCommonFunctions.js'
 import moment from "moment";
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
@@ -63,6 +63,30 @@ export default class syncPage extends Component {
     this.synchronize = this.synchronize.bind(this);
 
     this.updateState = this.updateState.bind(this);
+
+    this.hideFirstComponent = this.hideFirstComponent.bind(this);
+    this.hideSecondComponent = this.hideSecondComponent.bind(this);
+
+    this.checkValidations = this.checkValidations.bind(this);
+  }
+
+  hideFirstComponent() {
+    document.getElementById('div1').style.display = 'block';
+    this.state.timeout = setTimeout(function () {
+      document.getElementById('div1').style.display = 'none';
+    }, 8000);
+  }
+
+  hideSecondComponent() {
+    console.log("In second component")
+    document.getElementById('div2').style.display = 'block';
+    this.state.timeout = setTimeout(function () {
+      document.getElementById('div2').style.display = 'none';
+    }, 8000);
+  }
+
+  componentWillUnmount() {
+    clearTimeout(this.timeout);
   }
 
   toggle(tabPane, tab) {
@@ -605,6 +629,7 @@ export default class syncPage extends Component {
         commitVersionError: i18n.t('static.program.errortext'),
         loading: false
       })
+      this.hideSecondComponent()
     }.bind(this);
     openRequest.onsuccess = function (e) {
       db1 = e.target.result;
@@ -618,6 +643,7 @@ export default class syncPage extends Component {
           commitVersionError: i18n.t('static.program.errortext'),
           loading: false
         })
+        this.hideSecondComponent()
       }.bind(this);
       getRequest.onsuccess = function (event) {
         var myResult = [];
@@ -648,7 +674,8 @@ export default class syncPage extends Component {
             error => {
               this.setState({
                 statuses: [],
-                loading: false
+                loading: false,
+                color: "red"
               })
               if (error.message === "Network Error") {
                 this.setState({ message: error.message });
@@ -666,6 +693,7 @@ export default class syncPage extends Component {
                     break;
                 }
               }
+              this.hideFirstComponent()
             }
           );
       }.bind(this);
@@ -721,6 +749,7 @@ export default class syncPage extends Component {
                 commitVersionError: i18n.t('static.program.errortext'),
                 loading: false
               })
+              this.hideSecondComponent()
             }.bind(this);
             openRequest.onsuccess = function (e) {
               db1 = e.target.result;
@@ -732,6 +761,7 @@ export default class syncPage extends Component {
                   commitVersionError: i18n.t('static.program.errortext'),
                   loading: false
                 })
+                this.hideSecondComponent()
               }.bind(this);
               programRequest.onsuccess = function (e) {
                 var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
@@ -746,6 +776,7 @@ export default class syncPage extends Component {
                     commitVersionError: i18n.t('static.program.errortext'),
                     loading: false
                   })
+                  this.hideSecondComponent()
                 }.bind(this);
                 dProgramRequest.onsuccess = function (e) {
                   var dProgramDataBytes = CryptoJS.AES.decrypt(dProgramRequest.result.programData, SECRET_KEY);
@@ -759,6 +790,7 @@ export default class syncPage extends Component {
                       commitVersionError: i18n.t('static.program.errortext'),
                       loading: false
                     })
+                    this.hideSecondComponent()
                   }.bind(this);
                   rcpuRequest.onsuccess = function (event) {
                     var rcpuResult = [];
@@ -780,6 +812,7 @@ export default class syncPage extends Component {
                         commitVersionError: i18n.t('static.program.errortext'),
                         loading: false
                       })
+                      this.hideSecondComponent()
                     }.bind(this);
                     dataSourceRequest.onsuccess = function (event) {
                       var dataSourceResult = [];
@@ -824,6 +857,7 @@ export default class syncPage extends Component {
                             commitVersionError: i18n.t('static.program.errortext'),
                             loading: false
                           })
+                          this.hideSecondComponent()
                         }.bind(this);
                         shipmentStatusRequest.onsuccess = function (event) {
                           var shipmentStatusResult = [];
@@ -843,6 +877,7 @@ export default class syncPage extends Component {
                               commitVersionError: i18n.t('static.program.errortext'),
                               loading: false
                             })
+                            this.hideSecondComponent()
                           }.bind(this);
                           papuRequest.onsuccess = function (event) {
                             var papuResult = [];
@@ -866,6 +901,7 @@ export default class syncPage extends Component {
                                 commitVersionError: i18n.t('static.program.errortext'),
                                 loading: false
                               })
+                              this.hideSecondComponent()
                             }.bind(this);
                             fsRequest.onsuccess = function (event) {
                               var fsResult = [];
@@ -889,6 +925,7 @@ export default class syncPage extends Component {
                                   commitVersionError: i18n.t('static.program.errortext'),
                                   loading: false
                                 })
+                                this.hideSecondComponent()
                               }.bind(this);
                               bRequest.onsuccess = function (event) {
                                 var bResult = [];
@@ -920,6 +957,7 @@ export default class syncPage extends Component {
                                     commitVersionError: i18n.t('static.program.errortext'),
                                     loading: false
                                   })
+                                  this.hideSecondComponent()
                                 }.bind(this);
                                 currencyRequest.onsuccess = function (event) {
                                   var currencyResult = [];
@@ -1435,17 +1473,27 @@ export default class syncPage extends Component {
                                     } else {
                                       // If 0 check whether that exists in latest version or not
                                       var index = 0;
-                                      if (oldProgramDataProblemList[c].problem.problemId == 1 || oldProgramDataProblemList[c].problem.problemId == 2) {
+                                      if (oldProgramDataProblemList[c].realmProblem.problem.problemId == 1 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 2 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 8 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 10 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 14 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 15 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 21) {
                                         index = latestProgramDataProblemList.findIndex(
                                           f => moment(f.dt).format("YYYY-MM") == moment(oldProgramDataProblemList[c].dt).format("YYYY-MM")
                                             && f.region.id == oldProgramDataProblemList[c].region.id
                                             && f.planningUnit.id == oldProgramDataProblemList[c].planningUnit.id
-                                            && f.realmProblem.problem.problemId == oldProgramDataProblemList[c].problem.problemId);
-                                      } else if (oldProgramDataProblemList[c].problem.problemId == 9) {
+                                            && f.realmProblem.problem.problemId == oldProgramDataProblemList[c].realmProblem.problem.problemId);
+                                      } else if (oldProgramDataProblemList[c].realmProblem.problem.problemId == 13) {
+                                        index = -1;
+                                      } else if (oldProgramDataProblemList[c].realmProblem.problem.problemId == 3 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 4 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 5 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 6 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 7) {
                                         index = latestProgramDataProblemList.findIndex(
                                           f => f.planningUnit.id == oldProgramDataProblemList[c].planningUnit.id
-                                            && f.realmProblem.problem.problemId == oldProgramDataProblemList[c].problem.problemId);
+                                            && f.realmProblem.problem.problemId == oldProgramDataProblemList[c].realmProblem.problem.problemId
+                                            && oldProgramDataProblemList[c].newAdded != true
+                                            && f.shipmentId == oldProgramDataProblemList[c].shipmentId);
+                                      } else if (oldProgramDataProblemList[c].realmProblem.problem.problemId == 11 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 16 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 17 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 18 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 19 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 20) {
+                                        index = latestProgramDataProblemList.findIndex(
+                                          f => moment(f.dt).format("YYYY-MM") == moment(oldProgramDataProblemList[c].dt).format("YYYY-MM")
+                                            && f.planningUnit.id == oldProgramDataProblemList[c].planningUnit.id
+                                            && f.realmProblem.problem.problemId == oldProgramDataProblemList[c].realmProblem.problem.problemId);
                                       }
+                                      // var index = -1;
                                       console.log("Index", index);
                                       if (index == -1) {
                                         mergedProblemListData.push(oldProgramDataProblemList[c]);
@@ -1644,12 +1692,37 @@ export default class syncPage extends Component {
           } else {
             this.setState({
               message: response.data.messageCode,
-              loading: false
+              loading: false,
+              color: "red"
             },
               () => {
+                this.hideFirstComponent()
               })
           }
         })
+        .catch(
+          error => {
+            if (error.message === "Network Error") {
+              this.setState({ message: error.message, loading: false, color: "red" });
+              this.hideFirstComponent()
+            } else {
+              switch (error.response ? error.response.status : "") {
+                case 500:
+                case 401:
+                case 404:
+                case 406:
+                case 412:
+                  this.setState({ message: error.response.data.messageCode, loading: false, color: "red" });
+                  this.hideFirstComponent()
+                  break;
+                default:
+                  this.setState({ message: 'static.unkownError', loading: false, color: "red" });
+                  this.hideFirstComponent()
+                  break;
+              }
+            }
+          }
+        );
     } else {
       this.setState({ loading: false })
     }
@@ -2112,8 +2185,8 @@ export default class syncPage extends Component {
         }} loading={(loading) => {
           this.setState({ loading: loading })
         }} />
-        <h5>{i18n.t(this.state.message, { entityname })}</h5>
-        <h6 className="red">{this.state.commitVersionError}</h6>
+        <h5 id="div1" className={this.state.color}>{i18n.t(this.state.message, { entityname })}</h5>
+        <h5 className="red" id="div2">{this.state.noFundsBudgetError || this.state.commitVersionError}</h5>
         <Row style={{ display: this.state.loading ? "none" : "block" }}>
           <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
             <Card>
@@ -2124,7 +2197,7 @@ export default class syncPage extends Component {
 
                     <div className="d-md-flex">
                       <FormGroup className="col-md-4">
-                        <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
+                        <Label htmlFor="appendedInputButton">{this.state.noFundsBudgetError}{i18n.t('static.program.program')} </Label>
                         <div className="controls ">
                           <Select
                             name="programSelect"
@@ -2137,15 +2210,16 @@ export default class syncPage extends Component {
                         </div>
                       </FormGroup>
                       <div className="col-md-10 pt-4 pb-3">
-                      <ul className="legendcommitversion">
-                        <li><span className="lightpinklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.commitVersion.conflicts')}</span></li>
-                        <li><span className=" greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.commitVersion.changedInCurrentVersion')} </span></li>
-                        <li><span className="notawesome legendcolor"></span > <span className="legendcommitversionText">{i18n.t('static.commitVersion.changedInLatestVersion')}</span></li>
-                      </ul>
-                    </div>
+                        <ul className="legendcommitversion">
+                          <li><span className="lightpinklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.commitVersion.conflicts')}</span></li>
+                          <li><span className=" greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.commitVersion.changedInCurrentVersion')} </span></li>
+                          <li><span className="notawesome legendcolor"></span > <span className="legendcommitversionText">{i18n.t('static.commitVersion.changedInLatestVersion')}</span></li>
+                          <li><span className=" redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.label.noFundsAvailable')} </span></li>
+                        </ul>
+                      </div>
 
                     </div>
-                   
+
                   </Col>
                 </Form>
                 <div id="detailsDiv">
@@ -2316,125 +2390,190 @@ export default class syncPage extends Component {
     );
   };
 
+  checkValidations() {
+    var valid = true;
+    var elInstance = this.state.mergedShipmentJexcel;
+    var json = elInstance.getJson();
+    var shipmentData = [];
+    var shipmentJson = (this.state.mergedShipmentJexcel).getJson();
+    var oldProgramDataShipment = this.state.oldProgramDataShipment;
+    var latestProgramDataShipment = this.state.latestProgramDataShipment;
+    for (var c = 0; c < shipmentJson.length; c++) {
+      if (((shipmentJson[c])[31] == 2 || (shipmentJson[c])[31] == 4) && (shipmentJson[c])[0] != 0) {
+        shipmentData.push(oldProgramDataShipment.filter(a => a.shipmentId == (shipmentJson[c])[0])[0]);
+      } else if ((shipmentJson[c])[31] == 3 && (shipmentJson[c])[0] != 0) {
+        shipmentData.push(latestProgramDataShipment.filter(a => a.shipmentId == (shipmentJson[c])[0])[0]);
+      }
+    }
+    shipmentData = shipmentData.concat(oldProgramDataShipment.filter(c => c.shipmentId == 0));
+    for (var y = 0; y < json.length; y++) {
+      var map = new Map(Object.entries(json[y]));
+      var rowData = elInstance.getRowData(y);
+      if (map.get("6") != "" && map.get("12") != "") {
+        var budget = this.state.budgetListAll.filter(c => c.id == map.get("6"))[0]
+        var totalBudget = budget.budgetAmt * budget.currency.conversionRateToUsd;
+        var shipmentList = shipmentData.filter(c => c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.active == true && c.budget.id == map.get("6"))
+        var usedBudgetTotalAmount = 0;
+        for (var s = 0; s < shipmentList.length; s++) {
+          usedBudgetTotalAmount += parseFloat((parseFloat(shipmentList[s].productCost) + parseFloat(shipmentList[s].freightCost)) * parseFloat(shipmentList[s].currency.conversionRateToUsd));
+        }
+        var totalCost = parseFloat(((elInstance.getCell(`O${parseInt(y) + 1}`)).innerHTML).toString().replaceAll("\,", "")) + parseFloat(((elInstance.getCell(`P${parseInt(y) + 1}`)).innerHTML).toString().replaceAll("\,", ""));
+        var enteredBudgetAmt = (totalCost * (parseFloat((this.state.currencyListAll.filter(c => c.currencyId == rowData[12])[0]).conversionRateToUsd)));
+        usedBudgetTotalAmount = usedBudgetTotalAmount.toFixed(2);
+        enteredBudgetAmt = enteredBudgetAmt.toFixed(2);
+
+        var availableBudgetAmount = totalBudget - usedBudgetTotalAmount;
+        console.log("BudgetId", map.get("6"), "Entered amount", enteredBudgetAmt, "total budget", totalBudget, "Available budget", availableBudgetAmount, "Condition", enteredBudgetAmt > availableBudgetAmount || availableBudgetAmount < 0);
+        if (enteredBudgetAmt > availableBudgetAmount || availableBudgetAmount < 0) {
+          valid = false;
+          inValidWithColor("G", y, i18n.t('static.label.noFundsAvailable'), elInstance, "red");
+          inValidWithColor("O", y, i18n.t('static.label.noFundsAvailable'), elInstance, "red");
+        } else {
+        }
+      } else {
+      }
+    }
+    return valid;
+  }
+
   synchronize() {
     this.setState({ loading: true });
-    var db1;
-    var storeOS;
-    getDatabase();
-    var regionList = [];
-    var dataSourceList = [];
-    var dataSourceListAll = [];
-    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-    openRequest.onerror = function (event) {
-      this.setState({
-        supplyPlanError: i18n.t('static.program.errortext')
-      })
-    }.bind(this);
-    openRequest.onsuccess = function (e) {
-      db1 = e.target.result;
-      var programDataTransaction = db1.transaction(['programData'], 'readwrite');
-      var programDataOs = programDataTransaction.objectStore('programData');
-      var programRequest = programDataOs.get((this.state.programId).value);
-      programRequest.onerror = function (event) {
+    var checkValidations = this.checkValidations();
+    if (checkValidations) {
+      var db1;
+      var storeOS;
+      getDatabase();
+      var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+      openRequest.onerror = function (event) {
         this.setState({
           supplyPlanError: i18n.t('static.program.errortext')
         })
       }.bind(this);
-      programRequest.onsuccess = function (e) {
-        var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-        var programJson = JSON.parse(programData);
-        var planningUnitList = [];
-        var consumptionData = [];
-        var consumptionJson = (this.state.mergedConsumptionJexcel).getJson();
-        var oldProgramDataConsumption = this.state.oldProgramDataConsumption;
-        var latestProgramDataConsumption = this.state.latestProgramDataConsumption;
-        for (var c = 0; c < consumptionJson.length; c++) {
-          if (((consumptionJson[c])[18] == 2 || (consumptionJson[c])[18] == 4) && (consumptionJson[c])[0] != 0) {
-            consumptionData.push(oldProgramDataConsumption.filter(a => a.consumptionId == (consumptionJson[c])[0])[0]);
-          } else if ((consumptionJson[c])[18] == 3 && (consumptionJson[c])[0] != 0) {
-            consumptionData.push(latestProgramDataConsumption.filter(a => a.consumptionId == (consumptionJson[c])[0])[0]);
-            var index = planningUnitList.findIndex(a => a == (consumptionJson[c])[1]);
-            if (index == -1) {
-              planningUnitList.push((consumptionJson[c])[1]);
-            }
-          }
-        }
-        consumptionData = consumptionData.concat(oldProgramDataConsumption.filter(c => c.consumptionId == 0));
-
-        var inventoryData = [];
-        var inventoryJson = (this.state.mergedInventoryJexcel).getJson();
-        var oldProgramDataInventory = this.state.oldProgramDataInventory;
-        var latestProgramDataInventory = this.state.latestProgramDataInventory;
-        for (var c = 0; c < inventoryJson.length; c++) {
-          if (((inventoryJson[c])[19] == 2 || (inventoryJson[c])[19] == 4) && (inventoryJson[c])[0] != 0) {
-            inventoryData.push(oldProgramDataInventory.filter(a => a.inventoryId == (inventoryJson[c])[0])[0]);
-          } else if ((inventoryJson[c])[19] == 3 && (inventoryJson[c])[0] != 0) {
-            inventoryData.push(latestProgramDataInventory.filter(a => a.inventoryId == (inventoryJson[c])[0])[0]);
-            var index = planningUnitList.findIndex(a => a == (inventoryJson[c])[1]);
-            if (index == -1) {
-              planningUnitList.push((inventoryJson[c])[1]);
-            }
-          }
-        }
-        inventoryData = inventoryData.concat(oldProgramDataInventory.filter(c => c.inventoryId == 0));
-
-        var shipmentData = [];
-        var shipmentJson = (this.state.mergedShipmentJexcel).getJson();
-        var oldProgramDataShipment = this.state.oldProgramDataShipment;
-        var latestProgramDataShipment = this.state.latestProgramDataShipment;
-        for (var c = 0; c < shipmentJson.length; c++) {
-          if (((shipmentJson[c])[31] == 2 || (shipmentJson[c])[31] == 4) && (shipmentJson[c])[0] != 0) {
-            shipmentData.push(oldProgramDataShipment.filter(a => a.shipmentId == (shipmentJson[c])[0])[0]);
-          } else if ((shipmentJson[c])[31] == 3 && (shipmentJson[c])[0] != 0) {
-            shipmentData.push(latestProgramDataShipment.filter(a => a.shipmentId == (shipmentJson[c])[0])[0]);
-            var index = planningUnitList.findIndex(a => a == (shipmentJson[c])[1]);
-            if (index == -1) {
-              planningUnitList.push((shipmentJson[c])[1]);
-            }
-          }
-        }
-        shipmentData = shipmentData.concat(oldProgramDataShipment.filter(c => c.shipmentId == 0));
-        var problemReportList = this.state.mergedProblemListData;
-        console.log("Planning unit list", planningUnitList);
-        console.log("Consumption data", consumptionData);
-        console.log("InventoryData", inventoryData);
-        console.log("ShipmentData", shipmentData);
-        console.log("Program Report Data", problemReportList);
-        console.log("ProgramId", (this.state.programId).value);
-        console.log("VersionType", document.getElementById("versionType").value);
-        console.log("notes", document.getElementById("notes").value);
-        programJson.consumptionList = consumptionData;
-        programJson.inventoryList = inventoryData;
-        programJson.shipmentList = shipmentData;
-        programJson.problemReportList = problemReportList;
-        // programJson.problemReportList = [];
-        programJson.versionType = { id: document.getElementById("versionType").value };
-        programJson.versionStatus = { id: PENDING_APPROVAL_VERSION_STATUS };
-        programJson.notes = document.getElementById("notes").value;
-        var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY);
-
-        var whatIfProgramDataTransaction = db1.transaction(['whatIfProgramData'], 'readwrite');
-        var whatIfProgramDataOs = whatIfProgramDataTransaction.objectStore('whatIfProgramData');
-        var item = {
-          id: programRequest.result.id,
-          programId: programRequest.result.programId,
-          version: programRequest.result.version,
-          programName: (CryptoJS.AES.encrypt(JSON.stringify((programRequest.result.label)), SECRET_KEY)).toString(),
-          programData: encryptedText.toString(),
-          userId: programRequest.result.userId
-        }
-        var whatIfRequest = whatIfProgramDataOs.put(item);
-        whatIfRequest.onerror = function (event) {
+      openRequest.onsuccess = function (e) {
+        db1 = e.target.result;
+        var programDataTransaction = db1.transaction(['programData'], 'readwrite');
+        var programDataOs = programDataTransaction.objectStore('programData');
+        var programRequest = programDataOs.get((this.state.programId).value);
+        programRequest.onerror = function (event) {
           this.setState({
             supplyPlanError: i18n.t('static.program.errortext')
           })
         }.bind(this);
-        whatIfRequest.onsuccess = function (e) {
-          calculateSupplyPlan((this.state.programId).value, 0, 'whatIfProgramData', 'syncPage', this, planningUnitList);
+        programRequest.onsuccess = function (e) {
+          var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+          var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+          var programJson = JSON.parse(programData);
+          var planningUnitList = [];
+          var consumptionData = [];
+          var consumptionJson = (this.state.mergedConsumptionJexcel).getJson();
+          var oldProgramDataConsumption = this.state.oldProgramDataConsumption;
+          var latestProgramDataConsumption = this.state.latestProgramDataConsumption;
+          for (var c = 0; c < consumptionJson.length; c++) {
+            if (((consumptionJson[c])[18] == 2 || (consumptionJson[c])[18] == 4) && (consumptionJson[c])[0] != 0) {
+              consumptionData.push(oldProgramDataConsumption.filter(a => a.consumptionId == (consumptionJson[c])[0])[0]);
+            } else if ((consumptionJson[c])[18] == 3 && (consumptionJson[c])[0] != 0) {
+              consumptionData.push(latestProgramDataConsumption.filter(a => a.consumptionId == (consumptionJson[c])[0])[0]);
+            }
+          }
+          consumptionData = consumptionData.concat(oldProgramDataConsumption.filter(c => c.consumptionId == 0));
+
+          var inventoryData = [];
+          var inventoryJson = (this.state.mergedInventoryJexcel).getJson();
+          var oldProgramDataInventory = this.state.oldProgramDataInventory;
+          var latestProgramDataInventory = this.state.latestProgramDataInventory;
+          for (var c = 0; c < inventoryJson.length; c++) {
+            if (((inventoryJson[c])[19] == 2 || (inventoryJson[c])[19] == 4) && (inventoryJson[c])[0] != 0) {
+              inventoryData.push(oldProgramDataInventory.filter(a => a.inventoryId == (inventoryJson[c])[0])[0]);
+            } else if ((inventoryJson[c])[19] == 3 && (inventoryJson[c])[0] != 0) {
+              inventoryData.push(latestProgramDataInventory.filter(a => a.inventoryId == (inventoryJson[c])[0])[0]);
+            }
+          }
+          inventoryData = inventoryData.concat(oldProgramDataInventory.filter(c => c.inventoryId == 0));
+
+          var shipmentData = [];
+          var shipmentJson = (this.state.mergedShipmentJexcel).getJson();
+          var oldProgramDataShipment = this.state.oldProgramDataShipment;
+          var latestProgramDataShipment = this.state.latestProgramDataShipment;
+          for (var c = 0; c < shipmentJson.length; c++) {
+            if (((shipmentJson[c])[31] == 2 || (shipmentJson[c])[31] == 4) && (shipmentJson[c])[0] != 0) {
+              shipmentData.push(oldProgramDataShipment.filter(a => a.shipmentId == (shipmentJson[c])[0])[0]);
+            } else if ((shipmentJson[c])[31] == 3 && (shipmentJson[c])[0] != 0) {
+              shipmentData.push(latestProgramDataShipment.filter(a => a.shipmentId == (shipmentJson[c])[0])[0]);
+            }
+          }
+          shipmentData = shipmentData.concat(oldProgramDataShipment.filter(c => c.shipmentId == 0));
+          var problemReportList = this.state.mergedProblemListData.filter(c => c.newAdded != true);
+          console.log("Planning unit list", planningUnitList);
+          console.log("Consumption data", consumptionData);
+          console.log("InventoryData", inventoryData);
+          console.log("ShipmentData", shipmentData);
+          console.log("Program Report Data", problemReportList);
+          console.log("ProgramId", (this.state.programId).value);
+          console.log("VersionType", document.getElementById("versionType").value);
+          console.log("notes", document.getElementById("notes").value);
+          programJson.consumptionList = consumptionData;
+          programJson.inventoryList = inventoryData;
+          programJson.shipmentList = shipmentData;
+          programJson.problemReportList = problemReportList;
+          // programJson.problemReportList = [];
+          programJson.versionType = { id: document.getElementById("versionType").value };
+          programJson.versionStatus = { id: PENDING_APPROVAL_VERSION_STATUS };
+          programJson.notes = document.getElementById("notes").value;
+          console.log("Program json", programJson);
+          ProgramService.saveProgramData(programJson).then(response => {
+            if (response.status == 200) {
+              this.redirectToDashbaord();
+            } else {
+              this.setState({
+                message: response.data.messageCode,
+                color: "red",
+                loading: false
+              })
+              this.hideFirstComponent();
+            }
+          })
+            .catch(
+              error => {
+                if (error.message === "Network Error") {
+                  this.setState({
+                    message: error.message,
+                    color: "red",
+                    loading: false
+                  })
+                  this.hideFirstComponent();
+                } else {
+                  switch (error.response ? error.response.status : "") {
+                    case 500:
+                    case 401:
+                    case 404:
+                    case 406:
+                    case 412:
+                      this.setState({
+                        message: error.response.data.messageCode,
+                        color: "red",
+                        loading: false
+                      })
+                      this.hideFirstComponent();
+                      break;
+                    default:
+                      this.setState({
+                        message: 'static.unkownError',
+                        color: "red",
+                        loading: false
+                      })
+                      this.hideFirstComponent();
+                      break;
+                  }
+                }
+              }
+            );
         }.bind(this)
       }.bind(this)
-    }.bind(this)
+    } else {
+      console.log("in else");
+      this.setState({ "noFundsBudgetError": i18n.t('static.label.noFundsAvailable'), loading: false });
+      this.hideSecondComponent();
+    }
   }
 
   cancelClicked() {
@@ -2446,12 +2585,6 @@ export default class syncPage extends Component {
     this.setState({ loading: false })
     let id = AuthenticationService.displayDashboardBasedOnRole();
     this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.message.commitSuccess'))
-  }
-
-  hideSecondComponent() {
-    setTimeout(function () {
-      document.getElementById('div2').style.display = 'none';
-    }, 8000);
   }
 
   updateState(parameterName, value) {
