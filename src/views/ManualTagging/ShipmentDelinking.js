@@ -417,7 +417,7 @@ export default class ShipmentDelinking extends Component {
             programs: [],
             planningUnits: [],
             shipmentId: '',
-            haslink:false
+            haslink: false
         }
         this.filterData = this.filterData.bind(this);
         this.formatLabel = this.formatLabel.bind(this);
@@ -437,15 +437,15 @@ export default class ShipmentDelinking extends Component {
                 this.setState({
                     message: i18n.t('static.shipment.delinkingsuccess'),
                     color: 'green',
-                    haslink:true
+                    haslink: true
                 },
-                 () => {
+                    () => {
                         console.log(this.state.message, "success 1")
                         this.hideSecondComponent();
                         document.getElementById('div2').style.display = 'block';
                         this.filterData();
                     })
-                  })
+            })
     }
     hideFirstComponent() {
         this.timeout = setTimeout(function () {
@@ -459,7 +459,6 @@ export default class ShipmentDelinking extends Component {
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-            // this.setState({ message: '' })
         }, 8000);
     }
 
@@ -578,13 +577,14 @@ export default class ShipmentDelinking extends Component {
                                         this.setState({
                                             message: i18n.t('static.shipment.delinkingsuccess'),
                                             color: 'green',
-                                            haslink:true
-                                            
+                                            haslink: true
+
                                         }, () => {
-                                          this.hideSecondComponent();
-                                          this.filterData();
+                                            this.hideSecondComponent();
+                                            document.getElementById('div2').style.display = 'block';
+                                            this.filterData();
                                         });
-                                       
+
                                     })
 
                             }.bind(this)
@@ -610,17 +610,19 @@ export default class ShipmentDelinking extends Component {
         document.getElementById('div2').style.display = 'block';
         var programId = document.getElementById("programId").value;
         var planningUnitId = document.getElementById("planningUnitId").value;
-        if (this.state.haslink) {
-            this.setState({ haslink: false })
-        } else {
-            this.setState({ message: '' })
-        }
         if (programId != -1 && planningUnitId != 0) {
-             ManualTaggingService.getShipmentListForDelinking(programId, planningUnitId)
+            console.log("HASLINKED------->", this.state.haslink);
+            if (this.state.haslink) {
+                this.setState({ haslink: false })
+            } else {
+                this.setState({ message: '' })
+            }
+            ManualTaggingService.getShipmentListForDelinking(programId, planningUnitId)
                 .then(response => {
                     console.log("manual tagging response===", response);
                     this.setState({
-                        outputList: response.data,message:''
+                        outputList: response.data,
+                        // message: ''
                     }, () => {
                         this.buildJExcel();
                     });
@@ -676,27 +678,27 @@ export default class ShipmentDelinking extends Component {
 
     getPlanningUnitList() {
         var programId = document.getElementById("programId").value;
-        if(programId>0){
+        if (programId > 0) {
             ProgramService.getProgramPlaningUnitListByProgramId(programId)
-            .then(response => {
-                if (response.status == 200) {
-                    this.setState({
-                        planningUnits: response.data
-                    })
-                }
-                else {
-
-                    this.setState({
-                        message: response.data.messageCode, color: 'red'
-                    },
-                        () => {
-                            this.hideSecondComponent();
+                .then(response => {
+                    if (response.status == 200) {
+                        this.setState({
+                            planningUnits: response.data
                         })
-                }
-            })
+                    }
+                    else {
+
+                        this.setState({
+                            message: response.data.messageCode, color: 'red'
+                        },
+                            () => {
+                                this.hideSecondComponent();
+                            })
+                    }
+                })
         }
         this.filterData();
-        
+
     }
 
     formatLabel(cell, row) {
