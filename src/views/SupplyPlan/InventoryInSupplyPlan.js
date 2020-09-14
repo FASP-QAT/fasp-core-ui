@@ -167,6 +167,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                             index = inventoryListUnFiltered.findIndex(c => c.planningUnit.id == planningUnitId && c.region != null && c.region.id != 0 && c.region.id == inventoryList[j].region.id && moment(c.inventoryDate).format("MMM YY") == moment(inventoryList[j].inventoryDate).format("MMM YY") && c.realmCountryPlanningUnit.id == inventoryList[j].realmCountryPlanningUnit.id && (adjustmentType == 1 ? c.actualQty > 0 : c.adjustmentQty > 0));
                         }
                         data[14] = index;
+                        data[15] = 0;
                         inventoryDataArr[j] = data;
                     }
                     if (inventoryList.length == 0) {
@@ -195,6 +196,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         }
                         data[13] = "";
                         data[14] = -1;
+                        data[15] = 1;
                         inventoryDataArr[0] = data;
                     }
                     var options = {
@@ -215,7 +217,8 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                             { title: i18n.t('static.inventory.active'), type: 'checkbox', width: 100 },
                             { title: i18n.t('static.inventory.inventoryDate'), type: 'hidden', width: 0 },
                             { type: 'hidden', title: i18n.t('static.supplyPlan.batchInfo'), width: 0 },
-                            { type: 'hidden', title: i18n.t('static.supplyPlan.index'), width: 0 }
+                            { type: 'hidden', title: i18n.t('static.supplyPlan.index'), width: 0 },
+                            { type: 'hidden', title: i18n.t('static.supplyPlan.isChanged'), width: 0 }
                         ],
                         pagination: paginationOption,
                         paginationOptions: paginationArray,
@@ -382,7 +385,6 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                             allowInsertColumn: false,
                                             allowManualInsertColumn: false,
                                             allowDeleteRow: true,
-                                            oneditionend: this.onedit,
                                             copyCompatibility: true,
                                             allowInsertRow: true,
                                             allowManualInsertRow: false,
@@ -483,6 +485,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                                 }
                                                 data[13] = "";
                                                 data[14] = -1;
+                                                data[15] = 1;
                                                 obj.insertRow(data);
                                             }.bind(this)
                                         });
@@ -553,6 +556,9 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         this.props.updateState("inventoryError", "");
         this.props.updateState("inventoryDuplicateError", "");
         this.props.updateState("inventoryChangedFlag", 1);
+        if (x != 15) {
+            elInstance.setValueFromCoords(15, y, 1, true);
+        }
         if (x == 0) {
             checkValidtion("date", "A", y, rowData[0], elInstance);
         }
@@ -977,8 +983,14 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     var programJson = JSON.parse(programData);
                     var inventoryDataList = (programJson.inventoryList);
                     console.log("Json.length", json.length);
+                    var minDate = moment(Date.now()).startOf('month').format("YYYY-MM-DD");
                     for (var i = 0; i < json.length; i++) {
                         var map = new Map(Object.entries(json[i]));
+                        if (map.get("15") == 1) {
+                            if (moment(map.get("0")).format("YYYY-MM") < moment(minDate).format("YYYY-MM")) {
+                                minDate = moment(map.get("0")).format("YYYY-MM-DD");
+                            }
+                        }
                         console.log("parseInt(map.get(14))", parseInt(map.get("14")));
                         if (parseInt(map.get("14")) != -1) {
                             inventoryDataList[parseInt(map.get("14"))].inventoryDate = moment(map.get("0")).endOf('month').format("YYYY-MM-DD");
@@ -1048,7 +1060,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         } else {
                             objectStore = 'programData';
                         }
-                        calculateSupplyPlan(programId, planningUnitId, objectStore, "inventory", this.props);
+                        calculateSupplyPlan(programId, planningUnitId, objectStore, "inventory", this.props, [], moment(minDate).startOf('month').format("YYYY-MM-DD"));
                     }.bind(this)
                 }.bind(this)
             }.bind(this)

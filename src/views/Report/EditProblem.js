@@ -401,7 +401,7 @@ export default class EditLanguageComponent extends Component {
         // var bfList = AuthenticationService.getLoggedInUserRoleBusinessFunctionArray();
         // console.log("bfList#####====>", bfList);
         
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         this.getProblemStatus();
         let problemReportId = this.props.match.params.problemReportId;
         let programId = this.props.match.params.programId;
@@ -477,7 +477,14 @@ export default class EditLanguageComponent extends Component {
                     problemStatusRequest.onsuccess = function (e) {
                         var myResult = [];
                         // myResult = problemStatusRequest.result;
-                        var roleList=AuthenticationService.getLoggedInUserRole();
+
+                        let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+                        let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+
+                        console.log("decryptedUser=====>",decryptedUser);
+
+
+                        var roleList=decryptedUser.roleList;
                         // console.log("user Role====>",roleList);
                         var roleArray=[]
                         for(var r=0 ;r<roleList.length;r++){
@@ -631,7 +638,7 @@ export default class EditLanguageComponent extends Component {
                                 // }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
-                                    AuthenticationService.setupAxiosInterceptors();
+                                    // AuthenticationService.setupAxiosInterceptors();
 
                                     var db1;
                                     var storeOS;

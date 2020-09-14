@@ -1,6 +1,7 @@
 import i18n from 'i18next';
 import Backend from 'i18next-xhr-backend';
 import LanguageDetector from 'i18next-browser-languagedetector';
+import { reactI18nextModule } from 'react-i18next';
 
 // import en from '/';
 import en from '../src/assets/img/locales/en.json'
@@ -19,6 +20,7 @@ if (lang == null) {
 i18n
   .use(LanguageDetector)
   .use(Backend)
+  .use(initReactI18next)
   .init({
     lng: lang,
     backend: {
@@ -40,7 +42,7 @@ i18n
     react: {
       wait: true
     }, debug: true,
-    useSuspense: false,
+    useSuspense: true,
     wait:          true,
   }, (err, t) => {
     if (err) return console.log('something went wrong loading', err);
