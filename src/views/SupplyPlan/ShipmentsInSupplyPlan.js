@@ -237,8 +237,11 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             budgetList: budgetList,
                                             shipmentStatusList: shipmentStatusList
                                         })
+
                                         this.el = jexcel(document.getElementById("shipmentsDetailsTable"), '');
-                                        this.el.destroy();
+                                        if (this.state.shipmentsEl != "" && this.state.shipmentsEl != undefined) {
+                                            this.el.destroy();
+                                        }
                                         var data = [];
                                         var shipmentsArr = [];
                                         var shipmentEditable = true;
@@ -272,7 +275,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             var shipmentBatchInfoList = shipmentList[i].batchInfoList;
                                             console.log("Shipment batch info list", shipmentBatchInfoList);
                                             for (var sb = 0; sb < shipmentBatchInfoList.length; sb++) {
-                                                totalShipmentQty += parseInt(shipmentBatchInfoList[sb].shipmentQty);
+                                                totalShipmentQty += Math.round(shipmentBatchInfoList[sb].shipmentQty);
                                             }
                                             console.log("Total shipment qty", totalShipmentQty);
                                             var shipmentDatesJson = {
@@ -284,6 +287,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                 expectedDeliveryDate: shipmentList[i].expectedDeliveryDate,
                                                 receivedDate: shipmentList[i].receivedDate
                                             }
+                                            console.log("shipmentList[i].expectedDeliveryDate", shipmentList[i].expectedDeliveryDate);
 
                                             data = [];
                                             data[0] = shipmentList[i].shipmentStatus.id; //A
@@ -1386,11 +1390,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                         this.setState({
                                             shipmentsEl: myVar,
                                         })
-                                        var elInstance = myVar;
-                                        var json = elInstance.getJson();
-                                        for (var i = 0; i < json.length; i++) {
-                                            this.calculateLeadTimesOnChange(parseInt(i));
-                                        }
                                         this.props.updateState("loading", false);
                                     }.bind(this)
                                 }.bind(this)
@@ -1933,6 +1932,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
     calculateLeadTimesOnChange(y) {
         // Logic for dates
         var elInstance = this.state.shipmentsEl;
+        console.log("In calculate lead times")
         var rowData = elInstance.getRowData(y);
         var shipmentMode = rowData[7];
         var procurementAgent = rowData[2];
@@ -2234,6 +2234,13 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             }
                         }
                     }
+                    console.log("Planned date", plannedDate);
+                    console.log("Submitted date", submittedDate);
+                    console.log("Approved Date", approvedDate);
+                    console.log("shipped date", shippedDate);
+                    console.log("Arrived date", arrivedDate);
+                    console.log("ExpectedDeliveryDate", expectedDeliveryDate);
+
                     var json = {
                         plannedDate: plannedDate,
                         submittedDate: submittedDate,
