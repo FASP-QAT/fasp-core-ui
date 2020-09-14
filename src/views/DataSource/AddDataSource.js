@@ -251,6 +251,7 @@ export default class AddDataSource extends Component {
                                     this.setState({
                                         loading: true
                                     })
+                                    console.log("this.state----",this.state);
                                     DataSourceService.addDataSource(this.state)
                                         .then(response => {
                                             if (response.status == 200) {

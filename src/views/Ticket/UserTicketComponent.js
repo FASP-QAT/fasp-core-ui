@@ -537,7 +537,7 @@ export default class UserTicketComponent extends Component {
                                             onBlur={handleBlur}
                                             value={this.state.languageId}
                                             required>
-                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                            <option value="">{i18n.t('static.common.select')}</option>
                                             {languageList}
                                         </Input>
                                         <FormFeedback className="red">{errors.language}</FormFeedback>

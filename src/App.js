@@ -2,11 +2,11 @@ import React, { Component } from 'react';
 import { HashRouter, Route, Switch } from 'react-router-dom';
 // import { renderRoutes } from 'react-router-config';
 import './App.scss';
-//import  './i18n'
+import i18n from './i18n'
 import ResetPasswordComponent from './views/Pages/Login/ResetPasswordComponent';
 import UpdateExpiredPasswordComponent from './views/Pages/Login/UpdateExpiredPasswordComponent';
-import i18n from './i18n'
 import 'react-app-polyfill/stable';
+import { withTranslation } from "react-i18next";
 
 const loading = () => <div className="animated fadeIn pt-3 text-center"><div className="sk-spinner sk-spinner-pulse"></div></div>;
 
@@ -24,7 +24,10 @@ const UpdateExpiredPassword = React.lazy(() => import('./views/Pages/Login/Updat
 const ResetPassword = React.lazy(() => import('./views/Pages/Login/ResetPasswordComponent'));
 const Page500 = React.lazy(() => import('./views/Pages/Page500'));
 
+
 class App extends Component {
+  componentDidMount() {
+  }
 
   render() {
     return (
@@ -52,4 +55,4 @@ class App extends Component {
 
 
 
-export default App;
+export default withTranslation('translations')(App);

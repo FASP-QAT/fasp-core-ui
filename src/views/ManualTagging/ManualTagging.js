@@ -675,7 +675,8 @@ export default class ManualTagging extends Component {
             artmisList: [],
             shipmentId: '',
             reason: "1",
-            loading: true
+            loading: true,
+            haslinked: false
         }
         this.addNewCountry = this.addNewCountry.bind(this);
         this.editCountry = this.editCountry.bind(this);
@@ -695,12 +696,19 @@ export default class ManualTagging extends Component {
 
         ManualTaggingService.linkShipmentWithARTMIS(orderNo, primeLineNo, this.state.shipmentId)
             .then(response => {
-                console.log("link response===", response);
                 this.setState({
-                    message: i18n.t('static.shipment.linkingsuccess')
-                })
-                this.toggleLarge();
-                this.filterData();
+                    message: i18n.t('static.shipment.linkingsuccess'),
+                    color: 'green',
+                    haslinked: true
+                },
+                    () => {
+                        console.log(this.state.message, "success 1")
+                        this.hideSecondComponent();
+                        document.getElementById('div2').style.display = 'block';
+                        this.toggleLarge();
+                        this.filterData();
+                    })
+
             })
     }
     getOrderDetails() {
@@ -719,7 +727,7 @@ export default class ManualTagging extends Component {
                     this.setState({
                         reason: response.data.reason,
                         artmisList,
-                        result : ''
+                        result: ''
                     })
                 })
         } else {
@@ -739,17 +747,27 @@ export default class ManualTagging extends Component {
     }
 
     hideSecondComponent() {
+       
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 8000);
+        
+        
     }
 
     filterData() {
+        document.getElementById('div2').style.display = 'block';
         var programId = document.getElementById("programId").value;
         var planningUnitId = document.getElementById("planningUnitId").value;
 
         if (programId != -1 && planningUnitId != 0) {
             this.setState({ loading: true })
+            if (this.state.haslinked) {
+                this.setState({ haslinked: false })
+            } else {
+                this.setState({ message: '' })
+            }
+
             console.log("1-programId------>", programId);
             ManualTaggingService.getShipmentListForManualTagging(programId, planningUnitId)
                 .then(response => {
@@ -765,7 +783,8 @@ export default class ManualTagging extends Component {
             console.log("2-programId------>", programId);
             this.setState({
                 outputList: [],
-                message: i18n.t('static.program.validselectprogramtext')
+                message: i18n.t('static.program.validselectprogramtext'),
+                color: 'red'
             }, () => {
                 this.el = jexcel(document.getElementById("tableDiv"), '');
                 this.el.destroy();
@@ -774,7 +793,8 @@ export default class ManualTagging extends Component {
             console.log("3-programId------>", programId);
             this.setState({
                 outputList: [],
-                message: i18n.t('static.procurementUnit.validPlanningUnitText')
+                message: i18n.t('static.procurementUnit.validPlanningUnitText'),
+                color: 'red'
             }, () => {
                 this.el = jexcel(document.getElementById("tableDiv"), '');
                 this.el.destroy();
@@ -814,6 +834,7 @@ export default class ManualTagging extends Component {
 
                     this.setState({
                         message: response.data.messageCode,
+                        color: 'red',
                         loading: false
                     },
                         () => {
@@ -1017,7 +1038,8 @@ export default class ManualTagging extends Component {
                     else {
 
                         this.setState({
-                            message: response.data.messageCode
+                            message: response.data.messageCode,
+                            color: 'red'
                         },
                             () => {
                                 this.hideSecondComponent();
@@ -1276,7 +1298,7 @@ export default class ManualTagging extends Component {
                     this.setState({ loading: loading })
                 }} />
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
-                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                <h5 className={this.state.color} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 {/* <Card style={{ display: this.state.loading ? "none" : "block" }}> */}
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
                     <CardBody className="pb-lg-5">
