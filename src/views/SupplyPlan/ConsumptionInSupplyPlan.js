@@ -163,6 +163,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                             index = consumptionListUnFiltered.findIndex(c => c.planningUnit.id == planningUnitId && c.region.id == consumptionList[j].region.id && moment(c.consumptionDate).format("MMM YY") == moment(consumptionList[j].consumptionDate).format("MMM YY") && c.realmCountryPlanningUnit.id == consumptionList[j].realmCountryPlanningUnit.id && c.actualFlag.toString() == consumptionList[j].actualFlag.toString());
                         }
                         data[12] = index;
+                        data[13] = 0;
                         consumptionDataArr[j] = data;
                     }
                     if (consumptionList.length == 0) {
@@ -185,6 +186,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         data[10] = true;
                         data[11] = "";
                         data[12] = -1;
+                        data[13] = 1;
                         consumptionDataArr[0] = data;
                     }
                     var options = {
@@ -203,7 +205,8 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                             { title: i18n.t('static.program.notes'), type: 'text', width: 200 },
                             { title: i18n.t('static.inventory.active'), type: 'checkbox', width: 100 },
                             { type: 'hidden', title: i18n.t('static.supplyPlan.batchInfo'), width: 0 },
-                            { type: 'hidden', title: i18n.t('static.supplyPlan.index'), width: 0 }
+                            { type: 'hidden', title: i18n.t('static.supplyPlan.index'), width: 0 },
+                            { type: 'hidden', title: i18n.t('static.supplyPlan.isChanged'), width: 0 }
                         ],
                         pagination: paginationOption,
                         paginationOptions: paginationArray,
@@ -416,6 +419,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                                                 data[10] = true;
                                                 data[11] = "";
                                                 data[12] = -1;
+                                                data[13] = 1;
                                                 obj.insertRow(data);
                                             }.bind(this)
                                         });
@@ -487,6 +491,9 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         this.props.updateState("consumptionError", "");
         this.props.updateState("consumptionDuplicateError", "");
         this.props.updateState("consumptionChangedFlag", 1);
+        if (x != 13) {
+            elInstance.setValueFromCoords(13, y, 1, true);
+        }
         if (x == 0) {
             checkValidtion("date", "A", y, rowData[0], elInstance);
         }
@@ -863,8 +870,14 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                     var programJson = JSON.parse(programData);
                     var consumptionDataList = (programJson.consumptionList);
+                    var minDate = moment(Date.now()).startOf('month').format("YYYY-MM-DD");
                     for (var i = 0; i < json.length; i++) {
                         var map = new Map(Object.entries(json[i]));
+                        if (map.get("13") == 1) {
+                            if (moment(map.get("0")).format("YYYY-MM") < moment(minDate).format("YYYY-MM")) {
+                                minDate = moment(map.get("0")).format("YYYY-MM-DD");
+                            }
+                        }
                         var actualFlag = true;
                         if (map.get("2") == 2) {
                             actualFlag = false;
@@ -939,7 +952,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         } else {
                             objectStore = 'programData';
                         }
-                        calculateSupplyPlan(programId, planningUnitId, objectStore, "consumption", this.props);
+                        calculateSupplyPlan(programId, planningUnitId, objectStore, "consumption", this.props, [], moment(minDate).startOf('month').format("YYYY-MM-DD"));
                     }.bind(this)
                 }.bind(this)
             }.bind(this)
