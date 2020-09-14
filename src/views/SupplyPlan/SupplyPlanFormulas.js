@@ -21,6 +21,7 @@ class SupplyPlanFormulas extends Component {
       inventoryturns:false,
       stockstatus:false,
       stockstatusacrossplaningunit:false,
+      shipmentcost:false,
     };
     this.toggle = this.toggle.bind(this);
     this.toggleLarge = this.toggleLarge.bind(this);
@@ -32,6 +33,7 @@ class SupplyPlanFormulas extends Component {
     this.toggleInventoryTurns = this.toggleInventoryTurns.bind(this);
     this.toggleStockStatus = this.toggleStockStatus.bind(this);
     this.toggleStockStatusAcrossPlaningUnit = this.toggleStockStatusAcrossPlaningUnit.bind(this);
+    this.toggleShippmentCost = this.toggleShippmentCost.bind(this);
   }
 
   toggle(tab) {
@@ -91,6 +93,11 @@ class SupplyPlanFormulas extends Component {
   toggleStockStatusAcrossPlaningUnit(){
     this.setState({
       stockstatusacrossplaningunit: !this.state.stockstatusacrossplaningunit,
+    });
+  }
+  toggleShippmentCost(){
+    this.setState({
+      shipmentcost: !this.state.shipmentcost,
     });
   }
 
@@ -321,8 +328,8 @@ Months Of Stock = 3.54</p>
                       <ListGroupItem >
                     <ListGroupItemHeading className="formulasheading">Weighted Absolute Percentage Error (WAPE)</ListGroupItemHeading>
                     <ListGroupItemText className="formulastext">
-                    <img className="formula-img-mr img-fluid" src="../src/assets/img/Formulas/WAPE-Formula.png"/><br></br>
-                    <p>* N is number of months</p>
+                    <img className="formula-img-mr img-fluid" src="../src/assets/img/Formulas/ForecastError-Formula.png"/><br></br>
+                    {/* <p>* N is number of months</p> */}
                    
                     </ListGroupItemText>
                   </ListGroupItem>
@@ -508,6 +515,22 @@ Ending balance = 22,000</p><br></br>
                   </ModalBody>
                   </Modal>
 
+                   {/*Shipment Cost formuale */} 
+                   <Modal isOpen={this.state.shipmentcost}  className={'modal-lg ' + this.props.className} >
+                  <ModalHeader toggle={this.toggleShippmentCost} className="ModalHead modal-info-Headher"><strong className="TextWhite">Formulae</strong></ModalHeader>
+                  <ModalBody >
+                      <ListGroup>
+                      <ListGroupItem >
+                    <ListGroupItemHeading className="formulasheading">Shipment Cost</ListGroupItemHeading>
+                    <ListGroupItemText className="formulastext">
+                    
+                     <img className="formula-img-mr img-fluid" src="../src/assets/img/Formulas/Shipment-cost-formula.png"/>
+                    
+                    </ListGroupItemText>
+                  </ListGroupItem>
+                      </ListGroup>
+                  </ModalBody>
+                  </Modal>
                 {/* <ListGroup>
                 <ListGroupItem action>
                     <ListGroupItemHeading className="formulasheading">Opening Balance</ListGroupItemHeading>

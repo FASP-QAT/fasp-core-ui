@@ -1956,11 +1956,11 @@ const options = {
         labelString:i18n.t('static.shipment.qty'),
         display: true,
         fontSize: "12",
-        fontColor: 'blue'
+        fontColor: 'black'
       },
       ticks: {
         beginAtZero: true,
-        fontColor: 'blue'
+        fontColor: 'black'
       },
 
     }, {
@@ -2642,6 +2642,10 @@ class StockStatus extends Component {
     this.setState({
       planningUnits: []
     }, () => {
+
+      if (versionId == 0) {
+        this.setState({ message: i18n.t('static.program.validversion'), stockStatusList: [] });
+      } else {
       if (versionId.includes('Local')) {
         const lan = 'en';
         var db1;
@@ -2714,6 +2718,7 @@ class StockStatus extends Component {
             }
           );
       }
+    }
     });
 
   }
@@ -3046,7 +3051,7 @@ class StockStatus extends Component {
                               bsSize="sm"
                               onChange={(e) => { this.getPlanningUnit(); }}
                             >
-                              <option value="-1">{i18n.t('static.common.select')}</option>
+                              <option value="0">{i18n.t('static.common.select')}</option>
                               {versionList}
                             </Input>
 

@@ -73,16 +73,16 @@ export default class QatProblemActions extends Component {
                 var latestVersionProgramList = [];
 
                 // for (var i = 0; i < getRequest.result.length; i++) {
-                    // console.log("QPA 2=====>  in for");
-                    // if (getRequest.result[i].userId == userId) {
-                        var programDataBytes = CryptoJS.AES.decrypt(getRequest.result.programData, SECRET_KEY);
-                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                        var programJson = JSON.parse(programData);
-                        // console.log("QPA 2====>", programJson);
-                        programList.push(programJson);
-                        programRequestList.push(getRequest.result);
-                        versionIDs.push(getRequest.result.version);
-                    // }
+                // console.log("QPA 2=====>  in for");
+                // if (getRequest.result[i].userId == userId) {
+                var programDataBytes = CryptoJS.AES.decrypt(getRequest.result.programData, SECRET_KEY);
+                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                var programJson = JSON.parse(programData);
+                // console.log("QPA 2====>", programJson);
+                programList.push(programJson);
+                programRequestList.push(getRequest.result);
+                versionIDs.push(getRequest.result.version);
+                // }
 
                 // }
                 // console.log("program list=====>",programList)
@@ -154,7 +154,7 @@ export default class QatProblemActions extends Component {
                                 this.props.updateState(false);
                             }
                             for (var pp = 0; pp < programList.length; pp++) {
-                                console.log("=====>in for====>",programList[pp]);
+                                console.log("=====>in for====>", programList[pp]);
                                 var versionID = versionIDs[pp];
                                 var problemActionIndex = 0;
                                 problemActionList = programList[pp].problemReportList;
@@ -209,6 +209,7 @@ export default class QatProblemActions extends Component {
                                                             },
                                                             shipmentId: '',
                                                             data5: '',
+                                                            newAdded: false,
 
                                                             problemActionIndex: problemActionIndex,
 
@@ -353,6 +354,7 @@ export default class QatProblemActions extends Component {
                                                             },
                                                             shipmentId: '',
                                                             data5: '',
+                                                            newAdded: false,
 
                                                             problemActionIndex: problemActionIndex,
 
@@ -472,6 +474,7 @@ export default class QatProblemActions extends Component {
                                                     }
 
                                                     var indexShipment = 0;
+                                                    var newAddShipment = false;
                                                     if (filteredShipmentList[s].shipmentId > 0) {
                                                         indexShipment = problemActionList.findIndex(
                                                             c => c.program.id == programList[pp].programId
@@ -484,6 +487,7 @@ export default class QatProblemActions extends Component {
                                                                 && c.index == filteredShipmentList[s].index
                                                                 && c.realmProblem.problem.problemId == 3
                                                                 && c.versionId == versionID);
+                                                        newAddShipment = true;
                                                     }
 
                                                     if (indexShipment == -1) {
@@ -512,6 +516,7 @@ export default class QatProblemActions extends Component {
                                                             },
                                                             shipmentId: filteredShipmentList[s].shipmentId,
                                                             data5: '',
+                                                            newAdded: newAddShipment,
 
                                                             problemActionIndex: problemActionIndex,
 
@@ -709,6 +714,7 @@ export default class QatProblemActions extends Component {
                                                             },
                                                             shipmentId: '',
                                                             data5: '',
+                                                            newAdded: false,
                                                             problemActionIndex: problemActionIndex,
                                                             problemStatus: {
                                                                 id: 1,
@@ -826,6 +832,7 @@ export default class QatProblemActions extends Component {
                                                     }
 
                                                     var indexShipment = 0;
+                                                    var newAddShipment = false;
                                                     if (filteredShipmentList[s].shipmentId > 0) {
                                                         indexShipment = problemActionList.findIndex(
                                                             c => c.program.id == programList[pp].programId
@@ -838,6 +845,7 @@ export default class QatProblemActions extends Component {
                                                                 && c.index == filteredShipmentList[s].index
                                                                 && c.realmProblem.problem.problemId == 4
                                                                 && c.versionId == versionID);
+                                                        newAddShipment = true;
                                                     }
 
                                                     if (indexShipment == -1) {
@@ -866,6 +874,7 @@ export default class QatProblemActions extends Component {
                                                             },
                                                             shipmentId: filteredShipmentList[s].shipmentId,
                                                             data5: '',
+                                                            newAdded: newAddShipment,
 
                                                             problemActionIndex: problemActionIndex,
 
@@ -1037,6 +1046,7 @@ export default class QatProblemActions extends Component {
                                                     }
 
                                                     var indexShipment = 0;
+                                                    var newAddShipment = false;
                                                     if (filteredShipmentList[s].shipmentId > 0) {
                                                         indexShipment = problemActionList.findIndex(
                                                             c => c.program.id == programList[pp].programId
@@ -1049,6 +1059,7 @@ export default class QatProblemActions extends Component {
                                                                 && c.index == filteredShipmentList[s].index
                                                                 && c.realmProblem.problem.problemId == 5
                                                                 && c.versionId == versionID);
+                                                        newAddShipment = true;
                                                     }
 
                                                     if (indexShipment == -1) {
@@ -1077,6 +1088,7 @@ export default class QatProblemActions extends Component {
                                                             },
                                                             shipmentId: filteredShipmentList[s].shipmentId,
                                                             data5: '',
+                                                            newAdded:newAddShipment,
 
                                                             problemActionIndex: problemActionIndex,
 
@@ -1249,6 +1261,7 @@ export default class QatProblemActions extends Component {
                                                     }
 
                                                     var indexShipment = 0;
+                                                    var newAddShipment = false;
                                                     if (filteredShipmentList[s].shipmentId > 0) {
                                                         indexShipment = problemActionList.findIndex(
                                                             c => c.program.id == programList[pp].programId
@@ -1261,6 +1274,7 @@ export default class QatProblemActions extends Component {
                                                                 && c.index == filteredShipmentList[s].index
                                                                 && c.realmProblem.problem.problemId == 6
                                                                 && c.versionId == versionID);
+                                                                newAddShipment=true;
                                                     }
 
                                                     if (indexShipment == -1) {
@@ -1280,7 +1294,7 @@ export default class QatProblemActions extends Component {
 
                                                             dt: '',
                                                             region: {
-                                                                id:0
+                                                                id: 0
                                                             },
                                                             planningUnit: {
                                                                 id: filteredShipmentList[s].planningUnit.id,
@@ -1289,6 +1303,7 @@ export default class QatProblemActions extends Component {
                                                             },
                                                             shipmentId: filteredShipmentList[s].shipmentId,
                                                             data5: '',
+                                                            newAdded:newAddShipment,
 
                                                             problemActionIndex: problemActionIndex,
 
@@ -1461,6 +1476,7 @@ export default class QatProblemActions extends Component {
                                                     }
 
                                                     var indexShipment = 0;
+                                                    var newAddShipment = false;
                                                     if (filteredShipmentList[s].shipmentId > 0) {
                                                         indexShipment = problemActionList.findIndex(
                                                             c => c.program.id == programList[pp].programId
@@ -1473,6 +1489,7 @@ export default class QatProblemActions extends Component {
                                                                 && c.index == filteredShipmentList[s].index
                                                                 && c.realmProblem.problem.problemId == 7
                                                                 && c.versionId == versionID);
+                                                                newAddShipment=true;
                                                     }
 
                                                     if (indexShipment == -1) {
@@ -1492,7 +1509,7 @@ export default class QatProblemActions extends Component {
 
                                                             dt: '',
                                                             region: {
-                                                                id:0
+                                                                id: 0
                                                             },
                                                             planningUnit: {
                                                                 id: filteredShipmentList[s].planningUnit.id,
@@ -1501,6 +1518,7 @@ export default class QatProblemActions extends Component {
                                                             },
                                                             shipmentId: filteredShipmentList[s].shipmentId,
                                                             data5: '',
+                                                            newAdded:newAddShipment,
 
                                                             problemActionIndex: problemActionIndex,
 
@@ -1722,6 +1740,7 @@ export default class QatProblemActions extends Component {
                                                                     },
                                                                     shipmentId: '',
                                                                     data5: '',
+                                                                    newAdded: false,
                                                                     problemActionIndex: problemActionIndex,
                                                                     problemStatus: {
                                                                         id: 1,
@@ -1914,6 +1933,7 @@ export default class QatProblemActions extends Component {
                                                                     },
                                                                     shipmentId: '',
                                                                     data5: '',
+                                                                    newAdded: false,
                                                                     problemActionIndex: problemActionIndex,
                                                                     problemStatus: {
                                                                         id: 1,
@@ -2091,6 +2111,7 @@ export default class QatProblemActions extends Component {
                                                                     },
                                                                     shipmentId: '',
                                                                     data5: '',
+                                                                    newAdded: false,
                                                                     problemActionIndex: problemActionIndex,
                                                                     problemStatus: {
                                                                         id: 1,
@@ -2285,7 +2306,7 @@ export default class QatProblemActions extends Component {
 
                                                             dt: moment(Date.now()).format('YYYY-MM-DD'),
                                                             region: {
-                                                                id:0
+                                                                id: 0
                                                             },
                                                             planningUnit: {
                                                                 id: planningUnitList[p].planningUnit.id,
@@ -2294,7 +2315,7 @@ export default class QatProblemActions extends Component {
                                                             },
                                                             shipmentId: '',
                                                             data5: '',
-
+                                                            newAdded: false,
                                                             problemActionIndex: problemActionIndex,
 
                                                             problemStatus: {
@@ -2481,7 +2502,7 @@ export default class QatProblemActions extends Component {
 
                                                             dt: moment(Date.now()).format('YYYY-MM-DD'),
                                                             region: {
-                                                                id:0
+                                                                id: 0
                                                             },
                                                             planningUnit: {
                                                                 id: planningUnitList[p].planningUnit.id,
@@ -2490,7 +2511,7 @@ export default class QatProblemActions extends Component {
                                                             },
                                                             shipmentId: '',
                                                             data5: '',
-
+                                                            newAdded: false,
                                                             problemActionIndex: problemActionIndex,
 
                                                             problemStatus: {
@@ -2693,7 +2714,7 @@ export default class QatProblemActions extends Component {
                                                             },
                                                             shipmentId: '',
                                                             data5: '',
-
+                                                            newAdded: false,
                                                             problemActionIndex: problemActionIndex,
 
                                                             problemStatus: {
@@ -2884,7 +2905,7 @@ export default class QatProblemActions extends Component {
 
                                                             dt: moment(Date.now()).format('YYYY-MM-DD'),
                                                             region: {
-                                                                id:0
+                                                                id: 0
                                                             },
                                                             planningUnit: {
                                                                 id: planningUnitList[p].planningUnit.id,
@@ -2893,7 +2914,7 @@ export default class QatProblemActions extends Component {
                                                             },
                                                             shipmentId: '',
                                                             data5: '',
-
+                                                            newAdded: false,
                                                             problemActionIndex: problemActionIndex,
 
                                                             problemStatus: {
@@ -3081,7 +3102,7 @@ export default class QatProblemActions extends Component {
 
                                                             dt: moment(Date.now()).format('YYYY-MM-DD'),
                                                             region: {
-                                                                id:0
+                                                                id: 0
                                                             },
                                                             planningUnit: {
                                                                 id: planningUnitList[p].planningUnit.id,
@@ -3090,7 +3111,7 @@ export default class QatProblemActions extends Component {
                                                             },
                                                             shipmentId: '',
                                                             data5: '',
-
+                                                            newAdded: false,
                                                             problemActionIndex: problemActionIndex,
 
                                                             problemStatus: {
@@ -3292,7 +3313,7 @@ export default class QatProblemActions extends Component {
                                                             },
                                                             shipmentId: '',
                                                             data5: '',
-
+                                                            newAdded: false,
                                                             problemActionIndex: problemActionIndex,
 
                                                             problemStatus: {
@@ -3442,7 +3463,7 @@ export default class QatProblemActions extends Component {
                                                             },
                                                             shipmentId: '',
                                                             data5: '',
-
+                                                            newAdded: false,
                                                             problemActionIndex: problemActionIndex,
 
                                                             problemStatus: {

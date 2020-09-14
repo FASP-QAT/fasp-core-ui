@@ -1,32 +1,28 @@
-import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
-import { Button, Card, CardBody, CardGroup, Col, Container, ContainerFluid, Form, Input, InputGroup, InputGroupAddon, InputGroupText, Row, FormFeedback, Label, FormGroup } from 'reactstrap';
-import navigation from '../../../_nav';
-// routes config
-import image1 from '../../../assets/img/QAT-login-logo.png';
-import image2 from '../../../assets/img/wordmark.png';
-import image3 from '../../../assets/img/PEPFAR-logo.png';
-import image4 from '../../../assets/img/USAID-presidents-malaria-initiative.png';
-import InnerBgImg from '../../../../src/assets/img/bg-image/bg-login.jpg';
-
-import { Formik } from 'formik';
-import * as Yup from 'yup'
-import '../../Forms/ValidationForms/ValidationForms.css'
-
-import CryptoJS from 'crypto-js'
-import AuthenticationService from '../../Common/AuthenticationService.js';
-import { Online } from "react-detect-offline";
 import bcrypt from 'bcryptjs';
-import jwt_decode from 'jwt-decode'
-import { SECRET_KEY } from '../../../Constants.js'
-import LoginService from '../../../api/LoginService'
-import i18n from '../../../i18n'
-import axios from 'axios';
+import CryptoJS from 'crypto-js';
+import { Formik } from 'formik';
+import jwt_decode from 'jwt-decode';
 import moment from 'moment';
+import React, { Component } from 'react';
+import i18n from '../../../i18n';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
+import { Button, CardBody, CardGroup, Col, Container, Form, FormFeedback, Input, InputGroup, InputGroupAddon, InputGroupText, Row } from 'reactstrap';
+import * as Yup from 'yup';
+import InnerBgImg from '../../../../src/assets/img/bg-image/bg-login.jpg';
+import LoginService from '../../../api/LoginService';
+import image3 from '../../../assets/img/PEPFAR-logo.png';
+// routes config
+import image1 from '../../../assets/img/QAT-login-logo.png';
+import image4 from '../../../assets/img/USAID-presidents-malaria-initiative.png';
+import image2 from '../../../assets/img/wordmark.png';
+import { SECRET_KEY } from '../../../Constants.js';
+import AuthenticationService from '../../Common/AuthenticationService.js';
+import '../../Forms/ValidationForms/ValidationForms.css';
 
-import { qatProblemActions } from '../../../CommonComponent/QatProblemActions'
+
+
+
 
 
 const initialValues = {

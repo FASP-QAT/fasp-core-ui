@@ -340,7 +340,7 @@ export default class TechnicalAreaTicketComponent extends Component {
                                         </Input>
                                         <FormFeedback className="red">{errors.realmName}</FormFeedback>
                                     </FormGroup>
-                                    < FormGroup >
+                                    < FormGroup className="Selectcontrol-bdrNone">
                                         <Label for="countryName">{i18n.t('static.country.countryName')}<span class="red Reqasterisk">*</span></Label>
                                         <Select 
                                             className={classNames('form-control', 'd-block', 'w-100', 'bg-light',

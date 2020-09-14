@@ -254,20 +254,20 @@ const routes = [
   // { path: '/report/problemList', name: 'Qat Problem List', component: ProblemList },
 
   { path: '/problem/editProblem', name: ' Edit Problem', component: EditProblem },
-  { path: '/report/inventoryTurns', name: ' Inventory Turns', component: InventoryTurnsReport },
-  { path: '/report/costOfInventory', name: ' Cost of Inventory', component: CostOfInventoryReport },
-  { path: '/pipeline/planningUnitListFinalInventory/:pipelineId', name: 'Planning Unit List', component: PlanningUnitListNegativeInventory },
-  { path: '/pipeline/pieplineProgramList/:color/:message', name: 'Program List', component: PipelineProgramList },
-  { path: '/pipeline/pieplineProgramList', exact: true, name: 'Program List', component: PipelineProgramList },
-  { path: '/pipeline/pieplineProgramSetup/:pipelineId', name: 'Pipeline Program Setup', component: pipelineProgramSetup },
-  { path: '/pipeline/pipelineProgramImport', name: 'Pipeline Program Import', component: pipeline },
-  { path: '/program/programOnboarding', name: 'Setup Program', component: ProgramOnboarding },
+  { path: '/report/inventoryTurns', name: 'static.dashboard.inventoryTurns', component: InventoryTurnsReport },
+  { path: '/report/costOfInventory', name: 'static.dashboard.costOfInventory', component: CostOfInventoryReport },
+  { path: '/pipeline/planningUnitListFinalInventory/:pipelineId', name:'static.breadcrum.list',  entityname:'static.dashboard.planningunit', component: PlanningUnitListNegativeInventory },
+  { path: '/pipeline/pieplineProgramList/:color/:message', name: 'static.dashboard.pipelineprogramlist', component: PipelineProgramList },
+  { path: '/pipeline/pieplineProgramList', exact: true, name: 'static.dashboard.pipelineprogramlist', component: PipelineProgramList },
+  { path: '/pipeline/pieplineProgramSetup/:pipelineId', name: 'static.dashboard.setupprogram', component: pipelineProgramSetup },
+  { path: '/pipeline/pipelineProgramImport', name: 'static.dashboard.programimport', component: pipeline },
+  { path: '/program/programOnboarding', name: 'static.dashboard.setupprogram', component: ProgramOnboarding },
 
   { path: '/inventory/addInventory/:programId/:versionId/:planningUnitId', name:'static.dashboard.inventorydetails' ,component: AddInventory },
   { path: '/inventory/addInventory', name:'static.dashboard.inventorydetails' ,component: AddInventory, exact: true },
 
-  { path: '/productCategory/productCategoryTree', name: 'Product Category', component: ProductCategoryTree },
-  { path: '/productCategory/productCategoryTree/:color/:message', name: 'Product Category', component: ProductCategoryTree },
+  { path: '/productCategory/productCategoryTree', name: 'static.dashboard.productcategory', component: ProductCategoryTree },
+  { path: '/productCategory/productCategoryTree/:color/:message', name: 'static.dashboard.productcategory', component: ProductCategoryTree },
 
   { path: '/', exact: true, name:'static.home' },
   { path: '/programTree', name:'static.dashboard.program' ,component: ProgramTree },
@@ -644,6 +644,7 @@ class DefaultLayout extends Component {
 
 
   render() {
+    console.log('in I18n defaultlayout')
     return (
       <div className="app">
         <AppHeader fixed>
@@ -981,13 +982,13 @@ class DefaultLayout extends Component {
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }
                           },
                           {
-                            name: 'Manual Tagging',
+                            name: i18n.t('static.dashboard.manualTagging'),
                             url: '/shipment/manualTagging',
                             icon: 'fa fa-truck',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_MANUAL_TAGGING') ? false : true) }
                           },
                           {
-                            name: 'Shipment Delinking',
+                            name: i18n.t('static.dashboard.delinking'),
                             url: '/shipment/delinking',
                             icon: 'fa fa-truck',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DELINKING') ? false : true) }
@@ -1204,14 +1205,14 @@ class DefaultLayout extends Component {
                       ,
                       // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
                       {
-                        name: 'Setup Program',
+                        name: i18n.t('static.dashboard.setupprogram'),
                         url: '/program/programOnboarding',
                         icon: 'fa fa-list-ol',
                         attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SET_UP_PROGRAM') ? false : true) }
                       },
                       // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
                       {
-                        name: 'Pipeline Program Import',
+                        name: i18n.t('static.dashboard.programimport'),
                         // url: '/pipeline/pipelineProgramImport',
                         url: '/pipeline/pieplineProgramList',
                         icon: 'fa fa-sitemap',
@@ -1256,7 +1257,7 @@ class DefaultLayout extends Component {
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }
                           },
                           {
-                            name: 'Shipment Details',
+                            name: i18n.t('static.dashboard.shipmentdetails'),
                             url: '/shipment/shipmentDetails',
                             icon: 'fa fa-list',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }

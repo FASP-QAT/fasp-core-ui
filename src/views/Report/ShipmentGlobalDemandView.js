@@ -2050,9 +2050,17 @@ class ShipmentGlobalDemandView extends Component {
             let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
             let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
             let planningUnitIds = this.state.planningUnitValues.length == this.state.planningUnits.length ? [] : this.state.planningUnitValues.map(ele => (ele.value).toString());
-            let fundingSourceIds = this.state.fundingSourceValues.length == this.state.fundingSources.length ? [] : this.state.fundingSourceValues.map(ele => (ele.value).toString());
-            let shipmentStatusIds = this.state.shipmentStatusValues.length == this.state.shipmentStatuses.length ? [] : this.state.shipmentStatusValues.map(ele => (ele.value).toString());
+            
+            // let fundingSourceIds = this.state.fundingSourceValues.length == this.state.fundingSources.length ? [] : this.state.fundingSourceValues.map(ele => (ele.value).toString());
+            // let shipmentStatusIds = this.state.shipmentStatusValues.length == this.state.shipmentStatuses.length ? [] : this.state.shipmentStatusValues.map(ele => (ele.value).toString());
+
+            let fundingSourceIds = this.state.fundingSourceValues.map(ele => (ele.value).toString());
+            let shipmentStatusIds = this.state.shipmentStatusValues.map(ele => (ele.value).toString());
             console.log("shipmentStatusIds---->", shipmentStatusIds);
+            console.log("planningUnitIds---->", planningUnitIds);
+            console.log("fundingSourceIds---->", fundingSourceIds);
+            console.log("version---->", versionId);
+            console.log("program---->", programId);
 
             if (programId > 0 && versionId != 0 && this.state.planningUnitValues.length > 0 && this.state.fundingSourceValues.length > 0 && this.state.shipmentStatusValues.length > 0) {
                 var db1;
@@ -2089,7 +2097,8 @@ class ShipmentGlobalDemandView extends Component {
                         console.log("shipmentList Original------>", shipmentList);
                         const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true"));
 
-                        let dateFilter = activeFilter.filter(c => moment(c.deliveredDate).isBetween(startDate, endDate, null, '[)'))
+                        // let dateFilter = activeFilter.filter(c => moment(c.deliveredDate).isBetween(startDate, endDate, null, '[)'))
+                        let dateFilter = activeFilter.filter(c => moment((c.receivedDate == null || c.receivedDate == "") ? c.expectedDeliveryDate : c.receivedDate).isBetween(startDate, endDate, null, '[)'))
 
                         let planningUnitFilter = [];
                         for (let i = 0; i < planningUnitIds.length; i++) {
@@ -2850,7 +2859,7 @@ class ShipmentGlobalDemandView extends Component {
             fundingSourceValues: fundingSourceIds.map(ele => ele),
             fundingSourceLabels: fundingSourceIds.map(ele => ele.label)
         }, () => {
-
+            console.log("***************",this.state);
             this.fetchData();
         })
     }
