@@ -437,7 +437,7 @@ class AddUserComponent extends Component {
                                     this.setState({
                                         loading: true
                                     })
-                                    console.log("user object---", this.state.user)
+                                    console.log("user object--->>>>", this.state.user)
                                     this.setState({
                                         message: ''
                                     })

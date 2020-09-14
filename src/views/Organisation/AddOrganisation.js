@@ -401,6 +401,7 @@ export default class AddOrganisationComponent extends Component {
         organisation.organisationCode = ''
         organisation.realm.id = ''
         this.state.realmCountryId = ''
+        organisation.realmCountryArray = []
 
         this.setState({
             organisation

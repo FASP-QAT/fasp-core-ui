@@ -416,7 +416,8 @@ export default class ShipmentDelinking extends Component {
             loading: true,
             programs: [],
             planningUnits: [],
-            shipmentId: ''
+            shipmentId: '',
+            haslink: false
         }
         this.filterData = this.filterData.bind(this);
         this.formatLabel = this.formatLabel.bind(this);
@@ -434,9 +435,16 @@ export default class ShipmentDelinking extends Component {
             .then(response => {
                 console.log("link response===", response);
                 this.setState({
-                    message: i18n.t('static.shipment.delinkingsuccess')
-                })
-                this.filterData();
+                    message: i18n.t('static.shipment.delinkingsuccess'),
+                    color: 'green',
+                    haslink: true
+                },
+                    () => {
+                        console.log(this.state.message, "success 1")
+                        this.hideSecondComponent();
+                        document.getElementById('div2').style.display = 'block';
+                        this.filterData();
+                    })
             })
     }
     hideFirstComponent() {
@@ -562,14 +570,22 @@ export default class ShipmentDelinking extends Component {
                         items.push({
                             title: i18n.t('static.common.dlink'),
                             onclick: function () {
-
+                                this.setState({ loading: true })
                                 ManualTaggingService.delinkShipment(`${this.el.getValueFromCoords(0, y)}`)
                                     .then(response => {
                                         console.log("link response===", response);
                                         this.setState({
-                                            message: i18n.t('static.shipment.delinkingsuccess')
-                                        })
-                                        this.filterData();
+                                            message: i18n.t('static.shipment.delinkingsuccess'),
+                                            color: 'green',
+                                            haslink: true,
+                                            loading: false
+
+                                        }, () => {
+                                            this.hideSecondComponent();
+                                            document.getElementById('div2').style.display = 'block';
+                                            this.filterData();
+                                        });
+
                                     })
 
                             }.bind(this)
@@ -592,17 +608,50 @@ export default class ShipmentDelinking extends Component {
     }
 
     filterData() {
+        document.getElementById('div2').style.display = 'block';
         var programId = document.getElementById("programId").value;
         var planningUnitId = document.getElementById("planningUnitId").value;
-        ManualTaggingService.getShipmentListForDelinking(programId, planningUnitId)
-            .then(response => {
-                console.log("manual tagging response===", response);
-                this.setState({
-                    outputList: response.data
-                }, () => {
-                    this.buildJExcel();
-                });
-            })
+        if (programId != -1 && planningUnitId != 0) {
+            this.setState({ loading: true })
+            console.log("HASLINKED------->", this.state.haslink);
+            if (this.state.haslink) {
+                this.setState({ haslink: false })
+            } else {
+                this.setState({ message: '' })
+            }
+            ManualTaggingService.getShipmentListForDelinking(programId, planningUnitId)
+                .then(response => {
+                    console.log("manual tagging response===", response);
+                    this.setState({
+                        outputList: response.data,
+                        // message: ''
+                    }, () => {
+                        this.buildJExcel();
+                    });
+                })
+        } else if (programId == -1) {
+            console.log("2-programId------>", programId);
+            this.setState({
+                outputList: [],
+                message: i18n.t('static.program.validselectprogramtext'),
+                color: 'red'
+            }, () => {
+                this.el = jexcel(document.getElementById("tableDiv"), '');
+                this.el.destroy();
+            });
+        } else if (planningUnitId == 0) {
+            console.log("3-programId------>", programId);
+            this.setState({
+                outputList: [],
+                message: i18n.t('static.procurementUnit.validPlanningUnitText'),
+                color: 'red'
+            }, () => {
+                this.el = jexcel(document.getElementById("tableDiv"), '');
+                this.el.destroy();
+            });
+        }
+
+
     }
 
     getProgramList() {
@@ -616,7 +665,7 @@ export default class ShipmentDelinking extends Component {
                 else {
 
                     this.setState({
-                        message: response.data.messageCode, loading: false
+                        message: response.data.messageCode, loading: false, color: 'red'
                     },
                         () => {
                             this.hideSecondComponent();
@@ -631,23 +680,27 @@ export default class ShipmentDelinking extends Component {
 
     getPlanningUnitList() {
         var programId = document.getElementById("programId").value;
-        ProgramService.getProgramPlaningUnitListByProgramId(programId)
-            .then(response => {
-                if (response.status == 200) {
-                    this.setState({
-                        planningUnits: response.data
-                    })
-                }
-                else {
-
-                    this.setState({
-                        message: response.data.messageCode
-                    },
-                        () => {
-                            this.hideSecondComponent();
+        if (programId > 0) {
+            ProgramService.getProgramPlaningUnitListByProgramId(programId)
+                .then(response => {
+                    if (response.status == 200) {
+                        this.setState({
+                            planningUnits: response.data
                         })
-                }
-            })
+                    }
+                    else {
+
+                        this.setState({
+                            message: response.data.messageCode, color: 'red'
+                        },
+                            () => {
+                                this.hideSecondComponent();
+                            })
+                    }
+                })
+        }
+        this.filterData();
+
     }
 
     formatLabel(cell, row) {
@@ -812,7 +865,7 @@ export default class ShipmentDelinking extends Component {
                     this.setState({ loading: loading })
                 }} />
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
-                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                <h5 className={this.state.color} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 {/* <Card style={{ display: this.state.loading ? "none" : "block" }}> */}
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
                     <CardBody className="">
@@ -829,7 +882,7 @@ export default class ShipmentDelinking extends Component {
                                                 bsSize="sm"
                                                 onChange={this.getPlanningUnitList}
                                             >
-                                                <option value="">{i18n.t('static.common.select')}</option>
+                                                <option value="-1">{i18n.t('static.common.select')}</option>
                                                 {programList}
                                             </Input>
                                         </InputGroup>
@@ -846,7 +899,7 @@ export default class ShipmentDelinking extends Component {
                                                 bsSize="sm"
                                                 onChange={this.filterData}
                                             >
-                                                <option value="">{i18n.t('static.common.select')}</option>
+                                                <option value="0">{i18n.t('static.common.select')}</option>
                                                 {planningUnitList}
 
                                             </Input>

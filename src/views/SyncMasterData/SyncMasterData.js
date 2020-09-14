@@ -161,6 +161,9 @@ export default class SyncMasterData extends Component {
                             console.log("Shipment data list", shipmentDataList);
                             console.log("Batch Info list", batchInfoList);
                             var shipArray = response.data.shipmentList;
+                            console.log("Min Date shiparray", shipArray);
+                            var minDate = moment.min(shipArray.map(d => moment(d.expectedDeliveryDate)))
+                            console.log("Min Date in sync", minDate);
                             var batchArray = response.data.batchInfoList;
                             var planningUnitList = [];
                             for (var j = 0; j < shipArray.length; j++) {
@@ -211,7 +214,7 @@ export default class SyncMasterData extends Component {
                                 }.bind(this);
                                 putRequest.onsuccess = function (event) {
                                     console.log("Planning unit list", planningUnitList);
-                                    calculateSupplyPlan(prog.id, 0, 'programData', 'masterDataSync', '', planningUnitList);
+                                    calculateSupplyPlan(prog.id, 0, 'programData', 'masterDataSync', '', planningUnitList, minDate);
                                 }
                             }
                         } else {
