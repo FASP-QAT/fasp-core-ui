@@ -1442,6 +1442,7 @@ import ShipmentStatusService from '../../api/ShipmentStatusService';
 import { Online, Offline } from "react-detect-offline";
 import MultiSelect from 'react-multi-select-component';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { Multiselect } from 'multiselect-react-dropdown';
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
 const ref = React.createRef();
 
@@ -1586,8 +1587,8 @@ class ShipmentGlobalDemandView extends Component {
             show: false,
             message: '',
             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate:{year:  new Date().getFullYear()-3, month: new Date().getMonth()},
-            maxDate:{year:  new Date().getFullYear()+3, month: new Date().getMonth()+1},
+            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() },
+            maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() + 1 },
             loading: true
         };
 
@@ -1980,22 +1981,27 @@ class ShipmentGlobalDemandView extends Component {
 
                 ReportService.shipmentOverview(inputjson)
                     .then(response => {
-                        console.log("RESP----->", response.data);
+                        try {
+                            console.log("RESP----->", response.data);
+                            var table1Headers = [];
+                            table1Headers = Object.keys(response.data.procurementAgentSplit[0].procurementAgentQty);
+                            // table1Headers.unshift(i18n.t('static.planningunit.planningunit'));
+                            // table1Headers.push(i18n.t('static.report.totalUnit'));
+                            this.setState({
+                                data: response.data,
+                                fundingSourceSplit: response.data.fundingSourceSplit,
+                                planningUnitSplit: response.data.planningUnitSplit,
+                                procurementAgentSplit: response.data.procurementAgentSplit,
+                                table1Headers: table1Headers,
+                                loading: false
+                            }, () => {
 
-                        var table1Headers = [];
-                        table1Headers = Object.keys(response.data.procurementAgentSplit[0].procurementAgentQty);
-                        // table1Headers.unshift(i18n.t('static.planningunit.planningunit'));
-                        // table1Headers.push(i18n.t('static.report.totalUnit'));
-                        this.setState({
-                            data: response.data,
-                            fundingSourceSplit: response.data.fundingSourceSplit,
-                            planningUnitSplit: response.data.planningUnitSplit,
-                            procurementAgentSplit: response.data.procurementAgentSplit,
-                            table1Headers: table1Headers,
-                            loading: false
-                        }, () => {
+                            })
+                        } catch (error) {
+                            console.log("ERROR---->", error);
+                            this.setState({ loading: false })
+                        }
 
-                        })
                     })
 
             } else if (realmId <= 0) {
@@ -2050,7 +2056,7 @@ class ShipmentGlobalDemandView extends Component {
             let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
             let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
             let planningUnitIds = this.state.planningUnitValues.length == this.state.planningUnits.length ? [] : this.state.planningUnitValues.map(ele => (ele.value).toString());
-            
+
             // let fundingSourceIds = this.state.fundingSourceValues.length == this.state.fundingSources.length ? [] : this.state.fundingSourceValues.map(ele => (ele.value).toString());
             // let shipmentStatusIds = this.state.shipmentStatusValues.length == this.state.shipmentStatuses.length ? [] : this.state.shipmentStatusValues.map(ele => (ele.value).toString());
 
@@ -2718,7 +2724,7 @@ class ShipmentGlobalDemandView extends Component {
 
         this.setState({
             planningUnits: [],
-            planningUnitValues:[]
+            planningUnitValues: []
         }, () => {
             if (!navigator.onLine) {
                 let programId = document.getElementById("programId").value;
@@ -2859,7 +2865,7 @@ class ShipmentGlobalDemandView extends Component {
             fundingSourceValues: fundingSourceIds.map(ele => ele),
             fundingSourceLabels: fundingSourceIds.map(ele => ele.label)
         }, () => {
-            console.log("***************",this.state);
+            console.log("***************", this.state);
             this.fetchData();
         })
     }
@@ -3071,7 +3077,7 @@ class ShipmentGlobalDemandView extends Component {
 
                                                 <Picker
                                                     ref="pickRange"
-                                                    years={{min: this.state.minDate, max: this.state.maxDate}}
+                                                    years={{ min: this.state.minDate, max: this.state.maxDate }}
                                                     value={rangeValue}
                                                     lang={pickerLang}
                                                     //theme="light"
@@ -3181,7 +3187,7 @@ class ShipmentGlobalDemandView extends Component {
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.report.planningUnit')}</Label>
                                             <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                             <div className="controls">
-                                                <MultiSelect
+                                                {/* <MultiSelect
                                                     name="planningUnitId"
                                                     id="planningUnitId"
                                                     bsSize="md"
@@ -3189,6 +3195,20 @@ class ShipmentGlobalDemandView extends Component {
                                                     onChange={(e) => { this.handlePlanningUnitChange(e) }}
                                                     options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
                                                 // options={fundingSourceList && fundingSourceList.length > 0 ? fundingSourceList : []}
+                                                /> */}
+
+                                                <Multiselect
+                                                    name="planningUnitId"
+                                                    id="planningUnitId"
+                                                    bsSize="md"
+                                                    showCheckbox={true}
+                                                    options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []} // Options to display in the dropdown
+                                                    selectedValues={this.state.planningUnitValues} // Preselected value to persist in dropdown
+                                                    onSelect={(e) => { this.handlePlanningUnitChange(e) }}
+                                                    onRemove={(e) => { this.handlePlanningUnitChange(e) }}
+                                                    // onSelect={this.onSelect} // Function will trigger on select event
+                                                    // onRemove={this.onRemove} // Function will trigger on remove event
+                                                    displayValue="label" // Property name to display in the dropdown options
                                                 />
 
                                             </div>
