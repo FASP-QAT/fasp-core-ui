@@ -192,7 +192,7 @@ export default class QatProblemActions extends Component {
                                                             program: {
                                                                 id: programList[pp].programId,
                                                                 label: programList[pp].label,
-                                                                programCode: programList[pp].programCode
+                                                                code: programList[pp].programCode
                                                             },
                                                             versionId: versionID,
                                                             realmProblem: problemList[prob],
@@ -337,7 +337,7 @@ export default class QatProblemActions extends Component {
                                                             program: {
                                                                 id: programList[pp].programId,
                                                                 label: programList[pp].label,
-                                                                programCode: programList[pp].programCode
+                                                                code: programList[pp].programCode
                                                             },
                                                             versionId: versionID,
                                                             realmProblem: problemList[prob],
@@ -500,7 +500,7 @@ export default class QatProblemActions extends Component {
                                                             program: {
                                                                 id: programList[pp].programId,
                                                                 label: programList[pp].label,
-                                                                programCode: programList[pp].programCode
+                                                                code: programList[pp].programCode
                                                             },
                                                             versionId: versionID,
                                                             realmProblem: problemList[prob],
@@ -697,7 +697,7 @@ export default class QatProblemActions extends Component {
                                                             program: {
                                                                 id: programList[pp].programId,
                                                                 label: programList[pp].label,
-                                                                programCode: programList[pp].programCode
+                                                                code: programList[pp].programCode
                                                             },
                                                             versionId: versionID,
                                                             realmProblem: problemList[prob],
@@ -858,7 +858,7 @@ export default class QatProblemActions extends Component {
                                                             program: {
                                                                 id: programList[pp].programId,
                                                                 label: programList[pp].label,
-                                                                programCode: programList[pp].programCode
+                                                                code: programList[pp].programCode
                                                             },
                                                             versionId: versionID,
                                                             realmProblem: problemList[prob],
@@ -1072,7 +1072,7 @@ export default class QatProblemActions extends Component {
                                                             program: {
                                                                 id: programList[pp].programId,
                                                                 label: programList[pp].label,
-                                                                programCode: programList[pp].programCode
+                                                                code: programList[pp].programCode
                                                             },
                                                             versionId: versionID,
                                                             realmProblem: problemList[prob],
@@ -1287,7 +1287,7 @@ export default class QatProblemActions extends Component {
                                                             program: {
                                                                 id: programList[pp].programId,
                                                                 label: programList[pp].label,
-                                                                programCode: programList[pp].programCode
+                                                                code: programList[pp].programCode
                                                             },
                                                             versionId: versionID,
                                                             realmProblem: problemList[prob],
@@ -1502,7 +1502,7 @@ export default class QatProblemActions extends Component {
                                                             program: {
                                                                 id: programList[pp].programId,
                                                                 label: programList[pp].label,
-                                                                programCode: programList[pp].programCode
+                                                                code: programList[pp].programCode
                                                             },
                                                             versionId: versionID,
                                                             realmProblem: problemList[prob],
@@ -1723,7 +1723,7 @@ export default class QatProblemActions extends Component {
                                                                     program: {
                                                                         id: programList[pp].programId,
                                                                         label: programList[pp].label,
-                                                                        programCode: programList[pp].programCode
+                                                                        code: programList[pp].programCode
                                                                     },
                                                                     versionId: versionID,
                                                                     realmProblem: problemList[prob],
@@ -1916,7 +1916,7 @@ export default class QatProblemActions extends Component {
                                                                     program: {
                                                                         id: programList[pp].programId,
                                                                         label: programList[pp].label,
-                                                                        programCode: programList[pp].programCode
+                                                                        code: programList[pp].programCode
                                                                     },
                                                                     versionId: versionID,
                                                                     realmProblem: problemList[prob],
@@ -2094,7 +2094,7 @@ export default class QatProblemActions extends Component {
                                                                     program: {
                                                                         id: programList[pp].programId,
                                                                         label: programList[pp].label,
-                                                                        programCode: programList[pp].programCode
+                                                                        code: programList[pp].programCode
                                                                     },
                                                                     versionId: versionID,
                                                                     realmProblem: problemList[prob],
@@ -2299,7 +2299,7 @@ export default class QatProblemActions extends Component {
                                                             program: {
                                                                 id: programList[pp].programId,
                                                                 label: programList[pp].label,
-                                                                programCode: programList[pp].programCode
+                                                                code: programList[pp].programCode
                                                             },
                                                             versionId: versionID,
                                                             realmProblem: problemList[prob],
@@ -2495,7 +2495,7 @@ export default class QatProblemActions extends Component {
                                                             program: {
                                                                 id: programList[pp].programId,
                                                                 label: programList[pp].label,
-                                                                programCode: programList[pp].programCode
+                                                                code: programList[pp].programCode
                                                             },
                                                             versionId: versionID,
                                                             realmProblem: problemList[prob],
@@ -2697,7 +2697,7 @@ export default class QatProblemActions extends Component {
                                                             program: {
                                                                 id: programList[pp].programId,
                                                                 label: programList[pp].label,
-                                                                programCode: programList[pp].programCode
+                                                                code: programList[pp].programCode
                                                             },
                                                             versionId: versionID,
                                                             realmProblem: problemList[prob],
@@ -2898,7 +2898,7 @@ export default class QatProblemActions extends Component {
                                                             program: {
                                                                 id: programList[pp].programId,
                                                                 label: programList[pp].label,
-                                                                programCode: programList[pp].programCode
+                                                                code: programList[pp].programCode
                                                             },
                                                             versionId: versionID,
                                                             realmProblem: problemList[prob],
@@ -3095,7 +3095,7 @@ export default class QatProblemActions extends Component {
                                                             program: {
                                                                 id: programList[pp].programId,
                                                                 label: programList[pp].label,
-                                                                programCode: programList[pp].programCode
+                                                                code: programList[pp].programCode
                                                             },
                                                             versionId: versionID,
                                                             realmProblem: problemList[prob],
@@ -3296,7 +3296,7 @@ export default class QatProblemActions extends Component {
                                                             program: {
                                                                 id: programList[pp].programId,
                                                                 label: programList[pp].label,
-                                                                programCode: programList[pp].programCode
+                                                                code: programList[pp].programCode
                                                             },
                                                             versionId: versionID,
                                                             realmProblem: problemList[prob],
@@ -3446,7 +3446,7 @@ export default class QatProblemActions extends Component {
                                                             program: {
                                                                 id: programList[pp].programId,
                                                                 label: programList[pp].label,
-                                                                programCode: programList[pp].programCode
+                                                                code: programList[pp].programCode
                                                             },
                                                             versionId: versionID,
                                                             realmProblem: problemList[prob],
