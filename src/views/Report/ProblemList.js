@@ -1390,7 +1390,7 @@ export default class ConsumptionDetails extends React.Component {
                             </div>
                         </div>
                     </div>
-                    <CardBody className="pb-lg-5 ">
+                    <CardBody className="pb-lg-5 pt-lg-0">
                         <Col md="9 pl-1">
                             <div className="d-md-flex Selectdiv2">
                                 <FormGroup className="mt-md-2 mb-md-0 ">
