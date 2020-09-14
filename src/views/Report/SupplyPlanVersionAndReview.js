@@ -1699,7 +1699,7 @@ class SupplyPlanVersionAndReview extends Component {
                             </div>
                         }
                     </div>
-                    <CardBody className="pb-lg-5 pt-lg-0">
+                    <CardBody className="pb-lg-5 pt-lg-1">
 
                         <div>
                             <Form >

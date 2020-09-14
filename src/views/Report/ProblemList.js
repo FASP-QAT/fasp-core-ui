@@ -792,7 +792,7 @@ export default class ConsumptionDetails extends React.Component {
             data = [];
             data[0] = problemList[j].problemReportId
             data[1] = problemList[j].problemActionIndex
-            data[2] = problemList[j].program.programCode
+            data[2] = problemList[j].program.code
             data[3] = problemList[j].versionId
             data[4] = (problemList[j].region.label != null) ? (getLabelText(problemList[j].region.label, this.state.lang)) : ''
             data[5] = getLabelText(problemList[j].planningUnit.label, this.state.lang)
@@ -1390,7 +1390,7 @@ export default class ConsumptionDetails extends React.Component {
                             </div>
                         </div>
                     </div>
-                    <CardBody className="pb-lg-5 ">
+                    <CardBody className="pb-lg-5 pt-lg-0">
                         <Col md="9 pl-1">
                             <div className="d-md-flex Selectdiv2">
                                 <FormGroup className="mt-md-2 mb-md-0 ">

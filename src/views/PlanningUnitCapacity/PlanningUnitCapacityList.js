@@ -307,10 +307,10 @@ export default class PlanningUnitCapacityList extends Component {
             planningUnitCapacityArray[count] = data;
             count++;
         }
-        if (planningUnitCapacityList.length == 0) {
-            data = [];
-            planningUnitCapacityArray[0] = data;
-        }
+        // if (planningUnitCapacityList.length == 0) {
+        //     data = [];
+        //     planningUnitCapacityArray[0] = data;
+        // }
         // console.log("planningUnitCapacityArray---->", planningUnitCapacityArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();

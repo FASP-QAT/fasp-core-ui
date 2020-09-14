@@ -4,6 +4,7 @@ import { Formik } from 'formik';
 import jwt_decode from 'jwt-decode';
 import moment from 'moment';
 import React, { Component } from 'react';
+import i18n from '../../../i18n';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import { Button, CardBody, CardGroup, Col, Container, Form, FormFeedback, Input, InputGroup, InputGroupAddon, InputGroupText, Row } from 'reactstrap';
@@ -16,7 +17,6 @@ import image1 from '../../../assets/img/QAT-login-logo.png';
 import image4 from '../../../assets/img/USAID-presidents-malaria-initiative.png';
 import image2 from '../../../assets/img/wordmark.png';
 import { SECRET_KEY } from '../../../Constants.js';
-import i18n from '../../../i18n';
 import AuthenticationService from '../../Common/AuthenticationService.js';
 import '../../Forms/ValidationForms/ValidationForms.css';
 

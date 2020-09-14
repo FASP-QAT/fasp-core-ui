@@ -3088,9 +3088,9 @@ class EditSupplyPlanStatus extends Component {
 
                 <Col sm={12} sm={12} style={{ flexBasis: 'auto' }}>
                     <Card>
-                        <CardHeader>
+                        {/* <CardHeader>
                             <i className="icon-note"></i><strong>{i18n.t('static.report.updatestatus')}</strong>{' '}
-                        </CardHeader>
+                        </CardHeader> */}
                         <CardBody>
                             <Formik
                                 render={
@@ -3704,9 +3704,9 @@ class EditSupplyPlanStatus extends Component {
                                     setTouched
                                 }) => (
                                         <Form onSubmit={handleSubmit} noValidate name='supplyplanForm'>
-                                            <CardBody>
+                                            <CardBody className="pt-lg-0">
                                                 <Col md="12 pl-0">
-                                                    <div>
+                                                    <div className="row">
 
                                                         {/*  <FormGroup className="tab-ml-1">
                                                         <Label for="programName">{i18n.t('static.program.program')}<span className="red Reqasterisk">*</span> </Label>
@@ -3767,9 +3767,9 @@ class EditSupplyPlanStatus extends Component {
                                             </CardBody>
                                             <CardFooter>
                                                 <FormGroup>
-                                                    <Button type="button" size="md" color="danger" className="float-left mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                   <Button type="submit" size="md" color="success" className="float-left mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                                     <Button type="button" size="md" color="warning" className="float-left mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> Reset</Button>
-                                                    <Button type="submit" size="md" color="success" className="float-left mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
+                                                    <Button type="button" size="md" color="danger" className="float-left mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
 
                                                     &nbsp;
                                              </FormGroup>

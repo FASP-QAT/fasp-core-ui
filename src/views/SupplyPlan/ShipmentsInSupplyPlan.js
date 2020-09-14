@@ -315,6 +315,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             data[20] = shipmentList[i].accountFlag;
                                             data[21] = shipmentDatesJson;
                                             data[22] = shipmentList[i].suggestedQty;
+                                            data[23] = 0;
                                             shipmentsArr.push(data);
                                         }
                                         var options = {
@@ -342,6 +343,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                 { type: 'hidden', title: i18n.t('static.supplyPlan.emergencyOrder'), width: 0 },
                                                 { type: 'hidden', title: i18n.t('static.common.accountFlag'), width: 0 },
                                                 { type: 'hidden', title: i18n.t('static.supplyPlan.shipmentDatesJson'), width: 0 },
+                                                { type: 'hidden' },
                                                 { type: 'hidden' }
                                             ],
                                             pagination: paginationOption,
@@ -409,7 +411,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                         data[20] = true;
                                                         data[21] = "";
                                                         data[22] = 0;
-
+                                                        data[23] = 1;
                                                         obj.insertRow(data);
                                                     }.bind(this)
                                                 });
@@ -1473,6 +1475,10 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         var rowData = elInstance.getRowData(y);
         this.props.updateState("shipmentError", "");
         this.props.updateState("noFundsBudgetError", "");
+        console.log("X-------->", x, "Y---------->", y);
+        if (x != 23 && x != 21) {
+            elInstance.setValueFromCoords(23, y, 1, true);
+        }
         if (x == 0) {
             var valid = checkValidtion("text", "A", y, value, elInstance);
             if (valid == true) {
@@ -2238,7 +2244,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         receivedDate: receivedDate
                     }
                     elInstance.setValueFromCoords(21, y, json, true);
-                    elInstance.setValueFromCoords(1, y, expectedDeliveryDate, true);
+                    if (moment(elInstance.getValueFromCoords(1, y)).format("YYYY-MM-DD") != moment(expectedDeliveryDate).format("YYYY-MM-DD")) {
+                        elInstance.setValueFromCoords(1, y, expectedDeliveryDate, true);
+                    }
                 }.bind(this)
             }.bind(this)
         }
@@ -2861,9 +2869,16 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     var programJson = JSON.parse(programData);
                     var shipmentDataList = (programJson.shipmentList);
                     var batchInfoList = programJson.batchInfoList;
+                    var minDate = moment(Date.now()).startOf('month').format("YYYY-MM-DD");
                     for (var j = 0; j < json.length; j++) {
                         var map = new Map(Object.entries(json[j]));
-
+                        if (map.get("23") == 1) {
+                            console.log("In if");
+                            if (moment(map.get("1")).format("YYYY-MM") < moment(minDate).format("YYYY-MM")) {
+                                minDate = moment(map.get("1")).format("YYYY-MM-DD");
+                            }
+                        }
+                        console.log("minDate", minDate);
                         var selectedShipmentStatus = map.get("0");
                         var shipmentStatusId = selectedShipmentStatus;
                         var shipmentQty = (elInstance.getCell(`I${parseInt(j) + 1}`)).innerHTML;
@@ -3072,7 +3087,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         } else {
                             objectStore = 'programData';
                         }
-                        calculateSupplyPlan(programId, planningUnitId, objectStore, "shipment", this.props);
+                        calculateSupplyPlan(programId, planningUnitId, objectStore, "shipment", this.props, [], moment(minDate).startOf('month').format("YYYY-MM-DD"));
                     }.bind(this)
                 }.bind(this)
             }.bind(this)
