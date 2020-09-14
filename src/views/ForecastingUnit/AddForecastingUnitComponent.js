@@ -223,7 +223,7 @@ export default class AddForecastingUnitComponent extends Component {
                 .then(response => {
                     console.log(JSON.stringify(response.data))
                     this.setState({
-                        productcategories: response.data.slice(1)
+                        productcategories: response.data
                     })
                 })
         } else {

@@ -431,8 +431,6 @@ export default class AddHealthAreaComponent extends Component {
     healthArea.label.label_en = ''
     healthArea.realm.id = ''
     this.state.realmCountryId = ''
-    healthArea.healthAreaCode = ''
-    healthArea.realmCountryArray = []
 
     this.setState({
       healthArea

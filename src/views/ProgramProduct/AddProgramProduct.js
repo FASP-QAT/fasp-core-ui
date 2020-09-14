@@ -732,17 +732,13 @@ class AddprogramPlanningUnit extends Component {
         if (x == 0) {
             console.log("changed 2");
             var col = ("A").concat(parseInt(y) + 1);
-            // alert("value--->",value);
-            console.log("value--->",value)
             if (value == "") {
-                console.log("============in if when category is changed ");
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                 this.el.setValueFromCoords(11, y, 1, true);
                 valid = false;
             } else {
-                console.log("============in else when category is changed ");
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
                 this.el.setValueFromCoords(11, y, 1, true);

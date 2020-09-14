@@ -570,15 +570,14 @@ export default class ShipmentDelinking extends Component {
                         items.push({
                             title: i18n.t('static.common.dlink'),
                             onclick: function () {
-                                this.setState({ loading: true })
+
                                 ManualTaggingService.delinkShipment(`${this.el.getValueFromCoords(0, y)}`)
                                     .then(response => {
                                         console.log("link response===", response);
                                         this.setState({
                                             message: i18n.t('static.shipment.delinkingsuccess'),
                                             color: 'green',
-                                            haslink: true,
-                                            loading: false
+                                            haslink: true
 
                                         }, () => {
                                             this.hideSecondComponent();
@@ -612,7 +611,6 @@ export default class ShipmentDelinking extends Component {
         var programId = document.getElementById("programId").value;
         var planningUnitId = document.getElementById("planningUnitId").value;
         if (programId != -1 && planningUnitId != 0) {
-            this.setState({ loading: true })
             console.log("HASLINKED------->", this.state.haslink);
             if (this.state.haslink) {
                 this.setState({ haslink: false })
@@ -659,7 +657,7 @@ export default class ShipmentDelinking extends Component {
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        programs: response.data, loading: false
+                        programs: response.data, loading: false, color: 'red'
                     })
                 }
                 else {
