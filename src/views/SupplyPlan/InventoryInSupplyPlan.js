@@ -145,8 +145,8 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         data[2] = inventoryList[j].dataSource.id; //C
                         data[3] = inventoryList[j].realmCountryPlanningUnit.id; //D
                         data[4] = adjustmentType; //E
-                        data[5] = parseInt(inventoryList[j].adjustmentQty); //F
-                        data[6] = parseInt(inventoryList[j].actualQty); //G
+                        data[5] = Math.round(inventoryList[j].adjustmentQty); //F
+                        data[6] = Math.round(inventoryList[j].actualQty); //G
                         data[7] = inventoryList[j].multiplier; //H
                         data[8] = `=F${parseInt(j) + 1}*H${parseInt(j) + 1}`; //I
                         data[9] = `=G${parseInt(j) + 1}*H${parseInt(j) + 1}`; //J
