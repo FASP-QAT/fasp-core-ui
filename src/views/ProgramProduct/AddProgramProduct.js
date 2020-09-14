@@ -503,7 +503,7 @@ class AddprogramPlanningUnit extends Component {
                                     }
                                 });
                         } else {
-                            productCategoryList = []
+                            productCategoryListNew = []
                             this.setState({
                                 message: response.data.messageCode,
                                 loading: false
@@ -511,7 +511,7 @@ class AddprogramPlanningUnit extends Component {
                         }
                     });
             } else {
-                productCategoryList = []
+                productCategoryListNew = []
                 this.setState({
                     message: response.data.messageCode,
                     loading: false
