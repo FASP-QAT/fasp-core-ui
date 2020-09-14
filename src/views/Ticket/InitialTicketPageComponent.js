@@ -536,7 +536,7 @@ export default class InitialTicketPageComponent extends Component {
           </ModalFooter>
         </Modal> */}
 
-        <Modal isOpen={this.state.help} toggle={this.togglehelp} className={this.props.className}>
+        <Modal isOpen={this.state.help} toggle={this.togglehelp} className={this.props.className} backdrop="static">
           {/* className={'modal-info ' + this.props.className}> */}
           <ModalHeader toggle={this.togglehelp} className="ModalHead modal-info-Headher"><strong>Help</strong></ModalHeader>
           <ModalBody className="pb-0">

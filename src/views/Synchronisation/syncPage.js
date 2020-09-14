@@ -78,7 +78,6 @@ export default class syncPage extends Component {
   }
 
   hideSecondComponent() {
-    console.log("In second component")
     document.getElementById('div2').style.display = 'block';
     this.state.timeout = setTimeout(function () {
       document.getElementById('div2').style.display = 'none';
@@ -158,6 +157,7 @@ export default class syncPage extends Component {
       },
       pagination: false,
       search: false,
+      contextMenu: false,
       columnSorting: false,
       tableOverflow: false,
       wordWrap: true,
@@ -225,7 +225,7 @@ export default class syncPage extends Component {
       if ((valueToCompare == valueToCompareWith) || (valueToCompare == "" && valueToCompareWith == null) || (valueToCompare == null && valueToCompareWith == "")) {
         consumptionInstance.setStyle(col, "background-color", "transparent");
       } else {
-        consumptionInstance.setStyle(col, "background-color", "#86cd99");
+        consumptionInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
         consumptionInstance.setValueFromCoords(18, index, 2, true);
       }
     }
@@ -328,6 +328,7 @@ export default class syncPage extends Component {
       allowDeleteRow: false,
       tableOverflow: false,
       editable: false,
+      contextMenu: false,
       onload: this.loadedResolveConflictsInventory
     };
     var resolveConflictInventory = jexcel(document.getElementById("resolveConflictsInventoryTable"), options);
@@ -502,6 +503,7 @@ export default class syncPage extends Component {
       allowDeleteRow: false,
       tableOverflow: false,
       editable: false,
+      contextMenu: false,
       onload: this.loadedResolveConflictsShipment
     };
     var resolveConflictShipment = jexcel(document.getElementById("resolveConflictsShipmentTable"), options);
@@ -1465,7 +1467,6 @@ export default class syncPage extends Component {
                                   var downloadedProgramDataProblemList = downloadedProgramData.problemReportList;
                                   var mergedProblemListData = [];
                                   var existingProblemReportId = [];
-                                  console.log("oldProgramDataProblemList", oldProgramDataProblemList);
                                   for (var c = 0; c < oldProgramDataProblemList.length; c++) {
                                     if (oldProgramDataProblemList[c].problemReportId != 0) {
                                       mergedProblemListData.push(oldProgramDataProblemList[c]);
@@ -1494,7 +1495,6 @@ export default class syncPage extends Component {
                                             && f.realmProblem.problem.problemId == oldProgramDataProblemList[c].realmProblem.problem.problemId);
                                       }
                                       // var index = -1;
-                                      console.log("Index", index);
                                       if (index == -1) {
                                         mergedProblemListData.push(oldProgramDataProblemList[c]);
                                       } else {
@@ -1504,21 +1504,18 @@ export default class syncPage extends Component {
                                       }
                                     }
                                   }
-                                  console.log("Merged problem list data", mergedProblemListData);
                                   // Getting other entries of latest problemList data
                                   var latestOtherProblemListEntries = latestProgramDataProblemList.filter(c => !(existingProblemReportId.includes(c.problemReportId)));
-                                  console.log("Latset other problem data ", latestOtherProblemListEntries);
                                   mergedProblemListData = mergedProblemListData.concat(latestOtherProblemListEntries);
-                                  console.log("Merged problem list data", mergedProblemListData);
 
                                   var data = [];
                                   var mergedProblemListJexcel = [];
                                   for (var cd = 0; cd < mergedProblemListData.length; cd++) {
                                     data = []
                                     data[0] = mergedProblemListData[cd].problemReportId
-                                    data[1] = mergedProblemListData[cd].problemActionIndex
-                                    data[2] = mergedProblemListData[cd].program.programCode
-                                    data[3] = mergedProblemListData[cd].versionId
+                                    data[1] = 1;
+                                    data[2] = mergedProblemListData[cd].program.code
+                                    data[3] = 1;
                                     data[4] = (mergedProblemListData[cd].region.label != null) ? (getLabelText(mergedProblemListData[cd].region.label, this.state.lang)) : ''
                                     data[5] = getLabelText(mergedProblemListData[cd].planningUnit.label, this.state.lang)
                                     data[6] = (mergedProblemListData[cd].dt != null) ? (moment(mergedProblemListData[cd].dt).format('MMM-YY')) : ''
@@ -1535,27 +1532,26 @@ export default class syncPage extends Component {
                                     var oldDataList = oldProgramDataProblemList.filter(c => c.problemReportId == mergedProblemListData[cd].problemReportId);
                                     var oldData = ""
                                     if (oldDataList.length > 0) {
-                                      oldData = [oldDataList[0].problemReportId, oldDataList[0].problemActionIndex, oldDataList[0].program.programCode, oldDataList[0].versionId, (oldDataList[0].region.label != null) ? (getLabelText(oldDataList[0].region.label, this.state.lang)) : '', getLabelText(oldDataList[0].planningUnit.label, this.state.lang), (oldDataList[0].dt != null) ? (moment(oldDataList[0].dt).format('MMM-YY')) : '', moment(oldDataList[0].createdDate).format('MMM-YY'), getProblemDesc(oldDataList[0], this.state.lang), getSuggestion(oldDataList[0], this.state.lang), getLabelText(oldDataList[0].problemStatus.label, this.state.lang), this.getNote(oldDataList[0], this.state.lang), oldDataList[0].problemStatus.id, oldDataList[0].planningUnit.id, oldDataList[0].realmProblem.problem.problemId, oldDataList[0].realmProblem.problem.actionUrl, oldDataList[0].realmProblem.criticality.id, "", "", "", 4];
+                                      oldData = [oldDataList[0].problemReportId, 1, oldDataList[0].program.code, 1, (oldDataList[0].region.label != null) ? (getLabelText(oldDataList[0].region.label, this.state.lang)) : '', getLabelText(oldDataList[0].planningUnit.label, this.state.lang), (oldDataList[0].dt != null) ? (moment(oldDataList[0].dt).format('MMM-YY')) : '', moment(oldDataList[0].createdDate).format('MMM-YY'), getProblemDesc(oldDataList[0], this.state.lang), getSuggestion(oldDataList[0], this.state.lang), getLabelText(oldDataList[0].problemStatus.label, this.state.lang), this.getNote(oldDataList[0], this.state.lang), oldDataList[0].problemStatus.id, oldDataList[0].planningUnit.id, oldDataList[0].realmProblem.problem.problemId, oldDataList[0].realmProblem.problem.actionUrl, oldDataList[0].realmProblem.criticality.id, "", "", "", 4];
                                     }
                                     data[17] = oldData;//Old data
-                                    console.log("mergedProblemListData[cd].problemReportId", mergedProblemListData[cd].problemReportId);
                                     var latestDataList = latestProgramDataProblemList.filter(c => mergedProblemListData[cd].problemReportId != 0 && c.problemReportId == mergedProblemListData[cd].problemReportId);
                                     console.log("Latest data list", latestDataList);
                                     var latestData = ""
                                     if (latestDataList.length > 0) {
-                                      latestData = [latestDataList[0].problemReportId, latestDataList[0].problemActionIndex, latestDataList[0].program.programCode, latestDataList[0].versionId, (latestDataList[0].region.label != null) ? (getLabelText(latestDataList[0].region.label, this.state.lang)) : '', getLabelText(latestDataList[0].planningUnit.label, this.state.lang), (latestDataList[0].dt != null) ? (moment(latestDataList[0].dt).format('MMM-YY')) : '', moment(latestDataList[0].createdDate).format('MMM-YY'), getProblemDesc(latestDataList[0], this.state.lang), getSuggestion(latestDataList[0], this.state.lang), getLabelText(latestDataList[0].problemStatus.label, this.state.lang), this.getNote(latestDataList[0], this.state.lang), latestDataList[0].problemStatus.id, latestDataList[0].planningUnit.id, latestDataList[0].realmProblem.problem.problemId, latestDataList[0].realmProblem.problem.actionUrl, latestDataList[0].realmProblem.criticality.id, "", "", "", 4];
+                                      latestData = [latestDataList[0].problemReportId, 1, latestDataList[0].program.code, 1, (latestDataList[0].region.label != null) ? (getLabelText(latestDataList[0].region.label, this.state.lang)) : '', getLabelText(latestDataList[0].planningUnit.label, this.state.lang), (latestDataList[0].dt != null) ? (moment(latestDataList[0].dt).format('MMM-YY')) : '', moment(latestDataList[0].createdDate).format('MMM-YY'), getProblemDesc(latestDataList[0], this.state.lang), getSuggestion(latestDataList[0], this.state.lang), getLabelText(latestDataList[0].problemStatus.label, this.state.lang), this.getNote(latestDataList[0], this.state.lang), latestDataList[0].problemStatus.id, latestDataList[0].planningUnit.id, latestDataList[0].realmProblem.problem.problemId, latestDataList[0].realmProblem.problem.actionUrl, latestDataList[0].realmProblem.criticality.id, "", "", "", 4];
                                     }
                                     data[18] = latestData;//Latest data
                                     var downloadedDataList = downloadedProgramDataProblemList.filter(c => mergedProblemListData[cd].problemListId != 0 && c.problemListId == mergedProblemListData[cd].problemListId);
                                     var downloadedData = "";
                                     if (downloadedDataList.length > 0) {
-                                      downloadedData = [downloadedDataList[0].problemReportId, downloadedDataList[0].problemActionIndex, downloadedDataList[0].program.programCode, downloadedDataList[0].versionId, (downloadedDataList[0].region.label != null) ? (getLabelText(downloadedDataList[0].region.label, this.state.lang)) : '', getLabelText(downloadedDataList[0].planningUnit.label, this.state.lang), (downloadedDataList[0].dt != null) ? (moment(downloadedDataList[0].dt).format('MMM-YY')) : '', moment(downloadedDataList[0].createdDate).format('MMM-YY'), getProblemDesc(downloadedDataList[0], this.state.lang), getSuggestion(downloadedDataList[0], this.state.lang), getLabelText(downloadedDataList[0].problemStatus.label, this.state.lang), this.getNote(downloadedDataList[0], this.state.lang), downloadedDataList[0].problemStatus.id, downloadedDataList[0].planningUnit.id, downloadedDataList[0].realmProblem.problem.problemId, downloadedDataList[0].realmProblem.problem.actionUrl, downloadedDataList[0].realmProblem.criticality.id, "", "", "", 4];
+                                      downloadedData = [downloadedDataList[0].problemReportId, 1, downloadedDataList[0].program.code, 1, (downloadedDataList[0].region.label != null) ? (getLabelText(downloadedDataList[0].region.label, this.state.lang)) : '', getLabelText(downloadedDataList[0].planningUnit.label, this.state.lang), (downloadedDataList[0].dt != null) ? (moment(downloadedDataList[0].dt).format('MMM-YY')) : '', moment(downloadedDataList[0].createdDate).format('MMM-YY'), getProblemDesc(downloadedDataList[0], this.state.lang), getSuggestion(downloadedDataList[0], this.state.lang), getLabelText(downloadedDataList[0].problemStatus.label, this.state.lang), this.getNote(downloadedDataList[0], this.state.lang), downloadedDataList[0].problemStatus.id, downloadedDataList[0].planningUnit.id, downloadedDataList[0].realmProblem.problem.problemId, downloadedDataList[0].realmProblem.problem.actionUrl, downloadedDataList[0].realmProblem.criticality.id, "", "", "", 4];
                                     }
                                     data[19] = downloadedData;//Downloaded data
                                     data[20] = 4;
                                     mergedProblemListJexcel.push(data);
                                   }
-
+                                  console.log("MergedProblem list jexcel", mergedProblemListJexcel);
                                   var options = {
                                     data: mergedProblemListJexcel,
                                     columnDrag: true,
@@ -1576,7 +1572,7 @@ export default class syncPage extends Component {
                                       },
                                       {
                                         title: i18n.t('static.program.versionId'),
-                                        type: 'text',
+                                        type: 'hidden',
                                       },
                                       {
                                         title: i18n.t('static.region.region'),
@@ -1770,13 +1766,13 @@ export default class syncPage extends Component {
               var col = (colArr[j]).concat(parseInt(c) + 1);
               elInstance.setValueFromCoords(j, c, latestData[j], true);
               elInstance.setStyle(col, "background-color", "transparent");
-              elInstance.setStyle(col, "background-color", "#e5edf5");
+              elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
               elInstance.setValueFromCoords(18, c, 3, true);
               (jsonData[c])[18] = 3;
             } else if (latestData[j] == downloadedData[j]) {
               var col = (colArr[j]).concat(parseInt(c) + 1);
               elInstance.setStyle(col, "background-color", "transparent");
-              elInstance.setStyle(col, "background-color", "#86cd99");
+              elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
               elInstance.setValueFromCoords(18, c, 2, true);
               (jsonData[c])[18] = 2;
             } else {
@@ -1807,12 +1803,12 @@ export default class syncPage extends Component {
               var col = (colArr[14]).concat(parseInt(c) + 1);
               elInstance.setValueFromCoords(13, c, latestData[j], true);
               elInstance.setStyle(col, "background-color", "transparent");
-              elInstance.setStyle(col, "background-color", "#e5edf5");
+              elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
               elInstance.setValueFromCoords(18, c, 3, true);
             } else if (latestData[13] == downloadedData[13]) {
               var col = (colArr[14]).concat(parseInt(c) + 1);
               elInstance.setStyle(col, "background-color", "transparent");
-              elInstance.setStyle(col, "background-color", "#86cd99");
+              elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
               elInstance.setValueFromCoords(18, c, 2, true);
             } else {
               this.setState({
@@ -2053,7 +2049,6 @@ export default class syncPage extends Component {
     var jsonData = elInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T']
     for (var c = 0; c < jsonData.length; c++) {
-      console.log("jsonData[c])[18]", jsonData[c][18])
       if ((jsonData[c])[18] == "") {
         for (var i = 0; i < colArr.length; i++) {
           var col = (colArr[i]).concat(parseInt(c) + 1);
@@ -2090,13 +2085,15 @@ export default class syncPage extends Component {
               var col = (colArr[j]).concat(parseInt(c) + 1);
               elInstance.setValueFromCoords(j, c, latestData[j], true);
               elInstance.setStyle(col, "background-color", "transparent");
-              elInstance.setStyle(col, "background-color", "#e5edf5");
+              elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
               elInstance.setValueFromCoords(20, c, 3, true);
               (jsonData[c])[20] = 3;
             } else if (latestData[j] == downloadedData[j]) {
+              console.log("latestData[j]", latestData[j]);
+              console.log("downloaded", downloadedData[j])
               var col = (colArr[j]).concat(parseInt(c) + 1);
               elInstance.setStyle(col, "background-color", "transparent");
-              elInstance.setStyle(col, "background-color", "#86cd99");
+              elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
               elInstance.setValueFromCoords(20, c, 2, true);
               (jsonData[c])[20] = 2;
             } else {
@@ -2197,7 +2194,7 @@ export default class syncPage extends Component {
 
                     <div className="d-md-flex">
                       <FormGroup className="col-md-4">
-                        <Label htmlFor="appendedInputButton">{this.state.noFundsBudgetError}{i18n.t('static.program.program')} </Label>
+                        <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')} </Label>
                         <div className="controls ">
                           <Select
                             name="programSelect"

@@ -187,7 +187,7 @@ class RealmCountryRegion extends Component {
                             columnSorting: true,
                             tableOverflow: true,
                             wordWrap: true,
-                            paginationOptions: [10, 25, 50, 100],
+                            paginationOptions: [10, 25, 50],
                             position: 'top',
                             allowInsertColumn: false,
                             allowManualInsertColumn: false,
