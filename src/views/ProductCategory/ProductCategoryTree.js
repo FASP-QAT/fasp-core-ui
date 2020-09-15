@@ -208,8 +208,8 @@ export default class ProductCategoryTree extends Component {
                             }
                         ];
                         this.setState({
-                            // productCategoryList: response.data,
-                            productCategoryList: dummyJson,
+                            productCategoryList: response.data,
+                            // productCategoryList: dummyJson,
 
 
                         });
