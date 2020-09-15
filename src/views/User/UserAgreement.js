@@ -56,12 +56,12 @@ export default class UserAgreementComponent extends Component {
                             </CardHeader>
                             <CardBody>
                             <Col xs="11" sm="11">
-                                <div className="text-left">
+                                <div className="text-justify">
                                 <h4 className="UserTitle">End-User License Agreement</h4>
                                     <p>
                                     This End-User License Agreement (EULA) is a legal agreement between you, either in your 
                                     capacity as an individual or duly authorized agent acting as or on behalf an 
-                                    entity, and Chemonics International (hereinafter “Chemonics” or “Owner”)’ 
+                                    entity, and Chemonics International (hereinafter “Chemonics” or “Owner”)
                                     for your authorized use of its  Quantification Analytics Tool (QAT) and its applications. 
                                     IF YOU DO NOT AGREE TO ALL OF THE TERMS OF THIS EULA, DO NOT INSTALL, USE OR COPY THE
                                      SOFTWARE. 

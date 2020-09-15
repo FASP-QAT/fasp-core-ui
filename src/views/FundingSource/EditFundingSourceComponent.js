@@ -216,7 +216,7 @@ class EditFundingSourceComponent extends Component {
                                             <Form onSubmit={handleSubmit} noValidate name='fundingSourceForm'>
                                                 <CardBody className="pb-0">
                                                     <FormGroup>
-                                                        <Label htmlFor="realmId">{i18n.t('static.fundingsource.realm')}</Label>
+                                                        <Label htmlFor="realmId">{i18n.t('static.fundingsource.realm')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             type="text"
                                                             name="realmId"

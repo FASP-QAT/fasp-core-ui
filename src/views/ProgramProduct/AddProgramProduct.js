@@ -78,7 +78,7 @@ class AddprogramPlanningUnit extends Component {
         // });
 
         var puList = []
-        if (value != 0) {
+        if (value != -1) {
             console.log("in if=====>");
             var pc = this.state.productCategoryList.filter(c => c.payload.productCategoryId == value)[0]
             var pcList = this.state.productCategoryList.filter(c => c.payload.productCategoryId == pc.payload.productCategoryId || c.parentId == pc.id);
@@ -138,17 +138,28 @@ class AddprogramPlanningUnit extends Component {
                                 }
                                 console.log("ind", indendent);
                                 console.log("indendent.concat(response.data[k].payload.label.label_en)-->", indendent.concat(response.data[k].payload.label.label_en));
-                                var productCategoryJson = {
-                                    name: (response.data[k].payload.label.label_en),
-                                    id: response.data[k].payload.productCategoryId
+
+                                var productCategoryJson = {};
+                                if (response.data[k].payload.productCategoryId == 0) {
+                                    productCategoryJson = {
+                                        name: (response.data[k].payload.label.label_en),
+                                        id: -1
+                                    }
+                                } else {
+                                    productCategoryJson = {
+                                        name: (response.data[k].payload.label.label_en),
+                                        id: response.data[k].payload.productCategoryId
+                                    }
                                 }
+
                                 productCategoryListNew.push(productCategoryJson);
 
                             }
-                            console.log("constant product category list====>",productCategoryListNew);
+                            console.log("constant product category list====>", productCategoryListNew);
                             this.setState({ productCategoryList: response.data });
 
-                            PlanningUnitService.getAllPlanningUnitList()
+                            // PlanningUnitService.getAllPlanningUnitList()
+                            PlanningUnitService.getActivePlanningUnitList()
                                 .then(response => {
                                     if (response.status == 200) {
                                         this.setState({
@@ -287,7 +298,7 @@ class AddprogramPlanningUnit extends Component {
                                                         columnSorting: true,
                                                         tableOverflow: true,
                                                         wordWrap: true,
-                                                        paginationOptions: [10, 25, 50, 100],
+                                                        paginationOptions: [10, 25, 50],
                                                         position: 'top',
                                                         allowInsertColumn: false,
                                                         allowManualInsertColumn: false,
@@ -296,7 +307,8 @@ class AddprogramPlanningUnit extends Component {
                                                         oneditionend: this.onedit,
                                                         copyCompatibility: true,
                                                         text: {
-                                                            showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                                                            // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                                                            showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
                                                             show: '',
                                                             entries: '',
                                                         },
@@ -746,13 +758,13 @@ class AddprogramPlanningUnit extends Component {
         var valid = true;
         //Product category
         console.log("changed 1");
-        var rowData=this.el.getRowData(y);
+        var rowData = this.el.getRowData(y);
         if (x == 0) {
             console.log("changed 2");
             var col = ("A").concat(parseInt(y) + 1);
             // alert("value--->",value);
             console.log("value--->", rowData[0]);
-            console.log("rowData===>",this.el.getRowData(y));
+            console.log("rowData===>", this.el.getRowData(y));
             if (rowData[0] == "") {
                 console.log("============in if when category is changed ");
                 this.el.setStyle(col, "background-color", "transparent");
@@ -1108,7 +1120,7 @@ class AddprogramPlanningUnit extends Component {
                             <Col sm={12} md={12}>
                                 <h4 className="red">{this.props.message}</h4>
                                 <div className="table-responsive" >
-                                    <div id="mapPlanningUnit">
+                                    <div id="mapPlanningUnit" className="RowheightForaddprogaddRow">
                                     </div>
                                 </div>
                             </Col>
