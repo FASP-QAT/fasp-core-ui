@@ -132,7 +132,7 @@ export default class StepFive extends Component {
                             setFieldTouched
                         }) => (
                                 <Form className="needs-validation" onSubmit={handleSubmit} noValidate name='regionForm'>
-                                    <FormGroup>
+                                    <FormGroup className="Selectcontrol-bdrNone">
                                         <Label htmlFor="select">{i18n.t('static.program.region')}<span class="red Reqasterisk">*</span></Label>
                                         <Select
                                             className={classNames('form-control', 'col-md-4', 'd-block', 'w-100', 'bg-light',
