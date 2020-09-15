@@ -180,7 +180,7 @@ class ChangePasswordComponent extends Component {
                                                             this.hideFirstComponent();
                                                         });
                                                     } else {
-                                                        switch (error.response.status) {
+                                                        switch (error.response ? error.response.status : "") {
                                                             case 500:
                                                             case 401:
                                                             case 403:
