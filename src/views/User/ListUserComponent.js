@@ -556,7 +556,7 @@ class ListUserComponent extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [50, 50, 50],
+            colWidths: [50, 50, 50,50,120],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {

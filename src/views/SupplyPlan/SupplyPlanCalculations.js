@@ -3,7 +3,6 @@ import { SECRET_KEY, CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SUBMITT
 import moment from "moment";
 import i18n from '../../i18n';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import ProgramService from '../../api/ProgramService.js';
 
 export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, page, props, planningUnitList, minimumDate) {
     console.log("In calculate", minimumDate);
@@ -332,8 +331,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                 if (noOfEntriesOfActualStockCount > 0) {
                                     console.log("Actual stock count", actualStockCount);
                                     if (inventoryListForRegion[inv].actualQty != "" && inventoryListForRegion[inv].actualQty != null && inventoryListForRegion[inv].actualQty != 0) {
-                                        console.log("parseInt(parseInt(inventoryListForRegion[inv].actualQty) * parseInt(inventoryListForRegion[inv].multiplier))", parseInt(parseInt(inventoryListForRegion[inv].actualQty) * parseInt(inventoryListForRegion[inv].multiplier)));
-                                        actualStockCount += parseInt(parseInt(inventoryListForRegion[inv].actualQty) * parseInt(inventoryListForRegion[inv].multiplier));
+                                        actualStockCount += Math.round(parseFloat(inventoryListForRegion[inv].actualQty) * parseFloat(inventoryListForRegion[inv].multiplier));
                                     }
                                     var batchListForInventory = inventoryListForRegion[inv].batchInfoList;
                                     for (var b = 0; b < batchListForInventory.length; b++) {
@@ -365,7 +363,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                 } else {
                                     // If region has not reported actual stock count we will only consider adjustments
                                     if (inventoryListForRegion[inv].adjustmentQty != "" && inventoryListForRegion[inv].adjustmentQty != null && inventoryListForRegion[inv].adjustmentQty != 0) {
-                                        adjustmentQty += parseInt(parseInt(inventoryListForRegion[inv].adjustmentQty) * parseInt(inventoryListForRegion[inv].multiplier));
+                                        adjustmentQty += Math.round(parseFloat(inventoryListForRegion[inv].adjustmentQty) * parseFloat(inventoryListForRegion[inv].multiplier));
                                     }
                                     // Check batch details for adjustments if available
                                     var batchListForInventory = inventoryListForRegion[inv].batchInfoList;
@@ -416,7 +414,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                         for (var c = 0; c < consumptionList.length; c++) {
                             // Calculating actual consumption qty
                             if (consumptionList[c].actualFlag.toString() == "true") {
-                                actualConsumptionQty += parseInt(consumptionList[c].consumptionQty);
+                                actualConsumptionQty += Math.round(consumptionList[c].consumptionQty);
                                 // Adding regions reporting actual consumption
                                 var index = regionsReportingActualConsumption.findIndex(f => f == consumptionList[c].region.id);
                                 if (index == -1) {
@@ -424,7 +422,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                 }
                             } else {
                                 // Calculating forecated consumption qty
-                                forecastedConsumptionQty += parseInt(consumptionList[c].consumptionQty);
+                                forecastedConsumptionQty += Math.round(consumptionList[c].consumptionQty);
                             }
                         }
                         // Getting no of regions reporting actual consumption
@@ -595,13 +593,13 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                             var amcFilter = (programJsonForStoringTheResult.consumptionList).filter(c => (c.consumptionDate >= amcDate && c.consumptionDate <= amcDate) && c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.active == true);
                             for (var c = 0; c < amcFilter.length; c++) {
                                 if (amcFilter[c].actualFlag.toString() == "true") {
-                                    actualConsumptionQtyAmc += parseInt(amcFilter[c].consumptionQty);
+                                    actualConsumptionQtyAmc += Math.round(amcFilter[c].consumptionQty);
                                     var index = regionsReportingActualConsumptionAmc.findIndex(f => f == amcFilter[c].region.id);
                                     if (index == -1) {
                                         regionsReportingActualConsumptionAmc.push(amcFilter[c].region.id);
                                     }
                                 } else {
-                                    forecastedConsumptionQtyAmc += parseInt(amcFilter[c].consumptionQty);
+                                    forecastedConsumptionQtyAmc += Math.round(amcFilter[c].consumptionQty);
                                 }
                             }
                             noOfRegionsReportingActualConsumptionAmc = regionsReportingActualConsumptionAmc.length;

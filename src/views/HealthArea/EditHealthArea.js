@@ -324,7 +324,7 @@ export default class EditHealthAreaComponent extends Component {
                                             <Form onSubmit={handleSubmit} noValidate name='healthAreaForm'>
                                                 <CardBody className="pb-0">
                                                     <FormGroup>
-                                                        <Label htmlFor="select">{i18n.t('static.healtharea.realm')}</Label>
+                                                        <Label htmlFor="select">{i18n.t('static.healtharea.realm')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             bsSize="sm"
                                                             value={this.state.healthArea.realm.id}

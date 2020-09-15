@@ -803,6 +803,19 @@ export default class ForecastingUnitListComponent extends Component {
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
         this.hideFirstComponent();
+
+        if (!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN')) {
+            let realmId = AuthenticationService.getRealmId();
+            ProductService.getProductCategoryList(realmId)
+                .then(response => {
+                    console.log("product category list---", JSON.stringify(response.data))
+                    this.setState({
+                        productCategories: response.data
+                    })
+                })
+
+        }
+
         RealmService.getRealmListAll()
             .then(response => {
                 if (response.status == 200) {
@@ -866,8 +879,11 @@ export default class ForecastingUnitListComponent extends Component {
                 this.setState({
                     forecastingUnitList: response.data,
                     selSource: response.data,
-                    // loading: false
-                })
+                    loading: false
+                },
+                    () => {
+                        this.buildJexcel();
+                    })
             } else {
                 this.setState({
                     message: response.data.messageCode, loading: false
@@ -879,7 +895,7 @@ export default class ForecastingUnitListComponent extends Component {
 
 
         })
-        this.filterDataForRealm();
+        // this.filterDataForRealm();
 
     }
     loaded = function (instance, cell, x, y, value) {

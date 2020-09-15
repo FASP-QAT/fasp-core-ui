@@ -863,7 +863,9 @@ label.arrow_label:after {
 .RowheightForjexceladdRow .jexcel_content .jexcel tbody.draggable tr{ 
   height: 30px;
 }
-
+.RowheightForaddprogaddRow .jexcel_content .jexcel tbody.draggable tr{ 
+  height: 30px;
+}
 // Multiselect z-index going behind table 
 .go2139093995 * {
   z-index: 30;
@@ -3156,6 +3158,7 @@ border-radius: 2em;
   color: #aaa;
   left: 0;
   line-height: 26px!important;
+  font-size: 0.76562rem;
   padding-left: 10px;
   padding-right: 10px;
   position: absolute;
@@ -3279,3 +3282,22 @@ border-radius: 2em;
 .Select-clear {
   padding-right: 14px;
 }
+// ._2iA8p44d0WZ-WqRBGcAuEV {
+//   border: 1px solid #cccccc;
+//   border-radius: 3px!important;
+//    min-height: 22px;
+//   position: relative;
+//   border: 1px solid #cccccc;
+//   padding: 0.25rem 0.5rem !important;
+//   overflow: hidden;
+//   text-overflow: ellipsis;
+//   white-space: nowrap;
+//   flex: 1;
+//   height: 29px!important;
+
+// }
+// ._3vt7_Mh4hRCFbp__dFqBCI input {
+//   border: none;
+//   margin-top: 0px!important;
+//   background: transparent;
+// }

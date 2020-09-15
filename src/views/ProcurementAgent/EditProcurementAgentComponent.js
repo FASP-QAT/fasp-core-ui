@@ -313,7 +313,7 @@ class EditProcurementAgentComponent extends Component {
                                             <Form onSubmit={handleSubmit} noValidate name='procurementAgentForm'>
                                                 <CardBody className="pb-0">
                                                     <FormGroup>
-                                                        <Label htmlFor="realmId">{i18n.t('static.realm.realmName')}</Label>
+                                                        <Label htmlFor="realmId">{i18n.t('static.realm.realmName')}<span class="red Reqasterisk">*</span></Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
                                                         {/* <InputGroupText><i className="fa fa-pencil"></i></InputGroupText> */}
                                                         <Input
@@ -346,7 +346,7 @@ class EditProcurementAgentComponent extends Component {
                                                         <FormFeedback className="red">{errors.procurementAgentName}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="procurementAgentCode">{i18n.t('static.procurementagent.procurementagentcode')}</Label>
+                                                        <Label for="procurementAgentCode">{i18n.t('static.procurementagent.procurementagentcode')}<span class="red Reqasterisk">*</span></Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
                                                         {/* <InputGroupText><i className="fa fa-pencil-square-o"></i></InputGroupText> */}
                                                         <Input type="text"
