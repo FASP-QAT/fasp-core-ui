@@ -526,12 +526,12 @@ export default class MapPlanningUnits extends Component {
                                             filter: this.dropdownFilter
                                         },
                                         {
-                                            title: 'Reorder frequency in months',
+                                            title: 'Reorder Frequency In Months',
                                             type: 'number',
 
                                         },
                                         {
-                                            title: 'Min month of stock',
+                                            title: 'Min Month of Stock',
                                             type: 'number'
                                         },
                                         {
