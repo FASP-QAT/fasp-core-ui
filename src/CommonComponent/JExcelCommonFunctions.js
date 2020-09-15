@@ -56,7 +56,7 @@ export function jExcelLoadedFunction(instance, number) {
     pageSelect.options[pageSelect.options.length] = new Option('All', 5000000);
 
 
-    var jexcel_filterFirstdiv = document.getElementsByClassName('jexcel_filter')[0];
+    var jexcel_filterFirstdiv = document.getElementsByClassName('jexcel_filter')[number];
     var filter = jexcel_filterFirstdiv.firstChild;
     filter.classList.add('order-1');
     filter.classList.add('pr-1');

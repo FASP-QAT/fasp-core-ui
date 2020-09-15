@@ -157,6 +157,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             bRequest.onsuccess = function (event) {
                                 var bResult = [];
                                 bResult = bRequest.result;
+                                budgetList.push({ id: 0, name: i18n.t('static.common.select') });
                                 for (var k = 0; k < bResult.length; k++) {
                                     if (bResult[k].program.id == programJson.programId) {
                                         var bJson = {
@@ -172,12 +173,14 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                         fundingSource: bResult[k].fundingSource,
                                         currency: bResult[k].currency,
                                         budgetAmt: bResult[k].budgetAmt,
-                                        active: bResult[k].active
+                                        active: bResult[k].active,
+                                        programId: bResult[k].program.id
                                     })
                                 }
-
+                                console.log("Budhet list", budgetList);
                                 this.setState({
-                                    budgetListAll: budgetListAll
+                                    budgetListAll: budgetListAll,
+                                    programIdForBudget: programJson.programId
                                 })
 
                                 var dataSourceTransaction = db1.transaction(['dataSource'], 'readwrite');
@@ -272,7 +275,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             var shipmentBatchInfoList = shipmentList[i].batchInfoList;
                                             console.log("Shipment batch info list", shipmentBatchInfoList);
                                             for (var sb = 0; sb < shipmentBatchInfoList.length; sb++) {
-                                                totalShipmentQty += parseInt(shipmentBatchInfoList[sb].shipmentQty);
+                                                totalShipmentQty += Math.round(shipmentBatchInfoList[sb].shipmentQty);
                                             }
                                             console.log("Total shipment qty", totalShipmentQty);
                                             var shipmentDatesJson = {
@@ -284,6 +287,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                 expectedDeliveryDate: shipmentList[i].expectedDeliveryDate,
                                                 receivedDate: shipmentList[i].receivedDate
                                             }
+                                            console.log("shipmentList[i].expectedDeliveryDate", shipmentList[i].expectedDeliveryDate);
 
                                             data = [];
                                             data[0] = shipmentList[i].shipmentStatus.id; //A
@@ -543,6 +547,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                 allowManualInsertRow: false,
                                                                 allowExport: false,
                                                                 editable: tableEditable,
+                                                                contextMenu: false,
                                                                 onchange: this.shipmentQtyChanged,
                                                                 text: {
                                                                     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
@@ -608,6 +613,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                     allowManualInsertRow: false,
                                                                     allowExport: false,
                                                                     editable: false,
+                                                                    contextMenu: false,
                                                                     text: {
                                                                         showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
                                                                         show: '',
@@ -818,6 +824,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                 allowExport: false,
                                                                 onchange: this.shipmentDatesChanged,
                                                                 editable: tableEditable,
+                                                                contextMenu: false,
                                                                 text: {
                                                                     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
                                                                     show: '',
@@ -1386,11 +1393,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                         this.setState({
                                             shipmentsEl: myVar,
                                         })
-                                        var elInstance = myVar;
-                                        var json = elInstance.getJson();
-                                        for (var i = 0; i < json.length; i++) {
-                                            this.calculateLeadTimesOnChange(parseInt(i));
-                                        }
                                         this.props.updateState("loading", false);
                                     }.bind(this)
                                 }.bind(this)
@@ -1461,11 +1463,13 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
     budgetDropdownFilter = function (instance, cell, c, r, source) {
         var mylist = [];
         var value = (instance.jexcel.getJson()[r])[3];
+        console.log("Value", value);
         if (value != "") {
             var budgetList = this.state.budgetListAll;
-            mylist = budgetList.filter(b => b.fundingSource.fundingSourceId == value);
+            mylist = budgetList.filter(b => b.fundingSource.fundingSourceId == value && b.programId == this.state.programIdForBudget);
             mylist.push({ id: 0, name: i18n.t('static.common.select') })
         }
+        console.log("My list", mylist);
         return mylist;
     }
 
@@ -1624,6 +1628,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     elInstance.setValueFromCoords(12, y, freightCost.toFixed(2), true);
                 }
             }
+            positiveValidation("L", y, elInstance);
         }
 
         if (x == 8) {
@@ -1933,6 +1938,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
     calculateLeadTimesOnChange(y) {
         // Logic for dates
         var elInstance = this.state.shipmentsEl;
+        console.log("In calculate lead times")
         var rowData = elInstance.getRowData(y);
         var shipmentMode = rowData[7];
         var procurementAgent = rowData[2];
@@ -2234,6 +2240,13 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             }
                         }
                     }
+                    console.log("Planned date", plannedDate);
+                    console.log("Submitted date", submittedDate);
+                    console.log("Approved Date", approvedDate);
+                    console.log("shipped date", shippedDate);
+                    console.log("Arrived date", arrivedDate);
+                    console.log("ExpectedDeliveryDate", expectedDeliveryDate);
+
                     var json = {
                         plannedDate: plannedDate,
                         submittedDate: submittedDate,
