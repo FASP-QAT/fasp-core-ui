@@ -2231,14 +2231,16 @@ export default class SupplyPlanComponent extends React.Component {
                                         month: m[n].month,
                                         consumption: jsonList[0].consumptionQty,
                                         stock: jsonList[0].closingBalance,
-                                        planned: plannedShipmentsTotalData.qty + plannedErpShipmentsTotalData.qty,
-                                        delivered: deliveredShipmentsTotalData.qty + deliveredErpShipmentsTotalData.qty,
-                                        shipped: shippedShipmentsTotalData.qty + shippedErpShipmentsTotalData.qty,
-                                        ordered: orderedShipmentsTotalData.qty + orderedErpShipmentsTotalData.qty,
+                                        planned: parseInt(plannedShipmentsTotalData[n] != "" ? plannedShipmentsTotalData[n].qty : 0) + parseInt(plannedErpShipmentsTotalData[n] != "" ? plannedErpShipmentsTotalData[n].qty : 0),
+                                        delivered: parseInt(deliveredShipmentsTotalData[n] != "" ? deliveredShipmentsTotalData[n].qty : 0) + parseInt(deliveredErpShipmentsTotalData[n] != "" ? deliveredErpShipmentsTotalData[n].qty : 0),
+                                        shipped: parseInt(shippedShipmentsTotalData[n] != "" ? shippedShipmentsTotalData[n].qty : 0) + parseInt(shippedErpShipmentsTotalData[n] != "" ? shippedErpShipmentsTotalData[n].qty : 0),
+                                        ordered: parseInt(orderedShipmentsTotalData[n] != "" ? orderedShipmentsTotalData[n].qty : 0) + parseInt(orderedErpShipmentsTotalData[n] != "" ? orderedErpShipmentsTotalData[n].qty : 0),
                                         mos: parseFloat(jsonList[0].mos).toFixed(2),
                                         minMos: jsonList[0].minStockMoS,
                                         maxMos: jsonList[0].maxStockMoS
                                     }
+                                    console.log("Json----------->", json);
+                                    console.log("plannedShipmentsTotalData[n]------------>", plannedShipmentsTotalData[n])
                                     jsonArrForGraph.push(json);
                                 } else {
                                     openingBalanceArray.push(lastClosingBalance);

@@ -323,7 +323,7 @@ export default class EditOrganisationComponent extends Component {
                                                 <CardBody className="pb-0">
 
                                                     <FormGroup>
-                                                        <Label htmlFor="realmId">{i18n.t('static.organisation.realm')}</Label>
+                                                        <Label htmlFor="realmId">{i18n.t('static.organisation.realm')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             bsSize="sm"
                                                             value={this.state.organisation.realm.id}
@@ -340,7 +340,7 @@ export default class EditOrganisationComponent extends Component {
                                                     </FormGroup>
 
                                                     <FormGroup className="Selectcontrol-bdrNone">
-                                                        <Label htmlFor="realmCountryId">{i18n.t('static.organisation.realmcountry')}</Label>
+                                                        <Label htmlFor="realmCountryId">{i18n.t('static.organisation.realmcountry')}<span class="red Reqasterisk">*</span></Label>
                                                         <Select
                                                             bsSize="sm"
                                                             className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
@@ -363,7 +363,7 @@ export default class EditOrganisationComponent extends Component {
                                                     </FormGroup>
 
                                                     <FormGroup>
-                                                        <Label htmlFor="organisationCode">{i18n.t('static.organisation.organisationcode')} </Label>
+                                                        <Label htmlFor="organisationCode">{i18n.t('static.organisation.organisationcode')} <span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             bsSize="sm"
                                                             readOnly
@@ -377,7 +377,7 @@ export default class EditOrganisationComponent extends Component {
                                                     </FormGroup>
 
                                                     <FormGroup>
-                                                        <Label htmlFor="organisationName">{i18n.t('static.organisation.organisationname')} </Label>
+                                                        <Label htmlFor="organisationName">{i18n.t('static.organisation.organisationname')}<span class="red Reqasterisk">*</span> </Label>
                                                         <Input
                                                             bsSize="sm"
                                                             type="text" name="organisationName" valid={!errors.organisationName}

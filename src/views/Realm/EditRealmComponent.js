@@ -280,7 +280,7 @@ export default class UpdateDataSourceComponent extends Component {
                                                 <CardBody>
 
                                                     <FormGroup>
-                                                        <Label for="label">{i18n.t('static.realm.realmName')}</Label>
+                                                        <Label for="label">{i18n.t('static.realm.realmName')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input type="text"
                                                             name="label"
                                                             id="label"
@@ -294,7 +294,7 @@ export default class UpdateDataSourceComponent extends Component {
                                                         <FormFeedback className="red">{errors.label}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="realmCode">{i18n.t('static.realm.realmCode')}</Label>
+                                                        <Label for="realmCode">{i18n.t('static.realm.realmCode')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input type="text"
                                                             name="realmCode"
                                                             id="realmCode"
@@ -308,7 +308,7 @@ export default class UpdateDataSourceComponent extends Component {
                                                         <FormFeedback className="red">{errors.realmCode}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="minMosMinGaurdrail">{i18n.t('static.realm.minMosMinGaurdraillabel')}</Label>
+                                                        <Label for="minMosMinGaurdrail">{i18n.t('static.realm.minMosMinGaurdraillabel')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input type="number"
                                                             min="0"
                                                             name="minMosMinGaurdrail"
@@ -323,7 +323,7 @@ export default class UpdateDataSourceComponent extends Component {
                                                         <FormFeedback className="red">{errors.minMosMinGaurdrail}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="minMosMaxGaurdrail">{i18n.t('static.realm.minMosMaxGaurdraillabel')}</Label>
+                                                        <Label for="minMosMaxGaurdrail">{i18n.t('static.realm.minMosMaxGaurdraillabel')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input type="number"
                                                             min="0"
                                                             name="minMosMaxGaurdrail"
@@ -338,7 +338,7 @@ export default class UpdateDataSourceComponent extends Component {
                                                         <FormFeedback className="red">{errors.minMosMaxGaurdrail}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="maxMosMaxGaurdrail">{i18n.t('static.realm.maxMosMaxGaurdraillabel')}</Label>
+                                                        <Label for="maxMosMaxGaurdrail">{i18n.t('static.realm.maxMosMaxGaurdraillabel')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input type="number"
                                                             min="0"
                                                             name="maxMosMaxGaurdrail"
@@ -409,7 +409,7 @@ export default class UpdateDataSourceComponent extends Component {
                                                             <Label
                                                                 className="form-check-label"
                                                                 check htmlFor="inline-radio1">
-                                                                {i18n.t('static.common.active')}
+                                                                {i18n.t('static.realm.yes')}
                                                             </Label>
                                                         </FormGroup>
                                                         <FormGroup check inline>
@@ -425,7 +425,7 @@ export default class UpdateDataSourceComponent extends Component {
                                                             <Label
                                                                 className="form-check-label"
                                                                 check htmlFor="inline-radio2">
-                                                                {i18n.t('static.common.disabled')}
+                                                                {i18n.t('static.realm.no')}
                                                             </Label>
                                                         </FormGroup>
                                                     </FormGroup>

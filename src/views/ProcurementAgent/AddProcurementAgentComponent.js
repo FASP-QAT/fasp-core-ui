@@ -377,7 +377,7 @@ class AddProcurementAgentComponent extends Component {
                                                         <FormFeedback className="red">{errors.procurementAgentCode}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="colorHtmlCode">{i18n.t('static.procurementagent.procurementAgentColorCode')}<span className="red Reqasterisk">*</span></Label>
+                                                        <Label for="colorHtmlCode">{i18n.t('static.procurementagent.procurementAgentColorCode')}</Label>
                                                         <div bsSize="sm">
                                                             <div style={styles.swatch} onClick={this.handleClick}>
                                                                 <div style={styles.color} />

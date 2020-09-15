@@ -259,10 +259,13 @@ class ApplicationDashboard extends Component {
   }
 
   hideFirstComponent() {
-    setTimeout(function () {
-      document.getElementById('div1').style.display = 'none';
+    this.timeout = setTimeout(function () {
+        document.getElementById('div1').style.display = 'none';
     }, 8000);
-  }
+}
+componentWillUnmount() {
+    clearTimeout(this.timeout);
+}
 
   toggle() {
     this.setState({

@@ -548,7 +548,7 @@ class EditTracerCategoryComponent extends Component {
                                             <Form onSubmit={handleSubmit} noValidate name='tracerCategoryForm'>
                                                 <CardBody className="pb-0">
                                                     <FormGroup>
-                                                        <Label htmlFor="realmId">{i18n.t('static.realm.realm')}</Label>
+                                                        <Label htmlFor="realmId">{i18n.t('static.realm.realm')}<span class="red Reqasterisk">*</span></Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
                                                         {/* <InputGroupText><i className="fa fa-pencil"></i></InputGroupText> */}
                                                         <Input
