@@ -735,7 +735,8 @@ export default class EditLanguageComponent extends Component {
                                                     color: 'green'
                                                 })
 
-                                                this.props.history.push(`/report/problemList/` + i18n.t('static.message.consumptionSuccess'));
+                                                // this.props.history.push(`/report/problemList/` + i18n.t('static.message.consumptionSuccess'));
+                                                this.props.history.push(`/report/problemList/` + 'green/' + i18n.t('static.problem.updatedSuccessFully'));
                                             }.bind(this)
 
                                             // }.bind(this);
@@ -749,7 +750,7 @@ export default class EditLanguageComponent extends Component {
                                         errors,
                                         touched,
                                         handleChange,
-                                        handleBlur,
+                                        handleBlur, 
                                         handleSubmit,
                                         isSubmitting,
                                         isValid,
