@@ -1126,7 +1126,7 @@ export default class EditProcurementUnit extends Component {
                                                         <FormFeedback className="red">{errors.procurementUnitName}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="select">{i18n.t('static.procurementUnit.planningUnit')}</Label>
+                                                        <Label htmlFor="select">{i18n.t('static.procurementUnit.planningUnit')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             value={getLabelText(this.state.procurementUnit.planningUnit.label, this.state.lang)}
                                                             bsSize="sm"
@@ -1168,7 +1168,7 @@ export default class EditProcurementUnit extends Component {
                                                         <FormFeedback>{errors.unitId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="select">{i18n.t('static.procurementUnit.supplier')}</Label>
+                                                        <Label htmlFor="select">{i18n.t('static.procurementUnit.supplier')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             value={getLabelText(this.state.procurementUnit.supplier.label, this.state.lang)}
                                                             bsSize="sm"
