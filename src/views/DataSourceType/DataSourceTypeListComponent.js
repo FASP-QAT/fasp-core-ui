@@ -409,8 +409,8 @@ export default class DataSourceTypeListComponent extends Component {
         for (var j = 0; j < dataSourceTypeList.length; j++) {
             data = [];
             data[0] = dataSourceTypeList[j].dataSourceTypeId
-            data[1] = getLabelText(dataSourceTypeList[j].label, this.state.lang)
-            data[2] = getLabelText(dataSourceTypeList[j].realm.label, this.state.lang)
+            data[1] = getLabelText(dataSourceTypeList[j].realm.label, this.state.lang)
+            data[2] = getLabelText(dataSourceTypeList[j].label, this.state.lang)
             data[3] = dataSourceTypeList[j].active;
 
             dataSourceTypeArray[count] = data;
@@ -438,12 +438,12 @@ export default class DataSourceTypeListComponent extends Component {
                     readOnly: true
                 },
                 {
-                    title: i18n.t('static.datasourcetype.datasourcetype'),
-                    type: 'text',
+                    title: i18n.t('static.realm.realm'),
+                    type: (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') ? 'text' : 'hidden'),
                     readOnly: true
                 },
                 {
-                    title: i18n.t('static.realm.realm'),
+                    title: i18n.t('static.datasourcetype.datasourcetype'),
                     type: 'text',
                     readOnly: true
                 },
@@ -611,6 +611,7 @@ export default class DataSourceTypeListComponent extends Component {
 
                     </div>
                     <CardBody className="pb-lg-0">
+                    {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') &&
                         <Col md="3 pl-0">
                             <FormGroup className="Selectdiv">
                                 <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
@@ -633,6 +634,7 @@ export default class DataSourceTypeListComponent extends Component {
                                 </div>
                             </FormGroup>
                         </Col>
+                        }
                         <div className="SearchMarginTop">
                             {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground ">
                             </div>

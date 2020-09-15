@@ -447,7 +447,7 @@ export default class UpdateDataSourceComponent extends Component {
                                                                 {i18n.t('static.common.active')}
                                                             </Label>
                                                         </FormGroup>
-                                                        <FormGroup check inline>
+                                                        <FormGroup check inline className="inlineMargin">
                                                             <Input
                                                                 className="form-check-input"
                                                                 type="radio"
