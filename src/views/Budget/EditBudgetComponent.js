@@ -27,7 +27,7 @@ let initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         budgetName: Yup.string()
-            .matches(BUDGET_NAME_REGEX, i18n.t('static.message.budgetNameRegex'))
+            // .matches(BUDGET_NAME_REGEX, i18n.t('static.message.budgetNameRegex'))
             .required(i18n.t('static.budget.budgetamountdesc')),
         budgetAmt: Yup.string()
             // .typeError(i18n.t('static.procurementUnit.validNumberText'))
@@ -38,7 +38,7 @@ const validationSchema = function (values) {
         // stopDate: Yup.string()
         //     .required(i18n.t('static.budget.stopdatetext'))
         budgetCode: Yup.string()
-            .matches(ALPHABET_NUMBER_REGEX, i18n.t('static.message.alphabetnumerallowed'))
+            // .matches(ALPHABET_NUMBER_REGEX, i18n.t('static.message.alphabetnumerallowed'))
             .max(10, i18n.t('static.common.max10digittext'))
             .required(i18n.t('static.budget.budgetCodeText')),
     })
