@@ -609,7 +609,7 @@ export default class ProgramList extends Component {
 
   addNewProgram() {
     this.props.history.push({
-      pathname: "/program/addProgram"
+      pathname: "/program/programOnboarding" 
     });
   }
   buttonFormatter(cell, row) {

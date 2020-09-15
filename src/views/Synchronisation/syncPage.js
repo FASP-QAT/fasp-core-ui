@@ -14,7 +14,7 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import ProgramService from '../../api/ProgramService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import { jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunctionOnlyHideRow, inValid, inValidWithColor } from '../../CommonComponent/JExcelCommonFunctions.js'
+import { jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunctionOnlyHideRow, inValid, inValidWithColor, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
 import moment from "moment";
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
@@ -1038,9 +1038,9 @@ export default class syncPage extends Component {
                                     data[3] = mergedConsumptionData[cd].region.id; //B                        
                                     data[4] = mergedConsumptionData[cd].dataSource.id; //C
                                     data[5] = mergedConsumptionData[cd].realmCountryPlanningUnit.id; //D
-                                    data[6] = parseInt(mergedConsumptionData[cd].consumptionRcpuQty); //E
+                                    data[6] = Math.round(mergedConsumptionData[cd].consumptionRcpuQty); //E
                                     data[7] = mergedConsumptionData[cd].multiplier; //F
-                                    data[8] = parseInt(mergedConsumptionData[cd].consumptionRcpuQty) * mergedConsumptionData[cd].multiplier; //I
+                                    data[8] = Math.round(mergedConsumptionData[cd].consumptionRcpuQty) * mergedConsumptionData[cd].multiplier; //I
                                     data[9] = mergedConsumptionData[cd].dayOfStockOut;
                                     if (mergedConsumptionData[cd].notes === null || ((mergedConsumptionData[cd].notes).trim() == "NULL")) {
                                       data[10] = "";
@@ -1054,19 +1054,19 @@ export default class syncPage extends Component {
                                     var oldDataList = oldProgramDataConsumption.filter(c => c.consumptionId == mergedConsumptionData[cd].consumptionId);
                                     var oldData = ""
                                     if (oldDataList.length > 0) {
-                                      oldData = [oldDataList[0].consumptionId, oldDataList[0].planningUnit.id, moment(oldDataList[0].consumptionDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), oldDataList[0].region.id, oldDataList[0].dataSource.id, oldDataList[0].realmCountryPlanningUnit.id, parseInt(oldDataList[0].consumptionRcpuQty), oldDataList[0].multiplier, parseInt(oldDataList[0].consumptionRcpuQty) * oldDataList[0].multiplier, oldDataList[0].dayOfStockOut, oldDataList[0].notes, (oldDataList[0].actualFlag.toString() == "true" ? 1 : 0), oldDataList[0].active, JSON.stringify(oldDataList[0].batchInfoList != "" ? ((oldDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.consumptionQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
+                                      oldData = [oldDataList[0].consumptionId, oldDataList[0].planningUnit.id, moment(oldDataList[0].consumptionDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), oldDataList[0].region.id, oldDataList[0].dataSource.id, oldDataList[0].realmCountryPlanningUnit.id, Math.round(oldDataList[0].consumptionRcpuQty), oldDataList[0].multiplier, Math.round(oldDataList[0].consumptionRcpuQty) * oldDataList[0].multiplier, oldDataList[0].dayOfStockOut, oldDataList[0].notes, (oldDataList[0].actualFlag.toString() == "true" ? 1 : 0), oldDataList[0].active, JSON.stringify(oldDataList[0].batchInfoList != "" ? ((oldDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.consumptionQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
                                     }
                                     data[15] = oldData;//Old data
                                     var latestDataList = latestProgramDataConsumption.filter(c => c.consumptionId == mergedConsumptionData[cd].consumptionId);
                                     var latestData = ""
                                     if (latestDataList.length > 0) {
-                                      latestData = [latestDataList[0].consumptionId, latestDataList[0].planningUnit.id, moment(latestDataList[0].consumptionDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), latestDataList[0].region.id, latestDataList[0].dataSource.id, latestDataList[0].realmCountryPlanningUnit.id, parseInt(latestDataList[0].consumptionRcpuQty), latestDataList[0].multiplier, parseInt(latestDataList[0].consumptionRcpuQty) * latestDataList[0].multiplier, latestDataList[0].dayOfStockOut, latestDataList[0].notes, (latestDataList[0].actualFlag.toString() == "true" ? 1 : 0), latestDataList[0].active, JSON.stringify(latestDataList[0].batchInfoList != "" ? ((latestDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.consumptionQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
+                                      latestData = [latestDataList[0].consumptionId, latestDataList[0].planningUnit.id, moment(latestDataList[0].consumptionDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), latestDataList[0].region.id, latestDataList[0].dataSource.id, latestDataList[0].realmCountryPlanningUnit.id, Math.round(latestDataList[0].consumptionRcpuQty), latestDataList[0].multiplier, Math.round(latestDataList[0].consumptionRcpuQty) * latestDataList[0].multiplier, latestDataList[0].dayOfStockOut, latestDataList[0].notes, (latestDataList[0].actualFlag.toString() == "true" ? 1 : 0), latestDataList[0].active, JSON.stringify(latestDataList[0].batchInfoList != "" ? ((latestDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.consumptionQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
                                     }
                                     data[16] = latestData;//Latest data
                                     var downloadedDataList = downloadedProgramDataConsumption.filter(c => c.consumptionId == mergedConsumptionData[cd].consumptionId);
                                     var downloadedData = "";
                                     if (downloadedDataList.length > 0) {
-                                      downloadedData = [downloadedDataList[0].consumptionId, downloadedDataList[0].planningUnit.id, moment(downloadedDataList[0].consumptionDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), downloadedDataList[0].region.id, downloadedDataList[0].dataSource.id, downloadedDataList[0].realmCountryPlanningUnit.id, parseInt(downloadedDataList[0].consumptionRcpuQty), downloadedDataList[0].multiplier, parseInt(downloadedDataList[0].consumptionRcpuQty) * downloadedDataList[0].multiplier, downloadedDataList[0].dayOfStockOut, downloadedDataList[0].notes, (downloadedDataList[0].actualFlag.toString() == "true" ? 1 : 0), downloadedDataList[0].active, JSON.stringify(downloadedDataList[0].batchInfoList != "" ? ((downloadedDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.consumptionQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
+                                      downloadedData = [downloadedDataList[0].consumptionId, downloadedDataList[0].planningUnit.id, moment(downloadedDataList[0].consumptionDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), downloadedDataList[0].region.id, downloadedDataList[0].dataSource.id, downloadedDataList[0].realmCountryPlanningUnit.id, Math.round(downloadedDataList[0].consumptionRcpuQty), downloadedDataList[0].multiplier,Math.round(downloadedDataList[0].consumptionRcpuQty) * downloadedDataList[0].multiplier, downloadedDataList[0].dayOfStockOut, downloadedDataList[0].notes, (downloadedDataList[0].actualFlag.toString() == "true" ? 1 : 0), downloadedDataList[0].active, JSON.stringify(downloadedDataList[0].batchInfoList != "" ? ((downloadedDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.consumptionQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
                                     }
                                     data[17] = downloadedData;//Downloaded data
                                     data[18] = 4;
@@ -1098,6 +1098,7 @@ export default class syncPage extends Component {
                                       { type: 'hidden', title: 'result of compare' },
                                     ],
                                     pagination: 10,
+                                    paginationOptions:[10, 25, 50],
                                     search: true,
                                     columnSorting: true,
                                     tableOverflow: true,
@@ -1197,11 +1198,11 @@ export default class syncPage extends Component {
                                       data[4] = mergedInventoryData[cd].dataSource.id;
                                       data[5] = mergedInventoryData[cd].realmCountryPlanningUnit.id;
                                       data[6] = mergedInventoryData[cd].adjustmentQty != "" && mergedInventoryData[cd].adjustmentQty != null && mergedInventoryData[cd].adjustmentQty != 0 ? 2 : 1;
-                                      data[7] = parseInt(mergedInventoryData[cd].adjustmentQty);
-                                      data[8] = parseInt(mergedInventoryData[cd].actualQty);
+                                      data[7] = Math.round(mergedInventoryData[cd].adjustmentQty);
+                                      data[8] = Math.round(mergedInventoryData[cd].actualQty);
                                       data[9] = mergedInventoryData[cd].multiplier;
-                                      data[10] = parseInt(mergedInventoryData[cd].adjustmentQty) * mergedInventoryData[cd].multiplier;
-                                      data[11] = parseInt(mergedInventoryData[cd].actualQty) * mergedInventoryData[cd].multiplier;
+                                      data[10] = Math.round(mergedInventoryData[cd].adjustmentQty) * mergedInventoryData[cd].multiplier;
+                                      data[11] = Math.round(mergedInventoryData[cd].actualQty) * mergedInventoryData[cd].multiplier;
                                       data[12] = mergedInventoryData[cd].notes;
                                       data[13] = mergedInventoryData[cd].active;
                                       data[14] = JSON.stringify(mergedInventoryData[cd].batchInfoList != "" ? ((mergedInventoryData[cd].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty1": parseInt(a.adjustmentQty), "qty2": parseInt(a.actualQty) } })).sort(function (a, b) { return a.qty1 - b.qty1; }) : "");
@@ -1209,19 +1210,19 @@ export default class syncPage extends Component {
                                       var oldDataList = oldProgramDataInventory.filter(c => c.inventoryId == mergedInventoryData[cd].inventoryId && c.region != null && c.region.id != 0);
                                       var oldData = ""
                                       if (oldDataList.length > 0) {
-                                        oldData = [oldDataList[0].inventoryId, oldDataList[0].planningUnit.id, moment(oldDataList[0].inventoryDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), oldDataList[0].region.id, oldDataList[0].dataSource.id, oldDataList[0].realmCountryPlanningUnit.id, oldDataList[0].adjustmentQty != "" && oldDataList[0].adjustmentQty != null && oldDataList[0].adjustmentQty != 0 ? 2 : 1, parseInt(oldDataList[0].adjustmentQty), parseInt(oldDataList[0].actualQty), oldDataList[0].multiplier, parseInt(oldDataList[0].adjustmentQty) * oldDataList[0].multiplier, parseInt(oldDataList[0].actualQty) * oldDataList[0].multiplier, oldDataList[0].notes, oldDataList[0].active, JSON.stringify(oldDataList[0].batchInfoList != "" ? ((oldDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty1": parseInt(a.adjustmentQty), "qty2": parseInt(a.actualQty) } })).sort(function (a, b) { return a.qty1 - b.qty1; }) : ""), "", "", "", "", 4];
+                                        oldData = [oldDataList[0].inventoryId, oldDataList[0].planningUnit.id, moment(oldDataList[0].inventoryDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), oldDataList[0].region.id, oldDataList[0].dataSource.id, oldDataList[0].realmCountryPlanningUnit.id, oldDataList[0].adjustmentQty != "" && oldDataList[0].adjustmentQty != null && oldDataList[0].adjustmentQty != 0 ? 2 : 1, Math.round(oldDataList[0].adjustmentQty), Math.round(oldDataList[0].actualQty), oldDataList[0].multiplier, Math.round(oldDataList[0].adjustmentQty) * oldDataList[0].multiplier, Math.round(oldDataList[0].actualQty) * oldDataList[0].multiplier, oldDataList[0].notes, oldDataList[0].active, JSON.stringify(oldDataList[0].batchInfoList != "" ? ((oldDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty1": parseInt(a.adjustmentQty), "qty2": parseInt(a.actualQty) } })).sort(function (a, b) { return a.qty1 - b.qty1; }) : ""), "", "", "", "", 4];
                                       }
                                       data[16] = oldData;//Old data
                                       var latestDataList = latestProgramDataInventory.filter(c => c.inventoryId == mergedInventoryData[cd].inventoryId && c.region != null && c.region.id != 0);
                                       var latestData = ""
                                       if (latestDataList.length > 0) {
-                                        latestData = [latestDataList[0].inventoryId, latestDataList[0].planningUnit.id, moment(latestDataList[0].inventoryDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), latestDataList[0].region.id, latestDataList[0].dataSource.id, latestDataList[0].realmCountryPlanningUnit.id, latestDataList[0].adjustmentQty != "" && latestDataList[0].adjustmentQty != null && latestDataList[0].adjustmentQty != 0 ? 2 : 1, parseInt(latestDataList[0].adjustmentQty), parseInt(latestDataList[0].actualQty), latestDataList[0].multiplier, parseInt(latestDataList[0].adjustmentQty) * latestDataList[0].multiplier, parseInt(latestDataList[0].actualQty) * latestDataList[0].multiplier, latestDataList[0].notes, latestDataList[0].active, JSON.stringify(latestDataList[0].batchInfoList != "" ? ((latestDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty1": parseInt(a.adjustmentQty), "qty2": parseInt(a.actualQty) } })).sort(function (a, b) { return a.qty1 - b.qty1; }) : ""), "", "", "", "", 4];
+                                        latestData = [latestDataList[0].inventoryId, latestDataList[0].planningUnit.id, moment(latestDataList[0].inventoryDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), latestDataList[0].region.id, latestDataList[0].dataSource.id, latestDataList[0].realmCountryPlanningUnit.id, latestDataList[0].adjustmentQty != "" && latestDataList[0].adjustmentQty != null && latestDataList[0].adjustmentQty != 0 ? 2 : 1, Math.round(latestDataList[0].adjustmentQty), Math.round(latestDataList[0].actualQty), latestDataList[0].multiplier, Math.round(latestDataList[0].adjustmentQty) * latestDataList[0].multiplier, Math.round(latestDataList[0].actualQty) * latestDataList[0].multiplier, latestDataList[0].notes, latestDataList[0].active, JSON.stringify(latestDataList[0].batchInfoList != "" ? ((latestDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty1": parseInt(a.adjustmentQty), "qty2": parseInt(a.actualQty) } })).sort(function (a, b) { return a.qty1 - b.qty1; }) : ""), "", "", "", "", 4];
                                       }
                                       data[17] = latestData;//Latest data
                                       var downloadedDataList = downloadedProgramDataInventory.filter(c => c.inventoryId == mergedInventoryData[cd].inventoryId && c.region != null && c.region.id != 0);
                                       var downloadedData = "";
                                       if (downloadedDataList.length > 0) {
-                                        downloadedData = [downloadedDataList[0].inventoryId, downloadedDataList[0].planningUnit.id, moment(downloadedDataList[0].inventoryDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), downloadedDataList[0].region.id, downloadedDataList[0].dataSource.id, downloadedDataList[0].realmCountryPlanningUnit.id, downloadedDataList[0].adjustmentQty != "" && downloadedDataList[0].adjustmentQty != null && downloadedDataList[0].adjustmentQty != 0 ? 2 : 1, parseInt(downloadedDataList[0].adjustmentQty), parseInt(downloadedDataList[0].actualQty), downloadedDataList[0].multiplier, parseInt(downloadedDataList[0].adjustmentQty) * downloadedDataList[0].multiplier, parseInt(downloadedDataList[0].actualQty) * downloadedDataList[0].multiplier, downloadedDataList[0].notes, downloadedDataList[0].active, JSON.stringify(downloadedDataList[0].batchInfoList != "" ? ((downloadedDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty1": parseInt(a.adjustmentQty), "qty2": parseInt(a.actualQty) } })).sort(function (a, b) { return a.qty1 - b.qty1; }) : ""), "", "", "", "", 4];
+                                        downloadedData = [downloadedDataList[0].inventoryId, downloadedDataList[0].planningUnit.id, moment(downloadedDataList[0].inventoryDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), downloadedDataList[0].region.id, downloadedDataList[0].dataSource.id, downloadedDataList[0].realmCountryPlanningUnit.id, downloadedDataList[0].adjustmentQty != "" && downloadedDataList[0].adjustmentQty != null && downloadedDataList[0].adjustmentQty != 0 ? 2 : 1, Math.round(downloadedDataList[0].adjustmentQty), Math.round(downloadedDataList[0].actualQty), downloadedDataList[0].multiplier, Math.round(downloadedDataList[0].adjustmentQty) * downloadedDataList[0].multiplier, Math.round(downloadedDataList[0].actualQty) * downloadedDataList[0].multiplier, downloadedDataList[0].notes, downloadedDataList[0].active, JSON.stringify(downloadedDataList[0].batchInfoList != "" ? ((downloadedDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty1": parseInt(a.adjustmentQty), "qty2": parseInt(a.actualQty) } })).sort(function (a, b) { return a.qty1 - b.qty1; }) : ""), "", "", "", "", 4];
                                       }
                                       data[18] = downloadedData;//Downloaded data
                                       data[19] = 4;
@@ -1255,6 +1256,7 @@ export default class syncPage extends Component {
                                       { type: 'hidden', title: 'result of compare' },
                                     ],
                                     pagination: 10,
+                                    paginationOptions:[10, 25, 50],
                                     search: true,
                                     columnSorting: true,
                                     tableOverflow: true,
@@ -1415,6 +1417,7 @@ export default class syncPage extends Component {
                                       { type: 'hidden', title: 'result of compare' },
                                     ],
                                     pagination: 10,
+                                    paginationOptions:[10, 25, 50],
                                     search: true,
                                     columnSorting: true,
                                     tableOverflow: true,
@@ -1632,6 +1635,7 @@ export default class syncPage extends Component {
                                       { type: 'hidden', title: 'result of compare' },
                                     ],
                                     pagination: 10,
+                                    paginationOptions:[10, 25, 50],
                                     search: true,
                                     columnSorting: true,
                                     tableOverflow: true,
@@ -1725,7 +1729,7 @@ export default class syncPage extends Component {
   }
 
   loadedFunctionForMerge = function (instance) {
-    jExcelLoadedFunctionWithoutPagination(instance, 0);
+    jExcelLoadedFunction(instance, 0);
     var elInstance = instance.jexcel;
     var jsonData = elInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R']
@@ -1830,7 +1834,7 @@ export default class syncPage extends Component {
 
 
   loadedFunctionForMergeInventory = function (instance) {
-    jExcelLoadedFunctionWithoutPagination(instance, 1);
+    jExcelLoadedFunction(instance, 1);
     var elInstance = instance.jexcel;
     var jsonData = elInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S']
@@ -1934,7 +1938,7 @@ export default class syncPage extends Component {
   }
 
   loadedFunctionForMergeShipment = function (instance) {
-    jExcelLoadedFunctionWithoutPagination(instance, 2);
+    jExcelLoadedFunction(instance, 2);
     var elInstance = instance.jexcel;
     var jsonData = elInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF']
@@ -2044,7 +2048,7 @@ export default class syncPage extends Component {
   }
 
   loadedFunctionForMergeProblemList = function (instance) {
-    jExcelLoadedFunctionWithoutPagination(instance, 3);
+    jExcelLoadedFunction(instance, 3);
     var elInstance = instance.jexcel;
     var jsonData = elInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T']

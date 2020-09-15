@@ -405,7 +405,7 @@ export default class MapPlanningUnits extends Component {
         // });
 
         var puList = []
-        if (value != 0) {
+        if (value != -1) {
             console.log("in if=====>");
             var pc = this.state.productCategoryList.filter(c => c.payload.productCategoryId == value)[0]
             var pcList = this.state.productCategoryList.filter(c => c.payload.productCategoryId == pc.payload.productCategoryId || c.parentId == pc.id);
@@ -454,10 +454,22 @@ export default class MapPlanningUnits extends Component {
                         }
                         console.log("ind", indendent);
                         console.log("indendent.concat(response.data[k].payload.label.label_en)-->", indendent.concat(response.data[k].payload.label.label_en));
-                        var productCategoryJson = {
-                            name: (response.data[k].payload.label.label_en),
-                            id: response.data[k].payload.productCategoryId
+                       
+                       
+                       
+                        var productCategoryJson = {};
+                        if (response.data[k].payload.productCategoryId == 0) {
+                            productCategoryJson = {
+                                name: (response.data[k].payload.label.label_en),
+                                id: -1
+                            }
+                        } else {
+                            productCategoryJson = {
+                                name: (response.data[k].payload.label.label_en),
+                                id: response.data[k].payload.productCategoryId
+                            }
                         }
+
                         productCategoryList.push(productCategoryJson);
 
                     }
@@ -749,6 +761,17 @@ export default class MapPlanningUnits extends Component {
 
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunctionWithoutPagination(instance);
+        var asterisk = document.getElementsByClassName("resizable")[0];
+        var tr = asterisk.firstChild;
+        tr.children[1].classList.add('AsteriskTheadtrTd');
+        tr.children[2].classList.add('AsteriskTheadtrTd');
+        tr.children[3].classList.add('AsteriskTheadtrTd');
+        tr.children[4].classList.add('AsteriskTheadtrTd');
+        tr.children[5].classList.add('AsteriskTheadtrTd');
+        tr.children[6].classList.add('AsteriskTheadtrTd');
+        tr.children[7].classList.add('AsteriskTheadtrTd');
+        tr.children[8].classList.add('AsteriskTheadtrTd');
+        tr.children[9].classList.add('AsteriskTheadtrTd');
     }
 
     myFunction() {

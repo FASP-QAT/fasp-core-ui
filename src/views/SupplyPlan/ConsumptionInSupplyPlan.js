@@ -144,7 +144,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         data[2] = consumptionFlag;
                         data[3] = consumptionList[j].dataSource.id; //D
                         data[4] = consumptionList[j].realmCountryPlanningUnit.id; //E
-                        data[5] = parseInt(consumptionList[j].consumptionRcpuQty); //F
+                        data[5] = Math.round(consumptionList[j].consumptionRcpuQty); //F
                         data[6] = consumptionList[j].multiplier; //G
                         data[7] = `=F${parseInt(j) + 1}*G${parseInt(j) + 1}`; //H
                         data[8] = consumptionList[j].dayOfStockOut;

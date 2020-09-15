@@ -14,7 +14,7 @@ export default class PipelineProgramPlanningUnits extends Component {
         this.state = {
             planningUnitList: [],
             mapPlanningUnitEl: '',
-            loading:true,
+            loading: true,
             productCategoryList: []
         }
         this.loaded = this.loaded.bind(this);
@@ -29,7 +29,7 @@ export default class PipelineProgramPlanningUnits extends Component {
         var value = (instance.jexcel.getJson()[r])[c - 1];
 
         var puList = []
-        if (value != 0) {
+        if (value != -1) {
             console.log("in if=====>");
             var pc = this.state.productCategoryList.filter(c => c.payload.productCategoryId == value)[0]
             var pcList = this.state.productCategoryList.filter(c => c.payload.productCategoryId == pc.payload.productCategoryId || c.parentId == pc.id);
@@ -239,13 +239,13 @@ export default class PipelineProgramPlanningUnits extends Component {
         if (x == 10) {
             var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
             var col = ("K").concat(parseInt(y) + 1);
-            console.log('value=>',value)
+            console.log('value=>', value)
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                if (isNaN(parseInt(value)) || !(reg.test(value)|| value<0)) {
+                if (isNaN(parseInt(value)) || !(reg.test(value) || value < 0)) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -284,7 +284,7 @@ export default class PipelineProgramPlanningUnits extends Component {
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                if (isNaN(parseInt(value)) || !(reg.test(value)|| value<0)) {
+                if (isNaN(parseInt(value)) || !(reg.test(value) || value < 0)) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -521,7 +521,7 @@ export default class PipelineProgramPlanningUnits extends Component {
                 // pipelineId: {
                 //     id: this.props.pipelineId
                 // },
-                 active: map.get("13"),
+                active: map.get("13"),
                 program: {
                     id: 0
                 },
@@ -532,9 +532,9 @@ export default class PipelineProgramPlanningUnits extends Component {
                 monthsInFutureForAmc: map.get("7"),
                 monthsInPastForAmc: map.get("8"),
                 programPlanningUnitId: map.get("9"),
-                localProcurmentLeadTime: map.get("10")==''?null: map.get("10"),
+                localProcurmentLeadTime: map.get("10") == '' ? null : map.get("10"),
                 shelfLife: map.get("11"),
-                catalogPrice: map.get("12")==''?null:map.get("12")
+                catalogPrice: map.get("12") == '' ? null : map.get("12")
 
 
             }
@@ -566,10 +566,21 @@ export default class PipelineProgramPlanningUnits extends Component {
                     }
                     console.log("ind", indendent);
                     console.log("indendent.concat(response.data[k].payload.label.label_en)-->", indendent.concat(response.data[k].payload.label.label_en));
-                    var productCategoryJson = {
-                        name: (response.data[k].payload.label.label_en),
-                        id: response.data[k].payload.productCategoryId
+
+
+                    var productCategoryJson = {};
+                    if (response.data[k].payload.productCategoryId == 0) {
+                        productCategoryJson = {
+                            name: (response.data[k].payload.label.label_en),
+                            id: -1
+                        }
+                    } else {
+                        productCategoryJson = {
+                            name: (response.data[k].payload.label.label_en),
+                            id: response.data[k].payload.productCategoryId
+                        }
                     }
+
                     productCategoryList.push(productCategoryJson);
 
                 }
@@ -588,7 +599,7 @@ export default class PipelineProgramPlanningUnits extends Component {
                             this.setState({ activePlanningUnitList: response.data });
                             for (var k = 0; k < (response.data).length; k++) {
                                 var planningUnitJson = {
-                                    name: response.data[k].label.label_en+' ~ '+response.data[k].planningUnitId,
+                                    name: response.data[k].label.label_en + ' ~ ' + response.data[k].planningUnitId,
                                     id: response.data[k].planningUnitId
                                 }
                                 planningUnitListQat.push(planningUnitJson);
@@ -607,6 +618,8 @@ export default class PipelineProgramPlanningUnits extends Component {
                                             //seting this for loaded function
                                             this.setState({ planningUnitList: planningUnitList });
                                             //seting this for loaded function
+                                            console.log("planning Unit list==>",planningUnitList);
+                                        
                                             if (planningUnitList.length != 0) {
                                                 for (var j = 0; j < planningUnitList.length; j++) {
                                                     data = [];
@@ -614,8 +627,12 @@ export default class PipelineProgramPlanningUnits extends Component {
                                                     data[0] = planningUnitList[j].pipelineProductCategoryName;
                                                     data[1] = planningUnitList[j].pipelineProductName;
 
-                                                    data[2] = planningUnitList[j].productCategoryId;
-                                                    data[3] = planningUnitList[j].planningUnitId;   
+                                                    if(planningUnitList[j].productCategoryId==0){
+                                                        data[2] = -1;
+                                                    }else{
+                                                        data[2] = planningUnitList[j].productCategoryId;
+                                                    }
+                                                    data[3] = planningUnitList[j].planningUnitId;
                                                     data[4] = planningUnitList[j].multiplier
                                                     data[5] = planningUnitList[j].reorderFrequencyInMonths;
                                                     data[6] = planningUnitList[j].minMonthsOfStock;
@@ -632,13 +649,13 @@ export default class PipelineProgramPlanningUnits extends Component {
 
                                                     data[9] = planningUnitList[j].programPlanningUnitId
 
-                                                    data[10] = planningUnitList[j].localProcurmentLeadTime==-1?'':planningUnitList[j].localProcurmentLeadTime
+                                                    data[10] = planningUnitList[j].localProcurmentLeadTime == -1 ? '' : planningUnitList[j].localProcurmentLeadTime
                                                     if (planningUnitList[j].shelfLife == 0) {
                                                         data[11] = this.props.items.program.shelfLife;
                                                     } else {
                                                         data[11] = planningUnitList[j].shelfLife
                                                     }
-                                                    data[12] = planningUnitList[j].catalogPrice==-1?'':planningUnitList[j].catalogPrice
+                                                    data[12] = planningUnitList[j].catalogPrice == -1 ? '' : planningUnitList[j].catalogPrice
                                                     data[13] = planningUnitList[j].active
                                                     productDataArr.push(data);
 
@@ -655,7 +672,7 @@ export default class PipelineProgramPlanningUnits extends Component {
                                             var options = {
                                                 data: data,
                                                 columnDrag: true,
-                                                colWidths: [160, 190, 190, 190, 80, 80, 80, 80, 80, 80, 120, 120, 80,80],
+                                                colWidths: [160, 190, 190, 190, 80, 80, 80, 80, 80, 80, 120, 120, 80, 80],
                                                 columns: [
 
                                                     {
@@ -842,18 +859,18 @@ export default class PipelineProgramPlanningUnits extends Component {
                                             //         });
                                         }
                                     } else {
-                                        this.setState({ message: response.data.messageCode,loading:false })
+                                        this.setState({ message: response.data.messageCode, loading: false })
                                     }
                                 });
 
                         } else {
-                            this.setState({ message: response.data.messageCode,loading:false })
+                            this.setState({ message: response.data.messageCode, loading: false })
                         }
 
                     }).catch(
                         error => {
                             if (error.message === "Network Error") {
-                                this.setState({ message: error.message,loading:false });
+                                this.setState({ message: error.message, loading: false });
                             } else {
                                 switch (error.response ? error.response.status : "") {
                                     case 500:
@@ -861,10 +878,10 @@ export default class PipelineProgramPlanningUnits extends Component {
                                     case 404:
                                     case 406:
                                     case 412:
-                                        this.setState({ message: error.response.data.messageCode,loading:false });
+                                        this.setState({ message: error.response.data.messageCode, loading: false });
                                         break;
                                     default:
-                                        this.setState({ message: 'static.unkownError',loading:false });
+                                        this.setState({ message: 'static.unkownError', loading: false });
                                         break;
                                 }
                             }
@@ -878,13 +895,13 @@ export default class PipelineProgramPlanningUnits extends Component {
     }
 
     loadedJexcelCommonFunction = function (instance, cell, x, y, value) {
-        jExcelLoadedFunctionPipeline(instance,0);
+        jExcelLoadedFunctionPipeline(instance, 0);
     }
 
     render() {
         return (
             <>
-             <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
                 }} loading={(loading) => {
                     this.setState({ loading: loading })
