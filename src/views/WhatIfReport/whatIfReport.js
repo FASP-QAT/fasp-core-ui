@@ -561,7 +561,7 @@ export default class WhatIfReportComponent extends React.Component {
                     var shipmentList = programJson.shipmentList;
                     var shipmentUnFundedList = shipmentList.filter(c => c.fundingSource.id == "" || c.fundingSource.id == TBD_FUNDING_SOURCE && c.planningUnit.id == planningUnitId);
                     var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
-                    console.log("Shipment un funded shipment", shipmentUnFundedList,"Min Date",minDate);
+                    console.log("Shipment un funded shipment", shipmentUnFundedList, "Min Date", minDate);
                     for (var i = 0; i < shipmentUnFundedList.length; i++) {
                         var index = 0;
                         if (shipmentUnFundedList[i].shipmentId > 0) {
@@ -693,7 +693,7 @@ export default class WhatIfReportComponent extends React.Component {
                     var shipmentList = programJson.shipmentList;
                     var shipmentUnFundedList = shipmentList.filter(c => moment(c.submittedDate).format("YYYY-MM-DD") <= moment(Date.now()).format("YYYY-MM-DD") && (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS));
                     var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
-                    console.log("Shipment un funded shipment", shipmentUnFundedList,"Min Date",minDate);
+                    console.log("Shipment un funded shipment", shipmentUnFundedList, "Min Date", minDate);
                     for (var i = 0; i < shipmentUnFundedList.length; i++) {
                         var index = 0;
                         if (shipmentUnFundedList[i].shipmentId > 0) {
@@ -731,7 +731,7 @@ export default class WhatIfReportComponent extends React.Component {
                 } else if (this.state.scenarioId == 5) {
                     var shipmentList = programJson.shipmentList;
                     var shipmentUnFundedList = shipmentList.filter(c => moment(c.approvedDate).format("YYYY-MM-DD") <= moment(Date.now()).format("YYYY-MM-DD") && (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS));
-                    console.log("Shipment un funded shipment", shipmentUnFundedList,"Min Date",minDate);
+                    console.log("Shipment un funded shipment", shipmentUnFundedList, "Min Date", minDate);
                     var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
                     for (var i = 0; i < shipmentUnFundedList.length; i++) {
                         var index = 0;
@@ -772,7 +772,7 @@ export default class WhatIfReportComponent extends React.Component {
                     var shipmentList = programJson.shipmentList;
                     var shipmentUnFundedList = shipmentList.filter(c => (moment(c.shippedDate).format("YYYY-MM-DD") <= moment(Date.now()).format("YYYY-MM-DD") && (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS || c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS)) || (moment(c.arrivedDate).format("YYYY-MM-DD") <= moment(Date.now()).format("YYYY-MM-DD") && (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS || c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS || c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS)));
                     var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
-                    console.log("Shipment un funded shipment", shipmentUnFundedList,"Min Date",minDate);
+                    console.log("Shipment un funded shipment", shipmentUnFundedList, "Min Date", minDate);
                     for (var i = 0; i < shipmentUnFundedList.length; i++) {
                         var index = 0;
                         if (shipmentUnFundedList[i].shipmentId > 0) {
@@ -1913,10 +1913,10 @@ export default class WhatIfReportComponent extends React.Component {
                                         month: m[n].month,
                                         consumption: jsonList[0].consumptionQty,
                                         stock: jsonList[0].closingBalance,
-                                        planned: plannedShipmentsTotalData.qty + plannedErpShipmentsTotalData.qty,
-                                        delivered: deliveredShipmentsTotalData.qty + deliveredErpShipmentsTotalData.qty,
-                                        shipped: shippedShipmentsTotalData.qty + shippedErpShipmentsTotalData.qty,
-                                        ordered: orderedShipmentsTotalData.qty + orderedErpShipmentsTotalData.qty,
+                                        planned: parseInt(plannedShipmentsTotalData[n] != "" ? plannedShipmentsTotalData[n].qty : 0) + parseInt(plannedErpShipmentsTotalData[n] != "" ? plannedErpShipmentsTotalData[n].qty : 0),
+                                        delivered: parseInt(deliveredShipmentsTotalData[n] != "" ? deliveredShipmentsTotalData[n].qty : 0) + parseInt(deliveredErpShipmentsTotalData[n] != "" ? deliveredErpShipmentsTotalData[n].qty : 0),
+                                        shipped: parseInt(shippedShipmentsTotalData[n] != "" ? shippedShipmentsTotalData[n].qty : 0) + parseInt(shippedErpShipmentsTotalData[n] != "" ? shippedErpShipmentsTotalData[n].qty : 0),
+                                        ordered: parseInt(orderedShipmentsTotalData[n] != "" ? orderedShipmentsTotalData[n].qty : 0) + parseInt(orderedErpShipmentsTotalData[n] != "" ? orderedErpShipmentsTotalData[n].qty : 0),
                                         mos: parseFloat(jsonList[0].mos).toFixed(2),
                                         minMos: jsonList[0].minStockMoS,
                                         maxMos: jsonList[0].maxStockMoS

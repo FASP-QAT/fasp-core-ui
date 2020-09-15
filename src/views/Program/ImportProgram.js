@@ -72,6 +72,7 @@ export default class ImportProgram extends Component {
         this.importFile = this.importFile.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.resetClicked = this.resetClicked.bind(this);
     }
 
     hideSecondComponent() {
@@ -410,7 +411,7 @@ export default class ImportProgram extends Component {
                                             <FormGroup>
 
                                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white"><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
 
                                                 <Button type="button" id="fileImportButton" size="md" color="success" className="float-right mr-1" onClick={() => this.importFile()}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                 <Button type="button" id="formSubmitButton" size="md" color="success" className="float-right mr-1" onClick={() => this.formSubmit()}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
@@ -441,6 +442,12 @@ export default class ImportProgram extends Component {
     cancelClicked() {
         let id = AuthenticationService.displayDashboardBasedOnRole();
         this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
+    }
+
+    resetClicked() {
+        this.state.programId = '';
+        // this.setState({ programId }, () => { });
+        this.setState({ programId: '' });
     }
 
 }
