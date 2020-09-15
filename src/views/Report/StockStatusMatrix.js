@@ -842,7 +842,7 @@ export default class StockStatusMatrix extends React.Component {
     let header = []
 
     header = [[{ content: i18n.t('static.planningunit.planningunit'), rowSpan: 2, styles: { halign: 'center' } },
-    { content: i18n.t('static.dashboard.unit'), rowSpan: 2, styles: { halign: 'center', cellWidth: 80 } },
+    { content: i18n.t('static.dashboard.unit'), rowSpan: 2, styles: { halign: 'center'} },
     { content: i18n.t('static.common.min'), rowSpan: 2, styles: { halign: 'center' } },
     { content: i18n.t('static.program.reorderFrequencyInMonths'), rowSpan: 2, styles: { halign: 'center' } },
     { content: i18n.t('static.common.year'), rowSpan: 2, styles: { halign: 'center' } },
@@ -872,7 +872,8 @@ export default class StockStatusMatrix extends React.Component {
       body: data,
       styles: { lineWidth: 1, fontSize: 8, cellWidth: 38, halign: 'center' },
       columnStyles: {
-        0: { cellWidth: 153.89 },
+        0: { cellWidth: 141.89 },
+        1: { cellWidth: 50 },
       }
     };
 

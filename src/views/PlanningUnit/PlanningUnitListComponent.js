@@ -832,26 +832,28 @@ export default class PlanningUnitListComponent extends Component {
                     <CardBody className="pb-lg-5">
                         <Col md="9 pl-0">
                             <div className="d-md-flex  Selectdiv2 ">
-                                <FormGroup className="mt-md-2 mb-md-0">
-                                    <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
-                                    <div className="controls SelectField">
-                                        <InputGroup>
-                                            <Input
-                                                type="select"
-                                                name="realmId"
-                                                id="realmId"
-                                                bsSize="sm"
-                                                onChange={this.filterDataForRealm}
-                                            >
-                                                <option value="0">{i18n.t('static.common.all')}</option>
-                                                {realmList}
-                                            </Input>
-                                            {/* <InputGroupAddon addonType="append">
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') &&
+                                    <FormGroup className="mt-md-2 mb-md-0">
+                                        <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
+                                        <div className="controls SelectField">
+                                            <InputGroup>
+                                                <Input
+                                                    type="select"
+                                                    name="realmId"
+                                                    id="realmId"
+                                                    bsSize="sm"
+                                                    onChange={this.filterDataForRealm}
+                                                >
+                                                    <option value="0">{i18n.t('static.common.all')}</option>
+                                                    {realmList}
+                                                </Input>
+                                                {/* <InputGroupAddon addonType="append">
                                                 <Button color="secondary Gobtn btn-sm" onClick={this.filterDataForRealm}>{i18n.t('static.common.go')}</Button>
                                             </InputGroupAddon> */}
-                                        </InputGroup>
-                                    </div>
-                                </FormGroup>
+                                            </InputGroup>
+                                        </div>
+                                    </FormGroup>
+                                }
                                 &nbsp;
                             <FormGroup className=" tab-ml-1 mt-md-2 mb-md-0">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.forecastingunit.forecastingunit')}</Label>
