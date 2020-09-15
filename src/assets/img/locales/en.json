@@ -1132,5 +1132,6 @@
     "static.message.pipeline.programExists":"File with same program name is already imported .",
     "static.dashboard.programimport":"Pipeline Program Import",
     "static.dashboard.setupprogram":"Setup Program",
-    "static.dashboard.pipelineprogramlist":"Pipeline Program List"
+    "static.dashboard.pipelineprogramlist":"Pipeline Program List",
+    "static.problem.updatedSuccessFully":"Problem Status Updated Successfully"
 }
