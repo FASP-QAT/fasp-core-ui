@@ -404,9 +404,9 @@ export default class OrganisationListComponent extends Component {
         for (var j = 0; j < organisations.length; j++) {
             data = [];
             data[0] = organisations[j].organisationId
-            data[1] = organisations[j].organisationCode
+            data[1] = getLabelText(organisations[j].realm.label, this.state.lang)
             data[2] = getLabelText(organisations[j].label, this.state.lang)
-            data[3] = getLabelText(organisations[j].realm.label, this.state.lang)
+            data[3] = organisations[j].organisationCode
             data[4] = organisations[j].active;
 
             organisationsArray[count] = data;
@@ -434,18 +434,17 @@ export default class OrganisationListComponent extends Component {
                     readOnly: true
                 },
                 {
-                    title: i18n.t('static.organisation.organisationcode'),
-                    type: 'text',
+                    title: i18n.t('static.realm.realm'),
+                    type: (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') ? 'text' : 'hidden'),
                     readOnly: true
-                }
-                ,
+                },
                 {
                     title: i18n.t('static.organisation.organisationName'),
                     type: 'text',
                     readOnly: true
                 },
                 {
-                    title: i18n.t('static.realm.realm'),
+                    title: i18n.t('static.organisation.organisationcode'),
                     type: 'text',
                     readOnly: true
                 },
@@ -496,7 +495,7 @@ export default class OrganisationListComponent extends Component {
                 if (response.status == 200) {
                     this.setState({
                         realms: response.data
-                    }, () => {  })
+                    }, () => { })
                 } else {
                     this.setState({
                         message: response.data.messageCode, loading: false
@@ -603,28 +602,30 @@ export default class OrganisationListComponent extends Component {
 
                     </div>
                     <CardBody className="pb-lg-0">
-                        <Col md="3 pl-0">
-                            <FormGroup className="Selectdiv mt-md-2 mb-md-0">
-                                <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
-                                <div className="controls SelectGo">
-                                    <InputGroup>
-                                        <Input
-                                            type="select"
-                                            name="realmId"
-                                            id="realmId"
-                                            bsSize="sm"
-                                            onChange={this.filterData}
-                                        >
-                                            <option value="0">{i18n.t('static.common.all')}</option>
-                                            {realmList}
-                                        </Input>
-                                        {/* <InputGroupAddon addonType="append">
+                        {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') &&
+                            <Col md="3 pl-0">
+                                <FormGroup className="Selectdiv mt-md-2 mb-md-0">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
+                                    <div className="controls SelectGo">
+                                        <InputGroup>
+                                            <Input
+                                                type="select"
+                                                name="realmId"
+                                                id="realmId"
+                                                bsSize="sm"
+                                                onChange={this.filterData}
+                                            >
+                                                <option value="0">{i18n.t('static.common.all')}</option>
+                                                {realmList}
+                                            </Input>
+                                            {/* <InputGroupAddon addonType="append">
                                             <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
                                         </InputGroupAddon> */}
-                                    </InputGroup>
-                                </div>
-                            </FormGroup>
-                        </Col>
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
+                            </Col>
+                        }
                         <div id="tableDiv" className="jexcelremoveReadonlybackground"> </div>
                     </CardBody>
                 </Card>

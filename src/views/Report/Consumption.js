@@ -1685,7 +1685,7 @@ class Consumption extends Component {
     const headers = [[i18n.t('static.report.consumptionDate'),
     i18n.t('static.report.forecasted'),
     i18n.t('static.report.actual')]];
-    const data = navigator.onLine ? this.state.consumptions.map(elt => [moment(elt.transDate, 'yyyy-MM-dd').format('MMM YYYY'), this.formatter(elt.forecastedConsumption), this.formatter(elt.actualConsumption)]) : this.state.offlineConsumptionList.map(elt => [elt.transDate, this.formatter(elt.forecastedConsumption), this.formatter(elt.actualConsumption)]);
+    const data = navigator.onLine ? this.state.consumptions.map(elt => [moment(elt.transDate, 'yyyy-MM-dd').format('MMM YYYY'), this.formatter(this.roundN(elt.forecastedConsumption)), this.formatter(this.roundN(elt.actualConsumption))]) : this.state.offlineConsumptionList.map(elt => [elt.transDate, this.formatter(this.roundN(elt.forecastedConsumption)), this.formatter(this.roundN(elt.actualConsumption))]);
     // let content = {
     //   margin: { top: 80 },
     //   startY: height,
@@ -1708,8 +1708,8 @@ class Consumption extends Component {
       row2.push(i18n.t('static.report.actual'));
       for (let i = 0; i < consumptionArray.length; i++) {
         head.push((moment(consumptionArray[i].transDate, 'yyyy-MM-dd').format('MMM YYYY')));
-        row1.push(this.formatter(consumptionArray[i].forecastedConsumption));
-        row2.push(this.formatter(consumptionArray[i].actualConsumption));
+        row1.push(this.formatter(this.roundN(consumptionArray[i].forecastedConsumption)));
+        row2.push(this.formatter(this.roundN(consumptionArray[i].actualConsumption)));
       }
     } else {
       let consumptionArray = this.state.offlineConsumptionList;
@@ -1718,8 +1718,8 @@ class Consumption extends Component {
       row2.push(i18n.t('static.report.actual'));
       for (let i = 0; i < consumptionArray.length; i++) {
         head.push((moment(consumptionArray[i].transDate, 'yyyy-MM-dd').format('MMM YYYY')));
-        row1.push(this.formatter(consumptionArray[i].forecastedConsumption));
-        row2.push(this.formatter(consumptionArray[i].actualConsumption));
+        row1.push(this.formatter(this.roundN(consumptionArray[i].forecastedConsumption)));
+        row2.push(this.formatter(this.roundN(consumptionArray[i].actualConsumption)));
       }
     }
     head1[0] = head;
@@ -1750,6 +1750,13 @@ class Consumption extends Component {
     doc.save('canvas.pdf');*/
   }
 
+  roundN = num => {
+    if (num != ''||num!=null) {
+      return parseFloat(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
+    } else {
+      return ''
+    }
+  }
 
 
   // filterData() {
@@ -3019,7 +3026,7 @@ class Consumption extends Component {
                                     &&
                                     this.state.consumptions.map((item, idx) =>
                                       <td id="addr0" key={idx}>
-                                        {this.formatter(this.state.consumptions[idx].forecastedConsumption)}
+                                        {this.formatter(this.roundN(this.state.consumptions[idx].forecastedConsumption))}
                                       </td>
                                     )
                                   }
@@ -3032,7 +3039,7 @@ class Consumption extends Component {
                                     &&
                                     this.state.consumptions.map((item, idx) =>
                                       <td id="addr0" key={idx}>
-                                        {this.formatter(this.state.consumptions[idx].actualConsumption)}
+                                        {this.formatter(this.roundN(this.state.consumptions[idx].actualConsumption))}
                                       </td>
                                     )
                                   }
@@ -3068,7 +3075,7 @@ class Consumption extends Component {
                                     &&
                                     this.state.offlineConsumptionList.map((item, idx) =>
                                       <td id="addr0" key={idx}>
-                                        {this.formatter(this.state.offlineConsumptionList[idx].forecastedConsumption)}
+                                        {this.formatter(this.roundN(this.state.offlineConsumptionList[idx].forecastedConsumption))}
                                       </td>
                                     )
                                   }
@@ -3081,7 +3088,7 @@ class Consumption extends Component {
                                     &&
                                     this.state.offlineConsumptionList.map((item, idx) =>
                                       <td id="addr0" key={idx}>
-                                        {this.formatter(this.state.offlineConsumptionList[idx].actualConsumption)}
+                                        {this.formatter(this.roundN(this.state.offlineConsumptionList[idx].actualConsumption))}
                                       </td>
                                     )
                                   }

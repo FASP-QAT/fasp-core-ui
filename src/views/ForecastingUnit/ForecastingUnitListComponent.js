@@ -599,7 +599,7 @@ export default class ForecastingUnitListComponent extends Component {
                 },
                 {
                     title: i18n.t('static.realm.realm'),
-                    type: 'text',
+                    type: (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') ? 'text' : 'hidden'),
                     readOnly: true
                 },
                 {
@@ -803,6 +803,19 @@ export default class ForecastingUnitListComponent extends Component {
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
         this.hideFirstComponent();
+
+        if (!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN')) {
+            let realmId = AuthenticationService.getRealmId();
+            ProductService.getProductCategoryList(realmId)
+                .then(response => {
+                    console.log("product category list---", JSON.stringify(response.data))
+                    this.setState({
+                        productCategories: response.data
+                    })
+                })
+
+        }
+
         RealmService.getRealmListAll()
             .then(response => {
                 if (response.status == 200) {
@@ -868,9 +881,9 @@ export default class ForecastingUnitListComponent extends Component {
                     selSource: response.data,
                     loading: false
                 },
-                () => {
-                    this.buildJexcel();
-                })
+                    () => {
+                        this.buildJexcel();
+                    })
             } else {
                 this.setState({
                     message: response.data.messageCode, loading: false
@@ -979,27 +992,29 @@ export default class ForecastingUnitListComponent extends Component {
 
                         <Col md="9 pl-0">
                             <div className="d-md-flex  Selectdiv2">
-                                <FormGroup className="mt-md-2 mb-md-0 ">
-                                    <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
-                                    <div className="controls SelectField">
-                                        <InputGroup>
-                                            <Input
-                                                type="select"
-                                                name="realmId"
-                                                id="realmId"
-                                                bsSize="sm"
-                                                onChange={this.filterDataForRealm}
-                                            >
-                                                <option value="-1">{i18n.t('static.common.all')}</option>
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') &&
+                                    <FormGroup className="mt-md-2 mb-md-0 ">
+                                        <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
+                                        <div className="controls SelectField">
+                                            <InputGroup>
+                                                <Input
+                                                    type="select"
+                                                    name="realmId"
+                                                    id="realmId"
+                                                    bsSize="sm"
+                                                    onChange={this.filterDataForRealm}
+                                                >
+                                                    <option value="-1">{i18n.t('static.common.all')}</option>
 
-                                                {realmList}
-                                            </Input>
-                                            {/* <InputGroupAddon addonType="append">
+                                                    {realmList}
+                                                </Input>
+                                                {/* <InputGroupAddon addonType="append">
                                                 <Button color="secondary Gobtn btn-sm" onClick={this.filterDataForRealm}>{i18n.t('static.common.go')}</Button>
                                             </InputGroupAddon> */}
-                                        </InputGroup>
-                                    </div>
-                                </FormGroup>
+                                            </InputGroup>
+                                        </div>
+                                    </FormGroup>
+                                }
 
                                 <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>

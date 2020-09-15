@@ -637,7 +637,7 @@ class ListTracerCategoryComponent extends Component {
                                 },
                                 {
                                     title: i18n.t('static.realm.realm'),
-                                    type: 'text',
+                                    type: (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') ? 'text' : 'hidden'),
                                     readOnly: true
                                 },
                                 {
@@ -736,28 +736,31 @@ class ListTracerCategoryComponent extends Component {
                         </div>
                     </div>
                     <CardBody className="pb-lg-0">
-                        <Col md="3 pl-0">
-                            <FormGroup className="Selectdiv mt-md-2 mb-md-0">
-                                <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
-                                <div className="controls SelectGo">
-                                    <InputGroup>
-                                        <Input
-                                            type="select"
-                                            name="realmId"
-                                            id="realmId"
-                                            bsSize="sm"
-                                            onChange={this.filterData}
-                                        >
-                                            <option value="0">{i18n.t('static.common.all')}</option>
-                                            {realmList}
-                                        </Input>
-                                        {/* <InputGroupAddon addonType="append">
+                        {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') &&
+                            <Col md="3 pl-0">
+                                <FormGroup className="Selectdiv mt-md-2 mb-md-0">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
+                                    <div className="controls SelectGo">
+                                        <InputGroup>
+                                            <Input
+                                                type="select"
+                                                name="realmId"
+                                                id="realmId"
+                                                bsSize="sm"
+                                                onChange={this.filterData}
+                                            >
+                                                <option value="0">{i18n.t('static.common.all')}</option>
+                                                {realmList}
+                                            </Input>
+                                            {/* <InputGroupAddon addonType="append">
                                             <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
                                         </InputGroupAddon> */}
-                                    </InputGroup>
-                                </div>
-                            </FormGroup>
-                        </Col> <div id="tableDiv" className="jexcelremoveReadonlybackground"> </div>
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
+                            </Col>
+                        }
+                        <div id="tableDiv" className="jexcelremoveReadonlybackground"> </div>
                     </CardBody>
                 </Card>
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
