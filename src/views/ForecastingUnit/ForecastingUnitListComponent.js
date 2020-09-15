@@ -866,7 +866,10 @@ export default class ForecastingUnitListComponent extends Component {
                 this.setState({
                     forecastingUnitList: response.data,
                     selSource: response.data,
-                    // loading: false
+                    loading: false
+                },
+                () => {
+                    this.buildJexcel();
                 })
             } else {
                 this.setState({
@@ -879,7 +882,7 @@ export default class ForecastingUnitListComponent extends Component {
 
 
         })
-        this.filterDataForRealm();
+        // this.filterDataForRealm();
 
     }
     loaded = function (instance, cell, x, y, value) {

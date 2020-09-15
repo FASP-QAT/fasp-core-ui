@@ -26,7 +26,7 @@ const validationSchema = function (values) {
         realmId: Yup.string()
             .required(i18n.t('static.common.realmtext')),
         label: Yup.string()
-            .matches(/^([a-zA-Z]+\s)*[a-zA-Z]+$/, i18n.t('static.message.rolenamevalidtext'))
+            // .matches(/^([a-zA-Z]+\s)*[a-zA-Z]+$/, i18n.t('static.message.rolenamevalidtext'))
             .required(i18n.t('static.datasource.datasourcetext')),
         dataSourceTypeId: Yup.string()
             .required(i18n.t('static.datasource.datasourcetypetext'))
@@ -304,7 +304,7 @@ export default class AddDataSource extends Component {
                                                         <FormFeedback className="red">{errors.realmId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="programId">{i18n.t('static.dataSource.program')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Label htmlFor="programId">{i18n.t('static.dataSource.program')}</Label>
                                                         <Input
                                                             type="select"
                                                             name="programId"
