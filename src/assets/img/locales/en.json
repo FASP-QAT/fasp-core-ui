@@ -1137,6 +1137,7 @@
     "static.dashboard.setupprogram": "Setup Program",
     "static.dashboard.pipelineprogramlist": "Pipeline Program List",
     "static.problem.updatedSuccessFully": "Problem Status Updated Successfully",
-    "static.message.alreadExists": "Procurement agent display name already exists"
+    "static.message.alreadExists": "Procurement Agent Display Name Already Exists",
+    "static.message.languageCodeAlreadyExists":"Language Code Already Exists"
     
 }
