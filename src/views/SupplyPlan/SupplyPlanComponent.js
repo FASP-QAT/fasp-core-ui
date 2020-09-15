@@ -458,7 +458,7 @@ export default class SupplyPlanComponent extends React.Component {
                 const pageCount = doc.internal.getNumberOfPages()
 
                 doc.setFont('helvetica', 'bold')
-                doc.setFontSize(10)
+                doc.setFontSize(6)
                 for (var i = 1; i <= pageCount; i++) {
                     doc.setPage(i)
 
@@ -476,7 +476,7 @@ export default class SupplyPlanComponent extends React.Component {
             const addHeaders = doc => {
 
                 const pageCount = doc.internal.getNumberOfPages()
-                doc.setFont('helvetica', 'bold')
+              
 
                 // var file = new File('QAT-logo.png','../../../assets/img/QAT-logo.png');
                 // var reader = new FileReader();
@@ -487,6 +487,7 @@ export default class SupplyPlanComponent extends React.Component {
                 //}); 
                 for (var i = 1; i <= pageCount; i++) {
                     doc.setFontSize(12)
+                    doc.setFont('helvetica', 'bold')
                     doc.setPage(i)
                     doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
                     /*doc.addImage(data, 10, 30, {
@@ -498,6 +499,7 @@ export default class SupplyPlanComponent extends React.Component {
                     })
                     if (i == 1) {
                         doc.setFontSize(8)
+                        doc.setFont('helvetica', 'normal')
                         doc.text(i18n.t('static.program.program') + ' : ' + (this.state.programSelect).label, doc.internal.pageSize.width / 8, 80, {
                             align: 'left'
                         })
@@ -567,7 +569,10 @@ export default class SupplyPlanComponent extends React.Component {
                 startY: height,
                 head: headers,
                 body: data,
-                styles: { lineWidth: 1, fontSize: 8 },
+                styles: { lineWidth: 1, fontSize: 8,cellWidth: 39, halign: 'center' },
+                columnStyles: {
+                    0: { cellWidth: 59.89 }
+                }
             };
             doc.autoTable(content);
             addHeaders(doc)
