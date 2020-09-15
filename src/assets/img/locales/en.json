@@ -1094,7 +1094,7 @@
     "static.supplyPlan.saveShipmentDates": "Save shipments dates",
     "static.pipeline.duplicatePlanningUnittext": "*Yellow indicates that either the same planning unit is being selected twice or the planning unit you are trying to map does not exist. Create a ticket for the Planning Units which do not exist",
     "static.pipeline.programInfo": "Program info",
-    "static.pipeline.programData": "Program data",
+    "static.pipeline.programData": "Program Data",
     "static.pipeline.save": "Save",
     "static.technicalArea.technicalAreaDisplayName": "Technical Area Display Name",
     "static.program.programDisplayName": "Program Display Name",
