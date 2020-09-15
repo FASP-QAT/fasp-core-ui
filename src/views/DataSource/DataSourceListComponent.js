@@ -564,9 +564,15 @@ export default class DataSourceListComponent extends Component {
 
     filterData() {
         let dataSourceTypeId = document.getElementById("dataSourceTypeId").value;
-        let realmId = document.getElementById("realmId").value;
         let programId = document.getElementById("programId").value;
 
+        let realmId = 0;
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN')) {
+            realmId = document.getElementById("realmId").value;
+        }
+        console.log(dataSourceTypeId);
+        console.log(realmId);
+        console.log(programId);
         // if (dataSourceTypeId != 0) {
         //     const selSource = this.state.dataSourceList.filter(c => c.dataSourceType.id == dataSourceTypeId)
         //     this.setState({
@@ -668,7 +674,7 @@ export default class DataSourceListComponent extends Component {
                 },
                 {
                     title: i18n.t('static.realm.realm'),
-                    type: 'text',
+                    type: (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') ? 'text' : 'hidden'),
                     readOnly: true
                 },
                 {
@@ -854,7 +860,7 @@ export default class DataSourceListComponent extends Component {
             });
         }
     }
-    
+
     selected = function (instance, cell, x, y, value) {
         if ((x == 0 && value != 0) || (y == 0)) {
             // console.log("HEADER SELECTION--------------------------");
@@ -942,24 +948,26 @@ export default class DataSourceListComponent extends Component {
                     <CardBody className="pb-lg-0">
                         <Col md="9 pl-0">
                             <div className="d-md-flex Selectdiv2">
-                                <FormGroup className="mt-md-2 mb-md-0 ">
-                                    <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
-                                    <div className="controls SelectGo">
-                                        <InputGroup>
-                                            <Input
-                                                type="select"
-                                                name="realmId"
-                                                id="realmId"
-                                                bsSize="sm"
-                                                onChange={this.filterData}
-                                            >
-                                                <option value="0">{i18n.t('static.common.all')}</option>
-                                                {realmList}
-                                            </Input>
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') &&
+                                    <FormGroup className="mt-md-2 mb-md-0 ">
+                                        <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
+                                        <div className="controls SelectGo">
+                                            <InputGroup>
+                                                <Input
+                                                    type="select"
+                                                    name="realmId"
+                                                    id="realmId"
+                                                    bsSize="sm"
+                                                    onChange={this.filterData}
+                                                >
+                                                    <option value="0">{i18n.t('static.common.all')}</option>
+                                                    {realmList}
+                                                </Input>
 
-                                        </InputGroup>
-                                    </div>
-                                </FormGroup>
+                                            </InputGroup>
+                                        </div>
+                                    </FormGroup>
+                                }
                                 <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.dataSource.program')}</Label>
                                     <div className="controls SelectGo">
