@@ -914,7 +914,7 @@
     "static.consumption.consumptionType": "Consumption Type",
     "static.dashboard.shipments": "Shipments",
     "static.supplyPlan.manualEntryShipments": "Manual Entry Shipments",
-    "static.supplyPlan.delivered": "Delivered",
+    "static.supplyPlan.delivered": "Received",
     "static.supplyPlan.shipmentsDetails": "Shipments Details",
     "static.supplyPlan.shipped": "Shipped (Shipped, Arrived)",
     "static.supplyPlan.ordered": "Approved",
