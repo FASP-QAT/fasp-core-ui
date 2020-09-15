@@ -475,7 +475,7 @@ class EditUserComponent extends Component {
                                                         id="roleValid"
                                                     />
                                                     <FormGroup>
-                                                        <Label htmlFor="realmId">{i18n.t('static.realm.realm')}</Label><Input
+                                                        <Label htmlFor="realmId">{i18n.t('static.realm.realm')}<span class="red Reqasterisk">*</span></Label><Input
                                                             type="text"
                                                             name="realmId"
                                                             id="realmId"

@@ -298,7 +298,7 @@ class AddprogramPlanningUnit extends Component {
                                                         columnSorting: true,
                                                         tableOverflow: true,
                                                         wordWrap: true,
-                                                        paginationOptions: [10, 25, 50, 100],
+                                                        paginationOptions: [10, 25, 50],
                                                         position: 'top',
                                                         allowInsertColumn: false,
                                                         allowManualInsertColumn: false,
@@ -307,7 +307,8 @@ class AddprogramPlanningUnit extends Component {
                                                         oneditionend: this.onedit,
                                                         copyCompatibility: true,
                                                         text: {
-                                                            showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                                                            // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                                                            showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
                                                             show: '',
                                                             entries: '',
                                                         },
@@ -1119,7 +1120,7 @@ class AddprogramPlanningUnit extends Component {
                             <Col sm={12} md={12}>
                                 <h4 className="red">{this.props.message}</h4>
                                 <div className="table-responsive" >
-                                    <div id="mapPlanningUnit">
+                                    <div id="mapPlanningUnit" className="RowheightForaddprogaddRow">
                                     </div>
                                 </div>
                             </Col>

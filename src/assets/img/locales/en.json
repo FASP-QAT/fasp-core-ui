@@ -1133,5 +1133,6 @@
     "static.dashboard.programimport":"Pipeline Program Import",
     "static.dashboard.setupprogram":"Setup Program",
     "static.dashboard.pipelineprogramlist":"Pipeline Program List",
-    "static.problem.updatedSuccessFully":"Problem Status Updated Successfully"
+    "static.problem.updatedSuccessFully":"Problem Status Updated Successfully",
+    "static.message.alreadExists":"Procurement agent display name already exists"
 }
