@@ -352,7 +352,7 @@ class EditBudgetComponent extends Component {
                                                 <CardBody>
 
                                                     <FormGroup>
-                                                        <Label htmlFor="programId">{i18n.t('static.budget.program')}</Label>
+                                                        <Label htmlFor="programId">{i18n.t('static.budget.program')}<span class="red Reqasterisk">*</span></Label>
 
                                                         <Input
                                                             type="text"
@@ -372,7 +372,7 @@ class EditBudgetComponent extends Component {
                                                         <FormFeedback className="red">{errors.programId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="fundingSourceId">{i18n.t('static.budget.fundingsource')}</Label>
+                                                        <Label htmlFor="fundingSourceId">{i18n.t('static.budget.fundingsource')}<span class="red Reqasterisk">*</span></Label>
 
                                                         <Input
                                                             type="text"

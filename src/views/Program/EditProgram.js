@@ -508,7 +508,7 @@ export default class EditProgram extends Component {
 
                                                     <FormGroup>
 
-                                                        <Label htmlFor="select">{i18n.t('static.program.realm')}</Label>
+                                                        <Label htmlFor="select">{i18n.t('static.program.realm')}<span class="red Reqasterisk">*</span></Label>
 
                                                         <Input
                                                             value={getLabelText(this.state.program.realmCountry.realm.label, this.state.lang)}
@@ -526,7 +526,7 @@ export default class EditProgram extends Component {
 
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="select">{i18n.t('static.program.realmcountry')}</Label>
+                                                        <Label htmlFor="select">{i18n.t('static.program.realmcountry')}<span class="red Reqasterisk">*</span></Label>
 
                                                         <Input
                                                             value={getLabelText(this.state.program.realmCountry.country.label, this.state.lang)}
@@ -563,7 +563,7 @@ export default class EditProgram extends Component {
                                                         <FormFeedback>{errors.regionId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="select">{i18n.t('static.program.organisation')}</Label>
+                                                        <Label htmlFor="select">{i18n.t('static.program.organisation')}<span class="red Reqasterisk">*</span></Label>
 
                                                         <Input
                                                             value={getLabelText(this.state.program.organisation.label, this.state.lang)}
@@ -581,7 +581,7 @@ export default class EditProgram extends Component {
                                                     </FormGroup>
                                                     <FormGroup>
 
-                                                        <Label htmlFor="select">{i18n.t('static.program.healtharea')}</Label>
+                                                        <Label htmlFor="select">{i18n.t('static.program.healtharea')}<span class="red Reqasterisk">*</span></Label>
 
                                                         <Input
                                                             value={getLabelText(this.state.program.healthArea.label, this.state.lang)}

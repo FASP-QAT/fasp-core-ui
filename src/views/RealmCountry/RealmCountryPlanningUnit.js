@@ -124,7 +124,8 @@ class PlanningUnitCountry extends Component {
                                     this.setState({
                                         units: response.data
                                     })
-                                    PlanningUnitService.getAllPlanningUnitList()
+                                    // PlanningUnitService.getAllPlanningUnitList()
+                                    PlanningUnitService.getActivePlanningUnitList()
                                         .then(response => {
                                             if (response.status == 200) {
                                                 this.setState({
