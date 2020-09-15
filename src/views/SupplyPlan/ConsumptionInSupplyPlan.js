@@ -367,9 +367,10 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                                                         // region id
                                                         if (obj.getRowData(y)[3] == 0) {
                                                             items.push({
-                                                                title: obj.options.text.deleteSelectedRows,
+                                                                title: i18n.t("static.common.deleterow"),
                                                                 onclick: function () {
-                                                                    obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y));
+                                                                    console.log("y---------->", y);
+                                                                    obj.deleteRow(parseInt(y));
                                                                 }
                                                             });
                                                         }
@@ -430,9 +431,10 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                                     // region id
                                     if (obj.getRowData(y)[12] == -1) {
                                         items.push({
-                                            title: obj.options.text.deleteSelectedRows,
+                                            title: i18n.t("static.common.deleterow"),
                                             onclick: function () {
-                                                obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y));
+                                                console.log("y---------->", y);
+                                                obj.deleteRow(parseInt(y));
                                             }
                                         });
                                     }
