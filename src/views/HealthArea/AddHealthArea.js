@@ -353,6 +353,20 @@ export default class AddHealthAreaComponent extends Component {
                             />
                             <FormFeedback>{errors.realmCountryId}</FormFeedback>
                           </FormGroup>
+
+                          <FormGroup>
+                            <Label htmlFor="company">{i18n.t('static.technicalArea.technicalAreaDisplayName')}<span class="red Reqasterisk">*</span> </Label>
+                            <Input
+                              bsSize="sm"
+                              type="text" name="healthAreaCode" valid={!errors.healthAreaCode && this.state.healthArea.healthAreaCode != ''}
+                              invalid={touched.healthAreaCode && !!errors.healthAreaCode}
+                              onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                              onBlur={handleBlur}
+                              value={this.state.healthArea.healthAreaCode}
+                              id="healthAreaCode" />
+                            <FormFeedback className="red">{errors.healthAreaCode}</FormFeedback>
+                          </FormGroup>
+
                           <FormGroup>
                             <Label htmlFor="company">{i18n.t('static.healthArea.healthAreaName')}<span class="red Reqasterisk">*</span> </Label>
                             <Input
@@ -364,19 +378,6 @@ export default class AddHealthAreaComponent extends Component {
                               value={this.state.healthArea.label.label_en}
                               id="healthAreaName" />
                             <FormFeedback className="red">{errors.healthAreaName}</FormFeedback>
-                          </FormGroup>
-
-                          <FormGroup>
-                            <Label htmlFor="company">Technical Area Code<span class="red Reqasterisk">*</span> </Label>
-                            <Input
-                              bsSize="sm"
-                              type="text" name="healthAreaCode" valid={!errors.healthAreaCode && this.state.healthArea.healthAreaCode != ''}
-                              invalid={touched.healthAreaCode && !!errors.healthAreaCode}
-                              onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                              onBlur={handleBlur}
-                              value={this.state.healthArea.healthAreaCode}
-                              id="healthAreaCode" />
-                            <FormFeedback className="red">{errors.healthAreaCode}</FormFeedback>
                           </FormGroup>
 
                         </CardBody>
