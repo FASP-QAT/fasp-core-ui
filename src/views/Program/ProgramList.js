@@ -360,6 +360,7 @@ import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import jexcel from 'jexcel';
+import RealmCountryService from '../../api/RealmCountryService';
 import "../../../node_modules/jexcel/dist/jexcel.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js';
 
@@ -406,8 +407,10 @@ export default class ProgramList extends Component {
 
   filterData() {
     let countryId = document.getElementById("countryId").value;
+    console.log("countryId--------->", countryId)
     if (countryId != 0) {
-      const selProgram = this.state.programList.filter(c => c.realmCountry.country.countryId == countryId)
+      // const selProgram = this.state.programList.filter(c => c.realmCountry.country.countryId == countryId)
+      const selProgram = this.state.programList.filter(c => c.realmCountry.realmCountryId == countryId)
       this.setState({
         selProgram: selProgram
       }, () => {
@@ -440,11 +443,12 @@ export default class ProgramList extends Component {
     for (var j = 0; j < programList.length; j++) {
       data = [];
       data[0] = programList[j].programId
-      data[1] = getLabelText(programList[j].label, this.state.lang)
-      data[2] = programList[j].programCode;
-      data[3] = getLabelText(programList[j].realmCountry.realm.label, this.state.lang)
+      data[1] = getLabelText(programList[j].realmCountry.realm.label, this.state.lang)
+      data[2] = getLabelText(programList[j].label, this.state.lang)
+      data[3] = programList[j].programCode;
       data[4] = getLabelText(programList[j].realmCountry.country.label, this.state.lang)
       data[5] = getLabelText(programList[j].organisation.label, this.state.lang)
+      data[6] = getLabelText(programList[j].healthArea.label, this.state.lang)
 
 
       programArray[count] = data;
@@ -471,17 +475,17 @@ export default class ProgramList extends Component {
           type: 'hidden',
         },
         {
+          title: i18n.t('static.program.realm'),
+          type: 'text',
+          readOnly: true
+        },
+        {
           title: i18n.t('static.program.program'),
           type: 'text',
           readOnly: true
         },
         {
-          title: i18n.t('static.program.programCode'),
-          type: 'text',
-          readOnly: true
-        },
-        {
-          title: i18n.t('static.program.realm'),
+          title: i18n.t('static.program.programDisplayName'),
           type: 'text',
           readOnly: true
         },
@@ -492,6 +496,11 @@ export default class ProgramList extends Component {
         },
         {
           title: i18n.t('static.program.organisation'),
+          type: 'text',
+          readOnly: true
+        },
+        {
+          title: i18n.t('static.program.healtharea'),
           type: 'text',
           readOnly: true
         },
@@ -575,6 +584,7 @@ export default class ProgramList extends Component {
     this.hideFirstComponent();
     ProgramService.getProgramList().then(response => {
       if (response.status == 200) {
+        console.log("resp--------------------", response.data);
         this.setState({
           programList: response.data,
           selProgram: response.data,
@@ -593,18 +603,29 @@ export default class ProgramList extends Component {
       }
     })
 
-    CountryService.getCountryListActive().then(response => {
-      if (response.status == 200) {
-        console.log("response--->", response.data);
-        this.setState({
-          countryList: response.data,
-          // loading: false
-        })
-      } else {
-        this.setState({ message: response.data.messageCode, loading: false })
-      }
-    })
+    // CountryService.getCountryListActive().then(response => {
+    //   if (response.status == 200) {
+    //     console.log("response--->", response.data);
+    //     this.setState({
+    //       countryList: response.data,
+    //       // loading: false
+    //     })
+    //   } else {
+    //     this.setState({ message: response.data.messageCode, loading: false })
+    //   }
+    // })
 
+    let realmId = AuthenticationService.getRealmId();
+    RealmCountryService.getRealmCountryrealmIdById(realmId)
+      .then(response => {
+        if (response.status == 200) {
+          this.setState({
+            countryList: response.data, loading: false
+          })
+        } else {
+          this.setState({ message: response.data.messageCode, loading: false })
+        }
+      })
   }
 
   addNewProgram() {
@@ -636,12 +657,22 @@ export default class ProgramList extends Component {
         {i18n.t('static.common.result', { from, to, size })}
       </span>
     );
+    // const { countryList } = this.state;
+    // let countries = countryList.length > 0
+    //   && countryList.map((item, i) => {
+    //     return (
+    //       <option key={i} value={item.countryId}>
+    //         {getLabelText(item.label, this.state.lang)}
+    //       </option>
+    //     )
+    //   }, this);
+
     const { countryList } = this.state;
     let countries = countryList.length > 0
       && countryList.map((item, i) => {
         return (
-          <option key={i} value={item.countryId}>
-            {getLabelText(item.label, this.state.lang)}
+          <option key={i} value={item.realmCountryId}>
+            {getLabelText(item.country.label, this.state.lang)}
           </option>
         )
       }, this);

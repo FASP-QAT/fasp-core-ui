@@ -493,7 +493,7 @@ export default class EditProgram extends Component {
                                                     </FormGroup>
                                                     <FormGroup>
 
-                                                        <Label htmlFor="company">{i18n.t('static.program.programCode')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Label htmlFor="company">{i18n.t('static.program.programDisplayName')}<span class="red Reqasterisk">*</span></Label>
 
                                                         <Input
                                                             type="text" name="programCode" valid={!errors.programCode}
