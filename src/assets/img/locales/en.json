@@ -22,7 +22,7 @@
     "static.datasource.datasource": "Data Source",
     "static.budget.fundingsource": "Funding Source",
     "static.fundingsource.fundingsourcetext": "Please enter Funding Source",
-    "static.message.user.forgotPasswordSuccess": "Email With Password Reset Link Sent",
+    "static.message.user.forgotPasswordSuccess": "Email with password reset link sent",
     "static.program.import": "Import Program Data",
     "static.country.currencytext": "Please select Currency",
     "static.budget.subfundingtext": "Please select Sub Funding Source",
