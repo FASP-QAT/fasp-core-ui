@@ -414,7 +414,7 @@ class AuthenticationService {
         for (let i = 0; i < businessFunctionList.length; i++) {
             bfunction.push(businessFunctionList[i]);
         }
-        console.log("bfuntion---",bfunction);
+        console.log("bfuntion---", bfunction);
         return bfunction;
     }
     authenticatedRoute(route) {
@@ -837,9 +837,17 @@ class AuthenticationService {
                         return true;
                     }
                     break;
-                case "/shipment/shipmentDetails":
                 case "/shipment/manualTagging":
+                    if (bfunction.includes("ROLE_BF_MANUAL_TAGGING")) {
+                        return true;
+                    }
+                    break;
                 case "/shipment/delinking":
+                    if (bfunction.includes("ROLE_BF_DELINKING")) {
+                        return true;
+                    }
+                    break;
+                case "/shipment/shipmentDetails":
                 case "/shipment/shipmentDetails/:message":
                 case "/shipment/shipmentDetails/:programId/:versionId/:planningUnitId":
                     if (bfunction.includes("ROLE_BF_SUPPLY_PLAN")) {
@@ -1098,25 +1106,25 @@ class AuthenticationService {
                 case "/logout":
                     return true;
                     break;
-                case "/problem/editProblem": 
-                if (bfunction.includes("ROLE_BF_EDIT_PROBLEM")) {
-                    return true;
-                } 
-                // return true
+                case "/problem/editProblem":
+                    if (bfunction.includes("ROLE_BF_EDIT_PROBLEM")) {
+                        return true;
+                    }
+                    // return true
                     break;
                 case "/consumptionDetails/:programId/:versionId/:planningUnitId": return true
                     break;
                 case "/report/problemList/:color/:message":
-                    if(bfunction.includes("ROLE_BF_PROBLEM_AND_ACTION_REPORT")){
+                    if (bfunction.includes("ROLE_BF_PROBLEM_AND_ACTION_REPORT")) {
                         return true;
-                    } 
+                    }
                     // return true
                     break;
                 case "/report/addProblem/:color/:message":
-                if (bfunction.includes("ROLE_BF_ADD_PROBLEM")) {
-                    return true;
-                }
-                //  return true
+                    if (bfunction.includes("ROLE_BF_ADD_PROBLEM")) {
+                        return true;
+                    }
+                    //  return true
                     break;
                 default:
                     console.log("Inside default-");
