@@ -726,7 +726,7 @@
     "static.dashboard.inventoryTurns": "Inventory Turns",
     "static.dashboard.stockstatusovertime": "Stock Status Over Time",
     "static.report.noofmonth": "Number of months included in calculation",
-    "static.supplyplan.supplyplanformula": "Show formulas",
+    "static.supplyplan.supplyplanformula": "Show Formulae",
     "static.message.shipmentSaved": "Shipment data saved",
     "static.report.historicalConsumptionActual": "Historical Actual Consumption",
     "static.dashboard.forecastmetrics": "Forecast Metrics - Comparison View",
@@ -1137,6 +1137,7 @@
     "static.dashboard.setupprogram": "Setup Program",
     "static.dashboard.pipelineprogramlist": "Pipeline Program List",
     "static.problem.updatedSuccessFully": "Problem Status Updated Successfully",
-    "static.message.alreadExists": "Procurement agent display name already exists"
+    "static.message.alreadExists": "Procurement Agent Display Name Already Exists",
+    "static.message.languageCodeAlreadyExists":"Language Code Already Exists"
     
 }
