@@ -476,7 +476,7 @@ export default class SupplyPlanComponent extends React.Component {
             const addHeaders = doc => {
 
                 const pageCount = doc.internal.getNumberOfPages()
-              
+
 
                 // var file = new File('QAT-logo.png','../../../assets/img/QAT-logo.png');
                 // var reader = new FileReader();
@@ -569,7 +569,7 @@ export default class SupplyPlanComponent extends React.Component {
                 startY: height,
                 head: headers,
                 body: data,
-                styles: { lineWidth: 1, fontSize: 8,cellWidth: 39, halign: 'center' },
+                styles: { lineWidth: 1, fontSize: 8, cellWidth: 39, halign: 'center' },
                 columnStyles: {
                     0: { cellWidth: 59.89 }
                 }
@@ -1043,7 +1043,7 @@ export default class SupplyPlanComponent extends React.Component {
 
                     {/* Consumption modal */}
                     <Modal isOpen={this.state.consumption}
-                        className={'modal-lg ' + this.props.className, "modalWidth"} style={{ display: this.state.loading ? "none" : "block" }}>
+                        className={'modal-lg ' + this.props.className, "modalWidth"} >
                         <ModalHeader toggle={() => this.toggleLarge('Consumption')} className="modalHeaderSupplyPlan">
                             <strong>{i18n.t('static.dashboard.consumptiondetails')}</strong>
                             <ul className="legendcommitversion" style={{ display: 'inline-flex' }}>
@@ -1051,264 +1051,290 @@ export default class SupplyPlanComponent extends React.Component {
                                 <li><span className=" blacklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.actualConsumption')} </span></li>
                             </ul>
                         </ModalHeader>
-                        <ModalBody>
-                            <h6 className="red" id="div2">{this.state.consumptionDuplicateError || this.state.consumptionNoStockError || this.state.consumptionError}</h6>
-                            <div className="col-md-12">
-                                <span className="supplyplan-larrow-dataentry" onClick={this.leftClickedConsumption}> <i className="cui-arrow-left icons " > </i> {i18n.t('static.supplyPlan.scrollToLeft')} </span>
-                                <span className="supplyplan-rarrow-dataentry" onClick={this.rightClickedConsumption}> {i18n.t('static.supplyPlan.scrollToRight')} <i className="cui-arrow-right icons" ></i> </span>
-                            </div>
-                            <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
-                                <thead>
-                                    <tr>
-                                        <th className="regionTdWidthConsumption"></th>
+                        <div style={{ display: this.state.loading ? "none" : "block" }}>
+                            <ModalBody>
+                                <h6 className="red" id="div2">{this.state.consumptionDuplicateError || this.state.consumptionNoStockError || this.state.consumptionError}</h6>
+                                <div className="col-md-12">
+                                    <span className="supplyplan-larrow-dataentry" onClick={this.leftClickedConsumption}> <i className="cui-arrow-left icons " > </i> {i18n.t('static.supplyPlan.scrollToLeft')} </span>
+                                    <span className="supplyplan-rarrow-dataentry" onClick={this.rightClickedConsumption}> {i18n.t('static.supplyPlan.scrollToRight')} <i className="cui-arrow-right icons" ></i> </span>
+                                </div>
+                                <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
+                                    <thead>
+                                        <tr>
+                                            <th className="regionTdWidthConsumption"></th>
+                                            {
+                                                this.state.monthsArray.map(item => (
+                                                    <th className="supplyplanTdWidthForMonths">{item.monthName.concat(" ").concat(item.monthYear)}</th>
+                                                ))
+                                            }
+                                        </tr>
+                                    </thead>
+                                    <tbody>
                                         {
-                                            this.state.monthsArray.map(item => (
-                                                <th className="supplyplanTdWidthForMonths">{item.monthName.concat(" ").concat(item.monthYear)}</th>
-                                            ))
-                                        }
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {
-                                        this.state.regionListFiltered.map(item => (
-                                            <tr>
-                                                <td align="left">{item.name}</td>
-                                                {
-                                                    this.state.consumptionFilteredArray.filter(c => c.regionId == item.id).map(item1 => {
-                                                        if (item1.qty.toString() != '') {
-                                                            if (item1.actualFlag.toString() == 'true') {
-                                                                return (<td align="right" className="hoverTd" onClick={() => this.consumptionDetailsClicked(`${item1.month.startDate}`, `${item1.month.endDate}`, `${item1.regionId}`, `${item1.actualFlag}`, `${item1.month.month}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                            this.state.regionListFiltered.map(item => (
+                                                <tr>
+                                                    <td align="left">{item.name}</td>
+                                                    {
+                                                        this.state.consumptionFilteredArray.filter(c => c.regionId == item.id).map(item1 => {
+                                                            if (item1.qty.toString() != '') {
+                                                                if (item1.actualFlag.toString() == 'true') {
+                                                                    return (<td align="right" className="hoverTd" onClick={() => this.consumptionDetailsClicked(`${item1.month.startDate}`, `${item1.month.endDate}`, `${item1.regionId}`, `${item1.actualFlag}`, `${item1.month.month}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                                } else {
+                                                                    return (<td align="right" style={{ color: 'rgb(170, 85, 161)' }} className="hoverTd" onClick={() => this.consumptionDetailsClicked(`${item1.month.startDate}`, `${item1.month.endDate}`, `${item1.regionId}`, `${item1.actualFlag}`, `${item1.month.month}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                                }
                                                             } else {
-                                                                return (<td align="right" style={{ color: 'rgb(170, 85, 161)' }} className="hoverTd" onClick={() => this.consumptionDetailsClicked(`${item1.month.startDate}`, `${item1.month.endDate}`, `${item1.regionId}`, `${item1.actualFlag}`, `${item1.month.month}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                                return (<td align="right" className="hoverTd" onClick={() => this.consumptionDetailsClicked(`${item1.month.startDate}`, `${item1.month.endDate}`, `${item1.regionId}`, ``, `${item1.month.month}`)}></td>)
                                                             }
-                                                        } else {
-                                                            return (<td align="right" className="hoverTd" onClick={() => this.consumptionDetailsClicked(`${item1.month.startDate}`, `${item1.month.endDate}`, `${item1.regionId}`, ``, `${item1.month.month}`)}></td>)
-                                                        }
-                                                    })
-                                                }
-                                            </tr>
-                                        )
-                                        )
-                                    }
-                                </tbody>
-                                <tfoot>
-                                    <tr>
-                                        <th style={{ textAlign: 'left' }}>{i18n.t('static.supplyPlan.total')}</th>
-                                        {
-                                            this.state.consumptionFilteredArray.filter(c => c.regionId == -1).map(item => (
-                                                <th style={{ textAlign: 'right' }}><NumberFormat displayType={'text'} thousandSeparator={true} value={item.qty} /></th>
-                                            ))
+                                                        })
+                                                    }
+                                                </tr>
+                                            )
+                                            )
                                         }
-                                    </tr>
-                                </tfoot>
-                            </Table>
-                            {this.state.showConsumption == 1 && <ConsumptionInSupplyPlanComponent ref="consumptionChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} consumptionPage="supplyPlan" />}
-                            <div className="table-responsive mt-3">
-                                <div id="consumptionTable" />
-                            </div>
-                            <h6 className="red" id="div3">{this.state.consumptionBatchInfoDuplicateError || this.state.consumptionBatchInfoNoStockError || this.state.consumptionBatchError}</h6>
-                            <div className="table-responsive">
-                                <div id="consumptionBatchInfoTable" className="AddListbatchtrHeight"></div>
-                            </div>
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th style={{ textAlign: 'left' }}>{i18n.t('static.supplyPlan.total')}</th>
+                                            {
+                                                this.state.consumptionFilteredArray.filter(c => c.regionId == -1).map(item => (
+                                                    <th style={{ textAlign: 'right' }}><NumberFormat displayType={'text'} thousandSeparator={true} value={item.qty} /></th>
+                                                ))
+                                            }
+                                        </tr>
+                                    </tfoot>
+                                </Table>
+                                {this.state.showConsumption == 1 && <ConsumptionInSupplyPlanComponent ref="consumptionChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} consumptionPage="supplyPlan" />}
+                                <div className="table-responsive mt-3">
+                                    <div id="consumptionTable" />
+                                </div>
+                                <h6 className="red" id="div3">{this.state.consumptionBatchInfoDuplicateError || this.state.consumptionBatchInfoNoStockError || this.state.consumptionBatchError}</h6>
+                                <div className="table-responsive">
+                                    <div id="consumptionBatchInfoTable" className="AddListbatchtrHeight"></div>
+                                </div>
 
-                            <div id="showConsumptionBatchInfoButtonsDiv" style={{ display: 'none' }}>
-                                <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceledConsumption()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                {this.state.consumptionBatchInfoChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.consumptionChild.saveConsumptionBatchInfo()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBatchInfo')}</Button>}
+                                <div id="showConsumptionBatchInfoButtonsDiv" style={{ display: 'none' }}>
+                                    <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceledConsumption()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                    {this.state.consumptionBatchInfoChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.consumptionChild.saveConsumptionBatchInfo()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBatchInfo')}</Button>}
+                                </div>
+                            </ModalBody>
+                            <ModalFooter>
+                                {this.state.consumptionChangedFlag == 1 && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.refs.consumptionChild.saveConsumption}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>}{' '}
+                                <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceled('Consumption')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                            </ModalFooter>
+                        </div>
+                        <div style={{ display: this.state.loading ? "block" : "none" }} className="modalBackgroundSupplyPlan">
+                            <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                <div class="align-items-center">
+                                    <div ><h4> <strong>Loading...</strong></h4></div>
+
+                                    <div class="spinner-border blue ml-4" role="status">
+
+                                    </div>
+                                </div>
                             </div>
-                        </ModalBody>
-                        <ModalFooter>
-                            {this.state.consumptionChangedFlag == 1 && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.refs.consumptionChild.saveConsumption}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>}{' '}
-                            <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceled('Consumption')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                        </ModalFooter>
+                        </div>
                     </Modal>
                     {/* Consumption modal */}
                     {/* Adjustments modal */}
                     <Modal isOpen={this.state.adjustments}
                         className={'modal-lg ' + this.props.className, "modalWidth"} style={{ display: this.state.loading ? "none" : "block" }}>
                         <ModalHeader toggle={() => this.toggleLarge('Adjustments')} className="modalHeaderSupplyPlan">{i18n.t('static.supplyPlan.adjustmentsDetails')}</ModalHeader>
-                        <ModalBody>
-                            <h6 className="red" id="div2">{this.state.inventoryDuplicateError || this.state.inventoryNoStockError || this.state.inventoryError}</h6>
-                            <div className="col-md-12">
-                                <span className="supplyplan-larrow-dataentry-adjustment" onClick={this.leftClickedAdjustments}> <i className="cui-arrow-left icons " > </i> {i18n.t('static.supplyPlan.scrollToLeft')} </span>
-                                <span className="supplyplan-rarrow-dataentry" onClick={this.rightClickedAdjustments}> {i18n.t('static.supplyPlan.scrollToRight')} <i className="cui-arrow-right icons" ></i> </span>
-                            </div>
-                            <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
-                                <thead>
-                                    <tr>
-                                        <th className="regionTdWidthAdjustments"></th>
+                        <div style={{ display: this.state.loading ? "none" : "block" }}>
+                            <ModalBody>
+                                <h6 className="red" id="div2">{this.state.inventoryDuplicateError || this.state.inventoryNoStockError || this.state.inventoryError}</h6>
+                                <div className="col-md-12">
+                                    <span className="supplyplan-larrow-dataentry-adjustment" onClick={this.leftClickedAdjustments}> <i className="cui-arrow-left icons " > </i> {i18n.t('static.supplyPlan.scrollToLeft')} </span>
+                                    <span className="supplyplan-rarrow-dataentry" onClick={this.rightClickedAdjustments}> {i18n.t('static.supplyPlan.scrollToRight')} <i className="cui-arrow-right icons" ></i> </span>
+                                </div>
+                                <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
+                                    <thead>
+                                        <tr>
+                                            <th className="regionTdWidthAdjustments"></th>
+                                            {
+                                                this.state.monthsArray.map((item, count) => {
+                                                    if (count >= 3 && count <= 9) {
+                                                        return (<th colSpan="2">{item.monthName.concat(" ").concat(item.monthYear)}</th>)
+                                                    }
+                                                })
+                                            }
+                                        </tr>
+                                        <tr>
+                                            <th></th>
+                                            {
+                                                this.state.monthsArray.map((item, count) => {
+                                                    if (count >= 3 && count <= 9) {
+                                                        return (
+                                                            <>
+                                                                <th>{i18n.t("static.inventoryType.adjustment")}</th>
+                                                                <th>{i18n.t("static.inventory.inventory")}</th>
+                                                            </>)
+                                                    }
+                                                })
+                                            }
+                                        </tr>
+                                    </thead>
+                                    <tbody>
                                         {
-                                            this.state.monthsArray.map((item, count) => {
-                                                if (count >= 3 && count <= 9) {
-                                                    return (<th colSpan="2">{item.monthName.concat(" ").concat(item.monthYear)}</th>)
-                                                }
-                                            })
-                                        }
-                                    </tr>
-                                    <tr>
-                                        <th></th>
-                                        {
-                                            this.state.monthsArray.map((item, count) => {
-                                                if (count >= 3 && count <= 9) {
-                                                    return (
-                                                        <>
-                                                            <th>{i18n.t("static.inventoryType.adjustment")}</th>
-                                                            <th>{i18n.t("static.inventory.inventory")}</th>
-                                                        </>)
-                                                }
-                                            })
-                                        }
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {
-                                        this.state.regionListFiltered.map(item => (
-                                            <tr>
-                                                <td style={{ textAlign: 'left' }}>{item.name}</td>
-                                                {
-                                                    this.state.inventoryFilteredArray.filter(c => c.regionId == item.id).map((item1, count) => {
-                                                        if (count >= 3 && count <= 9) {
-                                                            if (item1.adjustmentsQty.toString() != '' && (item1.actualQty.toString() != "" || item1.actualQty.toString() != 0)) {
-                                                                return (
-                                                                    <>
-                                                                        <td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 2)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.adjustmentsQty} /></td>
-                                                                        <td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 1)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.actualQty} /></td>
-                                                                    </>
-                                                                )
-                                                            } else if (item1.adjustmentsQty.toString() != '' && (item1.actualQty.toString() == "" || item1.actualQty.toString() == 0)) {
-                                                                var lastActualConsumptionDate = moment(((this.state.lastActualConsumptionDateArr.filter(c => item1.regionId == c.region))[0]).lastActualConsumptionDate).format("YYYY-MM");
-                                                                var currentMonthDate = moment(item1.month.startDate).format("YYYY-MM");
-                                                                if (currentMonthDate > lastActualConsumptionDate) {
+                                            this.state.regionListFiltered.map(item => (
+                                                <tr>
+                                                    <td style={{ textAlign: 'left' }}>{item.name}</td>
+                                                    {
+                                                        this.state.inventoryFilteredArray.filter(c => c.regionId == item.id).map((item1, count) => {
+                                                            if (count >= 3 && count <= 9) {
+                                                                if (item1.adjustmentsQty.toString() != '' && (item1.actualQty.toString() != "" || item1.actualQty.toString() != 0)) {
                                                                     return (
                                                                         <>
                                                                             <td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 2)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.adjustmentsQty} /></td>
-                                                                            <td align="right"></td>
+                                                                            <td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 1)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.actualQty} /></td>
                                                                         </>
                                                                     )
+                                                                } else if (item1.adjustmentsQty.toString() != '' && (item1.actualQty.toString() == "" || item1.actualQty.toString() == 0)) {
+                                                                    var lastActualConsumptionDate = moment(((this.state.lastActualConsumptionDateArr.filter(c => item1.regionId == c.region))[0]).lastActualConsumptionDate).format("YYYY-MM");
+                                                                    var currentMonthDate = moment(item1.month.startDate).format("YYYY-MM");
+                                                                    if (currentMonthDate > lastActualConsumptionDate) {
+                                                                        return (
+                                                                            <>
+                                                                                <td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 2)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.adjustmentsQty} /></td>
+                                                                                <td align="right"></td>
+                                                                            </>
+                                                                        )
+                                                                    } else {
+                                                                        return (
+                                                                            <>
+                                                                                <td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 2)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.adjustmentsQty} /></td>
+                                                                                <td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 1)}></td>
+                                                                            </>
+                                                                        )
+                                                                    }
+
+                                                                } else if (item1.adjustmentsQty.toString() == '' && (item1.actualQty.toString() != "" || item1.actualQty.toString() != 0)) {
+                                                                    var lastActualConsumptionDate = moment(((this.state.lastActualConsumptionDateArr.filter(c => item1.regionId == c.region))[0]).lastActualConsumptionDate).format("YYYY-MM");
+                                                                    var currentMonthDate = moment(item1.month.startDate).format("YYYY-MM");
+                                                                    if (currentMonthDate > lastActualConsumptionDate) {
+                                                                        return (
+                                                                            <>
+                                                                                <td align="right"></td>
+                                                                                <td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 1)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.actualQty} /></td>
+
+                                                                            </>
+                                                                        )
+                                                                    } else {
+                                                                        return (
+                                                                            <>
+                                                                                <td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 2)}></td>
+                                                                                <td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 1)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.actualQty} /></td>
+                                                                            </>
+                                                                        )
+                                                                    }
                                                                 } else {
-                                                                    return (
-                                                                        <>
-                                                                            <td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 2)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.adjustmentsQty} /></td>
+                                                                    var lastActualConsumptionDate = moment(((this.state.lastActualConsumptionDateArr.filter(c => item1.regionId == c.region))[0]).lastActualConsumptionDate).format("YYYY-MM");
+                                                                    var currentMonthDate = moment(item1.month.startDate).format("YYYY-MM");
+                                                                    if (currentMonthDate > lastActualConsumptionDate) {
+                                                                        return (<><td align="right"></td><td align="right"></td></>)
+                                                                    } else {
+                                                                        return (<><td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 2)}></td>
                                                                             <td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 1)}></td>
-                                                                        </>
-                                                                    )
-                                                                }
-
-                                                            } else if (item1.adjustmentsQty.toString() == '' && (item1.actualQty.toString() != "" || item1.actualQty.toString() != 0)) {
-                                                                var lastActualConsumptionDate = moment(((this.state.lastActualConsumptionDateArr.filter(c => item1.regionId == c.region))[0]).lastActualConsumptionDate).format("YYYY-MM");
-                                                                var currentMonthDate = moment(item1.month.startDate).format("YYYY-MM");
-                                                                if (currentMonthDate > lastActualConsumptionDate) {
-                                                                    return (
-                                                                        <>
-                                                                            <td align="right"></td>
-                                                                            <td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 1)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.actualQty} /></td>
-
-                                                                        </>
-                                                                    )
-                                                                } else {
-                                                                    return (
-                                                                        <>
-                                                                            <td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 2)}></td>
-                                                                            <td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 1)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.actualQty} /></td>
-                                                                        </>
-                                                                    )
-                                                                }
-                                                            } else {
-                                                                var lastActualConsumptionDate = moment(((this.state.lastActualConsumptionDateArr.filter(c => item1.regionId == c.region))[0]).lastActualConsumptionDate).format("YYYY-MM");
-                                                                var currentMonthDate = moment(item1.month.startDate).format("YYYY-MM");
-                                                                if (currentMonthDate > lastActualConsumptionDate) {
-                                                                    return (<><td align="right"></td><td align="right"></td></>)
-                                                                } else {
-                                                                    return (<><td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 2)}></td>
-                                                                        <td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 1)}></td>
-                                                                    </>)
+                                                                        </>)
+                                                                    }
                                                                 }
                                                             }
-                                                        }
-                                                    })
-                                                }
-                                            </tr>
-                                        )
-                                        )
-
-                                    }
-                                    <tr bgcolor='#d9d9d9'>
-                                        <td style={{ textAlign: 'left' }}>{i18n.t('static.supplyPlan.total')}</td>
-                                        {
-                                            this.state.inventoryFilteredArray.filter(c => c.regionId == -1).map((item, count) => {
-                                                if (count >= 3 && count <= 9) {
-                                                    return (
-                                                        <>
-                                                            <td style={{ textAlign: 'right' }}><NumberFormat displayType={'text'} thousandSeparator={true} value={item.adjustmentsQty} />
-                                                            </td>
-                                                            {(item.actualQty) > 0 ? <td style={{ textAlign: 'right' }}><NumberFormat displayType={'text'} thousandSeparator={true} value={item.actualQty} /></td> : <td style={{ textAlign: 'left' }}>{item.actualQty}</td>}
-                                                        </>
-                                                    )
-                                                }
-                                            })
-                                        }
-                                    </tr>
-                                    <tr>
-                                        <td className="BorderNoneSupplyPlan" colSpan="15"></td>
-                                    </tr>
-                                    <tr bgcolor='#d9d9d9'>
-                                        <td align="left">{i18n.t("static.supplyPlan.projectedInventory")}</td>
-                                        {
-                                            this.state.inventoryFilteredArray.filter(c => c.regionId == -1).map((item, count) => {
-                                                if (count >= 3 && count <= 9) {
-                                                    return (
-                                                        <td colSpan="2"><NumberFormat displayType={'text'} thousandSeparator={true} value={item.projectedInventory} /></td>
-                                                    )
-
-                                                }
-                                            })
-                                        }
-                                    </tr>
-                                    <tr bgcolor='#d9d9d9'>
-                                        <td align="left">{i18n.t("static.supplyPlan.autoAdjustment")}</td>
-                                        {
-                                            this.state.inventoryFilteredArray.filter(c => c.regionId == -1).map((item1, count) => {
-                                                if (count >= 3 && count <= 9) {
-                                                    if (item1.autoAdjustments.toString() != '') {
-                                                        return (<td colSpan="2" ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.autoAdjustments} /></td>)
-                                                    } else {
-                                                        return (<td colSpan="2"></td>)
+                                                        })
                                                     }
-                                                }
-                                            })
-                                        }
-                                    </tr>
-                                    <tr bgcolor='#d9d9d9'>
-                                        <td align="left">{i18n.t("static.supplyPlan.finalInventory")}</td>
-                                        {
-                                            this.state.closingBalanceArray.map((item, count) => {
-                                                if (count >= 3 && count <= 9) {
-                                                    return (
-                                                        <td colSpan="2"><NumberFormat displayType={'text'} thousandSeparator={true} value={item} /></td>
-                                                    )
-                                                }
-                                            })
-                                        }
-                                    </tr>
-                                </tbody>
-                            </Table>
-                            {this.state.showInventory == 1 && <InventoryInSupplyPlanComponent ref="inventoryChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} inventoryPage="supplyPlan" hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} adjustmentsDetailsClicked={this.adjustmentsDetailsClicked} />}
-                            <div className="table-responsive mt-3">
-                                <div id="adjustmentsTable" className="table-responsive " />
-                            </div>
-                            <h6 className="red" id="div3">{this.state.inventoryBatchInfoDuplicateError || this.state.inventoryBatchInfoNoStockError || this.state.inventoryBatchError}</h6>
-                            <div className="table-responsive">
-                                <div id="inventoryBatchInfoTable" className="AddListbatchtrHeight"></div>
-                            </div>
+                                                </tr>
+                                            )
+                                            )
 
-                            <div id="showInventoryBatchInfoButtonsDiv" style={{ display: 'none' }}>
-                                <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceledInventory()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                {this.state.inventoryBatchInfoChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.inventoryChild.saveInventoryBatchInfo()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBatchInfo')}</Button>}
+                                        }
+                                        <tr bgcolor='#d9d9d9'>
+                                            <td style={{ textAlign: 'left' }}>{i18n.t('static.supplyPlan.total')}</td>
+                                            {
+                                                this.state.inventoryFilteredArray.filter(c => c.regionId == -1).map((item, count) => {
+                                                    if (count >= 3 && count <= 9) {
+                                                        return (
+                                                            <>
+                                                                <td style={{ textAlign: 'right' }}><NumberFormat displayType={'text'} thousandSeparator={true} value={item.adjustmentsQty} />
+                                                                </td>
+                                                                {(item.actualQty) > 0 ? <td style={{ textAlign: 'right' }}><NumberFormat displayType={'text'} thousandSeparator={true} value={item.actualQty} /></td> : <td style={{ textAlign: 'left' }}>{item.actualQty}</td>}
+                                                            </>
+                                                        )
+                                                    }
+                                                })
+                                            }
+                                        </tr>
+                                        <tr>
+                                            <td className="BorderNoneSupplyPlan" colSpan="15"></td>
+                                        </tr>
+                                        <tr bgcolor='#d9d9d9'>
+                                            <td align="left">{i18n.t("static.supplyPlan.projectedInventory")}</td>
+                                            {
+                                                this.state.inventoryFilteredArray.filter(c => c.regionId == -1).map((item, count) => {
+                                                    if (count >= 3 && count <= 9) {
+                                                        return (
+                                                            <td colSpan="2"><NumberFormat displayType={'text'} thousandSeparator={true} value={item.projectedInventory} /></td>
+                                                        )
+
+                                                    }
+                                                })
+                                            }
+                                        </tr>
+                                        <tr bgcolor='#d9d9d9'>
+                                            <td align="left">{i18n.t("static.supplyPlan.autoAdjustment")}</td>
+                                            {
+                                                this.state.inventoryFilteredArray.filter(c => c.regionId == -1).map((item1, count) => {
+                                                    if (count >= 3 && count <= 9) {
+                                                        if (item1.autoAdjustments.toString() != '') {
+                                                            return (<td colSpan="2" ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.autoAdjustments} /></td>)
+                                                        } else {
+                                                            return (<td colSpan="2"></td>)
+                                                        }
+                                                    }
+                                                })
+                                            }
+                                        </tr>
+                                        <tr bgcolor='#d9d9d9'>
+                                            <td align="left">{i18n.t("static.supplyPlan.finalInventory")}</td>
+                                            {
+                                                this.state.closingBalanceArray.map((item, count) => {
+                                                    if (count >= 3 && count <= 9) {
+                                                        return (
+                                                            <td colSpan="2"><NumberFormat displayType={'text'} thousandSeparator={true} value={item} /></td>
+                                                        )
+                                                    }
+                                                })
+                                            }
+                                        </tr>
+                                    </tbody>
+                                </Table>
+                                {this.state.showInventory == 1 && <InventoryInSupplyPlanComponent ref="inventoryChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} inventoryPage="supplyPlan" hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} adjustmentsDetailsClicked={this.adjustmentsDetailsClicked} />}
+                                <div className="table-responsive mt-3">
+                                    <div id="adjustmentsTable" className="table-responsive " />
+                                </div>
+                                <h6 className="red" id="div3">{this.state.inventoryBatchInfoDuplicateError || this.state.inventoryBatchInfoNoStockError || this.state.inventoryBatchError}</h6>
+                                <div className="table-responsive">
+                                    <div id="inventoryBatchInfoTable" className="AddListbatchtrHeight"></div>
+                                </div>
+
+                                <div id="showInventoryBatchInfoButtonsDiv" style={{ display: 'none' }}>
+                                    <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceledInventory()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                    {this.state.inventoryBatchInfoChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.inventoryChild.saveInventoryBatchInfo()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBatchInfo')}</Button>}
+                                </div>
+                            </ModalBody>
+                            <ModalFooter>
+                                {this.state.inventoryChangedFlag == 1 && <Button size="md" color="success" className="submitBtn float-right mr-1" onClick={this.refs.inventoryChild.saveInventory}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>}{' '}
+                                <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceled('Adjustments')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                            </ModalFooter>
+                        </div>
+                        <div style={{ display: this.state.loading ? "block" : "none" }} className="modalBackgroundSupplyPlan">
+                            <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                <div class="align-items-center">
+                                    <div ><h4> <strong>Loading...</strong></h4></div>
+
+                                    <div class="spinner-border blue ml-4" role="status">
+
+                                    </div>
+                                </div>
                             </div>
-                        </ModalBody>
-                        <ModalFooter>
-                            {this.state.inventoryChangedFlag == 1 && <Button size="md" color="success" className="submitBtn float-right mr-1" onClick={this.refs.inventoryChild.saveInventory}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>}{' '}
-                            <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceled('Adjustments')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                        </ModalFooter>
+                        </div>
                     </Modal>
                     {/* adjustments modal */}
 
@@ -1318,48 +1344,61 @@ export default class SupplyPlanComponent extends React.Component {
                         <ModalHeader toggle={() => this.toggleLarge('shipments')} className="modalHeaderSupplyPlan">
                             <strong>{i18n.t('static.supplyPlan.shipmentsDetails')} -  {i18n.t('static.planningunit.planningunit')} - {this.state.planningUnitName} </strong>
                         </ModalHeader>
-                        <ModalBody>
-                            {this.state.showShipments && <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} hideFourthComponent={this.hideFourthComponent} hideFifthComponent={this.hideFifthComponent} shipmentPage="supplyPlan" />}
-                            <h6 className="red" id="div2">{this.state.noFundsBudgetError || this.state.shipmentBatchError || this.state.shipmentError}</h6>
-                            <div className="table-responsive">
-                                <div id="shipmentsDetailsTable" />
-                            </div>
+                        <div style={{ display: this.state.loading ? "none" : "block" }}>
+                            <ModalBody>
+                                {this.state.showShipments && <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} hideFourthComponent={this.hideFourthComponent} hideFifthComponent={this.hideFifthComponent} shipmentPage="supplyPlan" />}
+                                <h6 className="red" id="div2">{this.state.noFundsBudgetError || this.state.shipmentBatchError || this.state.shipmentError}</h6>
+                                <div className="table-responsive">
+                                    <div id="shipmentsDetailsTable" />
+                                </div>
 
-                            <h6 className="red" id="div3">{this.state.qtyCalculatorValidationError}</h6>
-                            <div className="table-responsive">
-                                <div id="qtyCalculatorTable"></div>
-                            </div>
+                                <h6 className="red" id="div3">{this.state.qtyCalculatorValidationError}</h6>
+                                <div className="table-responsive">
+                                    <div id="qtyCalculatorTable"></div>
+                                </div>
 
-                            <div className="table-responsive">
-                                <div id="qtyCalculatorTable1"></div>
-                            </div>
+                                <div className="table-responsive">
+                                    <div id="qtyCalculatorTable1"></div>
+                                </div>
 
-                            <div id="showSaveQtyButtonDiv" style={{ display: 'none' }}>
-                                <Button size="md" color="danger" className="float-right mr-1 mb-2" onClick={() => this.actionCanceledShipments('qtyCalculator')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                {this.state.shipmentQtyChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentQty()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveShipmentQty')}</Button>}
-                            </div>
+                                <div id="showSaveQtyButtonDiv" style={{ display: 'none' }}>
+                                    <Button size="md" color="danger" className="float-right mr-1 mb-2" onClick={() => this.actionCanceledShipments('qtyCalculator')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                    {this.state.shipmentQtyChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentQty()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveShipmentQty')}</Button>}
+                                </div>
 
-                            <h6 className="red" id="div4">{this.state.shipmentDatesError}</h6>
-                            <div className="table-responsive">
-                                <div id="shipmentDatesTable"></div>
+                                <h6 className="red" id="div4">{this.state.shipmentDatesError}</h6>
+                                <div className="table-responsive">
+                                    <div id="shipmentDatesTable"></div>
+                                </div>
+                                <div id="showSaveShipmentsDatesButtonsDiv" style={{ display: 'none' }}>
+                                    <Button size="md" color="danger" className="float-right mr-1 mb-2" onClick={() => this.actionCanceledShipments('shipmentDates')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                    {this.state.shipmentDatesChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentsDate()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveShipmentDates')}</Button>}
+                                </div>
+                                <h6 className="red" id="div5">{this.state.shipmentBatchInfoDuplicateError || this.state.shipmentValidationBatchError}</h6>
+                                <div className="table-responsive">
+                                    <div id="shipmentBatchInfoTable" className="AddListbatchtrHeight"></div>
+                                </div>
+                                <div id="showShipmentBatchInfoButtonsDiv" style={{ display: 'none' }}>
+                                    <Button size="md" color="danger" className="float-right mr-1 " onClick={() => this.actionCanceledShipments('shipmentBatch')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                    {this.state.shipmentBatchInfoChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentBatchInfo()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBatchInfo')}</Button>}
+                                </div>
+                            </ModalBody>
+                            <ModalFooter>
+                                {this.state.shipmentChangedFlag == 1 && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipments()}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>}
+                                <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceled('shipments')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                            </ModalFooter>
+                        </div>
+                        <div style={{ display: this.state.loading ? "block" : "none" }} className="modalBackgroundSupplyPlan">
+                            <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                <div class="align-items-center">
+                                    <div ><h4> <strong>Loading...</strong></h4></div>
+
+                                    <div class="spinner-border blue ml-4" role="status">
+
+                                    </div>
+                                </div>
                             </div>
-                            <div id="showSaveShipmentsDatesButtonsDiv" style={{ display: 'none' }}>
-                                <Button size="md" color="danger" className="float-right mr-1 mb-2" onClick={() => this.actionCanceledShipments('shipmentDates')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                {this.state.shipmentDatesChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentsDate()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveShipmentDates')}</Button>}
-                            </div>
-                            <h6 className="red" id="div5">{this.state.shipmentBatchInfoDuplicateError || this.state.shipmentValidationBatchError}</h6>
-                            <div className="table-responsive">
-                                <div id="shipmentBatchInfoTable" className="AddListbatchtrHeight"></div>
-                            </div>
-                            <div id="showShipmentBatchInfoButtonsDiv" style={{ display: 'none' }}>
-                                <Button size="md" color="danger" className="float-right mr-1 " onClick={() => this.actionCanceledShipments('shipmentBatch')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                {this.state.shipmentBatchInfoChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentBatchInfo()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBatchInfo')}</Button>}
-                            </div>
-                        </ModalBody>
-                        <ModalFooter>
-                            {this.state.shipmentChangedFlag == 1 && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipments()}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>}
-                            <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceled('shipments')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                        </ModalFooter>
+                        </div>
                     </Modal>
                     {/* Shipments modal */}
                     {/* Expired Stock modal */}
@@ -1368,40 +1407,53 @@ export default class SupplyPlanComponent extends React.Component {
                         <ModalHeader toggle={() => this.toggleLarge('expiredStock')} className="modalHeaderSupplyPlan">
                             <strong>{i18n.t('static.dashboard.expiryDetails')}</strong>
                         </ModalHeader>
-                        <ModalBody>
-                            <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
-                                <thead>
-                                    <tr>
-                                        <th>{i18n.t('static.inventory.batchNumber')}</th>
-                                        <th>{i18n.t('static.inventory.expireDate')}</th>
-                                        <th>{i18n.t('static.supplyPlan.qatGenerated')}</th>
-                                        <th>{i18n.t('static.supplyPlan.expiredQty')}</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {
-                                        this.state.expiredStockDetails.map(item => (
-                                            <tr>
-                                                <td align="left">{item.batchNo}</td>
-                                                <td align="left">{moment(item.expiryDate).format(DATE_FORMAT_CAP)}</td>
-                                                <td align="left">{(item.autoGenerated) ? i18n.t("static.program.yes") : i18n.t("static.program.no")}</td>
-                                                <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item.expiredQty} /></td>
-                                            </tr>
-                                        )
-                                        )
-                                    }
-                                </tbody>
-                                <tfoot>
-                                    <tr>
-                                        <th style={{ textAlign: 'left' }} colSpan="3">{i18n.t('static.supplyPlan.total')}</th>
-                                        <th style={{ textAlign: 'right' }}><NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.expiredStockDetailsTotal} /></th>
-                                    </tr>
-                                </tfoot>
-                            </Table>
-                        </ModalBody>
-                        <ModalFooter>
-                            <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceledExpiredStock()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                        </ModalFooter>
+                        <div style={{ display: this.state.loading ? "none" : "block" }}>
+                            <ModalBody>
+                                <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
+                                    <thead>
+                                        <tr>
+                                            <th>{i18n.t('static.inventory.batchNumber')}</th>
+                                            <th>{i18n.t('static.inventory.expireDate')}</th>
+                                            <th>{i18n.t('static.supplyPlan.qatGenerated')}</th>
+                                            <th>{i18n.t('static.supplyPlan.expiredQty')}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {
+                                            this.state.expiredStockDetails.map(item => (
+                                                <tr>
+                                                    <td align="left">{item.batchNo}</td>
+                                                    <td align="left">{moment(item.expiryDate).format(DATE_FORMAT_CAP)}</td>
+                                                    <td align="left">{(item.autoGenerated) ? i18n.t("static.program.yes") : i18n.t("static.program.no")}</td>
+                                                    <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item.expiredQty} /></td>
+                                                </tr>
+                                            )
+                                            )
+                                        }
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th style={{ textAlign: 'left' }} colSpan="3">{i18n.t('static.supplyPlan.total')}</th>
+                                            <th style={{ textAlign: 'right' }}><NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.expiredStockDetailsTotal} /></th>
+                                        </tr>
+                                    </tfoot>
+                                </Table>
+                            </ModalBody>
+                            <ModalFooter>
+                                <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceledExpiredStock()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                            </ModalFooter>
+                        </div>
+                        <div style={{ display: this.state.loading ? "block" : "none" }} className="modalBackgroundSupplyPlan">
+                            <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                <div class="align-items-center">
+                                    <div ><h4> <strong>Loading...</strong></h4></div>
+
+                                    <div class="spinner-border blue ml-4" role="status">
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </Modal>
                     {/* Expired stock modal */}
                 </TabPane>
