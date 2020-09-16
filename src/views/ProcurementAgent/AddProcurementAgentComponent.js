@@ -126,8 +126,10 @@ class AddProcurementAgentComponent extends Component {
         console.log("color---", color);
         let { procurementAgent } = this.state;
         procurementAgent.colorHtmlCode = color.hex.toUpperCase();
+        let rgba = 'rgba(' + color.rgb.r + "," + color.rgb.g + "," + color.rgb.b + "," + color.rgb.a + ')';
         this.setState({
             color: color.rgb,
+            rgba,
             procurementAgent
         },
             () => { console.log("agent--------------", procurementAgent); });
