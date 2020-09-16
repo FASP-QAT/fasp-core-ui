@@ -66,7 +66,7 @@ export default class AuthenticationServiceComponent extends Component {
                                     case 404:
                                     case 406:
                                     case 412:
-                                        console.log("error.response.data.messageCode-------------",error.response.data.messageCode);
+                                        console.log("error.response.data.messageCode-------------************",error.response.data.messageCode);
                                         this.props.message(error.response.data.messageCode);
                                         this.props.loading(false)
                                         break;

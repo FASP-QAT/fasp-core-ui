@@ -73,7 +73,8 @@ class ChangePasswordComponent extends Component {
         super(props);
         this.state = {
             message: '',
-            username: ""
+            username: "",
+loading:false
         }
         this.cancelClicked = this.cancelClicked.bind(this);
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
@@ -91,9 +92,9 @@ class ChangePasswordComponent extends Component {
         //   });
     }
     hideFirstComponent() {
-        setTimeout(function () {
-            document.getElementById('div1').style.display = 'none';
-        }, 8000);
+//        setTimeout(function () {
+  //          document.getElementById('div1').style.display = 'none';
+    //    }, 8000);
 
         // setTimeout(function () {
         //     this.setState({
@@ -187,12 +188,12 @@ class ChangePasswordComponent extends Component {
                                                             case 404:
                                                             case 406:
                                                             case 412:
-                                                                console.log("error.response.data.messageCode 111 ---", error.response);
+                                                      //          console.log("error.response.data.messageCode 111 ---", error.response);
                                                                 console.log("error.response.data.messageCode ---", error.response.data.messageCode);
                                                                 this.setState({ message: error.response.data.messageCode },
                                                                     () => {
-                                                                        console.log("inside412");
-                                                                        document.getElementById('div1').style.display = 'block';
+                                                                        console.log("inside412->",this.state.message);
+                                                                       // document.getElementById('div1').style.display = 'block';
                                                                         this.hideFirstComponent();
                                                                     });
 
@@ -201,7 +202,7 @@ class ChangePasswordComponent extends Component {
                                                                 this.setState({ message: 'static.unkownError' },
                                                                     () => {
                                                                         console.log("inside412");
-                                                                        document.getElementById('div1').style.display = 'block';
+                                                                       //  document.getElementById('div1').style.display = 'block';
                                                                         this.hideFirstComponent();
                                                                     });
                                                                 break;
