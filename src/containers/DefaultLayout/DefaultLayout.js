@@ -842,7 +842,7 @@ class DefaultLayout extends Component {
                           //   icon: 'icon-graph'
                           // },
                           {
-                            name: 'Product Category',
+                            name: i18n.t('static.product.productcategory'),
                             url: '/productCategory/productCategoryTree',
                             icon: 'fa fa-cubes',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PRODUCT_CATEGORY') ? false : true) }

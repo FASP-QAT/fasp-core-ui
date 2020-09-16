@@ -14,6 +14,7 @@ export default class PipelineProgramImport extends Component {
         super(props);
         this.showPipelineProgramInfo = this.showPipelineProgramInfo.bind(this);
         this.state = {
+            loading: true,
             jsonText: '',
             message: ''
         }
@@ -55,7 +56,8 @@ export default class PipelineProgramImport extends Component {
                                 else {
                                     // alert("in else");
                                     this.setState({
-                                        message: response.data.messageCode
+                                        message: response.data.messageCode,
+                                        loading: false
                                     },
                                         () => {
                                             this.hideSecondComponent();
