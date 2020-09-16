@@ -655,7 +655,7 @@ class AuthenticationService {
                     break;
                 case "/budget/listBudget":
                 case "/budget/listBudget/:color/:message":
-                    if (bfunction.includes("ROLE_BF_MANAGE_BUDGET")) {
+                    if (bfunction.includes("ROLE_BF_LIST_BUDGET")) {
                         return true;
                     }
                     break;
@@ -767,7 +767,7 @@ class AuthenticationService {
                 case "/forecastingUnit/listForecastingUnit/:message":
                 case "/forecastingUnit/listForecastingUnit/:color/:message":
                     console.log("result---" + bfunction.includes("ROLE_BF_MANAGE_FORECASTING_UNIT"));
-                    if (bfunction.includes("ROLE_BF_MANAGE_FORECASTING_UNIT")) {
+                    if (bfunction.includes("ROLE_BF_LIST_FORECASTING_UNIT")) {
                         return true;
                     }
                     break;
@@ -785,7 +785,7 @@ class AuthenticationService {
                 case "/planningUnit/listPlanningUnit/:message":
                 case "/planningUnit/listPlanningUnit/:color/:message":
                 case "/planningUnitCapacity/planningUnitCapacity/:planningUnitId":
-                    if (bfunction.includes("ROLE_BF_MANAGE_PLANNING_UNIT")) {
+                    if (bfunction.includes("ROLE_BF_LIST_PLANNING_UNIT")) {
                         return true;
                     }
                     break;
@@ -981,7 +981,7 @@ class AuthenticationService {
                     }
                     break;
                 case "/report/shipmentGlobalView":
-                    if (bfunction.includes("ROLE_BF_PROCUREMENT_AGENT_REPORT")) {
+                    if (bfunction.includes("ROLE_BF_GLOBAL_DEMAND_REPORT")) {
                         return true;
                     }
                     break;
@@ -991,7 +991,7 @@ class AuthenticationService {
                     }
                     break;
                 case "/report/stockStatusAccrossPlanningUnitGlobalView":
-                    if (bfunction.includes("ROLE_BF_PROCUREMENT_AGENT_REPORT")) {
+                    if (bfunction.includes("ROLE_BF_STOCK_STATUS_GLOBAL_VIEW_REPORT")) {
                         return true;
                     }
                     break;
