@@ -537,7 +537,7 @@
     "static.planningunit.capacitytext": "Enter Volume (m^3)",
     "static.common.action": "Action",
     "static.planningunit.capacityupdate": "Map Volumes",
-    "static.planningunit.planningunitupdate": "Map Planning Unit",
+    "static.planningunit.planningunitupdate": "Map Alternate reporting unit",
     "static.planningunit.countrysku": "Alternate Reporting Unit",
     "static.dashboad.planningunitcountry": "Alternate Reporting Unit",
     "static.planningunit.Countrytext": "Enter Alternate Reporting Unit name",
