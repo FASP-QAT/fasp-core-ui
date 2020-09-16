@@ -179,39 +179,8 @@ export default class ProductCategoryTree extends Component {
                 .then(response => {
                     console.log("response product category list ====>", response.data);
                     if (response.status == 200) {
-                        var dummyJson = [
-                            {
-                                id: 1,
-                                parentId: null,
-                                payload: {
-                                    active: true,
-                                    productCategoryId: 0,
-                                    realm: {
-                                        id: 1,
-                                        label: { active: true, labelId: 4, label_en: "Global Health", label_sp: "", label_fr: "" },
-                                        code: "GHR",
-                                    },
-                                    label: {
-                                        active: true,
-                                        labelId: 1149,
-                                        label_en: "All Categories",
-                                        label_sp: null,
-                                        label_fr: null,
-                                        label_pr: null,
-                                    },
-                                    sortOrder: "",
-                                    expanded: true,
-                                },
-                                level: 0,
-                                sortOrder: "00",
-                                payloadId: 0
-                            }
-                        ];
                         this.setState({
                             productCategoryList: response.data,
-                            // productCategoryList: dummyJson,
-
-
                         });
 
                         console.log("this.state.productCategoryList====>", this.state.productCategoryList);
@@ -270,7 +239,6 @@ export default class ProductCategoryTree extends Component {
 
     }
     addNewNode() {
-
         console.log("this.state.treeData===>", this.state.treeData);
         let children = this.state.treeData[0].children;
         let duplicate = 0;
@@ -729,6 +697,7 @@ export default class ProductCategoryTree extends Component {
                                     <Label for="product category">{i18n.t('static.productCategory.productCategoryTree')}</Label>
                                     <div style={{ height: 450 }}>
                                         <SortableTree
+                                            canDrop={({ nextParent }) => nextParent !=null }
                                             getNodeKey={({ node }) => node.id}
                                             treeData={this.state.treeData}
                                             searchQuery={this.state.searchQuery}

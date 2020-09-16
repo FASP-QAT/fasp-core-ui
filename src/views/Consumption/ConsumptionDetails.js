@@ -151,7 +151,7 @@ export default class ConsumptionDetails extends React.Component {
         var programId = value != "" && value != undefined ? value.value : 0;
         document.getElementById("planningUnitId").value = 0;
         document.getElementById("planningUnit").value = "";
-        document.getElementById("consumptionTable").style.display = "none";
+        document.getElementById("consumptionTableDiv").style.display = "none";
         this.setState({
             programSelect: value,
             programId: value != "" && value != undefined ? value.value : 0,
@@ -253,7 +253,7 @@ export default class ConsumptionDetails extends React.Component {
         var planningUnitId = value != "" && value != undefined ? value.value : 0;
         var programId = document.getElementById("programId").value;
         if (planningUnitId != 0) {
-            document.getElementById("consumptionTable").style.display = "block";
+            document.getElementById("consumptionTableDiv").style.display = "block";
             var db1;
             getDatabase();
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -299,7 +299,7 @@ export default class ConsumptionDetails extends React.Component {
                 }.bind(this)
             }.bind(this)
         } else {
-            document.getElementById("consumptionTable").style.display = "none";
+            document.getElementById("consumptionTableDiv").style.display = "none";
             this.setState({ loading: false });
         }
     }
@@ -378,8 +378,8 @@ export default class ConsumptionDetails extends React.Component {
                                     )} />
 
                         <div className="shipmentconsumptionSearchMarginTop">
-                            {this.state.showConsumption == 1 && <ConsumptionInSupplyPlanComponent ref="consumptionChild" items={this.state} toggleLarge={this.toggleLarge} updateState={this.updateState} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} consumptionPage="consumptionDataEntry" />}
-                            <div className="table-responsive">
+                            <ConsumptionInSupplyPlanComponent ref="consumptionChild" items={this.state} toggleLarge={this.toggleLarge} updateState={this.updateState} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} consumptionPage="consumptionDataEntry" />
+                            <div className="table-responsive" id="consumptionTableDiv">
                                 <div id="consumptionTable" />
                             </div>
                         </div>

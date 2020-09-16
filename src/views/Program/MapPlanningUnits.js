@@ -515,43 +515,43 @@ export default class MapPlanningUnits extends Component {
                                     columns: [
 
                                         {
-                                            title: 'Product Category',
+                                            title: i18n.t('static.product.productcategory'),
                                             type: 'dropdown',
                                             source: productCategoryList
                                         },
                                         {
-                                            title: 'Planning Unit',
+                                            title: i18n.t('static.planningunit.planningunit'),
                                             type: 'autocomplete',
                                             source: list,
                                             filter: this.dropdownFilter
                                         },
                                         {
-                                            title: 'Reorder frequency in months',
+                                            title: i18n.t('static.report.reorderFrequencyInMonths'),
                                             type: 'number',
 
                                         },
                                         {
-                                            title: 'Min month of stock',
+                                            title: i18n.t('static.supplyPlan.minMonthsOfStock'),
                                             type: 'number'
                                         },
                                         {
-                                            title: 'Months In Future For AMC',
+                                            title: i18n.t('static.program.monthfutureamc'),
                                             type: 'number'
                                         },
                                         {
-                                            title: 'Months In Past For AMC',
+                                            title: i18n.t('static.program.monthpastamc'),
                                             type: 'number'
                                         },
                                         {
-                                            title: 'Local Procurment Lead Time',
+                                            title: i18n.t('static.report.procurmentAgentLeadTimeReport'),
                                             type: 'number'
                                         },
                                         {
-                                            title: 'Shelf Life',
+                                            title: i18n.t('static.supplyPlan.shelfLife'),
                                             type: 'number'
                                         },
                                         {
-                                            title: 'Catalog Price (USD)',
+                                            title: i18n.t('static.procurementAgentPlanningUnit.catalogPrice'),
                                             type: 'number'
                                         },
                                         // {

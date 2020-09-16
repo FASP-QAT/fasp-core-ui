@@ -122,7 +122,7 @@
     "static.dashboard.importprogram": "Import Program",
     "static.program.validairfreighttext": "Enter Air Freight Percentage",
     "static.dashboard.realmlevelmaster": "Realm Level Masters",
-    "static.dashboard.supplier": "Procurement Agent",
+    "static.dashboard.supplier": "Manufacturer",
     "static.dashboard.supplierheader": "Manufacturer",
     "static.fundingsource.realm": "Realm",
     "static.common.active": "Active",
@@ -417,9 +417,9 @@
     "static.shipment.delinkingsuccess": " Shipment delinked successfully",
     "static.shipment.linkingsuccess": " Shipment linked successfully",
     "static.masterDataSync.syncFailed": "Master data synced failed. Try again",
-    "static.breadcrum.add": "Add {{entity name}}",
-    "static.breadcrum.edit": "Update {{entity name}}",
-    "static.breadcrum.list": "{{entity name}}",
+    "static.breadcrum.add": "Add {{entityname}}",
+    "static.breadcrum.edit": "Update {{entityname}}",
+    "static.breadcrum.list": "{{entityname}}",
     "static.dashboard.changepassword": "Change Password",
     "static.dashboard.useraccessctrl": "User/Access Control",
     "static.productcategory.productcategory": "Planning Unit Category",
@@ -726,7 +726,7 @@
     "static.dashboard.inventoryTurns": "Inventory Turns",
     "static.dashboard.stockstatusovertime": "Stock Status Over Time",
     "static.report.noofmonth": "Number of months included in calculation",
-    "static.supplyplan.supplyplanformula": "Show formulas",
+    "static.supplyplan.supplyplanformula": "Show Formulae",
     "static.message.shipmentSaved": "Shipment data saved",
     "static.report.historicalConsumptionActual": "Historical Actual Consumption",
     "static.dashboard.forecastmetrics": "Forecast Metrics - Comparison View",
@@ -1094,7 +1094,7 @@
     "static.supplyPlan.saveShipmentDates": "Save shipments dates",
     "static.pipeline.duplicatePlanningUnittext": "*Yellow indicates that either the same planning unit is being selected twice or the planning unit you are trying to map does not exist. Create a ticket for the Planning Units which do not exist",
     "static.pipeline.programInfo": "Program info",
-    "static.pipeline.programData": "Program data",
+    "static.pipeline.programData": "Program Data",
     "static.pipeline.save": "Save",
     "static.technicalArea.technicalAreaDisplayName": "Technical Area Display Name",
     "static.program.programDisplayName": "Program Display Name",
@@ -1137,6 +1137,7 @@
     "static.dashboard.setupprogram": "Setup Program",
     "static.dashboard.pipelineprogramlist": "Pipeline Program List",
     "static.problem.updatedSuccessFully": "Problem Status Updated Successfully",
-    "static.message.alreadExists": "Procurement agent display name already exists"
+    "static.message.alreadExists": "Procurement Agent Display Name Already Exists",
+    "static.message.languageCodeAlreadyExists":"Language Code Already Exists"
     
 }
