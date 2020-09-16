@@ -220,6 +220,7 @@ class Login extends Component {
                                       case 401:
                                       case 404:
                                       case 412:
+                                        console.log("Login page 401---");
                                         this.setState({ message: error.response.data.messageCode });
                                         break;
                                       case 406:
@@ -231,6 +232,7 @@ class Login extends Component {
                                         });
                                         break;
                                       default:
+                                        console.log("Login page unknown error---");
                                         this.setState({ message: 'static.unkownError' });
                                         break;
                                     }
