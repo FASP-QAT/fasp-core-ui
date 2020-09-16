@@ -1081,6 +1081,19 @@
     "static.pipeline.duplicatePlanningUnittext":"* Los productos en celdas de color amarillo indican que el mismo producto se está seleccionando dos veces o no existe. Por favor crear un ticket para los productos que no existen.",
     "static.pipeline.programInfo":"Información del Programa",
     "static.pipeline.programData":"Datos del Programa",
-    "static.pipeline.save":"Guardar"
+    "static.pipeline.save":"Guardar",
+    "static.userHead.user": "Usuario",
+    "static.roleHead.role": "Rol",
+    "static.dataSourceTypeHead.dataSourceType": "Tipo de fuente de datos",
+    "static.fundingSourceHead.fundingSource": "Fuente de financiamiento",
+    "static.organisationHead.organisation": "Organización",
+    "static.tracerCategoryHead.tracerCategory": "Categoría de productos trazadores",
+    "static.planningUnitVolumeHead.planningUnitVolume": "Volumen del Producto",
+    "static.programHead.program": "Programa",
+    "static.consumptionDetailHead.consumptionDetail": "Detalles de consumo",
+    "static.inventoryDetailHead.inventoryDetail": "Detalles del inventario",
+    "static.shipmentDetailHead.shipmentDetail": "Informe sobre Detalles de los Pedidos",
+    "static.regionHead.region": "Región",
+    "static.budgetHead.budget": "Presupuesto"
     
 }

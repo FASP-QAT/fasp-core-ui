@@ -701,22 +701,38 @@ class RegionListComponent extends Component {
         //     }
         // );
 
-        RealmCountryService.getRealmCountryListAll()
+        // RealmCountryService.getRealmCountryListAll()
+        //     .then(response => {
+        //         if (response.status == 200) {
+        //             this.setState({
+        //                 realmCountryList: response.data
+        //             })
+        //         } else {
+        //             this.setState({
+        //                 message: response.data.messageCode
+        //             }
+        //                 ,
+        //                 () => {
+        //                     this.hideSecondComponent();
+        //                 })
+        //         }
+        //     })
+
+        let realmId = AuthenticationService.getRealmId();
+        RealmCountryService.getRealmCountryrealmIdById(realmId)
             .then(response => {
+                console.log("RealmCountryService---->", response.data)
                 if (response.status == 200) {
                     this.setState({
                         realmCountryList: response.data
-                    })
+                    },
+                        () => { })
                 } else {
-                    this.setState({
-                        message: response.data.messageCode
-                    }
-                        ,
-                        () => {
-                            this.hideSecondComponent();
-                        })
+                    this.setState({ message: response.data.messageCode, loading: false },
+                        () => { this.hideSecondComponent(); })
                 }
             })
+
         // .catch(
         //     error => {
         //         if (error.message === "Network Error") {
