@@ -868,7 +868,7 @@ export default class ShipmentDelinking extends Component {
                 <h5 className={this.state.color} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 {/* <Card style={{ display: this.state.loading ? "none" : "block" }}> */}
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
-                    <CardBody className="">
+                    <CardBody className="pb-lg-5">
                         <Col md="10 pl-0">
                             <div className="d-md-flex">
                                 <FormGroup className="col-md-4 pl-0">
@@ -911,7 +911,9 @@ export default class ShipmentDelinking extends Component {
                                 </FormGroup>
                             </div>
                         </Col>
+                        <div className="ReportSearchMarginTop">
                         <div id="tableDiv" className="jexcelremoveReadonlybackground">
+                        </div>
                         </div>
 
 

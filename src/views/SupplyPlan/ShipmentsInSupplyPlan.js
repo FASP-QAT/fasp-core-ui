@@ -1322,9 +1322,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                             // region id
                                                                             if (obj.getRowData(y)[5] == -1) {
                                                                                 items.push({
-                                                                                    title: obj.options.text.deleteSelectedRows,
+                                                                                    title: i18n.t("static.common.deleterow"),
                                                                                     onclick: function () {
-                                                                                        obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y));
+                                                                                        obj.deleteRow(parseInt(y));
                                                                                     }
                                                                                 });
                                                                             }
@@ -1377,9 +1377,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                     // region id
                                                     if (obj.getRowData(y)[16] == -1) {
                                                         items.push({
-                                                            title: obj.options.text.deleteSelectedRows,
+                                                            title: i18n.t("static.common.deleterow"),
                                                             onclick: function () {
-                                                                obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y));
+                                                                obj.deleteRow(parseInt(y));
                                                             }
                                                         });
                                                     }

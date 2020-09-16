@@ -147,7 +147,7 @@ export default class AddInventory extends Component {
     getPlanningUnitList(value) {
         document.getElementById("planningUnitId").value = 0;
         document.getElementById("planningUnit").value = "";
-        document.getElementById("adjustmentsTable").style.display = "none";
+        document.getElementById("adjustmentsTableDiv").style.display = "none";
         this.setState({
             programSelect: value,
             programId: value != "" && value != undefined ? value.value : 0,
@@ -259,7 +259,7 @@ export default class AddInventory extends Component {
         var planningUnitId = value != "" && value != undefined ? value.value : 0;
         var programId = document.getElementById("programId").value;
         if (planningUnitId != 0) {
-            document.getElementById("adjustmentsTable").style.display = "block";
+            document.getElementById("adjustmentsTableDiv").style.display = "block";
             var db1;
             getDatabase();
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -313,7 +313,7 @@ export default class AddInventory extends Component {
                 }.bind(this)
             }.bind(this)
         } else {
-            document.getElementById("adjustmentsTable").style.display = "none";
+            document.getElementById("adjustmentsTableDiv").style.display = "none";
             this.setState({ loading: false });
         }
     }
@@ -331,7 +331,7 @@ export default class AddInventory extends Component {
             inventoryType: value != "" && value != undefined ? value.value : 0,
             inventoryDataType: value
         })
-        document.getElementById("adjustmentsTable").style.display = "none";
+        document.getElementById("adjustmentsTableDiv").style.display = "none";
         if (this.state.planningUnit != 0 && (value != "" && value != undefined ? value.value : 0) != 0) {
             this.formSubmit(this.state.planningUnit);
         }
@@ -348,15 +348,15 @@ export default class AddInventory extends Component {
                 <h5 className={this.state.color} id="div1">{i18n.t(this.state.message, { entityname }) || this.state.supplyPlanError}</h5>
                 <h5 className="red" id="div2">{this.state.inventoryDuplicateError || this.state.inventoryNoStockError || this.state.inventoryError}</h5>
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
-                    <CardBody className="pb-lg-1 pt-lg-2" >
+                    <CardBody className="pb-lg-5 pt-lg-2" >
                         <Formik
                             render={
                                 ({
                                 }) => (
                                         <Form name='simpleForm'>
-                                            <Col md="12 pl-0">
+                                            <div className="pl-0">
                                                 <div className="row">
-                                                    <FormGroup className="col-md-4">
+                                                    <FormGroup className="col-md-3">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                                         <div className="controls ">
                                                             <Select
@@ -369,7 +369,7 @@ export default class AddInventory extends Component {
                                                             />
                                                         </div>
                                                     </FormGroup>
-                                                    <FormGroup className="col-md-4 ">
+                                                    <FormGroup className="col-md-3 ">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.qatProduct')}</Label>
                                                         <div className="controls ">
                                                             <Select
@@ -382,7 +382,7 @@ export default class AddInventory extends Component {
                                                             />
                                                         </div>
                                                     </FormGroup>
-                                                    <FormGroup className="col-md-4 ">
+                                                    <FormGroup className="col-md-3 ">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.inventoryType')}</Label>
                                                         <div className="controls ">
                                                             <Select
@@ -398,16 +398,16 @@ export default class AddInventory extends Component {
                                                     <input type="hidden" id="planningUnitId" name="planningUnitId" value={this.state.planningUnitId} />
                                                     <input type="hidden" id="programId" name="programId" value={this.state.programId} />
                                                 </div>
-                                            </Col>
+                                            </div>
                                         </Form>
                                     )} />
 
-                        <Col xs="12" sm="12" className="p-0">
+                        <div className="shipmentconsumptionSearchMarginTop">
                             {this.state.showInventory == 1 && <InventoryInSupplyPlanComponent ref="inventoryChild" items={this.state} toggleLarge={this.toggleLarge} updateState={this.updateState} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} inventoryPage="inventoryDataEntry" />}
-                            <div className="table-responsive">
+                            <div className="table-responsive" id="adjustmentsTableDiv">
                                 <div id="adjustmentsTable" />
                             </div>
-                        </Col>
+                        </div>
                     </CardBody>
                     <CardFooter>
                         <FormGroup>

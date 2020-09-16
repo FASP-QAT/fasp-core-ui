@@ -625,14 +625,14 @@ export default class ProgramOnboarding extends Component {
 
                                 <div className="d-sm-down-none  progressbar">
                                     <ul>
-                                        <li className="progressbartext1">Realm</li>
-                                        <li className="progressbartext2">Country</li>
-                                        <li className="progressbartext3">Technical Area</li>
-                                        <li className="progressbartext4">Organization</li>
-                                        <li className="progressbartext5">Region</li>
-                                        <li className="progressbartext6">Program Data</li>
-                                        <li className="progressbartext7">Planning Units</li>
-                                    </ul>
+                                        <li className="progressbartext1">{i18n.t('static.program.realm')}</li>
+                                        <li className="progressbartext2">{i18n.t('static.region.country')}</li>
+                                        <li className="progressbartext3">{i18n.t('static.healtharea.healtharea')}</li>
+                                        <li className="progressbartext4">{i18n.t('static.organisation.organisationheader')}</li>
+                                        <li className="progressbartext5">{i18n.t('static.program.region')}</li>
+                                        <li className="progressbartext6">{i18n.t('static.pipeline.programData')}</li>
+                                        <li className="progressbartext7">{i18n.t('static.dashboard.product')}</li>
+                                    </ul> 
                                 </div>
 
                                 <br></br>

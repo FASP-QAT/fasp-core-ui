@@ -472,34 +472,48 @@ export default class RealmCountryPlanningUnitList extends Component {
 
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
-        RealmCountryService.getRealmCountryListAll().then(response => {
-            console.log(response.data)
+        // RealmCountryService.getRealmCountryListAll().then(response => {
+        //     console.log(response.data)
 
-            this.setState({
-                realmCountrys: response.data
-            },
-                () => { this.buildJexcel() })
-        })
-            .catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message, loading: false });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode, loading: false });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError', loading: false });
-                                break;
-                        }
-                    }
+        //     this.setState({
+        //         realmCountrys: response.data
+        //     },
+        //         () => { this.buildJexcel() })
+        // })
+        //     .catch(
+        //         error => {
+        //             if (error.message === "Network Error") {
+        //                 this.setState({ message: error.message, loading: false });
+        //             } else {
+        //                 switch (error.response ? error.response.status : "") {
+        //                     case 500:
+        //                     case 401:
+        //                     case 404:
+        //                     case 406:
+        //                     case 412:
+        //                         this.setState({ message: error.response.data.messageCode, loading: false });
+        //                         break;
+        //                     default:
+        //                         this.setState({ message: 'static.unkownError', loading: false });
+        //                         break;
+        //                 }
+        //             }
+        //         }
+        //     );
+
+        let realmId = AuthenticationService.getRealmId();
+        RealmCountryService.getRealmCountryrealmIdById(realmId)
+            .then(response => {
+                console.log("RealmCountryService---->", response.data)
+                if (response.status == 200) {
+                    this.setState({
+                        realmCountrys: response.data
+                    },
+                        () => { this.buildJexcel() })
+                } else {
+                    this.setState({ message: response.data.messageCode, loading: false })
                 }
-            );
+            })
 
     }
 
