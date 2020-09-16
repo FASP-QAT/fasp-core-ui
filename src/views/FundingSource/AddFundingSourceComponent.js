@@ -247,7 +247,7 @@ class AddFundingSourceComponent extends Component {
                               onBlur={handleBlur}
                               value={this.Capitalize(this.state.fundingSource.fundingSourceCode)}
                               required
-                              maxLength={6}
+                              maxLength={7}
                             />
                             <FormFeedback className="red">{errors.fundingSourceCode}</FormFeedback>
                           </FormGroup>
