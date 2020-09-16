@@ -156,7 +156,7 @@ export default class ShipmentDetails extends React.Component {
     getPlanningUnitList(value) {
         document.getElementById("planningUnitId").value = 0;
         document.getElementById("planningUnit").value = "";
-        document.getElementById("shipmentsDetailsTable").style.display = "none";
+        document.getElementById("shipmentsDetailsTableDiv").style.display = "none";
         this.setState({
             programSelect: value,
             programId: value != "" && value != undefined ? value != "" && value != undefined ? value.value : 0 : 0,
@@ -240,7 +240,7 @@ export default class ShipmentDetails extends React.Component {
         var planningUnitId = value != "" && value != undefined ? value.value : 0;
         var programId = document.getElementById("programId").value;
         if (planningUnitId != 0) {
-            document.getElementById("shipmentsDetailsTable").style.display = "block";
+            document.getElementById("shipmentsDetailsTableDiv").style.display = "block";
             var db1;
             getDatabase();
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -287,7 +287,7 @@ export default class ShipmentDetails extends React.Component {
                 }.bind(this)
             }.bind(this)
         } else {
-            document.getElementById("shipmentsDetailsTable").style.display = "none";
+            document.getElementById("shipmentsDetailsTableDiv").style.display = "none";
             this.setState({ loading: false });
         }
     }
@@ -382,7 +382,7 @@ export default class ShipmentDetails extends React.Component {
                          
                         <div className="shipmentconsumptionSearchMarginTop">
                             {this.state.showShipments == 1 && <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} updateState={this.updateState} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} hideFourthComponent={this.hideFourthComponent} hideFifthComponent={this.hideFifthComponent} shipmentPage="shipmentDataEntry" />}
-                            <div className="table-responsive">
+                            <div className="table-responsive" id="shipmentsDetailsTableDiv">
                                 <div id="shipmentsDetailsTable" />
                             </div>
                         </div>

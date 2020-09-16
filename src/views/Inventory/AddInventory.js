@@ -147,7 +147,7 @@ export default class AddInventory extends Component {
     getPlanningUnitList(value) {
         document.getElementById("planningUnitId").value = 0;
         document.getElementById("planningUnit").value = "";
-        document.getElementById("adjustmentsTable").style.display = "none";
+        document.getElementById("adjustmentsTableDiv").style.display = "none";
         this.setState({
             programSelect: value,
             programId: value != "" && value != undefined ? value.value : 0,
@@ -259,7 +259,7 @@ export default class AddInventory extends Component {
         var planningUnitId = value != "" && value != undefined ? value.value : 0;
         var programId = document.getElementById("programId").value;
         if (planningUnitId != 0) {
-            document.getElementById("adjustmentsTable").style.display = "block";
+            document.getElementById("adjustmentsTableDiv").style.display = "block";
             var db1;
             getDatabase();
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -313,7 +313,7 @@ export default class AddInventory extends Component {
                 }.bind(this)
             }.bind(this)
         } else {
-            document.getElementById("adjustmentsTable").style.display = "none";
+            document.getElementById("adjustmentsTableDiv").style.display = "none";
             this.setState({ loading: false });
         }
     }
@@ -331,7 +331,7 @@ export default class AddInventory extends Component {
             inventoryType: value != "" && value != undefined ? value.value : 0,
             inventoryDataType: value
         })
-        document.getElementById("adjustmentsTable").style.display = "none";
+        document.getElementById("adjustmentsTableDiv").style.display = "none";
         if (this.state.planningUnit != 0 && (value != "" && value != undefined ? value.value : 0) != 0) {
             this.formSubmit(this.state.planningUnit);
         }
@@ -404,7 +404,7 @@ export default class AddInventory extends Component {
 
                         <Col xs="12" sm="12" className="p-0">
                             {this.state.showInventory == 1 && <InventoryInSupplyPlanComponent ref="inventoryChild" items={this.state} toggleLarge={this.toggleLarge} updateState={this.updateState} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} inventoryPage="inventoryDataEntry" />}
-                            <div className="table-responsive">
+                            <div className="table-responsive" id="adjustmentsTableDiv">
                                 <div id="adjustmentsTable" />
                             </div>
                         </Col>
