@@ -379,13 +379,14 @@ export default class ShipmentDetails extends React.Component {
                                             </Col>
                                         </Form>
                                     )} />
-
+                         
                         <div className="shipmentconsumptionSearchMarginTop">
                             {this.state.showShipments == 1 && <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} updateState={this.updateState} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} hideFourthComponent={this.hideFourthComponent} hideFifthComponent={this.hideFifthComponent} shipmentPage="shipmentDataEntry" />}
                             <div className="table-responsive">
                                 <div id="shipmentsDetailsTable" />
                             </div>
                         </div>
+                       
                     </CardBody>
                     <CardFooter>
                         <FormGroup>
