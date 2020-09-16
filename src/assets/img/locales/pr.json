@@ -715,5 +715,8 @@
     "static.inventoryDetailHead.inventoryDetail": "Detalhe de Estoque",
     "static.shipmentDetailHead.shipmentDetail": "Detalhe da Remessa",
     "static.regionHead.region": "Região",
-    "static.budgetHead.budget": "Orçamentos"
+    "static.budgetHead.budget": "Orçamentos",
+    "static.report.consumptionReports": "Relatórios de Consumo",
+    "static.report.inventoryReports": "Relatórios de estoque",
+    "static.report.shipmentReports": "Relatórios de Remessa"
 }
