@@ -73,7 +73,8 @@ class ChangePasswordComponent extends Component {
         super(props);
         this.state = {
             message: '',
-            username: ""
+            username: "",
+            loading:false
         }
         this.cancelClicked = this.cancelClicked.bind(this);
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
