@@ -119,7 +119,7 @@ class SupplyPlanFormulas extends Component {
                 <ListGroupItem >
                     <ListGroupItemHeading className="formulasheading">Opening Balance</ListGroupItemHeading>
                     <ListGroupItemText className="formulastext">
-                    <img className="formula-img-mr img-fluid" src="../src/assets/img/Formulas/Opening-balance-formula.png"/>
+                    <img className="formula-img-mr img-fluid" src="../src/assets/img/Opening-balance-formula.png"/>
                     
                     <p><span className="formulastext-p">Example :</span><br></br>
                     
@@ -133,7 +133,7 @@ Opening Balance for current month = 10,653</p>
                   <ListGroupItem >
                     <ListGroupItemHeading className="formulasheading">Ending Balance</ListGroupItemHeading>
                     <ListGroupItemText className="formulastext">
-                    <img className="formula-img-mr img-fluid" src="../src/assets/img/Formulas/Ending balance-formula.png"/><br></br>
+                    <img className="formula-img-mr img-fluid" src="../src/assets/img/Ending balance-formula.png"/><br></br>
                     <p><span className="formulastext-p">Example :</span><br></br>
                     Opening balance = 10,653<br></br>
 Adjustments = -100<br></br>
@@ -150,7 +150,7 @@ Ending balance = 22,000</p><br></br>
                   <ListGroupItem >
                     <ListGroupItemHeading className="formulasheading">Average Monthly Consumption (AMC)</ListGroupItemHeading>
                     <ListGroupItemText className="formulastext">
-                    <img className="formula-img-mr img-fluid" src="../src/assets/img/Formulas/AMC-Formula.png"/><br></br>
+                    <img className="formula-img-mr img-fluid" src="../src/assets/img/AMC-Formula.png"/><br></br>
                     <p>* Consider only non zero values. Also future months include current month</p>
                     <p><span className="formulastext-p">Example :</span><br></br>
                     Months in past = 3(Based on program planning unit)<br></br>
@@ -174,7 +174,7 @@ AMC = 6,392</p>
                   <ListGroupItem >
                     <ListGroupItemHeading className="formulasheading">Min Stock</ListGroupItemHeading>
                     <ListGroupItemText className="formulastext">
-                    <img className="formula-img-mr img-fluid" src="../src/assets/img/Formulas/Min-Formula.png"/>
+                    <img className="formula-img-mr img-fluid" src="../src/assets/img/Min-Formula.png"/>
                     <p><span className="formulastext-p">Example :</span><br></br>
                     MIN MONTH OF STOCK = 4<br></br>
                     REORDER FREQUENCY = 3<br></br>
@@ -191,7 +191,7 @@ Min = 25,568</p>
                     <ListGroupItemHeading className="formulasheading">Max Stock</ListGroupItemHeading>
                     <ListGroupItemText className="formulastext">
                     {/* Max = AMC * MIN(MAX(MIN_MONTHS_OF_STOCK,3)+REORDER_FREQUENCY,18) */}
-                    <img className="formula-img-mr img-fluid" src="../src/assets/img/Formulas/Max-Formula.png"/>
+                    <img className="formula-img-mr img-fluid" src="../src/assets/img/Max-Formula.png"/>
                     <p><span className="formulastext-p">Example :</span><br></br>
                     MIN MONTH OF STOCK = 4<br></br>
                     REORDER FREQUENCY = 3<br></br>
@@ -211,7 +211,7 @@ Max = 44,744</p>
                     <ListGroupItemHeading className="formulasheading">Min Months Of Stock</ListGroupItemHeading>
                     <ListGroupItemText className="formulastext">
                     
-                     <img className="formula-img-mr img-fluid" src="../src/assets/img/Formulas/Min-Months-Of-Stock-formula.png"/>
+                     <img className="formula-img-mr img-fluid" src="../src/assets/img/Min-Months-Of-Stock-formula.png"/>
                      <p><span className="formulastext-p">Example :</span><br></br>
                      MIN MONTH OF STOCK = 4<br></br>
                       REORDER FREQUENCY = 3<br></br>
@@ -227,7 +227,7 @@ Max = 44,744</p>
                     <ListGroupItemHeading className="formulasheading">Max Months Of Stock</ListGroupItemHeading>
                     <ListGroupItemText className="formulastext">
                     
-                     <img className="formula-img-mr img-fluid" src="../src/assets/img/Formulas/Max-Months-Of-Stock-formula.png"/>
+                     <img className="formula-img-mr img-fluid" src="../src/assets/img/Max-Months-Of-Stock-formula.png"/>
                      <p><span className="formulastext-p">Example :</span><br></br>
                      MIN MONTH OF STOCK = 4<br></br>
                     REORDER FREQUENCY = 3<br></br>
@@ -245,7 +245,7 @@ Max = 7</p>
                     <ListGroupItemHeading className="formulasheading">When to suggest order</ListGroupItemHeading>
                     <ListGroupItemText className="formulastext">
                     
-                     <img className="formula-img-mr img-fluid" src="../src/assets/img/Formulas/suggest order-Formula.png"/>
+                     <img className="formula-img-mr img-fluid" src="../src/assets/img/suggest order-Formula.png"/>
                      <p><span className="formulastext-p">Example :</span><br></br>
 Inventory of current month = 24,890<br></br>
 Min = 25,568<br></br>
@@ -257,7 +257,7 @@ Suggest Order = True</p>
                     <ListGroupItemHeading className="formulasheading">Suggested Order Qty</ListGroupItemHeading>
                     <ListGroupItemText className="formulastext">
                     
-                     <img className="formula-img-mr img-fluid" src="../src/assets/img/Formulas/suggest order qty-Formula.png"/>
+                     <img className="formula-img-mr img-fluid" src="../src/assets/img/suggest order qty-Formula.png"/>
                      <p><span className="formulastext-p">Example :</span><br></br>
                      Max = 44,744<br></br>
                     Min = 25,568<br></br>
@@ -272,7 +272,7 @@ Suggested Order Qty = 19,176</p>
                     <ListGroupItemHeading className="formulasheading">Months Of Stock</ListGroupItemHeading>
                     <ListGroupItemText className="formulastext">
                     
-                     <img className="formula-img-mr img-fluid" src="../src/assets/img/Formulas/Month0fstock-Formula.png"/>
+                     <img className="formula-img-mr img-fluid" src="../src/assets/img/Month0fstock-Formula.png"/>
                      <p><span className="formulastext-p">Example :</span><br></br>
                      Ending Balance = 22,642<br></br>
 AMC = 6,392<br></br>
@@ -297,7 +297,7 @@ Months Of Stock = 3.54</p>
                     <ListGroupItemHeading className="formulasheading">Cost Of Inventory</ListGroupItemHeading>
                     <ListGroupItemText className="formulastext">
                     
-                     <img className="formula-img-mr img-fluid" src="../src/assets/img/Formulas/Cost-Of-Inventory.png"/>
+                     <img className="formula-img-mr img-fluid" src="../src/assets/img/Cost-Of-Inventory.png"/>
                     
                     </ListGroupItemText>
                   </ListGroupItem>
@@ -313,7 +313,7 @@ Months Of Stock = 3.54</p>
                     <ListGroupItemHeading className="formulasheading">Inventory Turns</ListGroupItemHeading>
                     <ListGroupItemText className="formulastext">
                     
-                     <img className="formula-img-mr img-fluid" src="../src/assets/img/Formulas/Inventory Turns.png"/>
+                     <img className="formula-img-mr img-fluid" src="../src/assets/img/Inventory Turns.png"/>
                     
                     </ListGroupItemText>
                   </ListGroupItem>
@@ -328,7 +328,7 @@ Months Of Stock = 3.54</p>
                       <ListGroupItem >
                     <ListGroupItemHeading className="formulasheading">Weighted Absolute Percentage Error (WAPE)</ListGroupItemHeading>
                     <ListGroupItemText className="formulastext">
-                    <img className="formula-img-mr img-fluid" src="../src/assets/img/Formulas/ForecastError-Formula.png"/><br></br>
+                    <img className="formula-img-mr img-fluid" src="../src/assets/img/ForecastError-Formula.png"/><br></br>
                     {/* <p>* N is number of months</p> */}
                    
                     </ListGroupItemText>
@@ -344,7 +344,7 @@ Months Of Stock = 3.54</p>
                       <ListGroupItem >
                     <ListGroupItemHeading className="formulasheading">Average Monthly Consumption (AMC)</ListGroupItemHeading>
                     <ListGroupItemText className="formulastext">
-                    <img className="formula-img-mr img-fluid" src="../src/assets/img/Formulas/AMC-Formula.png"/><br></br>
+                    <img className="formula-img-mr img-fluid" src="../src/assets/img/AMC-Formula.png"/><br></br>
                     <p>* Consider only non zero values. Also future months include current month</p>
                     <p><span className="formulastext-p">Example :</span><br></br>
                     Months in past = 3(Based on program planning unit)<br></br>
@@ -369,7 +369,7 @@ AMC = 6,392</p>
                     <ListGroupItemHeading className="formulasheading">Months Of Stock</ListGroupItemHeading>
                     <ListGroupItemText className="formulastext">
                     
-                     <img className="formula-img-mr img-fluid" src="../src/assets/img/Formulas/Month0fstock-Formula.png"/>
+                     <img className="formula-img-mr img-fluid" src="../src/assets/img/Month0fstock-Formula.png"/>
                      <p><span className="formulastext-p">Example :</span><br></br>
                      Ending Balance = 22,642<br></br>
 AMC = 6,392<br></br>
@@ -390,7 +390,7 @@ Months Of Stock = 3.54</p>
                       <ListGroupItem >
                     <ListGroupItemHeading className="formulasheading">Average Monthly Consumption (AMC)</ListGroupItemHeading>
                     <ListGroupItemText className="formulastext">
-                    <img className="formula-img-mr img-fluid" src="../src/assets/img/Formulas/AMC-Formula.png"/><br></br>
+                    <img className="formula-img-mr img-fluid" src="../src/assets/img/AMC-Formula.png"/><br></br>
                     <p>* Consider only non zero values. Also future months include current month</p>
                     <p><span className="formulastext-p">Example :</span><br></br>
                     Months in past = 3(Based on program planning unit)<br></br>
@@ -415,7 +415,7 @@ AMC = 6,392</p>
                     <ListGroupItemHeading className="formulasheading">Months Of Stock</ListGroupItemHeading>
                     <ListGroupItemText className="formulastext">
                     
-                     <img className="formula-img-mr img-fluid" src="../src/assets/img/Formulas/Month0fstock-Formula.png"/>
+                     <img className="formula-img-mr img-fluid" src="../src/assets/img/Month0fstock-Formula.png"/>
                      <p><span className="formulastext-p">Example :</span><br></br>
                      Ending Balance = 22,642<br></br>
 AMC = 6,392<br></br>
@@ -429,7 +429,7 @@ Months Of Stock = 3.54</p>
                     <ListGroupItemHeading className="formulasheading">Max Stock</ListGroupItemHeading>
                     <ListGroupItemText className="formulastext">
                     {/* Max = AMC * MIN(MAX(MIN_MONTHS_OF_STOCK,3)+REORDER_FREQUENCY,18) */}
-                    <img className="formula-img-mr img-fluid" src="../src/assets/img/Formulas/Max-Formula.png"/>
+                    <img className="formula-img-mr img-fluid" src="../src/assets/img/Max-Formula.png"/>
                     <p><span className="formulastext-p">Example :</span><br></br>
                     MIN MONTH OF STOCK = 4<br></br>
                     REORDER FREQUENCY = 3<br></br>
@@ -458,7 +458,7 @@ Max = 44,744</p>
                       <ListGroupItem >
                     <ListGroupItemHeading className="formulasheading">Average Monthly Consumption (AMC)</ListGroupItemHeading>
                     <ListGroupItemText className="formulastext">
-                    <img className="formula-img-mr img-fluid" src="../src/assets/img/Formulas/AMC-Formula.png"/><br></br>
+                    <img className="formula-img-mr img-fluid" src="../src/assets/img/AMC-Formula.png"/><br></br>
                     <p>* Consider only non zero values. Also future months include current month</p>
                     <p><span className="formulastext-p">Example :</span><br></br>
                     Months in past = 3(Based on program planning unit)<br></br>
@@ -483,7 +483,7 @@ AMC = 6,392</p>
                     <ListGroupItemHeading className="formulasheading">Months Of Stock</ListGroupItemHeading>
                     <ListGroupItemText className="formulastext">
                     
-                     <img className="formula-img-mr img-fluid" src="../src/assets/img/Formulas/Month0fstock-Formula.png"/>
+                     <img className="formula-img-mr img-fluid" src="../src/assets/img/Month0fstock-Formula.png"/>
                      <p><span className="formulastext-p">Example :</span><br></br>
                      Ending Balance = 22,642<br></br>
 AMC = 6,392<br></br>
@@ -496,7 +496,7 @@ Months Of Stock = 3.54</p>
                   <ListGroupItem >
                     <ListGroupItemHeading className="formulasheading">Ending Balance</ListGroupItemHeading>
                     <ListGroupItemText className="formulastext">
-                    <img className="formula-img-mr img-fluid" src="../src/assets/img/Formulas/Ending balance-formula.png"/><br></br>
+                    <img className="formula-img-mr img-fluid" src="../src/assets/img/Ending balance-formula.png"/><br></br>
                     <p><span className="formulastext-p">Example :</span><br></br>
                     Opening balance = 10,653<br></br>
 Adjustments = -100<br></br>
@@ -524,7 +524,7 @@ Ending balance = 22,000</p><br></br>
                     <ListGroupItemHeading className="formulasheading">Shipment Cost</ListGroupItemHeading>
                     <ListGroupItemText className="formulastext">
                     
-                     <img className="formula-img-mr img-fluid" src="../src/assets/img/Formulas/Shipment-cost-formula.png"/>
+                     <img className="formula-img-mr img-fluid" src="../src/assets/img/Shipment-cost-formula.png"/>
                     
                     </ListGroupItemText>
                   </ListGroupItem>
@@ -535,7 +535,7 @@ Ending balance = 22,000</p><br></br>
                 <ListGroupItem action>
                     <ListGroupItemHeading className="formulasheading">Opening Balance</ListGroupItemHeading>
                     <ListGroupItemText className="formulastext">
-                    <img className="formula-img-mr img-fluid" src="../src/assets/img/Formulas/Opening-balance-formula.png"/>
+                    <img className="formula-img-mr img-fluid" src="../src/assets/img/Opening-balance-formula.png"/>
                     
                     <p><span className="formulastext-p">Example :</span><br></br>
                     
@@ -549,7 +549,7 @@ Opening Balance for current month = 10,653</p>
                   <ListGroupItem action>
                     <ListGroupItemHeading className="formulasheading">Ending Balance</ListGroupItemHeading>
                     <ListGroupItemText className="formulastext">
-                    <img className="formula-img-mr img-fluid" src="../src/assets/img/Formulas/Ending balance-formula.png"/><br></br>
+                    <img className="formula-img-mr img-fluid" src="../src/assets/img/Ending balance-formula.png"/><br></br>
                     <p><span className="formulastext-p">Example :</span><br></br>
                     Opening balance = 10,653<br></br>
 Adjustments = -100<br></br>
@@ -566,7 +566,7 @@ Ending balance = 22,000</p><br></br>
                   <ListGroupItem action>
                     <ListGroupItemHeading className="formulasheading">Average Monthly Consumption (AMC)</ListGroupItemHeading>
                     <ListGroupItemText className="formulastext">
-                    <img className="formula-img-mr img-fluid" src="../src/assets/img/Formulas/AMC-Formula.png"/><br></br>
+                    <img className="formula-img-mr img-fluid" src="../src/assets/img/AMC-Formula.png"/><br></br>
                     <p>* Consider only non zero values. Also future months include current month</p>
                     <p><span className="formulastext-p">Example :</span><br></br>
                     Months in past = 3(Based on program planning unit)<br></br>
@@ -590,7 +590,7 @@ AMC = 6,392</p>
                   <ListGroupItem action>
                     <ListGroupItemHeading className="formulasheading">Min Stock</ListGroupItemHeading>
                     <ListGroupItemText className="formulastext">
-                    <img className="formula-img-mr img-fluid" src="../src/assets/img/Formulas/Min-Formula.png"/>
+                    <img className="formula-img-mr img-fluid" src="../src/assets/img/Min-Formula.png"/>
                     <p><span className="formulastext-p">Example :</span><br></br>
                     MIN MONTH OF STOCK = 4<br></br>
                     REORDER FREQUENCY = 3<br></br>
@@ -607,7 +607,7 @@ Min = 25,568</p>
                     <ListGroupItemHeading className="formulasheading">Max Stock</ListGroupItemHeading>
                     <ListGroupItemText className="formulastext">
                    
-                    <img className="formula-img-mr img-fluid" src="../src/assets/img/Formulas/Max-Formula.png"/>
+                    <img className="formula-img-mr img-fluid" src="../src/assets/img/Max-Formula.png"/>
                     <p><span className="formulastext-p">Example :</span><br></br>
                     MIN MONTH OF STOCK = 4<br></br>
                     REORDER FREQUENCY = 3<br></br>
@@ -627,7 +627,7 @@ Max = 44,744</p>
                     <ListGroupItemHeading className="formulasheading">Min Months Of Stock</ListGroupItemHeading>
                     <ListGroupItemText className="formulastext">
                     
-                     <img className="formula-img-mr img-fluid" src="../src/assets/img/Formulas/Min-Months-Of-Stock-formula.png"/>
+                     <img className="formula-img-mr img-fluid" src="../src/assets/img/Min-Months-Of-Stock-formula.png"/>
                      <p><span className="formulastext-p">Example :</span><br></br>
                      MIN MONTH OF STOCK = 4<br></br>
                       REORDER FREQUENCY = 3<br></br>
@@ -643,7 +643,7 @@ Max = 44,744</p>
                     <ListGroupItemHeading className="formulasheading">Max Months Of Stock</ListGroupItemHeading>
                     <ListGroupItemText className="formulastext">
                     
-                     <img className="formula-img-mr img-fluid" src="../src/assets/img/Formulas/Max-Months-Of-Stock-formula.png"/>
+                     <img className="formula-img-mr img-fluid" src="../src/assets/img/Max-Months-Of-Stock-formula.png"/>
                      <p><span className="formulastext-p">Example :</span><br></br>
                      MIN MONTH OF STOCK = 4<br></br>
                     REORDER FREQUENCY = 3<br></br>
@@ -661,7 +661,7 @@ Max = 7</p>
                     <ListGroupItemHeading className="formulasheading">When to suggest order</ListGroupItemHeading>
                     <ListGroupItemText className="formulastext">
                     
-                     <img className="formula-img-mr img-fluid" src="../src/assets/img/Formulas/suggest order-Formula.png"/>
+                     <img className="formula-img-mr img-fluid" src="../src/assets/img/suggest order-Formula.png"/>
                      <p><span className="formulastext-p">Example :</span><br></br>
 Inventory of current month = 24,890<br></br>
 Min = 25,568<br></br>
@@ -673,7 +673,7 @@ Suggest Order = True</p>
                     <ListGroupItemHeading className="formulasheading">Suggested Order Qty</ListGroupItemHeading>
                     <ListGroupItemText className="formulastext">
                     
-                     <img className="formula-img-mr img-fluid" src="../src/assets/img/Formulas/suggest order qty-Formula.png"/>
+                     <img className="formula-img-mr img-fluid" src="../src/assets/img/suggest order qty-Formula.png"/>
                      <p><span className="formulastext-p">Example :</span><br></br>
                      Max = 44,744<br></br>
                     Min = 25,568<br></br>
@@ -688,7 +688,7 @@ Suggested Order Qty = 19,176</p>
                     <ListGroupItemHeading className="formulasheading">Months Of Stock</ListGroupItemHeading>
                     <ListGroupItemText className="formulastext">
                     
-                     <img className="formula-img-mr img-fluid" src="../src/assets/img/Formulas/Month0fstock-Formula.png"/>
+                     <img className="formula-img-mr img-fluid" src="../src/assets/img/Month0fstock-Formula.png"/>
                      <p><span className="formulastext-p">Example :</span><br></br>
                      Ending Balance = 22,642<br></br>
 AMC = 6,392<br></br>
@@ -703,7 +703,7 @@ Months Of Stock = 3.54</p>
                     <ListGroupItemHeading className="formulasheading">Cost Of Inventory</ListGroupItemHeading>
                     <ListGroupItemText className="formulastext">
                     
-                     <img className="formula-img-mr img-fluid" src="../src/assets/img/Formulas/Cost-Of-Inventory.png"/>
+                     <img className="formula-img-mr img-fluid" src="../src/assets/img/Cost-Of-Inventory.png"/>
                     
                     </ListGroupItemText>
                   </ListGroupItem>
@@ -712,7 +712,7 @@ Months Of Stock = 3.54</p>
                     <ListGroupItemHeading className="formulasheading">Inventory Turns</ListGroupItemHeading>
                     <ListGroupItemText className="formulastext">
                     
-                     <img className="formula-img-mr img-fluid" src="../src/assets/img/Formulas/Inventory Turns.png"/>
+                     <img className="formula-img-mr img-fluid" src="../src/assets/img/Inventory Turns.png"/>
                     
                     </ListGroupItemText>
                   </ListGroupItem>
@@ -723,7 +723,7 @@ Months Of Stock = 3.54</p>
                 <ListGroupItem action>
                     <ListGroupItemHeading className="formulasheading">Weighted Absolute Percentage Error (WAPE)</ListGroupItemHeading>
                     <ListGroupItemText className="formulastext">
-                    <img className="formula-img-mr img-fluid" src="../src/assets/img/Formulas/WAPE-Formula.png"/><br></br>
+                    <img className="formula-img-mr img-fluid" src="../src/assets/img/WAPE-Formula.png"/><br></br>
                     <p>* N is number of months</p>
                    
                     </ListGroupItemText>
