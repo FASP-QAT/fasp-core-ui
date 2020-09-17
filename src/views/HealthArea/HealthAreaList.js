@@ -402,7 +402,7 @@ export default class HealthAreaListComponent extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [100,100,200],
+            colWidths: [100, 100, 200],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
@@ -412,7 +412,7 @@ export default class HealthAreaListComponent extends Component {
                 },
                 {
                     title: i18n.t('static.healtharea.realm'),
-                    type: 'text',
+                    type: (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') ? 'text' : 'hidden'),
                     readOnly: true
                 },
                 {
@@ -421,7 +421,7 @@ export default class HealthAreaListComponent extends Component {
                     readOnly: true
                 },
                 {
-                    title: i18n.t('static.healtharea.healthareacode'),
+                    title: i18n.t('static.technicalArea.technicalAreaDisplayName'),
                     type: 'text',
                     readOnly: true
                 },
@@ -506,7 +506,7 @@ export default class HealthAreaListComponent extends Component {
                     this.setState({
                         realms: response.data
                     },
-                        () => {  })
+                        () => { })
                 } else {
                     this.setState({
                         message: response.data.messageCode, loading: false
@@ -619,28 +619,30 @@ export default class HealthAreaListComponent extends Component {
 
                     </div>
                     <CardBody className="pb-lg-0">
-                        <Col md="3 pl-0">
-                            <FormGroup className="Selectdiv mt-md-2 mb-md-0">
-                                <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
-                                <div className="controls SelectGo">
-                                    <InputGroup>
-                                        <Input
-                                            type="select"
-                                            name="realmId"
-                                            id="realmId"
-                                            bsSize="sm"
-                                            onChange={this.filterData}
-                                        >
-                                            <option value="0">{i18n.t('static.common.all')}</option>
-                                            {realmList}
-                                        </Input>
-                                        {/* <InputGroupAddon addonType="append">
+                        {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') &&
+                            <Col md="3 pl-0">
+                                <FormGroup className="Selectdiv mt-md-2 mb-md-0">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
+                                    <div className="controls SelectGo">
+                                        <InputGroup>
+                                            <Input
+                                                type="select"
+                                                name="realmId"
+                                                id="realmId"
+                                                bsSize="sm"
+                                                onChange={this.filterData}
+                                            >
+                                                <option value="0">{i18n.t('static.common.all')}</option>
+                                                {realmList}
+                                            </Input>
+                                            {/* <InputGroupAddon addonType="append">
                                             <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
                                         </InputGroupAddon> */}
-                                    </InputGroup>
-                                </div>
-                            </FormGroup>
-                        </Col>
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
+                            </Col>
+                        }
                         <div id="tableDiv" className="jexcelremoveReadonlybackground">
                         </div>
 

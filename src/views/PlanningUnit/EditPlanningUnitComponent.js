@@ -240,7 +240,7 @@ export default class EditPlanningUnitComponent extends Component {
                                             <Form onSubmit={handleSubmit} noValidate name='planningUnitForm'>
                                                 <CardBody className="pb-0">
                                                     <FormGroup>
-                                                        <Label htmlFor="forecastingUnitId">{i18n.t('static.planningunit.forecastingunit')}</Label>
+                                                        <Label htmlFor="forecastingUnitId">{i18n.t('static.planningunit.forecastingunit')}<span class="red Reqasterisk">*</span></Label>
 
                                                         <Input
                                                             type="text"
@@ -253,7 +253,7 @@ export default class EditPlanningUnitComponent extends Component {
                                                         </Input>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="unitId">{i18n.t('static.unit.unit')}</Label>
+                                                        <Label htmlFor="unitId">{i18n.t('static.unit.unit')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             type="text"
                                                             name="unitId"

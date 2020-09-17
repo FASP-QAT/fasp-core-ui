@@ -14,7 +14,7 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import ProgramService from '../../api/ProgramService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import { jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunctionOnlyHideRow, inValid, inValidWithColor } from '../../CommonComponent/JExcelCommonFunctions.js'
+import { jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunctionOnlyHideRow, inValid, inValidWithColor, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
 import moment from "moment";
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
@@ -78,7 +78,6 @@ export default class syncPage extends Component {
   }
 
   hideSecondComponent() {
-    console.log("In second component")
     document.getElementById('div2').style.display = 'block';
     this.state.timeout = setTimeout(function () {
       document.getElementById('div2').style.display = 'none';
@@ -143,9 +142,9 @@ export default class syncPage extends Component {
         { title: i18n.t('static.consumption.daysofstockout'), type: 'numeric', mask: '#,##', width: 80 },
         { title: i18n.t('static.program.notes'), type: 'text', width: 200 },
         { type: 'dropdown', title: i18n.t('static.consumption.consumptionType'), source: [{ id: 1, name: i18n.t('static.consumption.actual') }, { id: 2, name: i18n.t('static.consumption.forcast') }], width: 100 },
-        { title: i18n.t('static.inventory.active'), type: 'checkbox', width: 50 },
+        { title: i18n.t('static.inventory.active'), type: 'checkbox', width: 70 },
         { type: 'hidden', title: i18n.t('static.supplyPlan.batchInfo'), width: 0 },
-        { type: 'text', title: i18n.t('static.supplyPlan.batchInfo'), width: 50 },
+        { type: 'text', title: i18n.t('static.supplyPlan.batchInfo'), width: 70 },
         { type: 'hidden', title: 'Old data' },
         { type: 'hidden', title: 'latest data' },
         { type: 'hidden', title: 'downloaded data' },
@@ -158,6 +157,7 @@ export default class syncPage extends Component {
       },
       pagination: false,
       search: false,
+      contextMenu: false,
       columnSorting: false,
       tableOverflow: false,
       wordWrap: true,
@@ -225,7 +225,7 @@ export default class syncPage extends Component {
       if ((valueToCompare == valueToCompareWith) || (valueToCompare == "" && valueToCompareWith == null) || (valueToCompare == null && valueToCompareWith == "")) {
         consumptionInstance.setStyle(col, "background-color", "transparent");
       } else {
-        consumptionInstance.setStyle(col, "background-color", "#86cd99");
+        consumptionInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
         consumptionInstance.setValueFromCoords(18, index, 2, true);
       }
     }
@@ -305,9 +305,9 @@ export default class syncPage extends Component {
         { title: i18n.t('static.supplyPlan.quantityQATProduct'), type: 'numeric', mask: '[-]#,##', width: 80, },
         { title: i18n.t('static.supplyPlan.quantityQATProduct'), type: 'numeric', mask: '#,##', width: 80, },
         { title: i18n.t('static.program.notes'), type: 'text', width: 200 },
-        { title: i18n.t('static.inventory.active'), type: 'checkbox', width: 50 },
+        { title: i18n.t('static.inventory.active'), type: 'checkbox', width: 70 },
         { type: 'hidden', title: i18n.t('static.supplyPlan.batchInfo'), width: 0 },
-        { type: 'text', title: i18n.t('static.supplyPlan.batchInfo'), width: 50 },
+        { type: 'text', title: i18n.t('static.supplyPlan.batchInfo'), width: 70 },
         { type: 'hidden', title: 'Old data' },
         { type: 'hidden', title: 'latest data' },
         { type: 'hidden', title: 'downloaded data' },
@@ -328,6 +328,7 @@ export default class syncPage extends Component {
       allowDeleteRow: false,
       tableOverflow: false,
       editable: false,
+      contextMenu: false,
       onload: this.loadedResolveConflictsInventory
     };
     var resolveConflictInventory = jexcel(document.getElementById("resolveConflictsInventoryTable"), options);
@@ -481,7 +482,7 @@ export default class syncPage extends Component {
         { type: 'hidden', title: i18n.t('static.supplyPlan.emergencyOrder'), width: 0 },
         { type: 'hidden', title: i18n.t('static.common.accountFlag'), width: 0 },
         { type: 'hidden', title: i18n.t('static.supplyPlan.batchInfo'), width: 0 },
-        { type: 'text', title: i18n.t('static.supplyPlan.batchInfo'), width: 50 },
+        { type: 'text', title: i18n.t('static.supplyPlan.batchInfo'), width: 70 },
         { type: 'hidden', title: 'Old data' },
         { type: 'hidden', title: 'latest data' },
         { type: 'hidden', title: 'downloaded data' },
@@ -502,6 +503,7 @@ export default class syncPage extends Component {
       allowDeleteRow: false,
       tableOverflow: false,
       editable: false,
+      contextMenu: false,
       onload: this.loadedResolveConflictsShipment
     };
     var resolveConflictShipment = jexcel(document.getElementById("resolveConflictsShipmentTable"), options);
@@ -1036,9 +1038,9 @@ export default class syncPage extends Component {
                                     data[3] = mergedConsumptionData[cd].region.id; //B                        
                                     data[4] = mergedConsumptionData[cd].dataSource.id; //C
                                     data[5] = mergedConsumptionData[cd].realmCountryPlanningUnit.id; //D
-                                    data[6] = parseInt(mergedConsumptionData[cd].consumptionRcpuQty); //E
+                                    data[6] = Math.round(mergedConsumptionData[cd].consumptionRcpuQty); //E
                                     data[7] = mergedConsumptionData[cd].multiplier; //F
-                                    data[8] = parseInt(mergedConsumptionData[cd].consumptionRcpuQty) * mergedConsumptionData[cd].multiplier; //I
+                                    data[8] = Math.round(mergedConsumptionData[cd].consumptionRcpuQty) * mergedConsumptionData[cd].multiplier; //I
                                     data[9] = mergedConsumptionData[cd].dayOfStockOut;
                                     if (mergedConsumptionData[cd].notes === null || ((mergedConsumptionData[cd].notes).trim() == "NULL")) {
                                       data[10] = "";
@@ -1052,19 +1054,19 @@ export default class syncPage extends Component {
                                     var oldDataList = oldProgramDataConsumption.filter(c => c.consumptionId == mergedConsumptionData[cd].consumptionId);
                                     var oldData = ""
                                     if (oldDataList.length > 0) {
-                                      oldData = [oldDataList[0].consumptionId, oldDataList[0].planningUnit.id, moment(oldDataList[0].consumptionDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), oldDataList[0].region.id, oldDataList[0].dataSource.id, oldDataList[0].realmCountryPlanningUnit.id, parseInt(oldDataList[0].consumptionRcpuQty), oldDataList[0].multiplier, parseInt(oldDataList[0].consumptionRcpuQty) * oldDataList[0].multiplier, oldDataList[0].dayOfStockOut, oldDataList[0].notes, (oldDataList[0].actualFlag.toString() == "true" ? 1 : 0), oldDataList[0].active, JSON.stringify(oldDataList[0].batchInfoList != "" ? ((oldDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.consumptionQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
+                                      oldData = [oldDataList[0].consumptionId, oldDataList[0].planningUnit.id, moment(oldDataList[0].consumptionDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), oldDataList[0].region.id, oldDataList[0].dataSource.id, oldDataList[0].realmCountryPlanningUnit.id, Math.round(oldDataList[0].consumptionRcpuQty), oldDataList[0].multiplier, Math.round(oldDataList[0].consumptionRcpuQty) * oldDataList[0].multiplier, oldDataList[0].dayOfStockOut, oldDataList[0].notes, (oldDataList[0].actualFlag.toString() == "true" ? 1 : 0), oldDataList[0].active, JSON.stringify(oldDataList[0].batchInfoList != "" ? ((oldDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.consumptionQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
                                     }
                                     data[15] = oldData;//Old data
                                     var latestDataList = latestProgramDataConsumption.filter(c => c.consumptionId == mergedConsumptionData[cd].consumptionId);
                                     var latestData = ""
                                     if (latestDataList.length > 0) {
-                                      latestData = [latestDataList[0].consumptionId, latestDataList[0].planningUnit.id, moment(latestDataList[0].consumptionDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), latestDataList[0].region.id, latestDataList[0].dataSource.id, latestDataList[0].realmCountryPlanningUnit.id, parseInt(latestDataList[0].consumptionRcpuQty), latestDataList[0].multiplier, parseInt(latestDataList[0].consumptionRcpuQty) * latestDataList[0].multiplier, latestDataList[0].dayOfStockOut, latestDataList[0].notes, (latestDataList[0].actualFlag.toString() == "true" ? 1 : 0), latestDataList[0].active, JSON.stringify(latestDataList[0].batchInfoList != "" ? ((latestDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.consumptionQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
+                                      latestData = [latestDataList[0].consumptionId, latestDataList[0].planningUnit.id, moment(latestDataList[0].consumptionDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), latestDataList[0].region.id, latestDataList[0].dataSource.id, latestDataList[0].realmCountryPlanningUnit.id, Math.round(latestDataList[0].consumptionRcpuQty), latestDataList[0].multiplier, Math.round(latestDataList[0].consumptionRcpuQty) * latestDataList[0].multiplier, latestDataList[0].dayOfStockOut, latestDataList[0].notes, (latestDataList[0].actualFlag.toString() == "true" ? 1 : 0), latestDataList[0].active, JSON.stringify(latestDataList[0].batchInfoList != "" ? ((latestDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.consumptionQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
                                     }
                                     data[16] = latestData;//Latest data
                                     var downloadedDataList = downloadedProgramDataConsumption.filter(c => c.consumptionId == mergedConsumptionData[cd].consumptionId);
                                     var downloadedData = "";
                                     if (downloadedDataList.length > 0) {
-                                      downloadedData = [downloadedDataList[0].consumptionId, downloadedDataList[0].planningUnit.id, moment(downloadedDataList[0].consumptionDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), downloadedDataList[0].region.id, downloadedDataList[0].dataSource.id, downloadedDataList[0].realmCountryPlanningUnit.id, parseInt(downloadedDataList[0].consumptionRcpuQty), downloadedDataList[0].multiplier, parseInt(downloadedDataList[0].consumptionRcpuQty) * downloadedDataList[0].multiplier, downloadedDataList[0].dayOfStockOut, downloadedDataList[0].notes, (downloadedDataList[0].actualFlag.toString() == "true" ? 1 : 0), downloadedDataList[0].active, JSON.stringify(downloadedDataList[0].batchInfoList != "" ? ((downloadedDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.consumptionQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
+                                      downloadedData = [downloadedDataList[0].consumptionId, downloadedDataList[0].planningUnit.id, moment(downloadedDataList[0].consumptionDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), downloadedDataList[0].region.id, downloadedDataList[0].dataSource.id, downloadedDataList[0].realmCountryPlanningUnit.id, Math.round(downloadedDataList[0].consumptionRcpuQty), downloadedDataList[0].multiplier,Math.round(downloadedDataList[0].consumptionRcpuQty) * downloadedDataList[0].multiplier, downloadedDataList[0].dayOfStockOut, downloadedDataList[0].notes, (downloadedDataList[0].actualFlag.toString() == "true" ? 1 : 0), downloadedDataList[0].active, JSON.stringify(downloadedDataList[0].batchInfoList != "" ? ((downloadedDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.consumptionQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
                                     }
                                     data[17] = downloadedData;//Downloaded data
                                     data[18] = 4;
@@ -1075,7 +1077,7 @@ export default class syncPage extends Component {
                                     data: mergedConsumptionJexcel,
                                     columnDrag: true,
                                     columns: [
-                                      { title: i18n.t('static.commit.consumptionId'), type: 'text', },
+                                      { title: i18n.t('static.commit.consumptionId'), type: 'text',width: 100 },
                                       { title: i18n.t('static.planningunit.planningunit'), type: 'dropdown', source: planningUnitList, width: 200 },
                                       { title: i18n.t('static.pipeline.consumptionDate'), type: 'text', width: 85 },
                                       { title: i18n.t('static.region.region'), type: 'dropdown', source: regionList, width: 100 },
@@ -1087,15 +1089,16 @@ export default class syncPage extends Component {
                                       { title: i18n.t('static.consumption.daysofstockout'), type: 'numeric', mask: '#,##', width: 80 },
                                       { title: i18n.t('static.program.notes'), type: 'text', width: 200 },
                                       { type: 'dropdown', title: i18n.t('static.consumption.consumptionType'), source: [{ id: 1, name: i18n.t('static.consumption.actual') }, { id: 2, name: i18n.t('static.consumption.forcast') }], width: 100 },
-                                      { title: i18n.t('static.inventory.active'), type: 'checkbox', width: 50 },
+                                      { title: i18n.t('static.inventory.active'), type: 'checkbox', width: 70 },
                                       { type: 'hidden', title: i18n.t('static.supplyPlan.batchInfo'), width: 0 },
-                                      { type: 'text', title: i18n.t('static.supplyPlan.batchInfo'), width: 50 },
+                                      { type: 'text', title: i18n.t('static.supplyPlan.batchInfo'), width: 70 },
                                       { type: 'hidden', title: 'Old data' },
                                       { type: 'hidden', title: 'latest data' },
                                       { type: 'hidden', title: 'downloaded data' },
                                       { type: 'hidden', title: 'result of compare' },
                                     ],
                                     pagination: 10,
+                                    paginationOptions:[10, 25, 50],
                                     search: true,
                                     columnSorting: true,
                                     tableOverflow: true,
@@ -1195,11 +1198,11 @@ export default class syncPage extends Component {
                                       data[4] = mergedInventoryData[cd].dataSource.id;
                                       data[5] = mergedInventoryData[cd].realmCountryPlanningUnit.id;
                                       data[6] = mergedInventoryData[cd].adjustmentQty != "" && mergedInventoryData[cd].adjustmentQty != null && mergedInventoryData[cd].adjustmentQty != 0 ? 2 : 1;
-                                      data[7] = parseInt(mergedInventoryData[cd].adjustmentQty);
-                                      data[8] = parseInt(mergedInventoryData[cd].actualQty);
+                                      data[7] = Math.round(mergedInventoryData[cd].adjustmentQty);
+                                      data[8] = Math.round(mergedInventoryData[cd].actualQty);
                                       data[9] = mergedInventoryData[cd].multiplier;
-                                      data[10] = parseInt(mergedInventoryData[cd].adjustmentQty) * mergedInventoryData[cd].multiplier;
-                                      data[11] = parseInt(mergedInventoryData[cd].actualQty) * mergedInventoryData[cd].multiplier;
+                                      data[10] = Math.round(mergedInventoryData[cd].adjustmentQty) * mergedInventoryData[cd].multiplier;
+                                      data[11] = Math.round(mergedInventoryData[cd].actualQty) * mergedInventoryData[cd].multiplier;
                                       data[12] = mergedInventoryData[cd].notes;
                                       data[13] = mergedInventoryData[cd].active;
                                       data[14] = JSON.stringify(mergedInventoryData[cd].batchInfoList != "" ? ((mergedInventoryData[cd].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty1": parseInt(a.adjustmentQty), "qty2": parseInt(a.actualQty) } })).sort(function (a, b) { return a.qty1 - b.qty1; }) : "");
@@ -1207,19 +1210,19 @@ export default class syncPage extends Component {
                                       var oldDataList = oldProgramDataInventory.filter(c => c.inventoryId == mergedInventoryData[cd].inventoryId && c.region != null && c.region.id != 0);
                                       var oldData = ""
                                       if (oldDataList.length > 0) {
-                                        oldData = [oldDataList[0].inventoryId, oldDataList[0].planningUnit.id, moment(oldDataList[0].inventoryDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), oldDataList[0].region.id, oldDataList[0].dataSource.id, oldDataList[0].realmCountryPlanningUnit.id, oldDataList[0].adjustmentQty != "" && oldDataList[0].adjustmentQty != null && oldDataList[0].adjustmentQty != 0 ? 2 : 1, parseInt(oldDataList[0].adjustmentQty), parseInt(oldDataList[0].actualQty), oldDataList[0].multiplier, parseInt(oldDataList[0].adjustmentQty) * oldDataList[0].multiplier, parseInt(oldDataList[0].actualQty) * oldDataList[0].multiplier, oldDataList[0].notes, oldDataList[0].active, JSON.stringify(oldDataList[0].batchInfoList != "" ? ((oldDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty1": parseInt(a.adjustmentQty), "qty2": parseInt(a.actualQty) } })).sort(function (a, b) { return a.qty1 - b.qty1; }) : ""), "", "", "", "", 4];
+                                        oldData = [oldDataList[0].inventoryId, oldDataList[0].planningUnit.id, moment(oldDataList[0].inventoryDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), oldDataList[0].region.id, oldDataList[0].dataSource.id, oldDataList[0].realmCountryPlanningUnit.id, oldDataList[0].adjustmentQty != "" && oldDataList[0].adjustmentQty != null && oldDataList[0].adjustmentQty != 0 ? 2 : 1, Math.round(oldDataList[0].adjustmentQty), Math.round(oldDataList[0].actualQty), oldDataList[0].multiplier, Math.round(oldDataList[0].adjustmentQty) * oldDataList[0].multiplier, Math.round(oldDataList[0].actualQty) * oldDataList[0].multiplier, oldDataList[0].notes, oldDataList[0].active, JSON.stringify(oldDataList[0].batchInfoList != "" ? ((oldDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty1": parseInt(a.adjustmentQty), "qty2": parseInt(a.actualQty) } })).sort(function (a, b) { return a.qty1 - b.qty1; }) : ""), "", "", "", "", 4];
                                       }
                                       data[16] = oldData;//Old data
                                       var latestDataList = latestProgramDataInventory.filter(c => c.inventoryId == mergedInventoryData[cd].inventoryId && c.region != null && c.region.id != 0);
                                       var latestData = ""
                                       if (latestDataList.length > 0) {
-                                        latestData = [latestDataList[0].inventoryId, latestDataList[0].planningUnit.id, moment(latestDataList[0].inventoryDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), latestDataList[0].region.id, latestDataList[0].dataSource.id, latestDataList[0].realmCountryPlanningUnit.id, latestDataList[0].adjustmentQty != "" && latestDataList[0].adjustmentQty != null && latestDataList[0].adjustmentQty != 0 ? 2 : 1, parseInt(latestDataList[0].adjustmentQty), parseInt(latestDataList[0].actualQty), latestDataList[0].multiplier, parseInt(latestDataList[0].adjustmentQty) * latestDataList[0].multiplier, parseInt(latestDataList[0].actualQty) * latestDataList[0].multiplier, latestDataList[0].notes, latestDataList[0].active, JSON.stringify(latestDataList[0].batchInfoList != "" ? ((latestDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty1": parseInt(a.adjustmentQty), "qty2": parseInt(a.actualQty) } })).sort(function (a, b) { return a.qty1 - b.qty1; }) : ""), "", "", "", "", 4];
+                                        latestData = [latestDataList[0].inventoryId, latestDataList[0].planningUnit.id, moment(latestDataList[0].inventoryDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), latestDataList[0].region.id, latestDataList[0].dataSource.id, latestDataList[0].realmCountryPlanningUnit.id, latestDataList[0].adjustmentQty != "" && latestDataList[0].adjustmentQty != null && latestDataList[0].adjustmentQty != 0 ? 2 : 1, Math.round(latestDataList[0].adjustmentQty), Math.round(latestDataList[0].actualQty), latestDataList[0].multiplier, Math.round(latestDataList[0].adjustmentQty) * latestDataList[0].multiplier, Math.round(latestDataList[0].actualQty) * latestDataList[0].multiplier, latestDataList[0].notes, latestDataList[0].active, JSON.stringify(latestDataList[0].batchInfoList != "" ? ((latestDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty1": parseInt(a.adjustmentQty), "qty2": parseInt(a.actualQty) } })).sort(function (a, b) { return a.qty1 - b.qty1; }) : ""), "", "", "", "", 4];
                                       }
                                       data[17] = latestData;//Latest data
                                       var downloadedDataList = downloadedProgramDataInventory.filter(c => c.inventoryId == mergedInventoryData[cd].inventoryId && c.region != null && c.region.id != 0);
                                       var downloadedData = "";
                                       if (downloadedDataList.length > 0) {
-                                        downloadedData = [downloadedDataList[0].inventoryId, downloadedDataList[0].planningUnit.id, moment(downloadedDataList[0].inventoryDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), downloadedDataList[0].region.id, downloadedDataList[0].dataSource.id, downloadedDataList[0].realmCountryPlanningUnit.id, downloadedDataList[0].adjustmentQty != "" && downloadedDataList[0].adjustmentQty != null && downloadedDataList[0].adjustmentQty != 0 ? 2 : 1, parseInt(downloadedDataList[0].adjustmentQty), parseInt(downloadedDataList[0].actualQty), downloadedDataList[0].multiplier, parseInt(downloadedDataList[0].adjustmentQty) * downloadedDataList[0].multiplier, parseInt(downloadedDataList[0].actualQty) * downloadedDataList[0].multiplier, downloadedDataList[0].notes, downloadedDataList[0].active, JSON.stringify(downloadedDataList[0].batchInfoList != "" ? ((downloadedDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty1": parseInt(a.adjustmentQty), "qty2": parseInt(a.actualQty) } })).sort(function (a, b) { return a.qty1 - b.qty1; }) : ""), "", "", "", "", 4];
+                                        downloadedData = [downloadedDataList[0].inventoryId, downloadedDataList[0].planningUnit.id, moment(downloadedDataList[0].inventoryDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), downloadedDataList[0].region.id, downloadedDataList[0].dataSource.id, downloadedDataList[0].realmCountryPlanningUnit.id, downloadedDataList[0].adjustmentQty != "" && downloadedDataList[0].adjustmentQty != null && downloadedDataList[0].adjustmentQty != 0 ? 2 : 1, Math.round(downloadedDataList[0].adjustmentQty), Math.round(downloadedDataList[0].actualQty), downloadedDataList[0].multiplier, Math.round(downloadedDataList[0].adjustmentQty) * downloadedDataList[0].multiplier, Math.round(downloadedDataList[0].actualQty) * downloadedDataList[0].multiplier, downloadedDataList[0].notes, downloadedDataList[0].active, JSON.stringify(downloadedDataList[0].batchInfoList != "" ? ((downloadedDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty1": parseInt(a.adjustmentQty), "qty2": parseInt(a.actualQty) } })).sort(function (a, b) { return a.qty1 - b.qty1; }) : ""), "", "", "", "", 4];
                                       }
                                       data[18] = downloadedData;//Downloaded data
                                       data[19] = 4;
@@ -1231,7 +1234,7 @@ export default class syncPage extends Component {
                                     data: mergedInventoryJexcel,
                                     columnDrag: true,
                                     columns: [
-                                      { title: i18n.t('static.commit.inventoryId'), type: 'text', },
+                                      { title: i18n.t('static.commit.inventoryId'), type: 'text',width: 100 },
                                       { title: i18n.t('static.planningunit.planningunit'), type: 'dropdown', source: planningUnitList, width: 200 },
                                       { title: i18n.t('static.inventory.inventoryDate'), type: 'text', width: 85 },
                                       { title: i18n.t('static.region.region'), type: 'dropdown', source: regionList, width: 100 },
@@ -1244,15 +1247,16 @@ export default class syncPage extends Component {
                                       { title: i18n.t('static.supplyPlan.quantityQATProduct'), type: 'numeric', mask: '[-]#,##', width: 80, },
                                       { title: i18n.t('static.supplyPlan.quantityQATProduct'), type: 'numeric', mask: '#,##', width: 80, },
                                       { title: i18n.t('static.program.notes'), type: 'text', width: 200 },
-                                      { title: i18n.t('static.inventory.active'), type: 'checkbox', width: 50 },
+                                      { title: i18n.t('static.inventory.active'), type: 'checkbox', width: 70 },
                                       { type: 'hidden', title: i18n.t('static.supplyPlan.batchInfo'), width: 0 },
-                                      { type: 'text', title: i18n.t('static.supplyPlan.batchInfo'), width: 50 },
+                                      { type: 'text', title: i18n.t('static.supplyPlan.batchInfo'), width: 70 },
                                       { type: 'hidden', title: 'Old data' },
                                       { type: 'hidden', title: 'latest data' },
                                       { type: 'hidden', title: 'downloaded data' },
                                       { type: 'hidden', title: 'result of compare' },
                                     ],
                                     pagination: 10,
+                                    paginationOptions:[10, 25, 50],
                                     search: true,
                                     columnSorting: true,
                                     tableOverflow: true,
@@ -1379,7 +1383,7 @@ export default class syncPage extends Component {
                                     data: mergedShipmentJexcel,
                                     columnDrag: true,
                                     columns: [
-                                      { title: i18n.t('static.commit.shipmentId'), type: 'text', },
+                                      { title: i18n.t('static.commit.shipmentId'), type: 'text',width: 100  },
                                       { title: i18n.t('static.planningunit.planningunit'), type: 'dropdown', source: planningUnitList, width: 200 },
                                       { type: 'dropdown', title: i18n.t('static.supplyPlan.shipmentStatus'), source: shipmentStatusList, width: 100 },
                                       { type: 'text', title: i18n.t('static.supplyPlan.expectedDeliveryDate'), width: 100, },
@@ -1406,13 +1410,14 @@ export default class syncPage extends Component {
                                       { type: 'hidden', title: i18n.t('static.supplyPlan.emergencyOrder'), width: 0 },
                                       { type: 'hidden', title: i18n.t('static.common.accountFlag'), width: 0 },
                                       { type: 'hidden', title: i18n.t('static.supplyPlan.batchInfo'), width: 0 },
-                                      { type: 'text', title: i18n.t('static.supplyPlan.batchInfo'), width: 50 },
+                                      { type: 'text', title: i18n.t('static.supplyPlan.batchInfo'), width: 70 },
                                       { type: 'hidden', title: 'Old data' },
                                       { type: 'hidden', title: 'latest data' },
                                       { type: 'hidden', title: 'downloaded data' },
                                       { type: 'hidden', title: 'result of compare' },
                                     ],
                                     pagination: 10,
+                                    paginationOptions:[10, 25, 50],
                                     search: true,
                                     columnSorting: true,
                                     tableOverflow: true,
@@ -1465,7 +1470,6 @@ export default class syncPage extends Component {
                                   var downloadedProgramDataProblemList = downloadedProgramData.problemReportList;
                                   var mergedProblemListData = [];
                                   var existingProblemReportId = [];
-                                  console.log("oldProgramDataProblemList", oldProgramDataProblemList);
                                   for (var c = 0; c < oldProgramDataProblemList.length; c++) {
                                     if (oldProgramDataProblemList[c].problemReportId != 0) {
                                       mergedProblemListData.push(oldProgramDataProblemList[c]);
@@ -1494,7 +1498,6 @@ export default class syncPage extends Component {
                                             && f.realmProblem.problem.problemId == oldProgramDataProblemList[c].realmProblem.problem.problemId);
                                       }
                                       // var index = -1;
-                                      console.log("Index", index);
                                       if (index == -1) {
                                         mergedProblemListData.push(oldProgramDataProblemList[c]);
                                       } else {
@@ -1504,21 +1507,18 @@ export default class syncPage extends Component {
                                       }
                                     }
                                   }
-                                  console.log("Merged problem list data", mergedProblemListData);
                                   // Getting other entries of latest problemList data
                                   var latestOtherProblemListEntries = latestProgramDataProblemList.filter(c => !(existingProblemReportId.includes(c.problemReportId)));
-                                  console.log("Latset other problem data ", latestOtherProblemListEntries);
                                   mergedProblemListData = mergedProblemListData.concat(latestOtherProblemListEntries);
-                                  console.log("Merged problem list data", mergedProblemListData);
 
                                   var data = [];
                                   var mergedProblemListJexcel = [];
                                   for (var cd = 0; cd < mergedProblemListData.length; cd++) {
                                     data = []
                                     data[0] = mergedProblemListData[cd].problemReportId
-                                    data[1] = mergedProblemListData[cd].problemActionIndex
-                                    data[2] = mergedProblemListData[cd].program.programCode
-                                    data[3] = mergedProblemListData[cd].versionId
+                                    data[1] = 1;
+                                    data[2] = mergedProblemListData[cd].program.code
+                                    data[3] = 1;
                                     data[4] = (mergedProblemListData[cd].region.label != null) ? (getLabelText(mergedProblemListData[cd].region.label, this.state.lang)) : ''
                                     data[5] = getLabelText(mergedProblemListData[cd].planningUnit.label, this.state.lang)
                                     data[6] = (mergedProblemListData[cd].dt != null) ? (moment(mergedProblemListData[cd].dt).format('MMM-YY')) : ''
@@ -1535,31 +1535,30 @@ export default class syncPage extends Component {
                                     var oldDataList = oldProgramDataProblemList.filter(c => c.problemReportId == mergedProblemListData[cd].problemReportId);
                                     var oldData = ""
                                     if (oldDataList.length > 0) {
-                                      oldData = [oldDataList[0].problemReportId, oldDataList[0].problemActionIndex, oldDataList[0].program.programCode, oldDataList[0].versionId, (oldDataList[0].region.label != null) ? (getLabelText(oldDataList[0].region.label, this.state.lang)) : '', getLabelText(oldDataList[0].planningUnit.label, this.state.lang), (oldDataList[0].dt != null) ? (moment(oldDataList[0].dt).format('MMM-YY')) : '', moment(oldDataList[0].createdDate).format('MMM-YY'), getProblemDesc(oldDataList[0], this.state.lang), getSuggestion(oldDataList[0], this.state.lang), getLabelText(oldDataList[0].problemStatus.label, this.state.lang), this.getNote(oldDataList[0], this.state.lang), oldDataList[0].problemStatus.id, oldDataList[0].planningUnit.id, oldDataList[0].realmProblem.problem.problemId, oldDataList[0].realmProblem.problem.actionUrl, oldDataList[0].realmProblem.criticality.id, "", "", "", 4];
+                                      oldData = [oldDataList[0].problemReportId, 1, oldDataList[0].program.code, 1, (oldDataList[0].region.label != null) ? (getLabelText(oldDataList[0].region.label, this.state.lang)) : '', getLabelText(oldDataList[0].planningUnit.label, this.state.lang), (oldDataList[0].dt != null) ? (moment(oldDataList[0].dt).format('MMM-YY')) : '', moment(oldDataList[0].createdDate).format('MMM-YY'), getProblemDesc(oldDataList[0], this.state.lang), getSuggestion(oldDataList[0], this.state.lang), getLabelText(oldDataList[0].problemStatus.label, this.state.lang), this.getNote(oldDataList[0], this.state.lang), oldDataList[0].problemStatus.id, oldDataList[0].planningUnit.id, oldDataList[0].realmProblem.problem.problemId, oldDataList[0].realmProblem.problem.actionUrl, oldDataList[0].realmProblem.criticality.id, "", "", "", 4];
                                     }
                                     data[17] = oldData;//Old data
-                                    console.log("mergedProblemListData[cd].problemReportId", mergedProblemListData[cd].problemReportId);
                                     var latestDataList = latestProgramDataProblemList.filter(c => mergedProblemListData[cd].problemReportId != 0 && c.problemReportId == mergedProblemListData[cd].problemReportId);
                                     console.log("Latest data list", latestDataList);
                                     var latestData = ""
                                     if (latestDataList.length > 0) {
-                                      latestData = [latestDataList[0].problemReportId, latestDataList[0].problemActionIndex, latestDataList[0].program.programCode, latestDataList[0].versionId, (latestDataList[0].region.label != null) ? (getLabelText(latestDataList[0].region.label, this.state.lang)) : '', getLabelText(latestDataList[0].planningUnit.label, this.state.lang), (latestDataList[0].dt != null) ? (moment(latestDataList[0].dt).format('MMM-YY')) : '', moment(latestDataList[0].createdDate).format('MMM-YY'), getProblemDesc(latestDataList[0], this.state.lang), getSuggestion(latestDataList[0], this.state.lang), getLabelText(latestDataList[0].problemStatus.label, this.state.lang), this.getNote(latestDataList[0], this.state.lang), latestDataList[0].problemStatus.id, latestDataList[0].planningUnit.id, latestDataList[0].realmProblem.problem.problemId, latestDataList[0].realmProblem.problem.actionUrl, latestDataList[0].realmProblem.criticality.id, "", "", "", 4];
+                                      latestData = [latestDataList[0].problemReportId, 1, latestDataList[0].program.code, 1, (latestDataList[0].region.label != null) ? (getLabelText(latestDataList[0].region.label, this.state.lang)) : '', getLabelText(latestDataList[0].planningUnit.label, this.state.lang), (latestDataList[0].dt != null) ? (moment(latestDataList[0].dt).format('MMM-YY')) : '', moment(latestDataList[0].createdDate).format('MMM-YY'), getProblemDesc(latestDataList[0], this.state.lang), getSuggestion(latestDataList[0], this.state.lang), getLabelText(latestDataList[0].problemStatus.label, this.state.lang), this.getNote(latestDataList[0], this.state.lang), latestDataList[0].problemStatus.id, latestDataList[0].planningUnit.id, latestDataList[0].realmProblem.problem.problemId, latestDataList[0].realmProblem.problem.actionUrl, latestDataList[0].realmProblem.criticality.id, "", "", "", 4];
                                     }
                                     data[18] = latestData;//Latest data
                                     var downloadedDataList = downloadedProgramDataProblemList.filter(c => mergedProblemListData[cd].problemListId != 0 && c.problemListId == mergedProblemListData[cd].problemListId);
                                     var downloadedData = "";
                                     if (downloadedDataList.length > 0) {
-                                      downloadedData = [downloadedDataList[0].problemReportId, downloadedDataList[0].problemActionIndex, downloadedDataList[0].program.programCode, downloadedDataList[0].versionId, (downloadedDataList[0].region.label != null) ? (getLabelText(downloadedDataList[0].region.label, this.state.lang)) : '', getLabelText(downloadedDataList[0].planningUnit.label, this.state.lang), (downloadedDataList[0].dt != null) ? (moment(downloadedDataList[0].dt).format('MMM-YY')) : '', moment(downloadedDataList[0].createdDate).format('MMM-YY'), getProblemDesc(downloadedDataList[0], this.state.lang), getSuggestion(downloadedDataList[0], this.state.lang), getLabelText(downloadedDataList[0].problemStatus.label, this.state.lang), this.getNote(downloadedDataList[0], this.state.lang), downloadedDataList[0].problemStatus.id, downloadedDataList[0].planningUnit.id, downloadedDataList[0].realmProblem.problem.problemId, downloadedDataList[0].realmProblem.problem.actionUrl, downloadedDataList[0].realmProblem.criticality.id, "", "", "", 4];
+                                      downloadedData = [downloadedDataList[0].problemReportId, 1, downloadedDataList[0].program.code, 1, (downloadedDataList[0].region.label != null) ? (getLabelText(downloadedDataList[0].region.label, this.state.lang)) : '', getLabelText(downloadedDataList[0].planningUnit.label, this.state.lang), (downloadedDataList[0].dt != null) ? (moment(downloadedDataList[0].dt).format('MMM-YY')) : '', moment(downloadedDataList[0].createdDate).format('MMM-YY'), getProblemDesc(downloadedDataList[0], this.state.lang), getSuggestion(downloadedDataList[0], this.state.lang), getLabelText(downloadedDataList[0].problemStatus.label, this.state.lang), this.getNote(downloadedDataList[0], this.state.lang), downloadedDataList[0].problemStatus.id, downloadedDataList[0].planningUnit.id, downloadedDataList[0].realmProblem.problem.problemId, downloadedDataList[0].realmProblem.problem.actionUrl, downloadedDataList[0].realmProblem.criticality.id, "", "", "", 4];
                                     }
                                     data[19] = downloadedData;//Downloaded data
                                     data[20] = 4;
                                     mergedProblemListJexcel.push(data);
                                   }
-
+                                  console.log("MergedProblem list jexcel", mergedProblemListJexcel);
                                   var options = {
                                     data: mergedProblemListJexcel,
                                     columnDrag: true,
-                                    colWidths: [10, 10, 50, 50, 10, 10, 10, 50, 200, 200, 50, 50],
+                                    colWidths: [100, 10, 50, 50, 10, 10, 10, 50, 200, 200, 70, 70],
                                     colHeaderClasses: ["Reqasterisk"],
                                     columns: [
                                       {
@@ -1576,7 +1575,7 @@ export default class syncPage extends Component {
                                       },
                                       {
                                         title: i18n.t('static.program.versionId'),
-                                        type: 'text',
+                                        type: 'hidden',
                                       },
                                       {
                                         title: i18n.t('static.region.region'),
@@ -1636,6 +1635,7 @@ export default class syncPage extends Component {
                                       { type: 'hidden', title: 'result of compare' },
                                     ],
                                     pagination: 10,
+                                    paginationOptions:[10, 25, 50],
                                     search: true,
                                     columnSorting: true,
                                     tableOverflow: true,
@@ -1729,7 +1729,7 @@ export default class syncPage extends Component {
   }
 
   loadedFunctionForMerge = function (instance) {
-    jExcelLoadedFunctionWithoutPagination(instance, 0);
+    jExcelLoadedFunction(instance, 0);
     var elInstance = instance.jexcel;
     var jsonData = elInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R']
@@ -1770,13 +1770,13 @@ export default class syncPage extends Component {
               var col = (colArr[j]).concat(parseInt(c) + 1);
               elInstance.setValueFromCoords(j, c, latestData[j], true);
               elInstance.setStyle(col, "background-color", "transparent");
-              elInstance.setStyle(col, "background-color", "#e5edf5");
+              elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
               elInstance.setValueFromCoords(18, c, 3, true);
               (jsonData[c])[18] = 3;
             } else if (latestData[j] == downloadedData[j]) {
               var col = (colArr[j]).concat(parseInt(c) + 1);
               elInstance.setStyle(col, "background-color", "transparent");
-              elInstance.setStyle(col, "background-color", "#86cd99");
+              elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
               elInstance.setValueFromCoords(18, c, 2, true);
               (jsonData[c])[18] = 2;
             } else {
@@ -1807,12 +1807,12 @@ export default class syncPage extends Component {
               var col = (colArr[14]).concat(parseInt(c) + 1);
               elInstance.setValueFromCoords(13, c, latestData[j], true);
               elInstance.setStyle(col, "background-color", "transparent");
-              elInstance.setStyle(col, "background-color", "#e5edf5");
+              elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
               elInstance.setValueFromCoords(18, c, 3, true);
             } else if (latestData[13] == downloadedData[13]) {
               var col = (colArr[14]).concat(parseInt(c) + 1);
               elInstance.setStyle(col, "background-color", "transparent");
-              elInstance.setStyle(col, "background-color", "#86cd99");
+              elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
               elInstance.setValueFromCoords(18, c, 2, true);
             } else {
               this.setState({
@@ -1834,7 +1834,7 @@ export default class syncPage extends Component {
 
 
   loadedFunctionForMergeInventory = function (instance) {
-    jExcelLoadedFunctionWithoutPagination(instance, 1);
+    jExcelLoadedFunction(instance, 1);
     var elInstance = instance.jexcel;
     var jsonData = elInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S']
@@ -1938,7 +1938,7 @@ export default class syncPage extends Component {
   }
 
   loadedFunctionForMergeShipment = function (instance) {
-    jExcelLoadedFunctionWithoutPagination(instance, 2);
+    jExcelLoadedFunction(instance, 2);
     var elInstance = instance.jexcel;
     var jsonData = elInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF']
@@ -2048,12 +2048,11 @@ export default class syncPage extends Component {
   }
 
   loadedFunctionForMergeProblemList = function (instance) {
-    jExcelLoadedFunctionWithoutPagination(instance, 3);
+    jExcelLoadedFunction(instance, 3);
     var elInstance = instance.jexcel;
     var jsonData = elInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T']
     for (var c = 0; c < jsonData.length; c++) {
-      console.log("jsonData[c])[18]", jsonData[c][18])
       if ((jsonData[c])[18] == "") {
         for (var i = 0; i < colArr.length; i++) {
           var col = (colArr[i]).concat(parseInt(c) + 1);
@@ -2090,13 +2089,15 @@ export default class syncPage extends Component {
               var col = (colArr[j]).concat(parseInt(c) + 1);
               elInstance.setValueFromCoords(j, c, latestData[j], true);
               elInstance.setStyle(col, "background-color", "transparent");
-              elInstance.setStyle(col, "background-color", "#e5edf5");
+              elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
               elInstance.setValueFromCoords(20, c, 3, true);
               (jsonData[c])[20] = 3;
             } else if (latestData[j] == downloadedData[j]) {
+              console.log("latestData[j]", latestData[j]);
+              console.log("downloaded", downloadedData[j])
               var col = (colArr[j]).concat(parseInt(c) + 1);
               elInstance.setStyle(col, "background-color", "transparent");
-              elInstance.setStyle(col, "background-color", "#86cd99");
+              elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
               elInstance.setValueFromCoords(20, c, 2, true);
               (jsonData[c])[20] = 2;
             } else {
@@ -2197,7 +2198,7 @@ export default class syncPage extends Component {
 
                     <div className="d-md-flex">
                       <FormGroup className="col-md-4">
-                        <Label htmlFor="appendedInputButton">{this.state.noFundsBudgetError}{i18n.t('static.program.program')} </Label>
+                        <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')} </Label>
                         <div className="controls ">
                           <Select
                             name="programSelect"

@@ -36,7 +36,7 @@ const initialValues = {
 const validationSchema = function (values, t) {
     return Yup.object().shape({
         budget: Yup.string()
-            .matches(BUDGET_NAME_REGEX, i18n.t('static.message.budgetNameRegex'))
+            // .matches(BUDGET_NAME_REGEX, i18n.t('static.message.budgetNameRegex'))
             .required(i18n.t('static.budget.budgetamountdesc')),
         programId: Yup.string()
             .required(i18n.t('static.budget.programtext')),
@@ -53,7 +53,7 @@ const validationSchema = function (values, t) {
         currencyId: Yup.string()
             .required(i18n.t('static.country.currencytext')),
         budgetCode: Yup.string()
-            .matches(ALPHABET_NUMBER_REGEX, i18n.t('static.message.alphabetnumerallowed'))
+            // .matches(ALPHABET_NUMBER_REGEX, i18n.t('static.message.alphabetnumerallowed'))
             .max(10, i18n.t('static.common.max10digittext'))
             .required(i18n.t('static.budget.budgetCodeText')),
     })
@@ -369,19 +369,21 @@ class AddBudgetComponent extends Component {
 
                                     var amount = this.state.budget.budgetAmt.replace(/,/g, '');
                                     budget.budgetAmt = amount;
-                                    // alert(this.state.budget.startDate);
+
+                                    // alert("hiiiiii");
+                                    // this.setState({ budget: budget });
+                                    
+
                                     var startDate = moment(this.state.budget.startDate).format("YYYY-MM-DD");
                                     budget.startDate = startDate;
 
                                     var stopDate = moment(this.state.budget.stopDate).format("YYYY-MM-DD");
                                     budget.stopDate = stopDate;
 
-                                    // alert("hiiiiii");
-                                    // this.setState({ budget: budget });
-                                    this.setState({
-                                        loading: true
-                                    })
-                                    console.log("this.state.budget--->", budget);
+                                    // this.setState({
+                                    //     loading: true
+                                    // })
+
                                     BudgetService.addBudget(budget)
                                         .then(response => {
                                             if (response.status == 200) {

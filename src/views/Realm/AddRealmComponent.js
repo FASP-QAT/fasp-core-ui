@@ -21,9 +21,9 @@ const initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         realmCode: Yup.string()
-            .required(i18n.t('static.realm.realmNameText')).max(6, i18n.t('static.realm.realmCodeLength')),
+            .required(i18n.t('static.realm.realmCodeText')).max(6, i18n.t('static.realm.realmCodeLength')),
         label: Yup.string()
-            .required(i18n.t('static.realm.realmCodeText')),
+            .required(i18n.t('static.realm.realmNameText')),
         minMosMinGaurdrail: Yup.number()
             .typeError(i18n.t('static.procurementUnit.validNumberText'))
             // .matches(/^[0-9]*$/, i18n.t('static.user.validnumber'))
@@ -260,7 +260,7 @@ export default class AddRealmComponent extends Component {
                                                 <CardBody>
 
                                                     <FormGroup>
-                                                        <Label for="label">{i18n.t('static.realm.realmName')}</Label>
+                                                        <Label for="label">{i18n.t('static.realm.realmName')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input type="text"
                                                             name="label"
                                                             id="label"
@@ -274,7 +274,7 @@ export default class AddRealmComponent extends Component {
                                                         <FormFeedback className="red">{errors.label}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="realmCode">{i18n.t('static.realm.realmCode')}</Label>
+                                                        <Label for="realmCode">{i18n.t('static.realm.realmCode')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input type="text"
                                                             name="realmCode"
                                                             id="realmCode"
@@ -288,7 +288,7 @@ export default class AddRealmComponent extends Component {
                                                         <FormFeedback className="red">{errors.realmCode}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="minMosMinGaurdrail">{i18n.t('static.realm.minMosMinGaurdraillabel')}</Label>
+                                                        <Label for="minMosMinGaurdrail">{i18n.t('static.realm.minMosMinGaurdraillabel')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input type="number"
                                                             name="minMosMinGaurdrail"
                                                             id="minMosMinGaurdrail"
@@ -302,7 +302,7 @@ export default class AddRealmComponent extends Component {
                                                         <FormFeedback className="red">{errors.minMosMinGaurdrail}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="minMosMaxGaurdrail">{i18n.t('static.realm.minMosMaxGaurdraillabel')}</Label>
+                                                        <Label for="minMosMaxGaurdrail">{i18n.t('static.realm.minMosMaxGaurdraillabel')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input type="number"
                                                             // min="0"
                                                             name="minMosMaxGaurdrail"
@@ -317,7 +317,7 @@ export default class AddRealmComponent extends Component {
                                                         <FormFeedback className="red">{errors.minMosMaxGaurdrail}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="maxMosMaxGaurdrail">{i18n.t('static.realm.maxMosMaxGaurdraillabel')}</Label>
+                                                        <Label for="maxMosMaxGaurdrail">{i18n.t('static.realm.maxMosMaxGaurdraillabel')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input type="number"
                                                             // min="0"
                                                             name="maxMosMaxGaurdrail"

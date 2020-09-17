@@ -74,11 +74,25 @@ const validationSchema = function (values) {
         emailId: Yup.string()
             .email(i18n.t('static.user.invalidemail'))
             .required(i18n.t('static.user.validemail')),
+        // phoneNumber: Yup.string()
+        //     .min(4, i18n.t('static.user.validphonemindigit'))
+        //     .max(15, i18n.t('static.user.validphonemaxdigit'))
+        //     .matches(/^[0-9]*$/, i18n.t('static.user.validnumber'))
+        //     .required(i18n.t('static.user.validphone')),
+
+        needPhoneValidation: Yup.boolean(),
         phoneNumber: Yup.string()
-            .min(4, i18n.t('static.user.validphonemindigit'))
-            .max(15, i18n.t('static.user.validphonemaxdigit'))
-            .matches(/^[0-9]*$/, i18n.t('static.user.validnumber'))
-            .required(i18n.t('static.user.validphone'))
+            .when("needPhoneValidation", {
+                is: val => {
+                    return document.getElementById("needPhoneValidation").value === "true";
+
+                },
+                then: Yup.string().min(4, i18n.t('static.user.validphonemindigit'))
+                    .max(15, i18n.t('static.user.validphonemaxdigit'))
+                    .matches(/^[0-9]*$/, i18n.t('static.user.validnumber'))
+                    .required(i18n.t('static.user.validphone')),
+                otherwise: Yup.string().notRequired()
+            }),
     })
 }
 
@@ -147,7 +161,7 @@ class AddUserComponent extends Component {
         let { user } = this.state;
         let count = 0;
         let count1 = 0;
-        console.log("roles---",this.state.user.roles);
+        console.log("roles---", this.state.user.roles);
         for (var i = 0; i < this.state.user.roles.length; i++) {
             if (this.state.user.roles[i] != 'ROLE_APPLICATION_ADMIN') {
                 count++;
@@ -159,14 +173,14 @@ class AddUserComponent extends Component {
             this.setState({
                 showRealmValidation: (this.state.user.realm.realmId != '' ? false : true)
             },
-                () => {  });
+                () => { });
 
             document.getElementById("showRealm").value = true;
         } else {
             this.setState({
                 showRealmValidation: false
             },
-                () => {  });
+                () => { });
 
             document.getElementById("showRealm").value = false;
         }
@@ -217,7 +231,7 @@ class AddUserComponent extends Component {
             this.setState({
                 showRealmValidation: (this.state.user.realm.realmId != '' ? false : true)
             },
-                () => {  });
+                () => { });
             document.getElementById("showRealm").value = true;
             if (count1 > 0) {
                 this.setState({
@@ -441,7 +455,7 @@ class AddUserComponent extends Component {
                                     this.setState({
                                         message: ''
                                     })
-                                    console.log("user object---------------------",this.state.user);
+                                    console.log("user object---------------------", this.state.user);
                                     UserService.addNewUser(this.state.user)
                                         .then(response => {
                                             if (response.status == 200) {
@@ -485,8 +499,15 @@ class AddUserComponent extends Component {
                                                         id="roleValid"
                                                     />
 
+                                                    <Input
+                                                        type="hidden"
+                                                        name="needPhoneValidation"
+                                                        id="needPhoneValidation"
+                                                        value={(this.state.user.phoneNumber === '' ? false : true)}
+                                                    />
+
                                                     <FormGroup>
-                                                        <Label htmlFor="realmId">{i18n.t('static.realm.realm')}</Label>
+                                                        <Label htmlFor="realmId">{i18n.t('static.realm.realm')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             type="select"
                                                             name="realmId"
@@ -536,7 +557,7 @@ class AddUserComponent extends Component {
                                                         <FormFeedback className="red">{errors.emailId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="phoneNumber">{i18n.t('static.user.phoneNumber')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Label for="phoneNumber">{i18n.t('static.user.phoneNumber')}</Label>
                                                         <Input type="text"
                                                             name="phoneNumber"
                                                             id="phoneNumber"

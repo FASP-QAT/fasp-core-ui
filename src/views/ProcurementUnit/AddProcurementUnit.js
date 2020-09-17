@@ -1077,7 +1077,7 @@ export default class AddProcurementUnit extends Component {
                                                         <FormFeedback className="red">{errors.procurementUnitName}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="select">{i18n.t('static.procurementUnit.planningUnit')}</Label>
+                                                        <Label htmlFor="select">{i18n.t('static.procurementUnit.planningUnit')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             bsSize="sm"
                                                             valid={!errors.planningUnitId && this.state.procurementUnit.planningUnit.planningUnitId != ''}

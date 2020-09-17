@@ -173,14 +173,17 @@ export default class ProductCategoryTree extends Component {
                 loading: true
             });
             AuthenticationService.setupAxiosInterceptors();
+
             ProductCategoryService.getProductCategoryListByRealmId(this.state.realmId)
+
                 .then(response => {
+                    console.log("response product category list ====>", response.data);
                     if (response.status == 200) {
                         this.setState({
                             productCategoryList: response.data,
-                            // loading: false
                         });
 
+                        console.log("this.state.productCategoryList====>", this.state.productCategoryList);
                         var treeData = getTreeFromFlatData({
                             flatData: this.state.productCategoryList.map(
                                 node => ({ ...node, title: node.payload.label.label_en, name: node.payload.label.label_en, expanded: node.payload.expanded, isNew: false })),
@@ -188,6 +191,8 @@ export default class ProductCategoryTree extends Component {
                             getParentKey: node => node.parentId, // resolve a node's parent's key
                             rootKey: null // The value of the parent key when there is no parent (i.e., at root level)
                         });
+                        console.log("treeData------>", treeData);
+
 
                         this.state.productCategoryList.map(item => {
                             if (item.id > this.state.maxId) {
@@ -195,7 +200,7 @@ export default class ProductCategoryTree extends Component {
                             }
 
                         });
-                        console.log("treeData------>", treeData);
+
 
                         this.setState({ treeData: treeData, loading: false });
                         document.getElementById("treeDiv").style.display = "block";
@@ -234,13 +239,16 @@ export default class ProductCategoryTree extends Component {
 
     }
     addNewNode() {
+        console.log("this.state.treeData===>", this.state.treeData);
         let children = this.state.treeData[0].children;
         let duplicate = 0;
         console.log("children--------->", children);
-        for (let i = 0; i < children.length; i++) {
-            if (this.state.nodename.localeCompare(children[i].payload.label.label_en) == 0) {//same
-                // console.log("Children Duplicate");
-                duplicate = 1;
+        if (children != undefined) {
+            for (let i = 0; i < children.length; i++) {
+                if (this.state.nodename.localeCompare(children[i].payload.label.label_en) == 0) {//same
+                    // console.log("Children Duplicate");
+                    duplicate = 1;
+                }
             }
         }
         if (duplicate == 0) {//not duplicate found
@@ -689,6 +697,7 @@ export default class ProductCategoryTree extends Component {
                                     <Label for="product category">{i18n.t('static.productCategory.productCategoryTree')}</Label>
                                     <div style={{ height: 450 }}>
                                         <SortableTree
+                                            canDrop={({ nextParent }) => nextParent !=null }
                                             getNodeKey={({ node }) => node.id}
                                             treeData={this.state.treeData}
                                             searchQuery={this.state.searchQuery}

@@ -232,25 +232,23 @@ export default class DatabaseTranslations extends React.Component {
     changed = function (instance, cell, x, y, value) {
         if (x == 2) {
             var col = ("C").concat(parseInt(y) + 1);
-            this.el.setStyle(col, "background-color", "transparent");
-            this.el.setStyle(col, "background-color", "yellow");
             if (value == "") {
                 this.el.setComments(col, `${i18n.t('static.label.fieldRequired')}`);
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
             } else {
                 this.el.setComments(col, "");
+                this.el.setStyle(col, "background-color", "transparent");
             }
         } else if (x == 3) {
             var col = ("D").concat(parseInt(y) + 1);
             this.el.setStyle(col, "background-color", "transparent");
-            this.el.setStyle(col, "background-color", "yellow");
         } else if (x == 4) {
             var col = ("E").concat(parseInt(y) + 1);
             this.el.setStyle(col, "background-color", "transparent");
-            this.el.setStyle(col, "background-color", "yellow");
         } else if (x == 5) {
             var col = ("F").concat(parseInt(y) + 1);
             this.el.setStyle(col, "background-color", "transparent");
-            this.el.setStyle(col, "background-color", "yellow");
         }
 
         var labelList = this.state.labelList;

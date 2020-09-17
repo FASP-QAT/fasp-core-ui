@@ -65,7 +65,8 @@ class Login extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      message: ''
+      message: '', 
+      loading: false
     }
     this.forgotPassword = this.forgotPassword.bind(this);
     this.incorrectPassmessageHide = this.incorrectPassmessageHide.bind(this);
@@ -220,9 +221,11 @@ class Login extends Component {
                                       case 401:
                                       case 404:
                                       case 412:
+                                        console.log("Login page 401---");
                                         this.setState({ message: error.response.data.messageCode });
                                         break;
                                       case 406:
+                                        console.log("Login page password expired-----------")
                                         this.props.history.push({
                                           pathname: "/updateExpiredPassword",
                                           state: {
@@ -231,6 +234,7 @@ class Login extends Component {
                                         });
                                         break;
                                       default:
+                                        console.log("Login page unknown error---");
                                         this.setState({ message: 'static.unkownError' });
                                         break;
                                     }
@@ -363,8 +367,8 @@ class Login extends Component {
                   and delivers health commodities, offers comprehensive technical assistance to strengthen
                   national supply chain systems, and provides global supply chain leadership. For more
                   information, visit <a href="https://www.ghsupplychain.org/" target="_blank">ghsupplychain.org</a>. The information provided in this tool is not
-                                                                      official U.S. government information and does not represent the views or positions of the
-                                                                      Agency for International Development or the U.S. government.
+                                                                        official U.S. government information and does not represent the views or positions of the
+                                                                        Agency for International Development or the U.S. government.
               </p>
                 </CardBody>
                 <Row className="text-center Login-bttom-logo">

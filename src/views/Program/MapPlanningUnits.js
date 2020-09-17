@@ -405,7 +405,7 @@ export default class MapPlanningUnits extends Component {
         // });
 
         var puList = []
-        if (value != 0) {
+        if (value != -1) {
             console.log("in if=====>");
             var pc = this.state.productCategoryList.filter(c => c.payload.productCategoryId == value)[0]
             var pcList = this.state.productCategoryList.filter(c => c.payload.productCategoryId == pc.payload.productCategoryId || c.parentId == pc.id);
@@ -434,9 +434,11 @@ export default class MapPlanningUnits extends Component {
     getRealmId() {
         var list = [];
         var productCategoryList = [];
-        var realmId = document.getElementById("realmId").value;
+        var realmId = this.props.items.program.realm.realmId;
+        console.log("in mapping page---->",realmId);
+        console.log("in mapping page---->",this.props.items);
         AuthenticationService.setupAxiosInterceptors();
-        ProductCategoryServcie.getProductCategoryListByRealmId(realmId)
+        ProductCategoryServcie.getProductCategoryListByRealmId(this.props.items.program.realm.realmId)
             .then(response => {
                 if (response.status == 200) {
                     console.log("productCategory response----->", response.data);
@@ -454,10 +456,22 @@ export default class MapPlanningUnits extends Component {
                         }
                         console.log("ind", indendent);
                         console.log("indendent.concat(response.data[k].payload.label.label_en)-->", indendent.concat(response.data[k].payload.label.label_en));
-                        var productCategoryJson = {
-                            name: (response.data[k].payload.label.label_en),
-                            id: response.data[k].payload.productCategoryId
+                       
+                       
+                       
+                        var productCategoryJson = {};
+                        if (response.data[k].payload.productCategoryId == 0) {
+                            productCategoryJson = {
+                                name: (response.data[k].payload.label.label_en),
+                                id: -1
+                            }
+                        } else {
+                            productCategoryJson = {
+                                name: (response.data[k].payload.label.label_en),
+                                id: response.data[k].payload.productCategoryId
+                            }
                         }
+
                         productCategoryList.push(productCategoryJson);
 
                     }
@@ -503,43 +517,43 @@ export default class MapPlanningUnits extends Component {
                                     columns: [
 
                                         {
-                                            title: 'Product Category',
+                                            title: i18n.t('static.product.productcategory'),
                                             type: 'dropdown',
                                             source: productCategoryList
                                         },
                                         {
-                                            title: 'Planning Unit',
+                                            title: i18n.t('static.planningunit.planningunit'),
                                             type: 'autocomplete',
                                             source: list,
                                             filter: this.dropdownFilter
                                         },
                                         {
-                                            title: 'Reorder frequency in months',
+                                            title: i18n.t('static.report.reorderFrequencyInMonths'),
                                             type: 'number',
 
                                         },
                                         {
-                                            title: 'Min month of stock',
+                                            title: i18n.t('static.supplyPlan.minMonthsOfStock'),
                                             type: 'number'
                                         },
                                         {
-                                            title: 'Months In Future For AMC',
+                                            title: i18n.t('static.program.monthfutureamc'),
                                             type: 'number'
                                         },
                                         {
-                                            title: 'Months In Past For AMC',
+                                            title: i18n.t('static.program.monthpastamc'),
                                             type: 'number'
                                         },
                                         {
-                                            title: 'Local Procurment Lead Time',
+                                            title: i18n.t('static.report.procurmentAgentLeadTimeReport'),
                                             type: 'number'
                                         },
                                         {
-                                            title: 'Shelf Life',
+                                            title: i18n.t('static.supplyPlan.shelfLife'),
                                             type: 'number'
                                         },
                                         {
-                                            title: 'Catalog Price (USD)',
+                                            title: i18n.t('static.procurementAgentPlanningUnit.catalogPrice'),
                                             type: 'number'
                                         },
                                         // {
@@ -749,6 +763,17 @@ export default class MapPlanningUnits extends Component {
 
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunctionWithoutPagination(instance);
+        var asterisk = document.getElementsByClassName("resizable")[0];
+        var tr = asterisk.firstChild;
+        tr.children[1].classList.add('AsteriskTheadtrTd');
+        tr.children[2].classList.add('AsteriskTheadtrTd');
+        tr.children[3].classList.add('AsteriskTheadtrTd');
+        tr.children[4].classList.add('AsteriskTheadtrTd');
+        tr.children[5].classList.add('AsteriskTheadtrTd');
+        tr.children[6].classList.add('AsteriskTheadtrTd');
+        tr.children[7].classList.add('AsteriskTheadtrTd');
+        tr.children[8].classList.add('AsteriskTheadtrTd');
+        tr.children[9].classList.add('AsteriskTheadtrTd');
     }
 
     myFunction() {

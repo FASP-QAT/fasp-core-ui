@@ -151,7 +151,7 @@ export default class ConsumptionDetails extends React.Component {
         var programId = value != "" && value != undefined ? value.value : 0;
         document.getElementById("planningUnitId").value = 0;
         document.getElementById("planningUnit").value = "";
-        document.getElementById("consumptionTable").style.display = "none";
+        document.getElementById("consumptionTableDiv").style.display = "none";
         this.setState({
             programSelect: value,
             programId: value != "" && value != undefined ? value.value : 0,
@@ -253,7 +253,7 @@ export default class ConsumptionDetails extends React.Component {
         var planningUnitId = value != "" && value != undefined ? value.value : 0;
         var programId = document.getElementById("programId").value;
         if (planningUnitId != 0) {
-            document.getElementById("consumptionTable").style.display = "block";
+            document.getElementById("consumptionTableDiv").style.display = "block";
             var db1;
             getDatabase();
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -299,7 +299,7 @@ export default class ConsumptionDetails extends React.Component {
                 }.bind(this)
             }.bind(this)
         } else {
-            document.getElementById("consumptionTable").style.display = "none";
+            document.getElementById("consumptionTableDiv").style.display = "none";
             this.setState({ loading: false });
         }
     }
@@ -336,15 +336,15 @@ export default class ConsumptionDetails extends React.Component {
                 <h5 className={this.state.color} id="div1">{i18n.t(this.state.message, { entityname }) || this.state.supplyPlanError}</h5>
                 <h5 id="div2" className="red">{this.state.consumptionDuplicateError || this.state.consumptionNoStockError || this.state.consumptionError}</h5>
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
-                    <CardBody className="pb-lg-4 pt-lg-2">
+                    <CardBody className="pb-lg-5 pt-lg-2">
                         <Formik
                             render={
                                 ({
                                 }) => (
                                         <Form name='simpleForm'>
-                                            <Col md="10 pl-0">
+                                            <div className=" pl-0">
                                                 <div className="row">
-                                                    <FormGroup className="col-md-4">
+                                                    <FormGroup className="col-md-3">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                                         <div className="controls ">
                                                             <Select
@@ -357,7 +357,7 @@ export default class ConsumptionDetails extends React.Component {
                                                             />
                                                         </div>
                                                     </FormGroup>
-                                                    <FormGroup className="col-md-4 ">
+                                                    <FormGroup className="col-md-3 ">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.qatProduct')}</Label>
                                                         <div className="controls ">
                                                             <Select
@@ -373,13 +373,13 @@ export default class ConsumptionDetails extends React.Component {
                                                     <input type="hidden" id="planningUnitId" name="planningUnitId" value={this.state.planningUnitId} />
                                                     <input type="hidden" id="programId" name="programId" value={this.state.programId} />
                                                 </div>
-                                            </Col>
+                                            </div>
                                         </Form>
                                     )} />
 
                         <div className="shipmentconsumptionSearchMarginTop">
-                            {this.state.showConsumption == 1 && <ConsumptionInSupplyPlanComponent ref="consumptionChild" items={this.state} toggleLarge={this.toggleLarge} updateState={this.updateState} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} consumptionPage="consumptionDataEntry" />}
-                            <div className="table-responsive">
+                            <ConsumptionInSupplyPlanComponent ref="consumptionChild" items={this.state} toggleLarge={this.toggleLarge} updateState={this.updateState} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} consumptionPage="consumptionDataEntry" />
+                            <div className="table-responsive" id="consumptionTableDiv">
                                 <div id="consumptionTable" />
                             </div>
                         </div>

@@ -117,6 +117,26 @@ export default class ProgramOnboarding extends Component {
         this.addRowInJexcel = this.addRowInJexcel.bind(this);
     }
     componentDidMount() {
+        let { program } = this.state;
+        let realmId = AuthenticationService.getRealmId();
+        // console.log("realmId----->",realmId);
+        if (realmId != -1) {
+            // console.log("in if");
+            program.realm.realmId = realmId;
+            this.setState({ program }, () => {
+                this.refs.countryChild.getRealmCountryList();
+                this.refs.healthAreaChild.getHealthAreaList();
+                this.refs.organisationChild.getOrganisationList();
+                this.refs.sixChild.getProgramManagerList();
+                this.refs.child.getRealmId();
+            });
+            document.getElementById('realmId').disabled=true;
+
+        } else {
+            console.log("in else");
+            document.getElementById('realmId').disabled=false;
+        }
+
         document.getElementById('stepOne').style.display = 'block';
         document.getElementById('stepTwo').style.display = 'none';
         document.getElementById('stepThree').style.display = 'none';
@@ -625,13 +645,13 @@ export default class ProgramOnboarding extends Component {
 
                                 <div className="d-sm-down-none  progressbar">
                                     <ul>
-                                        <li className="progressbartext1">Realm</li>
-                                        <li className="progressbartext2">Country</li>
-                                        <li className="progressbartext3">Technical Area</li>
-                                        <li className="progressbartext4">Organization</li>
-                                        <li className="progressbartext5">Region</li>
-                                        <li className="progressbartext6">Program Data</li>
-                                        <li className="progressbartext7">Planning Units</li>
+                                        <li className="progressbartext1">{i18n.t('static.program.realm')}</li>
+                                        <li className="progressbartext2">{i18n.t('static.region.country')}</li>
+                                        <li className="progressbartext3">{i18n.t('static.healtharea.healtharea')}</li>
+                                        <li className="progressbartext4">{i18n.t('static.organisation.organisationheader')}</li>
+                                        <li className="progressbartext5">{i18n.t('static.program.region')}</li>
+                                        <li className="progressbartext6">{i18n.t('static.pipeline.programData')}</li>
+                                        <li className="progressbartext7">{i18n.t('static.dashboard.product')}</li>
                                     </ul>
                                 </div>
 

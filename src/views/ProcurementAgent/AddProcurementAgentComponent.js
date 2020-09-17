@@ -103,7 +103,7 @@ class AddProcurementAgentComponent extends Component {
                 submittedToApprovedLeadTime: '',
                 approvedToShippedLeadTime: '',
                 localProcurementAgent: false,
-                colorHtmlCode: '',
+                colorHtmlCode: '#F17013',
             },
             message: '',
             lang: localStorage.getItem('lang'),
@@ -126,8 +126,10 @@ class AddProcurementAgentComponent extends Component {
         console.log("color---", color);
         let { procurementAgent } = this.state;
         procurementAgent.colorHtmlCode = color.hex.toUpperCase();
+        let rgba = 'rgba(' + color.rgb.r + "," + color.rgb.g + "," + color.rgb.b + "," + color.rgb.a + ')';
         this.setState({
             color: color.rgb,
+            rgba,
             procurementAgent
         },
             () => { console.log("agent--------------", procurementAgent); });
@@ -377,7 +379,7 @@ class AddProcurementAgentComponent extends Component {
                                                         <FormFeedback className="red">{errors.procurementAgentCode}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="colorHtmlCode">{i18n.t('static.procurementagent.procurementAgentColorCode')}<span className="red Reqasterisk">*</span></Label>
+                                                        <Label for="colorHtmlCode">{i18n.t('static.procurementagent.procurementAgentColorCode')}</Label>
                                                         <div bsSize="sm">
                                                             <div style={styles.swatch} onClick={this.handleClick}>
                                                                 <div style={styles.color} />
@@ -443,7 +445,7 @@ class AddProcurementAgentComponent extends Component {
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label className="P-absltRadio">{i18n.t('static.procurementAgent.localProcurementAgent')}  </Label>
-                                                        <FormGroup check inline className="ml-12">
+                                                        <FormGroup check inline className="procurementAgentradiomargin">
                                                             <Input
                                                                 className="form-check-input"
                                                                 type="radio"

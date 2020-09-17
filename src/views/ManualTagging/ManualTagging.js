@@ -675,7 +675,6 @@ export default class ManualTagging extends Component {
             artmisList: [],
             shipmentId: '',
             reason: "1",
-            loading: true,
             haslinked: false
         }
         this.addNewCountry = this.addNewCountry.bind(this);
@@ -693,13 +692,14 @@ export default class ManualTagging extends Component {
     link() {
         var orderNo = document.getElementById("orderNo").value;
         var primeLineNo = document.getElementById("primeLineNo").value;
-
+        this.setState({ loading: true })
         ManualTaggingService.linkShipmentWithARTMIS(orderNo, primeLineNo, this.state.shipmentId)
             .then(response => {
                 this.setState({
                     message: i18n.t('static.shipment.linkingsuccess'),
                     color: 'green',
-                    haslinked: true
+                    haslinked: true,
+                    loading: false
                 },
                     () => {
                         console.log(this.state.message, "success 1")
@@ -747,12 +747,12 @@ export default class ManualTagging extends Component {
     }
 
     hideSecondComponent() {
-       
+
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 8000);
-        
-        
+
+
     }
 
     filterData() {

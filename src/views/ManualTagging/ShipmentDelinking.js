@@ -570,14 +570,15 @@ export default class ShipmentDelinking extends Component {
                         items.push({
                             title: i18n.t('static.common.dlink'),
                             onclick: function () {
-
+                                this.setState({ loading: true })
                                 ManualTaggingService.delinkShipment(`${this.el.getValueFromCoords(0, y)}`)
                                     .then(response => {
                                         console.log("link response===", response);
                                         this.setState({
                                             message: i18n.t('static.shipment.delinkingsuccess'),
                                             color: 'green',
-                                            haslink: true
+                                            haslink: true,
+                                            loading: false
 
                                         }, () => {
                                             this.hideSecondComponent();
@@ -611,6 +612,7 @@ export default class ShipmentDelinking extends Component {
         var programId = document.getElementById("programId").value;
         var planningUnitId = document.getElementById("planningUnitId").value;
         if (programId != -1 && planningUnitId != 0) {
+            this.setState({ loading: true })
             console.log("HASLINKED------->", this.state.haslink);
             if (this.state.haslink) {
                 this.setState({ haslink: false })
@@ -657,7 +659,7 @@ export default class ShipmentDelinking extends Component {
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        programs: response.data, loading: false, color: 'red'
+                        programs: response.data, loading: false
                     })
                 }
                 else {
@@ -866,7 +868,7 @@ export default class ShipmentDelinking extends Component {
                 <h5 className={this.state.color} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 {/* <Card style={{ display: this.state.loading ? "none" : "block" }}> */}
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
-                    <CardBody className="">
+                    <CardBody className="pb-lg-5">
                         <Col md="10 pl-0">
                             <div className="d-md-flex">
                                 <FormGroup className="col-md-4 pl-0">
@@ -909,7 +911,9 @@ export default class ShipmentDelinking extends Component {
                                 </FormGroup>
                             </div>
                         </Col>
+                        <div className="ReportSearchMarginTop">
                         <div id="tableDiv" className="jexcelremoveReadonlybackground">
+                        </div>
                         </div>
 
 

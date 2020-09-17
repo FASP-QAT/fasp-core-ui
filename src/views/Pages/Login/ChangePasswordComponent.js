@@ -73,7 +73,8 @@ class ChangePasswordComponent extends Component {
         super(props);
         this.state = {
             message: '',
-            username: ""
+            username: "",
+            loading:false
         }
         this.cancelClicked = this.cancelClicked.bind(this);
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
@@ -180,7 +181,7 @@ class ChangePasswordComponent extends Component {
                                                             this.hideFirstComponent();
                                                         });
                                                     } else {
-                                                        switch (error.response.status) {
+                                                        switch (error.response ? error.response.status : "") {
                                                             case 500:
                                                             case 401:
                                                             case 403:
