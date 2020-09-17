@@ -5,24 +5,32 @@ import PipelineService from '../../api/PipelineService.js';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import DataSourceService from '../../api/DataSourceService.js';
 import PlanningUnitService from '../../api/PlanningUnitService'
-import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
+import { jExcelLoadedFunction, jExcelLoadedFunctionPipeline } from '../../CommonComponent/JExcelCommonFunctions.js'
 import RealmCountryService from '../../api/RealmCountryService'
-
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { JEXCEL_DATE_FORMAT_WITHOUT_DATE } from '../../Constants';
 export default class PipelineProgramInventory extends Component {
 
     constructor(props) {
+       
         super(props);
         this.saveInventory = this.saveInventory.bind(this);
         this.loaded = this.loaded.bind(this);
         this.changed = this.changed.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
         this.dropdownFilter = this.dropdownFilter.bind(this);
+        this.state = {
+            loading:true
+        }
     }
 
     dropdownFilter = function (instance, cell, c, r, source) {
+        var realmCountryId = document.getElementById("realmCountryId").value;
         var mylist = [];
         var value = (instance.jexcel.getJson()[r])[c - 7];
-        var puList = (this.state.realmCountryPlanningUnitList).filter(c => c.planningUnit.id == value);
+        console.log("==========>planningUnitValue", value);
+        console.log("========>", this.state.realmCountryPlanningUnitList);
+        var puList = (this.state.realmCountryPlanningUnitList).filter(c => c.planningUnit.id == value && c.realmCountry.id == realmCountryId);
 
         for (var k = 0; k < puList.length; k++) {
             var realmCountryPlanningUnitJson = {
@@ -31,6 +39,8 @@ export default class PipelineProgramInventory extends Component {
             }
             mylist.push(realmCountryPlanningUnitJson);
         }
+
+        console.log("myList=====>", mylist);
         return mylist;
     }
 
@@ -50,6 +60,18 @@ export default class PipelineProgramInventory extends Component {
                 this.el.setComments(col, "");
             }
 
+           /* var col = ("H").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(7, y);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }*/
+
         }
         return valid;
     }
@@ -67,41 +89,19 @@ export default class PipelineProgramInventory extends Component {
             }
         }
 
-        if (x == 7) {
-            var col = ("H").concat(parseInt(y) + 1);
+        if (x == 3) {
+            var col = ("D").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                var json = this.el.getJson();
-                for (var i = 0; i < json.length; i++) {
-                    var map = new Map(Object.entries(json[i]));
-                    var planningUnitValue = map.get("7");
-                    if (planningUnitValue == value && y != i) {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, "Realm Country Planning Unit Allready Exists");
-                        i = json.length;
-                    } else {
-                        // var rmPlanningUnit = this.state.realmCountryPlanningUnitList.filter(c => c.realmCountryPlanningUnitId == value)[0];
-                        // console.log("this.el.getValueFromCoords(4, y)==",this.el.getValueFromCoords(4, y));
-                        // console.log("rmPlanningUnit.multiplier",rmPlanningUnit.multiplier);
-                        // var quantity = this.el.getValueFromCoords(4, y) / rmPlanningUnit.multiplier;
-                        // this.el.setValueFromCoords(8, y, rmPlanningUnit.multiplier, true);
-                        // this.el.setValueFromCoords(4, y, quantity, true);
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setComments(col, "");
-                    }
-                }
-
-                var rmPlanningUnit = this.state.realmCountryPlanningUnitList.filter(c => c.realmCountryPlanningUnitId == value)[0];
-                var quantity = this.el.getValueFromCoords(4, y) / rmPlanningUnit.multiplier;
-                this.el.setValueFromCoords(8, y, rmPlanningUnit.multiplier, true);
-                this.el.setValueFromCoords(4, y, quantity, true);
-
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
             }
         }
+       
+        
 
     }
 
@@ -120,6 +120,18 @@ export default class PipelineProgramInventory extends Component {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, (list[y].dataSourceId).concat(" Does not exist."));
+            }
+
+            var col = ("D").concat(parseInt(y) + 1);
+            var value = map.get("3");
+            if (value != "" && !isNaN(parseInt(value))) {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                // this.el.setComments(col, (list[y].dataSourceId).concat(" Does not exist."));
             }
         }
 
@@ -144,12 +156,13 @@ export default class PipelineProgramInventory extends Component {
                 planningUnitId: map.get("0"),
                 dataSourceId: dataSourceId,
                 regionId: map.get("2"),
-                inventoryDate: map.get("3"),
-                manualAdjustment: map.get("4"),
-                notes: map.get("5"),
-                active: map.get("6"),
-                realmCountryPlanningUnitId: map.get("7"),
-                multiplier: map.get("8")
+                inventoryDate: map.get("5"),
+                inventory: map.get("6"),
+                manualAdjustment: map.get("7"),
+                notes: map.get("8"),
+                // active: map.get("6"),
+                realmCountryPlanningUnitId: map.get("3"),
+                multiplier: map.get("4")
             }
             inventoryArray.push(inventoryJson);
         }
@@ -166,6 +179,7 @@ export default class PipelineProgramInventory extends Component {
             var realmCountryPlanningUnitList = [];
 
             this.setState({ realmCountryPlanningUnitList: response.data });
+            console.log("realmCountryPlanningUnitId====>", response.data);
 
             for (var i = 0; i < response.data.length; i++) {
                 var rcpJson = {
@@ -224,17 +238,21 @@ export default class PipelineProgramInventory extends Component {
                                     data = [];
                                     data[0] = inventoryList[j].planningUnitId;
                                     data[1] = inventoryList[j].dataSourceId;
-                                    data[2] = inventoryList[j].regionId;
-                                    data[3] = inventoryList[j].inventoryDate;
-                                    data[4] = inventoryList[j].manualAdjustment;
-                                    if (inventoryList[j].notes === null || inventoryList[j].notes === ' NULL') {
-                                        data[5] = '';
+                                    if (regionList.length == 1) {
+                                        data[2] = regionList[0].id;
                                     } else {
-                                        data[5] = inventoryList[j].notes;
+                                        data[2] = inventoryList[j].regionId;
+                                    };
+                                    data[3] = inventoryList[j].realmCountryPlanningUnitId;
+                                    data[4] = inventoryList[j].multiplier
+                                    data[5] = inventoryList[j].inventoryDate;
+                                    data[6] = inventoryList[j].inventory;
+                                    data[7] = inventoryList[j].manualAdjustment;
+                                    if (inventoryList[j].notes === null || inventoryList[j].notes === ' NULL') {
+                                        data[8] = '';
+                                    } else {
+                                        data[8] = inventoryList[j].notes;
                                     }
-                                    data[6] = true;
-                                    data[7] = inventoryList[j].realmCountryPlanningUnitId;
-                                    data[8] = inventoryList[j].multiplier
                                     inventoryDataArr.push(data);
                                 }
 
@@ -245,7 +263,7 @@ export default class PipelineProgramInventory extends Component {
                                 var options = {
                                     data: data,
                                     columnDrag: true,
-                                    colWidths: [190, 130, 100, 120, 100, 90, 100, 130, 130],
+                                    colWidths: [190, 130, 100, 120, 100, 150, 100, 130, 100],
                                     columns: [
 
                                         {
@@ -266,9 +284,26 @@ export default class PipelineProgramInventory extends Component {
 
                                         },
                                         {
+                                            title: i18n.t('static.planningunit.countrysku'),
+                                            type: 'dropdown',
+                                            source: realmCountryPlanningUnitList,
+                                            filter: this.dropdownFilter
+
+                                        },
+                                        {
+                                            title: i18n.t('static.unit.multiplier'),
+                                            type: 'text',
+                                            readonly: true
+                                        },
+                                        {
                                             title: i18n.t('static.inventory.inventoryDate'),
                                             type: 'calendar',
-                                            options: { format: 'MM-YYYY' }
+                                            options: { format: JEXCEL_DATE_FORMAT_WITHOUT_DATE }
+
+                                        },
+                                        {
+                                            title: i18n.t('static.inventory.inventory'),
+                                            type: 'text'
 
                                         },
 
@@ -279,24 +314,7 @@ export default class PipelineProgramInventory extends Component {
                                         {
                                             title: 'Note',
                                             type: 'text'
-                                        },
-                                        {
-                                            title: i18n.t('static.inventory.active'),
-                                            type: 'checkbox'
-                                        },
-                                        {
-                                            title: "Realm Country Planning Unit",
-                                            type: 'dropdown',
-                                            source: realmCountryPlanningUnitList,
-                                            filter: this.dropdownFilter
-
-                                        },
-                                        {
-                                            title: "Multiplier",
-                                            type: 'text',
-                                            readonly: true
-                                        },
-
+                                        }
                                     ],
                                     pagination: 10,
                                     search: true,
@@ -309,18 +327,21 @@ export default class PipelineProgramInventory extends Component {
                                     onchange: this.changed,
                                     oneditionend: this.onedit,
                                     copyCompatibility: true,
-                                    // paginationOptions: [10, 25, 50, 100],
+                                    paginationOptions: [10, 25, 50],
                                     position: 'top',
                                     text: {
-                                        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                                        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
                                         show: '',
                                         entries: '',
                                     },
-                                    onload: this.loaded,
+                                    onload: this.loadedJexcelCommonFunction,
                                 };
 
                                 this.el = jexcel(document.getElementById("inventorytableDiv"), options);
                                 this.loaded();
+                                this.setState({
+                                    loading: false
+                                })
                             });
 
 
@@ -330,16 +351,32 @@ export default class PipelineProgramInventory extends Component {
         });
     }
 
-    loaded = function (instance, cell, x, y, value) {
-        jExcelLoadedFunction(instance);
+    loadedJexcelCommonFunction = function (instance, cell, x, y, value) {
+        jExcelLoadedFunctionPipeline(instance,0);
     }
 
     render() {
         return (
             <>
-                <div className="table-responsive" >
+               <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
+                }} />
+                <div className="table-responsive" style={{ display: this.state.loading ? "none" : "block" }}>
 
                     <div id="inventorytableDiv">
+                    </div>
+                </div>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
                     </div>
                 </div>
             </>

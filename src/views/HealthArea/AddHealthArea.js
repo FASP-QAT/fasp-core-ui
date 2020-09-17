@@ -11,13 +11,15 @@ import HealthAreaService from "../../api/HealthAreaService";
 import UserService from "../../api/UserService";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import getLabelText from '../../CommonComponent/getLabelText';
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import classNames from 'classnames';
 
 const entityname = i18n.t('static.healtharea.healtharea');
 
 const initialValues = {
   realmId: '',
-  healthAreaName: ''
+  healthAreaName: '',
+  realmCountryId: [],
 }
 
 const validationSchema = function (values) {
@@ -25,7 +27,14 @@ const validationSchema = function (values) {
     realmId: Yup.string()
       .required(i18n.t('static.common.realmtext')),
     healthAreaName: Yup.string()
-      .required(i18n.t('static.healtharea.healthareatext'))
+      .matches(/^([a-zA-Z]+\s)*[a-zA-Z]+$/, i18n.t('static.message.rolenamevalidtext'))
+      .required(i18n.t('static.healtharea.healthareatext')),
+    healthAreaCode: Yup.string()
+      .max(3, 'Technical Area Code Is 3 Digit')
+      .required(i18n.t('static.country.countrycodetext')),
+    realmCountryId: Yup.string()
+      .required(i18n.t('static.program.validcountrytext'))
+
   })
 }
 
@@ -65,7 +74,8 @@ export default class AddHealthAreaComponent extends Component {
         realm: {
           id: ''
         },
-        realmCountryArray: []
+        realmCountryArray: [],
+        healthAreaCode: '',
 
       },
       lang: localStorage.getItem('lang'),
@@ -76,7 +86,8 @@ export default class AddHealthAreaComponent extends Component {
       //   { value: '3', label: 'R3' }
       // ],
       message: '',
-      selCountries: []
+      selCountries: [],
+      loading: true,
     }
     this.Capitalize = this.Capitalize.bind(this);
     this.cancelClicked = this.cancelClicked.bind(this);
@@ -95,6 +106,8 @@ export default class AddHealthAreaComponent extends Component {
       healthArea.label.label_en = event.target.value
     } else if (event.target.name === "realmId") {
       healthArea.realm.id = event.target.value
+    } else if (event.target.name === "healthAreaCode") {
+      healthArea.healthAreaCode = event.target.value.toUpperCase();
     }
     this.setState({
       healthArea
@@ -107,7 +120,9 @@ export default class AddHealthAreaComponent extends Component {
   touchAll(setTouched, errors) {
     setTouched({
       realmId: true,
-      healthAreaName: true
+      healthAreaName: true,
+      healthAreaCode: true,
+      realmCountryId: true
     }
     )
     this.validateForm(errors)
@@ -140,13 +155,13 @@ export default class AddHealthAreaComponent extends Component {
         if (response.status == 200) {
           console.log("country list---", response.data);
           this.setState({
-            countries: response.data
+            countries: response.data, loading: false
           })
         }
         else {
 
           this.setState({
-            message: response.data.messageCode
+            message: response.data.messageCode, loading: false
           },
             () => {
               this.hideSecondComponent();
@@ -159,7 +174,7 @@ export default class AddHealthAreaComponent extends Component {
       .then(response => {
         console.log("realm list---", response.data);
         this.setState({
-          realms: response.data
+          realms: response.data, loading: false
         })
       })
 
@@ -184,26 +199,34 @@ export default class AddHealthAreaComponent extends Component {
   }
 
   getRealmCountryList(e) {
-    AuthenticationService.setupAxiosInterceptors();
-    HealthAreaService.getRealmCountryList(e.target.value)
-      .then(response => {
-        console.log("Realm Country List list---", response.data);
-        if (response.status == 200) {
-          var json = response.data;
-          var regList = [];
-          for (var i = 0; i < json.length; i++) {
-            regList[i] = { value: json[i].realmCountryId, label: json[i].country.label.label_en }
+    if (e.target.value != 0) {
+      HealthAreaService.getRealmCountryList(e.target.value)
+        .then(response => {
+          console.log("Realm Country List list---", response.data);
+          if (response.status == 200) {
+            var json = response.data;
+            var regList = [];
+            for (var i = 0; i < json.length; i++) {
+              regList[i] = { value: json[i].realmCountryId, label: json[i].country.label.label_en }
+            }
+            this.setState({
+              realmCountryId: '',
+              realmCountryList: regList,
+              loading: false
+            })
+          } else {
+            this.setState({
+              message: response.data.messageCode
+            })
           }
-          this.setState({
-            realmCountryId: '',
-            realmCountryList: regList
-          })
-        } else {
-          this.setState({
-            message: response.data.messageCode
-          })
-        }
+        })
+    } else {
+      this.setState({
+        realmCountryId: '',
+        realmCountryList: [],
+        loading: false
       })
+    }
   }
 
   Capitalize(str) {
@@ -234,32 +257,42 @@ export default class AddHealthAreaComponent extends Component {
       <div className="animated fadeIn">
         <AuthenticationServiceComponent history={this.props.history} message={(message) => {
           this.setState({ message: message })
+        }} loading={(loading) => {
+          this.setState({ loading: loading })
         }} />
         <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-        <Row>
+        <Row style={{ display: this.state.loading ? "none" : "block" }}>
           <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
             <Card>
-              <CardHeader>
+              {/* <CardHeader>
                 <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
-              </CardHeader>
+              </CardHeader> */}
               <Formik
+                enableReinitialize={true}
                 initialValues={initialValues}
                 validate={validate(validationSchema)}
                 onSubmit={(values, { setSubmitting, setErrors }) => {
+
                   console.log("-------------------->" + this.state.healthArea);
-                  HealthAreaService.addHealthArea(this.state.healthArea)
-                    .then(response => {
-                      if (response.status == 200) {
-                        this.props.history.push(`/healthArea/listHealthArea/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
-                      } else {
-                        this.setState({
-                          message: response.data.messageCode
-                        },
-                          () => {
-                            this.hideSecondComponent();
-                          })
-                      }
+                  if (this.state.healthArea.label.label_en != '') {
+                    this.setState({
+                      loading: true
                     })
+                    HealthAreaService.addHealthArea(this.state.healthArea)
+                      .then(response => {
+                        if (response.status == 200) {
+                          this.props.history.push(`/healthArea/listHealthArea/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
+                        } else {
+                          this.setState({
+                            message: response.data.messageCode, loading: false
+                          },
+                            () => {
+                              this.hideSecondComponent();
+                            })
+                        }
+                      })
+                  }
+
 
                 }}
 
@@ -275,23 +308,12 @@ export default class AddHealthAreaComponent extends Component {
                     isSubmitting,
                     isValid,
                     setTouched,
-                    handleReset
+                    handleReset,
+                    setFieldValue,
+                    setFieldTouched
                   }) => (
                       <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='healthAreaForm'>
                         <CardBody>
-
-                          <FormGroup>
-                            <Label htmlFor="company">{i18n.t('static.healthArea.healthAreaName')}<span class="red Reqasterisk">*</span> </Label>
-                            <Input
-                              bsSize="sm"
-                              type="text" name="healthAreaName" valid={!errors.healthAreaName && this.state.healthArea.label.label_en != ''}
-                              invalid={touched.healthAreaName && !!errors.healthAreaName}
-                              onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
-                              onBlur={handleBlur}
-                              value={this.state.healthArea.label.label_en}
-                              id="healthAreaName" />
-                            <FormFeedback className="red">{errors.healthAreaName}</FormFeedback>
-                          </FormGroup>
 
                           <FormGroup>
                             <Label htmlFor="select">{i18n.t('static.healtharea.realm')}<span class="red Reqasterisk">*</span></Label>
@@ -309,14 +331,22 @@ export default class AddHealthAreaComponent extends Component {
                             <FormFeedback>{errors.realmId}</FormFeedback>
                           </FormGroup>
 
-                          <FormGroup>
-                            <Label htmlFor="select">{i18n.t('static.healtharea.realmcountry')}<span class="red Reqasterisk">*</span></Label>
+                          <FormGroup className="Selectcontrol-bdrNone">
+                            <Label htmlFor="realmCountryId">{i18n.t('static.healtharea.realmcountry')}<span class="red Reqasterisk">*</span></Label>
                             <Select
+                              className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                { 'is-valid': !errors.realmCountryId && this.state.healthArea.realmCountryArray.length != 0 },
+                                { 'is-invalid': (touched.realmCountryId && !!errors.realmCountryId) }
+                              )}
                               bsSize="sm"
-                              valid={!errors.realmCountryId && this.state.realmCountryId != ''}
-                              invalid={touched.realmCountryId && !!errors.realmCountryId}
-                              onChange={(e) => { handleChange(e); this.updateFieldData(e) }}
-                              onBlur={handleBlur} name="realmCountryId" id="realmCountryId"
+                              name="realmCountryId"
+                              id="realmCountryId"
+                              onChange={(e) => {
+                                handleChange(e);
+                                setFieldValue("realmCountryId", e);
+                                this.updateFieldData(e);
+                              }}
+                              onBlur={() => setFieldTouched("realmCountryId", true)}
                               multi
                               options={this.state.realmCountryList}
                               value={this.state.realmCountryId}
@@ -324,13 +354,39 @@ export default class AddHealthAreaComponent extends Component {
                             <FormFeedback>{errors.realmCountryId}</FormFeedback>
                           </FormGroup>
 
+                          <FormGroup>
+                            <Label htmlFor="company">{i18n.t('static.technicalArea.technicalAreaDisplayName')}<span class="red Reqasterisk">*</span> </Label>
+                            <Input
+                              bsSize="sm"
+                              type="text" name="healthAreaCode" valid={!errors.healthAreaCode && this.state.healthArea.healthAreaCode != ''}
+                              invalid={touched.healthAreaCode && !!errors.healthAreaCode}
+                              onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                              onBlur={handleBlur}
+                              value={this.state.healthArea.healthAreaCode}
+                              id="healthAreaCode" />
+                            <FormFeedback className="red">{errors.healthAreaCode}</FormFeedback>
+                          </FormGroup>
+
+                          <FormGroup>
+                            <Label htmlFor="company">{i18n.t('static.healthArea.healthAreaName')}<span class="red Reqasterisk">*</span> </Label>
+                            <Input
+                              bsSize="sm"
+                              type="text" name="healthAreaName" valid={!errors.healthAreaName && this.state.healthArea.label.label_en != ''}
+                              invalid={touched.healthAreaName && !!errors.healthAreaName}
+                              onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                              onBlur={handleBlur}
+                              value={this.state.healthArea.label.label_en}
+                              id="healthAreaName" />
+                            <FormFeedback className="red">{errors.healthAreaName}</FormFeedback>
+                          </FormGroup>
+
                         </CardBody>
 
                         <CardFooter>
                           <FormGroup>
-                            <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
-                            <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                            <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                            <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
+                            <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                            <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
 
                             &nbsp;
                                                   </FormGroup>
@@ -342,6 +398,17 @@ export default class AddHealthAreaComponent extends Component {
             </Card>
           </Col>
         </Row>
+        <div style={{ display: this.state.loading ? "block" : "none" }}>
+          <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+            <div class="align-items-center">
+              <div ><h4> <strong>Loading...</strong></h4></div>
+
+              <div class="spinner-border blue ml-4" role="status">
+
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -356,15 +423,17 @@ export default class AddHealthAreaComponent extends Component {
   }
 
   cancelClicked() {
-    this.props.history.push(`/healthArea/listHealthArea/`+ 'red/' + i18n.t('static.message.cancelled', { entityname }))
+    this.props.history.push(`/healthArea/listHealthArea/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
   }
 
   resetClicked() {
-    let { healthArea } = this.state
+    let { healthArea } = this.state;
 
     healthArea.label.label_en = ''
     healthArea.realm.id = ''
     this.state.realmCountryId = ''
+    healthArea.healthAreaCode = ''
+    healthArea.realmCountryArray = []
 
     this.setState({
       healthArea
@@ -372,6 +441,7 @@ export default class AddHealthAreaComponent extends Component {
     ) => {
       console.log("state after update---", this.state.healthArea)
     })
+
   }
 
 }

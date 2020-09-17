@@ -85,8 +85,7 @@ export default class StepOne extends Component {
         }
     }
 
-    componentDidMount() {
-
+    componentDidMount() { 
         console.log("-----------------------------------FIRST STEP-------->", this.props.items);
         AuthenticationService.setupAxiosInterceptors();
         HealthAreaService.getRealmList()
@@ -117,8 +116,10 @@ export default class StepOne extends Component {
             <>
 
                 <Formik
-
-                    initialValues={initialValues}
+                    enableReinitialize={true}
+                    initialValues={{
+                        realmId:this.props.items.program.realm.realmId
+                    }}
                     validate={validate(validationSchema)}
                     onSubmit={(values, { setSubmitting, setErrors }) => {
                         // console.log("in succcess--------------->");
@@ -138,17 +139,17 @@ export default class StepOne extends Component {
                             setTouched
                         }) => (
                                 <Form className="needs-validation" onSubmit={handleSubmit} noValidate name='realmForm'>
-
+                             
                                     <FormGroup>
                                         <Label htmlFor="select">{i18n.t('static.program.realm')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
-                                            valid={!errors.realmId && this.props.items.program.realm.realmId != ''}
+                                            valid={!errors.realmId}
                                             invalid={touched.realmId && !!errors.realmId}
                                             bsSize="sm"
                                             className="col-md-4"
                                             onBlur={handleBlur}
                                             type="select" name="realmId" id="realmId"
-                                            // value={this.props.program.realm.realmId}
+                                            value={this.props.items.program.realm.realmId}
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e); this.props.getDependentLists(e) }}
                                         >
                                             <option value="">{i18n.t('static.common.select')}</option>
@@ -159,8 +160,8 @@ export default class StepOne extends Component {
                                        
                                     </FormGroup>
 
-                                    <FormGroup>
-                                        <Button color="info" size="md" className="float-left mr-1" type="submit" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}>Next <i className="fa fa-angle-double-right"></i></Button>
+                                    <FormGroup className="pb-3">
+                                        <Button color="info" size="md" className="float-left mr-1" type="submit" onClick={() => this.touchAll(setTouched, errors)}>Next <i className="fa fa-angle-double-right"></i></Button>
                                     </FormGroup>
 
                                 </Form>

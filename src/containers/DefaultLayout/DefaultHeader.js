@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 
 import { AppAsideToggler, AppNavbarBrand, AppSidebarToggler } from '@coreui/react';
 import DefaultHeaderDropdown from './DefaultHeaderDropdown'
-import logo from '../../assets/img/brand/logo.svg'
+import logo from '../../assets/img/QAT-logo.png'
 import QAT from '../../assets/img/brand/QAT-minimize.png'
 import i18n from '../../i18n'
 import { Online, Offline } from 'react-detect-offline';
@@ -25,7 +25,7 @@ class DefaultHeader extends Component {
   changeLanguage(lang) {
     localStorage.setItem('lang', lang);
     i18n.changeLanguage(lang)
-    window.location.reload();
+    window.location.reload(false);
   }
   render() {
 
@@ -36,8 +36,8 @@ class DefaultHeader extends Component {
       <React.Fragment>
         <AppSidebarToggler className="d-lg-none" display="md" mobile />
         <AppNavbarBrand
-          full={{ src: logo, width: 150, height: 50, alt: 'QAT Logo' }}
-        minimized={{ src: QAT, width: 52, height: 50, alt: 'QAT Logo' }}
+          full={{ src: logo, width: 180, height: 50, alt: 'QAT Logo' }}
+          minimized={{ src: QAT, width: 50, height: 50, alt: 'QAT Logo' }}
         />
         <AppSidebarToggler className="d-md-down-none" display="lg" />
         {/* <Nav className="d-md-down-none" navbar>
@@ -52,12 +52,12 @@ class DefaultHeader extends Component {
           {/*          <NavItem className="px-3">
             <NavLink to="/dashboard" className="nav-link" >{i18n.t('static.common.dashboard')}</NavLink>
     </NavItem>*/}
-          {/* <NavItem className="px-3">
-            <NavLink to="/ProgramTree" className="nav-link" >KENYA-FAMILY PLANNING-MOH</NavLink>
-          </NavItem> */}
+          <NavItem className="px-3">
+            {console.log("Inside header called---", this)}
+            <NavLink to="#" className="nav-link" ><b>{this.props.title}</b></NavLink>
+          </NavItem>
         </Nav>
         <Nav className="ml-auto " navbar>
-
 
           {/* <div className="box-role d-none d-sm-block"><i className="icon-user-follow "></i> */}
           {/* <span><b>
@@ -80,12 +80,22 @@ class DefaultHeader extends Component {
               <DropdownItem onClick={this.changeLanguage.bind(this, 'pr')}> {i18n.t('static.language.Portuguese')}</DropdownItem>
             </DropdownMenu>
           </UncontrolledDropdown> */}
-          <DefaultHeaderDropdown onLogout={this.props.onLogout} accnt onChangePassword={this.props.onChangePassword} />
+          <DefaultHeaderDropdown mssgs/>
           <NavItem className="">
             <NavLink to="#" className="nav-link">
               <span className="icon-wrapper icon-wrapper-alt rounded-circle ">
                 <span className="icon-wrapper-bg "></span>
-                <i className="icon-logout icons   icon-anim-pulse text-primary " onClick={this.props.onLogout} title="Logout"></i>
+                <i className="cui-home icons HomeIcon   icon-anim-pulse text-primary " onClick={this.props.onChangeDashboard} title="View Dashboard"></i>
+              </span>
+            </NavLink>
+          </NavItem>
+          {/* <DefaultHeaderDropdown /> */}
+          <DefaultHeaderDropdown onLogout={this.props.onLogout} accnt onChangePassword={this.props.onChangePassword} onChangeDashboard={this.props.onChangeDashboard} />
+          <NavItem className="">
+            <NavLink to="#" className="nav-link">
+              <span className="icon-wrapper icon-wrapper-alt rounded-circle ">
+                <span className="icon-wrapper-bg "></span>
+                <i className="cui-account-logout icons   icon-anim-pulse text-primary " onClick={this.props.onLogout} title="Logout"></i>
               </span>
             </NavLink>
           </NavItem>

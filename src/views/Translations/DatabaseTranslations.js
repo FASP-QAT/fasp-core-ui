@@ -26,6 +26,12 @@ export default class DatabaseTranslations extends React.Component {
         }
         this.saveData = this.saveData.bind(this)
         this.cancelClicked = this.cancelClicked.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
+    }
+    hideSecondComponent() {
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
     }
 
     componentDidMount() {
@@ -65,7 +71,7 @@ export default class DatabaseTranslations extends React.Component {
                     columnSorting: true,
                     tableOverflow: true,
                     wordWrap: true,
-                    paginationOptions: [10, 25, 50, 100],
+                    paginationOptions: [10, 30, 50],
                     position: 'top',
                     allowInsertColumn: false,
                     allowManualInsertColumn: false,
@@ -74,7 +80,8 @@ export default class DatabaseTranslations extends React.Component {
                     allowDeleteRow: false,
                     tableOverflow: false,
                     text: {
-                        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                        // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
                         show: '',
                         entries: '',
                     },
@@ -87,8 +94,11 @@ export default class DatabaseTranslations extends React.Component {
                 })
             } else {
                 this.setState({
-                    message: response.data.message
-                })
+                    message: response.data.messageCode
+                },
+                    () => {
+                        this.hideSecondComponent();
+                    })
             }
         }).catch(
             error => {
@@ -114,6 +124,9 @@ export default class DatabaseTranslations extends React.Component {
 
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
+        var asterisk = document.getElementsByClassName("resizable")[0];
+        var tr = asterisk.firstChild;
+        tr.children[3].classList.add('AsteriskTheadtrTd');
     }
 
     saveData = function () {
@@ -136,11 +149,15 @@ export default class DatabaseTranslations extends React.Component {
             var json = this.state.labelList;
             LabelsService.saveDatabaseLabels(json).then(response => {
                 if (response.status == 200) {
-                    this.props.history.push(`/dashboard/` + i18n.t(response.data.messageCode))
+                    let id = AuthenticationService.displayDashboardBasedOnRole();
+                    this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t(response.data.messageCode))
                 } else {
                     this.setState({
-                        message: response.data.message
-                    })
+                        message: response.data.messageCode
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
                 }
             }).catch(
                 error => {
@@ -170,14 +187,14 @@ export default class DatabaseTranslations extends React.Component {
     render() {
         return (
             <div className="animated fadeIn">
-                <h5>{i18n.t(this.state.message)}</h5>
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row style={{ display: this.state.loading ? "none" : "block" }}>
 
                     <Col xs="12" sm="12">
                         <Card>
-                            <CardHeader>
+                            {/* <CardHeader>
                                 <strong>{i18n.t('static.label.databaseTranslations')}</strong>
-                            </CardHeader>
+                            </CardHeader> */}
                             <CardBody className="table-responsive pt-md-1 pb-md-1">
                                 {/* <div id="loader" className="center"></div> */}
                                 <div id="databaseTranslationTable"></div>
@@ -208,31 +225,30 @@ export default class DatabaseTranslations extends React.Component {
     }
 
     cancelClicked() {
-        this.props.history.push(`/dashboard/` + i18n.t('static.message.cancelled', { entityname }))
+        let id = AuthenticationService.displayDashboardBasedOnRole();
+        this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
     changed = function (instance, cell, x, y, value) {
         if (x == 2) {
             var col = ("C").concat(parseInt(y) + 1);
-            this.el.setStyle(col, "background-color", "transparent");
-            this.el.setStyle(col, "background-color", "yellow");
             if (value == "") {
                 this.el.setComments(col, `${i18n.t('static.label.fieldRequired')}`);
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
             } else {
                 this.el.setComments(col, "");
+                this.el.setStyle(col, "background-color", "transparent");
             }
         } else if (x == 3) {
             var col = ("D").concat(parseInt(y) + 1);
             this.el.setStyle(col, "background-color", "transparent");
-            this.el.setStyle(col, "background-color", "yellow");
         } else if (x == 4) {
             var col = ("E").concat(parseInt(y) + 1);
             this.el.setStyle(col, "background-color", "transparent");
-            this.el.setStyle(col, "background-color", "yellow");
         } else if (x == 5) {
             var col = ("F").concat(parseInt(y) + 1);
             this.el.setStyle(col, "background-color", "transparent");
-            this.el.setStyle(col, "background-color", "yellow");
         }
 
         var labelList = this.state.labelList;

@@ -77,7 +77,7 @@ export default class StepFour extends Component {
 
     getOrganisationList() {
         AuthenticationService.setupAxiosInterceptors();
-        ProgramService.getOrganisationList(document.getElementById('realmId').value)
+        ProgramService.getOrganisationList(this.props.items.program.realm.realmId)
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
@@ -151,7 +151,7 @@ export default class StepFour extends Component {
                                         <FormFeedback className="red">{errors.organisationId}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup>
-                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="organizationPrevious" id="organizationPrevious" onClick={this.props.previousToStepThree} > <i className="fa fa-angle-double-left"></i> Previous</Button>
+                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="organizationPrevious" id="organizationPrevious" onClick={this.props.previousToStepThree} > <i className="fa fa-angle-double-left"></i> Back</Button>
                                         &nbsp;
                                         <Button color="info" size="md" className="float-left mr-1" type="submit" name="organizationSub" id="organizationSub" onClick={() => this.touchAllFour(setTouched, errors)} disabled={!isValid} >Next <i className="fa fa-angle-double-right"></i></Button>
                                         &nbsp;

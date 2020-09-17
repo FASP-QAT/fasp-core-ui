@@ -101,13 +101,19 @@ class ProgramService {
         );
     }
     updateProgramStatus(json) {
-        return axios.put(`${API_URL}/api/programVersion/programId/${json.programId}/versionId/${json.currentVersion.versionId}/versionStatusId/${json.currentVersion.versionStatus.id}`, {}
+        return axios.put(`${API_URL}/api/programVersion/programId/${json.programId}/versionId/${json.currentVersion.versionId}/versionStatusId/${json.currentVersion.versionStatus.id}/${json.currentVersion.notes}`, {}
         );
     }
-    
-    getVersionTypeList(){
+
+    getVersionTypeList() {
         return axios.get(`${API_URL}/api/versionType`, {}
         );
+    }
+
+    checkOrderNumberAndLineNumber(orderNo, primeLineNo, realmCountryId, planningUnitId) {
+        return axios.get(`${API_URL}/api/programData/checkErpOrder/orderNo/${orderNo}/primeLineNo/${primeLineNo}/realmCountryId/${realmCountryId}/planningUnitId/${planningUnitId}`, {}
+        );
+
     }
 
 }

@@ -12,12 +12,13 @@ import ProductCategoryService from '../../api/PoroductCategoryService';
 import SortableTree, {
     getFlatDataFromTree,
     getTreeFromFlatData,
-    getNodeAtPath, addNodeUnderParent, removeNodeAtPath, changeNodeAtPath
+    getNodeAtPath, addNodeUnderParent, removeNodeAtPath, changeNodeAtPath, defaultSearchMethod
 } from "react-sortable-tree";
 import 'react-sortable-tree/style.css';
 import { node } from 'prop-types';
 import * as Yup from 'yup';
 import { Formik } from "formik";
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 
 let initialValues = {
     productCategory: ''
@@ -27,7 +28,7 @@ const validationSchema = function (values, t) {
     console.log("made by us schema--->", values)
     return Yup.object().shape({
         productCategory: Yup.string()
-            .required("Product category name is required.")
+            .required("Product Category Name Is Required.")
 
     })
 }
@@ -67,6 +68,12 @@ export default class ProductCategoryTree extends Component {
             nodename: '',
             maxId: 0,
             message: '',
+            duplicate: 0,
+            searchQuery: null,
+            searchFocusIndex: 0,
+            searchFoundCount: null,
+            loading: true
+            // searchFocusIndex: 0
 
 
         }
@@ -79,28 +86,46 @@ export default class ProductCategoryTree extends Component {
         this.getSortedFaltTreeData = this.getSortedFaltTreeData.bind(this);
         this.reSetTree = this.reSetTree.bind(this);
         this.setTreeData = this.setTreeData.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.handleSearchOnChange = this.handleSearchOnChange.bind(this);
+        // this.selectPrevMatch = this.selectPrevMatch.bind(this);
+        // this.selectNextMatch = this.selectNextMatch.bind(this);
     }
 
     setTreeData(treeData) {
         console.log("treeData----->", treeData);
     }
+    hideSecondComponent() {
+        document.getElementById('div2').style.display = 'block';
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
+    }
+
     componentDidMount() {
+        // setTimeout(function () { //Start the timer
+        //     this.setState({ loading: false })
+        // }.bind(this), 500)
         AuthenticationService.setupAxiosInterceptors();
         RealmService.getRealmListAll()
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        realmList: response.data
+                        realmList: response.data,
+                        loading: false
                     })
                 } else {
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode,
+                        loading: false
                     })
+                    this.hideSecondComponent();
                 }
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
+                        this.setState({ message: error.message, loading: false });
+                        this.hideSecondComponent();
                     } else {
                         switch (error.response.status) {
                             case 500:
@@ -108,10 +133,12 @@ export default class ProductCategoryTree extends Component {
                             case 404:
                             case 406:
                             case 412:
-                                this.setState({ message: error.response.data.messageCode });
+                                this.setState({ message: error.response.data.messageCode, loading: false });
+                                this.hideSecondComponent();
                                 break;
                             default:
-                                this.setState({ message: 'static.unkownError' });
+                                this.setState({ message: 'static.unkownError', loading: false });
+                                this.hideSecondComponent();
                                 console.log("Error code unkown");
                                 break;
                         }
@@ -124,90 +151,144 @@ export default class ProductCategoryTree extends Component {
         if (event.target.name === "realmId") {
             this.state.realmId = event.target.value;
         }
+        this.getProductCategoryListByRealmId();
     };
     nodeNameChange(event) {
         this.setState({ nodename: event.target.value });
     }
     getProductCategoryListByRealmId() {
-        AuthenticationService.setupAxiosInterceptors();
-        ProductCategoryService.getProductCategoryListByRealmId(this.state.realmId)
-            .then(response => {
-                if (response.status == 200) {
-                    this.setState({
-                        productCategoryList: response.data
-                    });
+        let realmId = document.getElementById("realmId").value;
+        if (realmId == 0) {
+            this.setState({
+                message: i18n.t('static.common.realmtext'),
+                color: 'red',
+                productCategoryList: []
+            });
+            this.hideSecondComponent();
+            document.getElementById("treeDiv").style.display = "none";
 
-                    var treeData = getTreeFromFlatData({
-                        flatData: this.state.productCategoryList.map(
-                            node => ({ ...node, title: node.payload.label.label_en, name: node.payload.label.label_en, expanded: node.payload.expanded, isNew: false })),
-                        getKey: node => node.id, // resolve a node's key
-                        getParentKey: node => node.parentId, // resolve a node's parent's key
-                        rootKey: null // The value of the parent key when there is no parent (i.e., at root level)
-                    });
+        } else {
+            this.setState({
+                message: '',
+                loading: true
+            });
+            AuthenticationService.setupAxiosInterceptors();
 
-                    this.state.productCategoryList.map(item => {
-                        if (item.id > this.state.maxId) {
-                            this.setState({ maxId: item.id })
-                        }
+            ProductCategoryService.getProductCategoryListByRealmId(this.state.realmId)
 
-                    });
+                .then(response => {
+                    console.log("response product category list ====>", response.data);
+                    if (response.status == 200) {
+                        this.setState({
+                            productCategoryList: response.data,
+                        });
 
-                    this.setState({ treeData: treeData });
-                    document.getElementById("treeDiv").style.display = "block";
-                } else {
-                    this.setState({
-                        message: response.data.messageCode
-                    })
-                }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
+                        console.log("this.state.productCategoryList====>", this.state.productCategoryList);
+                        var treeData = getTreeFromFlatData({
+                            flatData: this.state.productCategoryList.map(
+                                node => ({ ...node, title: node.payload.label.label_en, name: node.payload.label.label_en, expanded: node.payload.expanded, isNew: false })),
+                            getKey: node => node.id, // resolve a node's key
+                            getParentKey: node => node.parentId, // resolve a node's parent's key
+                            rootKey: null // The value of the parent key when there is no parent (i.e., at root level)
+                        });
+                        console.log("treeData------>", treeData);
+
+
+                        this.state.productCategoryList.map(item => {
+                            if (item.id > this.state.maxId) {
+                                this.setState({ maxId: item.id })
+                            }
+
+                        });
+
+
+                        this.setState({ treeData: treeData, loading: false });
+                        document.getElementById("treeDiv").style.display = "block";
                     } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown");
-                                break;
+                        this.setState({
+                            message: response.data.messageCode, loading: false
+                        })
+                        this.hideSecondComponent();
+                    }
+                }).catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({ message: error.message, loading: false });
+                            this.hideSecondComponent();
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+                                case 500:
+                                case 401:
+                                case 404:
+                                case 406:
+                                case 412:
+                                    this.setState({ message: error.response.data.messageCode, loading: false });
+                                    this.hideSecondComponent();
+                                    break;
+                                default:
+                                    this.setState({ message: 'static.unkownError', loading: false });
+                                    this.hideSecondComponent();
+                                    console.log("Error code unkown");
+                                    break;
+                            }
                         }
                     }
-                }
-            );
+                );
+        }
+
 
     }
     addNewNode() {
-        let currentMaxId = this.state.maxId + 1;
-        const addNode = {
-            id: currentMaxId,
-            parentId: 1,
-            payload: {
-                active: true,
-                productCategoryId: 0,
-                realm: {
-                    id: this.state.realmId
-                },
-                label: {
-                    label_en: this.state.nodename
-                },
-                expanded: true
-            },
-            isNew: true
-        };
+        console.log("this.state.treeData===>", this.state.treeData);
+        let children = this.state.treeData[0].children;
+        let duplicate = 0;
+        console.log("children--------->", children);
+        if (children != undefined) {
+            for (let i = 0; i < children.length; i++) {
+                if (this.state.nodename.localeCompare(children[i].payload.label.label_en) == 0) {//same
+                    // console.log("Children Duplicate");
+                    duplicate = 1;
+                }
+            }
+        }
+        if (duplicate == 0) {//not duplicate found
 
-        var newNode = addNodeUnderParent({
-            treeData: this.state.treeData,
-            parentKey: 1,
-            newNode: { ...addNode, title: addNode.payload.label.label_en },
-            getNodeKey: ({ node }) => node.id
+            let currentMaxId = this.state.maxId + 1;
+            const addNode = {
+                id: currentMaxId,
+                parentId: 1,
+                payload: {
+                    active: true,
+                    productCategoryId: 0,
+                    realm: {
+                        id: this.state.realmId
+                    },
+                    label: {
+                        label_en: this.state.nodename
+                    },
+                    expanded: true
+                },
+                isNew: true
+            };
+
+            var newNode = addNodeUnderParent({
+                treeData: this.state.treeData,
+                parentKey: 1,
+                newNode: { ...addNode, title: addNode.payload.label.label_en },
+                getNodeKey: ({ node }) => node.id
+            })
+            this.setState({ treeData: newNode.treeData, maxId: currentMaxId, nodename: '' });
+        } else {//duplicate found
+            this.setState({
+                message: 'Duplicate Product Category Name Found',
+                color: 'red'
+            })
+            this.hideSecondComponent();
+        }
+        this.setState({
+            duplicate: duplicate
         })
-        this.setState({ treeData: newNode.treeData, maxId: currentMaxId, nodename: '' });
+
     }
     disableNode(rowInfo) {
         // console.log("disable node row info---->", rowInfo);
@@ -336,10 +417,12 @@ export default class ProductCategoryTree extends Component {
             this.setState({ treeData: enabledNode, message: '' });
         } else {
             this.setState({ message: 'Sorry The Parent Is Disabled !' });
+            this.hideSecondComponent();
         }
 
     }
     getSortedFaltTreeData() {
+        this.setState({ loading: true })
         let unsortedFlatTreeData = getFlatDataFromTree({
             treeData: this.state.treeData,
             getNodeKey: ({ node }) => node.id,
@@ -364,22 +447,34 @@ export default class ProductCategoryTree extends Component {
             submitJson.push(json);
         }
         )
-        // console.log("submit json---->", submitJson);
+        console.log("submit json---->", submitJson);
+        console.log("submit json---->", JSON.stringify(submitJson));
         ProductCategoryService.addProductCategory(submitJson)
             .then(response => {
                 if (response.status == 200) {
                     // console.log("success-------------------------.");
-                    this.props.history.push(`/dashboard/` + i18n.t('static.productCategory.success'))
+                    // this.props.history.push(`/dashboard/` + i18n.t('static.productCategory.success'))
+                    // this.props.history.push(`/dashboard/` + 'green/' + i18n.t('static.productCategory.success'))
+                    this.props.history.push(`/productCategory/productCategoryTree/` + 'green/' + i18n.t('static.productCategory.success'))
+                    this.setState({
+                        message: i18n.t('static.productCategory.success'),
+                        color: 'green',
+                        loading: false
+                    })
+                    this.hideSecondComponent();
                 } else {
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode,
+                        loading: false
                     })
+                    this.hideSecondComponent();
                 }
             })
             .catch(
                 error => {
                     if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
+                        this.setState({ message: error.message, loading: false });
+                        this.hideSecondComponent();
                     } else {
                         switch (error.response ? error.response.status : "") {
                             case 500:
@@ -387,10 +482,12 @@ export default class ProductCategoryTree extends Component {
                             case 404:
                             case 406:
                             case 412:
-                                this.setState({ message: error.response.data.messageCode });
+                                this.setState({ message: error.response.data.messageCode, loading: false });
+                                this.hideSecondComponent();
                                 break;
                             default:
-                                this.setState({ message: 'static.unkownError' });
+                                this.setState({ message: 'static.unkownError', loading: false });
+                                this.hideSecondComponent();
                                 break;
                         }
                     }
@@ -400,6 +497,7 @@ export default class ProductCategoryTree extends Component {
 
     }
     reSetTree() {
+        this.setState({ nodename: '' });
         this.getProductCategoryListByRealmId();
     }
     touchAll(errors) {
@@ -419,7 +517,57 @@ export default class ProductCategoryTree extends Component {
             }
         }
     }
+    handleSearchOnChange = e => {
+        this.setState({
+            searchQuery: e.target.value,
+        });
+    };
+
+    // selectPrevMatch = () => {
+    //     // const { searchFocusIndex, searchFoundCount } = this.state;
+
+    //     this.setState({
+    //         searchFocusIndex:
+    //            this.state.searchFocusIndex !== null
+    //                 ? (this.state.searchFoundCount + this.state.searchFocusIndex - 1) % this.state.searchFoundCount
+    //                 : this.state.searchFoundCount - 1
+    //     });
+    // };
+
+    // selectNextMatch = () => {
+    //     // const { searchFocusIndex, searchFoundCount } = this.state;
+
+    //     this.setState({
+    //         searchFocusIndex:
+    //         this.state.searchFocusIndex !== null
+    //                 ? (this.state.searchFocusIndex + 1) % this.state.searchFoundCount
+    //                 : 0
+    //     });
+    // };
+
     render() {
+        const { searchString, searchFocusIndex, searchFoundCount } = this.state;
+
+        const customSearchMethod = ({ node, searchQuery }) =>
+            searchQuery &&
+            node.title.toLowerCase().indexOf(searchQuery.toLowerCase()) > -1;
+
+        const selectPrevMatch = () =>
+            this.setState({
+                searchFocusIndex:
+                    searchFocusIndex !== null
+                        ? (searchFoundCount + searchFocusIndex - 1) % searchFoundCount
+                        : searchFoundCount - 1,
+            });
+
+        const selectNextMatch = () =>
+            this.setState({
+                searchFocusIndex:
+                    searchFocusIndex !== null
+                        ? (searchFocusIndex + 1) % searchFoundCount
+                        : 0,
+            });
+
         const { realmList } = this.state;
         let realms = realmList.length > 0
             && realmList.map((item, i) => {
@@ -432,18 +580,23 @@ export default class ProductCategoryTree extends Component {
 
         return (
             <div className="animated fadeIn">
-                <h5 className="red">{this.state.message}</h5>
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
+                }} />
+                <h5 id="div2" className={this.state.color}>{this.state.message}</h5>
                 <Row>
                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                         <Card className="mb-lg-0">
-                            <CardHeader className="pb-lg-1">
+                            {/* <CardHeader className="pb-lg-1">
                                 <strong>Product Category</strong>
-                            </CardHeader>
-                            <CardBody className="pb-lg-0">
+                            </CardHeader> */}
+                            <CardBody className="pb-lg-0 pt-lg-1">
                                 <Col md="3 pl-0" >
                                     <FormGroup>
                                         <Label htmlFor="select">{i18n.t('static.program.realm')}</Label>
-                                        <div className="controls SelectGo">
+                                        <div className="controls ">
                                             <InputGroup>
                                                 <Input
                                                     bsSize="sm"
@@ -451,12 +604,12 @@ export default class ProductCategoryTree extends Component {
                                                     type="select" name="realmId" id="realmId"
                                                 // onChange={this.getProductCategoryListByRealmId}
                                                 >
-                                                    <option value="">{i18n.t('static.common.select')}</option>
+                                                    <option value="0">{i18n.t('static.common.select')}</option>
                                                     {realms}
                                                 </Input>
-                                                <InputGroupAddon addonType="append">
+                                                {/* <InputGroupAddon addonType="append">
                                                     <Button color="secondary Gobtn btn-sm" onClick={this.getProductCategoryListByRealmId}>{i18n.t('static.common.go')}</Button>
-                                                </InputGroupAddon>
+                                                </InputGroupAddon> */}
                                             </InputGroup>
                                         </div>
                                     </FormGroup>
@@ -468,7 +621,7 @@ export default class ProductCategoryTree extends Component {
 
                 <Row id="treeDiv" style={{ display: "none" }}>
                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
-                        <Card>
+                        <Card style={{ display: this.state.loading ? "none" : "block" }}>
                             <CardBody>
                                 <Formik
                                     enableReinitialize={true}
@@ -476,7 +629,12 @@ export default class ProductCategoryTree extends Component {
                                     validate={validate(validationSchema)}
                                     onSubmit={(values, { setSubmitting, setErrors, resetForm }) => {
                                         this.addNewNode();
-                                        resetForm({ productCategory: '' });
+                                        if (this.state.duplicate == 1) {
+
+                                        } else {
+                                            resetForm({ productCategory: '' });
+                                        }
+
                                     }}
                                     render={
                                         ({
@@ -488,37 +646,70 @@ export default class ProductCategoryTree extends Component {
                                             handleSubmit,
                                             isSubmitting,
                                             isValid,
-                                            setTouched
+                                            setTouched,
+                                            handleReset
                                         }) => (
-                                                <Form onSubmit={handleSubmit} noValidate name='productCategoryForm'>
+                                                <Form onSubmit={handleSubmit} className="needs-validation" onReset={handleReset} noValidate name='productCategoryForm'>
+
                                                     <FormGroup>
-                                                        <Row>
-                                                            <Col md={4} className="pr-lg-1">
-                                                                <Label for="product category">{i18n.t('static.productCategory.productCategoryName')}</Label>
-                                                                <Input
-                                                                    type="text"
-                                                                    value={this.state.nodename}
-                                                                    bsSize="sm"
-                                                                    valid={!errors.productCategory && this.state.nodename != ''}
-                                                                    invalid={touched.productCategory && !!errors.productCategory}
-                                                                    onChange={event => { handleChange(event); this.nodeNameChange(event) }}
-                                                                    onBlur={handleBlur}
-                                                                    name="productCategory" />
-                                                                <FormFeedback className="red">{errors.productCategory}</FormFeedback>
-                                                            </Col>
-                                                            <Col className="pl-lg-0" md={2} style={{ paddingTop: '27px' }}>
-                                                                <Button className="text-white" type="submit" size="sm" color="success" onClick={() => this.touchAll(errors)}><i className="fa fa-plus"></i> Add</Button>
-                                                            </Col>
-                                                        </Row>
+                                                        {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PRODUCT_CATEGORY') &&
+                                                            <Row>
+                                                                <Col md={4} className="pr-lg-1">
+                                                                    <Label for="product category">{i18n.t('static.productCategory.productCategoryName')}<span class="red Reqasterisk">*</span></Label>
+                                                                    <Input
+                                                                        type="text"
+                                                                        value={this.state.nodename}
+                                                                        bsSize="sm"
+                                                                        valid={!errors.productCategory && this.state.nodename != ''}
+                                                                        invalid={touched.productCategory && !!errors.productCategory}
+                                                                        onChange={event => { handleChange(event); this.nodeNameChange(event) }}
+                                                                        onBlur={handleBlur}
+                                                                        name="productCategory" />
+                                                                    <FormFeedback className="red">{errors.productCategory}</FormFeedback>
+                                                                </Col>
+                                                                <Col className="pl-lg-0" md={2} style={{ paddingTop: '27px' }}>
+                                                                    <Button className="text-white" type="submit" size="sm" color="success" onClick={() => this.touchAll(errors)}><i className="fa fa-plus"></i> Add</Button>
+                                                                </Col>
+                                                            </Row>}
                                                     </FormGroup>
+                                                    {/* {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PRODUCT_CATEGORY') &&
+                                                        // <CardFooter>
+                                                        <FormGroup className="mr-4">
+                                                            <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.reSetTree}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                            <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.getSortedFaltTreeData}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                        </ FormGroup>
+                                                        // </CardFooter>
+                                                    } */}
                                                 </Form>
                                             )} />
+                                <div className="col-md-12 ">
+                                    <Col md="3 float-right" >
+                                        <InputGroup>
+                                            <input type="search" bsSize="sm" placeholder="Search" onChange={this.handleSearchOnChange} className="form-control form-control-sm" />
+                                            <InputGroupAddon addonType="append">
+                                                <button type="button" className=" ml-1 btn btn-secondary Gobtn btn-sm " disabled={!this.state.searchFoundCount} onClick={selectPrevMatch}> <i class="fa fa-angle-left btn-Icon-productTreeNextPre"></i></button>
+                                                <button type="submit" className=" ml-1 btn btn-secondary Gobtn btn-sm " disabled={!this.state.searchFoundCount} onClick={selectNextMatch}><i class="fa fa-angle-right btn-Icon-productTreeNextPre" ></i></button>
+                                            </InputGroupAddon>
+                                        </InputGroup>
+                                    </Col>
+                                </div>
                                 <FormGroup>
                                     <Label for="product category">{i18n.t('static.productCategory.productCategoryTree')}</Label>
                                     <div style={{ height: 450 }}>
                                         <SortableTree
+                                            canDrop={({ nextParent }) => nextParent !=null }
                                             getNodeKey={({ node }) => node.id}
                                             treeData={this.state.treeData}
+                                            searchQuery={this.state.searchQuery}
+                                            searchMethod={customSearchMethod}
+                                            searchFocusOffset={this.state.searchFocusIndex}
+                                            searchFinishCallback={matches =>
+                                                this.setState({
+                                                    searchFoundCount: matches.length,
+                                                    searchFocusIndex:
+                                                        matches.length > 0 ? this.state.searchFocusIndex % matches.length : 0
+                                                })
+                                            }
                                             generateNodeProps={rowInfo => {
                                                 // console.log(rowInfo);
                                                 // if (rowInfo.node.payload.active == true && (rowInfo.parentNode != null && rowInfo.parentNode.id != 1)) {
@@ -567,14 +758,45 @@ export default class ProductCategoryTree extends Component {
 
                                     </div>
                                 </FormGroup>
+                                {/* <input type='text' onInput={(e) => { this.defaultSearchMethod(e.target.value)}} /> */}
+                                {/* <input type="search" onChange={this.handleSearchOnChange} className="form-control" />
+                                <button
+                                    type="button"
+                                    disabled={!this.state.searchFoundCount}
+                                    onClick={selectPrevMatch}
+                                >
+                                    &lt;
+                                </button>
+
+                                <button
+                                    type="submit"
+                                    disabled={!this.state.searchFoundCount}
+                                    onClick={selectNextMatch}
+                                >
+                                    &gt;
+                                 </button> */}
+
                             </CardBody>
                             <CardFooter>
-                                <FormGroup>
-                                    <Button type="reset" size="md" onClick={this.reSetTree} color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> Reset</Button>
-                                    <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.getSortedFaltTreeData}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                </ FormGroup>
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PRODUCT_CATEGORY') &&
+                                    <FormGroup className="mr-4  pb-3">
+                                        <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.reSetTree}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.getSortedFaltTreeData}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                    </ FormGroup>
+                                }
                             </CardFooter>
                         </Card>
+                        <div style={{ display: this.state.loading ? "block" : "none" }}>
+                            <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                <div class="align-items-center">
+                                    <div ><h4> <strong>Loading...</strong></h4></div>
+
+                                    <div class="spinner-border blue ml-4" role="status">
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </Col>
                 </Row>
             </div>

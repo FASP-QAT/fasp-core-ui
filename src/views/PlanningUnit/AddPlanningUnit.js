@@ -77,12 +77,19 @@ export default class AddPlanningUnit extends Component {
                     forecastingUnitId: ''
                 },
                 multiplier: ''
-            }
+            },
+            loading: true
         }
         this.Capitalize = this.Capitalize.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
+    }
+    hideSecondComponent() {
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
     }
 
     dataChange(event) {
@@ -138,18 +145,30 @@ export default class AddPlanningUnit extends Component {
         AuthenticationService.setupAxiosInterceptors();
         UnitService.getUnitListAll()
             .then(response => {
-                this.setState({
-                    units: response.data
-                })
+                if (response.status == 200) {
+                    this.setState({
+                        units: response.data, loading: false
+                    })
+                    AuthenticationService.setupAxiosInterceptors();
+                    ForecastingUnitService.getForecastingUnitList().then(response => {
+                        console.log(response.data)
+                        this.setState({
+                            forecastingUnits: response.data, loading: false
+                        })
+                    })
+                }
+                else {
+                    this.setState({
+                        message: response.data.messageCode, loading: false
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
+                }
+
             })
 
-        AuthenticationService.setupAxiosInterceptors();
-        ForecastingUnitService.getForecastingUnitList().then(response => {
-            console.log(response.data)
-            this.setState({
-                forecastingUnits: response.data
-            })
-        })
+
 
     }
 
@@ -185,27 +204,35 @@ export default class AddPlanningUnit extends Component {
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
                 }} />
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
-                <Row>
+                <Row style={{ display: this.state.loading ? "none" : "block" }}>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
-                            <CardHeader>
+                            {/* <CardHeader>
                                 <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
-                            </CardHeader>
+                            </CardHeader> */}
                             <Formik
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
+                                    this.setState({
+                                        loading: true
+                                    })
                                     console.log(JSON.stringify(this.state.planningUnit))
                                     PlanningUnitService.addPlanningUnit(this.state.planningUnit)
                                         .then(response => {
                                             if (response.status == 200) {
-                                                this.props.history.push(`/planningUnit/listPlanningUnit/` + i18n.t(response.data.messageCode, { entityname }))
+                                                this.props.history.push(`/planningUnit/listPlanningUnit/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
-                                                    message: response.data.messageCode
-                                                })
+                                                    message: response.data.messageCode, loading: false
+                                                },
+                                                    () => {
+                                                        this.hideSecondComponent();
+                                                    })
                                             }
                                         })
 
@@ -298,7 +325,7 @@ export default class AddPlanningUnit extends Component {
                                                 <CardFooter>
                                                     <FormGroup>
                                                         <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="reset" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                        <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                         &nbsp;
 
@@ -311,6 +338,17 @@ export default class AddPlanningUnit extends Component {
                         </Card>
                     </Col>
                 </Row>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div>
                     <h6>{i18n.t(this.state.message)}</h6>
                     <h6>{i18n.t(this.props.match.params.message)}</h6>
@@ -320,7 +358,7 @@ export default class AddPlanningUnit extends Component {
     }
 
     cancelClicked() {
-        this.props.history.push(`/planningUnit/listPlanningUnit/` + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/planningUnit/listPlanningUnit/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
     resetClicked() {

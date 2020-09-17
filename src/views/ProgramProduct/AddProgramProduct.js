@@ -1,75 +1,24 @@
 import React, { Component } from "react";
+import jexcel from 'jexcel';
+import "../../../node_modules/jexcel/dist/jexcel.css";
 import {
     Card, CardBody, CardHeader,
     Label, Input, FormGroup,
     CardFooter, Button, Table, Badge, Col, Row, Form, FormFeedback
 
 } from 'reactstrap';
-import DeleteSpecificRow from './TableFeatureTwo';
+
 import ProgramService from "../../api/ProgramService";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import PlanningUnitService from "../../api/PlanningUnitService";
-import StatusUpdateButtonFeature from '../../CommonComponent/StatusUpdateButtonFeature';
-import UpdateButtonFeature from '../../CommonComponent/UpdateButtonFeature';
 import i18n from '../../i18n';
-import * as Yup from 'yup';
-import { Formik } from "formik";
-import getLabelText from '../../CommonComponent/getLabelText'
-
+import ProductCategoryServcie from '../../api/PoroductCategoryService.js';
+import { jExcelLoadedFunction } from "../../CommonComponent/JExcelCommonFunctions";
 const entityname = i18n.t('static.dashboard.programPlanningUnit');
 
-let initialValues = {
-    planningUnitId: '',
-    reorderFrequencyInMonths: '',
-    minMonthsOfStock: '',
-    localProcurementLeadTime: ''
-}
 
-const validationSchema = function (values, t) {
-    // console.log("made by us schema--->", values)
-    return Yup.object().shape({
-        planningUnitId: Yup.string()
-            .required(i18n.t('static.procurementUnit.validPlanningUnitText')),
-        reorderFrequencyInMonths: Yup.string()
-            .matches(/^[0-9]*$/, i18n.t('static.procurementagent.onlynumberText'))
-            .typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .required(i18n.t('static.programPlanningUnit.validReorderFrequencyText')).min(0, i18n.t('static.procurementUnit.validValueText')),
-        minMonthsOfStock: Yup.string()
-            .matches(/^[0-9]*$/, i18n.t('static.procurementagent.onlynumberText'))
-            .typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .required('Please enter minimum month of stock').min(0, i18n.t('static.procurementUnit.validValueText')),
-        localProcurementLeadTime: Yup.number().
-            typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .required('Please enter local procurement lead time').min(0, i18n.t('static.procurementUnit.validValueText'))
-    })
-}
-
-
-const validate = (getValidationSchema) => {
-
-    return (values) => {
-        const validationSchema = getValidationSchema(values)
-        try {
-            validationSchema.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationError(error)
-        }
-    }
-}
-
-const getErrorsFromValidationError = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
-}
 
 class AddprogramPlanningUnit extends Component {
-
     constructor(props) {
         super(props);
         let rows = [];
@@ -83,6 +32,8 @@ class AddprogramPlanningUnit extends Component {
             planningUnitName: '',
             reorderFrequencyInMonths: '',
             minMonthsOfStock: '',
+            monthsInFutureForAmc: '',
+            monthsInPastForAmc: '',
             rows: rows,
             programList: [],
             planningUnitList: [],
@@ -93,552 +44,1110 @@ class AddprogramPlanningUnit extends Component {
             updateRowStatus: 0,
             lang: localStorage.getItem('lang'),
             batchNoRequired: false,
-            localProcurementLeadTime: ''
+            localProcurementLeadTime: '',
+            isValidData: true,
+            loading: true,
+            productCategoryList: []
 
         }
-        this.addRow = this.addRow.bind(this);
-        this.handleRemoveSpecificRow = this.handleRemoveSpecificRow.bind(this);
+        // this.addRow = this.addRow.bind(this);
+        // this.handleRemoveSpecificRow = this.handleRemoveSpecificRow.bind(this);
         this.submitForm = this.submitForm.bind(this);
-        this.setTextAndValue = this.setTextAndValue.bind(this);
+        // this.setTextAndValue = this.setTextAndValue.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
-        this.enableRow = this.enableRow.bind(this);
-        this.disableRow = this.disableRow.bind(this);
-        this.updateRow = this.updateRow.bind(this);
+        // this.enableRow = this.enableRow.bind(this);
+        // this.disableRow = this.disableRow.bind(this);
+        // this.updateRow = this.updateRow.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.checkValidation = this.checkValidation.bind(this);
+        this.addRowInJexcel = this.addRowInJexcel.bind(this);
+        this.changed = this.changed.bind(this);
+        this.dropdownFilter = this.dropdownFilter.bind(this);
+    }
+
+    dropdownFilter = function (instance, cell, c, r, source) {
+        var mylist = [];
+        var value = (instance.jexcel.getJson()[r])[c - 1];
+        // AuthenticationService.setupAxiosInterceptors();
+        // PlanningUnitService.getActivePlanningUnitList()
+        //     .then(response => {
+        //         if (response.status == 200) {
+        // console.log("for my list response---", response.data);
+        // this.setState({
+        //     planningUnitList: response.data
+        // });
+
+        var puList = []
+        if (value != -1) {
+            console.log("in if=====>");
+            var pc = this.state.productCategoryList.filter(c => c.payload.productCategoryId == value)[0]
+            var pcList = this.state.productCategoryList.filter(c => c.payload.productCategoryId == pc.payload.productCategoryId || c.parentId == pc.id);
+            var pcIdArray = [];
+            for (var pcu = 0; pcu < pcList.length; pcu++) {
+                pcIdArray.push(pcList[pcu].payload.productCategoryId);
+            }
+            puList = (this.state.planningUnitList).filter(c => pcIdArray.includes(c.forecastingUnit.productCategory.id) && c.active.toString() == "true");
+        } else {
+            console.log("in else=====>");
+            puList = this.state.planningUnitList
+        }
+
+        for (var k = 0; k < puList.length; k++) {
+            var planningUnitJson = {
+                name: puList[k].label.label_en,
+                id: puList[k].planningUnitId
+            }
+            mylist.push(planningUnitJson);
+        }
+        return mylist;
     }
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 8000);
     }
-    addRow() {
-        let addRow = true;
-        if (addRow) {
-            this.state.rows.map(item => {
-                if (item.planningUnit.id == this.state.planningUnitId) {
-                    addRow = false;
-                }
-            }
-            )
-        }
-        if (addRow == true) {
-            var programName = document.getElementById("programId");
-            var value = programName.selectedIndex;
-            var selectedProgramName = programName.options[value].text;
-            this.state.rows.push(
-                {
-                    planningUnit: {
-                        id: this.state.planningUnitId,
-                        label: {
-                            label_en: this.state.planningUnitName
-                        }
-                    },
-                    program: {
-                        id: this.state.programId,
-                        label: {
-                            label_en: selectedProgramName
-                        }
-                    },
-                    reorderFrequencyInMonths: this.state.reorderFrequencyInMonths,
-                    minMonthsOfStock: this.state.minMonthsOfStock,
-                    localProcurementLeadTime: this.state.localProcurementLeadTime,
-                    batchNoRequired: this.state.batchNoRequired,
-                    active: true,
-                    isNew: this.state.isNew,
-                    programPlanningUnitId: this.state.programPlanningUnitId
 
-                })
-
-            this.setState({ rows: this.state.rows, rowErrorMessage: '' });
-
-        } else {
-            this.setState({ rowErrorMessage: 'Planning Unit Already Exist In List.' });
-        }
-        this.setState({
-            planningUnitId: '',
-            reorderFrequencyInMonths: '',
-            minMonthsOfStock: '',
-            planningUnitName: '',
-            programPlanningUnitId: 0,
-            isNew: true,
-            updateRowStatus: 0,
-            localProcurementLeadTime: '',
-            batchNoRequired: false
-        });
-        document.getElementById('select').disabled = false;
-    }
-
-    updateRow(idx) {
-        if (this.state.updateRowStatus == 1) {
-            this.setState({ rowErrorMessage: 'One Of the mapped row is already in update.' })
-        } else {
-
-            document.getElementById('select').disabled = true;
-            initialValues = {
-                planningUnitId: this.state.rows[idx].planningUnit.id,
-                reorderFrequencyInMonths: this.state.rows[idx].reorderFrequencyInMonths,
-                minMonthsOfStock: this.state.rows[idx].minMonthsOfStock,
-                localProcurementLeadTime: this.state.rows[idx].localProcurementLeadTime,
-                batchNoRequired: this.state.rows[idx].batchNoRequired
-            }
-
-            const rows = [...this.state.rows]
-            this.setState({
-                planningUnitId: this.state.rows[idx].planningUnit.id,
-                planningUnitName: this.state.rows[idx].planningUnit.label.label_en,
-                reorderFrequencyInMonths: this.state.rows[idx].reorderFrequencyInMonths,
-                minMonthsOfStock: this.state.rows[idx].minMonthsOfStock,
-                programPlanningUnitId: this.state.rows[idx].programPlanningUnitId,
-                isNew: false,
-                updateRowStatus: 1,
-                localProcurementLeadTime: this.state.rows[idx].localProcurementLeadTime,
-                batchNoRequired: this.state.rows[idx].batchNoRequired
-            })
-            rows.splice(idx, 1);
-            this.setState({ rows });
-        }
-    }
-
-    enableRow(idx) {
-        this.state.rows[idx].active = true;
-        this.setState({ rows: this.state.rows })
-    }
-
-    disableRow(idx) {
-        this.state.rows[idx].active = false;
-        this.setState({ rows: this.state.rows })
-    }
-
-    handleRemoveSpecificRow(idx) {
-        const rows = [...this.state.rows]
-        rows.splice(idx, 1);
-        this.setState({ rows })
-    }
-
-    setTextAndValue = (event) => {
-        if (event.target.name === 'reorderFrequencyInMonths') {
-            this.setState({ reorderFrequencyInMonths: event.target.value });
-        }
-        if (event.target.name === 'minMonthsOfStock') {
-            this.setState({ minMonthsOfStock: event.target.value });
-        }
-        else if (event.target.name === 'planningUnitId') {
-            this.setState({ planningUnitName: event.target[event.target.selectedIndex].text });
-            this.setState({ planningUnitId: event.target.value })
-        }
-        if (event.target.name === 'localProcurementLeadTime') {
-            this.setState({ localProcurementLeadTime: event.target.value });
-        }
-        if (event.target.name === 'batchNoRequired') {
-            // this.setState({ batchNoRequired: event.target.value });
-            this.setState({ batchNoRequired: event.target.id === "batchNoRequired2" ? false : true })
-        }
-    };
-    submitForm() {
-        AuthenticationService.setupAxiosInterceptors();
-        console.log("SUBMIT----", this.state.rows);
-        ProgramService.addprogramPlanningUnitMapping(this.state.rows)
-            .then(response => {
-                if (response.status == "200") {
-                    this.props.history.push(`/program/listProgram/`+ 'green/' + i18n.t(response.data.messageCode, { entityname }))
-                } else {
-                    this.setState({
-                        message: response.data.messageCode
-                    },
-                        () => {
-                            this.hideSecondComponent();
-                        })
-                }
-
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown");
-                                break;
-                        }
-                    }
-                }
-            );
-
-
-
-    }
     componentDidMount() {
+        var list = [];
+        var productCategoryListNew = [];
+        var programObj;
+        // var realmId = document.getElementById("realmId").value;
+
         AuthenticationService.setupAxiosInterceptors();
 
-        ProgramService.getProgramPlaningUnitListByProgramId(this.state.programId)
-            .then(response => {
-                if (response.status == 200) {
-                    let myReasponse = response.data;
-                    if (myReasponse.length > 0) {
-                        // console.log("myReasponse ---", myReasponse);
-                        this.setState({ rows: myReasponse });
-                    }
-                } else {
-                    this.setState({
-                        message: response.data.messageCode
-                    })
-                }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown");
-                                break;
-                        }
-                    }
-                }
-            );
-
-
-        ProgramService.getProgramList().then(response => {
-            if (response.status == "200") {
-                this.setState({
-                    programList: response.data
-                });
-            } else {
-                this.setState({
-                    message: response.data.message
-                })
-            }
-
-        }).catch(
-            error => {
-                if (error.message === "Network Error") {
-                    this.setState({ message: error.message });
-                } else {
-                    switch (error.response ? error.response.status : "") {
-                        case 500:
-                        case 401:
-                        case 404:
-                        case 406:
-                        case 412:
-                            this.setState({ message: error.response.data.messageCode });
-                            break;
-                        default:
-                            this.setState({ message: 'static.unkownError' });
-                            console.log("Error code unkown");
-                            break;
-                    }
-                }
-            }
-        );
-        PlanningUnitService.getActivePlanningUnitList().then(response => {
+        ProgramService.getProgramById(this.props.match.params.programId).then(response => {
             if (response.status == 200) {
-                this.setState({
-                    planningUnitList: response.data
-                });
+                programObj = response.data;
+                var realmId = programObj.realmCountry.realm.realmId
+                console.log("problemObj====>", programObj, "realmId======", realmId);
+                ProductCategoryServcie.getProductCategoryListByRealmId(realmId)
+                    .then(response => {
+
+                        if (response.status == 200) {
+                            console.log("productCategory response----->", response.data);
+                            for (var k = 0; k < (response.data).length; k++) {
+                                var spaceCount = response.data[k].sortOrder.split(".").length;
+                                console.log("spaceCOunt--->", spaceCount);
+                                var indendent = "";
+                                for (var p = 1; p <= spaceCount - 1; p++) {
+                                    if (p == 1) {
+                                        indendent = indendent.concat("|_");
+                                    } else {
+                                        indendent = indendent.concat("_");
+                                    }
+                                }
+                                console.log("ind", indendent);
+                                console.log("indendent.concat(response.data[k].payload.label.label_en)-->", indendent.concat(response.data[k].payload.label.label_en));
+
+                                var productCategoryJson = {};
+                                if (response.data[k].payload.productCategoryId == 0) {
+                                    productCategoryJson = {
+                                        name: (response.data[k].payload.label.label_en),
+                                        id: -1
+                                    }
+                                } else {
+                                    productCategoryJson = {
+                                        name: (response.data[k].payload.label.label_en),
+                                        id: response.data[k].payload.productCategoryId
+                                    }
+                                }
+
+                                productCategoryListNew.push(productCategoryJson);
+
+                            }
+                            console.log("constant product category list====>", productCategoryListNew);
+                            this.setState({ productCategoryList: response.data });
+
+                            // PlanningUnitService.getAllPlanningUnitList()
+                            PlanningUnitService.getActivePlanningUnitList()
+                                .then(response => {
+                                    if (response.status == 200) {
+                                        this.setState({
+                                            planningUnitList: response.data
+                                        });
+                                        for (var k = 0; k < (response.data).length; k++) {
+                                            var planningUnitJson = {
+                                                name: response.data[k].label.label_en,
+                                                id: response.data[k].planningUnitId,
+                                                active: response.data[k].active
+                                            }
+                                            list.push(planningUnitJson);
+                                        }
+
+
+                                        AuthenticationService.setupAxiosInterceptors();
+                                        ProgramService.getProgramPlaningUnitListByProgramId(this.state.programId)
+                                            .then(response => {
+                                                if (response.status == 200) {
+                                                    // alert("hi");
+                                                    let myReasponse = response.data;
+                                                    var productDataArr = []
+                                                    // if (myReasponse.length > 0) {
+                                                    this.setState({ rows: myReasponse });
+                                                    var data = [];
+                                                    if (myReasponse.length != 0) {
+                                                        for (var j = 0; j < myReasponse.length; j++) {
+                                                            console.log("myReasponse[j]---", myReasponse[j]);
+                                                            data = [];
+                                                            data[0] = myReasponse[j].productCategory.id;
+                                                            data[1] = myReasponse[j].planningUnit.id;
+                                                            data[2] = myReasponse[j].reorderFrequencyInMonths;
+                                                            data[3] = myReasponse[j].minMonthsOfStock;
+                                                            data[4] = myReasponse[j].monthsInFutureForAmc;
+                                                            data[5] = myReasponse[j].monthsInPastForAmc;
+                                                            data[6] = myReasponse[j].localProcurementLeadTime;
+                                                            data[7] = myReasponse[j].shelfLife;
+                                                            data[8] = myReasponse[j].catalogPrice;
+                                                            data[9] = myReasponse[j].programPlanningUnitId;
+                                                            data[10] = myReasponse[j].active;
+                                                            data[11] = 0;
+                                                            data[12] = myReasponse[j].program.id;
+                                                            productDataArr.push(data);
+                                                        }
+                                                    }
+
+                                                    if (productDataArr.length == 0) {
+                                                        data = [];
+                                                        data[0] = 0;
+                                                        data[1] = "";
+                                                        data[2] = "";
+                                                        data[3] = "";
+                                                        data[4] = "";
+                                                        data[5] = "";
+                                                        data[6] = "";
+                                                        data[7] = "";
+                                                        data[8] = 0;
+                                                        data[9] = 0;
+                                                        data[10] = 1;
+                                                        data[11] = 1;
+                                                        data[12] = this.props.match.params.programId;
+                                                        productDataArr[0] = data;
+                                                    }
+
+
+                                                    this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
+                                                    this.el.destroy();
+                                                    var json = [];
+                                                    var data = productDataArr;
+                                                    var options = {
+                                                        data: data,
+                                                        columnDrag: true,
+                                                        colWidths: [290, 290, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+                                                        columns: [
+                                                            {
+                                                                title: 'Product Category',
+                                                                type: 'dropdown',
+                                                                source: productCategoryListNew
+                                                            },
+                                                            {
+                                                                title: 'Planning Unit',
+                                                                type: 'autocomplete',
+                                                                source: list,
+                                                                filter: this.dropdownFilter
+                                                            },
+                                                            {
+                                                                title: 'Reorder Frequency In Months',
+                                                                type: 'number',
+
+                                                            },
+                                                            {
+                                                                title: 'Min Month Of Stock',
+                                                                type: 'number'
+                                                            },
+                                                            {
+                                                                title: 'Months In Future For AMC',
+                                                                type: 'number'
+                                                            },
+                                                            {
+                                                                title: 'Months In Past For AMC',
+                                                                type: 'number'
+                                                            },
+                                                            {
+                                                                title: 'Local Procurment Lead Time(Months)',
+                                                                type: 'number'
+                                                            },
+                                                            {
+                                                                title: 'Shelf Life(Months)',
+                                                                type: 'number'
+                                                            },
+                                                            {
+                                                                title: 'Catalog Price (USD)',
+                                                                type: 'number'
+                                                            },
+                                                            {
+                                                                title: 'Id',
+                                                                type: 'hidden'
+                                                            },
+                                                            {
+                                                                title: 'Active',
+                                                                type: 'hidden'
+                                                            },
+                                                            {
+                                                                title: 'Changed Flag',
+                                                                type: 'hidden'
+                                                            },
+                                                            {
+                                                                title: 'ProgramId',
+                                                                type: 'hidden'
+                                                            }
+
+
+                                                        ],
+                                                        pagination: 10,
+                                                        search: true,
+                                                        columnSorting: true,
+                                                        tableOverflow: true,
+                                                        wordWrap: true,
+                                                        paginationOptions: [10, 25, 50],
+                                                        position: 'top',
+                                                        allowInsertColumn: false,
+                                                        allowManualInsertColumn: false,
+                                                        allowDeleteRow: true,
+                                                        onchange: this.changed,
+                                                        oneditionend: this.onedit,
+                                                        copyCompatibility: true,
+                                                        text: {
+                                                            // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                                                            showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
+                                                            show: '',
+                                                            entries: '',
+                                                        },
+                                                        onload: this.loaded,
+                                                        contextMenu: function (obj, x, y, e) {
+                                                            var items = [];
+                                                            //Add consumption batch info
+
+
+                                                            if (y == null) {
+                                                                // Insert a new column
+                                                                if (obj.options.allowInsertColumn == true) {
+                                                                    items.push({
+                                                                        title: obj.options.text.insertANewColumnBefore,
+                                                                        onclick: function () {
+                                                                            obj.insertColumn(1, parseInt(x), 1);
+                                                                        }
+                                                                    });
+                                                                }
+
+                                                                if (obj.options.allowInsertColumn == true) {
+                                                                    items.push({
+                                                                        title: obj.options.text.insertANewColumnAfter,
+                                                                        onclick: function () {
+                                                                            obj.insertColumn(1, parseInt(x), 0);
+                                                                        }
+                                                                    });
+                                                                }
+
+                                                                // Delete a column
+                                                                // if (obj.options.allowDeleteColumn == true) {
+                                                                //     items.push({
+                                                                //         title: obj.options.text.deleteSelectedColumns,
+                                                                //         onclick: function () {
+                                                                //             obj.deleteColumn(obj.getSelectedColumns().length ? undefined : parseInt(x));
+                                                                //         }
+                                                                //     });
+                                                                // }
+
+                                                                // Rename column
+                                                                // if (obj.options.allowRenameColumn == true) {
+                                                                //     items.push({
+                                                                //         title: obj.options.text.renameThisColumn,
+                                                                //         onclick: function () {
+                                                                //             obj.setHeader(x);
+                                                                //         }
+                                                                //     });
+                                                                // }
+
+                                                                // Sorting
+                                                                if (obj.options.columnSorting == true) {
+                                                                    // Line
+                                                                    items.push({ type: 'line' });
+
+                                                                    items.push({
+                                                                        title: obj.options.text.orderAscending,
+                                                                        onclick: function () {
+                                                                            obj.orderBy(x, 0);
+                                                                        }
+                                                                    });
+                                                                    items.push({
+                                                                        title: obj.options.text.orderDescending,
+                                                                        onclick: function () {
+                                                                            obj.orderBy(x, 1);
+                                                                        }
+                                                                    });
+                                                                }
+                                                            } else {
+                                                                // Insert new row before
+                                                                if (obj.options.allowInsertRow == true) {
+                                                                    items.push({
+                                                                        title: i18n.t('static.common.insertNewRowBefore'),
+                                                                        onclick: function () {
+                                                                            var data = [];
+                                                                            data[0] = 0;
+                                                                            data[1] = "";
+                                                                            data[2] = "";
+                                                                            data[3] = "";
+                                                                            data[4] = "";
+                                                                            data[5] = "";
+                                                                            data[6] = "";
+                                                                            data[7] = "";
+                                                                            data[8] = 0;
+                                                                            data[9] = 0;
+                                                                            data[10] = 1;
+                                                                            data[11] = 1;
+                                                                            data[12] = this.props.match.params.programId;
+                                                                            obj.insertRow(data, parseInt(y), 1);
+                                                                        }.bind(this)
+                                                                    });
+                                                                }
+                                                                // after
+                                                                if (obj.options.allowInsertRow == true) {
+                                                                    items.push({
+                                                                        title: i18n.t('static.common.insertNewRowAfter'),
+                                                                        onclick: function () {
+                                                                            var data = [];
+                                                                            data[0] = 0;
+                                                                            data[1] = "";
+                                                                            data[2] = "";
+                                                                            data[3] = "";
+                                                                            data[4] = "";
+                                                                            data[5] = "";
+                                                                            data[6] = "";
+                                                                            data[7] = "";
+                                                                            data[8] = 0;
+                                                                            data[9] = 0;
+                                                                            data[10] = 1;
+                                                                            data[11] = 1;
+                                                                            data[12] = this.props.match.params.programId;
+                                                                            obj.insertRow(data, parseInt(y));
+                                                                        }.bind(this)
+                                                                    });
+                                                                }
+                                                                // Delete a row
+                                                                if (obj.options.allowDeleteRow == true) {
+                                                                    // region id
+                                                                    if (obj.getRowData(y)[9] == 0) {
+                                                                        items.push({
+                                                                            title: obj.options.text.deleteSelectedRows,
+                                                                            onclick: function () {
+                                                                                obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y));
+                                                                            }
+                                                                        });
+                                                                    }
+                                                                }
+
+                                                                if (x) {
+                                                                    if (obj.options.allowComments == true) {
+                                                                        items.push({ type: 'line' });
+
+                                                                        var title = obj.records[y][x].getAttribute('title') || '';
+
+                                                                        items.push({
+                                                                            title: title ? obj.options.text.editComments : obj.options.text.addComments,
+                                                                            onclick: function () {
+                                                                                obj.setComments([x, y], prompt(obj.options.text.comments, title));
+                                                                            }
+                                                                        });
+
+                                                                        if (title) {
+                                                                            items.push({
+                                                                                title: obj.options.text.clearComments,
+                                                                                onclick: function () {
+                                                                                    obj.setComments([x, y], '');
+                                                                                }
+                                                                            });
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+
+                                                            // Line
+                                                            items.push({ type: 'line' });
+
+                                                            // Save
+                                                            if (obj.options.allowExport) {
+                                                                items.push({
+                                                                    title: i18n.t('static.supplyPlan.exportAsCsv'),
+                                                                    shortcut: 'Ctrl + S',
+                                                                    onclick: function () {
+                                                                        obj.download(true);
+                                                                    }
+                                                                });
+                                                            }
+
+                                                            return items;
+                                                        }.bind(this)
+                                                    };
+                                                    var elVar = jexcel(document.getElementById("mapPlanningUnit"), options);
+                                                    this.el = elVar;
+                                                    this.setState({ mapPlanningUnitEl: elVar, loading: false });
+                                                    // }
+                                                } else {
+                                                    this.setState({
+                                                        message: response.data.messageCode, loading: false
+                                                    })
+                                                }
+                                            }).catch(
+                                                error => {
+                                                    if (error.message === "Network Error") {
+                                                        this.setState({ message: error.message, loading: false });
+                                                    } else {
+                                                        switch (error.response ? error.response.status : "") {
+                                                            case 500:
+                                                            case 401:
+                                                            case 404:
+                                                            case 406:
+                                                            case 412:
+                                                                this.setState({ message: error.response.data.messageCode, loading: false });
+                                                                break;
+                                                            default:
+                                                                this.setState({ message: 'static.unkownError', loading: false });
+                                                                console.log("Error code unkown");
+                                                                break;
+                                                        }
+                                                    }
+                                                }
+                                            );
+
+                                    } else {
+                                        list = [];
+                                        this.setState({ loading: false });
+                                    }
+                                });
+                        } else {
+                            productCategoryListNew = []
+                            this.setState({
+                                message: response.data.messageCode,
+                                loading: false
+                            })
+                        }
+                    });
             } else {
+                productCategoryListNew = []
                 this.setState({
-                    message: response.data.messageCode
+                    message: response.data.messageCode,
+                    loading: false
                 })
             }
 
-        }).catch(
-            error => {
-                if (error.message === "Network Error") {
-                    this.setState({ message: error.message });
+        });
+
+    }
+
+    addRowInJexcel = function () {
+        var json = this.el.getJson();
+        var data = [];
+        data[0] = 0;
+        data[1] = "";
+        data[2] = "";
+        data[3] = "";
+        data[4] = "";
+        data[5] = "";
+        data[6] = "";
+        data[7] = "";
+        data[8] = 0;
+        data[9] = 0;
+        data[10] = 1;
+        data[11] = 1;
+        data[12] = this.props.match.params.programId;
+        this.el.insertRow(
+            data, 0, 1
+        );
+    }
+
+    checkValidation() {
+        var valid = true;
+        var json = this.el.getJson();
+        for (var y = 0; y < json.length; y++) {
+
+
+            var value = this.el.getValueFromCoords(11, y);
+            if (parseInt(value) == 1) {
+                // console.log("PROBLEM");
+
+
+                var col = ("A").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(0, y);
+                // console.log("value-----", value);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
                 } else {
-                    switch (error.response ? error.response.status : "") {
-                        case 500:
-                        case 401:
-                        case 404:
-                        case 406:
-                        case 412:
-                            this.setState({ message: error.response.data.messageCode });
-                            break;
-                        default:
-                            this.setState({ message: 'static.unkownError' });
-                            console.log("Error code unkown");
-                            break;
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+
+                var col = ("B").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(1, y);
+                // console.log("value-----", value);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+
+                //Reorder frequency
+                var col = ("C").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(2, y);
+                var reg = /^[0-9\b]+$/;
+                // console.log("value-----", value);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                }
+
+                //Min months of stock
+                var col = ("D").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(3, y);
+                var reg = /^[0-9\b]+$/;
+                // console.log("value-----", value);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                }
+
+                //Months in future for AMC
+                var col = ("E").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(4, y);
+                var reg = /^[0-9\b]+$/;
+                // console.log("value-----", value);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                }
+
+                //Months in past for AMC
+                var col = ("F").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(5, y);
+                var reg = /^[0-9\b]+$/;
+                // console.log("value-----", value);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                }
+
+                //Local procurement lead time
+                var col = ("G").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(6, y);
+                var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
+                // console.log("value-----", value);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                }
+
+
+                //Shelf life
+                var col = ("H").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(7, y);
+                var reg = /^[0-9\b]+$/;
+                // console.log("value-----", value);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                }
+
+
+                //Catalog price
+                var col = ("I").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(8, y);
+                var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
+                // console.log("value-----", value);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                }
+
+            }
+
+        }
+        return valid;
+    }
+
+    changed = function (instance, cell, x, y, value) {
+        var valid = true;
+        //Product category
+        console.log("changed 1");
+        var rowData = this.el.getRowData(y);
+        if (x == 0) {
+            console.log("changed 2");
+            var col = ("A").concat(parseInt(y) + 1);
+            // alert("value--->",value);
+            console.log("value--->", rowData[0]);
+            console.log("rowData===>", this.el.getRowData(y));
+            if (rowData[0] == "") {
+                console.log("============in if when category is changed ");
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                this.el.setValueFromCoords(11, y, 1, true);
+                valid = false;
+            } else {
+                console.log("============in else when category is changed ");
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+                this.el.setValueFromCoords(11, y, 1, true);
+                valid = true;
+            }
+            var columnName = jexcel.getColumnNameFromId([parseInt(x) + 1, y]);
+            instance.jexcel.setValue(columnName, '');
+        }
+
+        //Planning Unit
+        if (x == 1) {
+            console.log("changed 3");
+            var json = this.el.getJson();
+            var col = ("B").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                this.el.setValueFromCoords(11, y, 1, true);
+                valid = false;
+            } else {
+                for (var i = 0; i < json.length; i++) {
+                    var map = new Map(Object.entries(json[i]));
+                    var planningUnitValue = map.get("1");
+                    if (planningUnitValue == value && y != i) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, "Planning Unit aready exist");
+                        i = json.length;
+                        this.el.setValueFromCoords(11, y, 1, true);
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                        this.el.setValueFromCoords(11, y, 1, true);
+                        valid = true;
                     }
                 }
             }
-        );
+            // var columnName = jexcel.getColumnNameFromId([x + 1, y]);
+            // instance.jexcel.setValue(columnName, '');
+        }
 
-
-    }
-    touchAll(errors) {
-        this.validateForm(errors);
-    }
-    validateForm(errors) {
-        this.findFirstError('programPlanningUnitForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstError(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
+        //Reorder frequency
+        if (x == 2) {
+            console.log("changed 4");
+            var reg = /^[0-9\b]+$/;
+            var col = ("C").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                this.el.setValueFromCoords(11, y, 1, true);
+                valid = false;
+            } else {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    this.el.setValueFromCoords(11, y, 1, true);
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                    this.el.setValueFromCoords(11, y, 1, true);
+                    valid = true;
+                }
             }
         }
+        //Min months of stock
+        if (x == 3) {
+            console.log("changed 5");
+            var reg = /^[0-9\b]+$/;
+            var col = ("D").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                this.el.setValueFromCoords(11, y, 1, true);
+                valid = false;
+            } else {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    this.el.setValueFromCoords(11, y, 1, true);
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                    this.el.setValueFromCoords(11, y, 1, true);
+                    valid = true;
+                }
+            }
+        }
+        //Months in future for AMC
+        if (x == 4) {
+            console.log("changed 6");
+            var reg = /^[0-9\b]+$/;
+            var col = ("E").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                this.el.setValueFromCoords(11, y, 1, true);
+                valid = false;
+            } else {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    this.el.setValueFromCoords(11, y, 1, true);
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                    this.el.setValueFromCoords(11, y, 1, true);
+                    valid = true;
+                }
+            }
+        }
+        //Months in past for AMC
+        if (x == 5) {
+            console.log("changed 7");
+            var reg = /^[0-9\b]+$/;
+            var col = ("F").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                this.el.setValueFromCoords(11, y, 1, true);
+                valid = false;
+            } else {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    this.el.setValueFromCoords(11, y, 1, true);
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                    this.el.setValueFromCoords(11, y, 1, true);
+                    valid = true;
+                }
+            }
+        }
+        //Local procurement lead time
+        if (x == 6) {
+            console.log("changed 8");
+            var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
+            var col = ("G").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                this.el.setValueFromCoords(11, y, 1, true);
+                valid = false;
+            } else {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    this.el.setValueFromCoords(11, y, 1, true);
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                    this.el.setValueFromCoords(11, y, 1, true);
+                    valid = true;
+                }
+            }
+        }
+        //Shelf life
+        if (x == 7) {
+            console.log("changed 9");
+            var reg = /^[0-9\b]+$/;
+            var col = ("H").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                this.el.setValueFromCoords(11, y, 1, true);
+                valid = false;
+            } else {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    this.el.setValueFromCoords(11, y, 1, true);
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                    this.el.setValueFromCoords(11, y, 1, true);
+                    valid = true;
+                }
+            }
+        }
+        //Catalog price
+        if (x == 8) {
+            console.log("changed 10");
+            var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
+            var col = ("I").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                this.el.setValueFromCoords(11, y, 1, true);
+                valid = false;
+            } else {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    this.el.setValueFromCoords(11, y, 1, true);
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                    this.el.setValueFromCoords(11, y, 1, true);
+                    valid = true;
+                }
+            }
+        }
+        this.setState({ isValidData: valid });
+    }
+
+
+
+
+    submitForm() {
+
+        var validation = this.checkValidation();
+        // var validation = this.state.isValidData;
+        if (validation == true) {
+            this.setState({ loading: true })
+            // console.log("validation---true-->");
+
+            var json = this.el.getJson();
+            console.log("Rows on submit", json)
+            var planningUnitArray = []
+            console.log("json.length---" + json.length);
+            for (var i = 0; i < json.length; i++) {
+                var map = new Map(Object.entries(json[i]));
+                console.log("(map.get(11)---" + map.get("11"));
+                if (map.get("11") == 1) {
+                    if (map.get("9") == "") {
+                        var pId = 0;
+                    } else {
+                        var pId = map.get("9");
+                    }
+                    var planningUnitJson = {
+                        programPlanningUnitId: pId,
+                        program: {
+                            id: map.get("12")
+                        },
+                        planningUnit: {
+                            id: map.get("1"),
+                        },
+                        reorderFrequencyInMonths: map.get("2"),
+                        minMonthsOfStock: map.get("3"),
+                        monthsInFutureForAmc: map.get("4"),
+                        monthsInPastForAmc: map.get("5"),
+                        localProcurementLeadTime: map.get("6"),
+                        shelfLife: map.get("7"),
+                        catalogPrice: map.get("8"),
+                        active: map.get("10")
+                    }
+                    planningUnitArray.push(planningUnitJson);
+                }
+
+            }
+            AuthenticationService.setupAxiosInterceptors();
+            console.log("SUBMIT----", planningUnitArray);
+            ProgramService.addprogramPlanningUnitMapping(planningUnitArray)
+                .then(response => {
+                    if (response.status == "200") {
+                        this.props.history.push(`/program/listProgram/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
+                    } else {
+                        this.setState({
+                            message: response.data.messageCode, loading: false
+                        },
+                            () => {
+                                this.hideSecondComponent();
+                            })
+                    }
+
+                }).catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({ message: error.message, loading: false });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+                                case 500:
+                                case 401:
+                                case 404:
+                                case 406:
+                                case 412:
+                                    this.setState({ message: error.response.data.messageCode, loading: false });
+                                    break;
+                                default:
+                                    this.setState({ message: 'static.unkownError', loading: false });
+                                    console.log("Error code unkown");
+                                    break;
+                            }
+                        }
+                    }
+                );
+
+        } else {
+            console.log("Something went wrong");
+        }
+    }
+
+
+    loaded = function (instance, cell, x, y, value) {
+        jExcelLoadedFunction(instance);
+        var asterisk = document.getElementsByClassName("resizable")[0];
+        var tr = asterisk.firstChild;
+        tr.children[1].classList.add('AsteriskTheadtrTd');
+        tr.children[2].classList.add('AsteriskTheadtrTd');
+        tr.children[3].classList.add('AsteriskTheadtrTd');
+        tr.children[4].classList.add('AsteriskTheadtrTd');
+        tr.children[5].classList.add('AsteriskTheadtrTd');
+        tr.children[6].classList.add('AsteriskTheadtrTd');
+        tr.children[7].classList.add('AsteriskTheadtrTd');
+        tr.children[8].classList.add('AsteriskTheadtrTd');
+        tr.children[9].classList.add('AsteriskTheadtrTd');
     }
 
     render() {
-        const { programList } = this.state;
-        const { planningUnitList } = this.state;
-        let programs = programList.length > 0 && programList.map((item, i) => {
-            return (
-                <option key={i} value={item.programId}>
-                    {getLabelText(item.label, this.state.lang)}
-                </option>
-            )
-        }, this);
-        let products = planningUnitList.length > 0 && planningUnitList.map((item, i) => {
-            return (
-                <option key={i} value={item.planningUnitId}>
-                    {getLabelText(item.label, this.state.lang)}
-                </option>
-            )
-        }, this);
+
         return (
             <div className="animated fadeIn">
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
-                <Row>
-                    <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
-                        <Card>
-                            <CardHeader>
+
+                <div style={{ flexBasis: 'auto' }}>
+                    <Card style={{ display: this.state.loading ? "none" : "block" }}>
+                        {/* <CardHeader>
                                 <strong>{i18n.t('static.program.mapPlanningUnit')}</strong>
-                            </CardHeader>
-                            <CardBody>
-                                <Formik
-                                    enableReinitialize={true}
-                                    initialValues={initialValues}
-                                    validate={validate(validationSchema)}
-                                    onSubmit={(values, { setSubmitting, setErrors, resetForm }) => {
-                                        this.addRow();
-                                        resetForm({ planningUnitId: "", reorderFrequencyInMonths: "", minMonthsOfStock: "", localProcurementLeadTime: "", batchNoRequired: false });
-                                    }}
-                                    render={
-                                        ({
-                                            values,
-                                            errors,
-                                            touched,
-                                            handleChange,
-                                            handleBlur,
-                                            handleSubmit,
-                                            isSubmitting,
-                                            isValid,
-                                            setTouched
-                                        }) => (
-                                                <Form onSubmit={handleSubmit} noValidate name='programPlanningUnitForm'>
-                                                    <Row>
-                                                        <FormGroup className="col-md-6">
-                                                            <Label htmlFor="select">{i18n.t('static.program.program')}<span className="red Reqasterisk">*</span></Label>
-                                                            <Input
-                                                                type="select"
-                                                                value={this.state.programId}
-                                                                name="programId"
-                                                                id="programId"
-                                                                disabled>
-                                                                {programs}
-                                                            </Input>
-                                                        </FormGroup>
-                                                        <FormGroup className="col-md-6">
-                                                            <Label htmlFor="select">{i18n.t('static.planningunit.planningunit')}<span className="red Reqasterisk">*</span></Label>
-                                                            <Input
-                                                                type="select"
-                                                                name="planningUnitId"
-                                                                id="select"
-                                                                bsSize="sm"
-                                                                valid={!errors.planningUnitId && this.state.planningUnitId != ''}
-                                                                invalid={touched.planningUnitId && !!errors.planningUnitId}
-                                                                value={this.state.planningUnitId}
-                                                                onBlur={handleBlur}
-                                                                onChange={event => { handleChange(event); this.setTextAndValue(event) }}
-                                                                required
-                                                            >
-                                                                <option value="">Please select</option>
-                                                                {products}
-                                                            </Input>
-                                                            <FormFeedback className="red">{errors.planningUnitId}</FormFeedback>
-                                                        </FormGroup>
-                                                        <FormGroup className="col-md-6">
-                                                            <Label htmlFor="company">{i18n.t('static.program.reorderFrequencyInMonths')}<span className="red Reqasterisk">*</span></Label>
-                                                            <Input
-                                                                type="number"
-                                                                min='0'
-                                                                name="reorderFrequencyInMonths"
-                                                                id="reorderFrequencyInMonths"
-                                                                bsSize="sm"
-                                                                valid={!errors.reorderFrequencyInMonths && this.state.reorderFrequencyInMonths != ''}
-                                                                invalid={touched.reorderFrequencyInMonths && !!errors.reorderFrequencyInMonths}
-                                                                value={this.state.reorderFrequencyInMonths}
-                                                                placeholder={i18n.t('static.program.programPlanningUnit.reorderFrequencyText')}
-                                                                onBlur={handleBlur}
-                                                                onChange={event => { handleChange(event); this.setTextAndValue(event) }}
-                                                            />
-                                                            <FormFeedback className="red">{errors.reorderFrequencyInMonths}</FormFeedback>
-                                                        </FormGroup>
-                                                        <FormGroup className="col-md-6">
-                                                            <Label htmlFor="company">Minimum Month Of Stock<span className="red Reqasterisk">*</span></Label>
-                                                            <Input
-                                                                type="number"
-                                                                min='0'
-                                                                name="minMonthsOfStock"
-                                                                id="minMonthsOfStock"
-                                                                bsSize="sm"
-                                                                valid={!errors.minMonthsOfStock && this.state.minMonthsOfStock != ''}
-                                                                invalid={touched.minMonthsOfStock && !!errors.minMonthsOfStock}
-                                                                value={this.state.minMonthsOfStock}
-                                                                placeholder='Minimum month of stock'
-                                                                onBlur={handleBlur}
-                                                                onChange={event => { handleChange(event); this.setTextAndValue(event) }}
-                                                            />
-                                                            <FormFeedback className="red">{errors.minMonthsOfStock}</FormFeedback>
-                                                        </FormGroup>
-
-
-
-                                                        <FormGroup className="col-md-6">
-                                                            <Label htmlFor="company">Local procurementAgent lead time<span className="red Reqasterisk">*</span></Label>
-                                                            <Input
-                                                                type="number"
-                                                                min='0'
-                                                                name="localProcurementLeadTime"
-                                                                id="localProcurementLeadTime"
-                                                                bsSize="sm"
-                                                                valid={!errors.localProcurementLeadTime && this.state.localProcurementLeadTime != ''}
-                                                                invalid={touched.localProcurementLeadTime && !!errors.localProcurementLeadTime}
-                                                                value={this.state.localProcurementLeadTime}
-                                                                placeholder='Local procurementAgent lead time'
-                                                                onBlur={handleBlur}
-                                                                onChange={event => { handleChange(event); this.setTextAndValue(event) }}
-                                                            />
-                                                            <FormFeedback className="red">{errors.localProcurementLeadTime}</FormFeedback>
-                                                        </FormGroup>
-                                                        <FormGroup className="col-md-6">
-                                                            <Label htmlFor="company">Batch No Required<span className="red Reqasterisk">*</span></Label>
-                                                            <FormGroup check inline>
-                                                                <Input
-                                                                    className="form-check-input"
-                                                                    type="radio"
-                                                                    id="batchNoRequired1"
-                                                                    name="batchNoRequired"
-                                                                    value={true}
-                                                                    checked={this.state.batchNoRequired === true}
-                                                                    onChange={(e) => { handleChange(e); this.setTextAndValue(e) }}
-                                                                />
-                                                                <Label
-                                                                    className="form-check-label"
-                                                                    check htmlFor="inline-radio1">
-                                                                    {i18n.t('static.program.yes')}
-                                                                </Label>
-                                                            </FormGroup>
-                                                            <FormGroup check inline>
-                                                                <Input
-                                                                    className="form-check-input"
-                                                                    type="radio"
-                                                                    id="batchNoRequired2"
-                                                                    name="batchNoRequired"
-                                                                    value={false}
-                                                                    checked={this.state.batchNoRequired === false}
-                                                                    onChange={(e) => { handleChange(e); this.setTextAndValue(e) }}
-                                                                />
-                                                                <Label
-                                                                    className="form-check-label"
-                                                                    check htmlFor="inline-radio2">
-                                                                    {i18n.t('static.program.no')}
-                                                                </Label>
-                                                            </FormGroup>
-
-
-
-                                                        </FormGroup>
-
-
-                                                        <FormGroup className="col-md-12 mt-md-0">
-                                                            {/* <Button type="button" size="sm" color="danger" onClick={this.deleteLastRow} className="float-right mr-1" ><i className="fa fa-times"></i> Remove Last Row</Button> */}
-                                                            <Button type="submit" size="sm" color="success" onClick={() => this.touchAll(errors)} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
-                                                            &nbsp;
-
-                                     </FormGroup></Row>
-                                                </Form>
-                                            )} />
-                                <h5 className="red">{this.state.rowErrorMessage}</h5>
-                                <Table responsive className="table-striped table-hover table-bordered text-center mt-0">
-                                    <thead>
-                                        <tr>
-                                            <th className="text-left"> {i18n.t('static.program.program')} </th>
-                                            <th> {i18n.t('static.planningunit.planningunit')}</th>
-                                            <th> {i18n.t('static.program.reorderFrequencyInMonths')} </th>
-                                            <th>Minimum month of stock</th>
-                                            <th>Local procurementAgent lead time</th>
-                                            <th>Batch no required</th>
-                                            <th>{i18n.t('static.common.status')}</th>
-                                            <th>{i18n.t('static.common.update')}</th>
-
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {
-                                            this.state.rows.map((item, idx) => (
-                                                <tr id="addr0" key={idx}>
-                                                    <td className="text-left">
-                                                        {this.state.rows[idx].program.label.label_en}
-                                                    </td>
-                                                    <td>
-                                                        {this.state.rows[idx].planningUnit.label.label_en}
-                                                    </td>
-                                                    <td className="text-right">
-                                                        {this.state.rows[idx].reorderFrequencyInMonths}
-                                                    </td>
-                                                    <td className="text-right">
-                                                        {this.state.rows[idx].minMonthsOfStock}
-                                                    </td>
-                                                    <td>
-                                                        {this.state.rows[idx].localProcurementLeadTime}
-                                                    </td>
-                                                    <td>
-                                                        {this.state.rows[idx].batchNoRequired ? 'Yes' : 'No'}
-                                                    </td>
-                                                    <td>
-                                                        <StatusUpdateButtonFeature removeRow={this.handleRemoveSpecificRow} enableRow={this.enableRow} disableRow={this.disableRow} rowId={idx} status={this.state.rows[idx].active} isRowNew={this.state.rows[idx].isNew} />
-                                                    </td>
-                                                    <td className="whitebtnColor">
-                                                        <UpdateButtonFeature updateRow={this.updateRow} rowId={idx} isRowNew={this.state.rows[idx].isNew} />
-                                                    </td>
-                                                </tr>
-                                            ))
-                                        }
-                                    </tbody>
-                                </Table>
-                            </CardBody>
-                            <CardFooter>
-                                <FormGroup>
-                                    <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                    <Button type="submit" size="md" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                    &nbsp;
+                            </CardHeader> */}
+                        <CardBody className="p-0">
+                            <Col sm={12} md={12}>
+                                <h4 className="red">{this.props.message}</h4>
+                                <div className="table-responsive" >
+                                    <div id="mapPlanningUnit" className="RowheightForaddprogaddRow">
+                                    </div>
+                                </div>
+                            </Col>
+                        </CardBody>
+                        <CardFooter>
+                            <FormGroup>
+                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                {this.state.isValidData && <Button type="submit" size="md" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
+                                &nbsp;
+                                    <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.addRowInJexcel}> <i className="fa fa-plus"></i> Add Row</Button>
+                                &nbsp;
                                 </FormGroup>
-                            </CardFooter>
-                        </Card>
-                    </Col>
-                </Row>
+                        </CardFooter>
+                    </Card>
+                    <div style={{ display: this.state.loading ? "block" : "none" }}>
+                        <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                            <div class="align-items-center">
+                                <div ><h4> <strong>Loading...</strong></h4></div>
+
+                                <div class="spinner-border blue ml-4" role="status">
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
         );

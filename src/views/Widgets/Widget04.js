@@ -43,14 +43,14 @@ class Widget04 extends Component {
     progress.style = classNames('progress-xs mt-3 mb-0', progress.style);
 
     return (
-      <Card className={classes} {...attributes}>
+      <Card className={classes} {...attributes} >
         <CardBody>
-          <div className="h1 text-muted text-right mb-2">
-            <i className={card.icon}></i>
+          <div className="h1 text-right mb-2 icon-color">
+            <i className={card.icon} ></i>
           </div>
           <div className="h4 mb-0">{header}</div>
-          <small className="text-muted text-uppercase font-weight-bold">{children}</small>
-          <Progress className={progress.style} color={progress.color} value={progress.value} />
+          <small className="textrealmdashboard text-uppercase font-weight-bold">{children}</small>
+          {/* <Progress className={progress.style} color={progress.color} value={progress.value} /> */}
         </CardBody>
       </Card>
     );

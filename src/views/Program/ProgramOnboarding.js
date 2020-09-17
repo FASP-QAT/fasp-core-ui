@@ -21,13 +21,15 @@ import StepOne from './StepOne.js';
 import StepTwo from './StepTwo.js';
 import StepThree from './StepThree.js';
 import StepFour from './StepFour.js';
+import StepFive from './StepFive';
 import StepSix from './StepSix.js'
-
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 const entityname = i18n.t('static.program.programMaster');
 export default class ProgramOnboarding extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            loading: true,
             program: {
                 label: {
                     label_en: '',
@@ -55,13 +57,18 @@ export default class ProgramOnboarding extends Component {
                 },
                 airFreightPerc: '',
                 seaFreightPerc: '',
-                deliveredToReceivedLeadTime: '',
+                // deliveredToReceivedLeadTime: '',
                 draftToSubmittedLeadTime: '',
                 plannedToDraftLeadTime: '',
                 submittedToApprovedLeadTime: '',
                 approvedToShippedLeadTime: '',
                 monthsInFutureForAmc: '',
                 monthsInPastForAmc: '',
+
+                shippedToArrivedByAirLeadTime: '',
+                shippedToArrivedBySeaLeadTime: '',
+                arrivedToDeliveredLeadTime: '',
+
                 healthArea: {
                     id: ''
                 },
@@ -110,6 +117,26 @@ export default class ProgramOnboarding extends Component {
         this.addRowInJexcel = this.addRowInJexcel.bind(this);
     }
     componentDidMount() {
+        let { program } = this.state;
+        let realmId = AuthenticationService.getRealmId();
+        // console.log("realmId----->",realmId);
+        if (realmId != -1) {
+            // console.log("in if");
+            program.realm.realmId = realmId;
+            this.setState({ program }, () => {
+                this.refs.countryChild.getRealmCountryList();
+                this.refs.healthAreaChild.getHealthAreaList();
+                this.refs.organisationChild.getOrganisationList();
+                this.refs.sixChild.getProgramManagerList();
+                this.refs.child.getRealmId();
+            });
+            document.getElementById('realmId').disabled=true;
+
+        } else {
+            console.log("in else");
+            document.getElementById('realmId').disabled=false;
+        }
+
         document.getElementById('stepOne').style.display = 'block';
         document.getElementById('stepTwo').style.display = 'none';
         document.getElementById('stepThree').style.display = 'none';
@@ -123,11 +150,11 @@ export default class ProgramOnboarding extends Component {
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        realmList: response.data
+                        realmList: response.data, loading: false
                     })
                 } else {
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode, loading: false
                     })
                 }
             })
@@ -210,14 +237,15 @@ export default class ProgramOnboarding extends Component {
         console.log("program-----------", this.state.program);
 
         if (validation == true) {
+            this.setState({ loading: true });
             AuthenticationService.setupAxiosInterceptors();
             ProgramService.programInitialize(this.state.program).then(response => {
                 if (response.status == "200") {
                     console.log("in success--------");
-                    this.props.history.push(`/program/listProgram/` + i18n.t(response.data.messageCode, { entityname }))
+                    this.props.history.push(`/program/listProgram/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                 } else {
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode, loading: false
                     })
                 }
             }
@@ -311,19 +339,23 @@ export default class ProgramOnboarding extends Component {
             this.refs.sixChild.getProgramManagerList();
         } if (event.target.name == 'realmCountryId') {
             program.realmCountry.realmCountryId = event.target.value;
-            // this.refs.regionChild.getRegionList();
+            this.refs.regionChild.getRegionList();
         } if (event.target.name == 'organisationId') {
             program.organisation.id = event.target.value;
         } if (event.target.name == 'airFreightPerc') {
             program.airFreightPerc = event.target.value;
         } if (event.target.name == 'seaFreightPerc') {
             program.seaFreightPerc = event.target.value;
-        } if (event.target.name == 'deliveredToReceivedLeadTime') {
-            program.deliveredToReceivedLeadTime = event.target.value;
-        } if (event.target.name == 'draftToSubmittedLeadTime') {
-            program.draftToSubmittedLeadTime = event.target.value;
-        } if (event.target.name == 'plannedToDraftLeadTime') {
-            program.plannedToDraftLeadTime = event.target.value;
+        }
+        // if (event.target.name == 'deliveredToReceivedLeadTime') {
+        //     program.deliveredToReceivedLeadTime = event.target.value;
+        // } 
+        // if (event.target.name == 'draftToSubmittedLeadTime') {
+        //     program.draftToSubmittedLeadTime = event.target.value;
+        // } 
+
+        if (event.target.name == 'plannedToSubmittedLeadTime') {
+            program.plannedToSubmittedLeadTime = event.target.value;
         } if (event.target.name == 'submittedToApprovedLeadTime') {
             program.submittedToApprovedLeadTime = event.target.value;
         } if (event.target.name == 'approvedToShippedLeadTime') {
@@ -336,6 +368,14 @@ export default class ProgramOnboarding extends Component {
             program.healthArea.id = event.target.value;
         } if (event.target.name == 'userId') {
             program.programManager.userId = event.target.value;
+        } if (event.target.name == 'shippedToArrivedByAirLeadTime') {
+            program.shippedToArrivedByAirLeadTime = event.target.value;
+        }
+        if (event.target.name == 'shippedToArrivedBySeaLeadTime') {
+            program.shippedToArrivedBySeaLeadTime = event.target.value;
+        }
+        if (event.target.name == 'arrivedToDeliveredLeadTime') {
+            program.arrivedToDeliveredLeadTime = event.target.value;
         }
         else if (event.target.name == 'programNotes') {
             program.programNotes = event.target.value;
@@ -495,16 +535,21 @@ export default class ProgramOnboarding extends Component {
         return (
 
 
-            
+
 
             <div className="animated fadeIn">
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
+                }} />
                 <h5></h5>
                 <Row>
                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
-                        <Card>
-                            <CardHeader>
+                        <Card style={{ display: this.state.loading ? "none" : "block" }}>
+                            {/* <CardHeader>
                                 <i className="icon-note"></i><strong>Setup Program</strong>{' '}
-                            </CardHeader>
+                            </CardHeader> */}
                             <CardBody>
 
                                 <ProgressBar
@@ -600,13 +645,13 @@ export default class ProgramOnboarding extends Component {
 
                                 <div className="d-sm-down-none  progressbar">
                                     <ul>
-                                        <li className="progressbartext1">Realm</li>
-                                        <li className="progressbartext2">Country</li>
-                                        <li className="progressbartext3">Health Area</li>
-                                        <li className="progressbartext4">Organization</li>
-                                        <li className="progressbartext5">Region</li>
-                                        <li className="progressbartext6">Program Data</li>
-                                        <li className="progressbartext7">Planning Units</li>
+                                        <li className="progressbartext1">{i18n.t('static.program.realm')}</li>
+                                        <li className="progressbartext2">{i18n.t('static.region.country')}</li>
+                                        <li className="progressbartext3">{i18n.t('static.healtharea.healtharea')}</li>
+                                        <li className="progressbartext4">{i18n.t('static.organisation.organisationheader')}</li>
+                                        <li className="progressbartext5">{i18n.t('static.program.region')}</li>
+                                        <li className="progressbartext6">{i18n.t('static.pipeline.programData')}</li>
+                                        <li className="progressbartext7">{i18n.t('static.dashboard.product')}</li>
                                     </ul>
                                 </div>
 
@@ -698,12 +743,12 @@ export default class ProgramOnboarding extends Component {
                                     </FormGroup> */}
                                 </div>
                                 <div id="stepFive">
-                                    {/* <StepFive ref='regionChild' finishedStepFive={this.finishedStepFive} previousToStepFour={this.previousToStepFour} updateFieldData={this.updateFieldData}></StepFive> */}
-                                    <FormGroup>
+                                    <StepFive ref='regionChild' finishedStepFive={this.finishedStepFive} previousToStepFour={this.previousToStepFour} updateFieldData={this.updateFieldData} items={this.state}></StepFive>
+                                    {/* <FormGroup className="col-md-4 pl-0">
                                         <Label htmlFor="select">{i18n.t('static.program.region')}<span class="red Reqasterisk">*</span><span class="red Reqasterisk">*</span></Label>
                                         <Select
                                             onChange={(e) => { this.updateFieldData(e) }}
-                                            className="col-md-4 ml-field"
+                                            // className="col-md-4 ml-field"
                                             bsSize="sm"
                                             name="regionId"
                                             id="regionId"
@@ -711,16 +756,16 @@ export default class ProgramOnboarding extends Component {
                                             options={this.state.regionList}
                                             value={this.state.regionId}
                                         />
-                                        </FormGroup>
-                                        
-                                        <FormGroup>
-                                        
-                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.previousToStepFour} > <i className="fa fa-angle-double-left"></i> Previous</Button>
+                                    </FormGroup> */}
+
+                                    {/* <FormGroup>
+
+                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.previousToStepFour} > <i className="fa fa-angle-double-left"></i> Back</Button>
                                         &nbsp;
                                         <Button color="info" size="md" className="float-left mr-1 nextbtn" type="button" name="regionSub" id="regionSub" onClick={this.finishedStepFive}>Next <i className="fa fa-angle-double-right"></i></Button>
                                         &nbsp;
 
-                                    </FormGroup>
+                                    </FormGroup> */}
                                 </div>
                                 <div id="stepSix">
                                     <StepSix ref='sixChild' dataChange={this.dataChange} Capitalize={this.Capitalize} finishedStepSix={this.finishedStepSix} previousToStepFive={this.previousToStepFive} items={this.state}></StepSix>
@@ -854,16 +899,28 @@ export default class ProgramOnboarding extends Component {
                                 </div>
                                 <div id="stepSeven">
                                     <MapPlanningUnits ref="child" message={this.state.message} removeMessageText={this.removeMessageText} items={this.state}></MapPlanningUnits>
-                                    <FormGroup>
+                                    <FormGroup className="mt-2">
                                         <Button color="success" size="md" className="float-right mr-1" type="button" name="regionSub" id="regionSub" onClick={this.finishedStepSeven}> <i className="fa fa-check"></i> Submit</Button>
                                         &nbsp;
                                         <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.addRowInJexcel}> <i className="fa fa-plus"></i> Add Row</Button>
                                         &nbsp;
-                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.previousToStepSix} > <i className="fa fa-angle-double-left "></i> Previous</Button>
+                                        <Button color="info" size="md" className="float-left mr-1 px-4" type="button" name="regionPrevious" id="regionPrevious" onClick={this.previousToStepSix} > <i className="fa fa-angle-double-left "></i> Back</Button>
                                         &nbsp;
                                     </FormGroup>
                                 </div>
-                            </CardBody></Card></Col></Row></div>
+                            </CardBody></Card>
+                        <div style={{ display: this.state.loading ? "block" : "none" }}>
+                            <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                <div class="align-items-center">
+                                    <div ><h4> <strong>Loading...</strong></h4></div>
+
+                                    <div class="spinner-border blue ml-4" role="status">
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </Col></Row></div>
 
 
 

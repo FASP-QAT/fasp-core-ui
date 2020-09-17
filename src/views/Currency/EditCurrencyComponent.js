@@ -8,6 +8,7 @@ import CurrencyService from '../../api/CurrencyService.js';
 import i18n from '../../i18n';
 import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
+import { SPACE_REGEX, ALPHABETS_REGEX, DECIMAL_NO_REGEX } from '../../Constants.js';
 
 
 const entityname = i18n.t('static.currency.currencyMaster');
@@ -22,16 +23,19 @@ let initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         currencyCode: Yup.string()
-            .required(i18n.t('static.currency.currencycodetext'))
-            .max(4, i18n.t('static.currency.currencycodemax4digittext')),
+            .matches(ALPHABETS_REGEX, i18n.t('static.common.alphabetsOnly'))
+            .required(i18n.t('static.currency.currencycodetext')),
+        // .max(4, i18n.t('static.currency.currencycodemax4digittext')),
         // currencySymbol: Yup.string()
         //     .required(i18n.t('static.currency.currencysymboltext')).
         //     max(3, i18n.t('static.country.countrycodemax3digittext')).
         //     // matches(/^[A-Z@~`!@#$%^&*()_=+\\\\';:\"\\/?>.<,-]*$/i, i18n.t('static.currency.numbernotallowedtext')),
         //     matches(/^([^0-9]*)$/, i18n.t('static.currency.numbernotallowedtext')),
         label: Yup.string()
+            .matches(SPACE_REGEX, i18n.t('static.message.rolenamevalidtext'))
             .required(i18n.t('static.currency.currencytext')),
         conversionRate: Yup.string()
+            .matches(DECIMAL_NO_REGEX, i18n.t('static.currency.conversionrateNumberDecimalPlaces'))
             .required(i18n.t('static.currency.conversionrateNumber')).min(0, i18n.t('static.currency.conversionrateMin'))
     })
 }
@@ -78,7 +82,8 @@ export default class UpdateCurrencyComponent extends Component {
                 isSync: 'true'
             },
             message: '',
-            lang: localStorage.getItem('lang')
+            lang: localStorage.getItem('lang'),
+            loading: true
         }
         this.Capitalize = this.Capitalize.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
@@ -86,7 +91,11 @@ export default class UpdateCurrencyComponent extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.changeMessage = this.changeMessage.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.changeLoading = this.changeLoading.bind(this);
 
+    }
+    changeLoading(loading) {
+        this.setState({ loading: loading })
     }
     hideSecondComponent() {
         setTimeout(function () {
@@ -155,19 +164,19 @@ export default class UpdateCurrencyComponent extends Component {
             console.log(JSON.stringify(response.data))
             if (response.status == 200) {
                 this.setState({
-                    currency: response.data
+                    currency: response.data, loading: false
                 });
             }
             else {
                 this.setState({
-                    message: response.data.messageCode
+                    message: response.data.messageCode, loading: false
                 },
                     () => {
                         this.hideSecondComponent();
                     })
             }
 
-           
+
         })
 
     }
@@ -188,14 +197,14 @@ export default class UpdateCurrencyComponent extends Component {
 
         return (
             <div className="animated fadeIn">
-                <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} />
+                <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} loading={this.changeLoading} />
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-                <Row>
+                <Row style={{ display: this.state.loading ? "none" : "block" }}>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
-                            <CardHeader>
+                            {/* <CardHeader>
                                 <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
-                            </CardHeader>
+                            </CardHeader> */}
                             <Formik
                                 enableReinitialize={true}
                                 initialValues={{
@@ -207,19 +216,21 @@ export default class UpdateCurrencyComponent extends Component {
                                 }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
-
+                                    this.setState({
+                                        loading: true
+                                    })
                                     CurrencyService.editCurrency(this.state.currency)
                                         .then(response => {
                                             if (response.status == 200) {
                                                 // console.log("after update--",response.data);
-                                                this.props.history.push(`/currency/listCurrency/`+ 'green/' + i18n.t(response.data.messageCode, { entityname }))
+                                                this.props.history.push(`/currency/listCurrency/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
-                                                message: response.data.messageCode
-                                            },
-                                                () => {
-                                                    this.hideSecondComponent();
-                                                })
+                                                    message: response.data.messageCode, loading: false
+                                                },
+                                                    () => {
+                                                        this.hideSecondComponent();
+                                                    })
                                             }
                                         })
                                 }}
@@ -238,7 +249,7 @@ export default class UpdateCurrencyComponent extends Component {
                                         setTouched
                                     }) => (
                                             <Form onSubmit={handleSubmit} noValidate name='currencyForm'>
-                                                <CardBody>
+                                                <CardBody className="pb-0">
                                                     <FormGroup>
                                                         <Label for="label">{i18n.t('static.currency.currency')}<span class="red Reqasterisk">*</span></Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
@@ -248,7 +259,7 @@ export default class UpdateCurrencyComponent extends Component {
                                                             id="label"
                                                             bsSize="sm"
                                                             valid={!errors.label}
-                                                            invalid={touched.label && !!errors.label}
+                                                            invalid={touched.label && !!errors.label || this.state.currency.label.label_en == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.currency.label.label_en}
@@ -265,11 +276,13 @@ export default class UpdateCurrencyComponent extends Component {
                                                             id="currencyCode"
                                                             bsSize="sm"
                                                             valid={!errors.currencyCode}
-                                                            invalid={touched.currencyCode && !!errors.currencyCode}
+                                                            invalid={touched.currencyCode && !!errors.currencyCode || this.state.currency.currencyCode == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.currency.currencyCode}
-                                                            required />
+                                                            required
+                                                            maxLength={4}
+                                                        />
                                                         {/* </InputGroupAddon> */}
                                                         <FormFeedback className="red">{errors.currencyCode}</FormFeedback>
                                                     </FormGroup>
@@ -296,7 +309,7 @@ export default class UpdateCurrencyComponent extends Component {
                                                             id="conversionRate"
                                                             bsSize="sm"
                                                             valid={!errors.conversionRate}
-                                                            invalid={touched.conversionRate && !!errors.conversionRate}
+                                                            invalid={touched.conversionRate && !!errors.conversionRate || this.state.currency.conversionRateToUsd == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.currency.conversionRateToUsd}
@@ -357,6 +370,17 @@ export default class UpdateCurrencyComponent extends Component {
                         </Card>
                     </Col>
                 </Row>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }

@@ -20,6 +20,7 @@ const validationSchema = function (values) {
         realmId: Yup.string()
             .required(i18n.t('static.common.realmtext')),
         label: Yup.string()
+            .matches(/^([a-zA-Z]+\s)*[a-zA-Z]+$/, i18n.t('static.message.rolenamevalidtext'))
             .required(i18n.t('static.datasourcetype.datasourcetypetext'))
     })
 }
@@ -64,7 +65,8 @@ export default class AddDataSourceTypeComponent extends Component {
                     label_en: '',
                     labelId: 0,
                 }
-            }
+            },
+            loading: true
         }
 
         this.dataChange = this.dataChange.bind(this);
@@ -120,7 +122,8 @@ export default class AddDataSourceTypeComponent extends Component {
         RealmService.getRealmListAll()
             .then(response => {
                 this.setState({
-                    realms: response.data
+                    realms: response.data,
+                    loading: false
                 })
             })
     }
@@ -140,7 +143,7 @@ export default class AddDataSourceTypeComponent extends Component {
             && realms.map((item, i) => {
                 return (
                     <option key={i} value={item.realmId}>
-                       {getLabelText(item.label, this.state.lang)}
+                        {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);
@@ -148,25 +151,30 @@ export default class AddDataSourceTypeComponent extends Component {
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
                 }} />
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-                <Row>
+                <Row style={{ display: this.state.loading ? "none" : "block" }}>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
-                            <CardHeader>
+                            {/* <CardHeader>
                                 <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
-                            </CardHeader>
+                            </CardHeader> */}
                             <Formik
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
+                                    this.setState({
+                                        loading: true
+                                    })
                                     DataSourceTypeService.addDataSourceType(this.state.dataSourceType)
                                         .then(response => {
                                             if (response.status == 200) {
                                                 this.props.history.push(`/dataSourceType/listDataSourceType/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
-                                                    message: response.data.messageCode
+                                                    message: response.data.messageCode, loading: false
                                                 },
                                                     () => {
                                                         this.hideSecondComponent();
@@ -192,20 +200,6 @@ export default class AddDataSourceTypeComponent extends Component {
                                             <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='dataSourceType'>
                                                 <CardBody>
                                                     <FormGroup>
-                                                        <Label for="label">{i18n.t('static.datasourcetype.datasourcetype')}<span class="red Reqasterisk">*</span></Label>
-                                                        <Input type="text"
-                                                            name="label"
-                                                            id="label"
-                                                            bsSize="sm"
-                                                            valid={!errors.label && this.state.dataSourceType.label.label_en != ''}
-                                                            invalid={touched.label && !!errors.label}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.dataSourceType.label.label_en}
-                                                            required />
-                                                        <FormFeedback className="red">{errors.label}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
                                                         <Label htmlFor="realmId">{i18n.t('static.realm.realm')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             type="select"
@@ -224,13 +218,28 @@ export default class AddDataSourceTypeComponent extends Component {
                                                         </Input>
                                                         <FormFeedback className="red">{errors.realmId}</FormFeedback>
                                                     </FormGroup>
+                                                    <FormGroup>
+                                                        <Label for="label">{i18n.t('static.datasourcetype.datasourcetype')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Input type="text"
+                                                            name="label"
+                                                            id="label"
+                                                            bsSize="sm"
+                                                            valid={!errors.label && this.state.dataSourceType.label.label_en != ''}
+                                                            invalid={touched.label && !!errors.label}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.dataSourceType.label.label_en}
+                                                            required />
+                                                        <FormFeedback className="red">{errors.label}</FormFeedback>
+                                                    </FormGroup>
+
                                                 </CardBody>
 
                                                 <CardFooter>
                                                     <FormGroup>
 
-                                                        <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                        <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                         &nbsp;
                                                     </FormGroup>
@@ -242,6 +251,17 @@ export default class AddDataSourceTypeComponent extends Component {
                         </Card>
                     </Col>
                 </Row>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div>
                     <h6>{i18n.t(this.state.message)}</h6>
                     <h6>{i18n.t(this.props.match.params.message)}</h6>
@@ -250,7 +270,7 @@ export default class AddDataSourceTypeComponent extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/dataSourceType/listDataSourceType/` + 'red/'  + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/dataSourceType/listDataSourceType/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
     resetClicked() {

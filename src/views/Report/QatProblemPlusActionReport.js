@@ -4,6 +4,8 @@ import jexcel from 'jexcel';
 // import "./style.css";
 import "../../../node_modules/jexcel/dist/jexcel.css";
 import * as JsStoreFunctions from "../../CommonComponent/JsStoreFunctions.js";
+import { qatProblemActions } from '../../CommonComponent/QatProblemActions';
+import { DATE_FORMAT_CAP, INDEXED_DB_NAME, INDEXED_DB_VERSION } from '../../Constants.js';
 import {
     Card, CardBody, CardHeader,
     Label, Input, FormGroup,
@@ -22,8 +24,16 @@ import getLabelText from '../../CommonComponent/getLabelText'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import i18n from '../../i18n';
-import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
+import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
+import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
+import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
+import paginationFactory from 'react-bootstrap-table2-paginator';
+import BootstrapTable from 'react-bootstrap-table-next';
 
+
+
+let problemActionlist = [];
 export default class ConsumptionDetails extends React.Component {
 
     constructor(props) {
@@ -39,21 +49,25 @@ export default class ConsumptionDetails extends React.Component {
             procurementUnitList: [],
             supplierList: [],
             message: '',
+            planningUnitId: ''
         }
 
         // this.getConsumptionData = this.getConsumptionData.bind(this);
 
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this)
-        this.filterData = this.filterData.bind(this);
+        // this.fetchData = this.fetchData.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
+        this.editProblem = this.editProblem.bind(this);
+        // this.addRow = this.addRow.bind(this);
+        // this.changed = this.changed.bind(this);
     }
 
     componentDidMount = function () {
-
+        problemActionlist = qatProblemActions();
         const lan = 'en';
         var db1;
         getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
             var transaction = db1.transaction(['programData'], 'readwrite');
@@ -83,249 +97,68 @@ export default class ConsumptionDetails extends React.Component {
                 this.setState({
                     programList: proList
                 })
-
-
-                data = [];
-                data[0] = 'abc';
-                data[1] = 'a';
-                data[2] = '';
-                data[3] = '30-03-2020';
-                data[4] = '60';
-                data[5] = 'High';
-                data[6] = 'Button. Which will be clickable and redirect on respective page';
-                data[7] = 'Text Area';
-                data[8] = 1;
-
-                var dataArray = [];
-                dataArray[0] = data
-
-                this.el = jexcel(document.getElementById("shipmenttableDiv"), '');
-                this.el.destroy();
-                var json = [];
-                var data = dataArray;
-                var options = {
-                    data: data,
-                    columnDrag: true,
-                    colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100],
-                    columns: [
-                        {
-                            title: 'Problem Type',
-                            type: 'text',
-                            readOnly: true
-                        },
-                        {
-                            title: 'Program',
-                            type: 'text',
-                            readOnly: true
-                        },
-                        {
-                            title: 'Planning Unit',
-                            type: 'text',
-                            readOnly: true
-                        },
-                        {
-                            title: 'Problem Raised On',
-                            type: 'text',
-                            options: {
-                                format: 'YYYY-DD-MM'
-                            },
-                            readOnly: true
-                        },
-                        {
-                            title: 'Number of days the action has been outstanding​',
-                            type: 'text',
-                            readOnly: true
-                        },
-                        {
-                            title: 'Priority',
-                            type: 'text',
-                            readOnly: true
-                        },
-                        {
-                            title: 'Action',
-                            type: 'text',
-                            readOnly: true
-                        },
-                        {
-                            title: 'Country Updates',
-                            type: 'text',
-                        },
-                        {
-                            title: 'Post HQ Review Status',
-                            type: 'dropdown',
-                            source: [{ id: 1, name: 'Open' }, { id: 2, name: 'Closed' }]
-                        },
-                    ],
-                    pagination: 10,
-                    search: true,
-                    columnSorting: true,
-                    tableOverflow: true,
-                    wordWrap: true,
-                    allowInsertColumn: false,
-                    allowManualInsertColumn: false,
-                    allowDeleteRow: false,
-                    onchange: this.changed,
-                    oneditionend: this.onedit,
-                    copyCompatibility: true,
-                    paginationOptions: [10, 25, 50, 100],
-                    position: 'top',
-                    text: {
-                        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                        show: '',
-                        entries: '',
-                    },
-                    onload: this.loaded,
-                };
-                this.el = jexcel(document.getElementById("shipmenttableDiv"), options);
-
-
-
-
-
-
-
-
-
             }.bind(this);
         }.bind(this)
 
-
+        // problemActionlist = qatProblemActions();
     };
 
-    loaded = function (instance, cell, x, y, value) {
-        jExcelLoadedFunction(instance);
+    editProblem() {
+        this.props.history.push({
+            pathname: `/problem/editProblem`,
+
+        });
     }
 
-    filterData() {
-        let programId = document.getElementById('programId').value;
-        let planningUnitId = document.getElementById('planningUnitId').value;
-        let priorityId = document.getElementById('priorityId').value;
-        let hqStatusId = document.getElementById('hqStatusId').value;
-        console.log("IMP ---------> ", programId)
-
-        this.setState({ programId: programId });
-
-
-
-        if (parseInt(programId) != 0) {
-            var db1;
-            getDatabase();
-            var openRequest = indexedDB.open('fasp', 1);
-
-            var procurementAgentList = [];
-            var fundingSourceList = [];
-            var budgetList = [];
-            openRequest.onsuccess = function (e) {
-                db1 = e.target.result;
-
-                var transaction = db1.transaction(['programData'], 'readwrite');
-                var programTransaction = transaction.objectStore('programData');
-                var programRequest = programTransaction.get(programId);
-
-                programRequest.onsuccess = function (event) {
-                    var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                    var programJson = JSON.parse(programData);
-
-                    var sel = document.getElementById("planningUnitId");
-                    var planningUnitText = sel.options[sel.selectedIndex].text;
-
-                    // data = [];
-                    // data[0] = 'abc';
-                    // data[1] = 'a';
-                    // data[2] = planningUnitText;
-                    // data[3] = '30-03-2020';
-                    // data[4] = '60';
-                    // data[5] = 'High';
-                    // data[6] = 'Button. Which will be clickable and redirect on respective page';
-                    // data[7] = 'Text Area';
-                    // data[8] = 1;
-
-                    // var dataArray = [];
-                    // dataArray[0] = data
-
-                    // this.el = jexcel(document.getElementById("shipmenttableDiv"), '');
-                    // this.el.destroy();
-                    // var json = [];
-                    // var data = dataArray;
-                    // var options = {
-                    //     data: data,
-                    //     columnDrag: true,
-                    //     colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100],
-                    //     columns: [
-                    //         {
-                    //             title: 'Problem Type',
-                    //             type: 'text',
-                    //             readOnly: true
-                    //         },
-                    //         {
-                    //             title: 'Program',
-                    //             type: 'text',
-                    //             readOnly: true
-                    //         },
-                    //         {
-                    //             title: 'Planning Unit',
-                    //             type: 'text',
-                    //             readOnly: true
-                    //         },
-                    //         {
-                    //             title: 'Problem Raised On',
-                    //             type: 'text',
-                    //             options: {
-                    //                 format: 'YYYY-DD-MM'
-                    //             },
-                    //             readOnly: true
-                    //         },
-                    //         {
-                    //             title: 'Number of days the action has been outstanding​',
-                    //             type: 'text',
-                    //             readOnly: true
-                    //         },
-                    //         {
-                    //             title: 'Priority',
-                    //             type: 'text',
-                    //             readOnly: true
-                    //         },
-                    //         {
-                    //             title: 'Action',
-                    //             type: 'text',
-                    //             readOnly: true
-                    //         },
-                    //         {
-                    //             title: 'Country Updates',
-                    //             type: 'text',
-                    //         },
-                    //         {
-                    //             title: 'Post HQ Review Status',
-                    //             type: 'dropdown',
-                    //             source: [{ id: 1, name: 'Open' }, { id: 2, name: 'Closed' }]
-                    //         },
-                    //     ],
-                    //     pagination: 10,
-                    //     search: true,
-                    //     columnSorting: true,
-                    //     tableOverflow: true,
-                    //     wordWrap: true,
-                    //     allowInsertColumn: false,
-                    //     allowManualInsertColumn: false,
-                    //     allowDeleteRow: false,
-                    //     onchange: this.changed,
-                    //     oneditionend: this.onedit,
-                    //     copyCompatibility: true,
-                    //     paginationOptions: [10, 25, 50, 100],
-                    //     position: 'top'
-                    // };
-                    // this.el = jexcel(document.getElementById("shipmenttableDiv"), options);
-
-
-
-
-                }.bind(this)
-            }.bind(this)
-        }
+    getPlanningUnitList(event) {
+        // console.log("-------------in planning list-------------")
+        const lan = 'en';
+        var db1;
+        var storeOS;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+            var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
+            var planningunitRequest = planningunitOs.getAll();
+            var planningList = []
+            planningunitRequest.onerror = function (event) {
+                // Handle errors!
+            };
+            planningunitRequest.onsuccess = function (e) {
+                var myResult = [];
+                myResult = planningunitRequest.result;
+                // console.log("myResult", myResult);
+                var programId = (document.getElementById("programId").value).split("_")[0];
+                // console.log('programId----->>>', programId)
+                console.log(myResult);
+                var proList = []
+                for (var i = 0; i < myResult.length; i++) {
+                    if (myResult[i].program.id == programId) {
+                        var productJson = {
+                            name: getLabelText(myResult[i].planningUnit.label, lan),
+                            id: myResult[i].planningUnit.id
+                        }
+                        proList[i] = productJson
+                    }
+                }
+                this.setState({
+                    planningUnitList: proList
+                })
+            }.bind(this);
+        }.bind(this)
     }
-
     render() {
+
+        const { SearchBar, ClearSearchButton } = Search;
+        const customTotal = (from, to, size) => (
+            <span className="react-bootstrap-table-pagination-total">
+                {i18n.t('static.common.result', { from, to, size })}
+            </span>
+        );
+
+
         const lan = 'en';
         const { programList } = this.state;
         let programs = programList.length > 0
@@ -343,35 +176,171 @@ export default class ConsumptionDetails extends React.Component {
                     <option key={i} value={item.id}>{item.name}</option>
                 )
             }, this);
+        const columns = [
+            {
+                dataField: 'program.label',
+                text: 'Program',
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: (cell, row) => {
+                    if (cell != null && cell != "") {
+                        return getLabelText(cell, this.state.lang);
+                    }
+                }
+                // formatter: (cellContent, row) => {
+                //   return (
+                //     (row.active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'))
+                //   );
+                // }
+            },
+            {
+                dataField: 'region.label',
+                text: 'Region',
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: (cell, row) => {
+                    if (cell != null && cell != "") {
+                        return getLabelText(cell, this.state.lang);
+                    }
+                }
+            },
+            {
+                dataField: 'planningUnit.label',
+                text: 'Planning Unit ',
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: (cell, row) => {
+                    if (cell != null && cell != "") {
+                        return getLabelText(cell, this.state.lang);
+                    }
+                }
+            },
+            {
+                dataField: 'problemId',
+                text: 'Problem Id',
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'month',
+                text: 'Month',
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: (cell, row) => {
+                    if (cell != null && cell != "") {
+                        var modifiedDate = moment(cell).format(`${DATE_FORMAT_CAP}`);
+                        return modifiedDate;
+                    }
+                }
+            },
+            {
+                dataField: 'isFound',
+                text: 'Is Found',
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                // formatter: this.formatLabel
+            },
+            {
+                dataField: 'actionName.label',
+                text: 'Action',
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: (cell, row) => {
+                    if (cell != null && cell != "") {
+                        return getLabelText(cell, this.state.lang);
+                    }
+                }
+            },
+            {
+                dataField: 'criticality.label',
+                text: 'Criticality',
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: (cell, row) => {
+                    if (cell != null && cell != "") {
+                        return getLabelText(cell, this.state.lang);
+                    }
+                }
+            },
+            {
+                dataField: 'problemStatus.label',
+                text: 'HQ Review Status',
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: (cell, row) => {
+                    if (cell != null && cell != "") {
+                        return getLabelText(cell, this.state.lang);
+                    }
+                }
+            },
+            {
+                dataField: 'note',
+                text: 'HQ Note',
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            }
+        ];
+        const options = {
+            hidePageListOnlyOnePage: true,
+            firstPageText: i18n.t('static.common.first'),
+            prePageText: i18n.t('static.common.back'),
+            nextPageText: i18n.t('static.common.next'),
+            lastPageText: i18n.t('static.common.last'),
+            nextPageTitle: i18n.t('static.common.firstPage'),
+            prePageTitle: i18n.t('static.common.prevPage'),
+            firstPageTitle: i18n.t('static.common.nextPage'),
+            lastPageTitle: i18n.t('static.common.lastPage'),
+            showTotal: true,
+            paginationTotalRenderer: customTotal,
+            disablePageTitle: true,
+            sizePerPageList: [{
+                text: '10', value: 10
+            }, {
+                text: '30', value: 30
+            }
+                ,
+            {
+                text: '50', value: 50
+            },
+            {
+                text: 'All', value: problemActionlist.length
+            }]
+        }
+
 
         return (
 
             <div className="animated fadeIn">
+                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
+                }} />
 
                 <h5>{i18n.t(this.state.message)}</h5>
                 <Card>
 
-                    <CardHeader>
-                        <strong>QAT PROBLEM+ACTION REPORT</strong>
-                        {
-                            // this.state.matricsList.length > 0 &&
-                            <div className="card-header-actions">
-                                <a className="card-header-action">
-                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" />
-
-                                    {/* <Pdf targetRef={ref} filename={i18n.t('static.report.consumptionpdfname')}>
- 
- {({ toPdf }) =>
- <img style={{ height: '25px', width: '25px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => toPdf()} />
-
- }
- </Pdf>*/}
-                                </a>
-                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} />
+                    <div className="Card-header-addicon">
+                        {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}{' '}</strong> */}
+                        <div className="card-header-actions">
+                            <div className="card-header-action">
+                                {/* {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_BUDGET') &&  */}
+                                <a href="javascript:void();" title='Add Problem' ><i className="fa fa-plus-square"></i></a>
+                                {/* } */}
                             </div>
-                        }
-                    </CardHeader>
-                    <CardBody>
+                        </div>
+                    </div>
+                    <CardBody className=" pt-lg-0">
                         <Formik
                             render={
                                 ({
@@ -406,7 +375,7 @@ export default class ConsumptionDetails extends React.Component {
                                                                     id="planningUnitId"
                                                                     bsSize="sm"
                                                                     value={this.state.planningUnitId}
-                                                                    onChange={this.filterData}
+                                                                    onChange={this.fetchData}
                                                                 >
                                                                     <option value="0">Please Select</option>
                                                                     {planningUnits}
@@ -454,18 +423,42 @@ export default class ConsumptionDetails extends React.Component {
                                         </Form>
                                     )} />
 
-                        <Col xs="12" sm="12">
-                            <div className="table-responsive">
-                                <div id="shipmenttableDiv">
-
-                                </div>
-                            </div>
-                        </Col>
+                        <ToolkitProvider
+                            keyField="programId"
+                            data={problemActionlist}
+                            columns={columns}
+                            search={{ searchFormatted: true }}
+                            hover
+                            filter={filterFactory()}
+                        >
+                            {
+                                props => (
+                                    <div className="TableCust">
+                                        <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
+                                            <SearchBar {...props.searchProps} />
+                                            <ClearSearchButton {...props.searchProps} />
+                                        </div>
+                                        <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                            pagination={paginationFactory(options)}
+                                            rowEvents={{
+                                                onClick: (e, row, rowIndex) => {
+                                                    this.editProblem(row);
+                                                }
+                                            }}
+                                            {...props.baseProps}
+                                        />
+                                    </div>
+                                )
+                            }
+                        </ToolkitProvider>
                     </CardBody>
                     <CardFooter>
                         <FormGroup>
+                            <Button color="danger" size="md" className="float-right mr-1 px-4" type="button" name="regionPrevious" id="regionPrevious" onClick={this.cancelClicked} > <i className="fa fa-angle-double-left "></i> Cancel</Button>
                             &nbsp;
-</FormGroup>
+                            {/* {this.state.planningUnitId > 0 && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.addRow}> <i className="fa fa-plus"></i> Add Row</Button>}
+                            &nbsp; */}
+                        </FormGroup>
                     </CardFooter>
                 </Card>
 
@@ -474,48 +467,9 @@ export default class ConsumptionDetails extends React.Component {
         );
     }
 
-    getPlanningUnitList(event) {
-        // console.log("-------------in planning list-------------")
-        const lan = 'en';
-        var db1;
-        var storeOS;
-        getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
-        openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-            var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
-            var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
-            var planningunitRequest = planningunitOs.getAll();
-            var planningList = []
-            planningunitRequest.onerror = function (event) {
-                // Handle errors!
-            };
-            planningunitRequest.onsuccess = function (e) {
-                var myResult = [];
-                myResult = planningunitRequest.result;
-                // console.log("myResult", myResult);
-                var programId = (document.getElementById("programId").value).split("_")[0];
-                // console.log('programId----->>>', programId)
-                console.log(myResult);
-                var proList = []
-                for (var i = 0; i < myResult.length; i++) {
-                    if (myResult[i].program.id == programId) {
-                        var productJson = {
-                            name: getLabelText(myResult[i].planningUnit.label, lan),
-                            id: myResult[i].planningUnit.id
-                        }
-                        proList[i] = productJson
-                    }
-                }
-                this.setState({
-                    planningUnitList: proList
-                })
-            }.bind(this);
-        }.bind(this)
-    }
 
     cancelClicked() {
-        this.props.history.push(`/dashboard/` + i18n.t('static.message.cancelled'))
+        this.props.history.push(`/ApplicationDashboard/`);
     }
 }
 

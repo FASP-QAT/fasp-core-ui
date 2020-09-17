@@ -9,7 +9,7 @@ import CountryService from "../../api/CountryService";
 import RealmCountryService from "../../api/RealmCountryService";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';
-
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 const entityname = i18n.t('static.program.realmcountry');
 const initialValues = {
     realmId: [],
@@ -227,6 +227,11 @@ class AddRealmCountryComponent extends Component {
         //     }, this);
         return (
             <div className="animated fadeIn">
+                   <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
+                }} />
                  <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>

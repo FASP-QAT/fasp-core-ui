@@ -12,12 +12,15 @@ import UserService from "../../api/UserService";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n'
 import getLabelText from '../../CommonComponent/getLabelText';
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import classNames from 'classnames';
 
 
 let initialValues = {
     realmId: '',
-    healthAreaName: ''
+    healthAreaName: '',
+    healthAreaCode: '',
+    realmCountryId: [],
 }
 const entityname = i18n.t('static.healtharea.healtharea');
 const validationSchema = function (values) {
@@ -25,7 +28,13 @@ const validationSchema = function (values) {
         realmId: Yup.string()
             .required(i18n.t('static.common.realmtext')),
         healthAreaName: Yup.string()
-            .required(i18n.t('static.healtharea.healthareatext'))
+            .matches(/^([a-zA-Z]+\s)*[a-zA-Z]+$/, i18n.t('static.message.rolenamevalidtext'))
+            .required(i18n.t('static.healtharea.healthareatext')),
+        healthAreaCode: Yup.string()
+            .max(3, 'Technical Area Code Is 3 Digit')
+            .required(i18n.t('static.country.countrycodetext')),
+        realmCountryId: Yup.string()
+            .required(i18n.t('static.program.validcountrytext'))
     })
 }
 
@@ -74,14 +83,16 @@ export default class EditHealthAreaComponent extends Component {
                         label_fr: ''
                     }
                 },
-                realmCountryArray: []
+                realmCountryArray: [],
+                healthAreaCode: '',
 
             },
             // healthArea: this.props.location.state.healthArea,
             message: '',
             lang: localStorage.getItem('lang'),
             realmCountryId: '',
-            realmCountryList: []
+            realmCountryList: [],
+            loading: true
         }
         this.dataChange = this.dataChange.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
@@ -104,6 +115,9 @@ export default class EditHealthAreaComponent extends Component {
     changeMessage(message) {
         this.setState({ message: message })
     }
+    changeLoading(loading) {
+        this.setState({ loading: loading })
+    }
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
@@ -121,6 +135,8 @@ export default class EditHealthAreaComponent extends Component {
             healthArea.realm.id = event.target.value
         } else if (event.target.name === "active") {
             healthArea.active = event.target.id === "active2" ? false : true
+        } else if (event.target.name === "healthAreaCode") {
+            healthArea.healthAreaCode = event.target.value.toUpperCase();
         }
         this.setState({
             healthArea
@@ -133,7 +149,9 @@ export default class EditHealthAreaComponent extends Component {
     touchAll(setTouched, errors) {
         setTouched({
             realmId: true,
-            healthAreaName: true
+            healthAreaName: true,
+            healthAreaCode: true,
+            realmCountryId: true
         }
         )
         this.validateForm(errors)
@@ -160,30 +178,31 @@ export default class EditHealthAreaComponent extends Component {
         HealthAreaService.getHealthAreaById(this.props.match.params.healthAreaId).then(response => {
             if (response.status == 200) {
                 this.setState({
-                    healthArea: response.data
+                    healthArea: response.data, loading: false
                 })
 
             }
             else {
 
                 this.setState({
-                    message: response.data.messageCode
+                    message: response.data.messageCode, loading: false
                 },
                     () => {
                         this.hideSecondComponent();
                     })
             }
 
-            initialValues = {
-                healthAreaName: this.state.healthArea.label.label_en,
-                realmId: this.state.healthArea.realm.id
-            }
+            // initialValues = {
+            //     healthAreaName: this.state.healthArea.label.label_en,
+            //     healthAreaCode: this.state.healthArea.healthAreaCode,
+            //     realmId: this.state.healthArea.realm.id
+            // }
 
             UserService.getRealmList()
                 .then(response => {
                     console.log("realm list---", response.data);
                     this.setState({
-                        realms: response.data
+                        realms: response.data, loading: false
                     })
                 })
 
@@ -197,11 +216,11 @@ export default class EditHealthAreaComponent extends Component {
                             regList[i] = { value: json[i].realmCountryId, label: json[i].country.label.label_en }
                         }
                         this.setState({
-                            realmCountryList: regList
+                            realmCountryList: regList, loading: false
                         })
                     } else {
                         this.setState({
-                            message: response.data.messageCode
+                            message: response.data.messageCode, loading: false
                         })
                     }
                 })
@@ -249,27 +268,35 @@ export default class EditHealthAreaComponent extends Component {
 
         return (
             <div className="animated fadeIn">
-                <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} />
+                <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} loading={this.changeLoading} />
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
-                            <CardHeader>
+                            {/* <CardHeader>
                                 <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
-                            </CardHeader>
+                            </CardHeader> */}
                             <Formik
                                 enableReinitialize={true}
-                                initialValues={initialValues}
+                                initialValues={{
+                                    healthAreaName: this.state.healthArea.label.label_en,
+                                    healthAreaCode: this.state.healthArea.healthAreaCode,
+                                    realmId: this.state.healthArea.realm.id,
+                                    realmCountryId: this.state.healthArea.realmCountryArray
+                                }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
+                                    this.setState({
+                                        loading: true
+                                    })
                                     console.log("-------------------->" + this.state.healthArea);
                                     HealthAreaService.editHealthArea(this.state.healthArea)
                                         .then(response => {
                                             if (response.status == 200) {
-                                                this.props.history.push(`/healthArea/listHealthArea/` + 'green/'+ i18n.t(response.data.messageCode, { entityname }))
+                                                this.props.history.push(`/healthArea/listHealthArea/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
-                                                    message: response.data.messageCode
+                                                    message: response.data.messageCode, loading: false
                                                 },
                                                     () => {
                                                         this.hideSecondComponent();
@@ -290,31 +317,19 @@ export default class EditHealthAreaComponent extends Component {
                                         handleSubmit,
                                         isSubmitting,
                                         isValid,
-                                        setTouched
+                                        setTouched,
+                                        setFieldValue,
+                                        setFieldTouched
                                     }) => (
                                             <Form onSubmit={handleSubmit} noValidate name='healthAreaForm'>
-                                                <CardBody>
-
+                                                <CardBody className="pb-0">
                                                     <FormGroup>
-                                                        <Label htmlFor="company">{i18n.t('static.healthArea.healthAreaName')}<span class="red Reqasterisk">*</span> </Label>
-                                                        <Input
-                                                            bsSize="sm"
-                                                            type="text" name="healthAreaName" valid={!errors.healthAreaName}
-                                                            invalid={touched.healthAreaName && !!errors.healthAreaName}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.healthArea.label.label_en}
-                                                            id="healthAreaName" />
-                                                        <FormFeedback className="red">{errors.healthAreaName}</FormFeedback>
-                                                    </FormGroup>
-
-                                                    <FormGroup>
-                                                        <Label htmlFor="select">{i18n.t('static.healtharea.realm')}</Label>
+                                                        <Label htmlFor="select">{i18n.t('static.healtharea.realm')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             bsSize="sm"
                                                             value={this.state.healthArea.realm.id}
                                                             valid={!errors.realmId}
-                                                            invalid={touched.realmId && !!errors.realmId}
+                                                            invalid={touched.realmId && !!errors.realmId || this.state.healthArea.realm.realmId == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             disabled
@@ -325,20 +340,56 @@ export default class EditHealthAreaComponent extends Component {
                                                         <FormFeedback>{errors.realmId}</FormFeedback>
                                                     </FormGroup>
 
-                                                    <FormGroup>
+                                                    <FormGroup className="Selectcontrol-bdrNone">
                                                         <Label htmlFor="select">{i18n.t('static.healtharea.realmcountry')}<span class="red Reqasterisk">*</span></Label>
                                                         <Select
+                                                            className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                                { 'is-valid': !errors.realmCountryId },
+                                                                { 'is-invalid': (touched.realmCountryId && !!errors.realmCountryId || this.state.healthArea.realmCountryArray.length == 0) }
+                                                            )}
                                                             bsSize="sm"
-                                                            valid={!errors.realmCountryId}
-                                                            invalid={touched.realmCountryId && !!errors.realmCountryId}
-                                                            onChange={(e) => { handleChange(e); this.updateFieldData(e) }}
-                                                            onBlur={handleBlur} name="realmCountryId" id="realmCountryId"
+                                                            name="realmCountryId"
+                                                            id="realmCountryId"
+                                                            onChange={(e) => {
+                                                                handleChange(e);
+                                                                setFieldValue("realmCountryId", e);
+                                                                this.updateFieldData(e);
+                                                            }}
+                                                            onBlur={() => setFieldTouched("realmCountryId", true)}
                                                             multi
                                                             options={this.state.realmCountryList}
                                                             value={this.state.healthArea.realmCountryArray}
                                                         />
                                                         <FormFeedback>{errors.realmCountryId}</FormFeedback>
                                                     </FormGroup>
+
+                                                    <FormGroup>
+                                                        <Label htmlFor="company">{i18n.t('static.technicalArea.technicalAreaDisplayName')}<span class="red Reqasterisk">*</span> </Label>
+                                                        <Input
+                                                            bsSize="sm"
+                                                            type="text" name="healthAreaCode" valid={!errors.healthAreaCode && this.state.healthArea.healthAreaCode != ''}
+                                                            invalid={touched.healthAreaCode && !!errors.healthAreaCode || this.state.healthArea.healthAreaCode == ''}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.healthArea.healthAreaCode}
+                                                            id="healthAreaCode" />
+                                                        <FormFeedback className="red">{errors.healthAreaCode}</FormFeedback>
+                                                    </FormGroup>
+
+                                                    <FormGroup>
+                                                        <Label htmlFor="company">{i18n.t('static.healthArea.healthAreaName')}<span class="red Reqasterisk">*</span> </Label>
+                                                        <Input
+                                                            bsSize="sm"
+                                                            type="text" name="healthAreaName" valid={!errors.healthAreaName}
+                                                            invalid={touched.healthAreaName && !!errors.healthAreaName || this.state.healthArea.label.label_en == ''}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.healthArea.label.label_en}
+                                                            id="healthAreaName" />
+                                                        <FormFeedback className="red">{errors.healthAreaName}</FormFeedback>
+                                                    </FormGroup>
+
+
 
                                                     <FormGroup>
                                                         <Label className="P-absltRadio">{i18n.t('static.common.status')}  </Label>
@@ -400,7 +451,7 @@ export default class EditHealthAreaComponent extends Component {
     }
 
     cancelClicked() {
-        this.props.history.push(`/healthArea/listHealthArea/`+ 'red/'  + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/healthArea/listHealthArea/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
     resetClicked() {

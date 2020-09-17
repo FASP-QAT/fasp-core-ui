@@ -1,6 +1,7 @@
 import i18n from 'i18next';
 import Backend from 'i18next-xhr-backend';
 import LanguageDetector from 'i18next-browser-languagedetector';
+import { reactI18nextModule } from 'react-i18next';
 
 // import en from '/';
 import en from '../src/assets/img/locales/en.json'
@@ -19,6 +20,7 @@ if (lang == null) {
 i18n
   .use(LanguageDetector)
   .use(Backend)
+  .use(initReactI18next)
   .init({
     lng: lang,
     backend: {
@@ -39,16 +41,19 @@ i18n
     },
     react: {
       wait: true
-    }, debug: true
+    }, debug: true,
+    useSuspense: true,
+    wait:          true,
   }, (err, t) => {
     if (err) return console.log('something went wrong loading', err);
     t('key'); // -> same as i18next.t
   }
   )
 i18n.loadNamespaces('translations', (err, t) => { console.log('something went wrong loading', err); /* ... */ });
-i18n.on('initialized', () => {
-  if (i18n.options && i18n.options.second) {
-    // seems 2nd init was done
-  }
+i18n.on('languageChanged initialized', () => {
+  if (!i18n.isInitialized) return;
+  // if (i18n.options && i18n.options.second) {
+  //   // seems 2nd init was done
+  // }
 });
 export default i18n;

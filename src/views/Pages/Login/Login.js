@@ -1,39 +1,38 @@
-import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
-import { Button, Card, CardBody, CardGroup, Col, Container, ContainerFluid, Form, Input, InputGroup, InputGroupAddon, InputGroupText, Row, FormFeedback, Label, FormGroup } from 'reactstrap';
-import navigation from '../../../_nav';
-// routes config
-import image1 from '../../../assets/img/QAT-login-logo.png';
-import image2 from '../../../assets/img/wordmark.png';
-import image3 from '../../../assets/img/PEPFAR-logo.png';
-import image4 from '../../../assets/img/USAID-presidents-malaria-initiative.png';
-import InnerBgImg from '../../../../src/assets/img/bg-image/bg-login.jpg';
-
-import { Formik } from 'formik';
-import * as Yup from 'yup'
-import '../../Forms/ValidationForms/ValidationForms.css'
-
-import CryptoJS from 'crypto-js'
-import AuthenticationService from '../../Common/AuthenticationService.js';
-import { Online } from "react-detect-offline";
 import bcrypt from 'bcryptjs';
-import jwt_decode from 'jwt-decode'
-import { SECRET_KEY } from '../../../Constants.js'
-import LoginService from '../../../api/LoginService'
-import i18n from '../../../i18n'
-import axios from 'axios';
+import CryptoJS from 'crypto-js';
+import { Formik } from 'formik';
+import jwt_decode from 'jwt-decode';
 import moment from 'moment';
+import React, { Component } from 'react';
+import i18n from '../../../i18n';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
+import { Button, CardBody, CardGroup, Col, Container, Form, FormFeedback, Input, InputGroup, InputGroupAddon, InputGroupText, Row } from 'reactstrap';
+import * as Yup from 'yup';
+import InnerBgImg from '../../../../src/assets/img/bg-image/bg-login.jpg';
+import LoginService from '../../../api/LoginService';
+import image3 from '../../../assets/img/PEPFAR-logo.png';
+// routes config
+import image1 from '../../../assets/img/QAT-login-logo.png';
+import image4 from '../../../assets/img/USAID-presidents-malaria-initiative.png';
+import image2 from '../../../assets/img/wordmark.png';
+import { SECRET_KEY } from '../../../Constants.js';
+import AuthenticationService from '../../Common/AuthenticationService.js';
+import '../../Forms/ValidationForms/ValidationForms.css';
+
+
+
+
 
 
 const initialValues = {
-  username: "",
+  emailId: "",
   password: ""
 }
 const validationSchema = function (values) {
   return Yup.object().shape({
-    username: Yup.string()
+    emailId: Yup.string()
+      .email(i18n.t('static.user.invalidemail'))
       .required(i18n.t('static.login.usernametext')),
     password: Yup.string()
       .required(i18n.t('static.login.passwordtext'))
@@ -75,7 +74,7 @@ class Login extends Component {
 
   touchAll(setTouched, errors) {
     setTouched({
-      username: true,
+      emailId: true,
       password: true
     }
     )
@@ -140,8 +139,11 @@ class Login extends Component {
     setTimeout(function () { document.getElementById('div1').style.display = 'none'; }, 8000);
     var logoutMessage = document.getElementById('div1');
     var htmlContent = logoutMessage.innerHTML;
-    console.log("htnl content.......", htmlContent);
-    if (htmlContent.includes('Cancelled')) {
+    console.log("htnl content....... ", htmlContent);
+    if (htmlContent.includes('Cancelled') || htmlContent.includes('cancelled') || htmlContent.includes('sessionChange') || htmlContent.includes('change your session') || htmlContent.includes('expire') || htmlContent.includes('exceeded the maximum')) {
+      logoutMessage.style.color = 'red';
+    }
+    else if (htmlContent.includes('Access Denied')) {
       logoutMessage.style.color = 'red';
     }
     else {
@@ -173,32 +175,40 @@ class Login extends Component {
               </Col>
               <Col lg="5" md="7" xl="4">
                 <CardGroup>
-                  <Card className="p-4 Login-card mt-2">
+                  <div className="p-4 Login-card card-marginTop" >
                     <CardBody>
                       <Formik
                         initialValues={initialValues}
                         validate={validate(validationSchema)}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
-                          var username = values.username;
+                          var emailId = values.emailId;
                           var password = values.password;
                           if (navigator.onLine) {
-                            LoginService.authenticate(username, password)
+                            LoginService.authenticate(emailId, password)
                               .then(response => {
                                 var decoded = jwt_decode(response.data.token);
+                                console.log("decoded token---", decoded);
+
                                 let keysToRemove = ["token-" + decoded.userId, "user-" + decoded.userId, "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken"];
                                 keysToRemove.forEach(k => localStorage.removeItem(k))
-
                                 decoded.user.syncExpiresOn = moment().format("YYYY-MM-DD HH:mm:ss");
                                 // decoded.user.syncExpiresOn = moment("2020-04-29 13:13:19").format("YYYY-MM-DD HH:mm:ss");
                                 localStorage.setItem('token-' + decoded.userId, CryptoJS.AES.encrypt((response.data.token).toString(), `${SECRET_KEY}`));
-                                localStorage.setItem('user-' + decoded.userId, CryptoJS.AES.encrypt(JSON.stringify(decoded.user), `${SECRET_KEY}`));
+                                // localStorage.setItem('user-' + decoded.userId, CryptoJS.AES.encrypt(JSON.stringify(decoded.user), `${SECRET_KEY}`));
                                 localStorage.setItem('typeOfSession', "Online");
                                 localStorage.setItem('lastActionTaken', CryptoJS.AES.encrypt((moment(new Date()).format("YYYY-MM-DD HH:mm:ss")).toString(), `${SECRET_KEY}`));
                                 localStorage.setItem('curUser', CryptoJS.AES.encrypt((decoded.userId).toString(), `${SECRET_KEY}`));
                                 localStorage.setItem('lang', decoded.user.language.languageCode);
+                                localStorage.setItem('i18nextLng', decoded.user.language.languageCode);
+                                i18n.changeLanguage(decoded.user.language.languageCode);
+
 
                                 AuthenticationService.setupAxiosInterceptors();
-                                this.props.history.push(`/masterDataSync`)
+                                if (decoded.user.agreementAccepted) {
+                                  this.props.history.push(`/masterDataSync`)
+                                } else {
+                                  this.props.history.push(`/userAgreement`)
+                                }
                               })
                               .catch(
                                 error => {
@@ -210,26 +220,29 @@ class Login extends Component {
                                       case 401:
                                       case 404:
                                       case 412:
+                                        console.log("Login page 401---");
                                         this.setState({ message: error.response.data.messageCode });
                                         break;
                                       case 406:
                                         this.props.history.push({
                                           pathname: "/updateExpiredPassword",
                                           state: {
-                                            username
+                                            emailId
                                           }
                                         });
                                         break;
                                       default:
+                                        console.log("Login page unknown error---");
                                         this.setState({ message: 'static.unkownError' });
                                         break;
                                     }
                                   }
                                 }
                               );
+
                           }
                           else {
-                            var decryptedPassword = AuthenticationService.isUserLoggedIn(username);
+                            var decryptedPassword = AuthenticationService.isUserLoggedIn(emailId);
                             if (decryptedPassword != "") {
                               bcrypt.compare(password, decryptedPassword, function (err, res) {
                                 if (err) {
@@ -238,18 +251,22 @@ class Login extends Component {
                                 if (res) {
                                   let tempUser = localStorage.getItem("tempUser");
                                   let user = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + tempUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
-                                  let keysToRemove = ["curUser", "lang", "typeOfSession", "i18nextLng","lastActionTaken"];
+                                  let keysToRemove = ["curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken"];
                                   keysToRemove.forEach(k => localStorage.removeItem(k))
 
                                   localStorage.setItem('typeOfSession', "Offline");
                                   localStorage.setItem('curUser', CryptoJS.AES.encrypt((user.userId).toString(), `${SECRET_KEY}`));
                                   localStorage.setItem('lang', user.language.languageCode);
+                                  localStorage.setItem('i18nextLng', user.language.languageCode);
+                                  i18n.changeLanguage(user.language.languageCode);
                                   localStorage.removeItem("tempUser");
                                   if (AuthenticationService.syncExpiresOn() == true) {
                                     this.props.history.push(`/logout/static.message.syncExpiresOn`)
                                   } else {
                                     localStorage.setItem('lastActionTaken', CryptoJS.AES.encrypt((moment(new Date()).format("YYYY-MM-DD HH:mm:ss")).toString(), `${SECRET_KEY}`));
+                                    // qatProblemActions();
                                     this.props.history.push(`/ApplicationDashboard`)
+
                                   }
                                 } else {
                                   this.setState({ message: 'static.message.login.invalidCredentials' });
@@ -284,26 +301,26 @@ class Login extends Component {
                                 <InputGroup className="mb-3">
                                   <InputGroupAddon addonType="prepend">
                                     <InputGroupText>
-                                      <i className="icon-user Loginicon"></i>
+                                      <i className="cui-user Loginicon"></i>
                                     </InputGroupText>
                                   </InputGroupAddon>
                                   <Input
                                     type="text"
-                                    placeholder={i18n.t('static.login.username')}
-                                    autoComplete="username"
-                                    name="username"
-                                    id="username"
-                                    valid={!errors.username}
-                                    invalid={touched.username && !!errors.username}
+                                    placeholder={i18n.t('static.login.emailId')}
+                                    autoComplete="emailId"
+                                    name="emailId"
+                                    id="emailId"
+                                    valid={!errors.emailId}
+                                    invalid={touched.emailId && !!errors.emailId}
                                     onChange={handleChange}
                                     onBlur={handleBlur}
                                     required />
-                                  <FormFeedback>{errors.username}</FormFeedback>
+                                  <FormFeedback>{errors.emailId}</FormFeedback>
                                 </InputGroup>
                                 <InputGroup className="mb-4">
                                   <InputGroupAddon addonType="prepend">
                                     <InputGroupText>
-                                      <i className="icon-lock Loginicon"></i>
+                                      <i className="cui-lock-locked Loginicon"></i>
                                     </InputGroupText>
                                   </InputGroupAddon>
                                   <Input
@@ -331,7 +348,7 @@ class Login extends Component {
                               </Form>
                             )} />
                     </CardBody>
-                  </Card>
+                  </div>
 
                 </CardGroup>
               </Col>
@@ -348,8 +365,8 @@ class Login extends Component {
                   and delivers health commodities, offers comprehensive technical assistance to strengthen
                   national supply chain systems, and provides global supply chain leadership. For more
                   information, visit <a href="https://www.ghsupplychain.org/" target="_blank">ghsupplychain.org</a>. The information provided in this tool is not
-                                                        official U.S. government information and does not represent the views or positions of the
-                                                        Agency for International Development or the U.S. government.
+                                                                      official U.S. government information and does not represent the views or positions of the
+                                                                      Agency for International Development or the U.S. government.
               </p>
                 </CardBody>
                 <Row className="text-center Login-bttom-logo">

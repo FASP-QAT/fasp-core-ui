@@ -26,6 +26,7 @@ const validationSchema = function (values) {
         realmId: Yup.string()
             .required(i18n.t('static.common.realmtext')),
         label: Yup.string()
+            // .matches(/^([a-zA-Z]+\s)*[a-zA-Z]+$/, i18n.t('static.message.rolenamevalidtext'))
             .required(i18n.t('static.datasource.datasourcetext')),
         dataSourceTypeId: Yup.string()
             .required(i18n.t('static.datasource.datasourcetypetext'))
@@ -84,6 +85,7 @@ export default class AddDataSource extends Component {
             dataSourceTypeId: '',
             programs: [],
             programId: '',
+            loading: true,
         }
         this.Capitalize = this.Capitalize.bind(this);
 
@@ -146,7 +148,7 @@ export default class AddDataSource extends Component {
         RealmService.getRealmListAll()
             .then(response => {
                 this.setState({
-                    realms: response.data
+                    realms: response.data, loading: false
                 })
             })
     }
@@ -160,25 +162,38 @@ export default class AddDataSource extends Component {
     getDataSourceTypeByRealmId(e) {
 
         AuthenticationService.setupAxiosInterceptors();
-        DataSourceTypeService.getDataSourceTypeByRealmId(e.target.value)
-            .then(response => {
-                console.log("getDataSourceTypeByRealmId---", response.data);
-                this.setState({
-                    dataSourceTypeList: response.data
-                })
+        if (e.target.value != 0) {
+            DataSourceTypeService.getDataSourceTypeByRealmId(e.target.value)
+                .then(response => {
+                    console.log("getDataSourceTypeByRealmId---", response.data);
+                    this.setState({
+                        dataSourceTypeList: response.data, loading: false
+                    })
 
+                })
+        } else {
+            this.setState({
+                dataSourceTypeList: [], loading: false
             })
+        }
     }
 
     getProgramByRealmId(e) {
         AuthenticationService.setupAxiosInterceptors();
-        ProgramService.getProgramByRealmId(e.target.value)
-            .then(response => {
-                console.log("getProgramByRealmId---", response.data);
-                this.setState({
-                    programs: response.data
+        console.log("e.target.value---", e.target.value);
+        if (e.target.value != 0) {
+            ProgramService.getProgramByRealmId(e.target.value)
+                .then(response => {
+                    console.log("getProgramByRealmId---", response.data);
+                    this.setState({
+                        programs: response.data, loading: false
+                    })
                 })
+        } else {
+            this.setState({
+                programs: [], loading: false
             })
+        }
     }
 
     Capitalize(str) {
@@ -219,25 +234,32 @@ export default class AddDataSource extends Component {
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
                 }} />
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-                <Row>
+                <Row style={{ display: this.state.loading ? "none" : "block" }}>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
-                            <CardHeader>
+                            {/* <CardHeader>
                                 <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
-                            </CardHeader>
+                            </CardHeader> */}
                             <Formik
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
+                                    this.setState({
+                                        loading: true
+                                    })
+                                    console.log("this.state----",this.state);
                                     DataSourceService.addDataSource(this.state)
                                         .then(response => {
                                             if (response.status == 200) {
                                                 this.props.history.push(`/dataSource/listDataSource/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
-                                                    message: response.data.messageCode
+                                                    message: response.data.messageCode,
+                                                    loading: false
                                                 },
                                                     () => {
                                                         this.hideSecondComponent();
@@ -276,29 +298,13 @@ export default class AddDataSource extends Component {
                                                             required
                                                             value={this.state.realm.id}
                                                         >
-                                                            <option value="">{i18n.t('static.common.select')}</option>
+                                                            <option value="0">{i18n.t('static.common.select')}</option>
                                                             {realmList}
                                                         </Input>
                                                         <FormFeedback className="red">{errors.realmId}</FormFeedback>
                                                     </FormGroup>
-
                                                     <FormGroup>
-                                                        <Label for="label">{i18n.t('static.datasource.datasource')}<span class="red Reqasterisk">*</span></Label>
-                                                        <Input type="text"
-                                                            name="label"
-                                                            id="label"
-                                                            bsSize="sm"
-                                                            valid={!errors.label && this.state.label.label_en != ''}
-                                                            invalid={touched.label && !!errors.label}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.label.label_en}
-                                                            required />
-                                                        <FormFeedback className="red">{errors.label}</FormFeedback>
-                                                    </FormGroup>
-
-                                                    <FormGroup>
-                                                        <Label htmlFor="programId">{i18n.t('static.dataSource.program')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Label htmlFor="programId">{i18n.t('static.dataSource.program')}</Label>
                                                         <Input
                                                             type="select"
                                                             name="programId"
@@ -316,7 +322,6 @@ export default class AddDataSource extends Component {
                                                         </Input>
                                                         <FormFeedback className="red">{errors.realmId}</FormFeedback>
                                                     </FormGroup>
-
                                                     <FormGroup>
                                                         <Label htmlFor="dataSourceTypeId">{i18n.t('static.datasource.datasourcetype')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
@@ -336,12 +341,27 @@ export default class AddDataSource extends Component {
                                                         </Input>
                                                         <FormFeedback className="red">{errors.dataSourceTypeId}</FormFeedback>
                                                     </FormGroup>
+                                                    <FormGroup>
+                                                        <Label for="label">{i18n.t('static.datasource.datasource')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Input type="text"
+                                                            name="label"
+                                                            id="label"
+                                                            bsSize="sm"
+                                                            valid={!errors.label && this.state.label.label_en != ''}
+                                                            invalid={touched.label && !!errors.label}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.label.label_en}
+                                                            required />
+                                                        <FormFeedback className="red">{errors.label}</FormFeedback>
+                                                    </FormGroup>
+
                                                 </CardBody>
 
                                                 <CardFooter>
                                                     <FormGroup>
-                                                        <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="button" size="md"color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                        <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                         &nbsp;
 
@@ -354,6 +374,17 @@ export default class AddDataSource extends Component {
                         </Card>
                     </Col>
                 </Row>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div>
                     <h6>{i18n.t(this.state.message)}</h6>
                     <h6>{i18n.t(this.props.match.params.message)}</h6>
@@ -363,7 +394,7 @@ export default class AddDataSource extends Component {
     }
 
     cancelClicked() {
-        this.props.history.push(`/dataSource/listDataSource/` + 'red/'  + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/dataSource/listDataSource/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
     resetClicked() {

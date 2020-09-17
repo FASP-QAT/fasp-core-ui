@@ -47,11 +47,13 @@ export default class AuthenticationServiceComponent extends Component {
                                 return response;
                             } else {
                                 this.props.message("Network Error")
+                                this.props.loading(false)
                                 return "";
                             }
                         }, (error) => {
                             if (error.message === "Network Error") {
                                 this.props.message("Network Error")
+                                this.props.loading(false)
                             } else {
                                 switch (error.response ? error.response.status : "") {
                                     case 403:
@@ -64,10 +66,13 @@ export default class AuthenticationServiceComponent extends Component {
                                     case 404:
                                     case 406:
                                     case 412:
+                                        console.log("error.response.data.messageCode-------------",error.response.data.messageCode);
                                         this.props.message(error.response.data.messageCode);
+                                        this.props.loading(false)
                                         break;
                                     default:
                                         this.props.message('static.unkownError');
+                                        this.props.loading(false)
                                         break;
                                 }
                                 return Promise.reject(error);

@@ -8,27 +8,33 @@ import RealmService from "../../api/RealmService";
 import ProcurementAgentService from "../../api/ProcurementAgentService";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
+import { SketchPicker } from 'react-color';
+import reactCSS from 'reactcss'
 import getLabelText from '../../CommonComponent/getLabelText';
 const entityname = i18n.t('static.procurementagent.procurementagent');
 
 const initialValues = {
     procurementAgentName: "",
-    submittedToApprovedLeadTime: ""
+    submittedToApprovedLeadTime: "",
+    approvedToShippedLeadTime: "",
+    // colorHtmlCode: "",
 }
 
 const validationSchema = function (values) {
     return Yup.object().shape({
         procurementAgentName: Yup.string()
             .required(i18n.t('static.procurementAgent.procurementagentnametext')),
-        // submittedToApprovedLeadTime: Yup.string()
-        //     .matches(/^[0-9]*$/, i18n.t('static.procurementagent.onlynumberText'))
-        //     .required(i18n.t('static.procurementagent.submitToApproveLeadTime'))
         submittedToApprovedLeadTime: Yup.string()
-            .required(i18n.t('static.procurementagent.submitToApproveLeadTime')).min(0, i18n.t('static.program.validvaluetext')),
-        // submittedToApprovedLeadTime: Yup.number()
-        //     .typeError(i18n.t('static.procurementUnit.validNumberText'))
-        //     .required(i18n.t('static.procurementagent.submitToApproveLeadTime'))
-        //     .min(0, i18n.t('static.program.validvaluetext'))
+            .required(i18n.t('static.procurementagent.submitToApproveLeadTime'))
+            .min(0, i18n.t('static.program.validvaluetext'))
+            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
+        approvedToShippedLeadTime: Yup.string()
+            .required(i18n.t('static.procurementagent.approvedToShippedLeadTime'))
+            .min(0, i18n.t('static.program.validvaluetext'))
+            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
+        // colorHtmlCode: Yup.string()
+        //     .max(6, i18n.t('static.common.max6digittext'))
+        //     .required(i18n.t('static.procurementAgent.procurementAgentHTMLCode')),
     })
 }
 
@@ -57,6 +63,15 @@ class EditProcurementAgentComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            displayColorPicker: false,
+            rgba: '',
+            color: {
+                // hex: '#fff'
+                r: '241',
+                g: '112',
+                b: '19',
+                a: '1',
+            },
             realms: [],
             // procurementAgent: this.props.location.state.procurementAgent,
             procurementAgent: {
@@ -75,17 +90,51 @@ class EditProcurementAgentComponent extends Component {
                     label_pr: '',
                     label_fr: '',
                 },
-                procurementAgentCode: ''
+                procurementAgentCode: '',
+                colorHtmlCode: '',
+                submittedToApprovedLeadTime: '',
+                approvedToShippedLeadTime: '',
+                // localProcurementAgent: false,
             },
             message: '',
-            lang: localStorage.getItem('lang')
+            lang: localStorage.getItem('lang'),
+            loading: true
         }
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.changeMessage = this.changeMessage.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.changeLoading = this.changeLoading.bind(this);
     }
+    handleClick = () => {
+        this.setState({ displayColorPicker: !this.state.displayColorPicker })
+    };
+
+    handleClose = () => {
+        this.setState({ displayColorPicker: false })
+    };
+    changeLoading(loading) {
+        this.setState({ loading: loading })
+    }
+    handleChangeColor = (color) => {
+        let { procurementAgent } = this.state;
+        procurementAgent.colorHtmlCode = color.hex.toUpperCase();
+        let rgba = 'rgba(' + color.rgb.r + "," + color.rgb.g + "," + color.rgb.b + "," + color.rgb.a + ')';
+        this.setState({
+            color: color.rgb,
+            rgba,
+            procurementAgent
+        },
+            () => { console.log("agent--------------", procurementAgent); });
+    };
+    hideSecondComponent() {
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
+    }
+
     changeMessage(message) {
         this.setState({ message: message })
     }
@@ -108,11 +157,17 @@ class EditProcurementAgentComponent extends Component {
         if (event.target.name == "procurementAgentCode") {
             procurementAgent.procurementAgentCode = event.target.value;
         }
+        if (event.target.name == "colorHtmlCode") {
+            procurementAgent.colorHtmlCode = event.target.value.toUpperCase();
+        }
         if (event.target.name == "procurementAgentName") {
             procurementAgent.label.label_en = event.target.value;
         }
         if (event.target.name == "submittedToApprovedLeadTime") {
             procurementAgent.submittedToApprovedLeadTime = event.target.value;
+        }
+        if (event.target.name == "approvedToShippedLeadTime") {
+            procurementAgent.approvedToShippedLeadTime = event.target.value;
         }
         if (event.target.name == "active") {
             procurementAgent.active = event.target.id === "active2" ? false : true;
@@ -128,7 +183,9 @@ class EditProcurementAgentComponent extends Component {
     touchAll(setTouched, errors) {
         setTouched({
             procurementAgentName: true,
-            submittedToApprovedLeadTime: true
+            submittedToApprovedLeadTime: true,
+            approvedToShippedLeadTime: true,
+            // colorHtmlCode: true,
         }
         )
         this.validateForm(errors)
@@ -151,43 +208,93 @@ class EditProcurementAgentComponent extends Component {
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
         ProcurementAgentService.getProcurementAgentById(this.props.match.params.procurementAgentId).then(response => {
-            this.setState({
-                procurementAgent: response.data
-            });
+            if (response.status == 200) {
+                this.setState({
+                    procurementAgent: response.data, loading: false
+                });
+                let color = AuthenticationService.hexToRgbA(this.state.procurementAgent.colorHtmlCode);
+                this.setState({ rgba: color })
+            } else {
+                this.setState({
+                    message: response.data.messageCode, loading: false
+                },
+                    () => {
+                        this.hideSecondComponent();
+                    })
+            }
+
 
         })
     }
     render() {
+        const styles = reactCSS({
+            'default': {
+                color: {
+                    width: '100px',
+                    height: '17px',
+                    borderRadius: '2px',
+                    background: `${this.state.rgba}`,
+                    // background: `rgba(${AuthenticationService.hexToRgbA(this.state.procurementAgent.colorHtmlCode)})`,
+                },
+                swatch: {
+                    padding: '5px',
+                    background: '#fff',
+                    borderRadius: '1px',
+                    boxShadow: '0 0 0 1px rgba(0,0,0,.1)',
+                    display: 'inline-block',
+                    cursor: 'pointer',
+                },
+                popover: {
+                    position: 'absolute',
+                    zIndex: '2',
+                },
+                cover: {
+                    position: 'fixed',
+                    top: '0px',
+                    right: '0px',
+                    bottom: '0px',
+                    left: '0px',
+                },
+            },
+        });
         return (
             <div className="animated fadeIn">
-                <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} />
-                <h5>{i18n.t(this.state.message, { entityname })}</h5>
-                <Row>
+                <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} loading={this.changeLoading} />
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                <Row style={{ display: this.state.loading ? "none" : "block" }}>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
 
-                            <CardHeader>
+                            {/* <CardHeader>
                                 <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
-                            </CardHeader>
+                            </CardHeader> */}
                             <Formik
                                 enableReinitialize={true}
                                 initialValues={
                                     {
                                         procurementAgentCode: this.state.procurementAgent.procurementAgentCode,
                                         procurementAgentName: this.state.procurementAgent.label.label_en,
-                                        submittedToApprovedLeadTime: this.state.procurementAgent.submittedToApprovedLeadTime
+                                        submittedToApprovedLeadTime: this.state.procurementAgent.submittedToApprovedLeadTime,
+                                        approvedToShippedLeadTime: this.state.procurementAgent.approvedToShippedLeadTime,
+                                        colorHtmlCode: this.state.procurementAgent.colorHtmlCode,
                                     }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
+                                    this.setState({
+                                        loading: true
+                                    })
                                     AuthenticationService.setupAxiosInterceptors();
                                     ProcurementAgentService.updateProcurementAgent(this.state.procurementAgent)
                                         .then(response => {
                                             if (response.status == 200) {
-                                                this.props.history.push(`/procurementAgent/listProcurementAgent/` + i18n.t(response.data.messageCode, { entityname }))
+                                                this.props.history.push(`/procurementAgent/listProcurementAgent/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
-                                                    message: response.data.messageCode
-                                                })
+                                                    message: response.data.messageCode, loading: false
+                                                },
+                                                    () => {
+                                                        this.hideSecondComponent();
+                                                    })
                                             }
                                         })
                                 }}
@@ -204,9 +311,9 @@ class EditProcurementAgentComponent extends Component {
                                         setTouched
                                     }) => (
                                             <Form onSubmit={handleSubmit} noValidate name='procurementAgentForm'>
-                                                <CardBody>
+                                                <CardBody className="pb-0">
                                                     <FormGroup>
-                                                        <Label htmlFor="realmId">{i18n.t('static.realm.realmName')}</Label>
+                                                        <Label htmlFor="realmId">{i18n.t('static.realm.realmName')}<span class="red Reqasterisk">*</span></Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
                                                         {/* <InputGroupText><i className="fa fa-pencil"></i></InputGroupText> */}
                                                         <Input
@@ -221,7 +328,25 @@ class EditProcurementAgentComponent extends Component {
                                                         {/* </InputGroupAddon> */}
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="procurementAgentCode">{i18n.t('static.procurementagent.procurementagentcode')}</Label>
+                                                        <Label for="procurementAgentName">{i18n.t('static.procurementagent.procurementagentname')}<span className="red Reqasterisk">*</span></Label>
+                                                        {/* <InputGroupAddon addonType="prepend"> */}
+                                                        {/* <InputGroupText><i className="fa fa-pencil-square-o"></i></InputGroupText> */}
+                                                        <Input type="text"
+                                                            bsSize="sm"
+                                                            name="procurementAgentName"
+                                                            id="procurementAgentName"
+                                                            valid={!errors.procurementAgentName}
+                                                            invalid={touched.procurementAgentName && !!errors.procurementAgentName || this.state.procurementAgent.label.label_en == ''}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                            onBlur={handleBlur}
+                                                            required
+                                                            value={getLabelText(this.state.procurementAgent.label, this.state.lang)}
+                                                        />
+                                                        {/* </InputGroupAddon> */}
+                                                        <FormFeedback className="red">{errors.procurementAgentName}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label for="procurementAgentCode">{i18n.t('static.procurementagent.procurementagentcode')}<span class="red Reqasterisk">*</span></Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
                                                         {/* <InputGroupText><i className="fa fa-pencil-square-o"></i></InputGroupText> */}
                                                         <Input type="text"
@@ -235,23 +360,31 @@ class EditProcurementAgentComponent extends Component {
                                                         <FormFeedback className="red">{errors.procurementAgentCode}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="procurementAgentName">{i18n.t('static.procurementagent.procurementagentname')}<span className="red Reqasterisk">*</span></Label>
-                                                        {/* <InputGroupAddon addonType="prepend"> */}
-                                                        {/* <InputGroupText><i className="fa fa-pencil-square-o"></i></InputGroupText> */}
-                                                        <Input type="text"
+                                                        <Label for="colorHtmlCode">{i18n.t('static.procurementagent.procurementAgentColorCode')}<span className="red Reqasterisk">*</span></Label>
+                                                        <div bsSize="sm">
+                                                            <div style={styles.swatch} onClick={this.handleClick}>
+                                                                <div style={styles.color} />
+                                                            </div>
+                                                        </div>
+                                                        {this.state.displayColorPicker ? <div style={styles.popover}>
+                                                            <div style={styles.cover} onClick={this.handleClose} />
+                                                            <SketchPicker color={this.state.color} onChange={this.handleChangeColor} />
+                                                        </div> : null}
+                                                        {/* <Input type="text"
                                                             bsSize="sm"
-                                                            name="procurementAgentName"
-                                                            id="procurementAgentName"
-                                                            valid={!errors.procurementAgentName}
-                                                            invalid={touched.procurementAgentName && !!errors.procurementAgentName}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                            name="colorHtmlCode"
+                                                            id="colorHtmlCode"
+                                                            valid={!errors.colorHtmlCode && this.state.procurementAgent.colorHtmlCode != ''}
+                                                            invalid={touched.colorHtmlCode && !!errors.colorHtmlCode || this.state.procurementAgent.colorHtmlCode == ''}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             required
-                                                            value={getLabelText(this.state.procurementAgent.label, this.state.lang)}
+                                                            maxLength={6}
+                                                            value={this.state.procurementAgent.colorHtmlCode}
                                                         />
-                                                        {/* </InputGroupAddon> */}
-                                                        <FormFeedback className="red">{errors.procurementAgentName}</FormFeedback>
+                                                        <FormFeedback className="red">{errors.colorHtmlCode}</FormFeedback> */}
                                                     </FormGroup>
+
                                                     <FormGroup>
                                                         <Label for="submittedToApprovedLeadTime">{i18n.t('static.procurementagent.procurementagentsubmittoapprovetime')}<span className="red Reqasterisk">*</span></Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
@@ -261,7 +394,7 @@ class EditProcurementAgentComponent extends Component {
                                                             name="submittedToApprovedLeadTime"
                                                             id="submittedToApprovedLeadTime"
                                                             valid={!errors.submittedToApprovedLeadTime}
-                                                            invalid={touched.submittedToApprovedLeadTime && !!errors.submittedToApprovedLeadTime}
+                                                            invalid={touched.submittedToApprovedLeadTime && !!errors.submittedToApprovedLeadTime || this.state.procurementAgent.submittedToApprovedLeadTime == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             required
@@ -270,6 +403,25 @@ class EditProcurementAgentComponent extends Component {
                                                         />
                                                         {/* </InputGroupAddon> */}
                                                         <FormFeedback className="red">{errors.submittedToApprovedLeadTime}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label for="approvedToShippedLeadTime">{i18n.t('static.procurementagent.procurementagentapprovetoshippedtime')}<span className="red Reqasterisk">*</span></Label>
+                                                        {/* <InputGroupAddon addonType="prepend"> */}
+                                                        {/* <InputGroupText><i className="fa fa-clock-o"></i></InputGroupText> */}
+                                                        <Input type="number"
+                                                            bsSize="sm"
+                                                            name="approvedToShippedLeadTime"
+                                                            id="approvedToShippedLeadTime"
+                                                            valid={!errors.approvedToShippedLeadTime && this.state.procurementAgent.approvedToShippedLeadTime != ''}
+                                                            invalid={touched.approvedToShippedLeadTime && !!errors.approvedToShippedLeadTime || this.state.procurementAgent.approvedToShippedLeadTime == ''}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            required
+                                                            value={this.state.procurementAgent.approvedToShippedLeadTime}
+                                                            min="0"
+                                                        />
+                                                        {/* </InputGroupAddon> */}
+                                                        <FormFeedback className="red">{errors.approvedToShippedLeadTime}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label className="P-absltRadio">{i18n.t('static.common.status')}  </Label>
@@ -322,19 +474,32 @@ class EditProcurementAgentComponent extends Component {
                         </Card>
                     </Col>
                 </Row>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }
     cancelClicked() {
-        this.props.history.push(`/procurementAgent/listProcurementAgent/` + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/procurementAgent/listProcurementAgent/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
     resetClicked() {
         AuthenticationService.setupAxiosInterceptors();
         ProcurementAgentService.getProcurementAgentById(this.props.match.params.procurementAgentId).then(response => {
             this.setState({
-                procurementAgent: response.data
+                procurementAgent: response.data, loading: false
             });
+            let color = AuthenticationService.hexToRgbA(this.state.procurementAgent.colorHtmlCode);
+            this.setState({ rgba: color })
 
         })
     }

@@ -13,12 +13,10 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 const entityname = i18n.t('static.realm.realm');
 let initialValues = {
     realmCode: '',
-    label: ''
-    /*,
-    monthInPastForAmc: '',
-    monthInFutureForAmc: '',
-    orderFrequency: '',*/
-
+    label: '',
+    minMosMinGaurdrail: '',
+    minMosMaxGaurdrail: '',
+    maxMosMaxGaurdrail: ''
 }
 
 const validationSchema = function (values) {
@@ -27,6 +25,27 @@ const validationSchema = function (values) {
             .required(i18n.t('static.realm.realmNameText')).max(6, i18n.t('static.realm.realmCodeLength')),
         label: Yup.string()
             .required(i18n.t('static.realm.realmCodeText')),
+        minMosMinGaurdrail: Yup.number()
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
+            .integer(i18n.t('static.realm.decimalNotAllow'))
+            // .matches(/^[0-9]*$/, i18n.t('static.user.validnumber'))
+            .required(i18n.t('static.realm.minMosMinGaurdrail'))
+            .min(0, i18n.t('static.program.validvaluetext')),
+        minMosMaxGaurdrail: Yup.number()
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
+            .integer(i18n.t('static.realm.decimalNotAllow'))
+            // .matches(/^[0-9]*$/, i18n.t('static.user.validnumber'))
+            .required(i18n.t('static.realm.minMosMaxGaurdrail'))
+            .min(0, i18n.t('static.program.validvaluetext')),
+        maxMosMaxGaurdrail: Yup.number()
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
+            .integer(i18n.t('static.realm.decimalNotAllow'))
+            // .matches(/^[0-9]*$/, i18n.t('static.user.validnumber'))
+            .required(i18n.t('static.realm.maxMosMaxGaurdrail'))
+            .min(0, i18n.t('static.program.validvaluetext')),
         /*   monthInPastForAmc: Yup.number()
                .required(i18n.t('static.realm.monthInPastForAmcText')).min(0, i18n.t('static.program.validvaluetext')),
            monthInFutureForAmc: Yup.number()
@@ -63,6 +82,7 @@ export default class UpdateDataSourceComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            loading: true,
             // realm: this.props.location.state.realm,
             realm: {
                 realmCode: '',
@@ -75,7 +95,10 @@ export default class UpdateDataSourceComponent extends Component {
                 /*  monthInPastForAmc: '',
                   monthInFutureForAmc: '',
                   orderFrequency: '',*/
-                defaultRealm: ''
+                defaultRealm: '',
+                minMosMinGaurdrail: '',
+                minMosMaxGaurdrail: '',
+                maxMosMaxGaurdrail: ''
             },
             lang: localStorage.getItem('lang'),
             message: ''
@@ -86,6 +109,10 @@ export default class UpdateDataSourceComponent extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.changeMessage = this.changeMessage.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.changeLoading = this.changeLoading.bind(this);
+    }
+    changeLoading(loading) {
+        this.setState({ loading: loading })
     }
     hideSecondComponent() {
         setTimeout(function () {
@@ -104,6 +131,15 @@ export default class UpdateDataSourceComponent extends Component {
         if (event.target.name === "realmCode") {
             realm.realmCode = event.target.value.toUpperCase();
         }
+        if (event.target.name === "minMosMinGaurdrail") {
+            realm.minMosMinGaurdrail = event.target.value
+        }
+        if (event.target.name === "minMosMaxGaurdrail") {
+            realm.minMosMaxGaurdrail = event.target.value
+        }
+        if (event.target.name === "maxMosMaxGaurdrail") {
+            realm.maxMosMaxGaurdrail = event.target.value
+        }
         /* if (event.target.name === "monthInPastForAmc") {
              realm.monthInPastForAmc = event.target.value
          }
@@ -115,6 +151,9 @@ export default class UpdateDataSourceComponent extends Component {
          }*/
         else if (event.target.name === "defaultRealm") {
             realm.defaultRealm = event.target.id === "active2" ? false : true
+        }
+        if (event.target.name == "active") {
+            realm.active = event.target.id === "active3" ? false : true;
         }
         this.setState(
             {
@@ -128,9 +167,9 @@ export default class UpdateDataSourceComponent extends Component {
         setTouched({
             realmCode: true,
             label: true,
-            /*   monthInPastForAmc: true,
-               monthInFutureForAmc: true,
-               orderFrequency: true*/
+            minMosMinGaurdrail: true,
+            minMosMaxGaurdrail: true,
+            maxMosMaxGaurdrail: true
         }
         )
         this.validateForm(errors)
@@ -155,19 +194,19 @@ export default class UpdateDataSourceComponent extends Component {
         RealmService.getRealmById(this.props.match.params.realmId).then(response => {
             if (response.status == 200) {
                 this.setState({
-                    realm: response.data
+                    realm: response.data, loading: false
                 });
             }
-            else{
+            else {
 
                 this.setState({
-                    message: response.data.messageCode
+                    message: response.data.messageCode, loading: false
                 },
                     () => {
                         this.hideSecondComponent();
                     })
             }
-          
+
 
         })
     }
@@ -177,42 +216,45 @@ export default class UpdateDataSourceComponent extends Component {
         realm.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
     }
     cancelClicked() {
-        this.props.history.push(`/realm/realmList/`+ 'red/' + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/realm/listRealm/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
     render() {
 
         return (
             <div className="animated fadeIn">
-                <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} />
+                <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} loading={this.changeLoading} />
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-                <Row>
+                <Row style={{ display: this.state.loading ? "none" : "block" }}>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
-                            <CardHeader>
+                            {/* <CardHeader>
                                 <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
-                            </CardHeader>
+                            </CardHeader> */}
                             <Formik
                                 enableReinitialize={true}
                                 initialValues={{
                                     realmCode: this.state.realm.realmCode,
                                     label: getLabelText(this.state.realm.label, this.state.lang),
-                                    /* monthInPastForAmc: this.state.realm.monthInPastForAmc,
-                                     monthInFutureForAmc: this.state.realm.monthInFutureForAmc,
-                                     orderFrequency: this.state.realm.orderFrequency,*/
+                                    minMosMinGaurdrail: this.state.realm.minMosMinGaurdrail,
+                                    minMosMaxGaurdrail: this.state.realm.minMosMaxGaurdrail,
+                                    maxMosMaxGaurdrail: this.state.realm.maxMosMaxGaurdrail,
                                     defaultRealm: this.state.realm.defaultRealm,
                                 }}
 
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
+                                    this.setState({
+                                        loading: true
+                                    })
                                     AuthenticationService.setupAxiosInterceptors();
                                     RealmService.updateRealm(this.state.realm)
                                         .then(response => {
                                             if (response.status == 200) {
-                                                this.props.history.push(`/realm/realmList/`+ 'green/' + i18n.t(response.data.messageCode, { entityname }))
+                                                this.props.history.push(`/realm/listRealm/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
-                                                    message: response.data.messageCode
+                                                    message: response.data.messageCode, loading: false
                                                 },
                                                     () => {
                                                         this.hideSecondComponent();
@@ -238,13 +280,13 @@ export default class UpdateDataSourceComponent extends Component {
                                                 <CardBody>
 
                                                     <FormGroup>
-                                                        <Label for="label">{i18n.t('static.realm.realmName')}</Label>
+                                                        <Label for="label">{i18n.t('static.realm.realmName')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input type="text"
                                                             name="label"
                                                             id="label"
                                                             bsSize="sm"
                                                             valid={!errors.label}
-                                                            invalid={touched.label && !!errors.label}
+                                                            invalid={touched.label && !!errors.label || this.state.realm.label.label_en == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.realm.label.label_en}
@@ -252,18 +294,63 @@ export default class UpdateDataSourceComponent extends Component {
                                                         <FormFeedback className="red">{errors.label}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="realmCode">{i18n.t('static.realm.realmCode')}</Label>
+                                                        <Label for="realmCode">{i18n.t('static.realm.realmCode')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input type="text"
                                                             name="realmCode"
                                                             id="realmCode"
                                                             bsSize="sm"
                                                             valid={!errors.realmCode}
-                                                            invalid={touched.realmCode && !!errors.realmCode}
+                                                            invalid={touched.realmCode && !!errors.realmCode || this.state.realm.realmCode == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.realm.realmCode}
                                                             required />
                                                         <FormFeedback className="red">{errors.realmCode}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label for="minMosMinGaurdrail">{i18n.t('static.realm.minMosMinGaurdraillabel')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Input type="number"
+                                                            min="0"
+                                                            name="minMosMinGaurdrail"
+                                                            id="minMosMinGaurdrail"
+                                                            bsSize="sm"
+                                                            valid={!errors.minMosMinGaurdrail && (this.state.realm.minMosMinGaurdrail >= 0)}
+                                                            invalid={(touched.minMosMinGaurdrail && !!errors.minMosMinGaurdrail) || (this.state.realm.minMosMinGaurdrail < 0 || (this.state.realm.minMosMinGaurdrail).toString() == '')}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.realm.minMosMinGaurdrail}
+                                                            required />
+                                                        <FormFeedback className="red">{errors.minMosMinGaurdrail}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label for="minMosMaxGaurdrail">{i18n.t('static.realm.minMosMaxGaurdraillabel')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Input type="number"
+                                                            min="0"
+                                                            name="minMosMaxGaurdrail"
+                                                            id="minMosMaxGaurdrail"
+                                                            bsSize="sm"
+                                                            valid={!errors.minMosMaxGaurdrail && (this.state.realm.minMosMaxGaurdrail >= 0)}
+                                                            invalid={(touched.minMosMaxGaurdrail && !!errors.minMosMaxGaurdrail) || (this.state.realm.minMosMaxGaurdrail < 0 || (this.state.realm.minMosMaxGaurdrail).toString() == '')}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.realm.minMosMaxGaurdrail}
+                                                            required />
+                                                        <FormFeedback className="red">{errors.minMosMaxGaurdrail}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label for="maxMosMaxGaurdrail">{i18n.t('static.realm.maxMosMaxGaurdraillabel')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Input type="number"
+                                                            min="0"
+                                                            name="maxMosMaxGaurdrail"
+                                                            id="maxMosMaxGaurdrail"
+                                                            bsSize="sm"
+                                                            valid={!errors.maxMosMaxGaurdrail && (this.state.realm.maxMosMaxGaurdrail >= 0)}
+                                                            invalid={(touched.maxMosMaxGaurdrail && !!errors.maxMosMaxGaurdrail) || (this.state.realm.maxMosMaxGaurdrail < 0 || (this.state.realm.maxMosMaxGaurdrail).toString() == '')}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.realm.maxMosMaxGaurdrail}
+                                                            required />
+                                                        <FormFeedback className="red">{errors.maxMosMaxGaurdrail}</FormFeedback>
                                                     </FormGroup>
                                                     {/*    <FormGroup>
                                                         <Label for="monthInPastForAmc">{i18n.t('static.realm.monthInPastForAmc')}</Label>
@@ -322,7 +409,7 @@ export default class UpdateDataSourceComponent extends Component {
                                                             <Label
                                                                 className="form-check-label"
                                                                 check htmlFor="inline-radio1">
-                                                                {i18n.t('static.common.active')}
+                                                                {i18n.t('static.realm.yes')}
                                                             </Label>
                                                         </FormGroup>
                                                         <FormGroup check inline>
@@ -333,6 +420,41 @@ export default class UpdateDataSourceComponent extends Component {
                                                                 name="defaultRealm"
                                                                 value={false}
                                                                 checked={this.state.realm.defaultRealm === false}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            />
+                                                            <Label
+                                                                className="form-check-label"
+                                                                check htmlFor="inline-radio2">
+                                                                {i18n.t('static.realm.no')}
+                                                            </Label>
+                                                        </FormGroup>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label className="P-absltRadio">{i18n.t('static.common.status')}  </Label>
+                                                        <FormGroup check inline>
+                                                            <Input
+                                                                className="form-check-input"
+                                                                type="radio"
+                                                                id="active1"
+                                                                name="active"
+                                                                value={true}
+                                                                checked={this.state.realm.active === true}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            />
+                                                            <Label
+                                                                className="form-check-label"
+                                                                check htmlFor="inline-radio1">
+                                                                {i18n.t('static.common.active')}
+                                                            </Label>
+                                                        </FormGroup>
+                                                        <FormGroup check inline className="inlineMargin">
+                                                            <Input
+                                                                className="form-check-input"
+                                                                type="radio"
+                                                                id="active3"
+                                                                name="active"
+                                                                value={false}
+                                                                checked={this.state.realm.active === false}
                                                                 onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             />
                                                             <Label
@@ -359,6 +481,17 @@ export default class UpdateDataSourceComponent extends Component {
                         </Card>
                     </Col>
                 </Row>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }

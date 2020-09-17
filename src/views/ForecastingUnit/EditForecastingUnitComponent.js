@@ -104,7 +104,8 @@ export default class EditForecastingUnitComponent extends Component {
                     }
                 },
             },
-            lang: localStorage.getItem('lang')
+            lang: localStorage.getItem('lang'),
+            loading: true
         }
 
         this.dataChange = this.dataChange.bind(this);
@@ -113,6 +114,7 @@ export default class EditForecastingUnitComponent extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.changeMessage = this.changeMessage.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.changeLoading = this.changeLoading.bind(this);
 
     }
     hideSecondComponent() {
@@ -123,6 +125,10 @@ export default class EditForecastingUnitComponent extends Component {
 
     changeMessage(message) {
         this.setState({ message: message })
+    }
+
+    changeLoading(loading) {
+        this.setState({ loading: loading })
     }
 
     dataChange(event) {
@@ -185,12 +191,12 @@ export default class EditForecastingUnitComponent extends Component {
         ForecastingUnitService.getForcastingUnitById(this.props.match.params.forecastingUnitId).then(response => {
             if (response.status == 200) {
                 this.setState({
-                    forecastingUnit: response.data
+                    forecastingUnit: response.data, loading: false
                 });
             }
             else {
                 this.setState({
-                    message: response.data.messageCode
+                    message: response.data.messageCode, loading: false
                 },
                     () => {
                         this.hideSecondComponent();
@@ -215,14 +221,14 @@ export default class EditForecastingUnitComponent extends Component {
 
         return (
             <div className="animated fadeIn">
-                <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} />
+                <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} loading={this.changeLoading} />
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-                <Row>
+                <Row style={{ display: this.state.loading ? "none" : "block" }}>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
-                            <CardHeader>
+                            {/* <CardHeader>
                                 <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
-                            </CardHeader>
+                            </CardHeader> */}
                             <Formik
                                 enableReinitialize={true}
                                 initialValues={{
@@ -232,13 +238,16 @@ export default class EditForecastingUnitComponent extends Component {
                                 }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
+                                    this.setState({
+                                        loading: true
+                                    })
                                     ForecastingUnitService.editForecastingUnit(this.state.forecastingUnit)
                                         .then(response => {
                                             if (response.status == 200) {
                                                 this.props.history.push(`/forecastingUnit/listForecastingUnit/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
-                                                    message: response.data.messageCode
+                                                    message: response.data.messageCode, loading: false
                                                 },
                                                     () => {
                                                         this.hideSecondComponent();
@@ -248,7 +257,7 @@ export default class EditForecastingUnitComponent extends Component {
                                         .catch(
                                             error => {
                                                 if (error.message === "Network Error") {
-                                                    this.setState({ message: error.message });
+                                                    this.setState({ message: error.message, loading: false });
                                                 } else {
                                                     switch (error.response ? error.response.status : "") {
                                                         case 500:
@@ -256,10 +265,10 @@ export default class EditForecastingUnitComponent extends Component {
                                                         case 404:
                                                         case 406:
                                                         case 412:
-                                                            this.setState({ message: error.response.data.messageCode });
+                                                            this.setState({ message: error.response.data.messageCode, loading: false });
                                                             break;
                                                         default:
-                                                            this.setState({ message: 'static.unkownError' });
+                                                            this.setState({ message: 'static.unkownError', loading: false });
                                                             console.log("Error code unkown");
                                                             break;
                                                     }
@@ -282,9 +291,9 @@ export default class EditForecastingUnitComponent extends Component {
                                         setTouched
                                     }) => (
                                             <Form onSubmit={handleSubmit} noValidate name='forecastingUnitForm'>
-                                                <CardBody>
+                                                <CardBody className="pb-0">
                                                     <FormGroup>
-                                                        <Label htmlFor="realmId">{i18n.t('static.realm.realm')}</Label>
+                                                        <Label htmlFor="realmId">{i18n.t('static.realm.realm')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             type="text"
                                                             name="realmId"
@@ -296,7 +305,7 @@ export default class EditForecastingUnitComponent extends Component {
                                                         </Input>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="tracerCategoryId">{i18n.t('static.tracercategory.tracercategory')}</Label>
+                                                        <Label htmlFor="tracerCategoryId">{i18n.t('static.tracercategory.tracercategory')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             type="text"
                                                             name="tracerCategoryId"
@@ -308,7 +317,7 @@ export default class EditForecastingUnitComponent extends Component {
                                                         </Input>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="productCategoryId">{i18n.t('static.productcategory.productcategory')}</Label>
+                                                        <Label htmlFor="productCategoryId">{i18n.t('static.productcategory.productcategory')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             type="text"
                                                             name="productCategoryId"
@@ -326,7 +335,7 @@ export default class EditForecastingUnitComponent extends Component {
                                                             id="label"
                                                             bsSize="sm"
                                                             valid={!errors.label}
-                                                            invalid={touched.label && !!errors.label}
+                                                            invalid={touched.label && !!errors.label || this.state.forecastingUnit.label.label_en == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.forecastingUnit.label.label_en}
@@ -334,13 +343,13 @@ export default class EditForecastingUnitComponent extends Component {
                                                         <FormFeedback className="red">{errors.label}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="genericLabel">{i18n.t('static.product.productgenericname')}<span className="red Reqasterisk">*</span><span className="red Reqasterisk">*</span></Label>
+                                                        <Label for="genericLabel">{i18n.t('static.product.productgenericname')}</Label>
                                                         <Input type="text"
                                                             name="genericLabel"
                                                             id="genericLabel"
                                                             bsSize="sm"
                                                             valid={!errors.genericLabel}
-                                                            invalid={touched.genericLabel && !!errors.genericLabel}
+                                                            invalid={touched.genericLabel && !!errors.genericLabel || this.state.forecastingUnit.genericLabel.label_en == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.forecastingUnit.genericLabel.label_en}
@@ -348,7 +357,7 @@ export default class EditForecastingUnitComponent extends Component {
                                                         <FormFeedback className="red">{errors.genericLabel}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="unitId">{i18n.t('static.unit.unit')}</Label>
+                                                        <Label htmlFor="unitId">{i18n.t('static.unit.unit')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             type="text"
                                                             name="unitId"
@@ -414,6 +423,17 @@ export default class EditForecastingUnitComponent extends Component {
                         </Card>
                     </Col>
                 </Row>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div>
                     <h6>{i18n.t(this.state.message, { entityname })}</h6>
                     <h6>{i18n.t(this.props.match.params.message, { entityname })}</h6>

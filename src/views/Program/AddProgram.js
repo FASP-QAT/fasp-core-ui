@@ -14,7 +14,8 @@ import HealthAreaService from "../../api/HealthAreaService";
 import getLabelText from '../../CommonComponent/getLabelText'
 import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import classNames from 'classnames';
 
 const entityname = i18n.t('static.program.programMaster');
 const initialValues = {
@@ -25,18 +26,15 @@ const initialValues = {
     userId: '',
     airFreightPerc: '',
     seaFreightPerc: '',
-    // deliveredToReceivedLeadTime: '',
-    draftToSubmittedLeadTime: '',
-    plannedToDraftLeadTime: '',
+    plannedToSubmittedLeadTime: '',
     submittedToApprovedLeadTime: '',
     approvedToShippedLeadTime: '',
     shippedToArrivedByAirLeadTime: '',
     shippedToArrivedBySeaLeadTime: '',
     arrivedToDeliveredLeadTime: '',
-    monthsInFutureForAmc: '',
-    monthsInPastForAmc: '',
     healthAreaId: '',
-    programNotes: ''
+    programNotes: '',
+    regionId: []
 
 }
 
@@ -52,34 +50,47 @@ const validationSchema = function (values) {
             .required(i18n.t('static.program.validorganisationtext')),
         userId: Yup.string()
             .required(i18n.t('static.program.validmanagertext')),
-        airFreightPerc: Yup.number()
-            .required(i18n.t('static.program.validairfreighttext')).min(0, i18n.t('static.program.validvaluetext')),
-        seaFreightPerc: Yup.number()
-            .required(i18n.t('static.program.validseafreighttext')).min(0, i18n.t('static.program.validvaluetext')),
+        airFreightPerc: Yup.string()
+            .required(i18n.t('static.program.validairfreighttext'))
+            .min(0, i18n.t('static.program.validvaluetext'))
+            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
+        seaFreightPerc: Yup.string()
+            .required(i18n.t('static.program.validseafreighttext'))
+            .min(0, i18n.t('static.program.validvaluetext'))
+            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
         // deliveredToReceivedLeadTime: Yup.number()
         //     .required(i18n.t('static.program.validdelivertoreceivetext')).min(0, i18n.t('static.program.validvaluetext')),
-        draftToSubmittedLeadTime: Yup.string()
-            .required(i18n.t('static.program.validdrafttosubmittext')).min(0, i18n.t('static.program.validvaluetext')),
-        plannedToDraftLeadTime: Yup.string()
-            .required(i18n.t('static.program.validplantodrafttext')).min(0, i18n.t('static.program.validvaluetext')),
+        plannedToSubmittedLeadTime: Yup.string()
+            .required(i18n.t('static.program.validplantosubmittext'))
+            .min(0, i18n.t('static.program.validvaluetext'))
+            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
         submittedToApprovedLeadTime: Yup.string()
-            .required(i18n.t('static.program.validsubmittoapprovetext')).min(0, i18n.t('static.program.validvaluetext')),
+            .required(i18n.t('static.program.validsubmittoapprovetext'))
+            .min(0, i18n.t('static.program.validvaluetext'))
+            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
         approvedToShippedLeadTime: Yup.string()
-            .required(i18n.t('static.program.validapprovetoshiptext')).min(0, i18n.t('static.program.validvaluetext')),
+            .required(i18n.t('static.program.validapprovetoshiptext'))
+            .min(0, i18n.t('static.program.validvaluetext'))
+            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
         shippedToArrivedByAirLeadTime: Yup.string()
-            .required(i18n.t('static.program.shippedToArrivedByAirLeadTime')).min(0, i18n.t('static.program.validvaluetext')),
+            .required(i18n.t('static.program.shippedToArrivedByAirLeadTime'))
+            .min(0, i18n.t('static.program.validvaluetext'))
+            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
         shippedToArrivedBySeaLeadTime: Yup.string()
-            .required(i18n.t('static.program.shippedToArrivedBySeaLeadTime')).min(0, i18n.t('static.program.validvaluetext')),
+            .required(i18n.t('static.program.shippedToArrivedBySeaLeadTime'))
+            .min(0, i18n.t('static.program.validvaluetext'))
+            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
         arrivedToDeliveredLeadTime: Yup.string()
-            .required(i18n.t('static.program.arrivedToDeliveredLeadTime')).min(0, i18n.t('static.program.validvaluetext')),
-        monthsInFutureForAmc: Yup.string()
-            .required(i18n.t('static.program.validfutureamctext')).min(0, i18n.t('static.program.validvaluetext')),
-        monthsInPastForAmc: Yup.string()
-            .required(i18n.t('static.program.validpastamctext')).min(0, i18n.t('static.program.validvaluetext')),
+            .required(i18n.t('static.program.arrivedToDeliveredLeadTime'))
+            .min(0, i18n.t('static.program.validvaluetext'))
+            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
         healthAreaId: Yup.string()
             .required(i18n.t('static.program.validhealthareatext')),
         // programNotes: Yup.string()
         //     .required(i18n.t('static.program.validnotestext')),
+        regionId: Yup.string()
+            .required(i18n.t('static.common.regiontext'))
+
 
     })
 }
@@ -138,21 +149,18 @@ export default class AddProgram extends Component {
                 },
                 airFreightPerc: '',
                 seaFreightPerc: '',
-                // deliveredToReceivedLeadTime: '',
-                draftToSubmittedLeadTime: '',
-                plannedToDraftLeadTime: '',
+                plannedToSubmittedLeadTime: '',
                 submittedToApprovedLeadTime: '',
                 approvedToShippedLeadTime: '',
                 shippedToArrivedByAirLeadTime: '',
                 shippedToArrivedBySeaLeadTime: '',
                 arrivedToDeliveredLeadTime: '',
-                monthsInFutureForAmc: '',
-                monthsInPastForAmc: '',
                 healthArea: {
                     id: ''
                 },
                 programNotes: '',
                 regionArray: [],
+                loading: true
 
 
             },
@@ -189,11 +197,12 @@ export default class AddProgram extends Component {
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        realmList: response.data
+                        realmList: response.data,
+                        loading: false
                     })
                 } else {
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode, loading: false
                     })
                 }
             })
@@ -204,67 +213,69 @@ export default class AddProgram extends Component {
         }, 8000);
     }
     getDependentLists(e) {
-        console.log(e.target.value)
+        if (e.target.value != 0) {
+            ProgramService.getProgramManagerList(e.target.value)
+                .then(response => {
+                    console.log("manager list---", response.data);
+                    if (response.status == 200) {
+                        this.setState({
+                            programManagerList: response.data
+                        })
+                    } else {
+                        this.setState({
+                            message: response.data.messageCode
+                        })
+                    }
+                })
 
-        AuthenticationService.setupAxiosInterceptors();
-        ProgramService.getProgramManagerList(e.target.value)
-            .then(response => {
-                console.log("manager list---", response.data);
-                if (response.status == 200) {
-                    this.setState({
-                        programManagerList: response.data
-                    })
-                } else {
-                    this.setState({
-                        message: response.data.messageCode
-                    })
-                }
+            ProgramService.getRealmCountryList(e.target.value)
+                .then(response => {
+                    console.log("realm list---", response.data);
+                    if (response.status == 200) {
+                        this.setState({
+                            realmCountryList: response.data
+                        })
+                    } else {
+                        this.setState({
+                            message: response.data.messageCode
+                        })
+                    }
+                })
+            ProgramService.getOrganisationList(e.target.value)
+                .then(response => {
+                    console.log("organisation list---", response.data);
+                    if (response.status == 200) {
+                        this.setState({
+                            organisationList: response.data
+                        })
+                    } else {
+                        this.setState({
+                            message: response.data.messageCode
+                        })
+                    }
+                })
+
+            ProgramService.getHealthAreaList(e.target.value)
+                .then(response => {
+                    console.log("health area list---", response.data);
+                    if (response.status == 200) {
+                        this.setState({
+                            healthAreaList: response.data
+                        })
+                    } else {
+                        this.setState({
+                            message: response.data.messageCode
+                        })
+                    }
+                })
+        } else {
+            this.setState({
+                programManagerList: [],
+                healthAreaList: [],
+                organisationList: [],
+                realmCountryList: []
             })
-
-        ProgramService.getRealmCountryList(e.target.value)
-            .then(response => {
-                console.log("realm list---", response.data);
-                if (response.status == 200) {
-                    this.setState({
-                        realmCountryList: response.data
-                    })
-                } else {
-                    this.setState({
-                        message: response.data.messageCode
-                    })
-                }
-            })
-
-        AuthenticationService.setupAxiosInterceptors();
-        ProgramService.getOrganisationList(e.target.value)
-            .then(response => {
-                console.log("organisation list---", response.data);
-                if (response.status == 200) {
-                    this.setState({
-                        organisationList: response.data
-                    })
-                } else {
-                    this.setState({
-                        message: response.data.messageCode
-                    })
-                }
-            })
-
-
-        AuthenticationService.setupAxiosInterceptors();
-        ProgramService.getHealthAreaList(e.target.value)
-            .then(response => {
-                console.log("health area list---", response.data);
-                if (response.status == 200) {
-                    this.setState({
-                        healthAreaList: response.data
-                    })
-                } else {
-                    this.setState({
-                        message: response.data.messageCode
-                    })
-                }
-            })
+        }
     }
 
     getRegionList(e) {
@@ -314,14 +325,8 @@ export default class AddProgram extends Component {
             program.airFreightPerc = event.target.value;
         } if (event.target.name == 'seaFreightPerc') {
             program.seaFreightPerc = event.target.value;
-        }
-        // if (event.target.name == 'deliveredToReceivedLeadTime') {
-        //     program.deliveredToReceivedLeadTime = event.target.value;
-        // }
-        if (event.target.name == 'draftToSubmittedLeadTime') {
-            program.draftToSubmittedLeadTime = event.target.value;
-        } if (event.target.name == 'plannedToDraftLeadTime') {
-            program.plannedToDraftLeadTime = event.target.value;
+        } if (event.target.name == 'plannedToSubmittedLeadTime') {
+            program.plannedToSubmittedLeadTime = event.target.value;
         } if (event.target.name == 'submittedToApprovedLeadTime') {
             program.submittedToApprovedLeadTime = event.target.value;
         } if (event.target.name == 'approvedToShippedLeadTime') {
@@ -335,11 +340,6 @@ export default class AddProgram extends Component {
         }
         if (event.target.name == 'arrivedToDeliveredLeadTime') {
             program.arrivedToDeliveredLeadTime = event.target.value;
-        }
-        if (event.target.name == 'monthsInFutureForAmc') {
-            program.monthsInFutureForAmc = event.target.value;
-        } if (event.target.name == 'monthsInPastForAmc') {
-            program.monthsInPastForAmc = event.target.value;
         } if (event.target.name == 'healthAreaId') {
             program.healthArea.id = event.target.value;
         } if (event.target.name == 'userId') {
@@ -361,18 +361,15 @@ export default class AddProgram extends Component {
             userId: true,
             airFreightPerc: true,
             seaFreightPerc: true,
-            // deliveredToReceivedLeadTime: true,
-            draftToSubmittedLeadTime: true,
-            plannedToDraftLeadTime: true,
+            plannedToSubmittedLeadTime: true,
             submittedToApprovedLeadTime: true,
             approvedToShippedLeadTime: true,
             shippedToArrivedByAirLeadTime: true,
             shippedToArrivedBySeaLeadTime: true,
             arrivedToDeliveredLeadTime: true,
-            monthsInFutureForAmc: true,
-            monthsInPastForAmc: true,
             healthAreaId: true,
             // programNotes: true,
+            regionId: true
 
         }
         )
@@ -451,22 +448,28 @@ export default class AddProgram extends Component {
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
                 }} />
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-                <Row>
+                <Row style={{ display: this.state.loading ? "none" : "block" }}>
                     <Col sm={12} md={8} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <Formik
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
+                                    this.setState({
+                                        loading: true
+                                    })
                                     AuthenticationService.setupAxiosInterceptors();
                                     ProgramService.addProgram(this.state.program).then(response => {
                                         if (response.status == "200") {
-                                            this.props.history.push(`/program/listProgram/`+ 'green/' + i18n.t(response.data.messageCode, { entityname }))
+                                            this.props.history.push(`/program/listProgram/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                         } else {
                                             this.setState({
-                                                message: response.data.messageCode
+                                                message: response.data.messageCode,
+                                                loading: false
                                             },
                                                 () => {
                                                     this.hideSecondComponent();
@@ -487,13 +490,15 @@ export default class AddProgram extends Component {
                                         isSubmitting,
                                         isValid,
                                         setTouched,
-                                        handleReset
+                                        handleReset,
+                                        setFieldValue,
+                                        setFieldTouched
                                     }) => (
 
                                             <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='programForm'>
-                                                <CardHeader>
+                                                {/* <CardHeader>
                                                     <strong>{i18n.t('static.program.programadd')}</strong>
-                                                </CardHeader>
+                                                </CardHeader> */}
                                                 <CardBody>
                                                     <FormGroup>
                                                         <Label htmlFor="company">{i18n.t('static.program.program')}<span class="red Reqasterisk">*</span></Label>
@@ -505,7 +510,7 @@ export default class AddProgram extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.program.label.label_en}
-                                                            id="programName" placeholder={i18n.t('static.program.programtext')} />
+                                                            id="programName" />
                                                         <FormFeedback className="red">{errors.programName}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
@@ -520,7 +525,7 @@ export default class AddProgram extends Component {
                                                             onBlur={handleBlur}
                                                             value={this.state.program.realm.realmId}
                                                             type="select" name="realmId" id="realmId">
-                                                            <option value="">{i18n.t('static.common.select')}</option>
+                                                            <option value="0">{i18n.t('static.common.select')}</option>
                                                             {realms}
                                                         </Input>
 
@@ -547,15 +552,21 @@ export default class AddProgram extends Component {
 
                                                         <FormFeedback>{errors.realmCountryId}</FormFeedback>
                                                     </FormGroup>
-                                                    <FormGroup >
+                                                    <FormGroup className="Selectcontrol-bdrNone">
                                                         <Label htmlFor="select">{i18n.t('static.program.region')}<span class="red Reqasterisk">*</span><span class="red Reqasterisk">*</span></Label>
 
                                                         <Select
-                                                            valid={!errors.regionId && this.state.regionId != ''}
                                                             bsSize="sm"
-                                                            invalid={touched.reagonId && !!errors.regionId}
-                                                            onChange={(e) => { handleChange(e); this.updateFieldData(e) }}
-                                                            onBlur={handleBlur}
+                                                            className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                                { 'is-valid': !errors.regionId && this.state.program.regionArray.length != 0 },
+                                                                { 'is-invalid': (touched.regionId && !!errors.regionId) }
+                                                            )}
+                                                            onChange={(e) => {
+                                                                handleChange(e);
+                                                                setFieldValue("regionId", e);
+                                                                this.updateFieldData(e);
+                                                            }}
+                                                            onBlur={() => setFieldTouched("regionId", true)}
                                                             name="regionId"
                                                             id="regionId"
                                                             multi
@@ -641,7 +652,7 @@ export default class AddProgram extends Component {
                                                             onBlur={handleBlur}
                                                             type="number"
                                                             min="0"
-                                                            name="airFreightPerc" id="airFreightPerc" placeholder={i18n.t('static.program.airfreightperctext')} />
+                                                            name="airFreightPerc" id="airFreightPerc" />
                                                         <FormFeedback>{errors.airFreightPerc}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
@@ -655,41 +666,24 @@ export default class AddProgram extends Component {
                                                             onBlur={handleBlur}
                                                             type="number"
                                                             min="0"
-                                                            name="seaFreightPerc" id="seaFreightPerc" placeholder={i18n.t('static.program.seafreightperc')} />
+                                                            name="seaFreightPerc" id="seaFreightPerc" />
+                                                        <FormFeedback>{errors.seaFreightPerc}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
 
-                                                        <Label htmlFor="company">{i18n.t('static.program.draftleadtime')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Label htmlFor="company">{i18n.t('static.program.planleadtime')}<span class="red Reqasterisk">*</span></Label>
 
                                                         <Input
-                                                            value={this.state.program.plannedToDraftLeadTime}
+                                                            value={this.state.program.plannedToSubmittedLeadTime}
                                                             bsSize="sm"
-                                                            valid={!errors.plannedToDraftLeadTime && this.state.program.plannedToDraftLeadTime != ''}
-                                                            invalid={touched.plannedToDraftLeadTime && !!errors.plannedToDraftLeadTime}
+                                                            valid={!errors.plannedToSubmittedLeadTime && this.state.program.plannedToSubmittedLeadTime != ''}
+                                                            invalid={touched.plannedToSubmittedLeadTime && !!errors.plannedToSubmittedLeadTime}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             type="number"
                                                             min="0"
-                                                            name="plannedToDraftLeadTime" id="plannedToDraftLeadTime" placeholder={i18n.t('static.program.draftleadtext')} />
-                                                        <FormFeedback>{errors.plannedToDraftLeadTime}</FormFeedback>
-
-                                                    </FormGroup>
-                                                    <FormGroup>
-
-                                                        <Label htmlFor="company">{i18n.t('static.program.drafttosubmitleadtime')}<span class="red Reqasterisk">*</span></Label>
-
-                                                        <Input
-                                                            value={this.state.program.draftToSubmittedLeadTime}
-                                                            bsSize="sm"
-                                                            valid={!errors.draftToSubmittedLeadTime && this.state.program.draftToSubmittedLeadTime != ''}
-                                                            invalid={touched.draftToSubmittedLeadTime && !!errors.draftToSubmittedLeadTime}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            type="number"
-                                                            min="0"
-                                                            name="draftToSubmittedLeadTime" id="draftToSubmittedLeadTime" placeholder={i18n.t('static.program.drafttosubmittext')} />
-                                                        <FormFeedback>{errors.draftToSubmittedLeadTime}</FormFeedback>
-
+                                                            name="plannedToSubmittedLeadTime" id="plannedToSubmittedLeadTime" />
+                                                        <FormFeedback>{errors.plannedToSubmittedLeadTime}</FormFeedback>
 
                                                     </FormGroup>
                                                     <FormGroup>
@@ -705,7 +699,7 @@ export default class AddProgram extends Component {
                                                             onBlur={handleBlur}
                                                             type="number"
                                                             min="0"
-                                                            name="submittedToApprovedLeadTime" id="submittedToApprovedLeadTime" placeholder={i18n.t('static.program.submittoapprovetext')} />
+                                                            name="submittedToApprovedLeadTime" id="submittedToApprovedLeadTime" />
                                                         <FormFeedback>{errors.submittedToApprovedLeadTime}</FormFeedback>
 
                                                     </FormGroup>
@@ -722,7 +716,7 @@ export default class AddProgram extends Component {
                                                             onBlur={handleBlur}
                                                             type="number"
                                                             min="0"
-                                                            name="approvedToShippedLeadTime" id="approvedToShippedLeadTime" placeholder={i18n.t('static.program.approvetoshiptext')} />
+                                                            name="approvedToShippedLeadTime" id="approvedToShippedLeadTime" />
                                                         <FormFeedback>{errors.approvedToShippedLeadTime}</FormFeedback>
 
                                                     </FormGroup>
@@ -756,7 +750,7 @@ export default class AddProgram extends Component {
                                                             onBlur={handleBlur}
                                                             type="number"
                                                             min="0"
-                                                            name="shippedToArrivedByAirLeadTime" id="shippedToArrivedByAirLeadTime" placeholder={i18n.t('static.realmcountry.shippedToArrivedAirLeadTimetext')} />
+                                                            name="shippedToArrivedByAirLeadTime" id="shippedToArrivedByAirLeadTime" />
                                                         <FormFeedback>{errors.shippedToArrivedByAirLeadTime}</FormFeedback>
 
                                                     </FormGroup>
@@ -773,7 +767,7 @@ export default class AddProgram extends Component {
                                                             onBlur={handleBlur}
                                                             type="number"
                                                             min="0"
-                                                            name="shippedToArrivedBySeaLeadTime" id="shippedToArrivedBySeaLeadTime" placeholder={i18n.t('static.realmcountry.shippedToArrivedSeaLeadTimetext')} />
+                                                            name="shippedToArrivedBySeaLeadTime" id="shippedToArrivedBySeaLeadTime" />
                                                         <FormFeedback>{errors.shippedToArrivedBySeaLeadTime}</FormFeedback>
 
                                                     </FormGroup>
@@ -790,43 +784,8 @@ export default class AddProgram extends Component {
                                                             onBlur={handleBlur}
                                                             type="number"
                                                             min="0"
-                                                            name="arrivedToDeliveredLeadTime" id="arrivedToDeliveredLeadTime" placeholder={i18n.t('static.realmcountry.arrivedToDeliveredLeadTimetext')} />
+                                                            name="arrivedToDeliveredLeadTime" id="arrivedToDeliveredLeadTime" />
                                                         <FormFeedback>{errors.arrivedToDeliveredLeadTime}</FormFeedback>
-
-                                                    </FormGroup>
-                                                    <FormGroup>
-
-                                                        <Label htmlFor="company">{i18n.t('static.program.monthpastamc')}<span class="red Reqasterisk">*</span></Label>
-
-                                                        <Input
-                                                            value={this.state.program.monthsInPastForAmc}
-                                                            bsSize="sm"
-                                                            valid={!errors.monthsInPastForAmc && this.state.program.monthsInPastForAmc != ''}
-                                                            invalid={touched.monthsInPastForAmc && !!errors.monthsInPastForAmc}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            type="number"
-                                                            min="0"
-                                                            name="monthsInPastForAmc" id="monthsInPastForAmc" placeholder={i18n.t('static.program.monthpastamctext')} />
-                                                        <FormFeedback>{errors.monthsInPastForAmc}</FormFeedback>
-
-                                                    </FormGroup>
-                                                    <FormGroup>
-
-                                                        <Label htmlFor="company">{i18n.t('static.program.monthfutureamc')}<span class="red Reqasterisk">*</span></Label>
-
-                                                        <Input
-                                                            value={this.state.program.monthsInFutureForAmc}
-                                                            bsSize="sm"
-                                                            valid={!errors.monthsInFutureForAmc && this.state.program.monthsInFutureForAmc != ''}
-                                                            invalid={touched.monthsInFutureForAmc && !!errors.monthsInFutureForAmc}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            type="number"
-                                                            min="0"
-                                                            name="monthsInFutureForAmc" id="monthsInFutureForAmc" placeholder={i18n.t('static.program.monthfutureamctext')} />
-                                                        <FormFeedback>{errors.monthsInFutureForAmc}</FormFeedback>
-
                                                     </FormGroup>
 
                                                 </CardBody>
@@ -834,7 +793,7 @@ export default class AddProgram extends Component {
                                                     <FormGroup>
                                                         {/* <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> Reset</Button> */}
                                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                        <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')} </Button>
                                                         {/* <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>Submit</Button> */}
                                                         &nbsp;
@@ -845,12 +804,23 @@ export default class AddProgram extends Component {
                         </Card>
                     </Col>
                 </Row>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
         );
     }
     cancelClicked() {
-        this.props.history.push(`/program/listProgram/`+ 'red/' + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/program/listProgram/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
     resetClicked() {
         let { program } = this.state;
@@ -862,16 +832,15 @@ export default class AddProgram extends Component {
         program.organisation.id = ''
         program.airFreightPerc = ''
         program.seaFreightPerc = ''
-        program.deliveredToReceivedLeadTime = ''
-        program.draftToSubmittedLeadTime = ''
-        program.plannedToDraftLeadTime = ''
+        program.plannedToSubmittedLeadTime = ''
         program.submittedToApprovedLeadTime = ''
         program.approvedToShippedLeadTime = ''
-        program.monthsInFutureForAmc = ''
-        program.monthsInPastForAmc = ''
         program.healthArea.id = ''
         program.programManager.userId = ''
         program.programNotes = ''
+        program.arrivedToDeliveredLeadTime = ''
+        program.shippedToArrivedBySeaLeadTime = ''
+        program.shippedToArrivedByAirLeadTime = ''
 
         this.setState({ program }, () => { })
 

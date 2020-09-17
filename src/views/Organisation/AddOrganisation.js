@@ -11,13 +11,14 @@ import OrganisationService from "../../api/OrganisationService";
 import UserService from "../../api/UserService";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import getLabelText from '../../CommonComponent/getLabelText';
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import classNames from 'classnames';
 
 const entityname = i18n.t('static.organisation.organisation');
 
 const initialValues = {
     realmId: '',
-    realmCountryId: '',
+    realmCountryId: [],
     organisationCode: '',
     organisationName: ''
 }
@@ -27,10 +28,13 @@ const validationSchema = function (values) {
         realmId: Yup.string()
             .required(i18n.t('static.common.realmtext')),
         organisationName: Yup.string()
+            // .matches(/^([a-zA-Z]+\s)*[a-zA-Z]+$/, i18n.t('static.message.rolenamevalidtext'))
             .required(i18n.t('static.organisation.organisationtext')),
         organisationCode: Yup.string()
             .required(i18n.t('static.organisation.organisationcodetext'))
-            .max(4, i18n.t('static.organisation.organisationcodemax4digittext'))
+            .max(4, i18n.t('static.organisation.organisationcodemax4digittext')),
+        realmCountryId: Yup.string()
+            .required(i18n.t('static.program.validcountrytext'))
     })
 }
 
@@ -77,7 +81,8 @@ export default class AddOrganisationComponent extends Component {
             realmCountryId: '',
             realmCountryList: [],
             selCountries: [],
-            message: ''
+            message: '',
+            loading: true,
         }
 
 
@@ -113,7 +118,8 @@ export default class AddOrganisationComponent extends Component {
         setTouched({
             realmId: true,
             organisationName: true,
-            organisationCode: true
+            organisationCode: true,
+            realmCountryId: true
         }
         )
         this.validateForm(errors)
@@ -135,13 +141,13 @@ export default class AddOrganisationComponent extends Component {
     }
 
     componentDidMount() {
-
+        console.log("IN componentDidMount------------------");
         AuthenticationService.setupAxiosInterceptors();
         CountryService.getCountryListAll()
             .then(response => {
                 console.log("country list---", response.data);
                 this.setState({
-                    countries: response.data
+                    countries: response.data, loading: false,
                 })
             })
 
@@ -149,7 +155,8 @@ export default class AddOrganisationComponent extends Component {
             .then(response => {
                 console.log("realm list---", response.data);
                 this.setState({
-                    realms: response.data
+                    realms: response.data,
+                    loading: false,
                 })
             })
     }
@@ -184,7 +191,8 @@ export default class AddOrganisationComponent extends Component {
                     }
                     this.setState({
                         realmCountryId: '',
-                        realmCountryList: regList
+                        realmCountryList: regList,
+                        loading: false,
                     })
                 } else {
                     this.setState({
@@ -232,29 +240,38 @@ export default class AddOrganisationComponent extends Component {
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
                 }} />
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-                <Row>
+                <Row style={{ display: this.state.loading ? "none" : "block" }}>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
-                            <CardHeader>
+                            {/* <CardHeader>
                                 <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
-                            </CardHeader>
+                            </CardHeader> */}
                             <Formik
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
-                                    // console.log("-------------------->" + this.state.healthArea);
-                                    OrganisationService.addOrganisation(this.state.organisation)
-                                        .then(response => {
-                                            if (response.status == 200) {
-                                                this.props.history.push(`/organisation/listOrganisation/` + i18n.t(response.data.messageCode, { entityname }))
-                                            } else {
-                                                this.setState({
-                                                    message: response.data.messageCode
-                                                })
-                                            }
+
+                                    // console.log("-------------------->" + this.state.organisation.organisationCode);
+                                    if (this.state.organisation.organisationCode != '') {
+                                        this.setState({
+                                            loading: true
                                         })
+                                        OrganisationService.addOrganisation(this.state.organisation)
+                                            .then(response => {
+                                                if (response.status == 200) {
+                                                    this.props.history.push(`/organisation/listOrganisation/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
+                                                } else {
+                                                    this.setState({
+                                                        message: response.data.messageCode, loading: false
+                                                    })
+                                                }
+                                            })
+                                    }
+
 
                                 }}
 
@@ -269,7 +286,9 @@ export default class AddOrganisationComponent extends Component {
                                         isSubmitting,
                                         isValid,
                                         setTouched,
-                                        handleReset
+                                        handleReset,
+                                        setFieldValue,
+                                        setFieldTouched
                                     }) => (
                                             <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='organisationForm'>
                                                 <CardBody>
@@ -290,14 +309,22 @@ export default class AddOrganisationComponent extends Component {
                                                         <FormFeedback>{errors.realmId}</FormFeedback>
                                                     </FormGroup>
 
-                                                    <FormGroup>
+                                                    <FormGroup className="Selectcontrol-bdrNone">
                                                         <Label htmlFor="realmCountryId">{i18n.t('static.organisation.realmcountry')}<span class="red Reqasterisk">*</span></Label>
                                                         <Select
                                                             bsSize="sm"
-                                                            valid={!errors.realmCountryId && this.state.realmCountryId != ''}
-                                                            invalid={touched.realmCountryId && !!errors.realmCountryId}
-                                                            onChange={(e) => { handleChange(e); this.updateFieldData(e) }}
-                                                            onBlur={handleBlur} name="realmCountryId" id="realmCountryId"
+                                                            className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                                { 'is-valid': !errors.realmCountryId && this.state.organisation.realmCountryArray.length != 0 },
+                                                                { 'is-invalid': (touched.realmCountryId && !!errors.realmCountryId) }
+                                                            )}
+                                                            name="realmCountryId"
+                                                            id="realmCountryId"
+                                                            onChange={(e) => {
+                                                                handleChange(e);
+                                                                setFieldValue("realmCountryId", e);
+                                                                this.updateFieldData(e);
+                                                            }}
+                                                            onBlur={() => setFieldTouched("realmCountryId", true)}
                                                             multi
                                                             options={this.state.realmCountryList}
                                                             value={this.state.realmCountryId}
@@ -335,8 +362,8 @@ export default class AddOrganisationComponent extends Component {
 
                                                 <CardFooter>
                                                     <FormGroup>
-                                                        <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                        <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
 
                                                         &nbsp;
@@ -349,12 +376,23 @@ export default class AddOrganisationComponent extends Component {
                         </Card>
                     </Col>
                 </Row>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }
 
     cancelClicked() {
-        this.props.history.push(`/organisation/listOrganisation/`+ 'red/' + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/organisation/listOrganisation/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
     resetClicked() {
         let { organisation } = this.state
@@ -363,6 +401,7 @@ export default class AddOrganisationComponent extends Component {
         organisation.organisationCode = ''
         organisation.realm.id = ''
         this.state.realmCountryId = ''
+        organisation.realmCountryArray = []
 
         this.setState({
             organisation

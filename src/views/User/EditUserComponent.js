@@ -11,6 +11,9 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
+import { LABEL_REGEX } from '../../Constants.js';
+import classNames from 'classnames';
 
 const initialValues = {
     username: "",
@@ -23,21 +26,46 @@ const entityname = i18n.t('static.user.user')
 const validationSchema = function (values) {
     return Yup.object().shape({
         username: Yup.string()
-            .min(6, i18n.t('static.user.valid6char'))
-            .max(30, i18n.t('static.user.validpasswordlength'))
-            .matches(/^(?=.*[a-zA-Z]).*$/, i18n.t('static.user.alleast1alpha'))
-            .matches(/^\S*$/, i18n.t('static.user.nospace'))
-            .required(i18n.t('static.user.validusername')),
+            // .min(6, i18n.t('static.user.valid6char'))
+            // .max(30, i18n.t('static.user.validpasswordlength'))
+            // .matches(/^(?=.*[a-zA-Z]).*$/, i18n.t('static.user.alleast1alpha'))
+            // .matches(/^\S*$/, i18n.t('static.user.nospace'))
+            .required(i18n.t('static.user.validusername'))
+            .matches(LABEL_REGEX, i18n.t('static.message.rolenamevalidtext')),
         languageId: Yup.string()
             .required(i18n.t('static.user.validlanguage')),
         emailId: Yup.string()
             .email(i18n.t('static.user.invalidemail'))
             .required(i18n.t('static.user.validemail')),
+        // phoneNumber: Yup.string()
+        //     .min(4, i18n.t('static.user.validphonemindigit'))
+        //     .max(15, i18n.t('static.user.validphonemaxdigit'))
+        //     .matches(/^[0-9]*$/, i18n.t('static.user.validnumber'))
+        //     .required(i18n.t('static.user.validphone')),
+
+        needPhoneValidation: Yup.boolean(),
         phoneNumber: Yup.string()
-            .min(4, i18n.t('static.user.validphonemindigit'))
-            .max(15, i18n.t('static.user.validphonemaxdigit'))
-            .matches(/^[0-9]*$/, i18n.t('static.user.validnumber'))
-            .required(i18n.t('static.user.validphone'))
+            .when("needPhoneValidation", {
+                is: val => {
+                    return document.getElementById("needPhoneValidation").value === "true";
+
+                },
+                then: Yup.string().min(4, i18n.t('static.user.validphonemindigit'))
+                    .max(15, i18n.t('static.user.validphonemaxdigit'))
+                    .matches(/^[0-9]*$/, i18n.t('static.user.validnumber'))
+                    .required(i18n.t('static.user.validphone')),
+                otherwise: Yup.string().notRequired()
+            }),
+
+        roleId: Yup.string()
+            .test('roleValid', i18n.t('static.common.roleinvalidtext'),
+                function (value) {
+                    if (document.getElementById("roleValid").value == "false") {
+                        console.log("inside if ---", value);
+                        return true;
+                    }
+                })
+            .required(i18n.t('static.user.validrole')),
     })
 }
 
@@ -66,6 +94,7 @@ class EditUserComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            appAdminRole: false,
             lang: localStorage.getItem('lang'),
             realms: [],
             languages: [],
@@ -89,18 +118,25 @@ class EditUserComponent extends Component {
             },
             message: '',
             roleId: '',
-            roleList: []
+            roleList: [],
+            loading: true
         }
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.roleChange = this.roleChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
+        this.changeLoading = this.changeLoading.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
     hideSecondComponent() {
+        document.getElementById('div2').style.display = 'block';
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 8000);
+    }
+
+    changeLoading(loading) {
+        this.setState({ loading: loading })
     }
 
     dataChange(event) {
@@ -133,27 +169,14 @@ class EditUserComponent extends Component {
             () => { });
     };
 
-    roleChange(roleId) {
-        let { user } = this.state;
-        this.setState({ roleId });
-        var roleIdArray = [];
-        for (var i = 0; i < roleId.length; i++) {
-            roleIdArray[i] = roleId[i].value;
-        }
-        user.roles = roleIdArray;
-        this.setState({
-            user
-        },
-            () => { });
-    }
-
     touchAll(setTouched, errors) {
         setTouched({
             username: true,
             realmId: true,
             emailId: true,
             phoneNumber: true,
-            languageId: true
+            languageId: true,
+            roleId: true
         }
         )
         this.validateForm(errors)
@@ -173,28 +196,71 @@ class EditUserComponent extends Component {
         }
     }
 
+    roleChange(roleId) {
+        let { user } = this.state;
+        let count = 0;
+        let count1 = 0;
+        this.setState({ roleId });
+        var roleIdArray = [];
+        for (var i = 0; i < roleId.length; i++) {
+            roleIdArray[i] = roleId[i].value;
+            if (roleId[i].value != 'ROLE_APPLICATION_ADMIN') {
+                count++;
+                // showRealm
+
+            } else {
+                count1++;
+            }
+        }
+
+        if (count > 0) {
+            if (count1 > 0) {
+                this.setState({
+                    appAdminRole: true
+                })
+                document.getElementById("roleValid").value = true;
+            } else {
+                this.setState({
+                    appAdminRole: false
+                })
+                document.getElementById("roleValid").value = false;
+            }
+        } else {
+            this.setState({
+                appAdminRole: false
+            })
+            document.getElementById("roleValid").value = false;
+        }
+        user.roles = roleIdArray;
+        this.setState({
+            user,
+            validateRealm: (count > 0 ? true : false)
+        },
+            () => { });
+    }
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
+        document.getElementById("roleValid").value = false;
         // console.log("USERID --> ", this.props.match.params.userId);
         UserService.getUserByUserId(this.props.match.params.userId).then(response => {
             if (response.status == 200) {
                 this.setState({
-                    user: response.data
-    
+                    user: response.data,
+                    loading: false
                 }, (
                 ) => {
                     // console.log("state after update---", this.state.user);
                     // console.log("Role list---", this.state.user.roleList);
                 });
-            }else{
+            } else {
                 this.setState({
-                    message: response.data.messageCode
+                    message: response.data.messageCode, loading: false
                 },
                     () => {
                         this.hideSecondComponent();
                     })
             }
-           
+
 
         })
 
@@ -202,21 +268,21 @@ class EditUserComponent extends Component {
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        languages: response.data
+                        languages: response.data, loading: false
                     })
-                }else{
+                } else {
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode, loading: false
                     },
                         () => {
                             this.hideSecondComponent();
                         })
                 }
-                
+
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
+                        this.setState({ message: error.message, loading: false });
                     } else {
                         switch (error.response ? error.response.status : "") {
                             case 500:
@@ -224,10 +290,10 @@ class EditUserComponent extends Component {
                             case 404:
                             case 406:
                             case 412:
-                                this.setState({ message: error.response.data.messageCode });
+                                this.setState({ message: error.response.data.messageCode, loading: false });
                                 break;
                             default:
-                                this.setState({ message: 'static.unkownError' });
+                                this.setState({ message: 'static.unkownError', loading: false });
                                 break;
                         }
                     }
@@ -238,11 +304,11 @@ class EditUserComponent extends Component {
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        realms: response.data
+                        realms: response.data, loading: false
                     })
                 } else {
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode, loading: false
                     },
                         () => {
                             this.hideSecondComponent();
@@ -251,7 +317,7 @@ class EditUserComponent extends Component {
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
+                        this.setState({ message: error.message, loading: false });
                     } else {
                         switch (error.response ? error.response.status : "") {
                             case 500:
@@ -259,10 +325,10 @@ class EditUserComponent extends Component {
                             case 404:
                             case 406:
                             case 412:
-                                this.setState({ message: error.response.data.messageCode });
+                                this.setState({ message: error.response.data.messageCode, loading: false });
                                 break;
                             default:
-                                this.setState({ message: 'static.unkownError' });
+                                this.setState({ message: 'static.unkownError', loading: false });
                                 break;
                         }
                     }
@@ -273,26 +339,27 @@ class EditUserComponent extends Component {
             .then(response => {
                 if (response.status == 200) {
                     var roleList = [];
-                for (var i = 0; i < response.data.length; i++) {
-                    roleList[i] = { value: response.data[i].roleId, label: getLabelText(response.data[i].label, this.state.lang) }
-                }
-                this.setState({
-                    roleList
-                })
-                }
-                else{
+                    for (var i = 0; i < response.data.length; i++) {
+                        roleList[i] = { value: response.data[i].roleId, label: getLabelText(response.data[i].label, this.state.lang) }
+                    }
                     this.setState({
-                        message: response.data.messageCode
+                        roleList,
+                        loading: false
+                    })
+                }
+                else {
+                    this.setState({
+                        message: response.data.messageCode, loading: false
                     },
                         () => {
                             this.hideSecondComponent();
                         })
                 }
-                
+
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
+                        this.setState({ message: error.message, loading: false });
                     } else {
                         switch (error.response ? error.response.status : "") {
                             case 500:
@@ -300,10 +367,10 @@ class EditUserComponent extends Component {
                             case 404:
                             case 406:
                             case 412:
-                                this.setState({ message: error.response.data.messageCode });
+                                this.setState({ message: error.response.data.messageCode, loading: false });
                                 break;
                             default:
-                                this.setState({ message: 'static.unkownError' });
+                                this.setState({ message: 'static.unkownError', loading: false });
                                 break;
                         }
                     }
@@ -336,13 +403,14 @@ class EditUserComponent extends Component {
 
         return (
             <div className="animated fadeIn">
-               <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} loading={this.changeLoading} />
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
-                            <CardHeader>
+                            {/* <CardHeader>
                                 <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
-                            </CardHeader>
+                            </CardHeader> */}
                             <Formik
                                 enableReinitialize={true}
                                 initialValues={{
@@ -357,13 +425,19 @@ class EditUserComponent extends Component {
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     console.log(JSON.stringify(this.state.user))
+                                    this.setState({
+                                        message: '',
+                                        loading: true
+                                    })
                                     UserService.editUser(this.state.user)
                                         .then(response => {
                                             if (response.status == 200) {
-                                                this.props.history.push(`/user/listUser/`+ 'green/' + i18n.t(response.data.messageCode, { entityname }))
+                                                this.props.history.push(`/user/listUser/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
+
+
                                             } else {
                                                 this.setState({
-                                                    message: response.data.messageCode
+                                                    message: response.data.messageCode, loading: false
                                                 },
                                                     () => {
                                                         this.hideSecondComponent();
@@ -374,7 +448,7 @@ class EditUserComponent extends Component {
                                         .catch(
                                             error => {
                                                 if (error.message === "Network Error") {
-                                                    this.setState({ message: error.message });
+                                                    this.setState({ message: error.message, loading: false });
                                                 } else {
                                                     switch (error.response ? error.response.status : "") {
                                                         case 500:
@@ -382,10 +456,10 @@ class EditUserComponent extends Component {
                                                         case 404:
                                                         case 406:
                                                         case 412:
-                                                            this.setState({ message: error.response.data.messageCode });
+                                                            this.setState({ message: error.response.data.messageCode, loading: false });
                                                             break;
                                                         default:
-                                                            this.setState({ message: 'static.unkownError' });
+                                                            this.setState({ message: 'static.unkownError', loading: false });
                                                             break;
                                                     }
                                                 }
@@ -404,12 +478,25 @@ class EditUserComponent extends Component {
                                         handleSubmit,
                                         isSubmitting,
                                         isValid,
-                                        setTouched
+                                        setTouched,
+                                        setFieldValue,
+                                        setFieldTouched
                                     }) => (
                                             <Form onSubmit={handleSubmit} noValidate name='userForm'>
-                                                <CardBody>
+                                                <CardBody className="pt-2 pb-0">
+                                                    <Input
+                                                        type="hidden"
+                                                        name="roleValid"
+                                                        id="roleValid"
+                                                    />
+                                                    <Input
+                                                        type="hidden"
+                                                        name="needPhoneValidation"
+                                                        id="needPhoneValidation"
+                                                        value={(this.state.user.phoneNumber === '' ? false : true)}
+                                                    />
                                                     <FormGroup>
-                                                        <Label htmlFor="realmId">{i18n.t('static.realm.realm')}</Label><Input
+                                                        <Label htmlFor="realmId">{i18n.t('static.realm.realm')}<span class="red Reqasterisk">*</span></Label><Input
                                                             type="text"
                                                             name="realmId"
                                                             id="realmId"
@@ -426,7 +513,7 @@ class EditUserComponent extends Component {
                                                             id="username"
                                                             bsSize="sm"
                                                             valid={!errors.username}
-                                                            invalid={touched.username && !!errors.username}
+                                                            invalid={touched.username && !!errors.username || this.state.user.username == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             required
@@ -440,7 +527,7 @@ class EditUserComponent extends Component {
                                                             id="emailId"
                                                             bsSize="sm"
                                                             valid={!errors.emailId}
-                                                            invalid={touched.emailId && !!errors.emailId}
+                                                            invalid={touched.emailId && !!errors.emailId || this.state.user.emailId == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             required
@@ -449,7 +536,7 @@ class EditUserComponent extends Component {
                                                         <FormFeedback className="red">{errors.emailId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="phoneNumber">{i18n.t('static.user.phoneNumber')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Label for="phoneNumber">{i18n.t('static.user.phoneNumber')}</Label>
                                                         <Input type="text"
                                                             name="phoneNumber"
                                                             id="phoneNumber"
@@ -463,14 +550,20 @@ class EditUserComponent extends Component {
                                                         />
                                                         <FormFeedback className="red">{errors.phoneNumber}</FormFeedback>
                                                     </FormGroup>
-                                                    <FormGroup>
+                                                    <FormGroup className="Selectcontrol-bdrNone">
                                                         <Label htmlFor="roleId">{i18n.t('static.role.role')}<span class="red Reqasterisk">*</span></Label>
                                                         <Select
-                                                            valid={!errors.roleId}
+                                                            className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                                { 'is-valid': !errors.roleId },
+                                                                { 'is-invalid': (touched.roleId && !!errors.roleId || this.state.user.roles.length == 0 || this.state.appAdminRole) }
+                                                            )}
                                                             bsSize="sm"
-                                                            invalid={touched.roleId && !!errors.roleId}
-                                                            onChange={(e) => { handleChange(e); this.roleChange(e) }}
-                                                            onBlur={handleBlur}
+                                                            onChange={(e) => {
+                                                                handleChange(e);
+                                                                setFieldValue("roleId", e);
+                                                                this.roleChange(e);
+                                                            }}
+                                                            onBlur={() => setFieldTouched("roleId", true)}
                                                             name="roleId"
                                                             id="roleId"
                                                             multi
@@ -503,7 +596,7 @@ class EditUserComponent extends Component {
                                                             id="languageId"
                                                             bsSize="sm"
                                                             valid={!errors.languageId}
-                                                            invalid={touched.languageId && !!errors.languageId}
+                                                            invalid={touched.languageId && !!errors.languageId || this.state.user.language.languageId == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             required
@@ -567,7 +660,7 @@ class EditUserComponent extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/user/listUser/`+ 'red/'  + i18n.t("static.message.cancelled", { entityname }))
+        this.props.history.push(`/user/listUser/` + 'red/' + i18n.t("static.message.cancelled", { entityname }))
     }
 
     resetClicked() {

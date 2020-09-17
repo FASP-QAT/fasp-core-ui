@@ -8,6 +8,7 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import '../Forms/ValidationForms/ValidationForms.css';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
+import { LABEL_REGEX, ALPHABETS_REGEX } from '../../Constants.js';
 
 
 let initialValues = {
@@ -19,8 +20,12 @@ const validationSchema = function (values) {
     return Yup.object().shape({
 
         languageName: Yup.string()
+            .matches(LABEL_REGEX, i18n.t('static.message.rolenamevalidtext'))
             .required(i18n.t('static.language.languagetext')),
-        languageCode: Yup.string().required(i18n.t('static.language.languagecodetext')).max(2, i18n.t('static.language.languageCodemax3digittext'))
+        languageCode: Yup.string()
+            .matches(ALPHABETS_REGEX, i18n.t('static.common.alphabetsOnly'))
+            .required(i18n.t('static.language.languagecodetext'))
+        // .max(2, i18n.t('static.language.languageCodemax3digittext'))
 
     })
 }
@@ -55,7 +60,8 @@ export default class EditLanguageComponent extends Component {
             language: {
                 languageName: ''
             },
-            message: ''
+            message: '',
+            loading: true
         }
 
         this.Capitalize = this.Capitalize.bind(this);
@@ -63,10 +69,15 @@ export default class EditLanguageComponent extends Component {
         this.cancelClicked = this.cancelClicked.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.changeMessage = this.changeMessage.bind(this);
+        this.changeLoading = this.changeLoading.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
     changeMessage(message) {
         this.setState({ message: message })
+    }
+
+    changeLoading(loading) {
+        this.setState({ loading: loading })
     }
 
     hideSecondComponent() {
@@ -120,11 +131,12 @@ export default class EditLanguageComponent extends Component {
         LanguageService.getLanguageById(this.props.match.params.languageId).then(response => {
             if (response.status == 200) {
                 this.setState({
-                    language: response.data
+                    language: response.data,
+                    loading: false
                 });
             } else {
                 this.setState({
-                    message: response.data.messageCode
+                    message: response.data.messageCode, loading: false
                 },
                     () => {
                         this.hideSecondComponent();
@@ -145,14 +157,14 @@ export default class EditLanguageComponent extends Component {
     render() {
         return (
             <div className="animated fadeIn">
-                <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} />
+                <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} loading={this.changeLoading} />
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-                <Row>
+                <Row style={{ display: this.state.loading ? "none" : "block" }}>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
-                            <CardHeader>
+                            {/* <CardHeader>
                                 <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
-                            </CardHeader>
+                            </CardHeader> */}
                             <Formik
                                 enableReinitialize={true}
                                 initialValues={{
@@ -161,6 +173,9 @@ export default class EditLanguageComponent extends Component {
                                 }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
+                                    this.setState({
+                                        loading: true
+                                    })
                                     AuthenticationService.setupAxiosInterceptors();
                                     LanguageService.editLanguage(this.state.language).then(response => {
                                         console.log(response)
@@ -168,7 +183,7 @@ export default class EditLanguageComponent extends Component {
                                             this.props.history.push(`/language/listLanguage/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                         } else {
                                             this.setState({
-                                                message: response.data.messageCode
+                                                message: response.data.messageCode, loading: false
                                             },
                                                 () => {
                                                     this.hideSecondComponent();
@@ -192,7 +207,7 @@ export default class EditLanguageComponent extends Component {
                                         setTouched
                                     }) => (
                                             <Form onSubmit={handleSubmit} noValidate name='languageForm'>
-                                                <CardBody>
+                                                <CardBody className="pb-0">
                                                     <FormGroup>
                                                         <Label for="languageName">{i18n.t('static.language.language')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input type="text"
@@ -200,7 +215,7 @@ export default class EditLanguageComponent extends Component {
                                                             id="languageName"
                                                             bsSize="sm"
                                                             valid={!errors.languageName}
-                                                            invalid={touched.languageName && !!errors.languageName}
+                                                            invalid={touched.languageName && !!errors.languageName || this.state.language.languageName == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.language.languageName}
@@ -214,11 +229,13 @@ export default class EditLanguageComponent extends Component {
                                                             id="languageCode"
                                                             bsSize="sm"
                                                             valid={!errors.languageCode}
-                                                            invalid={touched.languageCode && !!errors.languageCode}
+                                                            invalid={touched.languageCode && !!errors.languageCode || this.state.language.languageCode == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.language.languageCode}
-                                                            required />
+                                                            required
+                                                            maxLength={2}
+                                                        />
                                                         <FormFeedback className="red">{errors.languageCode}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
@@ -260,7 +277,7 @@ export default class EditLanguageComponent extends Component {
                                                 <CardFooter>
                                                     <FormGroup>
                                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> Reset</Button>
+                                                        <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                                         &nbsp;
                                                     </FormGroup>
@@ -271,6 +288,17 @@ export default class EditLanguageComponent extends Component {
                         </Card>
                     </Col>
                 </Row>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
             </div>
         );
@@ -278,6 +306,7 @@ export default class EditLanguageComponent extends Component {
     cancelClicked() {
         this.props.history.push(`/language/listLanguage/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
+
 
     resetClicked() {
         // console.log("iiii-------->>>>>", this.props.match.params.languageId)

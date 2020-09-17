@@ -12,7 +12,40 @@ import {
 import getLabelText from '../../CommonComponent/getLabelText';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
+import classNames from 'classnames';
 
+const initialValuesFour = {
+    regionId: []
+}
+
+const validationSchemaFour = function (values) {
+    return Yup.object().shape({
+        regionId: Yup.string()
+            .required(i18n.t('static.common.regiontext')),
+    })
+}
+
+const validateFour = (getValidationSchema) => {
+    return (values) => {
+        const validationSchema = getValidationSchema(values)
+        try {
+            validationSchema.validateSync(values, { abortEarly: false })
+            return {}
+        } catch (error) {
+            return getErrorsFromValidationErrorFour(error)
+        }
+    }
+}
+
+const getErrorsFromValidationErrorFour = (validationError) => {
+    const FIRST_ERROR = 0
+    return validationError.inner.reduce((errors, error) => {
+        return {
+            ...errors,
+            [error.path]: error.errors[FIRST_ERROR],
+        }
+    }, {})
+}
 
 
 export default class StepFive extends Component {
@@ -23,6 +56,29 @@ export default class StepFive extends Component {
             regionId: ''
         }
     }
+
+    touchAllFour(setTouched, errors) {
+        setTouched({
+            regionId: true
+        }
+        )
+        this.validateFormFour(errors)
+    }
+    validateFormFour(errors) {
+        this.findFirstErrorFour('regionForm', (fieldName) => {
+            return Boolean(errors[fieldName])
+        })
+    }
+    findFirstErrorFour(formName, hasError) {
+        const form = document.forms[formName]
+        for (let i = 0; i < form.length; i++) {
+            if (hasError(form[i].name)) {
+                form[i].focus()
+                break
+            }
+        }
+    }
+
     componentDidMount() {
 
     }
@@ -53,27 +109,92 @@ export default class StepFive extends Component {
     render() {
         return (
             <>
-                <FormGroup>
+
+                <Formik
+                    initialValues={initialValuesFour}
+                    validate={validateFour(validationSchemaFour)}
+                    onSubmit={(values, { setSubmitting, setErrors }) => {
+                        this.props.finishedStepFive && this.props.finishedStepFive();
+
+                    }}
+                    render={
+                        ({
+                            values,
+                            errors,
+                            touched,
+                            handleChange,
+                            handleBlur,
+                            handleSubmit,
+                            isSubmitting,
+                            isValid,
+                            setTouched,
+                            setFieldValue,
+                            setFieldTouched
+                        }) => (
+                                <Form className="needs-validation" onSubmit={handleSubmit} noValidate name='regionForm'>
+                                    <FormGroup className="Selectcontrol-bdrNone">
+                                        <Label htmlFor="select">{i18n.t('static.program.region')}<span class="red Reqasterisk">*</span></Label>
+                                        <Select
+                                            className={classNames('form-control', 'col-md-4', 'd-block', 'w-100', 'bg-light',
+                                                { 'is-valid': !errors.regionId && this.props.items.program.regionArray.length != 0 },
+                                                { 'is-invalid': (touched.regionId && !!errors.regionId) }
+                                            )}
+                                            onChange={(e) => {
+                                                handleChange(e);
+                                                setFieldValue("regionId", e);
+                                                this.props.updateFieldData(e);
+                                            }}
+                                            onBlur={() => setFieldTouched("regionId", true)}
+                                            // onChange={(e) => { this.props.updateFieldData(e) }}
+                                            // className="col-md-4"
+                                            bsSize="sm"
+                                            name="regionId"
+                                            id="regionId"
+                                            multi
+                                            options={this.state.regionList}
+                                            // value={this.state.regionId}
+                                            value={this.props.items.program.regionArray}
+                                        // onChange={(e) => { handleChange(e); this.props.updateFieldData(e) }}
+                                        />
+
+                                        <FormFeedback className="red">{errors.regionId}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.props.previousToStepFour} > <i className="fa fa-angle-double-left"></i> Back</Button>
+                                        {/* <Button color="info" size="md" className="float-left mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.props.previousToStepFour} > <i className="fa fa-angle-double-left"></i> Back</Button> */}
+                                        &nbsp;
+                                        <Button color="info" size="md" className="float-left mr-1" type="submit" name="regionSub" id="regionSub" onClick={() => this.touchAllFour(setTouched, errors)} disabled={!isValid} >Next <i className="fa fa-angle-double-right"></i></Button>
+                                        {/* <Button color="info" size="md" className="float-left mr-1" type="button" name="regionSub" id="regionSub" onClick={this.props.finishedStepFive}>Next <i className="fa fa-angle-double-right"></i></Button> */}
+                                        &nbsp;
+                                    </FormGroup>
+                                </Form>
+                            )} />
+
+
+                {/* 
+                <FormGroup className="col-md-4 pl-0">
                     <Label htmlFor="select">{i18n.t('static.program.region')}<span class="red Reqasterisk">*</span><span class="red Reqasterisk">*</span></Label>
                     <Select
                         onChange={(e) => { this.props.updateFieldData(e) }}
-                        className="col-md-4"
+                        // className="col-md-4"
                         bsSize="sm"
                         name="regionId"
                         id="regionId"
                         multi
                         options={this.state.regionList}
                         value={this.state.regionId}
+                        onChange={(e) => { handleChange(e); this.props.updateFieldData(e) }}
                     />
-                    </FormGroup>
-                    <br></br>
-                    <FormGroup>
-                    <Button color="info" size="md" className="float-left mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.props.previousToStepFour} > <i className="fa fa-angle-double-left"></i> Previous</Button>
+                    <FormFeedback className="red">{errors.regionId}</FormFeedback>
+                </FormGroup>
+                <br></br>
+                <FormGroup>
+                    <Button color="info" size="md" className="float-left mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.props.previousToStepFour} > <i className="fa fa-angle-double-left"></i> Back</Button>
                     &nbsp;
                     <Button color="info" size="md" className="float-left mr-1" type="button" name="regionSub" id="regionSub" onClick={this.props.finishedStepFive}>Next <i className="fa fa-angle-double-right"></i></Button>
                     &nbsp;
-                    </FormGroup>
-                
+                    </FormGroup> */}
+
 
             </>
         );

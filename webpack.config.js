@@ -11,7 +11,7 @@ module.exports = {
     output: {
         path: path.resolve(__dirname, './'),
         filename: 'bundle.js',
-        // publicPath: '/',
+        publicPath: '/'
     },
     devServer: {
         port: 4202,
@@ -121,7 +121,7 @@ module.exports = {
         new WorkboxPlugin.GenerateSW({
             // swSrc: "src/src-sw.js",
             swDest: "faspsw.js",
-            maximumFileSizeToCacheInBytes: 20 * 1024 * 1024
+            maximumFileSizeToCacheInBytes: 30 * 1024 * 1024
             // swSrc: './src/sw.js',
         })
         // new WorkboxPlugin.GenerateSW({

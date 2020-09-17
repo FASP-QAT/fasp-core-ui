@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Container, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Container, Button, FormFeedback, InputGroupAddon, InputGroupText, InputGroup, CardBody, Form, FormGroup, Label, Input } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../../Forms/ValidationForms/ValidationForms.css'
@@ -8,7 +8,7 @@ import { Online } from "react-detect-offline";
 import UserService from '../../../api/UserService'
 import i18n from '../../../i18n'
 import InnerBgImg from '../../../../src/assets/img/bg-image/bg-login.jpg';
-import image1 from '../../../assets/img/QAT-logo.png';
+import image1 from '../../../assets/img/QAT-login-logo.png';
 
 
 const validationSchema = function (values) {
@@ -59,10 +59,40 @@ class ResetPasswordComponent extends Component {
         super(props);
         this.state = {
             message: '',
-            username: this.props.match.params.username,
-            token: this.props.match.params.token
+            emailId: this.props.match.params.emailId,
+            token: this.props.match.params.token,
+            display: 1
         }
         this.cancelClicked = this.cancelClicked.bind(this);
+        this.hideFirstComponent = this.hideFirstComponent.bind(this);
+
+        this.showPopUp = this.showPopUp.bind(this);
+    }
+    showPopUp() {
+        alert("1) Password has to be at least 6 characters\n2) Password should not contain password string\n3) Password must contain atleast 1 special character\n4) Password must contain atleast 1 number\n5) Password must contain atleast 1 uppercase alphabet\n6) Password must start with alphabet\n7) New password should not be same as username\n8) New password should not be same as old password")
+        // confirmAlert({
+        //     message: "Anchal&lt;br /&gt;Bhashkar",
+        //     buttons: [
+        //       {
+        //         label: i18n.t('static.common.close')
+        //       }
+        //     ]
+        //   });
+    }
+    hideFirstComponent() {
+        setTimeout(function () {
+            document.getElementById('div1').style.display = 'none';
+        }, 8000);
+
+        // setTimeout(function () {
+        //     this.setState({
+        //         message:''
+        //     },
+        //     () => { 
+        //         document.getElementById('div1').style.display = 'block';
+        //     });
+        // }, 8000);
+
     }
 
     cancelClicked() {
@@ -92,13 +122,15 @@ class ResetPasswordComponent extends Component {
         }
     }
     componentDidMount() {
-        UserService.confirmForgotPasswordToken(this.state.username, this.state.token)
+        this.hideFirstComponent();
+        UserService.confirmForgotPasswordToken(this.state.emailId, this.state.token)
             .then(response => {
                 this.setState({
                     message: response.data.messageCode
                 })
             }).catch(
                 error => {
+                    console.log("error---", error)
                     if (error.message === "Network Error") {
                         this.setState({ message: error.message });
                     } else {
@@ -106,6 +138,7 @@ class ResetPasswordComponent extends Component {
                             case 500:
                             case 401:
                             case 403:
+                                this.setState({ display: 0 })
                             case 404:
                             case 406:
                             case 412:
@@ -123,7 +156,7 @@ class ResetPasswordComponent extends Component {
     render() {
         return (
             <div className="app flex-row align-items-center">
-                <div className="Login-component" style={{ backgroundImage: "url(" + InnerBgImg +")" }}>
+                <div className="Login-component" style={{ backgroundImage: "url(" + InnerBgImg + ")" }}>
                     <Container className="container-login">
                         <Row className="justify-content-center">
                             <Col md="12">
@@ -131,11 +164,11 @@ class ResetPasswordComponent extends Component {
                                     <img src={image1} className="img-fluid " />
                                 </div>
                             </Col>
-                            <Col md="9" lg="7" xl="6" className="mt-4">
-                                <h5 className="mx-4">{i18n.t(this.state.message)}</h5>
-                                <Card className="mx-4">
+                            <Col md="9" lg="7" xl="6" className="ForgotmarginTop">
+                                <h4 style={{ color: "red",fontSize:"18px" }} className="mx-4 text-center">{i18n.t(this.state.message)}</h4>
+                                {this.state.display == 1 && <Card className="mx-4">
                                     <CardHeader>
-                                        <i className="icon-note frgtpass-heading"></i><strong className="frgtpass-heading">{i18n.t('static.user.resetPassword')}</strong>{' '}
+                                        <i className="fa fa-pencil-square-o frgtpass-heading"></i><strong className="frgtpass-heading">{i18n.t('static.user.resetPassword')}</strong>{' '}
                                     </CardHeader>
                                     <Formik
                                         initialValues={{
@@ -145,21 +178,26 @@ class ResetPasswordComponent extends Component {
                                         }}
                                         validate={validate(validationSchema)}
                                         onSubmit={(values, { setSubmitting, setErrors }) => {
+
                                             if (navigator.onLine) {
-                                                UserService.updatePassword(this.state.username, this.state.token, values.newPassword)
+                                                UserService.updatePassword(this.state.emailId, this.state.token, values.newPassword)
                                                     .then(response => {
                                                         if (response.status == 200) {
                                                             this.props.history.push(`/login/static.message.user.passwordSuccess`)
                                                         } else {
                                                             this.setState({
                                                                 message: response.data.message
-                                                            })
+                                                            });
+                                                            document.getElementById('div1').style.display = 'block';
+                                                            this.hideFirstComponent();
                                                         }
                                                     })
                                                     .catch(
                                                         error => {
                                                             if (error.message === "Network Error") {
                                                                 this.setState({ message: error.message });
+                                                                document.getElementById('div1').style.display = 'block';
+                                                                this.hideFirstComponent();
                                                             } else {
                                                                 switch (error.response ? error.response.status : "") {
                                                                     case 404:
@@ -170,11 +208,20 @@ class ResetPasswordComponent extends Component {
                                                                     case 403:
                                                                     case 406:
                                                                     case 412:
-                                                                        this.setState({ message: error.response.data.messageCode });
+                                                                        this.setState({ message: error.response.data.messageCode },
+                                                                            () => {
+                                                                                console.log("inside412");
+                                                                                document.getElementById('div1').style.display = 'block';
+                                                                                this.hideFirstComponent();
+                                                                            });
+
+
                                                                         break;
                                                                     case 403:
                                                                     default:
                                                                         this.setState({ message: 'static.unkownError' });
+                                                                        document.getElementById('div1').style.display = 'block';
+                                                                        this.hideFirstComponent();
                                                                         break;
                                                                 }
                                                             }
@@ -200,6 +247,7 @@ class ResetPasswordComponent extends Component {
                                                 setTouched
                                             }) => (
                                                     <Form onSubmit={handleSubmit} noValidate name='updatePasswordForm'>
+
                                                         <CardBody>
                                                             <Input type="text"
                                                                 name="username"
@@ -210,17 +258,22 @@ class ResetPasswordComponent extends Component {
                                                             />
                                                             <FormGroup>
                                                                 <Label for="newPassword">{i18n.t('static.user.newPasswordLabel')}</Label>
-                                                                <Input type="password"
-                                                                    name="newPassword"
-                                                                    id="newPassword"
-                                                                    bsSize="sm"
-                                                                    valid={!errors.newPassword}
-                                                                    invalid={touched.newPassword && !!errors.newPassword}
-                                                                    onChange={handleChange}
-                                                                    onBlur={handleBlur}
-                                                                    required
-                                                                />
-                                                                <FormFeedback>{errors.newPassword}</FormFeedback>
+                                                                <InputGroup>
+                                                                    <Input type="password"
+                                                                        name="newPassword"
+                                                                        id="newPassword"
+                                                                        bsSize="sm"
+                                                                        valid={!errors.newPassword}
+                                                                        invalid={touched.newPassword && !!errors.newPassword}
+                                                                        onChange={handleChange}
+                                                                        onBlur={handleBlur}
+                                                                        required
+                                                                    />
+                                                                    <InputGroupAddon addonType="append">
+                                                                        <InputGroupText><i class="fa fa-info-circle icons" aria-hidden="true" data-toggle="tooltip" data-html="true" data-placement="bottom" onClick={this.showPopUp} title=""></i></InputGroupText>
+                                                                    </InputGroupAddon>
+                                                                    <FormFeedback>{errors.newPassword}</FormFeedback>
+                                                                </InputGroup>
                                                             </FormGroup>
                                                             <FormGroup>
                                                                 <Label for="confirmNewPassword">{i18n.t('static.user.confirmNewPasswordLabel')}</Label>
@@ -244,9 +297,10 @@ class ResetPasswordComponent extends Component {
                                                                 &nbsp;
                           </FormGroup>
                                                         </CardFooter>
+
                                                     </Form>
                                                 )} />
-                                </Card>>
+                                </Card>}
                             </Col>
                         </Row>
                     </Container>

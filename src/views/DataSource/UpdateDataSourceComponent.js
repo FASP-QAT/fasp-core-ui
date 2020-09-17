@@ -18,6 +18,7 @@ let initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         label: Yup.string()
+            // .matches(/^([a-zA-Z]+\s)*[a-zA-Z]+$/, i18n.t('static.message.rolenamevalidtext'))
             .required(i18n.t('static.datasource.datasourcetext')),
         dataSourceTypeId: Yup.string()
             .required(i18n.t('static.datasource.datasourcetypetext'))
@@ -89,7 +90,7 @@ export default class UpdateDataSourceComponent extends Component {
                     }
                 },
             },
-
+            loading: true
         }
 
         this.Capitalize = this.Capitalize.bind(this);
@@ -98,6 +99,7 @@ export default class UpdateDataSourceComponent extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.changeMessage = this.changeMessage.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.changeLoading = this.changeLoading.bind(this);
         // initialValues = {
         //     label: this.props.location.state.dataSource.label.label_en,
         //     dataSourceTypeId: this.props.location.state.dataSource.dataSourceType.dataSourceTypeId
@@ -105,6 +107,9 @@ export default class UpdateDataSourceComponent extends Component {
     }
     changeMessage(message) {
         this.setState({ message: message })
+    }
+    changeLoading(loading) {
+        this.setState({ loading: loading })
     }
     hideSecondComponent() {
         setTimeout(function () {
@@ -158,22 +163,23 @@ export default class UpdateDataSourceComponent extends Component {
     componentDidMount() {
 
         AuthenticationService.setupAxiosInterceptors();
-       
+
         DataSourceService.getDataSourceById(this.props.match.params.dataSourceId).then(response => {
-            if (response.status == 200) { 
+            if (response.status == 200) {
                 this.setState({
-                dataSource: response.data
-            });}
-            else{
-                
+                    dataSource: response.data, loading: false
+                });
+            }
+            else {
+
                 this.setState({
-                    message: response.data.messageCode
+                    message: response.data.messageCode, loading: false
                 },
                     () => {
                         this.hideSecondComponent();
                     })
             }
-           
+
 
         })
 
@@ -193,14 +199,14 @@ export default class UpdateDataSourceComponent extends Component {
 
         return (
             <div className="animated fadeIn">
-                <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} />
+                <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} loading={this.changeLoading} />
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-                <Row>
+                <Row style={{ display: this.state.loading ? "none" : "block" }}>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
-                            <CardHeader>
+                            {/* <CardHeader>
                                 <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
-                            </CardHeader>
+                            </CardHeader> */}
                             <Formik
                                 enableReinitialize={true}
                                 initialValues={{
@@ -209,14 +215,17 @@ export default class UpdateDataSourceComponent extends Component {
                                 }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
+                                    this.setState({
+                                        loading: true
+                                    })
                                     AuthenticationService.setupAxiosInterceptors();
                                     DataSourceService.editDataSource(this.state.dataSource)
                                         .then(response => {
                                             if (response.status == 200) {
-                                                this.props.history.push(`/dataSource/listDataSource/`+ 'green/' + i18n.t(response.data.messageCode, { entityname }))
+                                                this.props.history.push(`/dataSource/listDataSource/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
-                                                    message: response.data.messageCode
+                                                    message: response.data.messageCode,loading:false
                                                 },
                                                     () => {
                                                         this.hideSecondComponent();
@@ -237,9 +246,9 @@ export default class UpdateDataSourceComponent extends Component {
                                         setTouched
                                     }) => (
                                             <Form onSubmit={handleSubmit} noValidate name='dataSourceForm'>
-                                                <CardBody>
+                                                <CardBody className="pb-0">
                                                     <FormGroup>
-                                                        <Label htmlFor="realmId">{i18n.t('static.realm.realm')}</Label>
+                                                        <Label htmlFor="realmId">{i18n.t('static.realm.realm')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             type="text"
                                                             name="realmId"
@@ -247,18 +256,6 @@ export default class UpdateDataSourceComponent extends Component {
                                                             bsSize="sm"
                                                             readOnly
                                                             value={this.state.dataSource.realm.label.label_en}
-                                                        >
-                                                        </Input>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label htmlFor="dataSourceTypeId">{i18n.t('static.datasource.datasourcetype')}</Label>
-                                                        <Input
-                                                            type="text"
-                                                            name="dataSourceTypeId"
-                                                            id="dataSourceTypeId"
-                                                            bsSize="sm"
-                                                            readOnly
-                                                            value={this.state.dataSource.dataSourceType.label.label_en}
                                                         >
                                                         </Input>
                                                     </FormGroup>
@@ -275,6 +272,19 @@ export default class UpdateDataSourceComponent extends Component {
                                                         </Input>
                                                     </FormGroup>
                                                     <FormGroup>
+                                                        <Label htmlFor="dataSourceTypeId">{i18n.t('static.datasource.datasourcetype')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Input
+                                                            type="text"
+                                                            name="dataSourceTypeId"
+                                                            id="dataSourceTypeId"
+                                                            bsSize="sm"
+                                                            readOnly
+                                                            value={this.state.dataSource.dataSourceType.label.label_en}
+                                                        >
+                                                        </Input>
+                                                    </FormGroup>
+
+                                                    <FormGroup>
                                                         <Label htmlFor="label">{i18n.t('static.datasource.datasource')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             type="text"
@@ -282,7 +292,7 @@ export default class UpdateDataSourceComponent extends Component {
                                                             id="label"
                                                             bsSize="sm"
                                                             valid={!errors.label}
-                                                            invalid={touched.label && !!errors.label}
+                                                            invalid={touched.label && !!errors.label || this.state.dataSource.label.label_en == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.dataSource.label.label_en}
@@ -342,6 +352,17 @@ export default class UpdateDataSourceComponent extends Component {
                         </Card>
                     </Col>
                 </Row>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div>
                     <h6>{i18n.t(this.state.message)}</h6>
                     <h6>{i18n.t(this.props.match.params.message)}</h6>

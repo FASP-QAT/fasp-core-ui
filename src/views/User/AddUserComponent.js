@@ -11,6 +11,9 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
+import { LABEL_REGEX } from '../../Constants.js';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import classNames from 'classnames';
 
 const initialValues = {
     username: "",
@@ -25,39 +28,71 @@ const validationSchema = function (values) {
     return Yup.object().shape({
 
         username: Yup.string()
-            .min(6, i18n.t('static.user.valid6char'))
-            .max(30, i18n.t('static.user.validpasswordlength'))
-            .matches(/^(?=.*[a-zA-Z]).*$/, i18n.t('static.user.alleast1alpha'))
-            .matches(/^\S*$/, i18n.t('static.user.nospace'))
-            .required(i18n.t('static.user.validusername')),
+            .required(i18n.t('static.user.validusername'))
+            .matches(LABEL_REGEX, i18n.t('static.message.rolenamevalidtext')),
         showRealm: Yup.boolean(),
         realmId: Yup.string()
-            .when("showRealm", (showRealm, schema) => {
-                if (document.getElementById("showRealm").value == "true") {
-                    return schema.required(i18n.t('static.common.realmtext'))
-                } else {
-                    return schema;
-                }
-                return schema;
+            .when("showRealm", {
+                is: val => {
+                    console.log("validation---------" + document.getElementById("showRealm").value)
+                    console.log("result---", (document.getElementById("showRealm").value === "true"));
+                    return document.getElementById("showRealm").value === "true";
+                },
+                then: Yup.string().required(i18n.t('static.common.realmtext')),
+                otherwise: Yup.string().notRequired()
             }),
-        // roleId: Yup.array()
-        // .min(3, 'Pick at least 3 tags')
-        // .of(
-        // Yup.object().shape({
-        // label: Yup.string().required(),
-        // value: Yup.string().required(),
-        // })
-        // ),
+        // .test('showRealm', i18n.t('static.common.realmtext'),
+        //     function (value) {
+        //         if (document.getElementById("showRealm").value === "true") {
+        //             console.log("inside if ---", value);
+        //             return true;
+        //         }
+        //     }),
+        // .test('showRealm', i18n.t('static.common.realmtext'),
+        //     function (value) {
+        //         if (document.getElementById("showRealm").value == "true") {
+        //             console.log("inside if ---", document.getElementById("showRealm").value);
+        //             return true;
+        //         } else {
+        //             console.log("else-------------", value);
+        //             return false;
+        //         }
+        //         return true;
+        //         console.log("out-------------");
+        //     }),
+        roleId: Yup.string()
+            .test('roleValid', i18n.t('static.common.roleinvalidtext'),
+                function (value) {
+                    if (document.getElementById("roleValid").value == "false") {
+                        console.log("inside if ---", value);
+                        return true;
+                    }
+                })
+            .required(i18n.t('static.user.validrole')),
         languageId: Yup.string()
             .required(i18n.t('static.user.validlanguage')),
         emailId: Yup.string()
             .email(i18n.t('static.user.invalidemail'))
             .required(i18n.t('static.user.validemail')),
+        // phoneNumber: Yup.string()
+        //     .min(4, i18n.t('static.user.validphonemindigit'))
+        //     .max(15, i18n.t('static.user.validphonemaxdigit'))
+        //     .matches(/^[0-9]*$/, i18n.t('static.user.validnumber'))
+        //     .required(i18n.t('static.user.validphone')),
+
+        needPhoneValidation: Yup.boolean(),
         phoneNumber: Yup.string()
-            .min(4, i18n.t('static.user.validphonemindigit'))
-            .max(15, i18n.t('static.user.validphonemaxdigit'))
-            .matches(/^[0-9]*$/, i18n.t('static.user.validnumber'))
-            .required(i18n.t('static.user.validphone'))
+            .when("needPhoneValidation", {
+                is: val => {
+                    return document.getElementById("needPhoneValidation").value === "true";
+
+                },
+                then: Yup.string().min(4, i18n.t('static.user.validphonemindigit'))
+                    .max(15, i18n.t('static.user.validphonemaxdigit'))
+                    .matches(/^[0-9]*$/, i18n.t('static.user.validnumber'))
+                    .required(i18n.t('static.user.validphone')),
+                otherwise: Yup.string().notRequired()
+            }),
     })
 }
 
@@ -86,6 +121,8 @@ class AddUserComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            showRealmValidation: false,
+            appAdminRole: false,
             lang: localStorage.getItem('lang'),
             realms: [],
             languages: [],
@@ -101,7 +138,7 @@ class AddUserComponent extends Component {
                 emailId: '',
                 phoneNumber: '',
             },
-            loading: false,
+            loading: true,
             roleId: '',
             roleList: [],
             message: '',
@@ -111,12 +148,42 @@ class AddUserComponent extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.roleChange = this.roleChange.bind(this);
+        this.realmChange = this.realmChange.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
     hideSecondComponent() {
+        document.getElementById('div2').style.display = 'block';
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 8000);
+    }
+    realmChange() {
+        let { user } = this.state;
+        let count = 0;
+        let count1 = 0;
+        console.log("roles---", this.state.user.roles);
+        for (var i = 0; i < this.state.user.roles.length; i++) {
+            if (this.state.user.roles[i] != 'ROLE_APPLICATION_ADMIN') {
+                count++;
+            } else {
+                count1++;
+            }
+        }
+        if (count > 0) {
+            this.setState({
+                showRealmValidation: (this.state.user.realm.realmId != '' ? false : true)
+            },
+                () => { });
+
+            document.getElementById("showRealm").value = true;
+        } else {
+            this.setState({
+                showRealmValidation: false
+            },
+                () => { });
+
+            document.getElementById("showRealm").value = false;
+        }
     }
 
     dataChange(event) {
@@ -133,6 +200,7 @@ class AddUserComponent extends Component {
 
         if (event.target.name == "realmId") {
             user.realm.realmId = event.target.value;
+
         }
         if (event.target.name == "languageId") {
             user.language.languageId = event.target.value;
@@ -146,22 +214,48 @@ class AddUserComponent extends Component {
     roleChange(roleId) {
         let { user } = this.state;
         let count = 0;
+        let count1 = 0;
         this.setState({ roleId });
         var roleIdArray = [];
         for (var i = 0; i < roleId.length; i++) {
             roleIdArray[i] = roleId[i].value;
-            if (roleId[i].value != 'ROLE_APPL_ADMIN') {
+            if (roleId[i].value != 'ROLE_APPLICATION_ADMIN') {
                 count++;
                 // showRealm
-
+            } else {
+                count1++;
             }
         }
+
         if (count > 0) {
+            this.setState({
+                showRealmValidation: (this.state.user.realm.realmId != '' ? false : true)
+            },
+                () => { });
             document.getElementById("showRealm").value = true;
+            if (count1 > 0) {
+                this.setState({
+                    appAdminRole: true
+                })
+                document.getElementById("roleValid").value = true;
+            } else {
+                this.setState({
+                    appAdminRole: false
+                })
+                document.getElementById("roleValid").value = false;
+            }
         } else {
+            this.setState({
+                showRealmValidation: false,
+                appAdminRole: false
+            },
+                () => { console.log("show--------------" + this.state.showRealmValidation) });
+            console.log("inside else");
             document.getElementById("showRealm").value = false;
+            document.getElementById("roleValid").value = false;
         }
         user.roles = roleIdArray;
+
         this.setState({
             user,
             validateRealm: (count > 0 ? true : false)
@@ -202,11 +296,11 @@ class AddUserComponent extends Component {
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        languages: response.data
+                        languages: response.data, loading: false
                     })
                 } else {
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode, loading: false
                     },
                         () => {
                             this.hideSecondComponent();
@@ -216,7 +310,7 @@ class AddUserComponent extends Component {
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
+                        this.setState({ message: error.message, loading: false });
                     } else {
                         switch (error.response ? error.response.status : "") {
                             case 500:
@@ -224,10 +318,10 @@ class AddUserComponent extends Component {
                             case 404:
                             case 406:
                             case 412:
-                                this.setState({ message: error.response.data.messageCode });
+                                this.setState({ message: error.response.data.messageCode, loading: false });
                                 break;
                             default:
-                                this.setState({ message: 'static.unkownError' });
+                                this.setState({ message: 'static.unkownError', loading: false });
                                 break;
                         }
                     }
@@ -238,21 +332,21 @@ class AddUserComponent extends Component {
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        realms: response.data
+                        realms: response.data, loading: false
                     })
-                }else{
+                } else {
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode, loading: false
                     },
                         () => {
                             this.hideSecondComponent();
                         })
                 }
-                
+
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
+                        this.setState({ message: error.message, loading: false });
                     } else {
                         switch (error.response ? error.response.status : "") {
                             case 500:
@@ -260,10 +354,10 @@ class AddUserComponent extends Component {
                             case 404:
                             case 406:
                             case 412:
-                                this.setState({ message: error.response.data.messageCode });
+                                this.setState({ message: error.response.data.messageCode, loading: false });
                                 break;
                             default:
-                                this.setState({ message: 'static.unkownError' });
+                                this.setState({ message: 'static.unkownError', loading: false });
                                 break;
                         }
                     }
@@ -278,21 +372,22 @@ class AddUserComponent extends Component {
                         roleList[i] = { value: response.data[i].roleId, label: getLabelText(response.data[i].label, this.state.lang) }
                     }
                     this.setState({
-                        roleList
+                        roleList,
+                        loading: false
                     })
-                }else{
+                } else {
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode, loading: false
                     },
                         () => {
                             this.hideSecondComponent();
                         })
                 }
-               
+
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
+                        this.setState({ message: error.message, loading: false });
                     } else {
                         switch (error.response ? error.response.status : "") {
                             case 500:
@@ -300,10 +395,10 @@ class AddUserComponent extends Component {
                             case 404:
                             case 406:
                             case 412:
-                                this.setState({ message: error.response.data.messageCode });
+                                this.setState({ message: error.response.data.messageCode, loading: false });
                                 break;
                             default:
-                                this.setState({ message: 'static.unkownError' });
+                                this.setState({ message: 'static.unkownError', loading: false });
                                 break;
                         }
                     }
@@ -336,13 +431,19 @@ class AddUserComponent extends Component {
 
         return (
             <div className="animated fadeIn">
-                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
+                }} />
+                <h5 style={{ color: "red" }} id="div2">
+                    {i18n.t(this.state.message, { entityname })}</h5>
                 <Row style={{ display: this.state.loading ? "none" : "block" }}>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
-                            <CardHeader>
+                            {/* <CardHeader>
                                 <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
-                            </CardHeader>
+                            </CardHeader> */}
                             <Formik
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
@@ -350,14 +451,18 @@ class AddUserComponent extends Component {
                                     this.setState({
                                         loading: true
                                     })
-                                    // console.log(JSON.stringify(this.state.user))
+                                    console.log("user object--->>>>", this.state.user)
+                                    this.setState({
+                                        message: ''
+                                    })
+                                    console.log("user object---------------------", this.state.user);
                                     UserService.addNewUser(this.state.user)
                                         .then(response => {
                                             if (response.status == 200) {
-                                                this.props.history.push(`/user/listUser/`+ 'green/'  + i18n.t(response.data.messageCode, { entityname }))
+                                                this.props.history.push(`/user/listUser/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
-                                                    message: response.data.messageCode
+                                                    message: response.data.messageCode, loading: false
                                                 },
                                                     () => {
                                                         this.hideSecondComponent();
@@ -365,29 +470,6 @@ class AddUserComponent extends Component {
                                             }
 
                                         })
-                                        .catch(
-                                            error => {
-                                                this.setState({ loading: false });
-                                                if (error.message === "Network Error") {
-                                                    this.setState({ message: error.message });
-                                                } else {
-                                                    switch (error.response ? error.response.status : "") {
-                                                        case 500:
-                                                        case 401:
-                                                        case 404:
-                                                        case 406:
-                                                        case 412:
-                                                            this.setState({ message: error.response.data.messageCode });
-                                                            break;
-                                                        default:
-                                                            this.setState({ message: 'static.unkownError' });
-                                                            break;
-                                                    }
-                                                }
-                                            }
-                                        );
-
-
                                 }}
                                 render={
                                     ({
@@ -400,15 +482,30 @@ class AddUserComponent extends Component {
                                         isSubmitting,
                                         isValid,
                                         setTouched,
-                                        handleReset
+                                        handleReset,
+                                        setFieldValue,
+                                        setFieldTouched
                                     }) => (
                                             <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='userForm'>
-                                                <CardBody>
+                                                <CardBody className="pt-2 pb-0">
                                                     <Input
                                                         type="hidden"
                                                         name="showRealm"
                                                         id="showRealm"
                                                     />
+                                                    <Input
+                                                        type="hidden"
+                                                        name="roleValid"
+                                                        id="roleValid"
+                                                    />
+
+                                                    <Input
+                                                        type="hidden"
+                                                        name="needPhoneValidation"
+                                                        id="needPhoneValidation"
+                                                        value={(this.state.user.phoneNumber === '' ? false : true)}
+                                                    />
+
                                                     <FormGroup>
                                                         <Label htmlFor="realmId">{i18n.t('static.realm.realm')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
@@ -416,14 +513,16 @@ class AddUserComponent extends Component {
                                                             name="realmId"
                                                             id="realmId"
                                                             bsSize="sm"
-                                                            valid={!errors.realmId && this.state.user.realm.realmId != ''}
-                                                            invalid={touched.realmId && !!errors.realmId}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            // valid={!errors.realmId && !this.state.showRealmValidation && this.state.user.realm.realmId != ''}
+                                                            // invalid={(touched.realmId && !!errors.realmId) || this.state.showRealmValidation}
+                                                            valid={!errors.realmId && this.state.user.realm.realmId != '' && this.state.showRealmValidation === false}
+                                                            invalid={(touched.realmId && !!errors.realmId) || this.state.showRealmValidation === true}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.realmChange(e) }}
                                                             onBlur={handleBlur}
                                                             required
                                                             value={this.state.user.realm.realmId}
                                                         >
-                                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                                            <option value="">{i18n.t('static.common.select')}</option>
                                                             {realmList}
                                                         </Input>
                                                         <FormFeedback className="red">{errors.realmId}</FormFeedback>
@@ -458,7 +557,7 @@ class AddUserComponent extends Component {
                                                         <FormFeedback className="red">{errors.emailId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="phoneNumber">{i18n.t('static.user.phoneNumber')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Label for="phoneNumber">{i18n.t('static.user.phoneNumber')}</Label>
                                                         <Input type="text"
                                                             name="phoneNumber"
                                                             id="phoneNumber"
@@ -471,14 +570,20 @@ class AddUserComponent extends Component {
                                                             value={this.state.user.phoneNumber}
                                                         /><FormFeedback className="red">{errors.phoneNumber}</FormFeedback>
                                                     </FormGroup>
-                                                    <FormGroup>
+                                                    <FormGroup className="Selectcontrol-bdrNone">
                                                         <Label htmlFor="roleId">{i18n.t('static.role.role')}<span class="red Reqasterisk">*</span></Label>
                                                         <Select
-                                                            valid={!errors.roleId}
+                                                            className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                                { 'is-valid': !errors.roleId && this.state.user.roles.length != 0 },
+                                                                { 'is-invalid': (touched.roleId && !!errors.roleId || this.state.appAdminRole) }
+                                                            )}
                                                             bsSize="sm"
-                                                            invalid={touched.roleId && !!errors.roleId}
-                                                            onChange={(e) => { handleChange(e); this.roleChange(e) }}
-                                                            onBlur={handleBlur}
+                                                            onChange={(e) => {
+                                                                handleChange(e);
+                                                                setFieldValue("roleId", e);
+                                                                this.roleChange(e);
+                                                            }}
+                                                            onBlur={() => setFieldTouched("roleId", true)}
                                                             name="roleId"
                                                             id="roleId"
                                                             multi
@@ -486,30 +591,8 @@ class AddUserComponent extends Component {
                                                             min={1}
                                                             options={this.state.roleList}
                                                             value={this.state.roleId}
-                                                            error={errors.roleId}
-                                                            touched={touched.roleId}
                                                         />
-                                                        {!!this.props.error &&
-                                                            this.props.touched && (
-                                                                <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
-                                                            )}
-                                                        {/* <Input
- type="select"
- name="roleId"
- id="roleId"
- bsSize="sm"
- valid={!errors.roleId}
- invalid={touched.roleId && !!errors.roleId}
- onChange={(e) => { handleChange(e); this.dataChange(e) }}
- onBlur={handleBlur}
- required
- value={this.state.user.roles}
- multiple={true}
- >
- <option value="" disabled>{i18n.t('static.common.select')}</option>
- {roleList}
- </Input> */}
-                                                        {/* <FormFeedback>{errors.roleId}</FormFeedback> */}
+                                                        <FormFeedback className="red">{errors.roleId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="languageId">{i18n.t('static.language.language')}<span class="red Reqasterisk">*</span></Label>
@@ -537,7 +620,7 @@ class AddUserComponent extends Component {
                                                         <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
 
- &nbsp;
+                                                        &nbsp;
  </FormGroup>
                                                 </CardFooter>
                                             </Form>

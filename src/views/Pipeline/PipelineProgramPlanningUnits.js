@@ -1,20 +1,21 @@
-import React, { Component } from 'react';
 import jexcel from 'jexcel';
+import React, { Component } from 'react';
 import "../../../node_modules/jexcel/dist/jexcel.css";
 import PipelineService from '../../api/PipelineService.js';
-import AuthenticationService from '../Common/AuthenticationService.js';
-import PlanningUnitService from '../../api/PlanningUnitService'
-import i18n from '../../i18n';
+import PlanningUnitService from '../../api/PlanningUnitService';
 import ProductCategoryServcie from '../../api/PoroductCategoryService.js';
-import { textFilter } from 'react-bootstrap-table2-filter';
-import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
-
+import { jExcelLoadedFunction, jExcelLoadedFunctionPipeline } from '../../CommonComponent/JExcelCommonFunctions.js';
+import i18n from '../../i18n';
+import AuthenticationService from '../Common/AuthenticationService.js';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 export default class PipelineProgramPlanningUnits extends Component {
     constructor(props) {
         super(props);
         this.state = {
             planningUnitList: [],
             mapPlanningUnitEl: '',
+            loading: true,
+            productCategoryList: []
         }
         this.loaded = this.loaded.bind(this);
         this.changed = this.changed.bind(this);
@@ -26,7 +27,23 @@ export default class PipelineProgramPlanningUnits extends Component {
     dropdownFilter = function (instance, cell, c, r, source) {
         var mylist = [];
         var value = (instance.jexcel.getJson()[r])[c - 1];
-        var puList = (this.state.activePlanningUnitList).filter(c => c.forecastingUnit.productCategory.id == value);
+
+        var puList = []
+        if (value != -1) {
+            console.log("in if=====>");
+            var pc = this.state.productCategoryList.filter(c => c.payload.productCategoryId == value)[0]
+            var pcList = this.state.productCategoryList.filter(c => c.payload.productCategoryId == pc.payload.productCategoryId || c.parentId == pc.id);
+            var pcIdArray = [];
+            for (var pcu = 0; pcu < pcList.length; pcu++) {
+                pcIdArray.push(pcList[pcu].payload.productCategoryId);
+            }
+            puList = (this.state.activePlanningUnitList).filter(c => pcIdArray.includes(c.forecastingUnit.productCategory.id) && c.active.toString() == "true");
+        } else {
+            console.log("in else=====>");
+            puList = this.state.activePlanningUnitList
+        }
+
+        // var puList = (this.state.activePlanningUnitList).filter(c => c.forecastingUnit.productCategory.id == value);
 
         for (var k = 0; k < puList.length; k++) {
             var planningUnitJson = {
@@ -55,12 +72,34 @@ export default class PipelineProgramPlanningUnits extends Component {
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, (list[y].pipelineProductName).concat(" Does not exist."));
             }
+            var col = ("K").concat(parseInt(y) + 1);
+            var value = (this.el.getRowData(y)[10]).toString();
+
+            if (value != "" && value > 0) {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            }
+            var col = ("M").concat(parseInt(y) + 1);
+            var value = (this.el.getRowData(y)[12]).toString();
+
+            if (value != "" && value > 0) {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            }
         }
 
     }
 
     changed = function (instance, cell, x, y, value) {
-
+        //Prodct category
         if (x == 2) {
             var col = ("C").concat(parseInt(y) + 1);
             if (value == "") {
@@ -75,7 +114,7 @@ export default class PipelineProgramPlanningUnits extends Component {
             instance.jexcel.setValue(columnName, '');
         }
 
-
+        //Planning Unit
         if (x == 3) {
             var json = this.el.getJson();
             var col = ("D").concat(parseInt(y) + 1);
@@ -102,7 +141,8 @@ export default class PipelineProgramPlanningUnits extends Component {
             // instance.jexcel.setValue(columnName, '');
         }
         if (x == 4) {
-            var reg = /^[0-9\b]+$/;
+            //var reg = /^[0-9\b]+$/;
+            var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
             var col = ("E").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -119,6 +159,7 @@ export default class PipelineProgramPlanningUnits extends Component {
                 }
             }
         }
+        //Reorder frequency in months
         if (x == 5) {
             var reg = /^[0-9\b]+$/;
             var col = ("F").concat(parseInt(y) + 1);
@@ -137,11 +178,130 @@ export default class PipelineProgramPlanningUnits extends Component {
                 }
             }
         }
+        //Min month of stock
+        if (x == 6) {
+            var reg = /^[0-9\b]+$/;
+            var col = ("G").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+        }
+        //Months In Future For AMC
+        if (x == 7) {
+            var reg = /^[0-9\b]+$/;
+            var col = ("H").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+        }
+        //Months In Past For AMC
+        if (x == 8) {
+            var reg = /^[0-9\b]+$/;
+            var col = ("I").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+        }
+        //Local Procurment Lead Time
+        if (x == 10) {
+            var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
+            var col = ("K").concat(parseInt(y) + 1);
+            console.log('value=>', value)
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if (isNaN(parseInt(value)) || !(reg.test(value) || value < 0)) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+        }
+        //Shelf Life
+        if (x == 11) {
+            var reg = /^[0-9\b]+$/;
+            var col = ("L").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+        }
+        //Catalog Price
+        if (x == 12) {
+            // var reg = /^[0-9]+.[0-9]+$/;
+            var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
+            var col = ("M").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if (isNaN(parseInt(value)) || !(reg.test(value) || value < 0)) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+        }
+
     }
 
     checkValidation() {
 
         var reg = /^[0-9\b]+$/;
+        var regDec = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
+
         var valid = true;
         var json = this.el.getJson();
         for (var y = 0; y < json.length; y++) {
@@ -175,16 +335,16 @@ export default class PipelineProgramPlanningUnits extends Component {
                     }
                 }
             }
-            var reg = /^[0-9\b]+$/;
+
             var col = ("E").concat(parseInt(y) + 1);
             var value = this.el.getValueFromCoords(4, y);
-            if (value == "") {
+            if (value === "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                 valid = false;
             } else {
-                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                if (isNaN(parseInt(value)) || !(regDec.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -193,9 +353,8 @@ export default class PipelineProgramPlanningUnits extends Component {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
                 }
+
             }
-
-
             var reg = /^[0-9\b]+$/;
             var col = ("F").concat(parseInt(y) + 1);
             var value = this.el.getValueFromCoords(5, y);
@@ -215,6 +374,131 @@ export default class PipelineProgramPlanningUnits extends Component {
                     this.el.setComments(col, "");
                 }
             }
+
+
+            var reg = /^[0-9\b]+$/;
+            var col = ("G").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(6, y);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+
+            var reg = /^[0-9\b]+$/;
+            var col = ("H").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(7, y);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+
+            var reg = /^[0-9\b]+$/;
+            var col = ("I").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(8, y);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+
+            //Local procurement lead time
+            var col = ("K").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(10, y);
+            if (value === "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                if (isNaN(parseInt(value)) || !(regDec.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+
+            }
+
+            var col = ("L").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(11, y);
+            if (value === "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                if (isNaN(parseInt(value)) || !(regDec.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+
+            }
+
+            var col = ("M").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(12, y);
+            if (value === "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                if (isNaN(parseInt(value)) || !(regDec.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+
+            }
+
+
+
 
         }
         return valid;
@@ -237,19 +521,26 @@ export default class PipelineProgramPlanningUnits extends Component {
                 // pipelineId: {
                 //     id: this.props.pipelineId
                 // },
-                // active: true,
+                active: map.get("13"),
                 program: {
                     id: 0
                 },
                 planningUnitId: planningUnitId,
-                reorderFrequencyInMonths: map.get("4"),
-                minMonthsOfStock: map.get("5"),
-                programPlanningUnitId: map.get("6"),
-                localProcurmentLeadTime:map.get("7")
-                
+                multiplier: map.get("4"),
+                reorderFrequencyInMonths: map.get("5"),
+                minMonthsOfStock: map.get("6"),
+                monthsInFutureForAmc: map.get("7"),
+                monthsInPastForAmc: map.get("8"),
+                programPlanningUnitId: map.get("9"),
+                localProcurmentLeadTime: map.get("10") == '' ? null : map.get("10"),
+                shelfLife: map.get("11"),
+                catalogPrice: map.get("12") == '' ? null : map.get("12")
+
+
             }
             planningUnitArray.push(planningUnitJson);
         }
+        console.log("planning unit array====>", planningUnitArray);
         return planningUnitArray;
 
     }
@@ -275,14 +566,25 @@ export default class PipelineProgramPlanningUnits extends Component {
                     }
                     console.log("ind", indendent);
                     console.log("indendent.concat(response.data[k].payload.label.label_en)-->", indendent.concat(response.data[k].payload.label.label_en));
-                    var productCategoryJson = {
-                        name: indendent.concat(response.data[k].payload.label.label_en),
-                        id: response.data[k].payload.productCategoryId
+
+
+                    var productCategoryJson = {};
+                    if (response.data[k].payload.productCategoryId == 0) {
+                        productCategoryJson = {
+                            name: (response.data[k].payload.label.label_en),
+                            id: -1
+                        }
+                    } else {
+                        productCategoryJson = {
+                            name: (response.data[k].payload.label.label_en),
+                            id: response.data[k].payload.productCategoryId
+                        }
                     }
+
                     productCategoryList.push(productCategoryJson);
 
                 }
-
+                this.setState({ productCategoryList: response.data });
                 console.log("category response---->", productCategoryList);
 
 
@@ -297,7 +599,7 @@ export default class PipelineProgramPlanningUnits extends Component {
                             this.setState({ activePlanningUnitList: response.data });
                             for (var k = 0; k < (response.data).length; k++) {
                                 var planningUnitJson = {
-                                    name: response.data[k].label.label_en,
+                                    name: response.data[k].label.label_en + ' ~ ' + response.data[k].planningUnitId,
                                     id: response.data[k].planningUnitId
                                 }
                                 planningUnitListQat.push(planningUnitJson);
@@ -316,6 +618,8 @@ export default class PipelineProgramPlanningUnits extends Component {
                                             //seting this for loaded function
                                             this.setState({ planningUnitList: planningUnitList });
                                             //seting this for loaded function
+                                            console.log("planning Unit list==>",planningUnitList);
+                                        
                                             if (planningUnitList.length != 0) {
                                                 for (var j = 0; j < planningUnitList.length; j++) {
                                                     data = [];
@@ -323,12 +627,36 @@ export default class PipelineProgramPlanningUnits extends Component {
                                                     data[0] = planningUnitList[j].pipelineProductCategoryName;
                                                     data[1] = planningUnitList[j].pipelineProductName;
 
-                                                    data[2] = planningUnitList[j].productCategoryId;
+                                                    if(planningUnitList[j].productCategoryId==0){
+                                                        data[2] = -1;
+                                                    }else{
+                                                        data[2] = planningUnitList[j].productCategoryId;
+                                                    }
                                                     data[3] = planningUnitList[j].planningUnitId;
-                                                    data[4] = planningUnitList[j].reorderFrequencyInMonths;
-                                                    data[5] = planningUnitList[j].minMonthsOfStock;
-                                                    data[6] = planningUnitList[j].programPlanningUnitId
-                                                    data[7] = planningUnitList[j].localProcurmentLeadTime
+                                                    data[4] = planningUnitList[j].multiplier
+                                                    data[5] = planningUnitList[j].reorderFrequencyInMonths;
+                                                    data[6] = planningUnitList[j].minMonthsOfStock;
+                                                    if (planningUnitList[j].monthsInFutureForAmc == 0) {
+                                                        data[7] = this.props.items.program.monthsInFutureForAmc;
+                                                    } else {
+                                                        data[7] = planningUnitList[j].monthsInFutureForAmc;
+                                                    }
+                                                    if (planningUnitList[j].monthsInPastForAmc == 0) {
+                                                        data[8] = this.props.items.program.monthsInPastForAmc;
+                                                    } else {
+                                                        data[8] = planningUnitList[j].monthsInPastForAmc;
+                                                    }
+
+                                                    data[9] = planningUnitList[j].programPlanningUnitId
+
+                                                    data[10] = planningUnitList[j].localProcurmentLeadTime == -1 ? '' : planningUnitList[j].localProcurmentLeadTime
+                                                    if (planningUnitList[j].shelfLife == 0) {
+                                                        data[11] = this.props.items.program.shelfLife;
+                                                    } else {
+                                                        data[11] = planningUnitList[j].shelfLife
+                                                    }
+                                                    data[12] = planningUnitList[j].catalogPrice == -1 ? '' : planningUnitList[j].catalogPrice
+                                                    data[13] = planningUnitList[j].active
                                                     productDataArr.push(data);
 
                                                 }
@@ -344,55 +672,80 @@ export default class PipelineProgramPlanningUnits extends Component {
                                             var options = {
                                                 data: data,
                                                 columnDrag: true,
-                                                colWidths: [290, 290, 290, 290, 170, 170],
+                                                colWidths: [160, 190, 190, 190, 80, 80, 80, 80, 80, 80, 120, 120, 80, 80],
                                                 columns: [
 
                                                     {
-                                                        title: 'Pipeline Product Category',
+                                                        title: i18n.t('static.pipeline.pplnproductcategory'),
                                                         type: 'text',
-                                                        readonly: true
+                                                        readOnly: true
                                                     }, {
-                                                        title: 'Pipeline Product',
+                                                        title: i18n.t('static.pipeline.pplnproduct'),
                                                         type: 'text',
-                                                        readonly: true
+                                                        readOnly: true
                                                     },
                                                     {
-                                                        title: 'Product Category',
+                                                        title: i18n.t('static.product.productcategory'),
                                                         type: 'dropdown',
                                                         source: productCategoryList,
                                                         // filter: this.dropdownFilter
                                                     },
                                                     {
-                                                        title: 'Planning Unit',
+                                                        title: i18n.t('static.planningunit.planningunit'),
                                                         type: 'autocomplete',
                                                         source: planningUnitListQat,
                                                         filter: this.dropdownFilter
                                                     },
                                                     {
-                                                        title: 'Reorder frequency in months',
+                                                        title: i18n.t('static.unit.multiplier'),
                                                         type: 'number',
 
                                                     },
                                                     {
-                                                        title: 'Min month of stock',
+                                                        title: i18n.t('static.program.reorderFrequencyInMonths'),
+                                                        type: 'number',
+
+                                                    },
+                                                    {
+                                                        title: i18n.t('static.supplyPlan.minStockMos'),
                                                         type: 'number'
                                                     },
                                                     {
-                                                        title: 'Pipeline Product Id',
+                                                        title: i18n.t('static.report.mosfuture'),
+                                                        type: 'number'
+                                                    },
+                                                    {
+                                                        title: i18n.t('static.report.mospast'),
+                                                        type: 'number'
+                                                    },
+                                                    {
+                                                        title: i18n.t('static.report.id'),
                                                         type: 'hidden'
                                                     },
                                                     {
-                                                        title: 'Local Procurment Lead Time',
+                                                        title: i18n.t('static.pipeline.localprocurementleadtime'),
                                                         type: 'number',
-
                                                     },
+                                                    {
+                                                        title: i18n.t('static.report.shelfLife'),
+                                                        type: 'number'
+                                                    },
+                                                    {
+                                                        title: i18n.t('static.procurementAgentPlanningUnit.catalogPrice'),
+                                                        type: 'number'
+                                                    },
+                                                    {
+                                                        title: i18n.t('static.common.status'),
+                                                        type: 'dropdown',
+                                                        source: [{ id: true, name: i18n.t('static.common.active') }, { id: false, name: i18n.t('static.common.disabled') }]
+                                                    }
                                                 ],
                                                 pagination: 10,
                                                 search: true,
                                                 columnSorting: true,
                                                 tableOverflow: true,
                                                 wordWrap: true,
-                                                // paginationOptions: [10, 25, 50, 100],
+                                                paginationOptions: [10, 25, 50],
                                                 // position: 'top',
                                                 allowInsertColumn: false,
                                                 allowManualInsertColumn: false,
@@ -400,8 +753,10 @@ export default class PipelineProgramPlanningUnits extends Component {
                                                 onchange: this.changed,
                                                 oneditionend: this.onedit,
                                                 copyCompatibility: true,
+                                                allowInsertRow: false,
                                                 text: {
-                                                    showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                                                    // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                                                    showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
                                                     show: '',
                                                     entries: '',
                                                 },
@@ -412,6 +767,9 @@ export default class PipelineProgramPlanningUnits extends Component {
                                             var elVar = jexcel(document.getElementById("mapPlanningUnit"), options);
                                             this.el = elVar;
                                             this.loaded();
+                                            this.setState({
+                                                loading: false
+                                            })
 
                                             // } else {
 
@@ -501,18 +859,18 @@ export default class PipelineProgramPlanningUnits extends Component {
                                             //         });
                                         }
                                     } else {
-                                        this.setState({ message: response.data.messageCode })
+                                        this.setState({ message: response.data.messageCode, loading: false })
                                     }
                                 });
 
                         } else {
-                            this.setState({ message: response.data.messageCode })
+                            this.setState({ message: response.data.messageCode, loading: false })
                         }
 
                     }).catch(
                         error => {
                             if (error.message === "Network Error") {
-                                this.setState({ message: error.message });
+                                this.setState({ message: error.message, loading: false });
                             } else {
                                 switch (error.response ? error.response.status : "") {
                                     case 500:
@@ -520,10 +878,10 @@ export default class PipelineProgramPlanningUnits extends Component {
                                     case 404:
                                     case 406:
                                     case 412:
-                                        this.setState({ message: error.response.data.messageCode });
+                                        this.setState({ message: error.response.data.messageCode, loading: false });
                                         break;
                                     default:
-                                        this.setState({ message: 'static.unkownError' });
+                                        this.setState({ message: 'static.unkownError', loading: false });
                                         break;
                                 }
                             }
@@ -537,16 +895,32 @@ export default class PipelineProgramPlanningUnits extends Component {
     }
 
     loadedJexcelCommonFunction = function (instance, cell, x, y, value) {
-        jExcelLoadedFunction(instance);
+        jExcelLoadedFunctionPipeline(instance, 0);
     }
 
     render() {
         return (
             <>
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
+                }} />
                 <h4 className="red">{this.props.message}</h4>
-                <div className="table-responsive" >
+                <div className="table-responsive" style={{ display: this.state.loading ? "none" : "block" }} >
 
                     <div id="mapPlanningUnit">
+                    </div>
+                </div>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
                     </div>
                 </div>
             </>

@@ -245,7 +245,7 @@ export default class AddProductCategory extends React.Component {
                 <Row>
                     <Col sm={12} md={8} style={{ flexBasis: 'auto' }}>
                         <Card>
-                            <CardHeader> <i className="icon-note"></i><strong>Add Product Category</strong></CardHeader>
+                            {/* <CardHeader> <i className="icon-note"></i><strong>Add Product Category</strong></CardHeader> */}
                             <CardBody>
                                 <FormGroup>
                                     <Row>

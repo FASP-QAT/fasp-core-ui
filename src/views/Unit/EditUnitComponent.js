@@ -9,6 +9,7 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import '../Forms/ValidationForms/ValidationForms.css';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { UNIT_LABEL_REGEX } from '../../Constants.js';
 
 let initialValues = {
     unit: ""
@@ -18,8 +19,11 @@ const validationSchema = function (values) {
     return Yup.object().shape({
 
         unitName: Yup.string()
+            .matches(UNIT_LABEL_REGEX, i18n.t('static.message.alphaspespacenumtext'))
             .required(i18n.t('static.unit.unittext')),
-        unitCode: Yup.string().required(i18n.t('static.unit.unitcodetext'))
+        unitCode: Yup.string()
+            .matches(UNIT_LABEL_REGEX, i18n.t('static.message.alphaspespacenumtext'))
+            .required(i18n.t('static.unit.unitcodetext'))
 
     })
 }
@@ -50,6 +54,7 @@ export default class EditUnitComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            loading: true,
             // unit: this.props.location.state.unit,
             unit: {
                 dimension: {
@@ -78,6 +83,10 @@ export default class EditUnitComponent extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.changeMessage = this.changeMessage.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.changeLoading = this.changeLoading.bind(this);
+    }
+    changeLoading(loading) {
+        this.setState({ loading: loading })
     }
     changeMessage(message) {
         this.setState({ message: message })
@@ -133,13 +142,13 @@ export default class EditUnitComponent extends Component {
         UnitService.getUnitById(this.props.match.params.unitId).then(response => {
             if (response.status == 200) {
                 this.setState({
-                    unit: response.data
+                    unit: response.data, loading: false
                 });
 
             }
             else {
                 this.setState({
-                    message: response.data.messageCode
+                    message: response.data.messageCode, loading: false
                 },
                     () => {
                         this.hideSecondComponent();
@@ -160,14 +169,14 @@ export default class EditUnitComponent extends Component {
     render() {
         return (
             <div className="animated fadeIn">
-                <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} />
+                <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} loading={this.changeLoading} />
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-                <Row>
+                <Row style={{ display: this.state.loading ? "none" : "block" }}>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
-                            <CardHeader>
+                            {/* <CardHeader>
                                 <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
-                            </CardHeader>
+                            </CardHeader> */}
                             <Formik
                                 enableReinitialize={true}
                                 initialValues={{
@@ -177,14 +186,17 @@ export default class EditUnitComponent extends Component {
                                 }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
+                                    this.setState({
+                                        loading: true
+                                    })
                                     AuthenticationService.setupAxiosInterceptors();
                                     UnitService.updateUnit(this.state.unit).then(response => {
                                         console.log(response)
                                         if (response.status == 200) {
-                                            this.props.history.push(`/unit/listUnit/`+ 'green/' + i18n.t(response.data.messageCode, { entityname }))
+                                            this.props.history.push(`/unit/listUnit/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                         } else {
                                             this.setState({
-                                                message: response.data.messageCode
+                                                message: response.data.messageCode, loading: false
                                             },
                                                 () => {
                                                     this.hideSecondComponent();
@@ -208,7 +220,7 @@ export default class EditUnitComponent extends Component {
                                         setTouched
                                     }) => (
                                             <Form onSubmit={handleSubmit} noValidate name='unitForm'>
-                                                <CardBody>
+                                                <CardBody className="pb-0">
                                                     <FormGroup>
                                                         <Label htmlFor="dimensionId">{i18n.t('static.dimension.dimension')}<span class="red Reqasterisk">*</span></Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
@@ -219,7 +231,7 @@ export default class EditUnitComponent extends Component {
                                                             name="dimensionId"
                                                             id="dimensionId"
                                                             valid={!errors.dimensionId}
-                                                            invalid={touched.dimensionId && !!errors.dimensionId}
+                                                            invalid={touched.dimensionId && !!errors.dimensionId || this.state.unit.dimension.dimensionId == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             readOnly={true}
@@ -238,7 +250,7 @@ export default class EditUnitComponent extends Component {
                                                             id="unitName"
                                                             bsSize="sm"
                                                             valid={!errors.unitName}
-                                                            invalid={touched.unitName && !!errors.unitName}
+                                                            invalid={touched.unitName && !!errors.unitName || this.state.unit.label.label_en == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.unit.label.label_en}
@@ -252,7 +264,7 @@ export default class EditUnitComponent extends Component {
                                                             id="unitCode"
                                                             bsSize="sm"
                                                             valid={!errors.unitCode}
-                                                            invalid={touched.unitCode && !!errors.unitCode}
+                                                            invalid={touched.unitCode && !!errors.unitCode || this.state.unit.unitCode == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             required
@@ -310,6 +322,17 @@ export default class EditUnitComponent extends Component {
                         </Card>
                     </Col>
                 </Row>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div>
                     <h6>{i18n.t(this.state.message)}</h6>
                     <h6>{i18n.t(this.props.match.params.message)}</h6>

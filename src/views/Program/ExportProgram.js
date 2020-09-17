@@ -13,12 +13,13 @@ import getLabelText from '../../CommonComponent/getLabelText.js';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME } from '../../Constants.js'
 import JSZip from 'jszip';
 import FileSaver from 'file-saver';
 import i18n from '../../i18n';
 import { getDatabase } from '../../CommonComponent/IndexedDbFunctions';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import AuthenticationService from '../Common/AuthenticationService';
 
 const initialValues = {
     programId: ''
@@ -54,7 +55,7 @@ const getErrorsFromValidationError = (validationError) => {
 }
 
 
-
+const entityname = i18n.t('static.dashboard.exportprogram')
 export default class ExportProgram extends Component {
 
     constructor(props) {
@@ -62,6 +63,8 @@ export default class ExportProgram extends Component {
         this.state = {
             programList: [],
             message: '',
+            selectProgramMessage: '',
+            loading: true,
         }
         this.formSubmit = this.formSubmit.bind(this)
         this.cancelClicked = this.cancelClicked.bind(this);
@@ -72,7 +75,7 @@ export default class ExportProgram extends Component {
         const lan = 'en'
         var db1;
         getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
             console.log("in success");
             db1 = e.target.result;
@@ -100,7 +103,8 @@ export default class ExportProgram extends Component {
             transaction.oncomplete = function (event) {
                 console.log("ProgramList", prgList)
                 this.setState({
-                    programList: prgList
+                    programList: prgList,
+                    loading: false
                 })
                 console.log("ProgramList", this.state.programList);
             }.bind(this)
@@ -108,43 +112,75 @@ export default class ExportProgram extends Component {
     }
 
     formSubmit() {
+        this.setState({ loading: true });
         var zip = new JSZip();
         var programId = this.state.programId;
         console.log("ProgramId", programId)
-        var db1;
-        var storeOS;
-        getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
-        openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-            var transaction = db1.transaction(['programData'], 'readwrite');
-            var program = transaction.objectStore('programData');
-            var getRequest = program.getAll();
-            getRequest.onerror = function (event) {
-                // Handle errors!
-            };
-            getRequest.onsuccess = function (event) {
-                var myResult = [];
-                myResult = getRequest.result;
-                for (var i = 0; i < myResult.length; i++) {
-                    for (var j = 0; j < programId.length; j++) {
-                        if (myResult[i].id == programId[j].value) {
-                            var txt = JSON.stringify(myResult[i]);
-                            var labelName = (programId[j].label).replace("/", "-")
-                            zip.file(labelName + "_" + parseInt(j + 1) + ".txt", txt);
+        if (programId != "" && programId != undefined) {
+            this.setState({
+                selectProgramMessage: ""
+            })
+            var db1;
+            var storeOS;
+            getDatabase();
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            openRequest.onsuccess = function (e) {
+                db1 = e.target.result;
+                var transaction = db1.transaction(['programData'], 'readwrite');
+                var program = transaction.objectStore('programData');
+                var getRequest = program.getAll();
+                getRequest.onerror = function (event) {
+                    // Handle errors!
+                };
+                getRequest.onsuccess = function (event) {
+                    var myResult = [];
+                    myResult = getRequest.result;
+                    var dTransaction = db1.transaction(['downloadedProgramData'], 'readwrite');
+                    var dProgram = dTransaction.objectStore('downloadedProgramData');
+                    var dGetRequest = dProgram.getAll();
+                    dGetRequest.onerror = function (event) {
+                        // Handle errors!
+                    };
+                    dGetRequest.onsuccess = function (event) {
+                        var dMyResult = [];
+                        dMyResult = dGetRequest.result;
+                        for (var i = 0; i < myResult.length; i++) {
+                            for (var j = 0; j < programId.length; j++) {
+                                if (myResult[i].id == programId[j].value) {
+                                    var txt = JSON.stringify(myResult[i]);
+                                    var dArray = dMyResult.filter(c => c.id == programId[j].value)[0];
+                                    var txt1 = JSON.stringify(dArray)
+                                    // var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                                    // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                                    var labelName = (programId[j].label).replace("/", "-")
+                                    // zip.file(labelName + "_" + parseInt(j + 1) + ".txt", programData);
+                                    console.log("Txt ", txt);
+                                    console.log("Txt 1", txt1);
+                                    zip.file(labelName + "_" + parseInt(j + 1) + ".txt",   txt + "@~-~@" + txt1  );
+                                }
+                            }
+                            if (i == myResult.length - 1) {
+                                zip.generateAsync({
+                                    type: "blob"
+                                }).then(function (content) {
+                                    FileSaver.saveAs(content, "download.zip");
+                                    let id = AuthenticationService.displayDashboardBasedOnRole();
+                                    this.setState({ loading: false });
+                                    this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.program.dataexportsuccess'))
+
+                                }.bind(this));
+                            }
                         }
-                    }
-                    if (i == myResult.length - 1) {
-                        zip.generateAsync({
-                            type: "blob"
-                        }).then(function (content) {
-                            FileSaver.saveAs(content, "download.zip");
-                            this.props.history.push(`/dashboard/` + i18n.t('static.program.dataexportsuccess'))
-                        }.bind(this));
-                    }
-                }
-            }.bind(this);
-        }.bind(this)
+                    }.bind(this);
+                }.bind(this)
+            }.bind(this)
+        } else {
+            console.log("in ekse")
+            this.setState({
+                selectProgramMessage: i18n.t('static.program.validselectprogramtext')
+            })
+            this.setState({ loading: false });
+        }
     }
 
     touchAll(setTouched, errors) {
@@ -172,6 +208,15 @@ export default class ExportProgram extends Component {
     }
 
     updateFieldData(value) {
+        if (value != "" && value != undefined) {
+            this.setState({
+                selectProgramMessage: ""
+            })
+        } else {
+            this.setState({
+                selectProgramMessage: i18n.t('static.program.validselectprogramtext')
+            })
+        }
         console.log("Value", value);
         // console.log(event.value)
         this.setState({ programId: value });
@@ -179,11 +224,14 @@ export default class ExportProgram extends Component {
 
     render() {
         return (
-            <>
+            <div className="animated fadeIn">
+                {/* <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5> */}
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
                 }} />
-                <Card>
+                <Card className="mt-2" style={{ display: this.state.loading ? "none" : "block" }}>
                     <Formik
                         initialValues={initialValues}
                         render={
@@ -194,10 +242,10 @@ export default class ExportProgram extends Component {
                                 handleBlur,
                             }) => (
                                     <Form noValidate name='simpleForm'>
-                                        <CardHeader>
+                                        {/* <CardHeader>
                                             <strong>{i18n.t('static.program.export')}</strong>
-                                        </CardHeader>
-                                        <CardBody>
+                                        </CardHeader> */}
+                                        <CardBody className="pb-lg-2 pt-lg-2">
                                             <FormGroup className="col-md-4" >
                                                 <Label htmlFor="select">{i18n.t('static.program.program')}</Label>
                                                 <Select
@@ -210,13 +258,14 @@ export default class ExportProgram extends Component {
                                                     options={this.state.programList}
                                                     value={this.state.programId}
                                                 />
-                                                <FormFeedback>{errors.programId}</FormFeedback>
+                                                <span className="red">{this.state.selectProgramMessage}</span>
                                             </FormGroup>
                                         </CardBody>
                                         <CardFooter>
                                             <FormGroup>
-                                                <Button type="reset" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+
                                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                 <Button type="button" size="md" color="success" className="float-right mr-1" onClick={() => this.formSubmit()}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                 &nbsp;
                                                 </FormGroup>
@@ -224,13 +273,24 @@ export default class ExportProgram extends Component {
                                     </Form>
                                 )} />
                 </Card>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
 
-            </>
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         )
     }
 
     cancelClicked() {
-        this.props.history.push(`/dashboard/` + i18n.t('static.program.actioncancelled'))
+        let id = AuthenticationService.displayDashboardBasedOnRole();
+        this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
     resetClicked() {

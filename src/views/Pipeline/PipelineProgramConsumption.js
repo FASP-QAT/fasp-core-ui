@@ -6,7 +6,10 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import DataSourceService from '../../api/DataSourceService.js';
 import PlanningUnitService from '../../api/PlanningUnitService';
 import moment from 'moment';
-
+import { jExcelLoadedFunction, jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunctionPipeline } from '../../CommonComponent/JExcelCommonFunctions';
+import { ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE, JEXCEL_DATE_FORMAT_WITHOUT_DATE } from '../../Constants';
+import RealmCountryService from '../../api/RealmCountryService';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 export default class PipelineProgramConsumption extends Component {
 
     constructor(props) {
@@ -15,14 +18,17 @@ export default class PipelineProgramConsumption extends Component {
         this.saveConsumption = this.saveConsumption.bind(this);
         this.changed = this.changed.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
+        this.state = {
+            loading:true
+        }
     }
 
     checkValidation() {
         var valid = true;
         var json = this.el.getJson();
         for (var y = 0; y < json.length; y++) {
-            var col = ("F").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(5, y);
+
+            var col = ("B").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -33,13 +39,45 @@ export default class PipelineProgramConsumption extends Component {
                 this.el.setComments(col, "");
             }
 
+            var col = ("C").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(2, y);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+            var reg = /^[0-9\b]+$/;
+            var col = ("G").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(6, y);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+
         }
         return valid;
     }
 
     changed = function (instance, cell, x, y, value) {
-        if (x == 5) {
-            var col = ("F").concat(parseInt(y) + 1);
+        if (x == 1) {
+            var json = this.el.getJson();
+            var col = ("B").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -49,6 +87,46 @@ export default class PipelineProgramConsumption extends Component {
                 this.el.setComments(col, "");
             }
         }
+        if (x == 2) {
+            var col = ("C").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+        }
+        if (x == 3) {
+            var col = ("D").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+        }
+        if (x == 6) {
+            var reg = /^[0-9\b]+$/;
+            var col = ("G").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+        }
 
     }
 
@@ -56,18 +134,45 @@ export default class PipelineProgramConsumption extends Component {
         var list = this.state.consumptionList;
         var json = this.el.getJson();
         for (var y = 0; y < json.length; y++) {
+
+            var value = (this.el.getRowData(y)[1]).toString();
+            var col = ("B").concat(parseInt(y) + 1);
+
+            if (value != "" && value > 0) {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            } else {
+                //valid = false;
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, (list[y].dataSourceId).concat(" Does not exist."));
+            }
             var map = new Map(Object.entries(json[y]));
-            var col = ("F").concat(parseInt(y) + 1);
-            var value = map.get("5");
+            var col = ("C").concat(parseInt(y) + 1);
+            var value = map.get("2");
             if (value != "" && !isNaN(parseInt(value))) {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
             } else {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, (list[map.get("8")].dataSourceId).concat(" Does not exist."));
+                this.el.setComments(col, (list[map.get("2")].regionId).concat(" Does not exist."));
             }
+            var col = ("D").concat(parseInt(y) + 1);
+            var value = map.get("3");
+            if (value != "" && !isNaN(parseInt(value))) {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                // this.el.setComments(col, (list[y].dataSourceId).concat(" Does not exist."));
+            }
+       
+
         }
+
 
     }
     saveConsumption() {
@@ -78,22 +183,25 @@ export default class PipelineProgramConsumption extends Component {
         for (var i = 0; i < json.length; i++) {
             var map = new Map(Object.entries(json[i]));
 
-            var dataSourceId = map.get("5");
+            var dataSourceId = map.get("1");
             if (dataSourceId != "" && !isNaN(parseInt(dataSourceId))) {
-                dataSourceId = map.get("5");
+                dataSourceId = map.get("1");
             } else {
-                dataSourceId = list[i].dataSourceId;
+                dataSourceId = list[map.get("1")].dataSourceId;
+
             }
 
             var consumptionJson = {
                 regionId: map.get("2"),
                 planningUnitId: map.get("0"),
-                consumptionDate: map.get("1"),
-                actualFlag: map.get("7"),
-                consumptionQty: map.get("3"),
-                dayOfStockOut: map.get("4"),
+                consumptionDate: map.get("5"),
+                actualFlag: map.get("9"),
+                consumptionQty: map.get("6"),
+                dayOfStockOut: map.get("7"),
                 dataSourceId: dataSourceId,
-                notes: map.get("6")
+                notes: map.get("8"),
+                realmCountryPlanningUnitId: map.get("3"),
+                multiplier: map.get("4")
             }
             consumptionArray.push(consumptionJson);
         }
@@ -114,11 +222,27 @@ export default class PipelineProgramConsumption extends Component {
                 }
                 regionList.push(regionJson);
             }
-
+            var realmCounryId = document.getElementById("realmCountryId").value;
+            AuthenticationService.setupAxiosInterceptors();
+            RealmCountryService.getRealmCountryPlanningUnitAllByrealmCountryId(realmCounryId).then(response => {
+                var realmCountryPlanningUnitList = [];
+    
+                this.setState({ realmCountryPlanningUnitList: response.data });
+                console.log("realmCountryPlanningUnitId====>", response.data);
+    
+                for (var i = 0; i < response.data.length; i++) {
+                    var rcpJson = {
+                        id: ((response.data)[i]).realmCountryPlanningUnitId,
+                        name: ((response.data)[i]).label.label_en
+                    }
+                    realmCountryPlanningUnitList.push(rcpJson);
+                }
+    
             AuthenticationService.setupAxiosInterceptors();
             DataSourceService.getActiveDataSourceList().then(response => {
                 // console.log("data source List ----->", response.data);
                 for (var j = 0; j < response.data.length; j++) {
+                    if(response.data[j].dataSourceType.id==ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE || response.data[j].dataSourceType.id==FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE)
                     var dataSourceJson = {
                         id: ((response.data)[j]).dataSourceId,
                         name: ((response.data)[j]).label.label_en
@@ -142,10 +266,10 @@ export default class PipelineProgramConsumption extends Component {
 
                         AuthenticationService.setupAxiosInterceptors();
                         PipelineService.getQatTempConsumptionById(this.props.pipelineId).then(response => {
-                            // console.log("temp consumpton list--->", response.data);
+                            console.log("temp consumpton list--->", response.data.length);
                             if (response.status == 200) {
 
-                                var data = [];
+                               
                                 var consumptionDataArr = [];
                                 var consumptionList = response.data;
 
@@ -155,24 +279,31 @@ export default class PipelineProgramConsumption extends Component {
 
                                 for (var j = 0; j < consumptionList.length; j++) {
                                     for (var cm = 0; cm < consumptionList[j].consNumMonth; cm++) {
-                                        data = [];
-                                        data[1] = moment(consumptionList[j].consumptionDate).add(cm,'months').format("YYYY-MM-DD");
-                                        data[2] = consumptionList[j].regionId;
-                                        data[3] = consumptionList[j].consumptionQty;
-                                        data[4] = consumptionList[j].dayOfStockOut;
-                                        data[5] = consumptionList[j].dataSourceId;
-                                        if (consumptionList[j].notes === null || consumptionList[j].notes === ' NULL') {
-                                            data[6] = '';
+                                       var data = [];
+                                        data[5] = moment(consumptionList[j].consumptionDate).add(cm, 'months').format("YYYY-MM-DD");
+                                        if (regionList.length == 1) {
+                                            data[2] = regionList[0].id;
                                         } else {
-                                            data[6] = consumptionList[j].notes;
+                                            data[2] = consumptionList[j].regionId;
+                                        };
+                                        // data[2] = consumptionList[j].regionId;
+                                        data[6] =(cm==0 || cm!=consumptionList[j].consNumMonth-1)? Math.ceil(consumptionList[j].consumptionQty/consumptionList[j].consNumMonth):Math.ceil(consumptionList[j].consumptionQty/consumptionList[j].consNumMonth)+(consumptionList[j].consumptionQty-((Math.ceil(consumptionList[j].consumptionQty/consumptionList[j].consNumMonth))*consumptionList[j].consNumMonth));
+                                        data[7] = consumptionList[j].dayOfStockOut;
+                                        data[1] = consumptionList[j].dataSourceId;
+                                        data[3] = consumptionList[j].realmCountryPlanningUnitId;
+                                        data[4] = consumptionList[j].multiplier
+                                        if (consumptionList[j].notes === null || consumptionList[j].notes === ' NULL') {
+                                            data[8] = '';
+                                        } else {
+                                            data[8] = consumptionList[j].notes;
                                         }
-                                        data[7] = consumptionList[j].actualFlag;
+                                        data[9] = consumptionList[j].actualFlag;
                                         data[0] = consumptionList[j].planningUnitId;
-                                        data[8] = j;
+                                        data[10] = j;
                                         consumptionDataArr.push(data);
                                     }
                                 }
-
+console.log('consumptionDataArr',consumptionDataArr)
                                 this.el = jexcel(document.getElementById("consumptiontableDiv"), '');
                                 this.el.destroy();
                                 var json = [];
@@ -182,42 +313,55 @@ export default class PipelineProgramConsumption extends Component {
                                 var options = {
                                     data: data,
                                     columnDrag: true,
-                                    colWidths: [200, 80, 90, 90, 80, 110, 150, 90],
+                                    colWidths: [150, 150, 150,150, 90, 90, 90, 90,150, 90],
                                     columns: [
                                         // { title: 'Month', type: 'text', readOnly: true },
                                         {
-                                            title: 'Planning Unit',
+                                            title: i18n.t('static.planningunit.planningunit'),
                                             type: 'dropdown',
                                             source: planningUnitListQat,
                                             readOnly: true
                                         },
-                                        {
-                                            title: 'Consumption Date',
-                                            type: 'calendar',
-                                            options: {
-                                                format: 'MM-YYYY'
-                                            }
-                                        },
-                                        {
-                                            title: i18n.t('static.inventory.region'),
-                                            type: 'dropdown',
-                                            source: regionList
-                                        },
-                                        {
-                                            title: i18n.t('static.consumption.consumptionqty'),
-                                            type: 'numeric'
-                                        },
-                                        {
-                                            title: i18n.t('static.consumption.daysofstockout'),
-                                            type: 'numeric'
-                                        },
+                                       
                                         {
                                             title: i18n.t('static.inventory.dataSource'),
                                             type: 'dropdown',
                                             source: dataSourceList
                                         },
                                         {
-                                            title: 'Notes',
+                                            title: i18n.t('static.inventory.region'),
+                                            type: 'dropdown',
+                                            source: regionList
+                                        }, {
+                                            title: i18n.t('static.planningunit.countrysku'),
+                                            type: 'dropdown',
+                                            source: realmCountryPlanningUnitList,
+                                            filter: this.dropdownFilter
+
+                                        },
+                                        {
+                                            title: i18n.t('static.unit.multiplier'),
+                                            type: 'text',
+                                            readonly: true
+                                        },
+                                        {
+                                            title: i18n.t('static.pipeline.consumptionDate'),
+                                            type: 'calendar',
+                                            options: {
+                                                format: JEXCEL_DATE_FORMAT_WITHOUT_DATE
+                                            }
+                                        },
+                                        {
+                                            title: i18n.t('static.consumption.consumptionqty'),
+                                            type: 'numeric',
+                                            mask:'###,###,###.##'
+                                        },
+                                        {
+                                            title: i18n.t('static.consumption.daysofstockout'),
+                                            type: 'numeric'
+                                        },
+                                        {
+                                            title: i18n.t('static.program.notes'),
                                             type: 'text'
                                         },
                                         {
@@ -226,7 +370,7 @@ export default class PipelineProgramConsumption extends Component {
                                             source: [{ id: true, name: i18n.t('static.consumption.actual') }, { id: false, name: i18n.t('static.consumption.forcast') }]
                                         },
 
-                                        { title: 'Index', type: 'hidden'},
+                                        { title: 'Index', type: 'hidden' },
                                         // { title: 'Last Modified date', type: 'text', readOnly: true },
                                         // { title: 'Last Modified by', type: 'text', readOnly: true }
                                     ],
@@ -240,13 +384,24 @@ export default class PipelineProgramConsumption extends Component {
                                     allowDeleteRow: false,
                                     onchange: this.changed,
                                     oneditionend: this.onedit,
+                                    allowInsertRow: false,
                                     copyCompatibility: true,
-                                    // paginationOptions: [10, 25, 50, 100],
-                                    position: 'top'
+                                    paginationOptions: [10, 25, 50],
+                                    position: 'top',
+                                    text: {
+                                        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
+                                        show: '',
+                                        entries: '',
+                                    },
+                                    onload: this.loadedJexcelCommonFunctionTwo,
                                 };
 
                                 this.el = jexcel(document.getElementById("consumptiontableDiv"), options);
                                 this.loaded();
+                                this.setState({
+                                    loading: false
+                                })
+
                             }
                             // else {
                             //     console.log("in else==================");
@@ -361,14 +516,35 @@ export default class PipelineProgramConsumption extends Component {
             });
 
         });
+    });
     }
+    loadedJexcelCommonFunctionTwo = function (instance, cell, x, y, value) {
+        jExcelLoadedFunctionPipeline(instance,0);
+    }
+
     render() {
         return (
             <>
+             <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
+                }} />
                 <h4 className="red">{this.props.message}</h4>
-                <div className="table-responsive" >
+                <div className="table-responsive" style={{ display: this.state.loading ? "none" : "block" }}>
 
                     <div id="consumptiontableDiv">
+                    </div>
+                </div>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
                     </div>
                 </div>
             </>

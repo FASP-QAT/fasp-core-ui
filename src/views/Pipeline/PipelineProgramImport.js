@@ -4,6 +4,7 @@ import i18n from '../../i18n';
 import PipelineService from "../../api/PipelineService.js";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import { confirmAlert } from 'react-confirm-alert';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 
 
 const entityname = i18n.t('static.dashboard.pipelineProgramImport');
@@ -13,6 +14,7 @@ export default class PipelineProgramImport extends Component {
         super(props);
         this.showPipelineProgramInfo = this.showPipelineProgramInfo.bind(this);
         this.state = {
+            loading: true,
             jsonText: '',
             message: ''
         }
@@ -34,7 +36,7 @@ export default class PipelineProgramImport extends Component {
 
         confirmAlert({
             title: i18n.t('static.program.confirmsubmit'),
-            message: 'Make sure that your program json file do not have  planning units with negative inventory ',
+            message: 'Please ensure you do not have negative inventory before you proceed.',
             buttons: [
                 {
                     label: i18n.t('static.program.yes'),
@@ -50,9 +52,12 @@ export default class PipelineProgramImport extends Component {
                                 console.log("messageCode-->", response.data.messageCode)
                                 if (response.status == 200) {
                                     this.props.history.push('/pipeline/pieplineProgramList/' + 'green/' + i18n.t('static.message.pipelineProgramImportSuccess'))
-                                } else {
+                                }
+                                else {
+                                    // alert("in else");
                                     this.setState({
-                                        message: i18n.t('static.program.errortext')
+                                        message: response.data.messageCode,
+                                        loading: false
                                     },
                                         () => {
                                             this.hideSecondComponent();
@@ -91,19 +96,24 @@ export default class PipelineProgramImport extends Component {
     render() {
         return (
             <div className="animated fadeIn">
-                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
+                }} />
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
                 {/* <h6></h6> */}
                 <Row>
                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                         <Card>
-                            <CardHeader>
+                            {/* <CardHeader>
                                 <strong>{i18n.t('static.program.import')}</strong>
-                            </CardHeader>
+                            </CardHeader> */}
                             <CardBody>
 
                                 <FormGroup id="fileImportDiv">
                                     <Col md="3">
-                                        <Label className="uploadfilelable" htmlFor="file-input">{i18n.t('static.program.fileinput')}</Label>
+                                        <Label className="uploadfilelable" htmlFor="file-input">{i18n.t('static.program.fileinputjson')}</Label>
                                     </Col>
                                     <Col xs="12" md="4">
                                         <Input
@@ -134,7 +144,7 @@ export default class PipelineProgramImport extends Component {
                                 <FormGroup>
 
                                     <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                    <Button type="reset" size="md" color="success" className="float-right mr-1"><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                    <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                     <Button onClick={this.showPipelineProgramInfo} type="button" id="formSubmitButton" size="md" color="success" className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                     &nbsp;
                                     </FormGroup>
@@ -147,5 +157,9 @@ export default class PipelineProgramImport extends Component {
     }
     cancelClicked() {
         this.props.history.push(`/pipeline/pieplineProgramList/` + 'red/' + i18n.t('static.message.cancelled', { entityname }));
+    }
+    resetClicked = () => {
+        const file = document.getElementById('file-input');
+        file.value = '';
     }
 }
