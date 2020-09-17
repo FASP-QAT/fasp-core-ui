@@ -870,12 +870,12 @@ class DefaultLayout extends Component {
                             name: i18n.t('static.dashboard.forecastingunit'),
                             url: '/forecastingUnit/listforecastingUnit',
                             icon: 'fa fa-line-chart',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_MANAGE_FORECASTING_UNIT') ? false : true) }
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECASTING_UNIT') ? false : true) }
                           }, {
                             name: i18n.t('static.dashboard.planningunit'),
                             url: '/planningUnit/listPlanningUnit',
                             icon: 'fa fa-list-alt',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_MANAGE_PLANNING_UNIT') ? false : true) }
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT') ? false : true) }
                           }, {
                             name: i18n.t('static.planningUnitVolumeHead.planningUnitVolume'),
                             url: '/planningUnitCapacity/listPlanningUnitcapacity',
@@ -925,7 +925,7 @@ class DefaultLayout extends Component {
                             name: i18n.t('static.dashboard.budget'),
                             url: '/budget/listBudget',
                             icon: 'fa fa-dollar',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_MANAGE_BUDGET') ? false : true) }
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_BUDGET') ? false : true) }
                           },
 
                           // {
@@ -963,7 +963,7 @@ class DefaultLayout extends Component {
                       {
                         name: i18n.t('static.pipeline.programData'),
                         icon: 'fa fa-list',
-                        attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_VIEW_PROGRAM_MASTERS') ? false : true) },
+                        attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_VIEW_PROGRAM_DATA') ? false : true) },
                         // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DOWNLOAD_PROGRAM') ? false : true) },
                         children: [
                           // {
@@ -1114,7 +1114,7 @@ class DefaultLayout extends Component {
                             name: i18n.t('static.report.stockStatusAccrossPlanningUnitGlobalView'),
                             url: '/report/stockStatusAccrossPlanningUnitGlobalView',
                             icon: 'fa fa-line-chart',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_GLOBAL_VIEW_REPORT') ? false : true) }
                           },
                           {
                             name: i18n.t('static.report.stockAdjustment'),
@@ -1203,7 +1203,7 @@ class DefaultLayout extends Component {
                             name: i18n.t('static.dashboard.shipmentGlobalViewheader'),
                             url: '/report/shipmentGlobalView',
                             icon: 'fa fa-wpforms',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_GLOBAL_DEMAND_REPORT') ? false : true) }
                           },
                           {
                             name: i18n.t('static.report.expiredInventory'),

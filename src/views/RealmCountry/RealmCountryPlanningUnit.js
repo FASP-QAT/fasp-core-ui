@@ -255,6 +255,19 @@ class PlanningUnitCountry extends Component {
                                                     }
 
                                                 ],
+                                                updateTable: function (el, cell, x, y, source, value, id) {
+                                                    var elInstance = el.jexcel;
+                                                    var rowData = elInstance.getRowData(y);
+                                                    var realmCountryPlanningUnitId = rowData[8];
+                                                    if(realmCountryPlanningUnitId==0){
+                                                        var cell = elInstance.getCell(`B${parseInt(y) + 1}`)
+                                                        cell.classList.remove('readonly');
+                                                    }else{
+                                                        var cell = elInstance.getCell(`B${parseInt(y) + 1}`)
+                                                        cell.classList.add('readonly');
+                                                    }
+                                                    
+                                                },
                                                 pagination: 10,
                                                 search: true,
                                                 columnSorting: true,
@@ -270,6 +283,7 @@ class PlanningUnitCountry extends Component {
                                                 onfocus: this.focus,
                                                 oneditionend: this.onedit,
                                                 copyCompatibility: true,
+                                                allowManualInsertRow: false,
                                                 text: {
                                                     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
                                                     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
@@ -388,7 +402,7 @@ class PlanningUnitCountry extends Component {
                                                                 items.push({
                                                                     title: obj.options.text.deleteSelectedRows,
                                                                     onclick: function () {
-                                                                        obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y));
+                                                                        obj.deleteRow(parseInt(y));
                                                                     }
                                                                 });
                                                             }
@@ -577,6 +591,14 @@ class PlanningUnitCountry extends Component {
     }
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
+        var asterisk = document.getElementsByClassName("resizable")[0];
+        var tr = asterisk.firstChild;
+        tr.children[1].classList.add('AsteriskTheadtrTd');
+        tr.children[2].classList.add('AsteriskTheadtrTd');
+        tr.children[3].classList.add('AsteriskTheadtrTd');
+        tr.children[4].classList.add('AsteriskTheadtrTd');
+        tr.children[5].classList.add('AsteriskTheadtrTd');
+        tr.children[6].classList.add('AsteriskTheadtrTd');
     }
 
     blur = function (instance) {
@@ -622,7 +644,7 @@ class PlanningUnitCountry extends Component {
             console.log("-----------------3--------------------");
             var col = ("D").concat(parseInt(y) + 1);
             // var value = this.el.getValueFromCoords(3, y);
-            var reg = /^[a-zA-Z0-9\b]+$/;
+            // var reg = /^[a-zA-Z0-9\b]+$/;
             if (value == "") {
                 console.log("-----------------blank--------------------");
                 this.el.setStyle(col, "background-color", "transparent");
@@ -631,14 +653,14 @@ class PlanningUnitCountry extends Component {
             }
             else {
                 console.log("-----------------3--------------------");
-                if (!(reg.test(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.skucodevalid'));
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                }
+                // if (!(reg.test(value))) {
+                //     this.el.setStyle(col, "background-color", "transparent");
+                //     this.el.setStyle(col, "background-color", "yellow");
+                //     this.el.setComments(col, i18n.t('static.message.skucodevalid'));
+                // } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+                // }
             }
         }
 
@@ -729,14 +751,14 @@ class PlanningUnitCountry extends Component {
                     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
                 } else {
-                    if (!(reg.test(value))) {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.message.skucodevalid'));
-                    } else {
+                    // if (!(reg.test(value))) {
+                    //     this.el.setStyle(col, "background-color", "transparent");
+                    //     this.el.setStyle(col, "background-color", "yellow");
+                    //     this.el.setComments(col, i18n.t('static.message.skucodevalid'));
+                    // } else {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setComments(col, "");
-                    }
+                    // }
                 }
 
                 // Unit
