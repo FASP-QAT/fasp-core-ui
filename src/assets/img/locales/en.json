@@ -1156,5 +1156,6 @@
     "static.report.inventoryReports": "Inventory Reports",
     "static.report.shipmentReports": "Shipment Reports",
     "static.country.countrycode2": "Country Display Name2",
-    "static.country.countrycodetext2": "Enter Country Display Name2"
+    "static.country.countrycodetext2": "Enter Country Display Name2",
+    "static.ticket.addUpdateUser": "Add / Update User"
 }
