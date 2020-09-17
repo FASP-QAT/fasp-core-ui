@@ -711,5 +711,6 @@
     "static.common.bugreport": "Signaler un bug",
     "static.ticket.ticketcreated": "Le ticket a été créé.",
     "static.ticket.ticketcode": "Code de billet",
-    "static.ticket.addUpdateMasterData": "Ajouter / mettre à jour les données de base"
+    "static.ticket.addUpdateMasterData": "Ajouter / mettre à jour les données de base",
+    "static.ticket.addUpdateUser": "Ajouter / mettre à jour un utilisateur"
 }

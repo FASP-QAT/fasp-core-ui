@@ -702,5 +702,6 @@
     "static.common.bugreport": "Reportar um erro",
     "static.ticket.ticketcreated": "O ingresso foi criado.",
     "static.ticket.ticketcode": "Código de Ingresso",
-    "static.ticket.addUpdateMasterData": "Adicionar / atualizar dados mestre"
+    "static.ticket.addUpdateMasterData": "Adicionar / atualizar dados mestre",
+    "static.ticket.addUpdateUser": "Adicionar / atualizar usuário"
 }
