@@ -618,6 +618,7 @@ export default class ProgramList extends Component {
     let realmId = AuthenticationService.getRealmId();
     RealmCountryService.getRealmCountryrealmIdById(realmId)
       .then(response => {
+        console.log("RealmCountryService---->", response.data)
         if (response.status == 200) {
           this.setState({
             countryList: response.data, loading: false
@@ -630,7 +631,7 @@ export default class ProgramList extends Component {
 
   addNewProgram() {
     this.props.history.push({
-      pathname: "/program/programOnboarding" 
+      pathname: "/program/programOnboarding"
     });
   }
   buttonFormatter(cell, row) {
