@@ -321,10 +321,10 @@ class EditFundingSourceComponent extends Component {
                         </div>
                     </div>
                 </div>
-                <div>
+                {/* <div>
                     <h6>{i18n.t(this.state.message)}</h6>
                     <h6>{i18n.t(this.props.match.params.message)}</h6>
-                </div>
+                </div> */}
             </div>
         );
     }

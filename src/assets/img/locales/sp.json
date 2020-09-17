@@ -1094,6 +1094,11 @@
     "static.inventoryDetailHead.inventoryDetail": "Detalles del inventario",
     "static.shipmentDetailHead.shipmentDetail": "Informe sobre Detalles de los Pedidos",
     "static.regionHead.region": "Región",
-    "static.budgetHead.budget": "Presupuesto"
+    "static.budgetHead.budget": "Presupuesto",
+    "static.report.consumptionReports": "Informes de consumo",
+    "static.report.inventoryReports": "Informes de inventario",
+    "static.report.shipmentReports": "Informes de envío",
+    "static.country.countrycode2": "Nombre de visualización del país2",
+    "static.country.countrycodetext2": "Ingrese el nombre de visualización del país2"
     
 }

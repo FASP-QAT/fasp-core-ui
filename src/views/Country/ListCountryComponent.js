@@ -467,7 +467,7 @@ export default class CountryListComponent extends Component {
                     readOnly: true
                 },
                 {
-                    title: 'Country Code2',
+                    title: i18n.t('static.country.countrycode2'),
                     type: 'text',
                     readOnly: true
                 },

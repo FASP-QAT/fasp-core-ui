@@ -283,6 +283,7 @@ class EditProcurementAgentComponent extends Component {
                                     this.setState({
                                         loading: true
                                     })
+                                    console.log("COLOR----->", this.state.procurementAgent);
                                     AuthenticationService.setupAxiosInterceptors();
                                     ProcurementAgentService.updateProcurementAgent(this.state.procurementAgent)
                                         .then(response => {

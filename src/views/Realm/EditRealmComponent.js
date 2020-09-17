@@ -22,9 +22,9 @@ let initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         realmCode: Yup.string()
-            .required(i18n.t('static.realm.realmNameText')).max(6, i18n.t('static.realm.realmCodeLength')),
+            .required(i18n.t('static.realm.realmCodeText')).max(6, i18n.t('static.realm.realmCodeLength')),
         label: Yup.string()
-            .required(i18n.t('static.realm.realmCodeText')),
+            .required(i18n.t('static.realm.realmNameText')),
         minMosMinGaurdrail: Yup.number()
             .typeError(i18n.t('static.procurementUnit.validNumberText'))
             .positive(i18n.t('static.realm.negativeNumberNotAllowed'))

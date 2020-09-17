@@ -397,6 +397,8 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
+import TracerCategoryService from '../../api/TracerCategoryService';
+import ProductService from '../../api/ProductService';
 
 
 const entityname = i18n.t('static.planningunit.planningunit');
@@ -407,6 +409,8 @@ export default class PlanningUnitListComponent extends Component {
         this.state = {
             forecastingUnits: [],
             planningUnitList: [],
+            tracerCategories: [],
+            productCategories: [],
             message: '',
             selSource: [],
             realmId: '',
@@ -422,6 +426,7 @@ export default class PlanningUnitListComponent extends Component {
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.buildJExcel = this.buildJExcel.bind(this);
+        this.dataChangeForRealm = this.dataChangeForRealm.bind(this);
     }
     hideFirstComponent() {
         this.timeout = setTimeout(function () {
@@ -440,36 +445,99 @@ export default class PlanningUnitListComponent extends Component {
     }
 
     filterData() {
-        let forecastingUnitId = document.getElementById("forecastingUnitId").value;
-        if (forecastingUnitId != 0) {
-            const selSource = this.state.planningUnitList.filter(c => c.forecastingUnit.forecastingUnitId == forecastingUnitId)
-            this.setState({
-                selSource
-            }, () => {
-                this.buildJExcel();
-            });
-        } else {
-            this.setState({
-                selSource: this.state.planningUnitList
-            }, () => {
-                this.buildJExcel();
-            });
-        }
-    }
-    filterDataForRealm() {
-        let realmId = document.getElementById("realmId").value;
-        if (realmId != 0) {
-            PlanningUnitService.getPlanningUnitByRealmId(realmId).then(response => {
-                console.log(response.data)
-                this.setState({
-                    planningUnitList: response.data,
-                    selSource: response.data
-                }, () => {
-                    this.buildJExcel();
-                });
-            })
+        var forecastingUnitList = this.state.forecastingUnitListAll;
+        var tracerCategoryId = document.getElementById("tracerCategoryId").value;
+        var productCategoryId = document.getElementById("productCategoryId").value;
+        if (tracerCategoryId != 0) {
+            forecastingUnitList = forecastingUnitList.filter(c => c.tracerCategory.id == tracerCategoryId);
         }
 
+        if (productCategoryId != 0) {
+            forecastingUnitList = forecastingUnitList.filter(c => c.productCategory.id == productCategoryId);
+        }
+        this.setState({
+            forecastingUnits: forecastingUnitList
+        })
+
+        let forecastingUnitId = document.getElementById("forecastingUnitId").value;
+        var planningUnitList = this.state.planningUnitList;
+        if (forecastingUnitId != 0) {
+            planningUnitList = planningUnitList.filter(c => c.forecastingUnit.forecastingUnitId == forecastingUnitId);
+        }
+        if (tracerCategoryId != 0) {
+            planningUnitList = planningUnitList.filter(c => c.forecastingUnit.tracerCategory.id == tracerCategoryId);
+        }
+        if (productCategoryId != 0) {
+            planningUnitList = planningUnitList.filter(c => c.forecastingUnit.productCategory.id == productCategoryId);
+        }
+
+        const selSource = planningUnitList
+        this.setState({
+            selSource
+        }, () => {
+            this.buildJExcel();
+        });
+    }
+
+    dataChangeForRealm(event) {
+        this.filterDataForRealm(event.target.value);
+    }
+
+    filterDataForRealm(r) {
+        let realmId = r;
+        if (realmId != 0) {
+            ProductService.getProductCategoryList(realmId)
+                .then(response => {
+                    console.log("product category list---", JSON.stringify(response.data))
+                    this.setState({
+                        productCategories: response.data,
+                        productCategoryListAll: response.data
+                    })
+                    TracerCategoryService.getTracerCategoryByRealmId(realmId)
+                        .then(response => {
+                            if (response.status == 200) {
+                                this.setState({
+                                    tracerCategories: response.data,
+                                    tracerCategoryListAll: response.data
+                                    // loading: false
+                                })
+                                ForecastingUnitService.getForcastingUnitByRealmId(realmId)
+                                    .then(response => {
+                                        if (response.status == 200) {
+                                            var forecastingUnits = response.data;
+                                            PlanningUnitService.getPlanningUnitByRealmId(realmId).then(response => {
+                                                console.log(response.data)
+                                                this.setState({
+                                                    planningUnitList: response.data,
+                                                    selSource: response.data,
+                                                    forecastingUnits: forecastingUnits,
+                                                    forecastingUnitListAll: forecastingUnits,
+                                                }, () => {
+                                                    this.buildJExcel();
+                                                });
+                                            })
+                                        } else {
+                                            this.setState({
+                                                message: response.data.messageCode, loading: false
+                                            },
+                                                () => {
+                                                    this.hideSecondComponent();
+                                                })
+                                        }
+
+                                    })
+                            } else {
+                                this.setState({
+                                    message: response.data.messageCode, loading: false
+                                },
+                                    () => {
+                                        this.hideSecondComponent();
+                                    })
+                            }
+
+                        })
+                })
+        }
     }
 
     PlanningUnitCapacity(event, row) {
@@ -631,56 +699,53 @@ export default class PlanningUnitListComponent extends Component {
 
     componentDidMount() {
         this.hideFirstComponent();
-        AuthenticationService.setupAxiosInterceptors();
-        ForecastingUnitService.getForecastingUnitList().then(response => {
-            // console.log(response.data)
-            if (response.status == 200) {
-                this.setState({
-                    forecastingUnits: response.data,
-                    // loading: false
-
-                })
-            }
-            else {
-                this.setState({
-                    message: response.data.messageCode
-                },
-                    () => {
-                        this.hideSecondComponent();
-                    })
-            }
-
-        })
-
-
-        RealmService.getRealmListAll()
-            .then(response => {
-                if (response.status == 200) {
-                    this.setState({
-                        realms: response.data,
-                        realmId: response.data[0].realmId,
-                        // loading: false
-                    })
-
-                    PlanningUnitService.getPlanningUnitByRealmId(this.state.realmId).then(response => {
-                        console.log("RESP-----", response.data)
+        if (AuthenticationService.getRealmId() == -1) {
+            document.getElementById("realmDiv").style.display = "block"
+            AuthenticationService.setupAxiosInterceptors();
+            RealmService.getRealmListAll()
+                .then(response => {
+                    if (response.status == 200) {
                         this.setState({
-                            planningUnitList: response.data,
-                            selSource: response.data
-                        }, () => {
-                            this.buildJExcel();
-                        });
-                    })
-
-                } else {
-                    this.setState({
-                        message: response.data.messageCode
-                    },
-                        () => {
-                            this.hideSecondComponent();
+                            realms: response.data,
+                            loading: false
                         })
-                }
+                    } else {
+                        this.setState({
+                            message: response.data.messageCode, loading: false, color: "red"
+                        })
+                        this.hideFirstComponent()
+                    }
+                }).catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({ message: error.message, loading: false, color: "red" });
+                            this.hideFirstComponent()
+                        } else {
+                            switch (error.response.status) {
+                                case 500:
+                                case 401:
+                                case 404:
+                                case 406:
+                                case 412:
+                                    this.setState({ message: error.response.data.messageCode, loading: false, color: "red" });
+                                    this.hideFirstComponent()
+                                    break;
+                                default:
+                                    this.setState({ message: 'static.unkownError', loading: false, color: "red" });
+                                    this.hideFirstComponent()
+                                    console.log("Error code unkown");
+                                    break;
+                            }
+                        }
+                    }
+                );
+        } else {
+            document.getElementById("realmDiv").style.display = "none"
+            this.setState({
+                loading: false
             })
+            this.filterDataForRealm(AuthenticationService.getRealmId());
+        }
     }
 
     editPlanningUnit(planningUnit) {
@@ -724,6 +789,26 @@ export default class PlanningUnitListComponent extends Component {
                 return (
                     <option key={i} value={item.forecastingUnitId}>
                         {getLabelText(item.label, this.state.lang)}
+                    </option>
+                )
+            }, this);
+
+        const { tracerCategories } = this.state;
+        let tracercategoryList = tracerCategories.length > 0
+            && tracerCategories.map((item, i) => {
+                return (
+                    <option key={i} value={item.tracerCategoryId}>
+                        {getLabelText(item.label, this.state.lang)}
+                    </option>
+                )
+            }, this);
+        const { productCategories } = this.state;
+        let productCategoryList = productCategories.length > 0
+            && productCategories.map((item, i) => {
+                console.log(JSON.stringify("----------", item))
+                return (
+                    <option key={i} value={item.payload.productCategoryId}>
+                        {getLabelText(item.payload.label, this.state.lang)}
                     </option>
                 )
             }, this);
@@ -829,35 +914,70 @@ export default class PlanningUnitListComponent extends Component {
                         </div>
 
                     </div>
-                    <CardBody className="pb-lg-5">
+                    <CardBody className="pb-lg-5 pt-lg-1">
                         <Col md="9 pl-0">
-                            <div className="d-md-flex  Selectdiv2 ">
-                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') &&
-                                    <FormGroup className="mt-md-2 mb-md-0">
-                                        <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
-                                        <div className="controls SelectField">
-                                            <InputGroup>
-                                                <Input
-                                                    type="select"
-                                                    name="realmId"
-                                                    id="realmId"
-                                                    bsSize="sm"
-                                                    onChange={this.filterDataForRealm}
-                                                >
-                                                    <option value="0">{i18n.t('static.common.all')}</option>
-                                                    {realmList}
-                                                </Input>
-                                                {/* <InputGroupAddon addonType="append">
+                            <div className="row">
+                                <FormGroup className="col-md-3" id="realmDiv">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
+                                    <div className="controls">
+                                        <InputGroup>
+                                            <Input
+                                                type="select"
+                                                name="realmId"
+                                                id="realmId"
+                                                bsSize="sm"
+                                                onChange={this.dataChangeForRealm}
+                                            >
+                                                <option value="0">{i18n.t('static.common.select')}</option>
+                                                {realmList}
+                                            </Input>
+                                            {/* <InputGroupAddon addonType="append">
                                                 <Button color="secondary Gobtn btn-sm" onClick={this.filterDataForRealm}>{i18n.t('static.common.go')}</Button>
                                             </InputGroupAddon> */}
-                                            </InputGroup>
-                                        </div>
-                                    </FormGroup>
-                                }
-                                &nbsp;
-                            <FormGroup className=" tab-ml-1 mt-md-2 mb-md-0">
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
+                                <FormGroup className="col-md-3 ">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
+                                    <div className="controls">
+                                        <InputGroup>
+                                            <Input
+                                                type="select"
+                                                name="productCategoryId"
+                                                id="productCategoryId"
+                                                bsSize="sm"
+                                                onChange={this.filterData}
+                                            >
+                                                {/* <option value="0">{i18n.t('static.common.all')}</option> */}
+                                                {productCategoryList}
+                                            </Input>
+
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
+                                <FormGroup className="col-md-3">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.tracercategory.tracercategory')}</Label>
+                                    <div className="controls">
+                                        <InputGroup>
+                                            <Input
+                                                type="select"
+                                                name="tracerCategoryId"
+                                                id="tracerCategoryId"
+                                                bsSize="sm"
+                                                onChange={this.filterData}
+                                            >
+                                                <option value="0">{i18n.t('static.common.all')}</option>
+                                                {tracercategoryList}
+                                            </Input>
+                                            {/* <InputGroupAddon addonType="append">
+                                                <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
+                                            </InputGroupAddon> */}
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
+                                <FormGroup className="col-md-3">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.forecastingunit.forecastingunit')}</Label>
-                                    <div className="controls SelectField">
+                                    <div className="controls">
                                         <InputGroup>
                                             <Input
                                                 type="select"
@@ -878,8 +998,11 @@ export default class PlanningUnitListComponent extends Component {
                             </div>
                         </Col>
 
-                        {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground">
-                        </div>
+                        {/* <div id="loader" className="center"></div> */}
+                        <div className="shipmentconsumptionSearchMarginTop">
+                            <div id="tableDiv" className="jexcelremoveReadonlybackground"></div>
+                            </div>
+                        
 
 
 
