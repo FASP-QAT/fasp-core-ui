@@ -505,7 +505,7 @@ const validationSchema = function (values) {
         countryCode2: Yup.string()
             // .max(2, 'Country code 2 is 2 digit number')
             .matches(ALPHABETS_REGEX, i18n.t('static.common.alphabetsOnly'))
-            .required(i18n.t('static.country.countrycodetext')),
+            .required(i18n.t('static.country.countrycodetext2')),
         countryCode: Yup.string()
             // .max(3, i18n.t('static.country.countrycodemax3digittext'))
             .matches(ALPHABETS_REGEX, i18n.t('static.common.alphabetsOnly'))
@@ -839,7 +839,7 @@ export default class AddCountryComponent extends Component {
                                                         <FormFeedback className="red">{errors.countryCode}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="countryCode">Country Code2<span class="red Reqasterisk">*</span></Label>
+                                                        <Label for="countryCode">{i18n.t('static.country.countrycode2')}<span class="red Reqasterisk">*</span></Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
                                                         {/* <InputGroupText><i className="fa fa-pencil"></i></InputGroupText> */}
                                                         <Input type="text"

@@ -1097,6 +1097,8 @@
     "static.budgetHead.budget": "Presupuesto",
     "static.report.consumptionReports": "Informes de consumo",
     "static.report.inventoryReports": "Informes de inventario",
-    "static.report.shipmentReports": "Informes de envío"
+    "static.report.shipmentReports": "Informes de envío",
+    "static.country.countrycode2": "Nombre de visualización del país2",
+    "static.country.countrycodetext2": "Ingrese el nombre de visualización del país2"
     
 }
