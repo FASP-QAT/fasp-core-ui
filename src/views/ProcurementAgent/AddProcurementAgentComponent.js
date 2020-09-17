@@ -103,7 +103,7 @@ class AddProcurementAgentComponent extends Component {
                 submittedToApprovedLeadTime: '',
                 approvedToShippedLeadTime: '',
                 localProcurementAgent: false,
-                colorHtmlCode: '',
+                colorHtmlCode: '#F17013',
             },
             message: '',
             lang: localStorage.getItem('lang'),
