@@ -31,6 +31,7 @@ export default class AuthenticationServiceComponent extends Component {
     //     this.props.history.push(`/login/${message != "" ? message : "static.logoutSuccess"}`)
     // }
     componentDidMount = () => {
+        console.log("Common component component did mount called-------------");
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
         if (AuthenticationService.checkTypeOfSession()) {
             if (navigator.onLine) {
@@ -44,6 +45,7 @@ export default class AuthenticationServiceComponent extends Component {
 
                         axios.interceptors.response.use((response) => {
                             if (response != null && response != "") {
+                                console.log("common component success");
                                 return response;
                             } else {
                                 this.props.message("Network Error")
@@ -72,7 +74,9 @@ export default class AuthenticationServiceComponent extends Component {
                                     case 412:
                                         console.log("error.response.data.messageCode-------------", error.response.data.messageCode);
                                         this.props.message(error.response.data.messageCode);
+                                        console.log("Common component called---------");
                                         this.props.loading(false)
+                                        console.log("Common component loading---------");
                                         break;
                                     default:
                                         this.props.message('static.unkownError');

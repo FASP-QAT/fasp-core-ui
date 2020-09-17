@@ -195,6 +195,7 @@ class RealmCountryRegion extends Component {
                             onchange: this.changed,
                             oneditionend: this.onedit,
                             copyCompatibility: true,
+                            allowManualInsertRow: false,
                             text: {
                                 // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
                                 showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
@@ -417,7 +418,7 @@ class RealmCountryRegion extends Component {
                         label: {
                             label_en: map1.get("1"),
                         },
-                        capacityCbm: map1.get("2"),
+                        capacityCbm: map1.get("2").replace(",",""),
                         gln: map1.get("3"),
                         active: map1.get("4"),
                         realmCountry: {
@@ -477,6 +478,11 @@ class RealmCountryRegion extends Component {
     }
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
+        var asterisk = document.getElementsByClassName("resizable")[0];
+        var tr = asterisk.firstChild;
+        // tr.children[1].classList.add('AsteriskTheadtrTd');
+        tr.children[2].classList.add('AsteriskTheadtrTd');
+        tr.children[3].classList.add('AsteriskTheadtrTd');
     }
     // -----------start of changed function
     changed = function (instance, cell, x, y, value) {

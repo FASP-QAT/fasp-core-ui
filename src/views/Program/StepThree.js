@@ -76,7 +76,7 @@ export default class StepThree extends Component {
 
     getHealthAreaList() {
         AuthenticationService.setupAxiosInterceptors();
-        ProgramService.getHealthAreaList(document.getElementById('realmId').value)
+        ProgramService.getHealthAreaList(this.props.items.program.realm.realmId)
             .then(response => {
                 if (response.status == 200) {
                     this.setState({

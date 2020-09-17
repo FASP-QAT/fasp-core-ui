@@ -117,6 +117,26 @@ export default class ProgramOnboarding extends Component {
         this.addRowInJexcel = this.addRowInJexcel.bind(this);
     }
     componentDidMount() {
+        let { program } = this.state;
+        let realmId = AuthenticationService.getRealmId();
+        // console.log("realmId----->",realmId);
+        if (realmId != -1) {
+            // console.log("in if");
+            program.realm.realmId = realmId;
+            this.setState({ program }, () => {
+                this.refs.countryChild.getRealmCountryList();
+                this.refs.healthAreaChild.getHealthAreaList();
+                this.refs.organisationChild.getOrganisationList();
+                this.refs.sixChild.getProgramManagerList();
+                this.refs.child.getRealmId();
+            });
+            document.getElementById('realmId').disabled=true;
+
+        } else {
+            console.log("in else");
+            document.getElementById('realmId').disabled=false;
+        }
+
         document.getElementById('stepOne').style.display = 'block';
         document.getElementById('stepTwo').style.display = 'none';
         document.getElementById('stepThree').style.display = 'none';
@@ -632,7 +652,7 @@ export default class ProgramOnboarding extends Component {
                                         <li className="progressbartext5">{i18n.t('static.program.region')}</li>
                                         <li className="progressbartext6">{i18n.t('static.pipeline.programData')}</li>
                                         <li className="progressbartext7">{i18n.t('static.dashboard.product')}</li>
-                                    </ul> 
+                                    </ul>
                                 </div>
 
                                 <br></br>
