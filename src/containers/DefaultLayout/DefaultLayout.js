@@ -870,12 +870,12 @@ class DefaultLayout extends Component {
                             name: i18n.t('static.dashboard.forecastingunit'),
                             url: '/forecastingUnit/listforecastingUnit',
                             icon: 'fa fa-line-chart',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_MANAGE_FORECASTING_UNIT') ? false : true) }
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECASTING_UNIT') ? false : true) }
                           }, {
                             name: i18n.t('static.dashboard.planningunit'),
                             url: '/planningUnit/listPlanningUnit',
                             icon: 'fa fa-list-alt',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_MANAGE_PLANNING_UNIT') ? false : true) }
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT') ? false : true) }
                           }, {
                             name: i18n.t('static.planningUnitVolumeHead.planningUnitVolume'),
                             url: '/planningUnitCapacity/listPlanningUnitcapacity',
@@ -925,7 +925,7 @@ class DefaultLayout extends Component {
                             name: i18n.t('static.dashboard.budget'),
                             url: '/budget/listBudget',
                             icon: 'fa fa-dollar',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_MANAGE_BUDGET') ? false : true) }
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_BUDGET') ? false : true) }
                           },
 
                           // {
@@ -963,7 +963,7 @@ class DefaultLayout extends Component {
                       {
                         name: i18n.t('static.pipeline.programData'),
                         icon: 'fa fa-list',
-                        attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_VIEW_PROGRAM_MASTERS') ? false : true) },
+                        attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_VIEW_PROGRAM_DATA') ? false : true) },
                         // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DOWNLOAD_PROGRAM') ? false : true) },
                         children: [
                           // {
@@ -1029,29 +1029,210 @@ class DefaultLayout extends Component {
                         ]
                       },
                       // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
+
+
+                      // {
+                      //   name: i18n.t('static.dashboard.report'),
+                      //   icon: 'fa fa-list',
+                      //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_REPORT') ? false : true) },
+                      //   children: [
+                      //     {
+                      //       name: i18n.t('static.dashboard.supplyPlan'),
+                      //       url: '/supplyPlan',
+                      //       icon: 'fa fa-calculator',
+                      //       attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }
+                      //     },
+                      //     {
+                      //       name: i18n.t('static.dashboard.whatIf'),
+                      //       url: '/report/whatIf',
+                      //       icon: 'fa fa-calculator',
+                      //       attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }
+                      //     },
+                      //     {
+                      //       name: i18n.t('static.regionHead.region'),
+                      //       url: '/region/listRegion',
+                      //       icon: 'fa fa-globe',
+                      //       attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_REGION') ? false : true) }
+                      //     },
+                      //     {
+                      //       name: i18n.t('static.dashboard.productcatalog'),
+                      //       url: '/report/productCatalog',
+                      //       icon: 'fa fa-th',
+                      //       attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PRODUCT_CATALOG_REPORT') ? false : true) }
+                      //     },
+                      //     {
+                      //       name: i18n.t('static.dashboard.consumption'),
+                      //       url: '/report/consumption',
+                      //       icon: 'fa fa-bar-chart',
+                      //       attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_REPORT') ? false : true) }
+                      //     }, {
+                      //       name: i18n.t('static.dashboard.globalconsumption'),
+                      //       url: '/report/globalConsumption',
+                      //       icon: 'fa fa-globe',
+                      //       attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_GLOBAL_VIEW_REPORT') ? false : true) }
+                      //     }, {
+                      //       name: i18n.t('static.report.forecasterrorovertime'),
+                      //       url: '/report/forecastOverTheTime',
+                      //       icon: 'fa fa-line-chart',
+                      //       attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT') ? false : true) }
+                      //     }, {
+                      //       name: i18n.t('static.dashboard.forecastmetrics'),
+                      //       url: '/report/forecastMetrics',
+                      //       icon: 'fa fa-bar-chart',
+                      //       attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_FORECAST_MATRIX_REPORT') ? false : true) }
+                      //     },
+                      //     {
+                      //       name: i18n.t('static.dashboard.stockstatusovertime'),
+                      //       url: '/report/stockStatusOverTime',
+                      //       icon: 'fa fa-line-chart',
+                      //       attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_OVER_TIME_REPORT') ? false : true) }
+                      //     },
+                      //     {
+                      //       name: i18n.t('static.dashboard.stockstatusmatrix'),
+                      //       url: '/report/stockStatusMatrix',
+                      //       icon: 'fa fa-line-chart',
+                      //       attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_MATRIX_REPORT') ? false : true) }
+                      //     },
+                      //     {
+                      //       name: i18n.t('static.dashboard.stockstatus'),
+                      //       url: '/report/stockStatus',
+                      //       icon: 'fa fa-line-chart',
+                      //       attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
+                      //     }, ,
+                      //     {
+                      //       name: i18n.t('static.dashboard.stockstatusacrossplanningunit'),
+                      //       url: '/report/stockStatusAcrossPlanningUnits',
+                      //       icon: 'fa fa-exchange',
+                      //       attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
+
+                      //     },
+                      //     {
+                      //       name: i18n.t('static.report.warehouseCapacity'),
+                      //       url: '/report/warehouseCapacity',
+                      //       icon: 'fa fa-line-chart',
+                      //       attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
+                      //     },
+                      //     {
+                      //       name: i18n.t('static.report.stockStatusAccrossPlanningUnitGlobalView'),
+                      //       url: '/report/stockStatusAccrossPlanningUnitGlobalView',
+                      //       icon: 'fa fa-line-chart',
+                      //       attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_GLOBAL_VIEW_REPORT') ? false : true) }
+                      //     },
+                      //     {
+                      //       name: i18n.t('static.report.stockAdjustment'),
+                      //       url: '/report/stockAdjustment',
+                      //       icon: 'fa fa-line-chart',
+                      //       attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
+                      //     },
+                      //     {
+                      //       name: i18n.t('static.dashboard.costOfInventory'),
+                      //       url: '/report/costOfInventory',
+                      //       icon: 'fa fa-exchange',
+                      //       attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) }
+                      //     },
+                      //     {
+                      //       name: i18n.t('static.dashboard.inventoryTurns'),
+                      //       url: '/report/inventoryTurns',
+                      //       // icon: 'fa fa-exchange'
+                      //       icon: 'fa fa-line-chart',
+                      //       attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) }
+                      //     },
+                      //     {
+                      //       name: i18n.t('static.dashboard.qatProblemList'),
+                      //       url: '/report/problemList',
+                      //       icon: 'fa fa-file-text-o',
+                      //       attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) }
+                      //     },
+                      //     // {
+                      //     //   name: 'QAT PROBLEM+ACTION REPORT',
+                      //     //   url: '/report/qatProblemPlusActionReport',
+                      //     //   icon: 'fa fa-file-text-o',
+                      //     //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) }
+                      //     // },
+                      //     // {
+                      //     //   name: i18n.t('static.dashboard.funderExport'),
+                      //     //   url: '/report/funderExport',
+                      //     //   icon: 'fa fa-list-alt',
+                      //     //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_FUNDER_REPORT') ? false : true) }
+                      //     // },
+                      //     {
+                      //       name: i18n.t('static.report.shipmentCostReport'),
+                      //       url: '/report/procurementAgentExport',
+                      //       icon: 'fa fa-wpforms',
+                      //       attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
+                      //     }
+                      //     ,
+                      //     {
+                      //       name: i18n.t('static.dashboard.supplierLeadTimes'),
+                      //       url: '/report/supplierLeadTimes',
+                      //       icon: 'fa fa-wpforms',
+                      //       attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
+                      //     }
+                      //     ,
+                      //     // {
+                      //     //   name: i18n.t('static.dashboard.aggregateShipmentByProduct'),
+                      //     //   url: '/report/aggregateShipmentByProduct',
+                      //     //   icon: 'fa fa-wpforms',
+                      //     //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
+                      //     // }
+                      //     ,
+
+                      //     {
+                      //       name: i18n.t('static.report.annualshipmentcost'),
+                      //       url: '/report/annualShipmentCost',
+                      //       icon: 'fa fa-file-text',
+                      //       attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_ANNUAL_SHIPMENT_COST_REPORT') ? false : true) }
+                      //     },
+                      //     {
+                      //       name: i18n.t('static.report.supplyplanversionandreviewReport'),
+                      //       url: '/report/supplyPlanVersionAndReview',
+                      //       icon: 'fa fa-exchange',
+                      //       attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_VERSION_AND_REVIEW') ? false : true) }
+                      //     },
+                      //     {
+                      //       name: i18n.t('static.report.shipmentDetailReport'),
+                      //       url: '/report/shipmentSummery',
+                      //       icon: 'fa fa-exchange',
+                      //       attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT') ? false : true) }
+                      //     },
+                      //     {
+                      //       name: i18n.t('static.dashboard.shipmentGlobalDemandViewheader'),
+                      //       url: '/report/shipmentGlobalDemandView',
+                      //       icon: 'fa fa-wpforms',
+                      //       attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
+                      //     },
+                      //     {
+                      //       name: i18n.t('static.dashboard.shipmentGlobalViewheader'),
+                      //       url: '/report/shipmentGlobalView',
+                      //       icon: 'fa fa-wpforms',
+                      //       attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_GLOBAL_DEMAND_REPORT') ? false : true) }
+                      //     },
+                      //     {
+                      //       name: i18n.t('static.report.expiredInventory'),
+                      //       url: '/report/expiredInventory',
+                      //       icon: 'fa fa-exchange',
+                      //       attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT') ? false : true) }
+                      //     },
+                      //     {
+                      //       name: i18n.t('static.budgetHead.budget'),
+                      //       url: '/report/budgets',
+                      //       icon: 'fa fa-exchange',
+                      //       attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT') ? false : true) }
+                      //     }
+                      //     // {
+                      //     //   name: i18n.t('static.report.supplyplanversionandreviewReport'),
+                      //     //   url: '/report/supplyPlanVersionAndReview',
+                      //     //   icon: 'fa fa-exchange'
+                      //     // }
+                      //   ]
+                      // }
+
+
                       {
                         name: i18n.t('static.dashboard.report'),
                         icon: 'fa fa-list',
                         attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_REPORT') ? false : true) },
                         children: [
-                          {
-                            name: i18n.t('static.dashboard.supplyPlan'),
-                            url: '/supplyPlan',
-                            icon: 'fa fa-calculator',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }
-                          },
-                          {
-                            name: i18n.t('static.dashboard.whatIf'),
-                            url: '/report/whatIf',
-                            icon: 'fa fa-calculator',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }
-                          },
-                          {
-                            name: i18n.t('static.regionHead.region'),
-                            url: '/region/listRegion',
-                            icon: 'fa fa-globe',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_REGION') ? false : true) }
-                          },
                           {
                             name: i18n.t('static.dashboard.productcatalog'),
                             url: '/report/productCatalog',
@@ -1059,171 +1240,228 @@ class DefaultLayout extends Component {
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PRODUCT_CATALOG_REPORT') ? false : true) }
                           },
                           {
-                            name: i18n.t('static.dashboard.consumption'),
-                            url: '/report/consumption',
-                            icon: 'fa fa-bar-chart',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_REPORT') ? false : true) }
-                          }, {
-                            name: i18n.t('static.dashboard.globalconsumption'),
-                            url: '/report/globalConsumption',
-                            icon: 'fa fa-globe',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_GLOBAL_VIEW_REPORT') ? false : true) }
-                          }, {
-                            name: i18n.t('static.report.forecasterrorovertime'),
-                            url: '/report/forecastOverTheTime',
-                            icon: 'fa fa-line-chart',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT') ? false : true) }
-                          }, {
-                            name: i18n.t('static.dashboard.forecastmetrics'),
-                            url: '/report/forecastMetrics',
-                            icon: 'fa fa-bar-chart',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_FORECAST_MATRIX_REPORT') ? false : true) }
+                            name: i18n.t('static.dashboard.supplierLeadTimes'),
+                            url: '/report/supplierLeadTimes',
+                            icon: 'fa fa-wpforms',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
                           },
+
+                          //1) Consumption Reports
                           {
-                            name: i18n.t('static.dashboard.stockstatusovertime'),
-                            url: '/report/stockStatusOverTime',
-                            icon: 'fa fa-line-chart',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_OVER_TIME_REPORT') ? false : true) }
+                            name: i18n.t('static.report.consumptionReports'),
+                            icon: 'fa fa-list',
+                            // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_REPORT') ? false : true) || (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_GLOBAL_VIEW_REPORT') ? false : true) || (this.state.businessFunctions.includes('ROLE_BF_GLOBAL_DEMAND_REPORT') ? false : true) || (this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT') ? false : true) || (this.state.businessFunctions.includes('ROLE_BF_FORECAST_MATRIX_REPORT') ? false : true) },
+                            children: [
+                              {
+                                name: i18n.t('static.dashboard.consumption'),
+                                url: '/report/consumption',
+                                icon: 'fa fa-bar-chart',
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_REPORT') ? false : true) }
+                              },
+                              {
+                                name: i18n.t('static.dashboard.globalconsumption'),
+                                url: '/report/globalConsumption',
+                                icon: 'fa fa-globe',
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_GLOBAL_VIEW_REPORT') ? false : true) }
+                              },
+                              {
+                                name: i18n.t('static.dashboard.shipmentGlobalViewheader'),
+                                url: '/report/shipmentGlobalView',
+                                icon: 'fa fa-wpforms',
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_GLOBAL_DEMAND_REPORT') ? false : true) }
+                              },
+                              {
+                                name: i18n.t('static.report.forecasterrorovertime'),
+                                url: '/report/forecastOverTheTime',
+                                icon: 'fa fa-line-chart',
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT') ? false : true) }
+                              },
+                              {
+                                name: i18n.t('static.dashboard.forecastmetrics'),
+                                url: '/report/forecastMetrics',
+                                icon: 'fa fa-bar-chart',
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_FORECAST_MATRIX_REPORT') ? false : true) }
+                              },
+
+
+                            ]
                           },
+
+
+                          //2) Inventory Reports
                           {
-                            name: i18n.t('static.dashboard.stockstatusmatrix'),
-                            url: '/report/stockStatusMatrix',
-                            icon: 'fa fa-line-chart',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_MATRIX_REPORT') ? false : true) }
+                            name: i18n.t('static.report.inventoryReports'),
+                            icon: 'fa fa-list',
+                            // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) || (this.state.businessFunctions.includes('ROLE_BF_REGION') ? false : true) || (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) || (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT') ? false : true) },
+                            children: [
+                              {
+                                name: i18n.t('static.report.warehouseCapacity'),
+                                url: '/report/warehouseCapacity',
+                                icon: 'fa fa-line-chart',
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
+                              },
+                              {
+                                name: i18n.t('static.regionHead.region'),
+                                url: '/region/listRegion',
+                                icon: 'fa fa-globe',
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_REGION') ? false : true) }
+                              },
+                              {
+                                name: i18n.t('static.dashboard.costOfInventory'),
+                                url: '/report/costOfInventory',
+                                icon: 'fa fa-exchange',
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) }
+                              },
+                              {
+                                name: i18n.t('static.dashboard.inventoryTurns'),
+                                url: '/report/inventoryTurns',
+                                // icon: 'fa fa-exchange'
+                                icon: 'fa fa-line-chart',
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) }
+                              },
+                              {
+                                name: i18n.t('static.report.expiredInventory'),
+                                url: '/report/expiredInventory',
+                                icon: 'fa fa-exchange',
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT') ? false : true) }
+                              },
+                              {
+                                name: i18n.t('static.report.stockAdjustment'),
+                                url: '/report/stockAdjustment',
+                                icon: 'fa fa-line-chart',
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
+                              },
+
+                            ]
                           },
+
+
+                          //3) Shipment Reports
+                          {
+                            name: i18n.t('static.report.shipmentReports'),
+                            icon: 'fa fa-list',
+                            // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT') ? false : true) || (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) || (this.state.businessFunctions.includes('ROLE_BF_ANNUAL_SHIPMENT_COST_REPORT') ? false : true) },
+                            children: [
+                              {
+                                name: i18n.t('static.report.shipmentDetailReport'),
+                                url: '/report/shipmentSummery',
+                                icon: 'fa fa-exchange',
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT') ? false : true) }
+                              },
+                              {
+                                name: i18n.t('static.dashboard.shipmentGlobalDemandViewheader'),
+                                url: '/report/shipmentGlobalDemandView',
+                                icon: 'fa fa-wpforms',
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
+                              },
+                              {
+                                name: i18n.t('static.report.shipmentCostReport'),
+                                url: '/report/procurementAgentExport',
+                                icon: 'fa fa-wpforms',
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
+                              },
+                              {
+                                name: i18n.t('static.report.annualshipmentcost'),
+                                url: '/report/annualShipmentCost',
+                                icon: 'fa fa-file-text',
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_ANNUAL_SHIPMENT_COST_REPORT') ? false : true) }
+                              },
+                              {
+                                name: i18n.t('static.budgetHead.budget'),
+                                url: '/report/budgets',
+                                icon: 'fa fa-exchange',
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT') ? false : true) }
+                              }
+
+                            ]
+                          },
+
+
+                          //4) Stock Status
                           {
                             name: i18n.t('static.dashboard.stockstatus'),
-                            url: '/report/stockStatus',
-                            icon: 'fa fa-line-chart',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
-                          }, ,
-                          {
-                            name: i18n.t('static.dashboard.stockstatusacrossplanningunit'),
-                            url: '/report/stockStatusAcrossPlanningUnits',
-                            icon: 'fa fa-exchange',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
+                            icon: 'fa fa-list',
+                            // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_OVER_TIME_REPORT') ? false : true) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_MATRIX_REPORT') ? false : true) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_GLOBAL_VIEW_REPORT') ? false : true) },
+                            children: [
+                              {
+                                name: i18n.t('static.dashboard.stockstatus'),
+                                url: '/report/stockStatus',
+                                icon: 'fa fa-line-chart',
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
+                              },
+                              {
+                                name: i18n.t('static.dashboard.stockstatusovertime'),
+                                url: '/report/stockStatusOverTime',
+                                icon: 'fa fa-line-chart',
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_OVER_TIME_REPORT') ? false : true) }
+                              },
+                              {
+                                name: i18n.t('static.dashboard.stockstatusmatrix'),
+                                url: '/report/stockStatusMatrix',
+                                icon: 'fa fa-line-chart',
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_MATRIX_REPORT') ? false : true) }
+                              },
+                              {
+                                name: i18n.t('static.dashboard.stockstatusacrossplanningunit'),
+                                url: '/report/stockStatusAcrossPlanningUnits',
+                                icon: 'fa fa-exchange',
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
 
+                              },
+                              {
+                                name: i18n.t('static.report.stockStatusAccrossPlanningUnitGlobalView'),
+                                url: '/report/stockStatusAccrossPlanningUnitGlobalView',
+                                icon: 'fa fa-line-chart',
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_GLOBAL_VIEW_REPORT') ? false : true) }
+                              },
+
+                            ]
                           },
+
+                          //5) Supply Plan
                           {
-                            name: i18n.t('static.report.warehouseCapacity'),
-                            url: '/report/warehouseCapacity',
-                            icon: 'fa fa-line-chart',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
+                            name: i18n.t('static.dashboard.supplyPlan'),
+                            icon: 'fa fa-list',
+                            // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) || (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_VERSION_AND_REVIEW') ? false : true) },
+                            children: [
+                              {
+                                name: i18n.t('static.dashboard.supplyPlan'),
+                                url: '/supplyPlan',
+                                icon: 'fa fa-calculator',
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }
+                              },
+                              {
+                                name: i18n.t('static.report.supplyplanversionandreviewReport'),
+                                url: '/report/supplyPlanVersionAndReview',
+                                icon: 'fa fa-exchange',
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_VERSION_AND_REVIEW') ? false : true) }
+                              },
+                              {
+                                name: i18n.t('static.dashboard.whatIf'),
+                                url: '/report/whatIf',
+                                icon: 'fa fa-calculator',
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }
+                              },
+
+                            ]
                           },
-                          {
-                            name: i18n.t('static.report.stockStatusAccrossPlanningUnitGlobalView'),
-                            url: '/report/stockStatusAccrossPlanningUnitGlobalView',
-                            icon: 'fa fa-line-chart',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
-                          },
-                          {
-                            name: i18n.t('static.report.stockAdjustment'),
-                            url: '/report/stockAdjustment',
-                            icon: 'fa fa-line-chart',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
-                          },
-                          {
-                            name: i18n.t('static.dashboard.costOfInventory'),
-                            url: '/report/costOfInventory',
-                            icon: 'fa fa-exchange',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) }
-                          },
-                          {
-                            name: i18n.t('static.dashboard.inventoryTurns'),
-                            url: '/report/inventoryTurns',
-                            // icon: 'fa fa-exchange'
-                            icon: 'fa fa-line-chart',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) }
-                          },
+
+
                           {
                             name: i18n.t('static.dashboard.qatProblemList'),
                             url: '/report/problemList',
                             icon: 'fa fa-file-text-o',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) }
                           },
-                          // {
-                          //   name: 'QAT PROBLEM+ACTION REPORT',
-                          //   url: '/report/qatProblemPlusActionReport',
-                          //   icon: 'fa fa-file-text-o',
-                          //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) }
-                          // },
-                          // {
-                          //   name: i18n.t('static.dashboard.funderExport'),
-                          //   url: '/report/funderExport',
-                          //   icon: 'fa fa-list-alt',
-                          //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_FUNDER_REPORT') ? false : true) }
-                          // },
-                          {
-                            name: i18n.t('static.report.shipmentCostReport'),
-                            url: '/report/procurementAgentExport',
-                            icon: 'fa fa-wpforms',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
-                          }
-                          ,
-                          {
-                            name: i18n.t('static.dashboard.supplierLeadTimes'),
-                            url: '/report/supplierLeadTimes',
-                            icon: 'fa fa-wpforms',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
-                          }
-                          ,
-                          // {
-                          //   name: i18n.t('static.dashboard.aggregateShipmentByProduct'),
-                          //   url: '/report/aggregateShipmentByProduct',
-                          //   icon: 'fa fa-wpforms',
-                          //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
-                          // }
-                          ,
 
-                          {
-                            name: i18n.t('static.report.annualshipmentcost'),
-                            url: '/report/annualShipmentCost',
-                            icon: 'fa fa-file-text',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_ANNUAL_SHIPMENT_COST_REPORT') ? false : true) }
-                          },
-                          {
-                            name: i18n.t('static.report.supplyplanversionandreviewReport'),
-                            url: '/report/supplyPlanVersionAndReview',
-                            icon: 'fa fa-exchange',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_VERSION_AND_REVIEW') ? false : true) }
-                          },
-                          {
-                            name: i18n.t('static.report.shipmentDetailReport'),
-                            url: '/report/shipmentSummery',
-                            icon: 'fa fa-exchange',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT') ? false : true) }
-                          },
-                          {
-                            name: i18n.t('static.dashboard.shipmentGlobalDemandViewheader'),
-                            url: '/report/shipmentGlobalDemandView',
-                            icon: 'fa fa-wpforms',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
-                          },
-                          {
-                            name: i18n.t('static.dashboard.shipmentGlobalViewheader'),
-                            url: '/report/shipmentGlobalView',
-                            icon: 'fa fa-wpforms',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
-                          },
-                          {
-                            name: i18n.t('static.report.expiredInventory'),
-                            url: '/report/expiredInventory',
-                            icon: 'fa fa-exchange',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT') ? false : true) }
-                          },
-                          {
-                            name: i18n.t('static.budgetHead.budget'),
-                            url: '/report/budgets',
-                            icon: 'fa fa-exchange',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT') ? false : true) }
-                          }
-                          // {
-                          //   name: i18n.t('static.report.supplyplanversionandreviewReport'),
-                          //   url: '/report/supplyPlanVersionAndReview',
-                          //   icon: 'fa fa-exchange'
-                          // }
+
                         ]
                       }
+
+
+
+
+
                       // {
                       //   name: "Supply plan",
                       //   icon: 'fa fa-list',  
@@ -1299,85 +1537,143 @@ class DefaultLayout extends Component {
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }
                           }
                         ]
-                      }, {
+                      },
+
+                      // {
+                      //   name: i18n.t('static.dashboard.report'),
+                      //   icon: 'fa fa-list',
+                      //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_REPORT') ? false : true) },
+                      //   children: [
+                      //     {
+                      //       name: i18n.t('static.dashboard.supplyPlan'),
+                      //       url: '/supplyPlan',
+                      //       icon: 'fa fa-calculator',
+                      //       attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }
+                      //     },
+                      //     {
+                      //       name: i18n.t('static.dashboard.whatIf'),
+                      //       url: '/report/whatIf',
+                      //       icon: 'fa fa-calculator',
+                      //       attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }
+                      //     },
+                      //     {
+                      //       name: i18n.t('static.dashboard.consumption'),
+                      //       url: '/report/consumption',
+                      //       icon: 'fa fa-exchange',
+                      //       attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_REPORT') ? false : true) }
+                      //     },
+                      //     {
+                      //       name: i18n.t('static.dashboard.stockstatusmatrix'),
+                      //       url: '/report/stockStatusMatrix',
+                      //       icon: 'fa fa-exchange',
+                      //       attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_MATRIX_REPORT') ? false : true) }
+                      //     },
+                      //     {
+                      //       name: i18n.t('static.report.stockAdjustment'),
+                      //       url: '/report/stockAdjustment',
+                      //       icon: 'fa fa-line-chart',
+                      //       attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
+                      //     },
+                      //     {
+                      //       name: i18n.t('static.report.warehouseCapacity'),
+                      //       url: '/report/warehouseCapacity',
+                      //       icon: 'fa fa-line-chart',
+                      //       attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
+                      //     },
+                      //     {
+                      //       name: i18n.t('static.report.shipmentCostReport'),
+                      //       url: '/report/procurementAgentExport',
+                      //       icon: 'fa fa-wpforms',
+                      //       attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
+                      //     },
+                      //     {
+                      //       name: i18n.t('static.report.annualshipmentcost'),
+                      //       url: '/report/annualShipmentCost',
+                      //       icon: 'fa fa-file-text',
+                      //       attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_ANNUAL_SHIPMENT_COST_REPORT') ? false : true) }
+                      //     },
+                      //     // {
+                      //     //   name: i18n.t('static.dashboard.aggregateShipmentByProduct'),
+                      //     //   url: '/report/aggregateShipmentByProduct',
+                      //     //   icon: 'fa fa-wpforms',
+                      //     //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
+                      //     // },
+                      //     {
+                      //       name: i18n.t('static.dashboard.stockstatus'),
+                      //       url: '/report/stockStatus',
+                      //       icon: 'fa fa-exchange',
+                      //       attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
+
+                      //     }
+                      //     ,
+                      //     {
+                      //       name: i18n.t('static.dashboard.stockstatusacrossplanningunit'),
+                      //       url: '/report/stockStatusAcrossPlanningUnits',
+                      //       icon: 'fa fa-exchange',
+                      //       attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
+
+                      //     },
+                      //     {
+                      //       name: i18n.t('static.report.expiredInventory'),
+                      //       url: '/report/expiredInventory',
+                      //       icon: 'fa fa-exchange',
+                      //       attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT') ? false : true) }
+                      //     },
+                      //     {
+                      //       name: i18n.t('static.dashboard.supplierLeadTimes'),
+                      //       url: '/report/supplierLeadTimes',
+                      //       icon: 'fa fa-wpforms',
+                      //       attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
+                      //     },
+                      //     {
+                      //       name: i18n.t('static.dashboard.productcatalog'),
+                      //       url: '/report/productCatalog',
+                      //       icon: 'fa fa-th',
+                      //       attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PRODUCT_CATALOG_REPORT') ? false : true) }
+
+                      //     }, {
+                      //       name: i18n.t('static.dashboard.costOfInventory'),
+                      //       url: '/report/costOfInventory',
+                      //       icon: 'fa fa-exchange',
+                      //       attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) }
+                      //     }, {
+                      //       name: i18n.t('static.dashboard.inventoryTurns'),
+                      //       url: '/report/inventoryTurns',
+                      //       icon: 'fa fa-line-chart',
+                      //       attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) }
+                      //     },
+                      //     {
+                      //       name: i18n.t('static.report.shipmentDetailReport'),
+                      //       url: '/report/shipmentSummery',
+                      //       icon: 'fa fa-exchange',
+                      //       attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT') ? false : true) }
+                      //     },
+                      //     {
+                      //       name: i18n.t('static.dashboard.shipmentGlobalDemandViewheader'),
+                      //       url: '/report/shipmentGlobalDemandView',
+                      //       icon: 'fa fa-wpforms',
+                      //       attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
+                      //     },
+                      //     {
+                      //       name: i18n.t('static.dashboard.qatProblemList'),
+                      //       url: '/report/problemList',
+                      //       icon: 'fa fa-file-text-o',
+                      //       attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) }
+                      //     },
+                      //   ]
+                      // }
+
+                      {
                         name: i18n.t('static.dashboard.report'),
                         icon: 'fa fa-list',
                         attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_REPORT') ? false : true) },
                         children: [
                           {
-                            name: i18n.t('static.dashboard.supplyPlan'),
-                            url: '/supplyPlan',
-                            icon: 'fa fa-calculator',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }
-                          },
-                          {
-                            name: i18n.t('static.dashboard.whatIf'),
-                            url: '/report/whatIf',
-                            icon: 'fa fa-calculator',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }
-                          },
-                          {
-                            name: i18n.t('static.dashboard.consumption'),
-                            url: '/report/consumption',
-                            icon: 'fa fa-exchange',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_REPORT') ? false : true) }
-                          },
-                          {
-                            name: i18n.t('static.dashboard.stockstatusmatrix'),
-                            url: '/report/stockStatusMatrix',
-                            icon: 'fa fa-exchange',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_MATRIX_REPORT') ? false : true) }
-                          },
-                          {
-                            name: i18n.t('static.report.stockAdjustment'),
-                            url: '/report/stockAdjustment',
-                            icon: 'fa fa-line-chart',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
-                          },
-                          {
-                            name: i18n.t('static.report.warehouseCapacity'),
-                            url: '/report/warehouseCapacity',
-                            icon: 'fa fa-line-chart',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
-                          },
-                          {
-                            name: i18n.t('static.report.shipmentCostReport'),
-                            url: '/report/procurementAgentExport',
-                            icon: 'fa fa-wpforms',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
-                          },
-                          {
-                            name: i18n.t('static.report.annualshipmentcost'),
-                            url: '/report/annualShipmentCost',
-                            icon: 'fa fa-file-text',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_ANNUAL_SHIPMENT_COST_REPORT') ? false : true) }
-                          },
-                          // {
-                          //   name: i18n.t('static.dashboard.aggregateShipmentByProduct'),
-                          //   url: '/report/aggregateShipmentByProduct',
-                          //   icon: 'fa fa-wpforms',
-                          //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
-                          // },
-                          {
-                            name: i18n.t('static.dashboard.stockstatus'),
-                            url: '/report/stockStatus',
-                            icon: 'fa fa-exchange',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
+                            name: i18n.t('static.dashboard.productcatalog'),
+                            url: '/report/productCatalog',
+                            icon: 'fa fa-th',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PRODUCT_CATALOG_REPORT') ? false : true) }
 
-                          }
-                          ,
-                          {
-                            name: i18n.t('static.dashboard.stockstatusacrossplanningunit'),
-                            url: '/report/stockStatusAcrossPlanningUnits',
-                            icon: 'fa fa-exchange',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
-
-                          },
-                          {
-                            name: i18n.t('static.report.expiredInventory'),
-                            url: '/report/expiredInventory',
-                            icon: 'fa fa-exchange',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT') ? false : true) }
                           },
                           {
                             name: i18n.t('static.dashboard.supplierLeadTimes'),
@@ -1385,35 +1681,161 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-wpforms',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
                           },
-                          {
-                            name: i18n.t('static.dashboard.productcatalog'),
-                            url: '/report/productCatalog',
-                            icon: 'fa fa-th',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PRODUCT_CATALOG_REPORT') ? false : true) }
 
-                          }, {
-                            name: i18n.t('static.dashboard.costOfInventory'),
-                            url: '/report/costOfInventory',
-                            icon: 'fa fa-exchange',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) }
-                          }, {
-                            name: i18n.t('static.dashboard.inventoryTurns'),
-                            url: '/report/inventoryTurns',
-                            icon: 'fa fa-line-chart',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) }
-                          },
+
+                          //1) Consumption Reports
                           {
-                            name: i18n.t('static.report.shipmentDetailReport'),
-                            url: '/report/shipmentSummery',
-                            icon: 'fa fa-exchange',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT') ? false : true) }
+                            name: i18n.t('static.report.consumptionReports'),
+                            icon: 'fa fa-list',
+                            // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_REPORT') ? false : true) },
+                            children: [
+                              {
+                                name: i18n.t('static.dashboard.consumption'),
+                                url: '/report/consumption',
+                                icon: 'fa fa-exchange',
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_REPORT') ? false : true) }
+                              },
+
+                            ]
                           },
+
+
+                          //2) Inventory Reports
                           {
-                            name: i18n.t('static.dashboard.shipmentGlobalDemandViewheader'),
-                            url: '/report/shipmentGlobalDemandView',
-                            icon: 'fa fa-wpforms',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
+                            name: i18n.t('static.report.inventoryReports'),
+                            icon: 'fa fa-list',
+                            // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) || (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) || (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT') ? false : true) },
+                            children: [
+                              {
+                                name: i18n.t('static.report.warehouseCapacity'),
+                                url: '/report/warehouseCapacity',
+                                icon: 'fa fa-line-chart',
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
+                              },
+                              {
+                                name: i18n.t('static.dashboard.costOfInventory'),
+                                url: '/report/costOfInventory',
+                                icon: 'fa fa-exchange',
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) }
+                              }, {
+                                name: i18n.t('static.dashboard.inventoryTurns'),
+                                url: '/report/inventoryTurns',
+                                icon: 'fa fa-line-chart',
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) }
+                              },
+                              {
+                                name: i18n.t('static.report.expiredInventory'),
+                                url: '/report/expiredInventory',
+                                icon: 'fa fa-exchange',
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT') ? false : true) }
+                              },
+                              {
+                                name: i18n.t('static.report.stockAdjustment'),
+                                url: '/report/stockAdjustment',
+                                icon: 'fa fa-line-chart',
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
+                              },
+
+                            ]
                           },
+
+
+                          //3) Shipment Reports
+                          {
+                            name: i18n.t('static.report.shipmentReports'),
+                            icon: 'fa fa-list',
+                            // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT') ? false : true) || (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) || (this.state.businessFunctions.includes('ROLE_BF_ANNUAL_SHIPMENT_COST_REPORT') ? false : true) },
+                            children: [
+                              {
+                                name: i18n.t('static.report.shipmentDetailReport'),
+                                url: '/report/shipmentSummery',
+                                icon: 'fa fa-exchange',
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT') ? false : true) }
+                              },
+                              {
+                                name: i18n.t('static.dashboard.shipmentGlobalDemandViewheader'),
+                                url: '/report/shipmentGlobalDemandView',
+                                icon: 'fa fa-wpforms',
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
+                              },
+                              {
+                                name: i18n.t('static.report.shipmentCostReport'),
+                                url: '/report/procurementAgentExport',
+                                icon: 'fa fa-wpforms',
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
+                              },
+                              {
+                                name: i18n.t('static.report.annualshipmentcost'),
+                                url: '/report/annualShipmentCost',
+                                icon: 'fa fa-file-text',
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_ANNUAL_SHIPMENT_COST_REPORT') ? false : true) }
+                              },
+
+                            ]
+                          },
+
+
+                          //4) Stock Status
+                          {
+                            name: i18n.t('static.dashboard.stockstatus'),
+                            icon: 'fa fa-list',
+                            // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_MATRIX_REPORT') ? false : true) },
+                            children: [
+                              {
+                                name: i18n.t('static.dashboard.stockstatus'),
+                                url: '/report/stockStatus',
+                                icon: 'fa fa-exchange',
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
+
+                              },
+                              {
+                                name: i18n.t('static.dashboard.stockstatusmatrix'),
+                                url: '/report/stockStatusMatrix',
+                                icon: 'fa fa-exchange',
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_MATRIX_REPORT') ? false : true) }
+                              },
+                              {
+                                name: i18n.t('static.dashboard.stockstatusacrossplanningunit'),
+                                url: '/report/stockStatusAcrossPlanningUnits',
+                                icon: 'fa fa-exchange',
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
+
+                              },
+
+                            ]
+                          },
+
+
+                          //5) Supply Plan
+                          {
+                            name: i18n.t('static.dashboard.supplyPlan'),
+                            icon: 'fa fa-list',
+                            // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) },
+                            children: [
+                              {
+                                name: i18n.t('static.dashboard.supplyPlan'),
+                                url: '/supplyPlan',
+                                icon: 'fa fa-calculator',
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }
+                              },
+                              {
+                                name: i18n.t('static.dashboard.whatIf'),
+                                url: '/report/whatIf',
+                                icon: 'fa fa-calculator',
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }
+                              },
+
+                            ]
+                          },
+
+                          // {
+                          //   name: i18n.t('static.dashboard.aggregateShipmentByProduct'),
+                          //   url: '/report/aggregateShipmentByProduct',
+                          //   icon: 'fa fa-wpforms',
+                          //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
+                          // },
+
+
                           {
                             name: i18n.t('static.dashboard.qatProblemList'),
                             url: '/report/problemList',
@@ -1422,6 +1844,9 @@ class DefaultLayout extends Component {
                           },
                         ]
                       }
+
+
+
                     ]
                 }} {...this.props} />
               </Offline>
