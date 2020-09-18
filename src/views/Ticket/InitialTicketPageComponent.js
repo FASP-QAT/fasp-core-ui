@@ -551,7 +551,7 @@ export default class InitialTicketPageComponent extends Component {
           <ModalHeader toggle={this.togglehelp} className="ModalHead modal-info-Headher"><strong>Help</strong></ModalHeader>
           <ModalBody className="pb-0">
             {this.state.initialPage == 1 && <div className="col-md-12">
-              <div><h4>What do yo want to do?</h4>Please click here to raise a query</div>
+              <div><h4>What do you want to do?</h4>Please click here to raise a query</div>
               <div className="mt-2 mb-2">
 
                 <ListGroup>

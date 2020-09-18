@@ -532,7 +532,7 @@ export default class MapPlanningUnits extends Component {
                                 var options = {
                                     data: data,
                                     columnDrag: true,
-                                    colWidths: [290, 290, 170, 170, 170, 170, 170, 170, 190],
+                                    colWidths: [250, 250, 90, 90, 90, 90, 90, 90, 90],
                                     columns: [
 
                                         {
