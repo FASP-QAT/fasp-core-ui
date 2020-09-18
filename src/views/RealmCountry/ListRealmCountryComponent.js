@@ -806,7 +806,7 @@ class ListRealmCountryComponent extends Component {
 
                         </div>
                     </CardHeader> */}
-                    <CardBody className="pb-lg-0 mt-3">
+                    <CardBody className="pb-lg-0 mt-1">
                         {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') &&
                             <Col md="3 pl-0">
                                 <FormGroup className="Selectdiv mt-md-1 mb-md-0">
