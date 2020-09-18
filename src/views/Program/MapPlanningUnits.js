@@ -13,7 +13,7 @@ export default class MapPlanningUnits extends Component {
         this.state = {
             planningUnitList: [],
             mapPlanningUnitEl: '',
-            loading:true,
+            loading: true,
             productCategoryList: []
         }
         this.changed = this.changed.bind(this);
@@ -69,15 +69,28 @@ export default class MapPlanningUnits extends Component {
                 this.el.setComments(col, "");
             }
             var col = ("B").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(1, y);
+            var value = this.el.getRowData(parseInt(y))[1];
+            console.log("Vlaue------>", value);
             if (value === "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                 valid = false;
             } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
+                for (var i = (json.length - 1); i >= 0; i--) {
+                    var map = new Map(Object.entries(json[i]));
+                    var planningUnitValue = map.get("1");
+                    if (planningUnitValue == value && y != i && i > y) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, "Planning Unit Allready Exists");
+                        i = -1;
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                }
 
             }
 
@@ -246,14 +259,20 @@ export default class MapPlanningUnits extends Component {
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                for (var i = 0; i < json.length; i++) {
+                console.log("json.length", json.length);
+                var jsonLength = parseInt(json.length) - 1;
+                console.log("jsonLength", jsonLength);
+                for (var i = jsonLength; i >= 0; i--) {
+                    console.log("i=---------->", i, "y----------->", y);
                     var map = new Map(Object.entries(json[i]));
                     var planningUnitValue = map.get("1");
+                    console.log("Planning Unit value in change", map.get("1"));
+                    console.log("Value----->", value);
                     if (planningUnitValue == value && y != i) {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
                         this.el.setComments(col, "Planning Unit Allready Exists");
-                        i = json.length;
+                        i = -1;
                     } else {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setComments(col, "");
@@ -435,8 +454,8 @@ export default class MapPlanningUnits extends Component {
         var list = [];
         var productCategoryList = [];
         var realmId = this.props.items.program.realm.realmId;
-        console.log("in mapping page---->",realmId);
-        console.log("in mapping page---->",this.props.items);
+        console.log("in mapping page---->", realmId);
+        console.log("in mapping page---->", this.props.items);
         AuthenticationService.setupAxiosInterceptors();
         ProductCategoryServcie.getProductCategoryListByRealmId(this.props.items.program.realm.realmId)
             .then(response => {
@@ -452,13 +471,13 @@ export default class MapPlanningUnits extends Component {
                                 indendent = indendent.concat("|_");
                             } else {
                                 indendent = indendent.concat("_");
-                            } 
+                            }
                         }
                         console.log("ind", indendent);
                         console.log("indendent.concat(response.data[k].payload.label.label_en)-->", indendent.concat(response.data[k].payload.label.label_en));
-                       
-                       
-                       
+
+
+
                         var productCategoryJson = {};
                         if (response.data[k].payload.productCategoryId == 0) {
                             productCategoryJson = {
@@ -513,7 +532,7 @@ export default class MapPlanningUnits extends Component {
                                 var options = {
                                     data: data,
                                     columnDrag: true,
-                                    colWidths: [290, 290, 170, 170, 170, 170, 170, 170,190],
+                                    colWidths: [290, 290, 170, 170, 170, 170, 170, 170, 190],
                                     columns: [
 
                                         {
@@ -694,7 +713,7 @@ export default class MapPlanningUnits extends Component {
                                                 items.push({
                                                     title: obj.options.text.deleteSelectedRows,
                                                     onclick: function () {
-                                                        obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y));
+                                                        obj.deleteRow(parseInt(y));
                                                     }
                                                 });
                                                 // }
@@ -744,7 +763,7 @@ export default class MapPlanningUnits extends Component {
                                 };
                                 var elVar = jexcel(document.getElementById("mapPlanningUnit"), options);
                                 this.el = elVar;
-                                this.setState({ mapPlanningUnitEl: elVar , loading: false});
+                                this.setState({ mapPlanningUnitEl: elVar, loading: false });
                             } else {
                                 list = [];
                             }
@@ -811,7 +830,7 @@ export default class MapPlanningUnits extends Component {
     render() {
         return (
             <>
-             <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
                 }} loading={(loading) => {
                     this.setState({ loading: loading })
