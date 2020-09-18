@@ -10,6 +10,7 @@
     "static.program.yes": "Yes",
     "static.program.healtharea": "Technical Area",
     "static.country.countrycodetext": "Enter Country Display Name",
+    "static.common.displayName": "Enter Display Name",
     "static.common.dashboard": "Dashboard",
     "static.program.realmcountry": "Country",
     "static.program.program": "Program",
@@ -1157,5 +1158,6 @@
     "static.report.shipmentReports": "Shipment Reports",
     "static.country.countrycode2": "Country Display Name2",
     "static.country.countrycodetext2": "Enter Country Display Name2",
-    "static.ticket.addUpdateUser": "Add / Update User"
+    "static.ticket.addUpdateUser": "Add / Update User",
+    "static.common.spacenotallowed":"Spaces not allowed at the begining and ending"
 }
