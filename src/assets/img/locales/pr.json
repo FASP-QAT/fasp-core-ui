@@ -721,5 +721,6 @@
     "static.report.shipmentReports": "Relatórios de Remessa",
     "static.country.countrycode2": "Nome de exibição do país 2",
     "static.country.countrycodetext2": "Insira o nome de exibição do país 2",
+    "static.message.rolenamevalidtext": "Somente letras e espaços são permitidos",
     "static.ticket.addUpdateUser": "Adicionar / atualizar usuário"
 }
