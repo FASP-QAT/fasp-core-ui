@@ -1764,7 +1764,7 @@ class ShipmentGlobalView extends Component {
         doc.autoTable(content1);
 
         let content2 = {
-            margin: { top: 80, left: 100, bottom: 50 },
+            margin: { top: 80, bottom: 50 },
             startY: doc.autoTableEndPosY() + 50,
             pageBreak: 'auto',
             styles: { lineWidth: 1, fontSize: 8, cellWidth: 120, halign: 'center' },
