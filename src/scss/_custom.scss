@@ -1831,8 +1831,8 @@ input::placeholder {
 .progressbartext7 {
   // left: 94.95%;
   width: 100px;
-  left: 102%;
-  transform: translateX(-99%) scale(1);
+  left: 100%;
+  transform: translateX(-63%) scale(1);
 }
 ////pipelinesetup progress bar
 
@@ -3163,7 +3163,7 @@ border-radius: 2em;
   bottom: 0;
   color: #aaa;
   left: 0;
-  line-height: 32px!important;
+  // line-height: 26px!important;
   font-size: 0.76562rem;
   padding-left: 10px;
   padding-right: 10px;
@@ -3176,7 +3176,7 @@ border-radius: 2em;
   white-space: nowrap;
 }
 .Select-input {
-  height: 28px!important;
+  height: 29px!important;
   // margin-bottom: -5px!important;
   
 }
@@ -3187,6 +3187,9 @@ border-radius: 2em;
   height: 0px!important;
   // border: none!important;
    background-color:transparent!important;
+}
+.Select-arrow-zone {
+  padding-top: 2px;
 }
 .Select.form-control{
   height: 0%!important;
