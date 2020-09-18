@@ -1542,7 +1542,7 @@ class AccessControlComponent extends Component {
                         items.push({
                             title: obj.options.text.deleteSelectedRows,
                             onclick: function () {
-                                obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y));
+                                obj.deleteRow(parseInt(y));
                             }
                         });
                         // }
