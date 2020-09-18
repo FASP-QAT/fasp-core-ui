@@ -156,7 +156,7 @@ export default class DatabaseTranslations extends React.Component {
             LabelsService.saveStaticLabels(json).then(response => {
                 if (response.status == 200) {
                     let id = AuthenticationService.displayDashboardBasedOnRole();
-                    this.props.history.push(`/ApplicationDashboard/`+`${id}` + '/green/' + i18n.t(response.data.messageCode))
+                    this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t(response.data.messageCode))
                 } else {
                     this.setState({
                         message: response.data.messageCode
@@ -232,17 +232,18 @@ export default class DatabaseTranslations extends React.Component {
 
     cancelClicked() {
         let id = AuthenticationService.displayDashboardBasedOnRole();
-        this.props.history.push(`/ApplicationDashboard/`+`${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
     changed = function (instance, cell, x, y, value) {
         if (x == 2) {
             var col = ("C").concat(parseInt(y) + 1);
-            this.el.setStyle(col, "background-color", "transparent");
-            this.el.setStyle(col, "background-color", "yellow");
             if (value == "") {
                 this.el.setComments(col, `${i18n.t('static.label.fieldRequired')}`);
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
             } else {
+                this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
             }
         } else if (x == 3) {
