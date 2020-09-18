@@ -430,7 +430,7 @@ class AddprogramPlanningUnit extends Component {
                                                                         items.push({
                                                                             title: obj.options.text.deleteSelectedRows,
                                                                             onclick: function () {
-                                                                                obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y));
+                                                                                obj.deleteRow(parseInt(y));
                                                                             }
                                                                         });
                                                                     }
@@ -580,7 +580,8 @@ class AddprogramPlanningUnit extends Component {
                 }
 
                 var col = ("B").concat(parseInt(y) + 1);
-                var value = this.el.getValueFromCoords(1, y);
+                var value = this.el.getRowData(parseInt(y))[1];
+                console.log("Vlaue------>", value);
                 // console.log("value-----", value);
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
@@ -588,8 +589,20 @@ class AddprogramPlanningUnit extends Component {
                     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
                 } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
+                    for (var i = (json.length - 1); i >= 0; i--) {
+                        var map = new Map(Object.entries(json[i]));
+                        var planningUnitValue = map.get("1");
+                        if (planningUnitValue == value && y != i && i > y) {
+                            this.el.setStyle(col, "background-color", "transparent");
+                            this.el.setStyle(col, "background-color", "yellow");
+                            this.el.setComments(col, "Planning Unit Allready Exists");
+                            i = -1;
+                            valid = false;
+                        } else {
+                            this.el.setStyle(col, "background-color", "transparent");
+                            this.el.setComments(col, "");
+                        }
+                    }
                 }
 
                 //Reorder frequency
@@ -795,16 +808,22 @@ class AddprogramPlanningUnit extends Component {
                 this.el.setValueFromCoords(11, y, 1, true);
                 valid = false;
             } else {
-                for (var i = 0; i < json.length; i++) {
+                console.log("json.length", json.length);
+                var jsonLength = parseInt(json.length) - 1;
+                console.log("jsonLength", jsonLength);
+                for (var i = jsonLength; i >= 0; i--) {
+                    console.log("i=---------->", i, "y----------->", y);
                     var map = new Map(Object.entries(json[i]));
                     var planningUnitValue = map.get("1");
+                    console.log("Planning Unit value in change", map.get("1"));
+                    console.log("Value----->", value);
                     if (planningUnitValue == value && y != i) {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, "Planning Unit aready exist");
-                        i = json.length;
+                        this.el.setComments(col, "Planning Unit Allready Exists");
                         this.el.setValueFromCoords(11, y, 1, true);
                         valid = false;
+                        i = -1;
                     } else {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setComments(col, "");
@@ -813,6 +832,7 @@ class AddprogramPlanningUnit extends Component {
                     }
                 }
             }
+
             // var columnName = jexcel.getColumnNameFromId([x + 1, y]);
             // instance.jexcel.setValue(columnName, '');
         }
