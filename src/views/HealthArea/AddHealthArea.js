@@ -33,7 +33,7 @@ const validationSchema = function (values) {
       .required(i18n.t('static.healtharea.healthareatext')),
     healthAreaCode: Yup.string()
       .matches(ALPHABET_NUMBER_REGEX, i18n.t('static.message.alphabetnumerallowed'))
-      .max(6, 'Technical Area Code length should be 6')
+      .max(6, 'Display name length should be 6')
       .required(i18n.t('static.common.displayName')),
     realmCountryId: Yup.string()
       .required(i18n.t('static.program.validcountrytext'))
