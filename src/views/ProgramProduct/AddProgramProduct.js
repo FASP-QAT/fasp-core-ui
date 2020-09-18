@@ -452,7 +452,7 @@ class AddprogramPlanningUnit extends Component {
                                                                     // region id
                                                                     if (obj.getRowData(y)[9] == 0) {
                                                                         items.push({
-                                                                            title: obj.options.text.deleteSelectedRows,
+                                                                            title: i18n.t("static.common.deleterow"),
                                                                             onclick: function () {
                                                                                 obj.deleteRow(parseInt(y));
                                                                             }
