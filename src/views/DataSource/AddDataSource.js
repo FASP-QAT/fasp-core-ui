@@ -182,11 +182,11 @@ export default class AddDataSource extends Component {
         AuthenticationService.setupAxiosInterceptors();
         console.log("e.target.value---", e.target.value);
         if (e.target.value != 0) {
-            ProgramService.getProgramByRealmId(e.target.value)
+            ProgramService.getProgramList(e.target.value)
                 .then(response => {
                     console.log("getProgramByRealmId---", response.data);
                     this.setState({
-                        programs: response.data, loading: false
+                        programs: (response.data).filter(c => c.active.toString() == "true"), loading: false
                     })
                 })
         } else {
@@ -251,7 +251,7 @@ export default class AddDataSource extends Component {
                                     this.setState({
                                         loading: true
                                     })
-                                    console.log("this.state----",this.state);
+                                    console.log("this.state----", this.state);
                                     DataSourceService.addDataSource(this.state)
                                         .then(response => {
                                             if (response.status == 200) {

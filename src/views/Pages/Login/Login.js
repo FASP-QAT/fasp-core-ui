@@ -225,7 +225,7 @@ class Login extends Component {
                                         this.setState({ message: error.response.data.messageCode });
                                         break;
                                       case 406:
-                                        console.log("Login page password expired-----------")
+                                        console.log("Login page password expired----------->"+emailId)
                                         this.props.history.push({
                                           pathname: "/updateExpiredPassword",
                                           state: {

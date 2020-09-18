@@ -14,6 +14,8 @@ import i18n from '../../i18n'
 import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import classNames from 'classnames';
+import { ALPHABET_NUMBER_REGEX, SPACE_REGEX } from '../../Constants.js';
+
 
 
 let initialValues = {
@@ -28,11 +30,12 @@ const validationSchema = function (values) {
         realmId: Yup.string()
             .required(i18n.t('static.common.realmtext')),
         healthAreaName: Yup.string()
-            // .matches(/^([a-zA-Z]+\s)*[a-zA-Z]+$/, i18n.t('static.message.rolenamevalidtext'))
+            .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.healtharea.healthareatext')),
         healthAreaCode: Yup.string()
-            .max(3, 'Technical Area Code Is 3 Digit')
-            .required(i18n.t('static.country.countrycodetext')),
+            .matches(ALPHABET_NUMBER_REGEX, i18n.t('static.message.alphabetnumerallowed'))
+            .max(6, 'Display name length should be 6')
+            .required(i18n.t('static.common.displayName')),
         realmCountryId: Yup.string()
             .required(i18n.t('static.program.validcountrytext'))
     })

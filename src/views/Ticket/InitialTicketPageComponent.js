@@ -83,6 +83,7 @@ export default class InitialTicketPageComponent extends Component {
     this.toggleProgramMasterForm = this.toggleProgramMasterForm.bind(this);
     this.toggleMasterInitial = this.toggleMasterInitial.bind(this);
     this.toggleSubMaster = this.toggleSubMaster.bind(this);
+    this.toggleUserMaster = this.toggleUserMaster.bind(this);
   }
 
   componentDidMount() {
@@ -167,11 +168,20 @@ export default class InitialTicketPageComponent extends Component {
     });
   }
 
+  //Show User Master Page
+  toggleUserMaster() {
+    this.setState({            
+      initialPage: 0,
+      showUserData: 1
+    });
+  }
+
   //Show main page back from bug report
   toggleMain() {
     this.setState({
       initialPage: 1,
-      showBugReport: 0
+      showBugReport: 0,
+      showUserData: 0
     });
   }
 
@@ -541,12 +551,13 @@ export default class InitialTicketPageComponent extends Component {
           <ModalHeader toggle={this.togglehelp} className="ModalHead modal-info-Headher"><strong>Help</strong></ModalHeader>
           <ModalBody className="pb-0">
             {this.state.initialPage == 1 && <div className="col-md-12">
-              <div><h4>What do yo want to do?</h4>Please click here to raise a query</div>
+              <div><h4>What do you want to do?</h4>Please click here to raise a query</div>
               <div className="mt-2 mb-2">
 
                 <ListGroup>
-                  <ListGroupItem className="list-group-item-help" tag="a" onClick={this.togglebugreport} action>  <i className="icon-list icons helpclickicon mr-2"></i>{i18n.t('static.common.bugreport')}</ListGroupItem>
+                  <ListGroupItem className="list-group-item-help" tag="a" onClick={this.toggleUserMaster} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.ticket.addUpdateUser')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>                  
                   <ListGroupItem className="list-group-item-help" tag="a" onClick={this.togglechangemaster} action><i className="icon-list  icons helpclickicon mr-2"></i> {i18n.t('static.ticket.addUpdateMasterData')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
+                  <ListGroupItem className="list-group-item-help" tag="a" onClick={this.togglebugreport} action>  <i className="icon-list icons helpclickicon mr-2"></i>{i18n.t('static.common.bugreport')}</ListGroupItem>                  
 
                 </ListGroup>
               </div>
@@ -581,7 +592,7 @@ export default class InitialTicketPageComponent extends Component {
 
                 {this.state.showOnlyApplicationMaster == 1 && <div className="mt-2 mb-2">
                   <ListGroup>
-                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleApplicationChangeAdditional(1) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.user.user')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
+                    {/* <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleApplicationChangeAdditional(1) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.user.user')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem> */}
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleApplicationChangeAdditional(2) }} action><i className="icon-note  icons helpclickicon mr-2"></i> {i18n.t('static.country.countryMaster')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleApplicationChangeAdditional(3) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.currency.currencyMaster')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleApplicationChangeAdditional(4) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.unit.unit')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
@@ -627,7 +638,7 @@ export default class InitialTicketPageComponent extends Component {
                 </div>}
 
                 {/* Application Master */}
-                {this.state.showUserData == 1 && <UserTicketComponent toggleMaster={() => this.toggleApplicationMasterForm(1)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
+                {this.state.showUserData == 1 && <UserTicketComponent toggleMaster={() => this.toggleApplicationMasterForm(1)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} toggleMain={this.toggleMain} />}
                 {this.state.showCountryData == 1 && <CountryTicketComponent toggleMaster={() => this.toggleApplicationMasterForm(2)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
                 {this.state.showCurrencyData == 1 && <CurrencyTicketComponent toggleMaster={() => this.toggleApplicationMasterForm(3)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
                 {this.state.showUnitData == 1 && <UnitsTicketComponent toggleMaster={() => this.toggleApplicationMasterForm(4)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}

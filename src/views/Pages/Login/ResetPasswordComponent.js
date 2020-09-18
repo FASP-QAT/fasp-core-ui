@@ -81,7 +81,7 @@ class ResetPasswordComponent extends Component {
     }
     hideFirstComponent() {
         setTimeout(function () {
-            document.getElementById('div1').style.display = 'none';
+            document.getElementById('div1').style.display = 'block';
         }, 8000);
 
         // setTimeout(function () {
@@ -165,7 +165,7 @@ class ResetPasswordComponent extends Component {
                                 </div>
                             </Col>
                             <Col md="9" lg="7" xl="6" className="ForgotmarginTop">
-                                <h4 style={{ color: "red",fontSize:"18px" }} className="mx-4 text-center">{i18n.t(this.state.message)}</h4>
+                                <h4 style={{ color: "red",fontSize:"18px" }} id="div1" className="mx-4 text-center">{i18n.t(this.state.message)}</h4>
                                 {this.state.display == 1 && <Card className="mx-4">
                                     <CardHeader>
                                         <i className="fa fa-pencil-square-o frgtpass-heading"></i><strong className="frgtpass-heading">{i18n.t('static.user.resetPassword')}</strong>{' '}
