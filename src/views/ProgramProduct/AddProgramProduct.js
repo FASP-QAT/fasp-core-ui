@@ -293,6 +293,29 @@ class AddprogramPlanningUnit extends Component {
 
 
                                                         ],
+                                                        updateTable: function (el, cell, x, y, source, value, id) {
+                                                            var elInstance = el.jexcel;
+                                                            var rowData = elInstance.getRowData(y);
+                                                            // var productCategoryId = rowData[0];
+                                                            var programPlanningUnitId = rowData[9];
+                                                            if(programPlanningUnitId==0){
+                                                                var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
+                                                                cell1.classList.remove('readonly');
+
+                                                                var cell2 = elInstance.getCell(`A${parseInt(y) + 1}`)
+                                                                cell2.classList.remove('readonly');
+
+                                                                
+                                                            }else{
+                                                                var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
+                                                                cell1.classList.add('readonly');
+
+                                                                var cell2 = elInstance.getCell(`A${parseInt(y) + 1}`)
+                                                                cell2.classList.add('readonly');
+
+                                                               
+                                                            }
+                                                        },
                                                         pagination: 10,
                                                         search: true,
                                                         columnSorting: true,
@@ -306,6 +329,7 @@ class AddprogramPlanningUnit extends Component {
                                                         onchange: this.changed,
                                                         oneditionend: this.onedit,
                                                         copyCompatibility: true,
+                                                        allowManualInsertRow: false,
                                                         text: {
                                                             // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
                                                             showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
@@ -1070,7 +1094,7 @@ class AddprogramPlanningUnit extends Component {
                             switch (error.response ? error.response.status : "") {
                                 case 500:
                                 case 401:
-                                case 404:
+                                case 404: 
                                 case 406:
                                 case 412:
                                     this.setState({ message: error.response.data.messageCode, loading: false });

@@ -564,7 +564,7 @@ export default class MapPlanningUnits extends Component {
                                     ],
                                     pagination: false,
                                     search: true,
-                                    columnSorting: true,
+                                    columnSorting: true, 
                                     tableOverflow: true,
                                     wordWrap: true,
                                     // paginationOptions: [10, 25, 50, 100],
@@ -575,6 +575,7 @@ export default class MapPlanningUnits extends Component {
                                     onchange: this.changed,
                                     oneditionend: this.onedit,
                                     copyCompatibility: true,
+                                    allowManualInsertRow: false,
                                     text: {
                                         showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
                                         show: '',
