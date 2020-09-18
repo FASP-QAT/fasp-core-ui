@@ -1129,15 +1129,15 @@ class PlanningUnitCapacity extends Component {
                 items.push({ type: 'line' });
 
                 // Save
-                if (obj.options.allowExport) {
-                    items.push({
-                        title: i18n.t('static.supplyPlan.exportAsCsv'),
-                        shortcut: 'Ctrl + S',
-                        onclick: function () {
-                            obj.download(true);
-                        }
-                    });
-                }
+                // if (obj.options.allowExport) {
+                //     items.push({
+                //         title: i18n.t('static.supplyPlan.exportAsCsv'),
+                //         shortcut: 'Ctrl + S',
+                //         onclick: function () {
+                //             obj.download(true);
+                //         }
+                //     });
+                // }
 
                 return items;
             }.bind(this)
