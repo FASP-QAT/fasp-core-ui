@@ -489,6 +489,7 @@ export default class PlanningUnitListComponent extends Component {
     }
 
     dataChangeForRealm(event) {
+        this.setState({loading:true})
         this.filterDataForRealm(event.target.value);
     }
 
@@ -750,9 +751,9 @@ export default class PlanningUnitListComponent extends Component {
                 );
         } else {
             document.getElementById("realmDiv").style.display = "none"
-            this.setState({
-                loading: false
-            })
+            // this.setState({
+            //     loading: false
+            // })
             this.filterDataForRealm(AuthenticationService.getRealmId());
         }
     }

@@ -10,6 +10,7 @@
     "static.program.yes": "Yes",
     "static.program.healtharea": "Technical Area",
     "static.country.countrycodetext": "Enter Country Display Name",
+    "static.common.displayName": "Enter Display Name",
     "static.common.dashboard": "Dashboard",
     "static.program.realmcountry": "Country",
     "static.program.program": "Program",
@@ -386,7 +387,7 @@
     "static.common.remove": "Remove",
     "static.healtharea.healtharea": "Technical Area",
     "static.healtharea.healthareacode": " Technical Area Code",
-    "static.organisation.organisation": "Organizations",
+    "static.organisation.organisation": "Organization",
     "static.organisation.organisationheader": "Organization",
     "static.tracercategory.tracercategory": "Tracer Category",
     "static.tracerCategory.tracercategorytext": "Enter Tracer Category",
@@ -429,7 +430,7 @@
     "static.language.languageCodemax3digittext": "Maximum two characters are allowed",
     "static.healtharea.realm": "Realm",
     "static.healtharea.realmcountry": "Country",
-    "static.organisation.organisationtext": "Enter Organization",
+    "static.organisation.organisationtext": "Enter Organization Name",
     "static.organisation.organisationcodetext": "Enter Display Name",
     "static.organisation.realm": "Realm",
     "static.organisation.realmcountry": "Country",
@@ -437,7 +438,7 @@
     "static.organisation.organisationcode": "Organization Display Name",
     "static.currency.currencycodemax4digittext": "Maximum 4 characters only",
     "static.currency.numbernotallowedtext": "Numbers are not allowed",
-    "static.organisation.organisationcodemax4digittext": "Maximum 4 characters only",
+    "static.organisation.organisationcodemax4digittext": "Display name length should be 4",
     "static.dashboard.forecastingunit": "Forecasting Unit",
     "static.forecastingunit.forecastingunit": "Forecasting Unit",
     "static.tracercategory.tracercategoryText": "Enter Tracer Category",
@@ -1157,5 +1158,6 @@
     "static.report.shipmentReports": "Shipment Reports",
     "static.country.countrycode2": "Country Display Name2",
     "static.country.countrycodetext2": "Enter Country Display Name2",
-    "static.ticket.addUpdateUser": "Add / Update User"
+    "static.ticket.addUpdateUser": "Add / Update User",
+    "static.common.spacenotallowed":"Spaces not allowed at the begining and ending"
 }

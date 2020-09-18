@@ -388,9 +388,9 @@ class RealmCountry extends Component {
                                                             // region id
                                                             if (obj.getRowData(y)[5] == 0) {
                                                                 items.push({
-                                                                    title: obj.options.text.deleteSelectedRows,
+                                                                    title: i18n.t("static.common.deleterow"),
                                                                     onclick: function () {
-                                                                        obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y));
+                                                                        obj.deleteRow(parseInt(y));
                                                                     }
                                                                 });
                                                             }
@@ -424,16 +424,16 @@ class RealmCountry extends Component {
                                                     // Line
                                                     items.push({ type: 'line' });
 
-                                                    // Save
-                                                    if (obj.options.allowExport) {
-                                                        items.push({
-                                                            title: i18n.t('static.supplyPlan.exportAsCsv'),
-                                                            shortcut: 'Ctrl + S',
-                                                            onclick: function () {
-                                                                obj.download(true);
-                                                            }
-                                                        });
-                                                    }
+                                                    // // Save
+                                                    // if (obj.options.allowExport) {
+                                                    //     items.push({
+                                                    //         title: i18n.t('static.supplyPlan.exportAsCsv'),
+                                                    //         shortcut: 'Ctrl + S',
+                                                    //         onclick: function () {
+                                                    //             obj.download(true);
+                                                    //         }
+                                                    //     });
+                                                    // }
 
                                                     return items;
                                                 }.bind(this)
