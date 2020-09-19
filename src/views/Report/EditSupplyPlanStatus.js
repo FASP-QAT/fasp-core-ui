@@ -3664,7 +3664,7 @@ class EditSupplyPlanStatus extends Component {
                                 ProgramService.updateProgramStatus(this.state.program)
                                     .then(response => {
                                        
-                                            this.props.history.push(`/report/supplyPlanVersionAndReview/`+'green/'+ + i18n.t(response.data.messageCode, { entityname }))
+                                            this.props.history.push(`/report/supplyPlanVersionAndReview/`+'green/'+i18n.t(response.data.messageCode, { entityname }))
                                         
                                         
                                     })
