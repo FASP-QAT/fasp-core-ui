@@ -3664,7 +3664,7 @@ class EditSupplyPlanStatus extends Component {
                                 ProgramService.updateProgramStatus(this.state.program)
                                     .then(response => {
                                        
-                                            this.props.history.push(`/report/supplyPlanVersionAndReview/` + i18n.t(response.data.messageCode, { entityname }))
+                                            this.props.history.push(`/report/supplyPlanVersionAndReview/`+'green/'+ + i18n.t(response.data.messageCode, { entityname }))
                                         
                                         
                                     })
@@ -3781,10 +3781,10 @@ class EditSupplyPlanStatus extends Component {
 
             </div>
         );
-
+ 
     }
     cancelClicked = () => {
-        this.props.history.push(`/report/supplyPlanVersionAndReview/` + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/report/supplyPlanVersionAndReview/`+'red/'+ i18n.t('static.message.cancelled', { entityname }))
     }
     resetClicked = () => {
         AuthenticationService.setupAxiosInterceptors();
