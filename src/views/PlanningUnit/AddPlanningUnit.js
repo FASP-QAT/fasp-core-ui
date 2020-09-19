@@ -9,6 +9,7 @@ import ForecastingUnitService from '../../api/ForecastingUnitService';
 import i18n from '../../i18n';
 import UnitService from '../../api/UnitService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
+import { SPACE_REGEX } from '../../Constants.js';
 
 const initialValues = {
     unitId: [],
@@ -23,6 +24,7 @@ const validationSchema = function (values) {
         unitId: Yup.string()
             .required(i18n.t('static.planningunit.unittext')),
         label: Yup.string()
+            .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.planningunit.planningunittext')),
         forecastingUnitId: Yup.string()
             .required(i18n.t('static.planningunit.forcastingunittext')),
