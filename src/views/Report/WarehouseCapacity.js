@@ -983,9 +983,16 @@ class warehouseCapacity extends Component {
             console.log("offline ProgramId---", programId);
 
             if (programId != 0) {
+                this.setState({ loading: true })
                 var db1;
                 getDatabase();
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+
+                openRequest.onerror = function (event) {
+                    this.setState({
+                        loading:false
+                    })
+                }.bind(this);
                 openRequest.onsuccess = function (e) {
                     db1 = e.target.result;
 
@@ -993,6 +1000,11 @@ class warehouseCapacity extends Component {
                     var programTransaction = transaction.objectStore('programData');
                     var programRequest = programTransaction.get(programId);
 
+                    programRequest.onerror = function (event) {
+                        this.setState({
+                            loading:false
+                        })
+                    }.bind(this);
                     programRequest.onsuccess = function (event) {
                         // this.setState({ loading: true })
                         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
