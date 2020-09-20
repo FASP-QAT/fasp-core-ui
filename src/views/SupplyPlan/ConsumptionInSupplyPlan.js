@@ -25,9 +25,42 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         this.saveConsumptionBatchInfo = this.saveConsumptionBatchInfo.bind(this);
         this.checkValidationConsumption = this.checkValidationConsumption.bind(this);
         this.saveConsumption = this.saveConsumption.bind(this);
+        this.showOnlyErrors = this.showOnlyErrors.bind(this);
         this.state = {
             consumptionEl: "",
             consumptionBatchInfoTableEl: ""
+        }
+    }
+
+    showOnlyErrors() {
+        var checkBoxValue = document.getElementById("showErrors");
+        var elInstance = this.state.consumptionEl;
+        var json = elInstance.getJson();
+        var showOption = (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+        if (json.length < showOption) {
+            showOption = json.length;
+        }
+        if (checkBoxValue.checked == true) {
+            console.log("in ncheck box true");
+            for (var j = 0; j < parseInt(showOption); j++) {
+                var rowData = elInstance.getRowData(j);
+                console.log("in for loop", rowData[14], "j--->", j);
+                var asterisk = document.getElementsByClassName("jexcel_content")[0];
+                console.log("asterisk", asterisk);
+                var tr = (asterisk.childNodes[0]).childNodes[2];
+                if (rowData[14].toString() == 1) {
+                    tr.childNodes[j].style.display = "";
+                } else {
+                    tr.childNodes[j].style.display = "none";
+                }
+            }
+        } else {
+            for (var j = 0; j < parseInt(showOption); j++) {
+                var asterisk = document.getElementsByClassName("jexcel_content")[0];
+                console.log("asterisk", asterisk);
+                var tr = (asterisk.childNodes[0]).childNodes[2];
+                tr.childNodes[j].style.display = "";
+            }
         }
     }
 
@@ -164,6 +197,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         }
                         data[12] = index;
                         data[13] = 0;
+                        data[14] = 0;
                         consumptionDataArr[j] = data;
                     }
                     if (consumptionList.length == 0) {
@@ -187,6 +221,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         data[11] = "";
                         data[12] = -1;
                         data[13] = 1;
+                        data[14] = 0;
                         consumptionDataArr[0] = data;
                     }
                     var options = {
@@ -206,7 +241,8 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                             { title: i18n.t('static.inventory.active'), type: 'checkbox', width: 100 },
                             { type: 'hidden', title: i18n.t('static.supplyPlan.batchInfo'), width: 0 },
                             { type: 'hidden', title: i18n.t('static.supplyPlan.index'), width: 0 },
-                            { type: 'hidden', title: i18n.t('static.supplyPlan.isChanged'), width: 0 }
+                            { type: 'hidden', title: i18n.t('static.supplyPlan.isChanged'), width: 0 },
+                            { type: 'hidden', width: 0 }
                         ],
                         pagination: paginationOption,
                         paginationOptions: paginationArray,
@@ -421,7 +457,16 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                                                 data[11] = "";
                                                 data[12] = -1;
                                                 data[13] = 1;
+                                                data[14] = 0;
                                                 obj.insertRow(data);
+                                                if (this.props.consumptionPage == "consumptionDataEntry") {
+                                                    var showOption = (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+                                                    console.log("showOption", showOption);
+                                                    if (showOption != 5000000) {
+                                                        var pageNo = parseInt(parseInt(json.length) / parseInt(showOption));
+                                                        obj.page(pageNo);
+                                                    }
+                                                }
                                             }.bind(this)
                                         });
                                     }
@@ -468,8 +513,6 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         tr.children[4].classList.add('AsteriskTheadtrTd');
         tr.children[5].classList.add('AsteriskTheadtrTd');
         tr.children[6].classList.add('AsteriskTheadtrTd');
-        tr.children[7].classList.add('AsteriskTheadtrTd');
-        tr.children[8].classList.add('AsteriskTheadtrTd');
     }
 
     filterDataSourceBasedOnConsumptionType = function (instance, cell, c, r, source) {
@@ -493,17 +536,30 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         this.props.updateState("consumptionError", "");
         this.props.updateState("consumptionDuplicateError", "");
         this.props.updateState("consumptionChangedFlag", 1);
+        if (x != 13 && x != 14) {
+            elInstance.setValueFromCoords(14, y, 0, true);
+
+        }
         if (x != 13) {
             elInstance.setValueFromCoords(13, y, 1, true);
         }
         if (x == 0) {
-            checkValidtion("date", "A", y, rowData[0], elInstance);
+            var valid = checkValidtion("date", "A", y, rowData[0], elInstance);
+            if (valid == false) {
+                elInstance.setValueFromCoords(14, y, 1, true);
+            }
         }
         if (x == 1) {
-            checkValidtion("text", "B", y, rowData[1], elInstance);
+            var valid = checkValidtion("text", "B", y, rowData[1], elInstance);
+            if (valid == false) {
+                elInstance.setValueFromCoords(14, y, 1, true);
+            }
         }
         if (x == 3) {
-            checkValidtion("text", "D", y, rowData[3], elInstance);
+            var valid = checkValidtion("text", "D", y, rowData[3], elInstance);
+            if (valid == false) {
+                elInstance.setValueFromCoords(14, y, 1, true);
+            }
         }
         if (x == 4) {
             elInstance.setValueFromCoords(6, y, "", true);
@@ -511,14 +567,22 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             if (valid == true) {
                 var multiplier = (this.state.realmCountryPlanningUnitList.filter(c => c.id == rowData[4])[0]).multiplier;
                 elInstance.setValueFromCoords(6, y, multiplier, true);
+            } else {
+                elInstance.setValueFromCoords(14, y, 1, true);
             }
         }
         if (x == 5) {
-            checkValidtion("number", "F", y, rowData[5], elInstance, INTEGER_NO_REGEX, 1, 1);
+            var valid = checkValidtion("number", "F", y, rowData[5], elInstance, INTEGER_NO_REGEX, 1, 1);
+            if (valid == false) {
+                elInstance.setValueFromCoords(14, y, 1, true);
+            }
         }
 
         if (x == 8) {
-            checkValidtion("numberNotRequired", "I", y, rowData[8], elInstance, INTEGER_NO_REGEX, 1, 1);
+            var valid = checkValidtion("numberNotRequired", "I", y, rowData[8], elInstance, INTEGER_NO_REGEX, 1, 1);
+            if (valid == false) {
+                elInstance.setValueFromCoords(14, y, 1, true);
+            }
         }
         if (x == 2) {
             var dataSource = rowData[3];
@@ -532,8 +596,12 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                 elInstance.setValueFromCoords(3, y, "", true);
             }
             elInstance.setValueFromCoords(11, y, "", true);
-            checkValidtion("text", "C", y, rowData[2], elInstance);
+            var valid = checkValidtion("text", "C", y, rowData[2], elInstance);
+            if (valid == false) {
+                elInstance.setValueFromCoords(14, y, 1, true);
+            }
         }
+        this.showOnlyErrors();
     }
 
     filterBatchInfoForExistingDataForConsumption = function (instance, cell, c, r, source) {
@@ -552,7 +620,6 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         var asterisk = document.getElementsByClassName("resizable")[1];
         var tr = asterisk.firstChild;
         tr.children[1].classList.add('AsteriskTheadtrTd');
-        tr.children[2].classList.add('AsteriskTheadtrTd');
         tr.children[3].classList.add('AsteriskTheadtrTd');
     }
 
@@ -698,12 +765,14 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             var batchInfoArray = [];
             var rowNumber = 0;
             var totalConsumption = 0;
+            var countForNonFefo = 0;
             for (var i = 0; i < json.length; i++) {
                 var map = new Map(Object.entries(json[i]));
                 if (i == 0) {
                     rowNumber = map.get("4");
                 }
                 if (map.get("0") != -1) {
+                    countForNonFefo += 1;
                     var batchInfoJson = {
                         consumptionTransBatchInfoId: map.get("3"),
                         batch: {
@@ -720,7 +789,14 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                 }
                 totalConsumption += parseInt(map.get("2").toString().replaceAll("\,", ""));
             }
+            if (countForNonFefo == 0) {
+                alert(i18n.t("static.batchDetails.warningFefo"));
+            }
             var consumptionInstance = this.state.consumptionEl;
+            var consumptionQty = consumptionInstance.getRowData(rowNumber)[5];
+            if (consumptionQty != "" && consumptionQty != totalConsumption) {
+                alert(i18n.t("static.batchDetails.warningQunatity"))
+            }
             consumptionInstance.setValueFromCoords(5, rowNumber, totalConsumption, true);
             consumptionInstance.setValueFromCoords(11, rowNumber, batchInfoArray, true);
             this.setState({
@@ -773,6 +849,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                     inValid(colArr[c], y, i18n.t('static.supplyPlan.duplicateConsumption'), elInstance);
                 }
                 valid = false;
+                elInstance.setValueFromCoords(14, y, 1, true);
                 this.props.updateState("consumptionDuplicateError", i18n.t('static.supplyPlan.duplicateConsumption'));
                 this.props.hideSecondComponent();
             } else {
@@ -785,37 +862,44 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                 var validation = checkValidtion("date", "A", y, rowData[0], elInstance);
                 if (validation == false) {
                     valid = false;
+                    elInstance.setValueFromCoords(14, y, 1, true);
                 }
 
                 validation = checkValidtion("text", "B", y, rowData[1], elInstance);
                 if (validation == false) {
                     valid = false;
+                    elInstance.setValueFromCoords(14, y, 1, true);
                 }
 
                 validation = checkValidtion("text", "D", y, rowData[3], elInstance);
                 if (validation == false) {
                     valid = false;
+                    elInstance.setValueFromCoords(14, y, 1, true);
                 }
 
 
                 validation = checkValidtion("text", "E", y, rowData[4], elInstance);
                 if (validation == false) {
                     valid = false;
+                    elInstance.setValueFromCoords(14, y, 1, true);
                 }
 
                 validation = checkValidtion("number", "F", y, rowData[5], elInstance, INTEGER_NO_REGEX, 1, 1);
                 if (validation == false) {
                     valid = false;
+                    elInstance.setValueFromCoords(14, y, 1, true);
                 }
 
                 validation = checkValidtion("numberNotRequired", "I", y, rowData[8], elInstance, INTEGER_NO_REGEX, 1, 1);
                 if (validation == false) {
                     valid = false;
+                    elInstance.setValueFromCoords(14, y, 1, true);
                 }
 
                 validation = checkValidtion("text", "C", y, rowData[2], elInstance);
                 if (validation == false) {
                     valid = false;
+                    elInstance.setValueFromCoords(14, y, 1, true);
                 }
             }
         }
@@ -826,6 +910,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
 
     // Save consumptions
     saveConsumption() {
+        this.showOnlyErrors();
         this.props.updateState("consumptionError", "");
         this.props.updateState("loading", true);
         var validation = this.checkValidationConsumption();
