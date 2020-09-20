@@ -3144,7 +3144,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             }
                             for (var bi = 0; bi < shipmentBatchInfoList.length; bi++) {
                                 // Push shipment batch details in program json batch info list
-                                var index = batchInfoList.filter(c => c.batchNo == shipmentBatchInfoList[bi].batch.batchNo);
+                                var index = batchInfoList.findIndex(c => c.batchNo == shipmentBatchInfoList[bi].batch.batchNo);
+                                console.log("Batch info list 1st", batchInfoList);
+                                console.log("Index1", index);
                                 if (index == -1) {
                                     var batchDetails = {
                                         batchId: shipmentBatchInfoList[bi].batch.batchId,
@@ -3257,8 +3259,11 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                 }
                                 batchInfoList.push(batchDetails);
                             }
+                            console.log("shipmentBatchInfoList.length", shipmentBatchInfoList.length);
                             for (var bi = 0; bi < shipmentBatchInfoList.length; bi++) {
-                                var index = batchInfoList.filter(c => c.batchNo == shipmentBatchInfoList[bi].batch.batchNo);
+                                var index = batchInfoList.findIndex(c => c.batchNo == shipmentBatchInfoList[bi].batch.batchNo);
+                                console.log("BatchInfoList", batchInfoList);
+                                console.log("Index", index);
                                 if (index == -1) {
                                     var batchDetails = {
                                         batchId: shipmentBatchInfoList[bi].batch.batchId,

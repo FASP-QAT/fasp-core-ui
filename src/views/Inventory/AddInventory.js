@@ -59,7 +59,7 @@ export default class AddInventory extends Component {
     }
     handleRangeDissmis(value) {
         this.setState({ rangeValue: value })
-        this.formSubmit(this.state.planningUnit,value);
+        this.formSubmit(this.state.planningUnit, value);
     }
 
     hideFirstComponent() {
@@ -255,7 +255,7 @@ export default class AddInventory extends Component {
                                 planningUnit: planningUnit,
                                 planningUnitId: planningUnitIdProp
                             })
-                            this.formSubmit(planningUnit,this.state.rangeValue);
+                            this.formSubmit(planningUnit, this.state.rangeValue);
                         }
                     }.bind(this);
                 }.bind(this)
@@ -268,7 +268,7 @@ export default class AddInventory extends Component {
         }
     }
 
-    formSubmit(value,rangeValue) {
+    formSubmit(value, rangeValue) {
         let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
         let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
         console.log("In form submit");
@@ -353,7 +353,7 @@ export default class AddInventory extends Component {
         })
         document.getElementById("adjustmentsTableDiv").style.display = "none";
         if (this.state.planningUnit != 0 && (value != "" && value != undefined ? value.value : 0) != 0) {
-            this.formSubmit(this.state.planningUnit,this.state.rangeValue);
+            this.formSubmit(this.state.planningUnit, this.state.rangeValue);
         }
     }
 
@@ -425,7 +425,7 @@ export default class AddInventory extends Component {
                                                                 bsSize="sm"
                                                                 options={this.state.planningUnitList}
                                                                 value={this.state.planningUnit}
-                                                                onChange={(e) => { this.formSubmit(e,this.state.rangeValue); }}
+                                                                onChange={(e) => { this.formSubmit(e, this.state.rangeValue); }}
                                                             />
                                                         </div>
                                                     </FormGroup>
