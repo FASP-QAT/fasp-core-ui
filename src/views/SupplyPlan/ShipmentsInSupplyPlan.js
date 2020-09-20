@@ -491,6 +491,16 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                         data[24] = 1;
                                                         data[25] = 0;
                                                         obj.insertRow(data);
+                                                        console.log("Json.length", json.length);
+                                                        obj.setValueFromCoords(14, json.length, false, true);
+                                                        obj.setValueFromCoords(16, json.length, -1, true);
+                                                        obj.setValueFromCoords(18, json.length, 0, true);
+                                                        obj.setValueFromCoords(19, json.length, false, true);
+                                                        obj.setValueFromCoords(20, json.length, true, true);
+                                                        obj.setValueFromCoords(22, json.length, 0, true);
+                                                        obj.setValueFromCoords(23, json.length, 1, true);
+                                                        obj.setValueFromCoords(24, json.length, 1, true);
+                                                        obj.setValueFromCoords(25, json.length, 0, true);
                                                         if (this.props.shipmentPage == "shipmentDataEntry") {
                                                             var showOption = (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
                                                             console.log("showOption", showOption);
@@ -844,7 +854,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                         type: 'calendar',
                                                                         options: {
                                                                             format: JEXCEL_DATE_FORMAT,
-                                                                            validRange: [moment(Date.now()).subtract(1, 'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
+                                                                            validRange: emergencyOrder.toString() == "false" ? [(moment(Date.now()).subtract(1, 'months').format("YYYY-MM-DD")).toString(), (moment(Date.now()).format("YYYY-MM-DD")).toString()] : []
                                                                         }
                                                                     },
                                                                     {
@@ -852,7 +862,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                         type: 'calendar',
                                                                         options: {
                                                                             format: JEXCEL_DATE_FORMAT,
-                                                                            validRange: [moment(Date.now()).subtract(1, 'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
+                                                                            validRange: emergencyOrder.toString() == "false" ? [(moment(Date.now()).subtract(1, 'months').format("YYYY-MM-DD")).toString(), (moment(Date.now()).format("YYYY-MM-DD")).toString()] : []
                                                                         }
                                                                     },
                                                                     {
@@ -860,7 +870,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                         type: 'calendar',
                                                                         options: {
                                                                             format: JEXCEL_DATE_FORMAT,
-                                                                            validRange: [moment(Date.now()).subtract(1, 'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
+                                                                            validRange: emergencyOrder.toString() == "false" ? [(moment(Date.now()).subtract(1, 'months').format("YYYY-MM-DD")).toString(), (moment(Date.now()).format("YYYY-MM-DD")).toString()] : []
                                                                         }
                                                                     },
                                                                     {
@@ -868,7 +878,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                         type: 'calendar',
                                                                         options: {
                                                                             format: JEXCEL_DATE_FORMAT,
-                                                                            validRange: [moment(Date.now()).subtract(1, 'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
+                                                                            validRange: emergencyOrder.toString() == "false" ? [(moment(Date.now()).subtract(1, 'months').format("YYYY-MM-DD")).toString(), (moment(Date.now()).format("YYYY-MM-DD")).toString()] : []
                                                                         }
                                                                     },
                                                                     {
@@ -876,7 +886,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                         type: 'calendar',
                                                                         options: {
                                                                             format: JEXCEL_DATE_FORMAT,
-                                                                            validRange: [moment(Date.now()).subtract(1, 'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
+                                                                            validRange: emergencyOrder.toString() == "false" ? [(moment(Date.now()).subtract(1, 'months').format("YYYY-MM-DD")).toString(), (moment(Date.now()).format("YYYY-MM-DD")).toString()] : []
                                                                         }
                                                                     },
                                                                     {
@@ -884,7 +894,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                         type: 'calendar',
                                                                         options: {
                                                                             format: JEXCEL_DATE_FORMAT,
-                                                                            validRange: [moment(Date.now()).subtract(1, 'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
+                                                                            validRange: emergencyOrder.toString() == "false" ? [(moment(Date.now()).subtract(1, 'months').format("YYYY-MM-DD")).toString(), (moment(Date.now()).format("YYYY-MM-DD")).toString()] : []
                                                                         }
                                                                     },
                                                                     {
@@ -1413,6 +1423,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                         }.bind(this)
                                                     });
                                                 }
+                                                console.log("RowData-------->", rowData);
                                                 if (rowData[19].toString() == "true" && rowData[14].toString() == "false") {
                                                     items.push({
                                                         title: i18n.t('static.supplyPlan.doNotConsideAsEmergencyOrder'),
@@ -1539,6 +1550,10 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     shipmentInstance.setStyle(col, 'color', textColor);
                 }
             } else {
+                for (var j = 0; j < colArr.length; j++) {
+                    var col = (colArr[j]).concat(parseInt(i) + 1);
+                    shipmentInstance.setStyle(col, "background-color", "transparent");
+                }
             }
         }
     }
@@ -1595,6 +1610,10 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 elInstance.setStyle(col, 'color', textColor);
             }
         } else {
+            for (var j = 0; j < colArr.length; j++) {
+                var col = (colArr[j]).concat(parseInt(y) + 1);
+                elInstance.setStyle(col, "background-color", "transparent");
+            }
         }
         if (x != 23 && x != 21 && x != 25) {
             elInstance.setValueFromCoords(25, y, 0, true);
