@@ -234,6 +234,9 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         data[16] = 0;
                         inventoryDataArr[0] = data;
                     }
+                    this.setState({
+                        inventoryAllJson: inventoryDataArr
+                    })
                     var options = {
                         data: inventoryDataArr,
                         columnDrag: true,
@@ -651,7 +654,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 }
             }
         }
-        this.showOnlyErrors();
+        // this.showOnlyErrors();
     }
 
     filterBatchInfoForExistingDataForInventory = function (instance, cell, c, r, source) {
@@ -1014,7 +1017,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
 
     // Save adjustments
     saveInventory() {
-        this.showOnlyErrors();
+        // this.showOnlyErrors();
         this.props.updateState("inventoryError", "");
         this.props.updateState("loading", true);
         var validation = this.checkValidationInventory();

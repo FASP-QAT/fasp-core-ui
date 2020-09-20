@@ -601,7 +601,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                 elInstance.setValueFromCoords(14, y, 1, true);
             }
         }
-        this.showOnlyErrors();
+        // this.showOnlyErrors();
     }
 
     filterBatchInfoForExistingDataForConsumption = function (instance, cell, c, r, source) {
@@ -910,7 +910,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
 
     // Save consumptions
     saveConsumption() {
-        this.showOnlyErrors();
+        // this.showOnlyErrors();
         this.props.updateState("consumptionError", "");
         this.props.updateState("loading", true);
         var validation = this.checkValidationConsumption();

@@ -1804,7 +1804,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             }
         }
         this.props.updateState("shipmentChangedFlag", 1);
-        this.showOnlyErrors();
+        // this.showOnlyErrors();
     }
 
     shipmentQtyChanged = function (instance, cell, x, y, value) {
@@ -3002,7 +3002,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
     }
 
     saveShipments() {
-        this.showOnlyErrors();
+        // this.showOnlyErrors();
         this.props.updateState("loading", true);
         var validation = this.checkValidationForShipments();
         if (validation == true) {

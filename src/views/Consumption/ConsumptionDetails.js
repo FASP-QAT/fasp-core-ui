@@ -418,10 +418,10 @@ export default class ConsumptionDetails extends React.Component {
                                                             />
                                                         </div>
                                                     </FormGroup>
-                                                    {this.state.consumptionChangedFlag == 1 && <FormGroup check inline>
+                                                    {/* {this.state.consumptionChangedFlag == 1 && <FormGroup check inline>
                                                         <Input className="form-check-input removeMarginLeftCheckbox" type="checkbox" id="showErrors" name="showErrors" value="true" onClick={this.refs.consumptionChild.showOnlyErrors} />
                                                         <Label className="form-check-label" check htmlFor="inline-checkbox1">{i18n.t("static.dataEntry.showOnlyErrors")}</Label>
-                                                    </FormGroup>}
+                                                    </FormGroup>} */}
                                                     <input type="hidden" id="planningUnitId" name="planningUnitId" value={this.state.planningUnitId} />
                                                     <input type="hidden" id="programId" name="programId" value={this.state.programId} />
                                                 </div>
