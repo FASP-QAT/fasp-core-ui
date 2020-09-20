@@ -1160,7 +1160,7 @@
     "static.country.countrycodetext2": "Enter Country Display Name2",
     "static.ticket.addUpdateUser": "Add / Update User",
     "static.ticket.help": "Help",
-    "static.ticket.header": "Service Desk",
+    "static.ticket.header": "QAT Helpdesk",
     "static.ticket.subheader": "WE ARE HERE TO HELP YOU WITH YOUR QUERY",
     "static.ticket.uploadScreenshot": "Upload Screenshot",
     "static.common.spacenotallowed":"Spaces not allowed at the begining and ending"
