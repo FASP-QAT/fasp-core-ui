@@ -2213,6 +2213,7 @@ class SupplierLeadTimes extends Component {
             } else {
                 planningUnitIds = this.state.planningUnitValues.map(ele => (ele.value).toString());
                 procurementAgentIds = this.state.procurementAgenttValues.map(ele => (ele.value).toString());
+                this.setState({ loading: true })
 
                 var db1;
                 var storeOS;
@@ -2221,7 +2222,8 @@ class SupplierLeadTimes extends Component {
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                 openRequest.onerror = function (event) {
                     this.setState({
-                        message: i18n.t('static.program.errortext')
+                        message: i18n.t('static.program.errortext'),
+                        loading: false
                     })
                 }.bind(this);
                 openRequest.onsuccess = function (e) {
@@ -2231,7 +2233,8 @@ class SupplierLeadTimes extends Component {
                     var programRequest = programDataOs.get(parseInt(document.getElementById("programId").value));
                     programRequest.onerror = function (event) {
                         this.setState({
-                            message: i18n.t('static.program.errortext')
+                            message: i18n.t('static.program.errortext'),
+                            loading:false
                         })
                     }.bind(this);
 
@@ -2244,7 +2247,8 @@ class SupplierLeadTimes extends Component {
                         var ppuRequest = ppuOs.getAll();
                         ppuRequest.onerror = function (event) {
                             this.setState({
-                                message: i18n.t('static.program.errortext')
+                                message: i18n.t('static.program.errortext'),
+                                loading:false
                             })
                         }.bind(this);
                         ppuRequest.onsuccess = function (e) {
@@ -2268,7 +2272,8 @@ class SupplierLeadTimes extends Component {
                             var papuRequest = papuOs.getAll();
                             papuRequest.onerror = function (event) {
                                 this.setState({
-                                    message: i18n.t('static.program.errortext')
+                                    message: i18n.t('static.program.errortext'),
+                                    loading:false
                                 })
                             }.bind(this);
 
@@ -2292,7 +2297,8 @@ class SupplierLeadTimes extends Component {
                                 var paRequest = paOs.getAll();
                                 paRequest.onerror = function (event) {
                                     this.setState({
-                                        message: i18n.t('static.program.errortext')
+                                        message: i18n.t('static.program.errortext'),
+                                        loading:false
                                     })
                                 }.bind(this);
 

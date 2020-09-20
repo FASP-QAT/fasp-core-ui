@@ -1926,6 +1926,7 @@ class Consumption extends Component {
 
     if (planningUnitId > 0 && programId > 0 && versionId != 0) {
       if (versionId.includes('Local')) {
+        this.setState({ loading: true })
         console.log("------------OFFLINE PART------------");
         var db1;
         var storeOS;
@@ -1934,7 +1935,8 @@ class Consumption extends Component {
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
           this.setState({
-            message: i18n.t('static.program.errortext')
+            message: i18n.t('static.program.errortext'),
+            loading:false
           })
         }.bind(this);
         openRequest.onsuccess = function (e) {
@@ -1954,7 +1956,8 @@ class Consumption extends Component {
           var programRequest = programDataOs.get(program);
           programRequest.onerror = function (event) {
             this.setState({
-              message: i18n.t('static.program.errortext')
+              message: i18n.t('static.program.errortext'),
+              loading:false
             })
           }.bind(this);
           programRequest.onsuccess = function (e) {

@@ -2019,10 +2019,16 @@ class StockStatusAcrossPlanningUnits extends Component {
         if (programId != 0 && versionId != 0) {
             if (versionId.includes('Local')) {
 
-
+                this.setState({ loading: true })
                 var db1;
                 getDatabase();
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+
+                openRequest.onerror = function (event) {
+                    this.setState({
+                        loading: false
+                    })
+                }.bind(this);
                 openRequest.onsuccess = function (e) {
                     db1 = e.target.result;
 
@@ -2035,6 +2041,11 @@ class StockStatusAcrossPlanningUnits extends Component {
                     var data = [];
                     var programRequest = programTransaction.get(program);
 
+                    programRequest.onerror = function (event) {
+                        this.setState({
+                            loading: false
+                        })
+                    }.bind(this);
                     programRequest.onsuccess = function (event) {
                         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
@@ -2046,9 +2057,12 @@ class StockStatusAcrossPlanningUnits extends Component {
                         var planningList = []
                         planningunitRequest.onerror = function (event) {
                             // Handle errors!
+                            this.setState({
+                                loading: false
+                            })
                         };
                         planningunitRequest.onsuccess = function (e) {
-                            // this.setState({ loading: true })
+                            
                             var myResult = [];
                             myResult = planningunitRequest.result;
                             var programId = (document.getElementById("programId").value).split("_")[0];
