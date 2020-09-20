@@ -12,6 +12,7 @@ import RealmService from "../../api/RealmService";
 import ProgramService from "../../api/ProgramService";
 import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { ALPHABET_NUMBER_REGEX, SPACE_REGEX } from '../../Constants.js';
 
 const initialValues = {
     realmId: [],
@@ -26,7 +27,7 @@ const validationSchema = function (values) {
         realmId: Yup.string()
             .required(i18n.t('static.common.realmtext')),
         label: Yup.string()
-            // .matches(/^([a-zA-Z]+\s)*[a-zA-Z]+$/, i18n.t('static.message.rolenamevalidtext'))
+            .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.datasource.datasourcetext')),
         dataSourceTypeId: Yup.string()
             .required(i18n.t('static.datasource.datasourcetypetext'))
@@ -182,11 +183,11 @@ export default class AddDataSource extends Component {
         AuthenticationService.setupAxiosInterceptors();
         console.log("e.target.value---", e.target.value);
         if (e.target.value != 0) {
-            ProgramService.getProgramByRealmId(e.target.value)
+            ProgramService.getProgramList(e.target.value)
                 .then(response => {
                     console.log("getProgramByRealmId---", response.data);
                     this.setState({
-                        programs: response.data, loading: false
+                        programs: (response.data).filter(c => c.active.toString() == "true"), loading: false
                     })
                 })
         } else {
@@ -251,7 +252,7 @@ export default class AddDataSource extends Component {
                                     this.setState({
                                         loading: true
                                     })
-                                    console.log("this.state----",this.state);
+                                    console.log("this.state----", this.state);
                                     DataSourceService.addDataSource(this.state)
                                         .then(response => {
                                             if (response.status == 200) {
@@ -298,7 +299,7 @@ export default class AddDataSource extends Component {
                                                             required
                                                             value={this.state.realm.id}
                                                         >
-                                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                                            <option value="">{i18n.t('static.common.select')}</option>
                                                             {realmList}
                                                         </Input>
                                                         <FormFeedback className="red">{errors.realmId}</FormFeedback>
@@ -317,7 +318,7 @@ export default class AddDataSource extends Component {
                                                             required
                                                             value={this.state.program.id}
                                                         >
-                                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                                            <option value="">{i18n.t('static.common.select')}</option>
                                                             {programList}
                                                         </Input>
                                                         <FormFeedback className="red">{errors.realmId}</FormFeedback>
@@ -385,10 +386,10 @@ export default class AddDataSource extends Component {
                         </div>
                     </div>
                 </div>
-                <div>
+                {/* <div>
                     <h6>{i18n.t(this.state.message)}</h6>
                     <h6>{i18n.t(this.props.match.params.message)}</h6>
-                </div>
+                </div> */}
             </div>
         );
     }

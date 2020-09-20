@@ -79,6 +79,10 @@ class UpdateExpiredPasswordComponent extends Component {
         this.logoutClicked = this.logoutClicked.bind(this);
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
     }
+
+    componentDidMount(){
+        console.log("Update expired password email id--->"+this.props.location.state.emailId)
+    }
     hideFirstComponent() {
         setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
@@ -151,6 +155,7 @@ class UpdateExpiredPasswordComponent extends Component {
                                         validate={validate(validationSchema)}
                                         onSubmit={(values, { setSubmitting, setErrors }) => {
                                             if (navigator.onLine) {
+                                                console.log("Update expired password email id on submit method--->"+values.emailId)
                                                 UserService.updateExpiredPassword(values.emailId, values.oldPassword, values.newPassword)
                                                     .then(response => {
                                                         var decoded = jwt_decode(response.data.token);

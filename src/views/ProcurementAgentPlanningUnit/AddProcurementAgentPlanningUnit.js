@@ -1146,9 +1146,9 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                                     // region id
                                                                     if (obj.getRowData(y)[11] == 0) {
                                                                         items.push({
-                                                                            title: obj.options.text.deleteSelectedRows,
+                                                                            title: i18n.t("static.common.deleterow"),
                                                                             onclick: function () {
-                                                                                obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y));
+                                                                                obj.deleteRow(parseInt(y));
                                                                             }
                                                                         });
                                                                     }
@@ -1183,15 +1183,15 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                             items.push({ type: 'line' });
 
                                                             // Save
-                                                            if (obj.options.allowExport) {
-                                                                items.push({
-                                                                    title: i18n.t('static.supplyPlan.exportAsCsv'),
-                                                                    shortcut: 'Ctrl + S',
-                                                                    onclick: function () {
-                                                                        obj.download(true);
-                                                                    }
-                                                                });
-                                                            }
+                                                            // if (obj.options.allowExport) {
+                                                            //     items.push({
+                                                            //         title: i18n.t('static.supplyPlan.exportAsCsv'),
+                                                            //         shortcut: 'Ctrl + S',
+                                                            //         onclick: function () {
+                                                            //             obj.download(true);
+                                                            //         }
+                                                            //     });
+                                                            // }
 
                                                             return items;
                                                         }.bind(this)
