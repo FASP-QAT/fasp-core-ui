@@ -57,7 +57,8 @@ export default class BugReportTicketComponent extends Component {
                 file: '',
                 attachFile: ''
             },
-            message: ''
+            message: '',
+            loading: false
         }
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
@@ -133,15 +134,19 @@ export default class BugReportTicketComponent extends Component {
     render() {
 
         return (
-            <div className="col-md-12">
+            <div className="col-md-12">                
                 <h5 style={{ color: "green" }} id="div2">{i18n.t(this.state.message)}</h5>
                 <h4>{i18n.t('static.common.bugreport')}</h4>
                 <br></br>
+                <div style={{ display: this.state.loading ? "none" : "block" }}>
                 <Formik
                     initialValues={initialValues}
                     validate={validate(validationSchema)}
                     onSubmit={(values, { setSubmitting, setErrors }) => {
-                        JiraTikcetService.addBugReportIssue(this.state.bugReport).then(response => { 
+                        this.setState({
+                            loading: true
+                        })
+                        JiraTikcetService.addBugReportIssue(this.state.bugReport).then(response => {                             
                             console.log("Response :",response.status, ":" ,JSON.stringify(response.data));
                             if (response.status == 200 || response.status == 201) {
                                 var msg = response.data.key;
@@ -150,7 +155,7 @@ export default class BugReportTicketComponent extends Component {
                                 });
 
                                 this.setState({
-                                    message: msg
+                                    message: msg, loading: false
                                 },
                                     () => {
                                         this.resetClicked();
@@ -159,7 +164,7 @@ export default class BugReportTicketComponent extends Component {
                             } else {
                                 this.setState({
                                     // message: response.data.messageCode
-                                    message: 'Error while creating query'
+                                    message: 'Error while creating query', loading: false
                                 },
                                     () => {
                                         this.resetClicked();
@@ -228,10 +233,10 @@ export default class BugReportTicketComponent extends Component {
                                     </FormGroup>
                                     <FormGroup >
                                         <Col>
-                                            <Label className="uploadfilelable" htmlFor="attachFile">Upload Screenshot<span class="red Reqasterisk">*</span></Label>
+                                            <Label className="uploadfilelable" htmlFor="attachFile">{i18n.t('static.ticket.uploadScreenshot')}<span class="red Reqasterisk">*</span></Label>
                                         </Col>
                                         <div className="custom-file">                                            
-                                            <Input type="file" className="custom-file-input" id="attachFile" name="attachFile" accept=".zip,.png"
+                                            <Input type="file" className="custom-file-input" id="attachFile" name="attachFile" accept=".zip,.png,.jpg,.jpeg"
                                                 valid={!errors.attachFile && this.state.bugReport.attachFile != ''}
                                                 invalid={touched.attachFile && !!errors.attachFile}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e); }}
@@ -250,6 +255,15 @@ export default class BugReportTicketComponent extends Component {
                                     </ModalFooter>
                                 </Form>
                             )} />
+                            </div>
+                            <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                    <div class="align-items-center">
+                                        <div ><h4> <strong>Loading...</strong></h4></div>
+                                        <div class="spinner-border blue ml-4" role="status"></div>
+                                    </div>
+                                </div> 
+                            </div>
             </div>
         );
     }

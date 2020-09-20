@@ -1113,7 +1113,7 @@
     "static.technicalArea.technicalAreaCodeText": " Please enter technical area code",
     "static.technicalArea.productcategorynametext": " Please enter product category name",
     "static.common.notes": " Notes",
-    "static.common.bugreport": " Report a bug",
+    "static.common.bugreport": "Report a bug",
     "static.report.procurmentAgentLeadTimeReport": " Procurement Agent Lead Time",
     "static.dashboard.linkShipment": " Link shipment",
     "static.commitVersion.conflicts": " Conflicts",
@@ -1157,5 +1157,9 @@
     "static.report.shipmentReports": "Shipment Reports",
     "static.country.countrycode2": "Country Display Name2",
     "static.country.countrycodetext2": "Enter Country Display Name2",
-    "static.ticket.addUpdateUser": "Add / Update User"
+    "static.ticket.addUpdateUser": "Add / Update User",
+    "static.ticket.help": "Help",
+    "static.ticket.header": "Service Desk",
+    "static.ticket.subheader": "WE ARE HERE TO HELP YOU WITH YOUR QUERY",
+    "static.ticket.uploadScreenshot": "Upload Screenshot"
 }
