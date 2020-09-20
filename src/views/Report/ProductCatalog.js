@@ -2182,13 +2182,15 @@ class ProductCatalog extends Component {
                         }
                     );
             } else {
+                this.setState({ loading: true })
                 var db1;
                 var storeOS;
                 getDatabase();
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                 openRequest.onerror = function (event) {
                     this.setState({
-                        message: i18n.t('static.program.errortext')
+                        message: i18n.t('static.program.errortext'),
+                        loading: false
                     })
                 }.bind(this);
                 openRequest.onsuccess = function (e) {
@@ -2202,6 +2204,11 @@ class ProductCatalog extends Component {
                         })
                     }.bind(this);
 
+                    programRequest.onerror = function (event) {
+                        this.setState({
+                            loading: false
+                        })
+                    }.bind(this);
                     programRequest.onsuccess = function (e) {
                         var result = programRequest.result;
                         console.log("1------>", result);
@@ -2215,6 +2222,11 @@ class ProductCatalog extends Component {
                             })
                         }.bind(this);
 
+                        fuRequest.onerror = function (event) {
+                            this.setState({
+                                loading: false
+                            })
+                        }.bind(this);
                         fuRequest.onsuccess = function (e) {
                             var result1 = fuRequest.result;
                             console.log("2------>", result1);
@@ -2228,6 +2240,11 @@ class ProductCatalog extends Component {
                                 })
                             }.bind(this);
 
+                            puRequest.onerror = function (event) {
+                                this.setState({
+                                    loading: false
+                                })
+                            }.bind(this);
                             puRequest.onsuccess = function (e) {
                                 var result2 = puRequest.result;
                                 console.log("3------>", result2);
@@ -2241,6 +2258,11 @@ class ProductCatalog extends Component {
                                     })
                                 }.bind(this);
 
+                                ppuRequest.onerror = function (event) {
+                                    this.setState({
+                                        loading: false
+                                    })
+                                }.bind(this);
                                 ppuRequest.onsuccess = function (e) {
                                     // this.setState({ loading: true })
                                     var result3 = ppuRequest.result;

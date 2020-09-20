@@ -1616,6 +1616,11 @@ h5,
   border-color: 1px solid red;
 }
 
+.legendcommitversion .greylegend {
+  background-color: #D3D3D3;
+  border-color: 1px solid #D3D3D3;
+}
+
 .legend .lightgreenlegend {
   background-color: #d9ead3;
   border-color: 1px solid #d9ead3;
@@ -3402,4 +3407,8 @@ margin-left: -45px;
  }
  ._3vLmCG3bB3CM2hhAiQX1tN {
   margin-top: 29px!important;
+}
+
+.removeMarginLeftCheckbox{
+  margin-left: 0px!important;
 }

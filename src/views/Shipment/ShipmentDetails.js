@@ -2,7 +2,7 @@ import React from "react";
 import {
     Card, CardBody,
     Label, FormGroup,
-    CardFooter, Button, Col, Form, Modal, ModalHeader, ModalFooter, ModalBody
+    CardFooter, Button, Col, Form, Modal, ModalHeader, ModalFooter, ModalBody,Input
 } from 'reactstrap';
 import { Formik } from 'formik';
 import CryptoJS from 'crypto-js'
@@ -15,6 +15,9 @@ import ShipmentsInSupplyPlanComponent from "../SupplyPlan/ShipmentsInSupplyPlan"
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import AuthenticationService from "../Common/AuthenticationService.js";
+import Picker from 'react-month-picker'
+import MonthBox from '../../CommonComponent/MonthBox.js'
+import moment from "moment"
 
 const entityname = i18n.t('static.dashboard.shipmentdetails');
 
@@ -38,7 +41,9 @@ export default class ShipmentDetails extends React.Component {
             timeout: 0,
             showShipments: 0,
             shipmentChangedFlag: 0,
-            shipmentModalTitle: ""
+            shipmentModalTitle: "",
+            shipmentType: { value: 1, label: i18n.t('static.shipment.manualShipments') },
+            rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
         }
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this)
         this.formSubmit = this.formSubmit.bind(this);
@@ -50,6 +55,31 @@ export default class ShipmentDetails extends React.Component {
         this.hideThirdComponent = this.hideThirdComponent.bind(this);
         this.hideFourthComponent = this.hideFourthComponent.bind(this);
         this.hideFifthComponent = this.hideFifthComponent.bind(this);
+        this.updateDataType = this.updateDataType.bind(this);
+        this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
+        this.handleRangeChange = this.handleRangeChange.bind(this);
+        this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
+        this.pickRange = React.createRef();
+    }
+
+    show() {
+    }
+    handleRangeChange(value, text, listIndex) {
+        //
+    }
+    handleRangeDissmis(value) {
+        this.setState({ rangeValue: value })
+        this.formSubmit(this.state.planningUnit, value);
+    }
+
+    updateDataType(value) {
+        this.setState({
+            shipmentType: value
+        })
+        document.getElementById("shipmentsDetailsTableDiv").style.display = "none";
+        if (this.state.planningUnit != 0 && (value != "" && value != undefined ? value.value : 0) != 0) {
+            this.formSubmit(this.state.planningUnit, this.state.rangeValue);
+        }
     }
 
     hideFirstComponent() {
@@ -80,7 +110,7 @@ export default class ShipmentDetails extends React.Component {
         }, 8000);
     }
 
-    hideFifthComponent(){
+    hideFifthComponent() {
         document.getElementById('div5').style.display = 'block';
         this.state.timeout = setTimeout(function () {
             document.getElementById('div5').style.display = 'none';
@@ -221,7 +251,7 @@ export default class ShipmentDetails extends React.Component {
                             planningUnit: planningUnit,
                             planningUnitId: planningUnitIdProp
                         })
-                        this.formSubmit(planningUnit);
+                        this.formSubmit(planningUnit, this.state.rangeValue);
                     }
                 }.bind(this);
             }.bind(this)
@@ -233,7 +263,9 @@ export default class ShipmentDetails extends React.Component {
         }
     }
 
-    formSubmit(value) {
+    formSubmit(value, rangeValue) {
+        let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
+        let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
         this.setState({ loading: true })
         var programId = document.getElementById('programId').value;
         this.setState({ programId: programId, planningUnitId: value != "" && value != undefined ? value.value : 0, planningUnit: value });
@@ -275,6 +307,12 @@ export default class ShipmentDetails extends React.Component {
                         shipmentListUnFiltered: shipmentListUnFiltered
                     })
                     var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == (value != "" && value != undefined ? value.value : 0));
+                    if ((this.state.shipmentType).value == 1) {
+                        shipmentList = shipmentList.filter(c => c.erpFlag.toString() == "false");
+                    } else {
+                        shipmentList = shipmentList.filter(c => c.erpFlag.toString() == "true");
+                    }
+                    shipmentList = shipmentList.filter(c => moment(c.expectedDeliveryDate).format("YYYY-MM-DD") >= moment(startDate).format("YYYY-MM-DD") && moment(c.expectedDeliveryDate).format("YYYY-MM-DD") <= moment(stopDate).format("YYYY-MM-DD"))
                     console.log("Shipment list", shipmentList);
                     this.setState({
                         shelfLife: programPlanningUnit.shelfLife,
@@ -313,7 +351,7 @@ export default class ShipmentDetails extends React.Component {
 
     actionCanceled() {
         this.setState({
-            message: i18n.t('static.message.cancelled'),
+            message: i18n.t('static.actionCancelled'),
             color: 'red',
         })
         this.hideFirstComponent()
@@ -329,6 +367,16 @@ export default class ShipmentDetails extends React.Component {
     }
 
     render() {
+        const pickerLang = {
+            months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            from: 'From', to: 'To',
+        }
+        const { rangeValue } = this.state
+
+        const makeText = m => {
+            if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
+            return '?'
+        }
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
@@ -347,6 +395,23 @@ export default class ShipmentDetails extends React.Component {
                                         <Form name='simpleForm'>
                                             <div className=" pl-0">
                                                 <div className="row">
+                                                    <FormGroup className="col-md-3">
+                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                                                        <div className="controls edit">
+
+                                                            <Picker
+                                                                ref={this.pickRange}
+                                                                value={rangeValue}
+                                                                lang={pickerLang}
+                                                                //theme="light"
+                                                                onChange={this.handleRangeChange}
+                                                                onDismiss={this.handleRangeDissmis}
+                                                            >
+                                                                <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
+                                                            </Picker>
+                                                        </div>
+
+                                                    </FormGroup>
                                                     <FormGroup className="col-md-3">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                                         <div className="controls ">
@@ -369,24 +434,47 @@ export default class ShipmentDetails extends React.Component {
                                                                 bsSize="sm"
                                                                 options={this.state.planningUnitList}
                                                                 value={this.state.planningUnit}
-                                                                onChange={(e) => { this.formSubmit(e); }}
+                                                                onChange={(e) => { this.formSubmit(e, this.state.rangeValue); }}
                                                             />
                                                         </div>
                                                     </FormGroup>
+                                                    <FormGroup className="col-md-3 ">
+                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.shipmentType')}</Label>
+                                                        <div className="controls ">
+                                                            <Select
+                                                                name="shipmentType"
+                                                                id="shipmentType"
+                                                                bsSize="sm"
+                                                                options={[{ value: 1, label: i18n.t('static.shipment.manualShipments') }, { value: 2, label: i18n.t('static.shipment.erpShipment') }]}
+                                                                value={this.state.shipmentType}
+                                                                onChange={(e) => { this.updateDataType(e); }}
+                                                            />
+                                                        </div>
+                                                    </FormGroup>
+                                                    {/* {this.state.shipmentChangedFlag == 1 && <FormGroup check inline>
+                                                        <Input className="form-check-input removeMarginLeftCheckbox" type="checkbox" id="showErrors" name="showErrors" value="true" onClick={this.refs.shipmentChild.showOnlyErrors} />
+                                                        <Label className="form-check-label" check htmlFor="inline-checkbox1">{i18n.t("static.dataEntry.showOnlyErrors")}</Label>
+                                                    </FormGroup>} */}
                                                     <input type="hidden" id="planningUnitId" name="planningUnitId" value={this.state.planningUnitId} />
                                                     <input type="hidden" id="programId" name="programId" value={this.state.programId} />
                                                 </div>
                                             </div>
                                         </Form>
                                     )} />
-                         
+                        <div className="col-md-10 pb-3">
+                            <ul className="legendcommitversion">
+                                <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyOrder')}</span></li>
+                                <li><span className=" greylegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.doNotIncludeInProjectedShipment')} </span></li>
+                            </ul>
+                        </div>
+
                         <div className="shipmentconsumptionSearchMarginTop">
                             {this.state.showShipments == 1 && <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} updateState={this.updateState} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} hideFourthComponent={this.hideFourthComponent} hideFifthComponent={this.hideFifthComponent} shipmentPage="shipmentDataEntry" />}
                             <div className="table-responsive" id="shipmentsDetailsTableDiv">
                                 <div id="shipmentsDetailsTable" />
                             </div>
                         </div>
-                       
+
                     </CardBody>
                     <CardFooter>
                         <FormGroup>
@@ -448,5 +536,10 @@ export default class ShipmentDetails extends React.Component {
                 </div>
             </div>
         );
+    }
+
+    _handleClickRangeBox(e) {
+        console.log("Thuis.refs", this);
+        this.pickRange.current.show()
     }
 }
