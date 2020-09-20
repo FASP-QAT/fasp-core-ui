@@ -87,7 +87,7 @@ const validationSchema = function (values) {
         programId: Yup.string()
             .required(i18n.t('static.budget.budgetamountdesc')),
         versionStatusId: Yup.number().typeError(i18n.t('static.program.validstatus'))
-            .required(i18n.t('static.program.validstatus')).notOneOf([0,1], i18n.t('static.program.validstatus')),
+            .required(i18n.t('static.program.validstatus')).notOneOf([0, 1], i18n.t('static.program.validstatus')),
         versionNotes: Yup.string()
             .required(i18n.t('static.program.validnotestext')),
         // stopDate: Yup.string()
@@ -527,7 +527,7 @@ class EditSupplyPlanStatus extends Component {
                 batchInfoList: batchList,
                 batchInfoListAllForInventory: batchInfoList
             })
-            var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
             openRequest.onerror = function (event) {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext')
@@ -758,7 +758,7 @@ class EditSupplyPlanStatus extends Component {
             shipmentListUnFiltered: programJson.shipmentList
         })
 
-        var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
             this.setState({
                 supplyPlanError: i18n.t('static.program.errortext')
@@ -931,7 +931,7 @@ class EditSupplyPlanStatus extends Component {
         this.setState({
             batchInfoListAll: batchInfoListAll
         })
-        var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
             this.setState({
                 supplyPlanError: i18n.t('static.program.errortext')
@@ -1931,7 +1931,7 @@ class EditSupplyPlanStatus extends Component {
         var db1;
         getDatabase();
         var regionList = [];
-        var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
             this.setState({
                 supplyPlanError: i18n.t('static.program.errortext')
@@ -2792,7 +2792,7 @@ class EditSupplyPlanStatus extends Component {
         var storeOS;
         getDatabase();
         var dataSourceListAll = [];
-        var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (e) {
             this.setState({
                 supplyPlanError: i18n.t('static.program.errortext')
@@ -3663,10 +3663,8 @@ class EditSupplyPlanStatus extends Component {
                             onSubmit={(values, { setSubmitting, setErrors }) => {
                                 ProgramService.updateProgramStatus(this.state.program)
                                     .then(response => {
-                                       
-                                            this.props.history.push(`/report/supplyPlanVersionAndReview/` + i18n.t(response.data.messageCode, { entityname }))
-                                        
-                                        
+                                        console.log("messageCode",response)
+                                        this.props.history.push(`/report/supplyPlanVersionAndReview/` + 'green/' + i18n.t("static.message.supplyplanversionapprovedsuccess"))
                                     })
                                     .catch(
                                         error => {
@@ -3767,7 +3765,7 @@ class EditSupplyPlanStatus extends Component {
                                             </CardBody>
                                             <CardFooter>
                                                 <FormGroup>
-                                                   <Button type="submit" size="md" color="success" className="float-left mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
+                                                    <Button type="submit" size="md" color="success" className="float-left mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                                     <Button type="button" size="md" color="warning" className="float-left mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> Reset</Button>
                                                     <Button type="button" size="md" color="danger" className="float-left mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
 
@@ -3784,7 +3782,7 @@ class EditSupplyPlanStatus extends Component {
 
     }
     cancelClicked = () => {
-        this.props.history.push(`/report/supplyPlanVersionAndReview/` + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/report/supplyPlanVersionAndReview/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
     resetClicked = () => {
         AuthenticationService.setupAxiosInterceptors();

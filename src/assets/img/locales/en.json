@@ -1114,7 +1114,7 @@
     "static.technicalArea.technicalAreaCodeText": " Please enter technical area code",
     "static.technicalArea.productcategorynametext": " Please enter product category name",
     "static.common.notes": " Notes",
-    "static.common.bugreport": " Report a bug",
+    "static.common.bugreport": "Report a bug",
     "static.report.procurmentAgentLeadTimeReport": " Procurement Agent Lead Time",
     "static.dashboard.linkShipment": " Link shipment",
     "static.commitVersion.conflicts": " Conflicts",
@@ -1166,5 +1166,10 @@
     "static.dataentry.showErrors":"Show only errors",
     "static.batchDetails.warningFefo":"Batch deatils with only fefo entry will not get saved.",
     "static.batchDetails.warningQunatity":"Total Batch deatils qty will override the existing quantity.",
-    "static.dataEntry.showOnlyErrors":"Show only errors"
+    "static.dataEntry.showOnlyErrors":"Show only errors",
+    "static.ticket.help": "Help",
+    "static.ticket.header": "Service Desk",
+    "static.ticket.subheader": "WE ARE HERE TO HELP YOU WITH YOUR QUERY",
+    "static.ticket.uploadScreenshot": "Upload Screenshot",
+    "static.message.supplyplanversionapprovedsuccess":"Supply Plan status updated successfully"
 }
