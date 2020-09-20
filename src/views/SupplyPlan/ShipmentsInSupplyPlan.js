@@ -982,8 +982,15 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                                 var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
                                                                                 cell.classList.add('readonly');
                                                                             }
-                                                                            var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
+
+                                                                            if (lastShipmentStatus == "") {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                            } else {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                            }
+
                                                                             var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
                                                                             cell.classList.add('readonly');
                                                                             var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
@@ -1012,10 +1019,23 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                                 var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
                                                                                 cell.classList.add('readonly');
                                                                             }
-                                                                            var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
-                                                                            var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
+                                                                            if (lastShipmentStatus == "") {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                            } else if (lastShipmentStatus == PLANNED_SHIPMENT_STATUS) {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                            } else {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                            }
+
                                                                             var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
                                                                             cell.classList.add('readonly');
                                                                             var cell = elInstance.getCell(`F${parseInt(0) + 1}`)
@@ -1042,12 +1062,36 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                                 var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
                                                                                 cell.classList.add('readonly');
                                                                             }
-                                                                            var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
-                                                                            var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
-                                                                            var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
+                                                                            
+                                                                            if (lastShipmentStatus == "") {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                            } else if (lastShipmentStatus == PLANNED_SHIPMENT_STATUS) {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                            } else if (lastShipmentStatus == SUBMITTED_SHIPMENT_STATUS) {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                            } else {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                            }
                                                                             var cell = elInstance.getCell(`F${parseInt(0) + 1}`)
                                                                             cell.classList.add('readonly');
                                                                             var cell = elInstance.getCell(`G${parseInt(0) + 1}`)
@@ -1072,14 +1116,53 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                                 var cell = elInstance.getCell(`F${parseInt(0) + 1}`)
                                                                                 cell.classList.add('readonly');
                                                                             }
-                                                                            var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
-                                                                            var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
-                                                                            var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
-                                                                            var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
+                                                                            
+                                                                            if (lastShipmentStatus == "") {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                            } else if (lastShipmentStatus == PLANNED_SHIPMENT_STATUS) {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                            } else if (lastShipmentStatus == SUBMITTED_SHIPMENT_STATUS) {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                            } else if (lastShipmentStatus == APPROVED_SHIPMENT_STATUS) {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                            } else {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                            }
                                                                             var cell = elInstance.getCell(`G${parseInt(0) + 1}`)
                                                                             cell.classList.add('readonly');
                                                                             var cell = elInstance.getCell(`B${parseInt(1) + 1}`)
@@ -1102,16 +1185,73 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                                 var cell = elInstance.getCell(`G${parseInt(0) + 1}`)
                                                                                 cell.classList.add('readonly');
                                                                             }
-                                                                            var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
-                                                                            var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
-                                                                            var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
-                                                                            var cell = elInstance.getCell(`F${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
-                                                                            var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
+                                                                            if (lastShipmentStatus == "") {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`F${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                            } else if (lastShipmentStatus == PLANNED_SHIPMENT_STATUS) {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`F${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                            } else if (lastShipmentStatus == SUBMITTED_SHIPMENT_STATUS) {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`c${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`F${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                            } else if (lastShipmentStatus == APPROVED_SHIPMENT_STATUS) {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`F${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                            } else if (lastShipmentStatus == SHIPPED_SHIPMENT_STATUS) {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`F${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                            } else {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`F${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                            }
                                                                             var cell = elInstance.getCell(`B${parseInt(1) + 1}`)
                                                                             cell.classList.add('readonly');
                                                                             var cell = elInstance.getCell(`C${parseInt(1) + 1}`)
@@ -1166,8 +1306,14 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                                 var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
                                                                                 cell.classList.add('readonly');
                                                                             }
-                                                                            var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
+                                                                            if (lastShipmentStatus == "") {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                            } else {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                            }
+
                                                                             var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
                                                                             cell.classList.add('readonly');
                                                                             var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
@@ -1186,10 +1332,23 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                                 var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
                                                                                 cell.classList.add('readonly');
                                                                             }
-                                                                            var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
-                                                                            var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
+
+                                                                            if (lastShipmentStatus == "") {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                            } else if (lastShipmentStatus == PLANNED_SHIPMENT_STATUS) {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                            } else {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                            }
                                                                             var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
                                                                             cell.classList.add('readonly');
                                                                             var cell = elInstance.getCell(`F${parseInt(0) + 1}`)
@@ -1206,12 +1365,36 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                                 var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
                                                                                 cell.classList.add('readonly');
                                                                             }
-                                                                            var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
-                                                                            var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
-                                                                            var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
+
+                                                                            if (lastShipmentStatus == "") {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                            } else if (lastShipmentStatus == PLANNED_SHIPMENT_STATUS) {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                            } else if (lastShipmentStatus == SUBMITTED_SHIPMENT_STATUS) {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                            } else {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                            }
                                                                             var cell = elInstance.getCell(`F${parseInt(0) + 1}`)
                                                                             cell.classList.add('readonly');
                                                                             var cell = elInstance.getCell(`G${parseInt(0) + 1}`)
@@ -1226,14 +1409,52 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                                 var cell = elInstance.getCell(`F${parseInt(0) + 1}`)
                                                                                 cell.classList.add('readonly');
                                                                             }
-                                                                            var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
-                                                                            var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
-                                                                            var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
-                                                                            var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
+                                                                            if (lastShipmentStatus == "") {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                            } else if (lastShipmentStatus == PLANNED_SHIPMENT_STATUS) {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                            } else if (lastShipmentStatus == SUBMITTED_SHIPMENT_STATUS) {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                            } else if (lastShipmentStatus == APPROVED_SHIPMENT_STATUS) {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                            } else {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                            }
                                                                             var cell = elInstance.getCell(`G${parseInt(0) + 1}`)
                                                                             cell.classList.add('readonly');
                                                                             var cell = elInstance.getCell(`F${parseInt(1) + 1}`)
@@ -1246,16 +1467,73 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                                 var cell = elInstance.getCell(`G${parseInt(0) + 1}`)
                                                                                 cell.classList.add('readonly');
                                                                             }
-                                                                            var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
-                                                                            var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
-                                                                            var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
-                                                                            var cell = elInstance.getCell(`F${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
-                                                                            var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
+                                                                            if (lastShipmentStatus == "") {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`F${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                            } else if (lastShipmentStatus == PLANNED_SHIPMENT_STATUS) {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`F${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                            } else if (lastShipmentStatus == SUBMITTED_SHIPMENT_STATUS) {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`c${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`F${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                            } else if (lastShipmentStatus == APPROVED_SHIPMENT_STATUS) {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`F${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                            } else if (lastShipmentStatus == SHIPPED_SHIPMENT_STATUS) {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`F${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                            } else {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`F${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                            }
                                                                             var cell = elInstance.getCell(`G${parseInt(1) + 1}`)
                                                                             cell.classList.add('readonly');
                                                                         }
