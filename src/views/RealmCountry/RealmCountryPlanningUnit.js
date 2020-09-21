@@ -259,14 +259,14 @@ class PlanningUnitCountry extends Component {
                                                     var elInstance = el.jexcel;
                                                     var rowData = elInstance.getRowData(y);
                                                     var realmCountryPlanningUnitId = rowData[8];
-                                                    if(realmCountryPlanningUnitId==0){
+                                                    if (realmCountryPlanningUnitId == 0) {
                                                         var cell = elInstance.getCell(`B${parseInt(y) + 1}`)
                                                         cell.classList.remove('readonly');
-                                                    }else{
+                                                    } else {
                                                         var cell = elInstance.getCell(`B${parseInt(y) + 1}`)
                                                         cell.classList.add('readonly');
                                                     }
-                                                    
+
                                                 },
                                                 pagination: 10,
                                                 search: true,
@@ -678,19 +678,40 @@ class PlanningUnitCountry extends Component {
         }
 
         //Multiplier
+        // if (x == 5) {
+        //     var col = ("F").concat(parseInt(y) + 1);
+        //     var reg = /^[0-9\b]+$/;
+        //     if (value == "" || isNaN(parseInt(value)) || !(reg.test(value))) {
+        //         this.el.setStyle(col, "background-color", "transparent");
+        //         this.el.setStyle(col, "background-color", "yellow");
+        //         this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+        //     }
+        //     else {
+        //         this.el.setStyle(col, "background-color", "transparent");
+        //         this.el.setComments(col, "");
+        //     }
+        // }
+
         if (x == 5) {
             var col = ("F").concat(parseInt(y) + 1);
             var reg = /^[0-9\b]+$/;
-            if (value == "" || isNaN(parseInt(value)) || !(reg.test(value))) {
+            if (value == "" || isNaN(Number.parseInt(value)) || value < 0) {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                if (isNaN(Number.parseInt(value)) || value < 0) {
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                }
+                else {
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                }
             }
             else {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
             }
         }
+
+
         //Active
         if (x == 6) {
             this.el.setValueFromCoords(9, y, 1, true);
@@ -756,8 +777,8 @@ class PlanningUnitCountry extends Component {
                     //     this.el.setStyle(col, "background-color", "yellow");
                     //     this.el.setComments(col, i18n.t('static.message.skucodevalid'));
                     // } else {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setComments(col, "");
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
                     // }
                 }
 

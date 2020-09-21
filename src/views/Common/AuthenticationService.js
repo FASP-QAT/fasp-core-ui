@@ -1050,7 +1050,7 @@ class AuthenticationService {
                     break;
                 case "/report/supplyPlanVersionAndReview":
                 case "/report/editStatus/:programId/:versionId":
-                case "/report/supplyPlanVersionAndReview/:message":
+                case "/report/supplyPlanVersionAndReview/:color/:message":
                     if (bfunction.includes("ROLE_BF_SUPPLY_PLAN_VERSION_AND_REVIEW")) {
                         return true;
                     }

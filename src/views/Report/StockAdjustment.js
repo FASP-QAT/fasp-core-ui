@@ -1611,9 +1611,11 @@ class StockAdjustmentComponent extends Component {
                 getDatabase();
                 var regionList = [];
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                this.setState({ loading: true })
                 openRequest.onerror = function (event) {
                     this.setState({
-                        message: i18n.t('static.program.errortext')
+                        message: i18n.t('static.program.errortext'),
+                        loading:false
                     })
                 }.bind(this);
                 openRequest.onsuccess = function (e) {
@@ -1628,11 +1630,12 @@ class StockAdjustmentComponent extends Component {
                     var programRequest = programDataOs.get(program);
                     programRequest.onerror = function (event) {
                         this.setState({
-                            message: i18n.t('static.program.errortext')
+                            message: i18n.t('static.program.errortext'),
+                            loading:false
                         })
                     }.bind(this);
                     programRequest.onsuccess = function (e) {
-                        // this.setState({ loading: true })
+                        
                         console.log("2----", programRequest)
                         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);

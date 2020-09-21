@@ -1506,7 +1506,8 @@ export default class InventoryTurns extends Component {
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                 openRequest.onerror = function (event) {
                     this.setState({
-                        message: i18n.t('static.program.errortext')
+                        message: i18n.t('static.program.errortext'),
+                        loading:false
                     })
                 }.bind(this);
                 openRequest.onsuccess = function (e) {
@@ -1521,11 +1522,12 @@ export default class InventoryTurns extends Component {
                     var programRequest = programDataOs.get(program);
                     programRequest.onerror = function (event) {
                         this.setState({
-                            message: i18n.t('static.program.errortext')
+                            message: i18n.t('static.program.errortext'),
+                            loading:false
                         })
                     }.bind(this);
                     programRequest.onsuccess = function (e) {
-                        // this.setState({ loading: true })
+                        this.setState({ loading: true })
                         console.log(programRequest)
                         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
@@ -1536,6 +1538,9 @@ export default class InventoryTurns extends Component {
                         var planningunitRequest = planningunitOs.getAll();
                         planningunitRequest.onerror = function (event) {
                             // Handle errors!
+                            this.setState({
+                                loading:false
+                            })
                         };
                         planningunitRequest.onsuccess = function (e) {
                             var myResult = [];

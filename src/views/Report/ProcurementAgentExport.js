@@ -2707,11 +2707,13 @@ class ProcurementAgentExport extends Component {
                     var db1;
                     var storeOS;
                     getDatabase();
+                    this.setState({ loading: true })
                     var regionList = [];
                     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                     openRequest.onerror = function (event) {
                         this.setState({
-                            message: i18n.t('static.program.errortext')
+                            message: i18n.t('static.program.errortext'),
+                            loading: false
                         })
                     }.bind(this);
                     openRequest.onsuccess = function (e) {
@@ -2731,7 +2733,8 @@ class ProcurementAgentExport extends Component {
                         var programRequest = programDataOs.get(program);
                         programRequest.onerror = function (event) {
                             this.setState({
-                                message: i18n.t('static.program.errortext')
+                                message: i18n.t('static.program.errortext'),
+                                loading: false
                             })
                         }.bind(this);
                         programRequest.onsuccess = function (e) {
@@ -2743,8 +2746,14 @@ class ProcurementAgentExport extends Component {
                             var programTransaction = db1.transaction(['program'], 'readwrite');
                             var programOs = programTransaction.objectStore('program');
                             var program1Request = programOs.getAll();
+
+                            program1Request.onerror = function (event) {
+                                this.setState({
+                                    loading: false
+                                })
+                            }.bind(this);
                             program1Request.onsuccess = function (event) {
-                                // this.setState({ loading: true })
+                                
                                 var programResult = [];
                                 programResult = program1Request.result;
                                 let airFreight = 0;
@@ -2952,10 +2961,12 @@ class ProcurementAgentExport extends Component {
                     var storeOS;
                     getDatabase();
                     var regionList = [];
+                    this.setState({ loading: true })
                     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                     openRequest.onerror = function (event) {
                         this.setState({
-                            message: i18n.t('static.program.errortext')
+                            message: i18n.t('static.program.errortext'),
+                            loading: false
                         })
                     }.bind(this);
                     openRequest.onsuccess = function (e) {
@@ -2975,7 +2986,8 @@ class ProcurementAgentExport extends Component {
                         var programRequest = programDataOs.get(program);
                         programRequest.onerror = function (event) {
                             this.setState({
-                                message: i18n.t('static.program.errortext')
+                                message: i18n.t('static.program.errortext'),
+                                loading: false
                             })
                         }.bind(this);
                         programRequest.onsuccess = function (e) {
@@ -2987,8 +2999,14 @@ class ProcurementAgentExport extends Component {
                             var programTransaction = db1.transaction(['program'], 'readwrite');
                             var programOs = programTransaction.objectStore('program');
                             var program1Request = programOs.getAll();
+
+                            program1Request.onerror = function (event) {
+                                this.setState({
+                                    loading: false
+                                })
+                            }.bind(this);
                             program1Request.onsuccess = function (event) {
-                                // this.setState({ loading: true })
+                                
                                 var programResult = [];
                                 programResult = program1Request.result;
                                 let airFreight = 0;
@@ -3197,10 +3215,12 @@ class ProcurementAgentExport extends Component {
                     var storeOS;
                     getDatabase();
                     var regionList = [];
+                    this.setState({ loading: true })
                     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                     openRequest.onerror = function (event) {
                         this.setState({
-                            message: i18n.t('static.program.errortext')
+                            message: i18n.t('static.program.errortext'),
+                            loading: false
                         })
                     }.bind(this);
                     openRequest.onsuccess = function (e) {
@@ -3220,7 +3240,8 @@ class ProcurementAgentExport extends Component {
                         var programRequest = programDataOs.get(program);
                         programRequest.onerror = function (event) {
                             this.setState({
-                                message: i18n.t('static.program.errortext')
+                                message: i18n.t('static.program.errortext'),
+                                loading: false
                             })
                         }.bind(this);
                         programRequest.onsuccess = function (e) {
@@ -3232,8 +3253,14 @@ class ProcurementAgentExport extends Component {
                             var programTransaction = db1.transaction(['program'], 'readwrite');
                             var programOs = programTransaction.objectStore('program');
                             var program1Request = programOs.getAll();
+
+                            program1Request.onerror = function (event) {
+                                this.setState({
+                                    loading: false
+                                })
+                            }.bind(this);
                             program1Request.onsuccess = function (event) {
-                                // this.setState({ loading: true })
+                                
                                 var programResult = [];
                                 programResult = program1Request.result;
                                 let airFreight = 0;

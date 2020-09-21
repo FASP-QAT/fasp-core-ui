@@ -751,7 +751,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                             }
                         }
                         if (props.consumptionPage == "consumptionDataEntry") {
-                            props.formSubmit(props.items.planningUnit);
+                            props.formSubmit(props.items.planningUnit,props.items.rangeValue);
                         }
                         props.updateState("loading", false);
                         props.hideFirstComponent();
@@ -773,7 +773,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                             }
                         }
                         if (props.inventoryPage == "inventoryDataEntry") {
-                            props.formSubmit(props.items.planningUnit);
+                            props.formSubmit(props.items.planningUnit,props.items.rangeValue);
                         }
                         props.updateState("loading", false);
                         props.hideFirstComponent();
@@ -792,7 +792,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                             }
                         }
                         if (props.shipmentPage == "shipmentDataEntry") {
-                            props.formSubmit(props.items.planningUnit);
+                            props.formSubmit(props.items.planningUnit,props.items.rangeValue);
                         }
                         props.updateState("loading", false);
                         props.hideFirstComponent()

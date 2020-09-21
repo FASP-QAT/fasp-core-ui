@@ -7,6 +7,7 @@ import PlanningUnitService from '../../api/PlanningUnitService';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
+import { SPACE_REGEX } from '../../Constants.js';
 
 const entityname = i18n.t('static.planningunit.planningunit');
 let initialValues = {
@@ -19,6 +20,7 @@ let initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         label: Yup.string()
+            .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.planningunit.planningunittext')),
         multiplier: Yup.string()
             .required(i18n.t('static.planningunit.multipliertext'))
