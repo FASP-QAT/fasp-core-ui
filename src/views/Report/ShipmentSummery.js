@@ -1061,8 +1061,8 @@ class ShipmentSummery extends Component {
             message: '',
             viewById: 1,
             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate:{year:  new Date().getFullYear()-3, month: new Date().getMonth()},
-            maxDate:{year:  new Date().getFullYear()+3, month: new Date().getMonth()+1},
+            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() },
+            maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() + 1 },
             loading: true
         };
         this.formatLabel = this.formatLabel.bind(this);
@@ -1291,7 +1291,7 @@ class ShipmentSummery extends Component {
             startY: height,
             styles: { lineWidth: 1, fontSize: 8, cellWidth: 190, halign: 'center' },
             columnStyles: {
-                 0: { cellWidth: 191.89 },
+                0: { cellWidth: 191.89 },
             },
             html: '#mytable1',
 
@@ -1546,80 +1546,80 @@ class ShipmentSummery extends Component {
             if (versionId == 0) {
                 this.setState({ message: i18n.t('static.program.validversion'), data: [] });
             } else {
-            if (versionId.includes('Local')) {
-                const lan = 'en';
-                var db1;
-                var storeOS;
-                getDatabase();
-                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                openRequest.onsuccess = function (e) {
-                    db1 = e.target.result;
-                    var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
-                    var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
-                    var planningunitRequest = planningunitOs.getAll();
-                    var planningList = []
-                    planningunitRequest.onerror = function (event) {
-                        // Handle errors!
-                    };
-                    planningunitRequest.onsuccess = function (e) {
-                        var myResult = [];
-                        myResult = planningunitRequest.result;
-                        var programId = (document.getElementById("programId").value).split("_")[0];
-                        var proList = []
-                        // console.log(myResult)
-                        for (var i = 0; i < myResult.length; i++) {
-                            if (myResult[i].program.id == programId) {
+                if (versionId.includes('Local')) {
+                    const lan = 'en';
+                    var db1;
+                    var storeOS;
+                    getDatabase();
+                    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                    openRequest.onsuccess = function (e) {
+                        db1 = e.target.result;
+                        var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+                        var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
+                        var planningunitRequest = planningunitOs.getAll();
+                        var planningList = []
+                        planningunitRequest.onerror = function (event) {
+                            // Handle errors!
+                        };
+                        planningunitRequest.onsuccess = function (e) {
+                            var myResult = [];
+                            myResult = planningunitRequest.result;
+                            var programId = (document.getElementById("programId").value).split("_")[0];
+                            var proList = []
+                            // console.log(myResult)
+                            for (var i = 0; i < myResult.length; i++) {
+                                if (myResult[i].program.id == programId) {
 
-                                proList[i] = myResult[i]
+                                    proList[i] = myResult[i]
+                                }
                             }
-                        }
+                            this.setState({
+                                planningUnits: proList, message: ''
+                            }, () => {
+                                this.fetchData();
+                            })
+                        }.bind(this);
+                    }.bind(this)
+
+
+                }
+                else {
+                    AuthenticationService.setupAxiosInterceptors();
+
+                    //let productCategoryId = document.getElementById("productCategoryId").value;
+                    ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
+                        // console.log('**' + JSON.stringify(response.data))
                         this.setState({
-                            planningUnits: proList, message: ''
+                            planningUnits: response.data, message: ''
                         }, () => {
                             this.fetchData();
                         })
-                    }.bind(this);
-                }.bind(this)
-
-
-            }
-            else {
-                AuthenticationService.setupAxiosInterceptors();
-
-                //let productCategoryId = document.getElementById("productCategoryId").value;
-                ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
-                    // console.log('**' + JSON.stringify(response.data))
-                    this.setState({
-                        planningUnits: response.data, message: ''
-                    }, () => {
-                        this.fetchData();
                     })
-                })
-                    .catch(
-                        error => {
-                            this.setState({
-                                planningUnits: [],
-                            })
-                            if (error.message === "Network Error") {
-                                this.setState({ message: error.message });
-                            } else {
-                                switch (error.response ? error.response.status : "") {
-                                    case 500:
-                                    case 401:
-                                    case 404:
-                                    case 406:
-                                    case 412:
-                                        this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
-                                        break;
-                                    default:
-                                        this.setState({ message: 'static.unkownError' });
-                                        break;
+                        .catch(
+                            error => {
+                                this.setState({
+                                    planningUnits: [],
+                                })
+                                if (error.message === "Network Error") {
+                                    this.setState({ message: error.message });
+                                } else {
+                                    switch (error.response ? error.response.status : "") {
+                                        case 500:
+                                        case 401:
+                                        case 404:
+                                        case 406:
+                                        case 412:
+                                            this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
+                                            break;
+                                        default:
+                                            this.setState({ message: 'static.unkownError' });
+                                            break;
+                                    }
                                 }
                             }
-                        }
-                    );
+                        );
+                }
             }
-        }
         });
 
     }
@@ -1668,7 +1668,8 @@ class ShipmentSummery extends Component {
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                 openRequest.onerror = function (event) {
                     this.setState({
-                        message: i18n.t('static.program.errortext')
+                        message: i18n.t('static.program.errortext'),
+                        loading: false
                     })
                 }.bind(this);
                 openRequest.onsuccess = function (e) {
@@ -1683,11 +1684,12 @@ class ShipmentSummery extends Component {
                     var programRequest = programDataOs.get(program);
                     programRequest.onerror = function (event) {
                         this.setState({
-                            message: i18n.t('static.program.errortext')
+                            message: i18n.t('static.program.errortext'),
+                            loading: false
                         })
                     }.bind(this);
                     programRequest.onsuccess = function (e) {
-                        // this.setState({ loading: true })
+                        this.setState({ loading: true })
                         // console.log("2----", programRequest)
                         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
@@ -1717,6 +1719,9 @@ class ShipmentSummery extends Component {
 
                         planningunitRequest.onerror = function (event) {
                             // Handle errors!
+                            this.setState({
+                                loading: false
+                            })
                         };
 
 
@@ -2133,7 +2138,7 @@ class ShipmentSummery extends Component {
                                                     {/* <InputGroup> */}
                                                     <Picker
                                                         ref="pickRange"
-                                                        years={{min: this.state.minDate, max: this.state.maxDate}}
+                                                        years={{ min: this.state.minDate, max: this.state.maxDate }}
                                                         value={rangeValue}
                                                         lang={pickerLang}
                                                         //theme="light"

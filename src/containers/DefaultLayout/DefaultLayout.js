@@ -503,7 +503,7 @@ const routes = [
 
   { path: '/report/supplyPlanVersionAndReview', exact: true, name: 'static.report.supplyplanversionandreviewReport', component: SupplyPlanVersionAndReview },
   { path: '/report/editStatus/:programId/:versionId', name: 'static.report.updatestatus', component: EditSupplyPlanStatus },
-  { path: '/report/supplyPlanVersionAndReview/:message', name: 'static.report.supplyplanversionandreviewReport', component: SupplyPlanVersionAndReview },
+  { path: '/report/supplyPlanVersionAndReview/:color/:message', name: 'static.report.supplyplanversionandreviewReport', component: SupplyPlanVersionAndReview },
 
   { path: '/report/shipmentSummery', exact: true, name: 'static.report.shipmentDetailReport', component: ShipmentSummery },
   { path: '/report/shipmentSummery/:message', name: 'static.report.shipmentSummeryReport', component: ShipmentSummery },

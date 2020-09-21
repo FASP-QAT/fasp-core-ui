@@ -25,9 +25,42 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         this.saveInventoryBatchInfo = this.saveInventoryBatchInfo.bind(this);
         this.checkValidationInventory = this.checkValidationInventory.bind(this);
         this.saveInventory = this.saveInventory.bind(this);
+        this.showOnlyErrors = this.showOnlyErrors.bind(this);
         this.state = {
             inventoryEl: "",
             inventoryBatchInfoTableEl: ""
+        }
+    }
+
+    showOnlyErrors() {
+        var checkBoxValue = document.getElementById("showErrors");
+        var elInstance = this.state.inventoryEl;
+        var json = elInstance.getJson();
+        var showOption = (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+        if (json.length < showOption) {
+            showOption = json.length;
+        }
+        if (checkBoxValue.checked == true) {
+            console.log("in ncheck box true");
+            for (var j = 0; j < parseInt(showOption); j++) {
+                var rowData = elInstance.getRowData(j);
+                console.log("in for loop", rowData[16]);
+                var asterisk = document.getElementsByClassName("jexcel_content")[0];
+                console.log("asterisk", asterisk);
+                var tr = (asterisk.childNodes[0]).childNodes[2];
+                if (rowData[16].toString() == 1) {
+                    tr.childNodes[j].style.display = "";
+                } else {
+                    tr.childNodes[j].style.display = "none";
+                }
+            }
+        } else {
+            for (var j = 0; j < parseInt(showOption); j++) {
+                var asterisk = document.getElementsByClassName("jexcel_content")[0];
+                console.log("asterisk", asterisk);
+                var tr = (asterisk.childNodes[0]).childNodes[2];
+                tr.childNodes[j].style.display = "";
+            }
         }
     }
 
@@ -168,6 +201,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         }
                         data[14] = index;
                         data[15] = 0;
+                        data[16] = 0;
                         inventoryDataArr[j] = data;
                     }
                     if (inventoryList.length == 0) {
@@ -197,8 +231,12 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         data[13] = "";
                         data[14] = -1;
                         data[15] = 1;
+                        data[16] = 0;
                         inventoryDataArr[0] = data;
                     }
+                    this.setState({
+                        inventoryAllJson: inventoryDataArr
+                    })
                     var options = {
                         data: inventoryDataArr,
                         columnDrag: true,
@@ -211,14 +249,15 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                             { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: adjustmentColumnType, mask: '[-]#,##', width: 80 },
                             { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: actualColumnType, mask: '#,##.00', decimal: '.', width: 80 },
                             { title: i18n.t('static.unit.multiplier'), type: 'numeric', mask: '#,##.00', decimal: '.', width: 80, readOnly: true },
-                            { title: i18n.t('static.supplyPlan.quantityQATProduct'), type: adjustmentColumnType, mask: '#,##.00', decimal: '.', width: 80, readOnly: true },
+                            { title: i18n.t('static.supplyPlan.quantityQATProduct'), type: adjustmentColumnType, mask: '[-]#,##.00', decimal: '.', width: 80, readOnly: true },
                             { title: i18n.t('static.supplyPlan.quantityQATProduct'), type: actualColumnType, mask: '#,##.00', decimal: '.', width: 80, readOnly: true },
                             { title: i18n.t('static.program.notes'), type: 'text', width: 200 },
                             { title: i18n.t('static.inventory.active'), type: 'checkbox', width: 100 },
                             { title: i18n.t('static.inventory.inventoryDate'), type: 'hidden', width: 0 },
                             { type: 'hidden', title: i18n.t('static.supplyPlan.batchInfo'), width: 0 },
                             { type: 'hidden', title: i18n.t('static.supplyPlan.index'), width: 0 },
-                            { type: 'hidden', title: i18n.t('static.supplyPlan.isChanged'), width: 0 }
+                            { type: 'hidden', title: i18n.t('static.supplyPlan.isChanged'), width: 0 },
+                            { type: 'hidden', width: 0 },
                         ],
                         pagination: paginationOption,
                         paginationOptions: paginationArray,
@@ -486,7 +525,16 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                                 data[13] = "";
                                                 data[14] = -1;
                                                 data[15] = 1;
+                                                data[16] = 0;
                                                 obj.insertRow(data);
+                                                if (this.props.inventoryPage == "inventoryDataEntry") {
+                                                    var showOption = (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+                                                    console.log("showOption", showOption);
+                                                    if (showOption != 5000000) {
+                                                        var pageNo = parseInt(parseInt(json.length) / parseInt(showOption));
+                                                        obj.page(pageNo);
+                                                    }
+                                                }
                                             }.bind(this)
                                         });
                                     }
@@ -545,9 +593,6 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         tr.children[5].classList.add('AsteriskTheadtrTd');
         tr.children[6].classList.add('AsteriskTheadtrTd');
         tr.children[7].classList.add('AsteriskTheadtrTd');
-        tr.children[8].classList.add('AsteriskTheadtrTd');
-        tr.children[9].classList.add('AsteriskTheadtrTd');
-        tr.children[10].classList.add('AsteriskTheadtrTd');
     }
 
     inventoryChanged = function (instance, cell, x, y, value) {
@@ -556,17 +601,30 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         this.props.updateState("inventoryError", "");
         this.props.updateState("inventoryDuplicateError", "");
         this.props.updateState("inventoryChangedFlag", 1);
+        if (x != 15 && x != 16) {
+            elInstance.setValueFromCoords(16, y, 0, true);
+
+        }
         if (x != 15) {
             elInstance.setValueFromCoords(15, y, 1, true);
         }
         if (x == 0) {
-            checkValidtion("date", "A", y, rowData[0], elInstance);
+            var valid = checkValidtion("date", "A", y, rowData[0], elInstance);
+            if (valid == false) {
+                elInstance.setValueFromCoords(16, y, 1, true);
+            }
         }
         if (x == 1) {
-            checkValidtion("text", "B", y, rowData[1], elInstance);
+            var valid = checkValidtion("text", "B", y, rowData[1], elInstance);
+            if (valid == false) {
+                elInstance.setValueFromCoords(16, y, 1, true);
+            }
         }
         if (x == 2) {
-            checkValidtion("text", "C", y, rowData[2], elInstance);
+            var valid = checkValidtion("text", "C", y, rowData[2], elInstance);
+            if (valid == false) {
+                elInstance.setValueFromCoords(16, y, 1, true);
+            }
         }
         if (x == 3) {
             elInstance.setValueFromCoords(7, y, "", true);
@@ -575,19 +633,28 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 var multiplier = (this.state.realmCountryPlanningUnitList.filter(c => c.id == rowData[3])[0]).multiplier;
                 elInstance.setValueFromCoords(7, y, multiplier, true);
             }
+            if (valid == false) {
+                elInstance.setValueFromCoords(16, y, 1, true);
+            }
         }
         if (x == 5) {
             if (rowData[4] == 2) {
-                checkValidtion("number", "F", y, rowData[5], elInstance, NEGATIVE_INTEGER_NO_REGEX, 0, 0);
+                var valid = checkValidtion("number", "F", y, rowData[5], elInstance, NEGATIVE_INTEGER_NO_REGEX, 0, 0);
+                if (valid == false) {
+                    elInstance.setValueFromCoords(16, y, 1, true);
+                }
             }
         }
 
         if (x == 6) {
             if (rowData[4] == 1) {
-                checkValidtion("number", "G", y, rowData[6], elInstance, INTEGER_NO_REGEX, 1, 1);
+                var valid = checkValidtion("number", "G", y, rowData[6], elInstance, INTEGER_NO_REGEX, 1, 1);
+                if (valid == false) {
+                    elInstance.setValueFromCoords(16, y, 1, true);
+                }
             }
         }
-
+        // this.showOnlyErrors();
     }
 
     filterBatchInfoForExistingDataForInventory = function (instance, cell, c, r, source) {
@@ -607,7 +674,6 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         console.log("astrrisk", asterisk);
         var tr = asterisk.firstChild;
         tr.children[1].classList.add('AsteriskTheadtrTd');
-        tr.children[2].classList.add('AsteriskTheadtrTd');
         tr.children[4].classList.add('AsteriskTheadtrTd');
         tr.children[5].classList.add('AsteriskTheadtrTd');
     }
@@ -796,13 +862,14 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             var rowNumber = 0;
             var totalAdjustments = 0;
             var totalActualStock = 0;
-
+            var countForNonFefo = 0;
             for (var i = 0; i < json.length; i++) {
                 var map = new Map(Object.entries(json[i]));
                 if (i == 0) {
                     rowNumber = map.get("6");
                 }
                 if (map.get("0") != -1) {
+                    countForNonFefo += 1;
                     var batchInfoJson = {
                         inventoryTransBatchInfoId: map.get("5"),
                         batch: {
@@ -820,6 +887,14 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             }
             var inventoryInstance = this.state.inventoryEl;
             var rowData = inventoryInstance.getRowData(parseInt(rowNumber));
+            if (countForNonFefo == 0) {
+                alert(i18n.t("static.batchDetails.warningFefo"));
+            }
+            if (map.get("2") == 1 && rowData[6] != "" && totalActualStock != rowData[6]) {
+                alert(i18n.t("static.batchDetails.warningQunatity"))
+            } else if (map.get("2") == 2 && rowData[5] != "" && totalAdjustments != rowData[5]) {
+                alert(i18n.t("static.batchDetails.warningQunatity"))
+            }
 
             if (map.get("2") == 1) {
                 inventoryInstance.setValueFromCoords(5, rowNumber, "", true);
@@ -882,6 +957,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     inValid(colArr[c], y, i18n.t('static.supplyPlan.duplicateAdjustments'), elInstance);
                 }
                 valid = false;
+                elInstance.setValueFromCoords(16, y, 1, true);
                 this.props.updateState("inventoryDuplicateError", i18n.t('static.supplyPlan.duplicateAdjustments'));
                 this.props.hideSecondComponent()
             } else {
@@ -897,28 +973,33 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 var validation = checkValidtion("date", "A", y, rowData[0], elInstance);
                 if (validation == false) {
                     valid = false;
+                    elInstance.setValueFromCoords(16, y, 1, true);
                 }
 
                 var validation = checkValidtion("text", "B", y, rowData[1], elInstance);
                 if (validation == false) {
                     valid = false;
+                    elInstance.setValueFromCoords(16, y, 1, true);
                 }
 
                 var validation = checkValidtion("text", "C", y, rowData[2], elInstance);
                 if (validation == false) {
                     valid = false;
+                    elInstance.setValueFromCoords(16, y, 1, true);
                 }
 
 
                 var validation = checkValidtion("text", "D", y, rowData[3], elInstance);
                 if (validation == false) {
                     valid = false;
+                    elInstance.setValueFromCoords(16, y, 1, true);
                 }
 
                 if (rowData[4] == 2) {
                     var validation = checkValidtion("number", "F", y, rowData[5], elInstance, NEGATIVE_INTEGER_NO_REGEX, 0, 0);
                     if (validation == false) {
                         valid = false;
+                        elInstance.setValueFromCoords(16, y, 1, true);
                     }
                 }
 
@@ -926,6 +1007,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     var validation = checkValidtion("number", "G", y, rowData[6], elInstance, INTEGER_NO_REGEX, 1, 1);
                     if (validation == false) {
                         valid = false;
+                        elInstance.setValueFromCoords(16, y, 1, true);
                     }
                 }
             }
@@ -935,6 +1017,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
 
     // Save adjustments
     saveInventory() {
+        // this.showOnlyErrors();
         this.props.updateState("inventoryError", "");
         this.props.updateState("loading", true);
         var validation = this.checkValidationInventory();
