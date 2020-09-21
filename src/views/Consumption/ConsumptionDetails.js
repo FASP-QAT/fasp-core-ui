@@ -38,6 +38,8 @@ export default class ConsumptionDetails extends React.Component {
             showConsumption: 0,
             consumptionChangedFlag: 0,
             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() },
+            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
         }
 
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
@@ -381,6 +383,7 @@ export default class ConsumptionDetails extends React.Component {
                                                         <div className="controls edit">
 
                                                             <Picker
+                                                                years={{ min: this.state.minDate, max: this.state.maxDate }}
                                                                 ref={this.pickRange}
                                                                 value={rangeValue}
                                                                 lang={pickerLang}
