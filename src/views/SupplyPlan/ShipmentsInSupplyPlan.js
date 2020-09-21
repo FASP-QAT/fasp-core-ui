@@ -1062,7 +1062,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                                 var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
                                                                                 cell.classList.add('readonly');
                                                                             }
-                                                                            
+
                                                                             if (lastShipmentStatus == "") {
                                                                                 var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
                                                                                 cell.classList.remove('readonly');
@@ -1116,7 +1116,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                                 var cell = elInstance.getCell(`F${parseInt(0) + 1}`)
                                                                                 cell.classList.add('readonly');
                                                                             }
-                                                                            
+
                                                                             if (lastShipmentStatus == "") {
                                                                                 var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
                                                                                 cell.classList.remove('readonly');
@@ -1869,28 +1869,30 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         this.props.updateState("shipmentError", "");
         this.props.updateState("noFundsBudgetError", "");
         console.log("X-------->", x, "Y---------->", y);
-        var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X']
-        if (rowData[20].toString() == "false") {
-            for (var j = 0; j < colArr.length; j++) {
-                var col = (colArr[j]).concat(parseInt(y) + 1);
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "#D3D3D3");
-                let textColor = contrast('#D3D3D3');
-                console.log("Contrast")
-                elInstance.setStyle(col, 'color', textColor);
-            }
-        } else if (rowData[19].toString() == "true") {
-            for (var j = 0; j < colArr.length; j++) {
-                var col = (colArr[j]).concat(parseInt(y) + 1);
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "red");
-                let textColor = contrast('red');
-                elInstance.setStyle(col, 'color', textColor);
-            }
-        } else {
-            for (var j = 0; j < colArr.length; j++) {
-                var col = (colArr[j]).concat(parseInt(y) + 1);
-                elInstance.setStyle(col, "background-color", "transparent");
+        if (x == 19 || x == 20) {
+            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X']
+            if (rowData[20].toString() == "false") {
+                for (var j = 0; j < colArr.length; j++) {
+                    var col = (colArr[j]).concat(parseInt(y) + 1);
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "#D3D3D3");
+                    let textColor = contrast('#D3D3D3');
+                    console.log("Contrast")
+                    elInstance.setStyle(col, 'color', textColor);
+                }
+            } else if (rowData[19].toString() == "true") {
+                for (var j = 0; j < colArr.length; j++) {
+                    var col = (colArr[j]).concat(parseInt(y) + 1);
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "red");
+                    let textColor = contrast('red');
+                    elInstance.setStyle(col, 'color', textColor);
+                }
+            } else {
+                for (var j = 0; j < colArr.length; j++) {
+                    var col = (colArr[j]).concat(parseInt(y) + 1);
+                    elInstance.setStyle(col, "background-color", "transparent");
+                }
             }
         }
         if (x != 23 && x != 21 && x != 25) {
@@ -3387,6 +3389,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             shipmentDataList[parseInt(map.get("16"))].freightCost = parseFloat(freightCost.toString().replaceAll("\,", "")).toFixed(2);
                             shipmentDataList[parseInt(map.get("16"))].notes = map.get("13");
                             shipmentDataList[parseInt(map.get("16"))].accountFlag = map.get("20");
+                            shipmentDataList[parseInt(map.get("16"))].active = map.get("24");
                             shipmentDataList[parseInt(map.get("16"))].emergencyOrder = map.get("19");
                             shipmentDataList[parseInt(map.get("16"))].currency.currencyId = map.get("9");
                             shipmentDataList[parseInt(map.get("16"))].currency.conversionRateToUsd = (parseFloat((this.state.currencyListAll.filter(c => c.currencyId == map.get("9"))[0]).conversionRateToUsd));
@@ -3467,7 +3470,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             console.log("In else")
                             var shipmentJson = {
                                 accountFlag: true,
-                                active: true,
+                                active: map.get("24"),
                                 dataSource: {
                                     id: map.get("6")
                                 },
