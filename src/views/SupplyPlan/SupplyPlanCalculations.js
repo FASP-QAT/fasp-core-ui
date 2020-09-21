@@ -751,7 +751,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                             }
                         }
                         if (props.consumptionPage == "consumptionDataEntry") {
-                            props.formSubmit(props.items.planningUnit,props.items.rangeValue);
+                            props.formSubmit(props.items.planningUnit, props.items.rangeValue);
                         }
                         props.updateState("loading", false);
                         props.hideFirstComponent();
@@ -760,11 +760,11 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                         console.log("After save")
                         // this.showInventoryData();
                         // console.log("props.items.inventoryDataType", props.items.inventoryDataType);
-                        props.updateState("message", i18n.t('static.message.adjustmentsSaved'));
                         props.updateState("color", 'green');
                         props.updateState("inventoryChangedFlag", 0);
                         console.log("after update state")
                         if (props.inventoryPage != "inventoryDataEntry") {
+                            props.updateState("message", i18n.t('static.message.adjustmentsSaved'));
                             props.toggleLarge('Adjustments');
                             if (props.inventoryPage != "supplyPlanCompare") {
                                 props.formSubmit(props.items.planningUnit, props.items.monthCount);
@@ -773,7 +773,12 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                             }
                         }
                         if (props.inventoryPage == "inventoryDataEntry") {
-                            props.formSubmit(props.items.planningUnit,props.items.rangeValue);
+                            if (props.items.inventoryType == 1) {
+                                props.updateState("message", i18n.t('static.message.inventorySaved'));
+                            } else {
+                                props.updateState("message", i18n.t('static.message.adjustmentsSaved'));
+                            }
+                            props.formSubmit(props.items.planningUnit, props.items.rangeValue);
                         }
                         props.updateState("loading", false);
                         props.hideFirstComponent();
@@ -792,7 +797,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                             }
                         }
                         if (props.shipmentPage == "shipmentDataEntry") {
-                            props.formSubmit(props.items.planningUnit,props.items.rangeValue);
+                            props.formSubmit(props.items.planningUnit, props.items.rangeValue);
                         }
                         props.updateState("loading", false);
                         props.hideFirstComponent()
