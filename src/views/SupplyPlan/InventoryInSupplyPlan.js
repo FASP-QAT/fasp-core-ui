@@ -886,41 +886,71 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             }
             var inventoryInstance = this.state.inventoryEl;
             var rowData = inventoryInstance.getRowData(parseInt(rowNumber));
+            var allConfirm = true;
             if (countForNonFefo == 0) {
-                alert(i18n.t("static.batchDetails.warningFefo"));
-            }
-            if (map.get("2") == 1 && rowData[6] != "" && totalActualStock != rowData[6]) {
-                alert(i18n.t("static.batchDetails.warningQunatity"))
-            } else if (map.get("2") == 2 && rowData[5] != "" && totalAdjustments != rowData[5]) {
-                alert(i18n.t("static.batchDetails.warningQunatity"))
+                var cf = window.confirm(i18n.t("static.batchDetails.warningFefo"));
+                if (cf == true) {
+                    if (map.get("2") == 1 && rowData[6] != "" && totalActualStock != rowData[6]) {
+                        var cf1 = window.confirm(i18n.t("static.batchDetails.warningQunatity"))
+                        if (cf1 == true) {
+                        } else {
+                            allConfirm = false;
+                        }
+                    } else if (map.get("2") == 2 && rowData[5] != "" && totalAdjustments != rowData[5]) {
+                        var cf1 = window.confirm(i18n.t("static.batchDetails.warningQunatity"))
+                        if (cf1 == true) {
+                        } else {
+                            allConfirm = false;
+                        }
+                    }
+                }else{
+                    allConfirm = false;
+                }
+            } else {
+                if (map.get("2") == 1 && rowData[6] != "" && totalActualStock != rowData[6]) {
+                    var cf1 = window.confirm(i18n.t("static.batchDetails.warningQunatity"))
+                    if (cf1 == true) {
+                    } else {
+                        allConfirm = false;
+                    }
+                } else if (map.get("2") == 2 && rowData[5] != "" && totalAdjustments != rowData[5]) {
+                    var cf1 = window.confirm(i18n.t("static.batchDetails.warningQunatity"))
+                    if (cf1 == true) {
+                    } else {
+                        allConfirm = false;
+                    }
+                }
             }
 
-            if (map.get("2") == 1) {
-                inventoryInstance.setValueFromCoords(5, rowNumber, "", true);
-                inventoryInstance.setValueFromCoords(6, rowNumber, totalActualStock, true);
-            } else {
-                inventoryInstance.setValueFromCoords(5, rowNumber, totalAdjustments, true);
-                inventoryInstance.setValueFromCoords(6, rowNumber, "", true);
-            }
-            // rowData[15] = batchInfoArray;
-            inventoryInstance.setValueFromCoords(13, rowNumber, batchInfoArray, "");
-            this.setState({
-                inventoryChangedFlag: 1,
-                inventoryBatchInfoChangedFlag: 0,
-                inventoryBatchInfoTableEl: ''
-            })
-            this.props.updateState("inventoryChangedFlag", 1);
-            this.props.updateState("inventoryBatchInfoChangedFlag", 0);
-            this.props.updateState("inventoryBatchInfoTableEl", "");
-            this.setState({
-                inventoryBatchInfoTableEl: ""
-            })
-            document.getElementById("showInventoryBatchInfoButtonsDiv").style.display = 'none';
-            if (this.props.inventoryPage == "inventoryDataEntry") {
-                this.props.toggleLarge();
+            if (allConfirm == true) {
+                if (map.get("2") == 1) {
+                    inventoryInstance.setValueFromCoords(5, rowNumber, "", true);
+                    inventoryInstance.setValueFromCoords(6, rowNumber, totalActualStock, true);
+                } else {
+                    inventoryInstance.setValueFromCoords(5, rowNumber, totalAdjustments, true);
+                    inventoryInstance.setValueFromCoords(6, rowNumber, "", true);
+                }
+                // rowData[15] = batchInfoArray;
+                inventoryInstance.setValueFromCoords(13, rowNumber, batchInfoArray, "");
+                this.setState({
+                    inventoryChangedFlag: 1,
+                    inventoryBatchInfoChangedFlag: 0,
+                    inventoryBatchInfoTableEl: ''
+                })
+                this.props.updateState("inventoryChangedFlag", 1);
+                this.props.updateState("inventoryBatchInfoChangedFlag", 0);
+                this.props.updateState("inventoryBatchInfoTableEl", "");
+                this.setState({
+                    inventoryBatchInfoTableEl: ""
+                })
+                document.getElementById("showInventoryBatchInfoButtonsDiv").style.display = 'none';
+                if (this.props.inventoryPage == "inventoryDataEntry") {
+                    this.props.toggleLarge();
+                }
+                elInstance.destroy();
             }
             this.props.updateState("loading", false);
-            elInstance.destroy();
+
         } else {
             this.setState({
                 inventoryBatchError: i18n.t('static.supplyPlan.validationFailed')
