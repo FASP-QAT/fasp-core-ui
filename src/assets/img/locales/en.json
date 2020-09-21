@@ -1171,5 +1171,6 @@
     "static.ticket.header": "QAT Helpdesk",
     "static.ticket.subheader": "WE ARE HERE TO HELP YOU WITH YOUR QUERY",
     "static.ticket.uploadScreenshot": "Upload Screenshot",
-    "static.message.supplyplanversionapprovedsuccess":"Supply Plan status updated successfully"
+    "static.message.supplyplanversionapprovedsuccess":"Supply Plan status updated successfully",
+    "static.message.inventorySaved": "Inventory data saved"
 }
