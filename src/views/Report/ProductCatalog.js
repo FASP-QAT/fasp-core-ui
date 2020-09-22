@@ -2018,7 +2018,7 @@ class ProductCatalog extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            // colWidths: [150, 150, 100],
+            colWidths: [80, 80, 80,90,0,80,80,80,0,0,80,80,80,70],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
