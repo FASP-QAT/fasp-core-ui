@@ -1354,20 +1354,19 @@ class SupplierLeadTimes extends Component {
 
         for (var j = 0; j < outPutList.length; j++) {
             data = [];
-            data[0] = getLabelText(outPutList[j].country.label, this.state.lang)
-            data[1] = getLabelText(outPutList[j].program.label, this.state.lang)
-            data[2] = getLabelText(outPutList[j].planningUnit.label, this.state.lang)
-            data[3] = getLabelText(outPutList[j].procurementAgent.label, this.state.lang)
-            data[4] = outPutList[j].plannedSubmittedLeadTime
-            data[5] = outPutList[j].submittedToApprovedLeadTime
-            data[6] = outPutList[j].approvedToShippedLeadTime
-            data[7] = outPutList[j].shippedToArrivedBySeaLeadTime
+            data[0] = getLabelText(outPutList[j].program.label, this.state.lang)
+            data[1] = getLabelText(outPutList[j].planningUnit.label, this.state.lang)
+            data[2] =getLabelText(outPutList[j].procurementAgent.label, this.state.lang) 
+            data[3] = outPutList[j].plannedSubmittedLeadTime
+            data[4] = outPutList[j].submittedToApprovedLeadTime
+            data[5] = outPutList[j].approvedToShippedLeadTime
+            data[6] = outPutList[j].shippedToArrivedBySeaLeadTime
 
-            data[8] = outPutList[j].shippedToArrivedByAirLeadTime
-            data[9] = outPutList[j].arrivedToDeliveredLeadTime
-            data[10] = outPutList[j].totalSeaLeadTime
-            data[11] = outPutList[j].totalAirLeadTime
-            data[12] = outPutList[j].localProcurementAgentLeadTime
+            data[7] = outPutList[j].shippedToArrivedByAirLeadTime
+            data[8] = outPutList[j].arrivedToDeliveredLeadTime
+            data[9] = outPutList[j].totalSeaLeadTime
+            data[10] = outPutList[j].totalAirLeadTime
+            data[11] = outPutList[j].localProcurementAgentLeadTime
             // data[13] = outPutList[j].
             outPutArray[count] = data;
             count++;
@@ -1388,12 +1387,7 @@ class SupplierLeadTimes extends Component {
             // colWidths: [150, 150, 100],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
-                {
-                    title: i18n.t('static.program.realmcountry'),
-                    type: 'text',
-                    readOnly: true
-                },
-                {
+               {
                     title: i18n.t('static.program.program'),
                     type: 'text',
                     readOnly: true
@@ -2436,21 +2430,11 @@ class SupplierLeadTimes extends Component {
         const { procurementAgents } = this.state
         let procurementAgentList = procurementAgents.length > 0
             && procurementAgents.map((item, i) => {
-                return ({ label: getLabelText(item.label, this.state.lang), value: item.procurementAgentId })
+                return ({ label: item.procurementAgentCode, value: item.procurementAgentId })
 
             }, this);
         const columns = [
-            {
-                dataField: 'country.label',
-                text: i18n.t('static.report.country'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { width: '150px' },
-                formatter: (cell, row) => {
-                    return getLabelText(cell, this.state.lang);
-                }
-            },
+            
             {
                 dataField: 'program.label',
                 text: i18n.t('static.program.program'),
@@ -2474,15 +2458,15 @@ class SupplierLeadTimes extends Component {
                 }
             },
             {
-                dataField: 'procurementAgent.label',
+                dataField: 'procurementAgent.procurementAgentCode',
                 text: i18n.t('static.report.procurementAgentName'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
                 style: { width: '300px' },
-                formatter: (cell, row) => {
-                    return getLabelText(cell, this.state.lang);
-                }
+                // formatter: (cell, row) => {
+                //     return getLabelText(cell, this.state.lang);
+                // }
             },
             {
                 dataField: 'plannedSubmittedLeadTime',

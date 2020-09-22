@@ -1436,7 +1436,7 @@ if(value!=null){
     }
     return x1 + x2;
   }else{
-    return 0;
+    return '';
   }
   }
   dateFormatter = value => {
@@ -1937,7 +1937,7 @@ if(value!=null){
                 var forcastConsumption = 0;
                 var montcnt = 0
                 var absvalue = 0;
-                var currentActualconsumption = 0;
+                var currentActualconsumption = null;
                 var currentForcastConsumption = 0;
                 for (var i = month, j = 0; j <= monthInCalc; i-- , j++) {
                   if (i == 0) {
@@ -1960,7 +1960,14 @@ if(value!=null){
                   actualconsumption = actualconsumption + actconsumption
                   forcastConsumption = forcastConsumption + forConsumption
                   if (j == 0) {
+                    console.log(currentActualconsumption,' ',actconsumption)
+                    if(currentActualconsumption==null && actconsumption>0)
+                    {
+                      currentActualconsumption=0
+                    }
+                    if(currentActualconsumption!=null){
                     currentActualconsumption = currentActualconsumption + actconsumption
+                    }
                     currentForcastConsumption = currentForcastConsumption + forConsumption
                   }
                   if (actconsumption > 0 && forConsumption > 0)
