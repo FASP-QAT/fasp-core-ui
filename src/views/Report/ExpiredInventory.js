@@ -706,7 +706,6 @@ export default class ExpiredInventory extends Component {
                
 
             },  {
-
                 dataField: 'batchInfo.createdDate',
                 text: i18n.t('static.report.createdDate'),
                 sort: true,
