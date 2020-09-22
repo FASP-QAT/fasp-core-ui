@@ -1876,9 +1876,9 @@ export default class SupplyPlanComponent extends React.Component {
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                     var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                                     paColor = procurementAgent.colorHtmlCode;
-                                                    var index = paColors.findIndex(c => c.color ==  paColor);
+                                                    var index = paColors.findIndex(c => c.color == paColor);
                                                     if (index == -1) {
-                                                        paColors.push({ color:  paColor, text: procurementAgent.procurementAgentCode })
+                                                        paColors.push({ color: paColor, text: procurementAgent.procurementAgentCode })
                                                     }
                                                 } else {
                                                     if (shipmentDetails[i].procurementAgent.id != "") {
@@ -1899,9 +1899,9 @@ export default class SupplyPlanComponent extends React.Component {
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                     var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                                     paColor = procurementAgent.colorHtmlCode;
-                                                    var index = paColors.findIndex(c => c.color ==  paColor);
+                                                    var index = paColors.findIndex(c => c.color == paColor);
                                                     if (index == -1) {
-                                                        paColors.push({ color:  paColor, text: procurementAgent.procurementAgentCode })
+                                                        paColors.push({ color: paColor, text: procurementAgent.procurementAgentCode })
                                                     }
                                                 } else {
                                                     if (shipmentDetails[i].procurementAgent.id != "") {
@@ -1922,9 +1922,9 @@ export default class SupplyPlanComponent extends React.Component {
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                     var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                                     paColor = procurementAgent.colorHtmlCode;
-                                                    var index = paColors.findIndex(c => c.color ==  paColor);
+                                                    var index = paColors.findIndex(c => c.color == paColor);
                                                     if (index == -1) {
-                                                        paColors.push({ color:  paColor, text: procurementAgent.procurementAgentCode })
+                                                        paColors.push({ color: paColor, text: procurementAgent.procurementAgentCode })
                                                     }
                                                 } else {
                                                     if (shipmentDetails[i].procurementAgent.id != "") {
@@ -1945,9 +1945,9 @@ export default class SupplyPlanComponent extends React.Component {
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                     var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                                     paColor = procurementAgent.colorHtmlCode;
-                                                    var index = paColors.findIndex(c => c.color ==  paColor);
+                                                    var index = paColors.findIndex(c => c.color == paColor);
                                                     if (index == -1) {
-                                                        paColors.push({ color:  paColor, text: procurementAgent.procurementAgentCode })
+                                                        paColors.push({ color: paColor, text: procurementAgent.procurementAgentCode })
                                                     }
                                                 } else {
                                                     if (shipmentDetails[i].procurementAgent.id != "") {
@@ -2022,9 +2022,9 @@ export default class SupplyPlanComponent extends React.Component {
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                     var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                                     paColor = procurementAgent.colorHtmlCode;
-                                                    var index = paColors.findIndex(c => c.color ==  paColor);
+                                                    var index = paColors.findIndex(c => c.color == paColor);
                                                     if (index == -1) {
-                                                        paColors.push({ color:  paColor, text: procurementAgent.procurementAgentCode })
+                                                        paColors.push({ color: paColor, text: procurementAgent.procurementAgentCode })
                                                     }
                                                 } else {
                                                     if (shipmentDetails[i].procurementAgent.id != "") {
@@ -2045,9 +2045,9 @@ export default class SupplyPlanComponent extends React.Component {
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                     var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                                     paColor = procurementAgent.colorHtmlCode;
-                                                    var index = paColors.findIndex(c => c.color ==  paColor);
+                                                    var index = paColors.findIndex(c => c.color == paColor);
                                                     if (index == -1) {
-                                                        paColors.push({ color:  paColor, text: procurementAgent.procurementAgentCode })
+                                                        paColors.push({ color: paColor, text: procurementAgent.procurementAgentCode })
                                                     }
                                                 } else {
                                                     if (shipmentDetails[i].procurementAgent.id != "") {
@@ -2068,9 +2068,9 @@ export default class SupplyPlanComponent extends React.Component {
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                     var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                                     paColor = procurementAgent.colorHtmlCode;
-                                                    var index = paColors.findIndex(c => c.color ==  paColor);
+                                                    var index = paColors.findIndex(c => c.color == paColor);
                                                     if (index == -1) {
-                                                        paColors.push({ color:  paColor, text: procurementAgent.procurementAgentCode })
+                                                        paColors.push({ color: paColor, text: procurementAgent.procurementAgentCode })
                                                     }
                                                 } else {
                                                     if (shipmentDetails[i].procurementAgent.id != "") {
@@ -2091,9 +2091,9 @@ export default class SupplyPlanComponent extends React.Component {
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                     var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                                     paColor = procurementAgent.colorHtmlCode;
-                                                    var index = paColors.findIndex(c => c.color ==  paColor);
+                                                    var index = paColors.findIndex(c => c.color == paColor);
                                                     if (index == -1) {
-                                                        paColors.push({ color:  paColor, text: procurementAgent.procurementAgentCode })
+                                                        paColors.push({ color: paColor, text: procurementAgent.procurementAgentCode })
                                                     }
                                                 } else {
                                                     if (shipmentDetails[i].procurementAgent.id != "") {
@@ -2274,7 +2274,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         inventoryArrayForRegion.push({ "regionId": regionListFiltered[r].id, "adjustmentsQty": adjustmentsQtyForRegion, "actualQty": actualQtyForRegion, "month": m[n] })
                                     }
                                     consumptionArrayForRegion.push({ "regionId": -1, "qty": consumptionTotalForRegion, "actualFlag": true, "month": m[n] })
-                                    
+
                                     var projectedInventoryForRegion = jsonList[0].closingBalance - (jsonList[0].nationalAdjustment != "" ? jsonList[0].nationalAdjustment : 0);
                                     console.log("project Inventory", projectedInventoryForRegion);
                                     if (regionsReportingActualInventory.length != totalNoOfRegions) {
@@ -2763,6 +2763,7 @@ export default class SupplyPlanComponent extends React.Component {
                 var planningUnitId = document.getElementById("planningUnitId").value;
                 var programPlanningUnit = ((this.state.programPlanningUnitList).filter(p => p.planningUnit.id == planningUnitId))[0];
                 var shelfLife = programPlanningUnit.shelfLife;
+                var catalogPrice = programPlanningUnit.catalogPrice;
                 if (month != "") {
                     var suggestedShipmentList = this.state.suggestedShipmentsTotalData.filter(c => c.month == month && c.suggestedOrderQty != "");
                 } else {
@@ -2812,6 +2813,7 @@ export default class SupplyPlanComponent extends React.Component {
                     shipmentListUnFiltered: programJson.shipmentList,
                     programJson: programJson,
                     shelfLife: shelfLife,
+                    catalogPrice:catalogPrice,
                     shipmentList: shipmentList,
                     showShipments: 1,
                 })

@@ -374,7 +374,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             data[7] = "";
                                             data[8] = 0;
                                             data[9] = "";
-                                            data[10] = "";
+                                            data[10] = this.props.items.catalogPrice;
                                             data[11] = `=ROUND(K${parseInt(0) + 1}*I${parseInt(0) + 1},2)`;
                                             data[12] = "";
                                             data[13] = "";
@@ -474,7 +474,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                         data[7] = "";
                                                         data[8] = 0;
                                                         data[9] = "";
-                                                        data[10] = "";
+                                                        data[10] = this.props.items.catalogPrice;
                                                         data[11] = `=ROUND(K${parseInt(json.length) + 1}*I${parseInt(json.length) + 1},2)`;
                                                         data[12] = "";
                                                         data[13] = "";
@@ -828,6 +828,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                             data[5] = arrivedDate;
                                                             data[6] = receivedDate;
                                                             data[7] = y;
+                                                            data[8] = i18n.t("static.consumption.actual")
                                                             json.push(data);
                                                             data = [];
                                                             data[0] = i18n.t("static.supplyPlan.estimated")
@@ -838,15 +839,16 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                             data[5] = expectedArrivedDate;
                                                             data[6] = expectedDeliveryDate;
                                                             data[7] = y;
+                                                            data[8] = i18n.t("static.supplyPlan.estimated")
                                                             json.push(data);
                                                             var options = {
                                                                 data: json,
                                                                 columnDrag: true,
-                                                                colWidths: [80, 100, 100, 100, 100, 100, 100],
+                                                                colWidths: [80, 100, 100, 100, 100, 100, 100, 0, 80],
                                                                 columns: [
                                                                     {
                                                                         title: i18n.t('static.supplyPlan.type'),
-                                                                        type: 'text',
+                                                                        type: 'hidden',
                                                                         readOnly: true
                                                                     },
                                                                     {
@@ -900,7 +902,12 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                     {
                                                                         title: i18n.t('static.supplyPlan.rowNumber'),
                                                                         type: 'hidden',
-                                                                    }
+                                                                    },
+                                                                    {
+                                                                        title: i18n.t('static.supplyPlan.type'),
+                                                                        type: 'text',
+                                                                        readOnly: true
+                                                                    },
                                                                 ],
                                                                 pagination: false,
                                                                 search: false,

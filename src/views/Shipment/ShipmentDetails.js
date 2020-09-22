@@ -318,6 +318,7 @@ export default class ShipmentDetails extends React.Component {
                     console.log("Shipment list", shipmentList);
                     this.setState({
                         shelfLife: programPlanningUnit.shelfLife,
+                        catalogPrice: programPlanningUnit.catalogPrice,
                         programJson: programJson,
                         shipmentListUnFiltered: shipmentListUnFiltered,
                         shipmentList: shipmentList,
