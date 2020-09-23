@@ -13,6 +13,7 @@ import HealthAreaService from '../../api/HealthAreaService';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import classNames from 'classnames';
+import { SPACE_REGEX, ALPHABET_NUMBER_REGEX } from '../../Constants';
 
 const initialValues = {
     summary: 'Add / Update Organization',
@@ -32,8 +33,11 @@ const validationSchema = function (values) {
         realmCountryId: Yup.string()
             .required(i18n.t('static.program.validcountrytext')),
         organisationName: Yup.string()            
+            .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.organisation.organisationtext')),
         organisationCode: Yup.string()
+            .matches(ALPHABET_NUMBER_REGEX, i18n.t('static.message.alphabetnumerallowed'))
+            .max(4, i18n.t('static.organisation.organisationcodemax4digittext'))
             .required(i18n.t('static.organisation.organisationcodetext')),
         // notes: Yup.string()
         //     .required(i18n.t('static.common.notestext'))

@@ -2177,7 +2177,7 @@ if(value!=null){
         <Row>
           <Col lg="12">
             <Card style={{ display: this.state.loading ? "none" : "block" }}>
-              <div className="Card-header-reporticon pb-3">
+              <div className="Card-header-reporticon pb-2">
                 <div className="card-header-actions">
                   <a className="card-header-action">
                     <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggleForecastMatrix() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span>

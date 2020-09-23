@@ -7,6 +7,7 @@ import { Formik } from 'formik';
 import i18n from '../../i18n';
 import * as Yup from 'yup';
 import JiraTikcetService from '../../api/JiraTikcetService';
+import { DECIMAL_NO_REGEX, ALPHABETS_REGEX, SPACE_REGEX } from '../../Constants';
 
 const initialValues = {
     summary: "Add / Update Currency",
@@ -21,11 +22,14 @@ const validationSchema = function (values) {
         summary: Yup.string()
             .required(i18n.t('static.common.summarytext')),
         currencyName: Yup.string()
-            .required(i18n.t('static.currency.currencytext')),
+            .required(i18n.t('static.currency.currencytext'))
+            .matches(SPACE_REGEX, i18n.t('static.message.rolenamevalidtext')),
         currencyCode: Yup.string()
-            .required(i18n.t('static.currency.currencycodetext')),
+            .required(i18n.t('static.currency.currencycodetext'))
+            .matches(ALPHABETS_REGEX, i18n.t('static.common.alphabetsOnly')),
         conversionRatetoUSD: Yup.string()
-            .required(i18n.t('static.currency.currencyconversiontext')),        
+            .required(i18n.t('static.currency.currencyconversiontext'))
+            .matches(DECIMAL_NO_REGEX, i18n.t('static.currency.conversionrateNumberDecimalPlaces')),        
         // notes: Yup.string()
         //     .required(i18n.t('static.common.notestext'))
     })
