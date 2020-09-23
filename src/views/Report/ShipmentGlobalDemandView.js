@@ -2816,6 +2816,7 @@ class ShipmentGlobalDemandView extends Component {
     }
 
     handlePlanningUnitChange = (planningUnitIds) => {
+        console.log(planningUnitIds)
         planningUnitIds = planningUnitIds.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
         })
