@@ -54,8 +54,8 @@ class AnnualShipmentCost extends Component {
             versions: [],
             lang: localStorage.getItem('lang'),
             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() },
-            maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() + 1 },
+            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth()+2 },
+            maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
             outPutList: [],
             message: '',
         };
