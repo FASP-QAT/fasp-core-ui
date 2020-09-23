@@ -27,7 +27,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.region.validcountry')),
         regionId: Yup.string()
             .required(i18n.t('static.region.validregion')),
-        capacity: Yup.string()
+        capacity: Yup.number()
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))            
+            .positive(i18n.t('static.realm.negativeNumberNotAllowed'))            
             .required(i18n.t('static.region.capacitycbmtext')),
         glnCode: Yup.string()
             .required(i18n.t('static.region.glntext')),

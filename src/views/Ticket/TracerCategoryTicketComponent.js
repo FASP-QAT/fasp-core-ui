@@ -9,6 +9,7 @@ import * as Yup from 'yup';
 import JiraTikcetService from '../../api/JiraTikcetService';
 import RealmService from '../../api/RealmService';
 import getLabelText from '../../CommonComponent/getLabelText';
+import { BUDGET_NAME_REGEX } from '../../Constants';
 
 const initialValues = {
     summary: "Add / Update Tracer Category",
@@ -24,6 +25,7 @@ const validationSchema = function (values) {
         realmName: Yup.string()
             .required(i18n.t('static.common.realmtext')),
         tracerCategoryName: Yup.string()
+            .matches(BUDGET_NAME_REGEX, i18n.t('static.message.budgetNameRegex'))
             .required(i18n.t('static.tracerCategory.tracercategorytext')),
         // notes: Yup.string()
         //     .required(i18n.t('static.common.notestext'))

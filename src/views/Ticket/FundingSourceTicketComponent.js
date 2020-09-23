@@ -8,6 +8,7 @@ import i18n from '../../i18n';
 import * as Yup from 'yup';
 import JiraTikcetService from '../../api/JiraTikcetService';
 import RealmService from '../../api/RealmService';
+import { LABEL_REGEX } from '../../Constants';
 
 const initialValues = {
     summary: "Add / Update Funding Source",
@@ -24,8 +25,10 @@ const validationSchema = function (values) {
         realmName: Yup.string()
             .required(i18n.t('static.common.realmtext')),
         fundingSourceName: Yup.string()
+            .matches(LABEL_REGEX, i18n.t('static.message.rolenamevalidtext'))
             .required(i18n.t('static.fundingsource.fundingsourcetext')),
         fundingSourceCode: Yup.string()
+            .matches(/^[a-zA-Z]+$/, i18n.t('static.common.alphabetsOnly'))
             .required(i18n.t('static.fundingsource.fundingsourceCodeText')),        
         // notes: Yup.string()
         //     .required(i18n.t('static.common.notestext'))
