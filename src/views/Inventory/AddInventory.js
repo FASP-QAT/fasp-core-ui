@@ -36,6 +36,8 @@ export default class AddInventory extends Component {
             inventoryChangedFlag: 0,
             inventoryDataType: { value: 1, label: i18n.t('static.inventory.inventory') },
             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() },
+            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
         }
         this.options = props.options;
         this.formSubmit = this.formSubmit.bind(this);
@@ -59,7 +61,7 @@ export default class AddInventory extends Component {
     }
     handleRangeDissmis(value) {
         this.setState({ rangeValue: value })
-        this.formSubmit(this.state.planningUnit,value);
+        this.formSubmit(this.state.planningUnit, value);
     }
 
     hideFirstComponent() {
@@ -255,7 +257,7 @@ export default class AddInventory extends Component {
                                 planningUnit: planningUnit,
                                 planningUnitId: planningUnitIdProp
                             })
-                            this.formSubmit(planningUnit,this.state.rangeValue);
+                            this.formSubmit(planningUnit, this.state.rangeValue);
                         }
                     }.bind(this);
                 }.bind(this)
@@ -268,7 +270,7 @@ export default class AddInventory extends Component {
         }
     }
 
-    formSubmit(value,rangeValue) {
+    formSubmit(value, rangeValue) {
         let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
         let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
         console.log("In form submit");
@@ -353,7 +355,7 @@ export default class AddInventory extends Component {
         })
         document.getElementById("adjustmentsTableDiv").style.display = "none";
         if (this.state.planningUnit != 0 && (value != "" && value != undefined ? value.value : 0) != 0) {
-            this.formSubmit(this.state.planningUnit,this.state.rangeValue);
+            this.formSubmit(this.state.planningUnit, this.state.rangeValue);
         }
     }
 
@@ -378,7 +380,7 @@ export default class AddInventory extends Component {
                 <h5 className={this.state.color} id="div1">{i18n.t(this.state.message, { entityname }) || this.state.supplyPlanError}</h5>
                 <h5 className="red" id="div2">{this.state.inventoryDuplicateError || this.state.inventoryNoStockError || this.state.inventoryError}</h5>
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
-                    <CardBody className="pb-lg-5 pt-lg-2" >
+                    <CardBody className="pb-lg-2 pt-lg-2" >
                         <Formik
                             render={
                                 ({
@@ -391,6 +393,7 @@ export default class AddInventory extends Component {
                                                         <div className="controls edit">
 
                                                             <Picker
+                                                                years={{ min: this.state.minDate, max: this.state.maxDate }}
                                                                 ref={this.pickRange}
                                                                 value={rangeValue}
                                                                 lang={pickerLang}
@@ -425,7 +428,7 @@ export default class AddInventory extends Component {
                                                                 bsSize="sm"
                                                                 options={this.state.planningUnitList}
                                                                 value={this.state.planningUnit}
-                                                                onChange={(e) => { this.formSubmit(e,this.state.rangeValue); }}
+                                                                onChange={(e) => { this.formSubmit(e, this.state.rangeValue); }}
                                                             />
                                                         </div>
                                                     </FormGroup>

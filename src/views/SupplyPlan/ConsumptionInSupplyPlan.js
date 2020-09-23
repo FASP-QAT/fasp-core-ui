@@ -789,33 +789,54 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                 }
                 totalConsumption += parseInt(map.get("2").toString().replaceAll("\,", ""));
             }
+            var allConfirm = true;
             if (countForNonFefo == 0) {
-                alert(i18n.t("static.batchDetails.warningFefo"));
+                var cf = window.confirm(i18n.t("static.batchDetails.warningFefo"));
+                if (cf == true) {
+                    var consumptionInstance = this.state.consumptionEl;
+                    var consumptionQty = consumptionInstance.getRowData(rowNumber)[5];
+                    if (consumptionQty != "" && consumptionQty != totalConsumption) {
+                        var cf1 = window.confirm(i18n.t("static.batchDetails.warningQunatity"))
+                        if (cf1 == true) {
+                        } else {
+                            allConfirm = false;
+                        }
+                    }
+                } else {
+                    allConfirm = false;
+                }
+            } else {
+                var consumptionInstance = this.state.consumptionEl;
+                var consumptionQty = consumptionInstance.getRowData(rowNumber)[5];
+                if (consumptionQty != "" && consumptionQty != totalConsumption) {
+                    var cf1 = window.confirm(i18n.t("static.batchDetails.warningQunatity"))
+                    if (cf1 == true) {
+                    } else {
+                        allConfirm = false;
+                    }
+                }
             }
-            var consumptionInstance = this.state.consumptionEl;
-            var consumptionQty = consumptionInstance.getRowData(rowNumber)[5];
-            if (consumptionQty != "" && consumptionQty != totalConsumption) {
-                alert(i18n.t("static.batchDetails.warningQunatity"))
-            }
-            consumptionInstance.setValueFromCoords(5, rowNumber, totalConsumption, true);
-            consumptionInstance.setValueFromCoords(11, rowNumber, batchInfoArray, true);
-            this.setState({
-                consumptionChangedFlag: 1,
-                consumptionBatchInfoChangedFlag: 0,
-                consumptionBatchInfoTableEl: ''
-            })
-            this.props.updateState("consumptionChangedFlag", 1);
-            this.props.updateState("consumptionBatchInfoChangedFlag", 0);
-            this.props.updateState("consumptionBatchInfoTableEl", "");
-            this.setState({
-                consumptionBatchInfoTableEl: ""
-            })
-            document.getElementById("showConsumptionBatchInfoButtonsDiv").style.display = 'none';
-            if (this.props.consumptionPage == "consumptionDataEntry") {
-                this.props.toggleLarge();
+            if (allConfirm == true) {
+                consumptionInstance.setValueFromCoords(5, rowNumber, totalConsumption, true);
+                consumptionInstance.setValueFromCoords(11, rowNumber, batchInfoArray, true);
+                this.setState({
+                    consumptionChangedFlag: 1,
+                    consumptionBatchInfoChangedFlag: 0,
+                    consumptionBatchInfoTableEl: ''
+                })
+                this.props.updateState("consumptionChangedFlag", 1);
+                this.props.updateState("consumptionBatchInfoChangedFlag", 0);
+                this.props.updateState("consumptionBatchInfoTableEl", "");
+                this.setState({
+                    consumptionBatchInfoTableEl: ""
+                })
+                document.getElementById("showConsumptionBatchInfoButtonsDiv").style.display = 'none';
+                if (this.props.consumptionPage == "consumptionDataEntry") {
+                    this.props.toggleLarge();
+                }
+                elInstance.destroy();
             }
             this.props.updateState("loading", false);
-            elInstance.destroy();
         } else {
             this.props.updateState("consumptionBatchError", i18n.t('static.supplyPlan.validationFailed'));
             this.props.updateState("loading", false);
