@@ -305,6 +305,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                         var actualStockCount = 0;
                         var adjustmentQty = 0;
                         var regionsReportingActualInventory = 0;
+                        var totalNoOfRegions = (regionListFiltered).length;
                         for (var r = 0; r < totalNoOfRegions; r++) {
                             // Filtering inventory data for a region
                             var inventoryListForRegion = inventoryList.filter(c => c.region != null && c.region.id != 0 && c.region.id == regionList[r].id);
@@ -391,7 +392,6 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                 }
                             }
                         }
-
                         // Consumption part
                         // Filtering consumption list for that month, that planning unit
                         var consumptionList = (programJsonForStoringTheResult.consumptionList).filter(c => (c.consumptionDate >= startDate && c.consumptionDate <= endDate) && c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.active == true);
@@ -399,7 +399,6 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                         var forecastedConsumptionQty = 0;
                         var regionsReportingActualConsumption = [];
                         var noOfRegionsReportingActualConsumption = 0;
-                        var totalNoOfRegions = (regionListFiltered).length;
                         var consumptionQty = 0;
                         var consumptionType = "";
                         var regionList = regionListFiltered;
@@ -489,7 +488,6 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                             // If expected is less than 0 than make an national adjustment
                             nationalAdjustment = actualStockCount - expectedStock;
                         }
-
                         // Calculations of national adjustments wps
                         var nationalAdjustmentWps = 0;
                         // Check if all the regions have reported actual inventory and expected stock is not equal to actual stock make an national adjustment wps
