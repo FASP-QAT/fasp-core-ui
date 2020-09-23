@@ -1356,7 +1356,7 @@ class SupplierLeadTimes extends Component {
             data = [];
             data[0] = getLabelText(outPutList[j].program.label, this.state.lang)
             data[1] = getLabelText(outPutList[j].planningUnit.label, this.state.lang)
-            data[2] =getLabelText(outPutList[j].procurementAgent.label, this.state.lang) 
+            data[2] =outPutList[j].procurementAgent.code 
             data[3] = outPutList[j].plannedSubmittedLeadTime
             data[4] = outPutList[j].submittedToApprovedLeadTime
             data[5] = outPutList[j].approvedToShippedLeadTime
@@ -1524,7 +1524,7 @@ class SupplierLeadTimes extends Component {
                 (getLabelText(ele.country.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
                 (getLabelText(ele.program.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
                 (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
-                (getLabelText(ele.procurementAgent.label, this.state.lang) == null ? '' : getLabelText(ele.procurementAgent.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
+                (ele.procurementAgent.code== null ? '' : ele.procurementAgent.code.replaceAll(',', ' ')).replaceAll(' ', '%20'),
                 ele.plannedSubmittedLeadTime,
                 // ele.draftToSubmittedLeadTime,
                 ele.submittedToApprovedLeadTime,
