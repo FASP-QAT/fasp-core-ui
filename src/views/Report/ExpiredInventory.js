@@ -440,7 +440,7 @@ export default class ExpiredInventory extends Component {
                             var pu = (this.state.planningUnits.filter(c => c.planningUnit.id == ele.planningUnitId))[0]
                            var list1= ele.batchDetails.filter(c => c.expiredQty>0 && (c.expiryDate >= startDate && c.expiryDate <= endDate))
                            list1.map(ele1=>{
-                               ele1.createdDate=ele.transDate
+                              // ele1.createdDate=ele.transDate
                             var json = {
                                 planningUnit: pu.planningUnit,
                                 batchInfo: ele1,
