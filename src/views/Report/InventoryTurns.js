@@ -1808,7 +1808,7 @@ var inputJson={
                                 <Form >
                                     <div className="pl-0">
                                         <div className="row">
-                                        <FormGroup className="col-md-3">
+                                        <FormGroup className="col-md-3 pl-0">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.report.month')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                                                 <div className="controls edit">
                                                     <Picker

@@ -2656,7 +2656,7 @@ class SupplierLeadTimes extends Component {
                                             </div>
                                         </FormGroup>
                                     </Online> */}
-                                <FormGroup className="col-md-3">
+                                <FormGroup className="col-md-3 pl-0">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                     <div className="controls">
                                         <InputGroup>

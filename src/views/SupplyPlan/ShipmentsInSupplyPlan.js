@@ -292,12 +292,12 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             paginationArray = [10, 25, 50];
                                         }
                                         console.log("Shipment list------------------------------->", shipmentList);
+                                        var erpType = "hidden";
                                         for (var i = 0; i < shipmentList.length; i++) {
                                             var shipmentMode = 1;
                                             if (shipmentList[i].shipmentMode == "Air") {
                                                 shipmentMode = 2;
                                             }
-                                            var erpType = "hidden";
                                             if (shipmentList[i].erpFlag.toString() == "true" && this.props.shipmentPage != "shipmentDataEntry") {
                                                 erpType = "text";
                                             }
@@ -374,7 +374,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             data[7] = "";
                                             data[8] = 0;
                                             data[9] = "";
-                                            data[10] = "";
+                                            data[10] = this.props.items.catalogPrice;
                                             data[11] = `=ROUND(K${parseInt(0) + 1}*I${parseInt(0) + 1},2)`;
                                             data[12] = "";
                                             data[13] = "";
@@ -474,7 +474,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                         data[7] = "";
                                                         data[8] = 0;
                                                         data[9] = "";
-                                                        data[10] = "";
+                                                        data[10] = this.props.items.catalogPrice;
                                                         data[11] = `=ROUND(K${parseInt(json.length) + 1}*I${parseInt(json.length) + 1},2)`;
                                                         data[12] = "";
                                                         data[13] = "";
@@ -491,6 +491,16 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                         data[24] = 1;
                                                         data[25] = 0;
                                                         obj.insertRow(data);
+                                                        console.log("Json.length", json.length);
+                                                        obj.setValueFromCoords(14, json.length, false, true);
+                                                        obj.setValueFromCoords(16, json.length, -1, true);
+                                                        obj.setValueFromCoords(18, json.length, 0, true);
+                                                        obj.setValueFromCoords(19, json.length, false, true);
+                                                        obj.setValueFromCoords(20, json.length, true, true);
+                                                        obj.setValueFromCoords(22, json.length, 0, true);
+                                                        obj.setValueFromCoords(23, json.length, 1, true);
+                                                        obj.setValueFromCoords(24, json.length, 1, true);
+                                                        obj.setValueFromCoords(25, json.length, 0, true);
                                                         if (this.props.shipmentPage == "shipmentDataEntry") {
                                                             var showOption = (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
                                                             console.log("showOption", showOption);
@@ -818,6 +828,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                             data[5] = arrivedDate;
                                                             data[6] = receivedDate;
                                                             data[7] = y;
+                                                            data[8] = i18n.t("static.consumption.actual")
                                                             json.push(data);
                                                             data = [];
                                                             data[0] = i18n.t("static.supplyPlan.estimated")
@@ -828,15 +839,16 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                             data[5] = expectedArrivedDate;
                                                             data[6] = expectedDeliveryDate;
                                                             data[7] = y;
+                                                            data[8] = i18n.t("static.supplyPlan.estimated")
                                                             json.push(data);
                                                             var options = {
                                                                 data: json,
                                                                 columnDrag: true,
-                                                                colWidths: [80, 100, 100, 100, 100, 100, 100],
+                                                                colWidths: [80, 100, 100, 100, 100, 100, 100, 0, 80],
                                                                 columns: [
                                                                     {
                                                                         title: i18n.t('static.supplyPlan.type'),
-                                                                        type: 'text',
+                                                                        type: 'hidden',
                                                                         readOnly: true
                                                                     },
                                                                     {
@@ -844,7 +856,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                         type: 'calendar',
                                                                         options: {
                                                                             format: JEXCEL_DATE_FORMAT,
-                                                                            validRange: [moment(Date.now()).subtract(1, 'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
+                                                                            validRange: emergencyOrder.toString() == "false" ? [(moment(Date.now()).subtract(1, 'months').format("YYYY-MM-DD")).toString(), (moment(Date.now()).format("YYYY-MM-DD")).toString()] : []
                                                                         }
                                                                     },
                                                                     {
@@ -852,7 +864,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                         type: 'calendar',
                                                                         options: {
                                                                             format: JEXCEL_DATE_FORMAT,
-                                                                            validRange: [moment(Date.now()).subtract(1, 'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
+                                                                            validRange: emergencyOrder.toString() == "false" ? [(moment(Date.now()).subtract(1, 'months').format("YYYY-MM-DD")).toString(), (moment(Date.now()).format("YYYY-MM-DD")).toString()] : []
                                                                         }
                                                                     },
                                                                     {
@@ -860,7 +872,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                         type: 'calendar',
                                                                         options: {
                                                                             format: JEXCEL_DATE_FORMAT,
-                                                                            validRange: [moment(Date.now()).subtract(1, 'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
+                                                                            validRange: emergencyOrder.toString() == "false" ? [(moment(Date.now()).subtract(1, 'months').format("YYYY-MM-DD")).toString(), (moment(Date.now()).format("YYYY-MM-DD")).toString()] : []
                                                                         }
                                                                     },
                                                                     {
@@ -868,7 +880,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                         type: 'calendar',
                                                                         options: {
                                                                             format: JEXCEL_DATE_FORMAT,
-                                                                            validRange: [moment(Date.now()).subtract(1, 'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
+                                                                            validRange: emergencyOrder.toString() == "false" ? [(moment(Date.now()).subtract(1, 'months').format("YYYY-MM-DD")).toString(), (moment(Date.now()).format("YYYY-MM-DD")).toString()] : []
                                                                         }
                                                                     },
                                                                     {
@@ -876,7 +888,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                         type: 'calendar',
                                                                         options: {
                                                                             format: JEXCEL_DATE_FORMAT,
-                                                                            validRange: [moment(Date.now()).subtract(1, 'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
+                                                                            validRange: emergencyOrder.toString() == "false" ? [(moment(Date.now()).subtract(1, 'months').format("YYYY-MM-DD")).toString(), (moment(Date.now()).format("YYYY-MM-DD")).toString()] : []
                                                                         }
                                                                     },
                                                                     {
@@ -884,13 +896,18 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                         type: 'calendar',
                                                                         options: {
                                                                             format: JEXCEL_DATE_FORMAT,
-                                                                            validRange: [moment(Date.now()).subtract(1, 'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
+                                                                            validRange: emergencyOrder.toString() == "false" ? [(moment(Date.now()).subtract(1, 'months').format("YYYY-MM-DD")).toString(), (moment(Date.now()).format("YYYY-MM-DD")).toString()] : []
                                                                         }
                                                                     },
                                                                     {
                                                                         title: i18n.t('static.supplyPlan.rowNumber'),
                                                                         type: 'hidden',
-                                                                    }
+                                                                    },
+                                                                    {
+                                                                        title: i18n.t('static.supplyPlan.type'),
+                                                                        type: 'text',
+                                                                        readOnly: true
+                                                                    },
                                                                 ],
                                                                 pagination: false,
                                                                 search: false,
@@ -972,8 +989,15 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                                 var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
                                                                                 cell.classList.add('readonly');
                                                                             }
-                                                                            var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
+
+                                                                            if (lastShipmentStatus == "") {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                            } else {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                            }
+
                                                                             var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
                                                                             cell.classList.add('readonly');
                                                                             var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
@@ -1002,10 +1026,23 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                                 var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
                                                                                 cell.classList.add('readonly');
                                                                             }
-                                                                            var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
-                                                                            var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
+                                                                            if (lastShipmentStatus == "") {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                            } else if (lastShipmentStatus == PLANNED_SHIPMENT_STATUS) {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                            } else {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                            }
+
                                                                             var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
                                                                             cell.classList.add('readonly');
                                                                             var cell = elInstance.getCell(`F${parseInt(0) + 1}`)
@@ -1032,12 +1069,36 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                                 var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
                                                                                 cell.classList.add('readonly');
                                                                             }
-                                                                            var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
-                                                                            var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
-                                                                            var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
+
+                                                                            if (lastShipmentStatus == "") {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                            } else if (lastShipmentStatus == PLANNED_SHIPMENT_STATUS) {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                            } else if (lastShipmentStatus == SUBMITTED_SHIPMENT_STATUS) {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                            } else {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                            }
                                                                             var cell = elInstance.getCell(`F${parseInt(0) + 1}`)
                                                                             cell.classList.add('readonly');
                                                                             var cell = elInstance.getCell(`G${parseInt(0) + 1}`)
@@ -1062,14 +1123,53 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                                 var cell = elInstance.getCell(`F${parseInt(0) + 1}`)
                                                                                 cell.classList.add('readonly');
                                                                             }
-                                                                            var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
-                                                                            var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
-                                                                            var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
-                                                                            var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
+
+                                                                            if (lastShipmentStatus == "") {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                            } else if (lastShipmentStatus == PLANNED_SHIPMENT_STATUS) {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                            } else if (lastShipmentStatus == SUBMITTED_SHIPMENT_STATUS) {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                            } else if (lastShipmentStatus == APPROVED_SHIPMENT_STATUS) {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                            } else {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                            }
                                                                             var cell = elInstance.getCell(`G${parseInt(0) + 1}`)
                                                                             cell.classList.add('readonly');
                                                                             var cell = elInstance.getCell(`B${parseInt(1) + 1}`)
@@ -1092,16 +1192,73 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                                 var cell = elInstance.getCell(`G${parseInt(0) + 1}`)
                                                                                 cell.classList.add('readonly');
                                                                             }
-                                                                            var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
-                                                                            var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
-                                                                            var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
-                                                                            var cell = elInstance.getCell(`F${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
-                                                                            var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
+                                                                            if (lastShipmentStatus == "") {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`F${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                            } else if (lastShipmentStatus == PLANNED_SHIPMENT_STATUS) {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`F${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                            } else if (lastShipmentStatus == SUBMITTED_SHIPMENT_STATUS) {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`c${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`F${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                            } else if (lastShipmentStatus == APPROVED_SHIPMENT_STATUS) {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`F${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                            } else if (lastShipmentStatus == SHIPPED_SHIPMENT_STATUS) {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`F${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                            } else {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`F${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                            }
                                                                             var cell = elInstance.getCell(`B${parseInt(1) + 1}`)
                                                                             cell.classList.add('readonly');
                                                                             var cell = elInstance.getCell(`C${parseInt(1) + 1}`)
@@ -1156,8 +1313,14 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                                 var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
                                                                                 cell.classList.add('readonly');
                                                                             }
-                                                                            var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
+                                                                            if (lastShipmentStatus == "") {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                            } else {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                            }
+
                                                                             var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
                                                                             cell.classList.add('readonly');
                                                                             var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
@@ -1176,10 +1339,23 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                                 var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
                                                                                 cell.classList.add('readonly');
                                                                             }
-                                                                            var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
-                                                                            var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
+
+                                                                            if (lastShipmentStatus == "") {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                            } else if (lastShipmentStatus == PLANNED_SHIPMENT_STATUS) {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                            } else {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                            }
                                                                             var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
                                                                             cell.classList.add('readonly');
                                                                             var cell = elInstance.getCell(`F${parseInt(0) + 1}`)
@@ -1196,12 +1372,36 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                                 var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
                                                                                 cell.classList.add('readonly');
                                                                             }
-                                                                            var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
-                                                                            var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
-                                                                            var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
+
+                                                                            if (lastShipmentStatus == "") {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                            } else if (lastShipmentStatus == PLANNED_SHIPMENT_STATUS) {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                            } else if (lastShipmentStatus == SUBMITTED_SHIPMENT_STATUS) {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                            } else {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                            }
                                                                             var cell = elInstance.getCell(`F${parseInt(0) + 1}`)
                                                                             cell.classList.add('readonly');
                                                                             var cell = elInstance.getCell(`G${parseInt(0) + 1}`)
@@ -1216,14 +1416,52 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                                 var cell = elInstance.getCell(`F${parseInt(0) + 1}`)
                                                                                 cell.classList.add('readonly');
                                                                             }
-                                                                            var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
-                                                                            var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
-                                                                            var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
-                                                                            var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
+                                                                            if (lastShipmentStatus == "") {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                            } else if (lastShipmentStatus == PLANNED_SHIPMENT_STATUS) {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                            } else if (lastShipmentStatus == SUBMITTED_SHIPMENT_STATUS) {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                            } else if (lastShipmentStatus == APPROVED_SHIPMENT_STATUS) {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                            } else {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                            }
                                                                             var cell = elInstance.getCell(`G${parseInt(0) + 1}`)
                                                                             cell.classList.add('readonly');
                                                                             var cell = elInstance.getCell(`F${parseInt(1) + 1}`)
@@ -1236,16 +1474,73 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                                 var cell = elInstance.getCell(`G${parseInt(0) + 1}`)
                                                                                 cell.classList.add('readonly');
                                                                             }
-                                                                            var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
-                                                                            var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
-                                                                            var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
-                                                                            var cell = elInstance.getCell(`F${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
-                                                                            var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
+                                                                            if (lastShipmentStatus == "") {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`F${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                            } else if (lastShipmentStatus == PLANNED_SHIPMENT_STATUS) {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`F${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                            } else if (lastShipmentStatus == SUBMITTED_SHIPMENT_STATUS) {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`c${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`F${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                            } else if (lastShipmentStatus == APPROVED_SHIPMENT_STATUS) {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                                var cell = elInstance.getCell(`F${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                            } else if (lastShipmentStatus == SHIPPED_SHIPMENT_STATUS) {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`F${parseInt(0) + 1}`)
+                                                                                cell.classList.remove('readonly');
+                                                                            } else {
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`F${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                            }
                                                                             var cell = elInstance.getCell(`G${parseInt(1) + 1}`)
                                                                             cell.classList.add('readonly');
                                                                         }
@@ -1413,6 +1708,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                         }.bind(this)
                                                     });
                                                 }
+                                                console.log("RowData-------->", rowData);
                                                 if (rowData[19].toString() == "true" && rowData[14].toString() == "false") {
                                                     items.push({
                                                         title: i18n.t('static.supplyPlan.doNotConsideAsEmergencyOrder'),
@@ -1518,6 +1814,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         tr.children[12].classList.add('AsteriskTheadtrTd');
         tr.children[13].classList.add('AsteriskTheadtrTd');
         var shipmentInstance = (instance).jexcel;
+        shipmentInstance.orderBy(1, 0);
         var json = shipmentInstance.getJson();
         var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X']
         for (var i = 0; i < json.length; i++) {
@@ -1539,6 +1836,10 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     shipmentInstance.setStyle(col, 'color', textColor);
                 }
             } else {
+                for (var j = 0; j < colArr.length; j++) {
+                    var col = (colArr[j]).concat(parseInt(i) + 1);
+                    shipmentInstance.setStyle(col, "background-color", "transparent");
+                }
             }
         }
     }
@@ -1576,25 +1877,31 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         this.props.updateState("shipmentError", "");
         this.props.updateState("noFundsBudgetError", "");
         console.log("X-------->", x, "Y---------->", y);
-        var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X']
-        if (rowData[20].toString() == "false") {
-            for (var j = 0; j < colArr.length; j++) {
-                var col = (colArr[j]).concat(parseInt(y) + 1);
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "#D3D3D3");
-                let textColor = contrast('#D3D3D3');
-                console.log("Contrast")
-                elInstance.setStyle(col, 'color', textColor);
+        if (x == 19 || x == 20) {
+            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X']
+            if (rowData[20].toString() == "false") {
+                for (var j = 0; j < colArr.length; j++) {
+                    var col = (colArr[j]).concat(parseInt(y) + 1);
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "#D3D3D3");
+                    let textColor = contrast('#D3D3D3');
+                    console.log("Contrast")
+                    elInstance.setStyle(col, 'color', textColor);
+                }
+            } else if (rowData[19].toString() == "true") {
+                for (var j = 0; j < colArr.length; j++) {
+                    var col = (colArr[j]).concat(parseInt(y) + 1);
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "red");
+                    let textColor = contrast('red');
+                    elInstance.setStyle(col, 'color', textColor);
+                }
+            } else {
+                for (var j = 0; j < colArr.length; j++) {
+                    var col = (colArr[j]).concat(parseInt(y) + 1);
+                    elInstance.setStyle(col, "background-color", "transparent");
+                }
             }
-        } else if (rowData[19].toString() == "true") {
-            for (var j = 0; j < colArr.length; j++) {
-                var col = (colArr[j]).concat(parseInt(y) + 1);
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "red");
-                let textColor = contrast('red');
-                elInstance.setStyle(col, 'color', textColor);
-            }
-        } else {
         }
         if (x != 23 && x != 21 && x != 25) {
             elInstance.setValueFromCoords(25, y, 0, true);
@@ -1793,6 +2100,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         if (x == 18) {
             if (value != 0) {
                 var adjustedQty = ((elInstance.getCell(`I${parseInt(y) + 1}`)).innerHTML).toString().replaceAll("\,", "");
+                console.log("Adjusted Qty", adjustedQty);
+                console.log("Value", value);
                 if (value != adjustedQty) {
                     inValid("I", y, i18n.t('static.supplyPlan.batchNumberMissing'), elInstance);
                     this.props.updateState("shipmentBatchError", i18n.t('static.supplyPlan.batchNumberMissing'));
@@ -1861,7 +2170,24 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             var shipmentQty = ((elInstance.getCell(`F${parseInt(0) + 1}`)).innerHTML).toString().replaceAll("\,", "");
             var rowNumber = rowData[6];
             var shipmentInstance = this.state.shipmentsEl;
+            var batchDetails = shipmentInstance.getRowData(rowNumber)[17];
+            console.log("BatchDetails.length", batchDetails);
+            console.log("BatchDetails.length", batchDetails.length);
+            if (batchDetails.length == 1) {
+                console.log("batchDetails[0].batch.autoGenerated", batchDetails[0].batch.autoGenerated);
+                if (batchDetails[0].batch.autoGenerated.toString() == "true") {
+                    batchDetails[0].shipmentQty = shipmentQty;
+                    console.log("BatchDetails[0", batchDetails[0].shipmentQty);
+                }
+            }
             shipmentInstance.setValueFromCoords(8, rowNumber, shipmentQty, true);
+            if (batchDetails.length == 1) {
+                console.log("batchDetails[0].batch.autoGenerated", batchDetails[0].batch.autoGenerated);
+                if (batchDetails[0].batch.autoGenerated.toString() == "true") {
+                    shipmentInstance.setValueFromCoords(17, rowNumber, batchDetails, true);
+                    shipmentInstance.setValueFromCoords(18, rowNumber, shipmentQty, true);
+                }
+            }
             this.props.updateState("shipmentQtyChangedFlag", 0);
             this.props.updateState("shipmentChangedFlag", 1);
             this.props.updateState("qtyCalculatorTableEl", "");
@@ -3090,6 +3416,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             shipmentDataList[parseInt(map.get("16"))].freightCost = parseFloat(freightCost.toString().replaceAll("\,", "")).toFixed(2);
                             shipmentDataList[parseInt(map.get("16"))].notes = map.get("13");
                             shipmentDataList[parseInt(map.get("16"))].accountFlag = map.get("20");
+                            shipmentDataList[parseInt(map.get("16"))].active = map.get("24");
                             shipmentDataList[parseInt(map.get("16"))].emergencyOrder = map.get("19");
                             shipmentDataList[parseInt(map.get("16"))].currency.currencyId = map.get("9");
                             shipmentDataList[parseInt(map.get("16"))].currency.conversionRateToUsd = (parseFloat((this.state.currencyListAll.filter(c => c.currencyId == map.get("9"))[0]).conversionRateToUsd));
@@ -3144,7 +3471,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             }
                             for (var bi = 0; bi < shipmentBatchInfoList.length; bi++) {
                                 // Push shipment batch details in program json batch info list
-                                var index = batchInfoList.filter(c => c.batchNo == shipmentBatchInfoList[bi].batch.batchNo);
+                                var index = batchInfoList.findIndex(c => c.batchNo == shipmentBatchInfoList[bi].batch.batchNo);
+                                console.log("Batch info list 1st", batchInfoList);
+                                console.log("Index1", index);
                                 if (index == -1) {
                                     var batchDetails = {
                                         batchId: shipmentBatchInfoList[bi].batch.batchId,
@@ -3168,7 +3497,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             console.log("In else")
                             var shipmentJson = {
                                 accountFlag: true,
-                                active: true,
+                                active: map.get("24"),
                                 dataSource: {
                                     id: map.get("6")
                                 },
@@ -3257,8 +3586,11 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                 }
                                 batchInfoList.push(batchDetails);
                             }
+                            console.log("shipmentBatchInfoList.length", shipmentBatchInfoList.length);
                             for (var bi = 0; bi < shipmentBatchInfoList.length; bi++) {
-                                var index = batchInfoList.filter(c => c.batchNo == shipmentBatchInfoList[bi].batch.batchNo);
+                                var index = batchInfoList.findIndex(c => c.batchNo == shipmentBatchInfoList[bi].batch.batchNo);
+                                console.log("BatchInfoList", batchInfoList);
+                                console.log("Index", index);
                                 if (index == -1) {
                                     var batchDetails = {
                                         batchId: shipmentBatchInfoList[bi].batch.batchId,

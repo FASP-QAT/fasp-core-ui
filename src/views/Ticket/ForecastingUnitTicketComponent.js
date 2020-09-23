@@ -12,6 +12,7 @@ import TracerCategoryService from '../../api/TracerCategoryService';
 import getLabelText from '../../CommonComponent/getLabelText';
 import ProductService from '../../api/ProductService';
 import RealmService from '../../api/RealmService';
+import { SPACE_REGEX } from '../../Constants';
 
 const initialValues = {
     summary: "Add / Update Forecasting Unit",
@@ -35,6 +36,7 @@ const validationSchema = function (values) {
         productCategory: Yup.string()
             .required(i18n.t('static.common.selectProductCategory')),
         forecastingUnitDesc: Yup.string()
+            .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.forecastingunit.forecastingunittext')),
         genericName: Yup.string()
             .required(i18n.t('static.product.generictext')),

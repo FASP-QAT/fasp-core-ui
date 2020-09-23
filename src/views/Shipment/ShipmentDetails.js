@@ -2,7 +2,7 @@ import React from "react";
 import {
     Card, CardBody,
     Label, FormGroup,
-    CardFooter, Button, Col, Form, Modal, ModalHeader, ModalFooter, ModalBody,Input
+    CardFooter, Button, Col, Form, Modal, ModalHeader, ModalFooter, ModalBody, Input
 } from 'reactstrap';
 import { Formik } from 'formik';
 import CryptoJS from 'crypto-js'
@@ -44,6 +44,8 @@ export default class ShipmentDetails extends React.Component {
             shipmentModalTitle: "",
             shipmentType: { value: 1, label: i18n.t('static.shipment.manualShipments') },
             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() },
+            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
         }
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this)
         this.formSubmit = this.formSubmit.bind(this);
@@ -316,6 +318,7 @@ export default class ShipmentDetails extends React.Component {
                     console.log("Shipment list", shipmentList);
                     this.setState({
                         shelfLife: programPlanningUnit.shelfLife,
+                        catalogPrice: programPlanningUnit.catalogPrice,
                         programJson: programJson,
                         shipmentListUnFiltered: shipmentListUnFiltered,
                         shipmentList: shipmentList,
@@ -400,6 +403,7 @@ export default class ShipmentDetails extends React.Component {
                                                         <div className="controls edit">
 
                                                             <Picker
+                                                                years={{ min: this.state.minDate, max: this.state.maxDate }}
                                                                 ref={this.pickRange}
                                                                 value={rangeValue}
                                                                 lang={pickerLang}

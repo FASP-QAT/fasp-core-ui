@@ -9,6 +9,7 @@ import * as Yup from 'yup';
 import JiraTikcetService from '../../api/JiraTikcetService';
 import DimensionService from '../../api/DimensionService';
 import getLabelText from '../../CommonComponent/getLabelText';
+import { UNIT_LABEL_REGEX } from '../../Constants';
 
 const initialValues = {
     summary: "Add / Update Units",
@@ -25,9 +26,11 @@ const validationSchema = function (values) {
         dimension: Yup.string()
             .required(i18n.t('static.unit.dimensiontext')),
         unit: Yup.string()
-            .required(i18n.t('static.unit.unittext')),
+            .required(i18n.t('static.unit.unittext'))
+            .matches(UNIT_LABEL_REGEX, i18n.t('static.message.alphaspespacenumtext')),
         unitCode: Yup.string()
-            .required(i18n.t('static.unit.unitcodetext')),        
+            .required(i18n.t('static.unit.unitcodetext'))
+            .matches(UNIT_LABEL_REGEX, i18n.t('static.message.alphaspespacenumtext')),        
         // notes: Yup.string()
         //     .required(i18n.t('static.common.notestext'))
     })

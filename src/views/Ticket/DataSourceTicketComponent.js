@@ -11,6 +11,7 @@ import RealmService from '../../api/RealmService';
 import DataSourceTypeService from '../../api/DataSourceTypeService';
 import ProgramService from '../../api/ProgramService';
 import getLabelText from '../../CommonComponent/getLabelText';
+import { SPACE_REGEX } from '../../Constants';
 
 const initialValues = {
     summary: "Add / Update Data Source",
@@ -32,6 +33,7 @@ const validationSchema = function (values) {
         dataSourceType: Yup.string()
             .required(i18n.t('static.datasource.datasourcetypetext')),
         dataSourceName: Yup.string()
+            .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.datasource.datasourcetext')),                
         // notes: Yup.string()
         //     .required(i18n.t('static.common.notestext'))

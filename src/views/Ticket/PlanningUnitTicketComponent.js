@@ -9,6 +9,7 @@ import * as Yup from 'yup';
 import JiraTikcetService from '../../api/JiraTikcetService';
 import UnitService from '../../api/UnitService';
 import ForecastingUnitService from '../../api/ForecastingUnitService';
+import { SPACE_REGEX } from '../../Constants';
 
 const initialValues = {
     summary: "Add / Update Planning Unit",
@@ -24,12 +25,14 @@ const validationSchema = function (values) {
         summary: Yup.string()
             .required(i18n.t('static.common.summarytext')),
         planningUnitDesc: Yup.string()
+            .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.planningunit.planningunittext')),
         forecastingUnitDesc: Yup.string()
             .required(i18n.t('static.planningunit.forcastingunittext')),
         unit: Yup.string()
             .required(i18n.t('static.procurementUnit.validUnitIdText')),
-        multiplier: Yup.string()
+        multiplier: Yup.number()
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
             .required(i18n.t('static.planningunit.multipliertext')),
         // notes: Yup.string()
         //     .required(i18n.t('static.common.notestext'))

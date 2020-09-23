@@ -27,7 +27,7 @@ const validationSchema = function (values) {
         realmId: Yup.string()
             .required(i18n.t('static.common.realmtext')),
         countryId: Yup.string()
-            .required(i18n.t('static.healtharea.countrytex')),
+            .required(i18n.t('static.healtharea.countrytext')),
         currencyId: Yup.string()
             .required(i18n.t('static.country.currencytext')),        
         // notes: Yup.string()

@@ -38,6 +38,8 @@ export default class ConsumptionDetails extends React.Component {
             showConsumption: 0,
             consumptionChangedFlag: 0,
             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() },
+            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
         }
 
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
@@ -61,7 +63,7 @@ export default class ConsumptionDetails extends React.Component {
     }
     handleRangeDissmis(value) {
         this.setState({ rangeValue: value })
-        this.formSubmit(this.state.planningUnit,value);
+        this.formSubmit(this.state.planningUnit, value);
     }
 
     hideFirstComponent() {
@@ -250,7 +252,7 @@ export default class ConsumptionDetails extends React.Component {
                                 planningUnit: planningUnit,
                                 planningUnitId: planningUnitIdProp
                             })
-                            this.formSubmit(planningUnit,this.state.rangeValue);
+                            this.formSubmit(planningUnit, this.state.rangeValue);
                         }
                     }.bind(this);
                 }.bind(this)
@@ -263,7 +265,7 @@ export default class ConsumptionDetails extends React.Component {
         }
     }
 
-    formSubmit(value,rangeValue) {
+    formSubmit(value, rangeValue) {
         this.setState({ loading: true })
         let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
         let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
@@ -381,6 +383,7 @@ export default class ConsumptionDetails extends React.Component {
                                                         <div className="controls edit">
 
                                                             <Picker
+                                                                years={{ min: this.state.minDate, max: this.state.maxDate }}
                                                                 ref={this.pickRange}
                                                                 value={rangeValue}
                                                                 lang={pickerLang}
@@ -414,7 +417,7 @@ export default class ConsumptionDetails extends React.Component {
                                                                 bsSize="sm"
                                                                 options={this.state.planningUnitList}
                                                                 value={this.state.planningUnit}
-                                                                onChange={(e) => { this.formSubmit(e,this.state.rangeValue); }}
+                                                                onChange={(e) => { this.formSubmit(e, this.state.rangeValue); }}
                                                             />
                                                         </div>
                                                     </FormGroup>
@@ -429,7 +432,7 @@ export default class ConsumptionDetails extends React.Component {
                                         </Form>
                                     )} />
 
-                        <div className="">
+                        <div className="shipmentconsumptionSearchMarginTop">
                             <ConsumptionInSupplyPlanComponent ref="consumptionChild" items={this.state} toggleLarge={this.toggleLarge} updateState={this.updateState} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} consumptionPage="consumptionDataEntry" />
                             <div className="table-responsive" id="consumptionTableDiv">
                                 <div id="consumptionTable" />
