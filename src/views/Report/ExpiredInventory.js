@@ -49,6 +49,8 @@ const pickerLang = {
 export default class ExpiredInventory extends Component {
     constructor(props) {
         super(props);
+        this.getPrograms = this.getPrograms.bind(this);
+        this.filterVersion = this.filterVersion.bind(this);
         this.fetchData = this.fetchData.bind(this);
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
         this.handleRangeChange = this.handleRangeChange.bind(this);
@@ -58,15 +60,30 @@ export default class ExpiredInventory extends Component {
             outPutList: [],
             programs: [],
             versions: [],
-            planningUnits: [],
             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth()+2 },
-            maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
+            minDate:{year:  new Date().getFullYear()-3, month: new Date().getMonth()},
+            maxDate:{year:  new Date().getFullYear()+3, month: new Date().getMonth()+1},
         }
     }
 
     componentDidMount() {
         this.getPrograms();
+        this.state.outPutList = [
+            {
+                planningUnit: {
+                    planningUnitId: 1,
+                    label: {
+                        label_en: 'Abacvare 20 mg / 50 tablets',
+                        label_fr: '',
+                        label_sp: '',
+                        label_pr: '',
+                    }
+                },
+                quantity: 10000,
+                batchNo: 'BATCH1248',
+                expDate: '2020-07-01'
+            }
+        ]
     }
 
     handleRangeChange(value, text, listIndex) {
@@ -85,22 +102,23 @@ export default class ExpiredInventory extends Component {
         if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
         return '?'
     }
-    getPrograms = () => {
+    getPrograms() {
         if (navigator.onLine) {
             AuthenticationService.setupAxiosInterceptors();
-            ProgramService.getProgramList()
+            let realmId = AuthenticationService.getRealmId();
+            ProgramService.getProgramByRealmId(realmId)
                 .then(response => {
                     console.log(JSON.stringify(response.data))
                     this.setState({
-                        programs: response.data, message: '', loading: false
+                        programs: response.data
                     }, () => { this.consolidatedProgramList() })
                 }).catch(
                     error => {
                         this.setState({
-                            programs: [], loading: false
+                            programs: []
                         }, () => { this.consolidatedProgramList() })
                         if (error.message === "Network Error") {
-                            this.setState({ loading: false, message: error.message });
+                            this.setState({ message: error.message });
                         } else {
                             switch (error.response ? error.response.status : "") {
                                 case 500:
@@ -108,22 +126,19 @@ export default class ExpiredInventory extends Component {
                                 case 404:
                                 case 406:
                                 case 412:
-                                    this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
                                     break;
                                 default:
-                                    this.setState({ loading: false, message: 'static.unkownError' });
+                                    this.setState({ message: 'static.unkownError' });
                                     break;
                             }
                         }
                     }
                 );
-
         } else {
             console.log('offline')
-            this.setState({ loading: false })
             this.consolidatedProgramList()
         }
-
     }
     consolidatedProgramList = () => {
         const lan = 'en';
@@ -166,10 +181,7 @@ export default class ExpiredInventory extends Component {
                             proList.push(programData)
                         }
                     }
-
-
                 }
-
                 this.setState({
                     programs: proList
                 })
@@ -177,21 +189,19 @@ export default class ExpiredInventory extends Component {
             }.bind(this);
 
         }.bind(this);
-
-
     }
-
-
     filterVersion = () => {
         let programId = document.getElementById("programId").value;
         if (programId != 0) {
-
             const program = this.state.programs.filter(c => c.programId == programId)
             console.log(program)
             if (program.length == 1) {
                 if (navigator.onLine) {
                     this.setState({
-                        versions: []
+                        versions: [],
+                        planningUnits: [],
+                        // outPutList: []
+
                     }, () => {
                         this.setState({
                             versions: program[0].versionList.filter(function (x, i, a) {
@@ -199,8 +209,6 @@ export default class ExpiredInventory extends Component {
                             })
                         }, () => { this.consolidatedVersionList(programId) });
                     });
-
-
                 } else {
                     this.setState({
                         versions: []
@@ -211,7 +219,6 @@ export default class ExpiredInventory extends Component {
                 this.setState({
                     versions: []
                 })
-
             }
         } else {
             this.setState({
@@ -219,6 +226,7 @@ export default class ExpiredInventory extends Component {
             })
         }
     }
+
     consolidatedVersionList = (programId) => {
         const lan = 'en';
         const { versions } = this.state
@@ -251,12 +259,8 @@ export default class ExpiredInventory extends Component {
 
                         version.versionId = `${version.versionId} (Local)`
                         verList.push(version)
-
                     }
-
-
                 }
-
                 console.log(verList)
                 this.setState({
                     versions: verList.filter(function (x, i, a) {
@@ -265,115 +269,7 @@ export default class ExpiredInventory extends Component {
                 })
 
             }.bind(this);
-
-
-
         }.bind(this)
-
-
-    }
-    getPlanningUnit = () => {
-        let programId = document.getElementById("programId").value;
-        let versionId = document.getElementById("versionId").value;
-        this.setState({
-            planningUnits: []
-        }, () => {
-
-            if (versionId == 0) {
-                this.setState({ message: i18n.t('static.program.validversion'), stockStatusList: [] });
-            } else {
-                if (versionId.includes('Local')) {
-                    const lan = 'en';
-                    var db1;
-                    var storeOS;
-                    getDatabase();
-                    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                    openRequest.onsuccess = function (e) {
-                        db1 = e.target.result;
-                        var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
-                        var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
-                        var planningunitRequest = planningunitOs.getAll();
-                        var planningList = []
-                        planningunitRequest.onerror = function (event) {
-                            // Handle errors!
-                        };
-                        planningunitRequest.onsuccess = function (e) {
-                            var myResult = [];
-                            myResult = planningunitRequest.result;
-                            var programId = (document.getElementById("programId").value).split("_")[0];
-                            var proList = []
-                            console.log(myResult)
-                            for (var i = 0; i < myResult.length; i++) {
-                                if (myResult[i].program.id == programId) {
-
-                                    proList[i] = myResult[i]
-                                }
-                            }
-                            this.setState({
-                                planningUnits: proList, message: ''
-                            }, () => {
-                                this.fetchData();
-                            })
-                        }.bind(this);
-                    }.bind(this)
-
-
-                }
-                else {
-                    AuthenticationService.setupAxiosInterceptors();
-
-                    ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
-                        console.log('**' + JSON.stringify(response.data))
-                        this.setState({
-                            planningUnits: response.data, message: ''
-                        }, () => {
-                            this.fetchData();
-                        })
-                    })
-                        .catch(
-                            error => {
-                                this.setState({
-                                    planningUnits: [],
-                                })
-                                if (error.message === "Network Error") {
-                                    this.setState({ message: error.message });
-                                } else {
-                                    switch (error.response ? error.response.status : "") {
-                                        case 500:
-                                        case 401:
-                                        case 404:
-                                        case 406:
-                                        case 412:
-                                            this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
-                                            break;
-                                        default:
-                                            this.setState({ message: 'static.unkownError' });
-                                            break;
-                                    }
-                                }
-                            }
-                        );
-                }
-            }
-        });
-
-    }
-    dateformatter = value => {
-        var dt = new Date(value)
-        return moment(dt).format('MMM-DD-YYYY');
-    }
-    formatter = value => {
-
-        var cell1 = value
-        cell1 += '';
-        var x = cell1.split('.');
-        var x1 = x[0];
-        var x2 = x.length > 1 ? '.' + x[1] : '';
-        var rgx = /(\d+)(\d{3})/;
-        while (rgx.test(x1)) {
-            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-        }
-        return x1 + x2;
     }
 
     fetchData() {
@@ -385,16 +281,16 @@ export default class ExpiredInventory extends Component {
             // "planningUnitId": document.getElementById("planningUnitId").value,
             // "fundingSourceId": document.getElementById("fundingSourceId").value,
             // "shipmentStatusId": document.getElementById("shipmentStatusId").value,
-            "startDate": this.state.rangeValue.from.year + '-' + ("00" + this.state.rangeValue.from.month).substr(-2) + '-01',
-            "stopDate": this.state.rangeValue.to.year + '-' + ("00" + this.state.rangeValue.to.month).substr(-2) + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate(),
-            "includePlannedShipment": document.getElementById("includePlanningShipments").value == true ? 1 : 0
+            // "startDate": this.state.rangeValue.from.year + '-' + ("00" + this.state.rangeValue.from.month).substr(-2) + '-01',
+            // "stopDate": this.state.rangeValue.to.year + '-' + ("00" + this.state.rangeValue.to.month).substr(-2) + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate(),
+            // "reportbaseValue": document.getElementById("view").value,
 
         }
 
         let versionId = document.getElementById("versionId").value;
         let programId = document.getElementById("programId").value;
-        let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
-        let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
+        let myStartDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
+        let myEndDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
         // let planningUnitId = document.getElementById("planningUnitId").value;
         // let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         // let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
@@ -434,35 +330,300 @@ export default class ExpiredInventory extends Component {
 
                         var programJson = JSON.parse(programData);
                         console.log("3----", programJson);
-                        var list = (programJson.supplyPlan).filter(c => (c.expiredStock > 0 && (c.transDate >= startDate && c.transDate <= endDate)));
-                        var data = []
-                        list.map(ele => {
-                            var pu = (this.state.planningUnits.filter(c => c.planningUnit.id == ele.planningUnitId))[0]
-                           var list1= ele.batchDetails.filter(c => c.expiredQty>0 && (c.expiryDate >= startDate && c.expiryDate <= endDate))
-                           list1.map(ele1=>{
-                              // ele1.createdDate=ele.transDate
-                            var json = {
-                                planningUnit: pu.planningUnit,
-                                batchInfo: ele1,
-                                expiredQty: document.getElementById("includePlanningShipments").value.toString() == 'true'?ele1.expiredQty:ele1.expiredQtyWps,
-                                program: { id: programJson.programId, label: programJson.label, code: programJson.programCode }
+                        var regionList = [];
+                        for (var i = 0; i < programJson.regionList.length; i++) {
+                            var regionJson = {
+                                // name: // programJson.regionList[i].regionId,
+                                name: getLabelText(programJson.regionList[i].label, this.state.lang),
+                                id: programJson.regionList[i].regionId
                             }
-                            data.push(json)
-                        })
-                        })
-                        console.log(data)
-                        this.setState({
-                            outPutList: data
-                        })
+                            regionList.push(regionJson);
+
+                        }
+                        var regionListFiltered = regionList;
+                        //=============expired inventory code
+
+                        // Calculations for exipred stock
+                        var batchInfoForPlanningUnit = programJson.batchInfoList;
+                        // .filter(c => c.planningUnitId == document.getElementById("planningUnitId").value);
+                        var myArray = batchInfoForPlanningUnit.sort(function (a, b) { return new Date(a.expiryDate) - new Date(b.expiryDate) })
+                        for (var ma = 0; ma < myArray.length; ma++) {
+
+                            //**** shipment
+                            var shipmentList = programJson.shipmentList;
+                            var shipmentBatchArray = [];
+                            for (var ship = 0; ship < shipmentList.length; ship++) {
+                                var batchInfoList = shipmentList[ship].batchInfoList;
+                                for (var bi = 0; bi < batchInfoList.length; bi++) {
+                                    shipmentBatchArray.push({ batchNo: batchInfoList[bi].batch.batchNo, qty: batchInfoList[bi].shipmentQty })
+                                }
+                            }
+
+                            var stockForBatchNumber = shipmentBatchArray.filter(c => c.batchNo == myArray[ma].batchNo)[0];
+                            var totalStockForBatchNumber = stockForBatchNumber.qty;
+
+
+                            //**** consumption
+                            var consumptionList = programJson.consumptionList;
+                            var consumptionBatchArray = [];
+
+                            for (var con = 0; con < consumptionList.length; con++) {
+                                var batchInfoList = consumptionList[con].batchInfoList;
+                                for (var bi = 0; bi < batchInfoList.length; bi++) {
+                                    consumptionBatchArray.push({ batchNo: batchInfoList[bi].batch.batchNo, qty: batchInfoList[bi].consumptionQty })
+                                }
+                            }
+                            var consumptionForBatchNumber = consumptionBatchArray.filter(c => c.batchNo == myArray[ma].batchNo);
+                            if (consumptionForBatchNumber == undefined) {
+                                consumptionForBatchNumber = [];
+                            }
+                            var consumptionQty = 0;
+                            for (var b = 0; b < consumptionForBatchNumber.length; b++) {
+                                consumptionQty += parseInt(consumptionForBatchNumber[b].qty);
+                            }
+
+                            //**** inventory
+                            var inventoryList = programJson.inventoryList;
+                            var inventoryBatchArray = [];
+                            for (var inv = 0; inv < inventoryList.length; inv++) {
+                                var batchInfoList = inventoryList[inv].batchInfoList;
+                                for (var bi = 0; bi < batchInfoList.length; bi++) {
+                                    inventoryBatchArray.push({ batchNo: batchInfoList[bi].batch.batchNo, qty: batchInfoList[bi].adjustmentQty * inventoryList[inv].multiplier })
+                                }
+                            }
+                            var inventoryForBatchNumber = [];
+                            if (inventoryBatchArray.length > 0) {
+                                inventoryForBatchNumber = inventoryBatchArray.filter(c => c.batchNo == myArray[ma].batchNo);
+                            }
+                            if (inventoryForBatchNumber == undefined) {
+                                inventoryForBatchNumber = [];
+                            }
+                            var adjustmentQty = 0;
+                            for (var b = 0; b < inventoryForBatchNumber.length; b++) {
+                                adjustmentQty += parseFloat(inventoryForBatchNumber[b].qty);
+                            }
+
+                            //**  remaning batch quantity
+                            var remainingBatchQty = parseInt(totalStockForBatchNumber) - parseInt(consumptionQty) + parseFloat(adjustmentQty);
+                            myArray[ma].remainingQty = remainingBatchQty;
+                        }
+                        console.log("MyArray", myArray);
+
+                        var consumptionList = (programJson.consumptionList).filter(c => c.active == true);
+                        var inventoryList = (programJson.inventoryList).filter(c => c.active == true);
+                        var createdDate = moment(FIRST_DATA_ENTRY_DATE).format("YYYY-MM-DD");
+                        var firstDataEntryDate = moment(FIRST_DATA_ENTRY_DATE).format("YYYY-MM-DD");
+
+                        // var curDate = moment(this.state.monthsArray[TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN - 1].startDate).subtract(1, 'months').format("YYYY-MM-DD");
+                        var curDate = '2021-07-01';
+
+                        for (var i = 0; createdDate < curDate; i++) {
+
+                            createdDate = moment(firstDataEntryDate).add(i, 'months').format("YYYY-MM-DD");
+                            var consumptionQty = 0;
+                            var unallocatedConsumptionQty = 0;
+                            var startDate = moment(createdDate).startOf('month').format("YYYY-MM-DD");
+                            var endDate = moment(createdDate).endOf('month').format("YYYY-MM-DD");
+
+                            var batchDetailsForParticularPeriod = myArray.filter(c => (moment(c.createdDate).format("YYYY-MM-DD") <= moment(startDate).format("YYYY-MM-DD")) && ((moment(c.expiryDate).format("YYYY-MM-DD")) >= (moment(startDate).format("YYYY-MM-DD"))) && (c.remainingQty > 0));
+                            console.log("--------------------------------------------------------------");
+                            console.log("Start date", startDate);
+
+
+                            for (var reg = 0; reg < regionListFiltered.length; reg++) {
+                                var c = consumptionList.filter(c => (c.consumptionDate >= startDate && c.consumptionDate <= endDate) && c.region.id == regionListFiltered[reg].id);
+                                for (var j = 0; j < c.length; j++) {
+                                    var count = 0;
+                                    for (var k = 0; k < c.length; k++) {
+                                        if (c[j].consumptionDate == c[k].consumptionDate && c[j].region.id == c[k].region.id && j != k) {
+                                            count++;
+                                        } else {
+
+                                        }
+                                    }
+                                    if (count == 0) {
+
+                                        consumptionQty = consumptionQty + parseInt((c[j].consumptionQty));
+                                        var qty = 0;
+                                        if (c[j].batchInfoList.length > 0) {
+                                            for (var a = 0; a < c[j].batchInfoList.length; a++) {
+                                                qty += parseInt((c[j].batchInfoList)[a].consumptionQty);
+                                            }
+                                        }
+                                        var remainingQty = parseInt((c[j].consumptionQty)) - parseInt(qty);
+                                        // unallocatedConsumptionQty = parseInt(unallocatedConsumptionQty) + parseInt(remainingQty);
+                                        unallocatedConsumptionQty = parseInt(remainingQty);
+
+                                        var batchDetailsForParticularPeriodForPlanningUnit = batchDetailsForParticularPeriod.filter(p => p.planningUnitId == c[j].planningUnit.id);
+
+                                        for (var ua = 0; unallocatedConsumptionQty != 0 && batchDetailsForParticularPeriodForPlanningUnit.length > 0 && ua < batchDetailsForParticularPeriodForPlanningUnit.length; ua++) {
+                                            console.log("Remaining Qty", parseInt(batchDetailsForParticularPeriodForPlanningUnit[ua].remainingQty), "Batch no", batchDetailsForParticularPeriodForPlanningUnit[ua].batchNo);
+                                            console.log("Unallocated consumption", unallocatedConsumptionQty);
+                                            var index = myArray.findIndex(c => c.batchNo == batchDetailsForParticularPeriodForPlanningUnit[ua].batchNo);
+                                            if (parseInt(batchDetailsForParticularPeriodForPlanningUnit[ua].remainingQty) >= parseInt(unallocatedConsumptionQty)) {
+                                                myArray[index].remainingQty = parseInt(batchDetailsForParticularPeriodForPlanningUnit[ua].remainingQty) - parseInt(unallocatedConsumptionQty);
+                                                unallocatedConsumptionQty = 0
+                                            } else {
+                                                var rq = batchDetailsForParticularPeriodForPlanningUnit[ua].remainingQty;
+                                                myArray[index].remainingQty = 0;
+                                                unallocatedConsumptionQty = parseInt(unallocatedConsumptionQty) - parseInt(rq);
+                                            }
+                                        }
+
+                                    } else {
+                                        if (c[j].actualFlag.toString() == 'true') {
+                                            consumptionQty = consumptionQty + parseInt((c[j].consumptionQty));
+                                            var qty = 0;
+                                            if (c[j].batchInfoList.length > 0) {
+                                                for (var a = 0; a < c[j].batchInfoList.length; a++) {
+                                                    qty += parseInt((c[j].batchInfoList)[a].consumptionQty);
+                                                }
+                                            }
+                                            var remainingQty = parseInt((c[j].consumptionQty)) - parseInt(qty);
+                                            // unallocatedConsumptionQty = parseInt(unallocatedConsumptionQty) + parseInt(remainingQty);
+                                            unallocatedConsumptionQty = parseInt(remainingQty);
+
+                                            var batchDetailsForParticularPeriodForPlanningUnit = batchDetailsForParticularPeriod.filter(p => p.planningUnitId == c[j].planningUnit.id);
+
+                                            for (var ua = 0; unallocatedConsumptionQty != 0 && batchDetailsForParticularPeriodForPlanningUnit.length > 0 && ua < batchDetailsForParticularPeriodForPlanningUnit.length; ua++) {
+                                                console.log("Remaining Qty", parseInt(batchDetailsForParticularPeriodForPlanningUnit[ua].remainingQty), "Batch no", batchDetailsForParticularPeriodForPlanningUnit[ua].batchNo);
+                                                console.log("Unallocated consumption", unallocatedConsumptionQty);
+                                                var index = myArray.findIndex(c => c.batchNo == batchDetailsForParticularPeriodForPlanningUnit[ua].batchNo);
+                                                if (parseInt(batchDetailsForParticularPeriodForPlanningUnit[ua].remainingQty) >= parseInt(unallocatedConsumptionQty)) {
+                                                    myArray[index].remainingQty = parseInt(batchDetailsForParticularPeriodForPlanningUnit[ua].remainingQty) - parseInt(unallocatedConsumptionQty);
+                                                    unallocatedConsumptionQty = 0
+                                                } else {
+                                                    var rq = batchDetailsForParticularPeriodForPlanningUnit[ua].remainingQty;
+                                                    myArray[index].remainingQty = 0;
+                                                    unallocatedConsumptionQty = parseInt(unallocatedConsumptionQty) - parseInt(rq);
+                                                }
+                                            }
+
+
+                                        }
+                                    }
+                                }
+                            }
+
+                            var adjustmentQty = 0;
+                            var unallocatedAdjustmentQty = 0;
+                            for (var reg = 0; reg < regionListFiltered.length; reg++) {
+                                var c = inventoryList.filter(c => (c.inventoryDate >= startDate && c.inventoryDate <= endDate) && c.region != null && c.region.id == regionListFiltered[reg].id);
+                                for (var j = 0; j < c.length; j++) {
+                                    adjustmentQty += parseFloat((c[j].adjustmentQty * c[j].multiplier));
+                                    var qty1 = 0;
+                                    if (c[j].batchInfoList.length > 0) {
+                                        for (var a = 0; a < c[j].batchInfoList.length; a++) {
+                                            qty1 += parseFloat(parseInt((c[j].batchInfoList)[a].adjustmentQty) * c[j].multiplier);
+                                        }
+                                    }
+                                    var remainingQty = parseFloat((c[j].adjustmentQty * c[j].multiplier)) - parseFloat(qty1);
+                                    unallocatedAdjustmentQty = parseFloat(remainingQty);
+
+                                    var batchDetailsForParticularPeriodForPlanningUnit = batchDetailsForParticularPeriod.filter(p => p.planningUnitId == c[j].planningUnit.id);
+
+                                    if (unallocatedAdjustmentQty < 0) {
+                                        for (var ua = batchDetailsForParticularPeriodForPlanningUnit.length; unallocatedAdjustmentQty != 0 && batchDetailsForParticularPeriodForPlanningUnit.length > 0 && ua != 0; ua--) {
+                                            console.log("ua============>", ua)
+                                            console.log("Remaining Qty", parseInt(batchDetailsForParticularPeriodForPlanningUnit[ua - 1].remainingQty), "Batch no", batchDetailsForParticularPeriodForPlanningUnit[ua - 1].batchNo);
+                                            console.log("Unallocated adjustments", unallocatedAdjustmentQty);
+
+                                            var index = myArray.findIndex(c => c.batchNo == batchDetailsForParticularPeriodForPlanningUnit[ua - 1].batchNo);
+                                            if (parseInt(batchDetailsForParticularPeriodForPlanningUnit[ua - 1].remainingQty) + parseInt(unallocatedAdjustmentQty) > 0) {
+                                                myArray[index].remainingQty = parseInt(batchDetailsForParticularPeriodForPlanningUnit[ua - 1].remainingQty) + parseInt(unallocatedAdjustmentQty);
+                                                unallocatedAdjustmentQty = 0
+                                            } else {
+                                                var rq = batchDetailsForParticularPeriodForPlanningUnit[ua - 1].remainingQty;
+                                                myArray[index].remainingQty = 0;
+                                                unallocatedAdjustmentQty = parseInt(unallocatedAdjustmentQty) + parseInt(rq);
+                                            }
+                                        }
+                                    } else {
+                                        if (batchDetailsForParticularPeriodForPlanningUnit.length > 0) {
+                                            console.log("Remaining Qty", parseInt(batchDetailsForParticularPeriodForPlanningUnit[0].remainingQty), "Batch no", batchDetailsForParticularPeriodForPlanningUnit[0].batchNo);
+                                            console.log("Unallocated adjustments", unallocatedAdjustmentQty);
+                                            batchDetailsForParticularPeriodForPlanningUnit[0].remainingQty = batchDetailsForParticularPeriodForPlanningUnit[0].remainingQty + unallocatedAdjustmentQty;
+                                            unallocatedAdjustmentQty = 0;
+                                        }
+                                    }
+
+                                }
+                            }
+
+
+                            var c1 = inventoryList.filter(c => (c.inventoryDate >= startDate && c.inventoryDate <= endDate) && c.region == null);
+                            for (var j = 0; j < c1.length; j++) {
+
+                                adjustmentQty += parseFloat((c1[j].adjustmentQty * c1[j].multiplier));
+                                unallocatedAdjustmentQty = parseFloat((c1[j].adjustmentQty * c1[j].multiplier));
+
+                                var batchDetailsForParticularPeriodForPlanningUnit = batchDetailsForParticularPeriod.filter(p => p.planningUnitId == c1[j].planningUnit.id);
+
+                                if (unallocatedAdjustmentQty < 0) {
+                                    for (var ua = batchDetailsForParticularPeriodForPlanningUnit.length; unallocatedAdjustmentQty != 0 && batchDetailsForParticularPeriodForPlanningUnit.length > 0 && ua != 0; ua--) {
+                                        console.log("Remaining Qty", parseInt(batchDetailsForParticularPeriodForPlanningUnit[ua - 1].remainingQty), "Batch no", batchDetailsForParticularPeriodForPlanningUnit[ua - 1].batchNo);
+                                        console.log("Unallocated adjustments", unallocatedAdjustmentQty);
+                                        var index = myArray.findIndex(c => c.batchNo == batchDetailsForParticularPeriodForPlanningUnit[ua - 1].batchNo);
+                                        if (parseInt(batchDetailsForParticularPeriodForPlanningUnit[ua - 1].remainingQty) + parseInt(unallocatedAdjustmentQty) > 0) {
+                                            myArray[index].remainingQty = parseInt(batchDetailsForParticularPeriodForPlanningUnit[ua - 1].remainingQty) + parseInt(unallocatedAdjustmentQty);
+                                            unallocatedAdjustmentQty = 0
+                                        } else {
+                                            var rq = batchDetailsForParticularPeriodForPlanningUnit[ua - 1].remainingQty;
+                                            myArray[index].remainingQty = 0;
+                                            unallocatedAdjustmentQty = parseInt(unallocatedAdjustmentQty) + parseInt(rq);
+                                        }
+                                    }
+                                } else {
+                                    if (batchDetailsForParticularPeriod.length > 0) {
+                                        console.log("Remaining Qty", parseInt(batchDetailsForParticularPeriod[0].remainingQty), "Batch no", batchDetailsForParticularPeriod[0].batchNo);
+                                        console.log("Unallocated adjustments", unallocatedAdjustmentQty);
+                                        batchDetailsForParticularPeriod[0].remainingQty = batchDetailsForParticularPeriod[0].remainingQty + unallocatedAdjustmentQty;
+                                        unallocatedAdjustmentQty = 0;
+                                    }
+                                }
+                            }
+
+                        }
+
+                        var dateFilterMyArray = myArray.filter(c => c.expiryDate >= moment(myStartDate).format('YYYY-MM-DD') && c.expiryDate <= moment(myEndDate).format('YYYY-MM-DD') && c.remainingQty > 0);
+                        console.log("My array after accounting all the calculations", dateFilterMyArray);
+                        // var expiredStockArr = myArray;
+                        // console.log(myEndDate+"======"+myStartDate);
+
+
                     }.bind(this)
                 }.bind(this)
             } else {
+                alert("in else online version");
+                console.log("json---", json);
                 AuthenticationService.setupAxiosInterceptors();
-                ReportService.getExpiredStock(json)
+                ReportService.getAnnualShipmentCost(json)
                     .then(response => {
                         console.log("-----response", JSON.stringify(response.data));
+                        var outPutList = [];
+                        var responseData = response.data;
+                        for (var i = 0; i < responseData.length; i++) {
+                            var shipmentAmt = responseData[i].shipmentAmt;
+                            var json = {
+                                'FUNDING_SOURCE_ID': responseData[i].fundingSource.id,
+                                'PROCUREMENT_AGENT_ID': responseData[i].procurementAgent.id,
+                                'fundingsource': getLabelText(responseData[i].fundingSource.label, this.state.lang),
+                                'procurementAgent': getLabelText(responseData[i].procurementAgent.label, this.state.lang),
+                                'PLANNING_UNIT_ID': responseData[i].planningUnit.id,
+                                'planningUnit': getLabelText(responseData[i].planningUnit.label, this.state.lang)
+                            }
+                            for (var key in shipmentAmt) {
+                                var keyName = key.split("-")[1];
+                                var keyValue = shipmentAmt[key];
+                                console.log("keyName--", keyName);
+                                console.log("keyValue--", keyValue);
+                                json[keyName] = keyValue;
+                            }
+                            outPutList.push(json);
+                        }
+                        console.log("json final---", json);
                         this.setState({
-                            outPutList: response.data
+                            outPutList: outPutList
                         })
                     }).catch(
                         error => {
@@ -489,135 +650,16 @@ export default class ExpiredInventory extends Component {
                     );
             }
         } else if (programId == 0) {
-            this.setState({ message: i18n.t('static.common.selectProgram'), outPutList: [] });
+            this.setState({ message: i18n.t('static.common.selectProgram'), data: [] });
 
         } else if (versionId == 0) {
-            this.setState({ message: i18n.t('static.program.validversion'), outPutList: [] });
+            this.setState({ message: i18n.t('static.program.validversion'), data: [] });
+
+        } else {
+            this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [] });
 
         }
     }
-
-    exportCSV = (columns) => {
-
-        var csvRow = [];
-        csvRow.push((i18n.t('static.report.dateRange') + ' , ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20'))
-        csvRow.push((i18n.t('static.program.program') + ' , ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20')))
-        csvRow.push((i18n.t('static.report.version') + ' , ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20'))
-        csvRow.push((i18n.t('static.program.isincludeplannedshipment') + ' , ' + document.getElementById("includePlanningShipments").selectedOptions[0].text).replaceAll(' ', '%20'))
-        csvRow.push('')
-        csvRow.push('')
-        csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
-        csvRow.push('')
-        var re;
-
-        const headers = [];
-        columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ', '%20') });
-
-        var A = [headers]
-        this.state.outPutList.map(ele => A.push([(getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), this.formatter(ele.expiredQty), ele.batchInfo.batchNo,ele.batchInfo.autoGenerated,(this.dateformatter( ele.batchInfo.createdDate)).replaceAll(' ', '%20'),(this.dateformatter(ele.batchInfo.expiryDate)).replaceAll(' ', '%20')]));
-
-        for (var i = 0; i < A.length; i++) {
-            csvRow.push(A[i].join(","))
-        }
-        var csvString = csvRow.join("%0A")
-        var a = document.createElement("a")
-        a.href = 'data:attachment/csv,' + csvString
-        a.target = "_Blank"
-        a.download = i18n.t('static.report.expiredInventory') + ".csv"
-        document.body.appendChild(a)
-        a.click()
-    }
-    exportPDF = (columns) => {
-        const addFooters = doc => {
-
-            const pageCount = doc.internal.getNumberOfPages()
-
-            doc.setFont('helvetica', 'bold')
-            doc.setFontSize(6)
-            for (var i = 1; i <= pageCount; i++) {
-                doc.setPage(i)
-
-                doc.setPage(i)
-                doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
-                    align: 'center'
-                })
-                doc.text('Copyright © 2020 Quantification Analytics Tool', doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
-                    align: 'center'
-                })
-
-
-            }
-        }
-        const addHeaders = doc => {
-
-            const pageCount = doc.internal.getNumberOfPages()
-            for (var i = 1; i <= pageCount; i++) {
-                doc.setFontSize(12)
-                doc.setFont('helvetica', 'bold')
-
-                doc.setPage(i)
-                doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
-                doc.setTextColor("#002f6c");
-                doc.text(i18n.t('static.report.expiredInventory'), doc.internal.pageSize.width / 2, 60, {
-                    align: 'center'
-                })
-                if (i == 1) {
-                    doc.setFontSize(8)
-                    doc.setFont('helvetica', 'normal')
-                    doc.text(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
-                                    align: 'left'
-                                  })
-                    doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
-                        align: 'left'
-                    })
-                    doc.text(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
-                        align: 'left'
-                    })
-                    doc.text(i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
-                        align: 'left'
-                    })
-                  
-                }
-
-            }
-        }
-        const unit = "pt";
-        const size = "A4"; // Use A1, A2, A3 or A4
-        const orientation = "landscape"; // portrait or landscape
-
-        const marginLeft = 10;
-        const doc = new jsPDF(orientation, unit, size, true);
-
-        doc.setFontSize(8);
-
-        // var canvas = document.getElementById("cool-canvas");
-        //creates image
-
-        // var canvasImg = canvas.toDataURL("image/png", 1.0);
-        var width = doc.internal.pageSize.width;
-        var height = doc.internal.pageSize.height;
-        var h1 = 50;
-        // var aspectwidth1 = (width - h1);
-
-        // doc.addImage(canvasImg, 'png', 50, 200, 750, 290, 'CANVAS');
-
-        const headers = columns.map((item, idx) => (item.text));
-        const data = this.state.outPutList.map(ele => [getLabelText(ele.planningUnit.label), this.formatter(ele.expiredQty),ele.batchInfo.batchNo,ele.batchInfo.autoGenerated, this.dateformatter(ele.batchInfo.createdDate), this.dateformatter(ele.batchInfo.expiryDate)]);
-
-        let content = {
-            margin: { top: 80, bottom: 50 },
-            startY: 170,
-            head: [headers],
-            body: data,
-            styles: { lineWidth: 1, fontSize: 8, halign: 'center' }
-        };
-        doc.autoTable(content);
-        addHeaders(doc)
-        addFooters(doc)
-        doc.save(i18n.t('static.report.expiredInventory') + ".pdf")
-    }
-   
-
 
     render() {
 
@@ -657,7 +699,7 @@ export default class ExpiredInventory extends Component {
         const columns = [
             {
                 dataField: 'planningUnit.label',
-                text: i18n.t('static.planningunit.planningunit'),
+                text: 'Planning Unit',
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -667,8 +709,8 @@ export default class ExpiredInventory extends Component {
                 }
             },
             {
-                dataField: 'expiredQty',
-                text: i18n.t('static.supplyPlan.expiredQty'),
+                dataField: 'quantity',
+                text: 'Quantity',
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -688,57 +730,56 @@ export default class ExpiredInventory extends Component {
 
             },
             {
-                dataField: 'batchInfo.batchNo',
-                text: i18n.t('static.inventory.batchNumber'),
+                dataField: 'batchNo',
+                text: 'Batch Number',
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
                 style: { width: '80px' },
-               
+                // formatter: (cell, row) => {
+                //     cell += '';
+                //     var x = cell.split('.');
+                //     var x1 = x[0];
+                //     var x2 = x.length > 1 ? '.' + x[1] : '';
+                //     var rgx = /(\d+)(\d{3})/;
+                //     while (rgx.test(x1)) {
+                //         x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                //     }
+                //     return x1 + x2;
+                // }
 
-            }, {
-
-
-
-                dataField: 'batchInfo.autoGenerated',
-                text: i18n.t('static.report.autogenerated'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { width: '80px' },
-               
-
-            },  {
-                dataField: 'batchInfo.createdDate',
-                text: i18n.t('static.report.createdDate'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { width: '80px' },
-                formatter: (cellContent, row) => {
-                    return (
-                        (row.batchInfo.createdDate ? moment(row.batchInfo.createdDate).format(`${DATE_FORMAT_CAP}`) : null)
-                        // (row.lastLoginDate ? moment(row.lastLoginDate).format('DD-MMM-YY hh:mm A') : null)
-                    );
-                }
-                
             },
             {
-                dataField: 'batchInfo.expiryDate',
-                text: i18n.t('static.supplyPlan.expiryDate'),
+                dataField: 'expDate',
+                text: 'Expiry Date',
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
                 style: { width: '80px' },
                 formatter: (cellContent, row) => {
                     return (
-                        (row.batchInfo.expiryDate ? moment(row.batchInfo.expiryDate).format(`${DATE_FORMAT_CAP}`) : null)
+                        (row.expDate ? moment(row.expDate).format(`${DATE_FORMAT_CAP}`) : null)
                         // (row.lastLoginDate ? moment(row.lastLoginDate).format('DD-MMM-YY hh:mm A') : null)
                     );
                 }
-               
+                // formatter: (cell, row) => {
+                //     var decimalFixedValue = cell.toFixed(2);
+                //     decimalFixedValue += '';
+                //     var x = decimalFixedValue.split('.');
+                //     var x1 = x[0];
+                //     var x2 = x.length > 1 ? '.' + x[1] : '';
+                //     var rgx = /(\d+)(\d{3})/;
+                //     while (rgx.test(x1)) {
+                //         x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                //     }
+                //     return x1 + x2;
+                // }
+
             },
-            
+            // formatter: (cell, row) => {
+            //     return new moment(cell).format('MMM-DD-YYYY');
+            // }
+
         ];
 
         const tabelOptions = {
@@ -780,8 +821,8 @@ export default class ExpiredInventory extends Component {
                         {/* <i className="icon-menu"></i><strong>Expired Inventory</strong> */}
                         <div className="card-header-actions">
                             <a className="card-header-action">
-                                {true && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF(columns)} />}
-                                {this.state.outPutList.length > 0 && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />}
+                                {true && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF()} />}
+                                {this.state.outPutList.length > 0 && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />}
                             </a>
                         </div>
                     </div>
@@ -815,7 +856,7 @@ export default class ExpiredInventory extends Component {
 
                                                 <Picker
                                                     ref="pickRange"
-                                                    years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                                    years={{min: this.state.minDate, max: this.state.maxDate}}
                                                     value={rangeValue}
                                                     lang={pickerLang}
                                                     //theme="light"
@@ -856,28 +897,10 @@ export default class ExpiredInventory extends Component {
                                                         name="versionId"
                                                         id="versionId"
                                                         bsSize="sm"
-                                                        onChange={(e) => { this.getPlanningUnit(); }}
+                                                        onChange={(e) => { this.fetchData(); }}
                                                     >
                                                         <option value="0">{i18n.t('static.common.select')}</option>
                                                         {versionList}
-                                                    </Input>
-
-                                                </InputGroup>
-                                            </div>
-                                        </FormGroup>
-                                        <FormGroup className="col-md-3">
-                                            <Label htmlFor="appendedInputButton">{i18n.t('static.program.isincludeplannedshipment')}</Label>
-                                            <div className="controls ">
-                                                <InputGroup>
-                                                    <Input
-                                                        type="select"
-                                                        name="includePlanningShipments"
-                                                        id="includePlanningShipments"
-                                                        bsSize="sm"
-                                                        onChange={(e) => { this.fetchData() }}
-                                                    >
-                                                        <option value="true">{i18n.t('static.program.yes')}</option>
-                                                        <option value="false">{i18n.t('static.program.no')}</option>
                                                     </Input>
 
                                                 </InputGroup>

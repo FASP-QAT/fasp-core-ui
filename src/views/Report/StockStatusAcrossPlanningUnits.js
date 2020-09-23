@@ -1379,8 +1379,8 @@ class StockStatusAcrossPlanningUnits extends Component {
             lang: localStorage.getItem('lang'),
             loading: true,
             singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
-            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth()+2 },
-            maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth()  },
+            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() },
+            maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() + 1 },
 
         }
         this.buildJExcel = this.buildJExcel.bind(this);

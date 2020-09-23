@@ -2055,8 +2055,8 @@ class StockStatus extends Component {
       versions: [],
       show: false,
       rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-      minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth()+2 },
-      maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth()  },
+      minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() },
+      maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() + 1 },
 
     };
     this.filterData = this.filterData.bind(this);
@@ -2316,7 +2316,7 @@ class StockStatus extends Component {
                 var list = programJson.supplyPlan.filter(c => c.planningUnitId == planningUnitId && c.transDate == dt)
 
                 if (list.length > 0) {
-                  var shiplist = shipmentList.filter(c => c.receivedDate==null ||c.receivedDate==""?(c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr):(c.receivedDate >= dt && c.receivedDate <= enddtStr))
+                  var shiplist = shipmentList.filter(c => c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr)
 
                   var json = {
                     dt: new Date(from, month - 1),
@@ -2345,7 +2345,7 @@ class StockStatus extends Component {
                   }
                 }
                 data.push(json)
-                console.log(json)
+                console.log(data)
                 if (month == this.state.rangeValue.to.month && from == to) {
                   this.setState({
                     stockStatusList: data,

@@ -1061,8 +1061,8 @@ class ShipmentSummery extends Component {
             message: '',
             viewById: 1,
             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth()+2 },
-            maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth()  },
+            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() },
+            maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() + 1 },
             loading: true
         };
         this.formatLabel = this.formatLabel.bind(this);
@@ -1187,7 +1187,7 @@ class ShipmentSummery extends Component {
             viewById == 1 ? parseFloat(re[item].productCost).toFixed(2) : parseFloat(re[item].productCost * re[item].multiplier).toFixed(2),
             viewById == 1 ? parseFloat(re[item].freightCost).toFixed(2) : parseFloat(re[item].freightCost * re[item].multiplier).toFixed(2),
             viewById == 1 ? parseFloat(re[item].totalCost).toFixed(2) : parseFloat(re[item].totalCost * re[item].multiplier).toFixed(2),
-            ((re[item].notes).replaceAll(',', ' ')).replaceAll(' ', '%20')
+            re[item].notes
             ])
         }
         for (var i = 0; i < B.length; i++) {
@@ -1696,12 +1696,12 @@ class ShipmentSummery extends Component {
                         var programJson = JSON.parse(programData);
                         var shipmentList = (programJson.shipmentList);
                         console.log("shipmentList------>", shipmentList);
-                        const activeFilter = shipmentList.filter(c => c.active == true);
+                        const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true"));
                         // const activeFilter = shipmentList;
-                        console.log(startDate,endDate)
+
                         // let dateFilter = activeFilter.filter(c => moment(c.deliveredDate).isBetween(startDate, endDate, null, '[)'))
-                        let dateFilter = activeFilter.filter(c =>(c.receivedDate == null || c.receivedDate == "") ? ( c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate ):  (c.receivedDate >= startDate && c.receivedDate <= endDate))
-console.log(dateFilter)
+                        let dateFilter = activeFilter.filter(c => moment((c.receivedDate == null || c.receivedDate == "") ? c.expectedDeliveryDate : c.receivedDate).isBetween(startDate, endDate, null, '[)'))
+
                         let data = [];
                         let planningUnitFilter = [];
                         for (let i = 0; i < planningUnitIds.length; i++) {
@@ -1901,7 +1901,7 @@ console.log(dateFilter)
         //Graph start
         let shipmentStatus = [...new Set(this.state.data.map(ele => (getLabelText(ele.shipmentStatus.label, this.state.lang))))];
         console.log("shipmentStatus=======>>>", shipmentStatus.sort());
-        shipmentStatus=shipmentStatus.sort()
+
         let shipmentSummerydata = [];
         let data = [];
         var mainData = this.state.data;
@@ -2333,17 +2333,17 @@ console.log(dateFilter)
                                                 <Table id="mytable2" responsive className="table-striped table-hover table-bordered text-center mt-2">
                                                     <thead>
                                                         <tr>
-                                                            <th style={{ 'text-align': 'center' }}>{i18n.t('static.report.planningUnit/ForecastingUnit')}</th>
-                                                            <th style={{ 'width': '87px', 'text-align': 'center' }}>{i18n.t('static.report.id')}</th>
-                                                            <th style={{ 'text-align': 'center' }}>{i18n.t('static.report.procurementAgentName')}</th>
-                                                            <th style={{ 'text-align': 'center' }}>{i18n.t('static.budget.fundingsource')}</th>
-                                                            <th style={{ 'text-align': 'center' }}>{i18n.t('static.common.status')}</th>
-                                                            <th style={{ 'text-align': 'center' }}>{i18n.t('static.report.qty')}</th>
-                                                            <th style={{ 'text-align': 'center' }}>{i18n.t('static.report.expectedReceiveddate')}</th>
-                                                            <th style={{ 'text-align': 'center' }}>{i18n.t('static.report.productCost')}</th>
-                                                            <th style={{ 'text-align': 'center' }}>{i18n.t('static.report.freightCost')}</th>
-                                                            <th style={{ 'text-align': 'center' }}>{i18n.t('static.report.totalCost')}</th>
-                                                            <th style={{ 'text-align': 'center' }}>{i18n.t('static.program.notes')}</th>
+                                                            <th style={{ 'text-align': 'left' }}>{i18n.t('static.report.planningUnit/ForecastingUnit')}</th>
+                                                            <th style={{ 'width': '87px' }}>{i18n.t('static.report.id')}</th>
+                                                            <th>{i18n.t('static.report.procurementAgentName')}</th>
+                                                            <th>{i18n.t('static.budget.fundingsource')}</th>
+                                                            <th>{i18n.t('static.common.status')}</th>
+                                                            <th style={{ 'text-align': 'right' }}>{i18n.t('static.report.qty')}</th>
+                                                            <th>{i18n.t('static.report.expectedReceiveddate')}</th>
+                                                            <th style={{ 'text-align': 'right' }}>{i18n.t('static.report.productCost')}</th>
+                                                            <th style={{ 'text-align': 'right' }}>{i18n.t('static.report.freightCost')}</th>
+                                                            <th style={{ 'text-align': 'right' }}>{i18n.t('static.report.totalCost')}</th>
+                                                            <th>{i18n.t('static.program.notes')}</th>
                                                         </tr>
 
                                                     </thead>
@@ -2400,17 +2400,17 @@ console.log(dateFilter)
                                                             this.state.data.map((item, idx) =>
                                                                 <tr id="addr0" key={idx} >
                                                                     <td style={{ 'text-align': 'left' }}>{getLabelText(this.state.data[idx].planningUnit.label, this.state.lang)}</td>
-                                                                    <td  style={{ 'text-align': 'center' }}>{this.state.data[idx].shipmentId}</td>
-                                                                    <td  style={{ 'text-align': 'center' }}>{getLabelText(this.state.data[idx].procurementAgent.label, this.state.lang)}</td>
-                                                                    <td  style={{ 'text-align': 'center' }}>{getLabelText(this.state.data[idx].fundingSource.label, this.state.lang)}</td>
-                                                                    <td  style={{ 'text-align': 'center' }}>{getLabelText(this.state.data[idx].shipmentStatus.label, this.state.lang)}</td>
-                                                                    <td style={{ 'text-align': 'center' }}>{(this.state.data[idx].shipmentQty).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
-                                                                    <td  style={{ 'text-align': 'center' }}>{moment(this.state.data[idx].expectedDeliveryDate, 'yyyy-MM-dd').format('MMM YYYY')}</td>
-                                                                    <td style={{ 'text-align': 'center' }}>{viewById == 1 ? (parseFloat(this.state.data[idx].productCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : (parseFloat(this.state.data[idx].productCost * this.state.data[idx].multiplier).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                                    <td>{this.state.data[idx].shipmentId}</td>
+                                                                    <td>{getLabelText(this.state.data[idx].procurementAgent.label, this.state.lang)}</td>
+                                                                    <td>{getLabelText(this.state.data[idx].fundingSource.label, this.state.lang)}</td>
+                                                                    <td>{getLabelText(this.state.data[idx].shipmentStatus.label, this.state.lang)}</td>
+                                                                    <td style={{ 'text-align': 'right' }}>{(this.state.data[idx].shipmentQty).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                                    <td>{moment(this.state.data[idx].expectedDeliveryDate, 'yyyy-MM-dd').format('MMM YYYY')}</td>
+                                                                    <td style={{ 'text-align': 'right' }}>{viewById == 1 ? (parseFloat(this.state.data[idx].productCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : (parseFloat(this.state.data[idx].productCost * this.state.data[idx].multiplier).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
                                                                     <td style={{ 'text-align': 'right' }}>{viewById == 1 ? (parseFloat(this.state.data[idx].freightCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : (parseFloat(this.state.data[idx].freightCost * this.state.data[idx].multiplier).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
                                                                     {/* <td style={{ 'text-align': 'right' }}>{viewById == 1 ? (parseFloat(this.state.data[idx].productCost+this.state.data[idx].freightCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : (parseFloat((this.state.data[idx].productCost+this.state.data[idx].freightCost) * this.state.data[idx].multiplier).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td> */}
-                                                                    <td style={{ 'text-align': 'center' }}>{viewById == 1 ? (parseFloat(this.state.data[idx].totalCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : (parseFloat((this.state.data[idx].totalCost) * this.state.data[idx].multiplier).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
-                                                                    <td style={{ 'text-align': 'center' }}>{this.state.data[idx].notes}</td>
+                                                                    <td style={{ 'text-align': 'right' }}>{viewById == 1 ? (parseFloat(this.state.data[idx].totalCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : (parseFloat((this.state.data[idx].totalCost) * this.state.data[idx].multiplier).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                                    <td style={{ 'text-align': 'right' }}>{this.state.data[idx].notes}</td>
                                                                 </tr>
                                                             )}
                                                     </tbody>

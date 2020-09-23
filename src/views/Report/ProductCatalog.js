@@ -2032,7 +2032,7 @@ class ProductCatalog extends Component {
                     readOnly: true
                 },
                 {
-                    title: i18n.t('static.tracercategory.tracercategory'),
+                    title: i18n.t('static.dashboard.tracercategory'),
                     type: 'text',
                     readOnly: true
                 },
@@ -2042,7 +2042,7 @@ class ProductCatalog extends Component {
                     type: 'text',
                     readOnly: true
                 }, {
-                    title: i18n.t('static.report.forcastingUOM'),
+                    title: i18n.t('static.unit.unit'),
                     type: 'text',
                     readOnly: true
                 }, {
@@ -2058,7 +2058,7 @@ class ProductCatalog extends Component {
                     type: 'text',
                     readOnly: true
                 }, {
-                    title: i18n.t('static.report.planningUOM'),
+                    title: i18n.t('static.unit.unit'),
                     type: 'text',
                     readOnly: true
                 }, {
@@ -2400,7 +2400,7 @@ class ProductCatalog extends Component {
             },
             {
                 dataField: 'tracerCategory.label',
-                text: i18n.t('static.tracercategory.tracercategory'),
+                text: i18n.t('static.dashboard.tracercategory'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -2420,7 +2420,7 @@ class ProductCatalog extends Component {
             },
             {
                 dataField: 'fUnit.label',
-                text: i18n.t('static.report.forcastingUOM'),
+                text: i18n.t('static.unit.unit'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -2459,7 +2459,7 @@ class ProductCatalog extends Component {
 
             {
                 dataField: 'pUnit.label',
-                text: i18n.t('static.report.planningUOM'),
+                text: i18n.t('static.unit.unit'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',

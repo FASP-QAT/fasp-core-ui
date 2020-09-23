@@ -1587,8 +1587,8 @@ class ShipmentGlobalDemandView extends Component {
             show: false,
             message: '',
             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth()+2 },
-            maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
+            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() },
+            maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() + 1 },
             loading: true
         };
 
@@ -2816,7 +2816,6 @@ class ShipmentGlobalDemandView extends Component {
     }
 
     handlePlanningUnitChange = (planningUnitIds) => {
-        console.log(planningUnitIds)
         planningUnitIds = planningUnitIds.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
         })
