@@ -26,11 +26,20 @@ const validationSchema = function (values) {
             .required(i18n.t('static.realm.realmNameText')),
         realmCode: Yup.string()
             .required(i18n.t('static.realm.realmCodeText')),
-        minMosMinGaurdrail: Yup.string()
+        minMosMinGaurdrail: Yup.number()
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))            
+            .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
+            .integer(i18n.t('static.realm.decimalNotAllow'))
             .required(i18n.t('static.realm.minMosMinGaurdrail')),
-        minMosMaxGaurdrail: Yup.string()
+        minMosMaxGaurdrail: Yup.number()
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
+            .integer(i18n.t('static.realm.decimalNotAllow'))
             .required(i18n.t('static.realm.minMosMaxGaurdrail')),        
-        maxMosMaxGaurdrail: Yup.string()
+        maxMosMaxGaurdrail: Yup.number()
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
+            .integer(i18n.t('static.realm.decimalNotAllow'))
             .required(i18n.t('static.realm.maxMosMaxGaurdrail')),        
         // notes: Yup.string()
         //     .required(i18n.t('static.common.notestext'))

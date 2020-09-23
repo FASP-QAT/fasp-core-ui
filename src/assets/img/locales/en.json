@@ -177,7 +177,7 @@
     "static.program.airfreightperctext": "Air Freight Percentage",
     "static.message.login.locked": "User account is locked",
     "static.datasourcetype.datasourcetype": "Data Source Type",
-    "static.message.user.failedPasswordUpdate": "Could not update password",
+    "static.message.failedPasswordUpdate": "Could not update password",
     "static.dashboard.currency": "Currency",
     "static.dashboard.currencyheader": "Currencies",
     "static.dashboard.datasource": "Data Source",

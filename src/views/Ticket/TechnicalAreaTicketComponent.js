@@ -14,6 +14,7 @@ import CountryService from '../../api/CountryService';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import classNames from 'classnames';
+import { SPACE_REGEX, ALPHABET_NUMBER_REGEX } from '../../Constants';
 
 const initialValues = {
     summary: "Add / Update Technical Area",
@@ -33,8 +34,11 @@ const validationSchema = function (values) {
         countryName: Yup.string()
             .required(i18n.t('static.program.validcountrytext')),
         technicalAreaName: Yup.string()
+            .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.healtharea.healthareatext')),
         technicalAreaCode: Yup.string()
+            .matches(ALPHABET_NUMBER_REGEX, i18n.t('static.message.alphabetnumerallowed'))
+            .max(6, 'Display name length should be 6')
             .required(i18n.t('static.technicalArea.technicalAreaCodeText')),
         // notes: Yup.string()
         //     .required(i18n.t('static.common.notestext'))
