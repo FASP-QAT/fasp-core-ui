@@ -44,8 +44,8 @@ export default class ShipmentDetails extends React.Component {
             shipmentModalTitle: "",
             shipmentType: { value: 1, label: i18n.t('static.shipment.manualShipments') },
             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() },
-            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth()+2 },
+            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth()  },
         }
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this)
         this.formSubmit = this.formSubmit.bind(this);

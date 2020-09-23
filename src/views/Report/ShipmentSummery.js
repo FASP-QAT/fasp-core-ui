@@ -1061,8 +1061,8 @@ class ShipmentSummery extends Component {
             message: '',
             viewById: 1,
             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() },
-            maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() + 1 },
+            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth()+2 },
+            maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth()  },
             loading: true
         };
         this.formatLabel = this.formatLabel.bind(this);
@@ -1696,12 +1696,12 @@ class ShipmentSummery extends Component {
                         var programJson = JSON.parse(programData);
                         var shipmentList = (programJson.shipmentList);
                         console.log("shipmentList------>", shipmentList);
-                        const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true"));
+                        const activeFilter = shipmentList.filter(c => c.active == true);
                         // const activeFilter = shipmentList;
-
+                        console.log(startDate,endDate)
                         // let dateFilter = activeFilter.filter(c => moment(c.deliveredDate).isBetween(startDate, endDate, null, '[)'))
-                        let dateFilter = activeFilter.filter(c => moment((c.receivedDate == null || c.receivedDate == "") ? c.expectedDeliveryDate : c.receivedDate).isBetween(startDate, endDate, null, '[)'))
-
+                        let dateFilter = activeFilter.filter(c =>(c.receivedDate == null || c.receivedDate == "") ? ( c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate ):  (c.receivedDate >= startDate && c.receivedDate <= endDate))
+console.log(dateFilter)
                         let data = [];
                         let planningUnitFilter = [];
                         for (let i = 0; i < planningUnitIds.length; i++) {
