@@ -1100,5 +1100,7 @@
     "static.report.shipmentReports": "Rapports d'expédition",
     "static.country.countrycode2": "Nom d'affichage du pays2",
     "static.country.countrycodetext2": "Entrez le nom d'affichage du pays2",
-    "static.ticket.addUpdateUser": "Ajouter / mettre à jour un utilisateur"
+    "static.ticket.addUpdateUser": "Ajouter / mettre à jour un utilisateur",
+    "static.jexcel.search":"chercher",
+    "static.jexcel.clear":"Clair"
 }

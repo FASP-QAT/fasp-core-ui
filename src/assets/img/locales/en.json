@@ -1171,5 +1171,9 @@
     "static.ticket.header": "QAT Helpdesk",
     "static.ticket.subheader": "WE ARE HERE TO HELP YOU WITH YOUR QUERY",
     "static.ticket.uploadScreenshot": "Upload Screenshot",
-    "static.message.supplyplanversionapprovedsuccess":"Supply Plan status updated successfully"
+    "static.message.supplyplanversionapprovedsuccess":"Supply Plan status updated successfully",
+    "static.jexcel.search":"Search",
+    "static.jexcel.clear":"Clear",
+    "static.validSpace.string":"No spaces are allowed at start or end of string,only single space is allowed between two words.",
+    "static.validNoSpace.string":"No spaces are allowed at start,end or in middle of string."
 }
