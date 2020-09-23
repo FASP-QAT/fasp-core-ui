@@ -62,7 +62,7 @@
     "static.program.validprogramtext":"Ingresar el nombre del Programa",
     "static.procurementagent.procurementagentapprovetosubmittime":"Tiempo de espera desde Sometido hasta Aprobado (meses)",
     "static.program.export":"Exportar datos del Programa",
-    "static.common.status":"Status",
+    "static.common.status":"Estado",
     "static.message.login.unauthorized":"No tiene permiso para realizar esta operación o acceder a este recurso. Comunicarse con el administrador del Ámbito si necesita acceso a este recurso.",
     "static.realmcountry.validname":"Ingresar nombre del ámbito",
     "static.subfundingsource.errorfundingsource":"Seleccionar la fuente de financiamiento",
@@ -580,7 +580,7 @@
     "static.program.version":"V ~",
     "static.program.errorSelectAtleastOneProgram":"Seleccionar al menos un Programa para descargar",
     "static.program.errorSelectProgramIfYouSelectVersion":"Seleccionar un Programa si está seleccionando un versión",
-    "static.common.download":"Descargar",
+    "static.common.download":"Carga",
     "static.dashboard.report":"Informes",
     "static.dashboard.productcatalog":"Catálogo de productos específicos del Programa",
     "static.common.issync":"Sincronizar tasa de cambio",
@@ -1100,6 +1100,12 @@
     "static.report.shipmentReports": "Informes de envío",
     "static.country.countrycode2": "Nombre de visualización del país2",
     "static.country.countrycodetext2": "Ingrese el nombre de visualización del país2",
-    "static.ticket.addUpdateUser": "Agregar / actualizar usuario"
+    "static.ticket.addUpdateUser": "Agregar / actualizar usuario",
+    "static.common.spacenotallowed":"Espacios no permitidos al principio y al final",
+    "static.datasource.datasourcetype": "Tipo de fuente de datos",
+    "static.technicalArea.technicalAreaDisplayName": "Nombre de visualización del área técnica",
+    "static.common.displayName": "Ingrese el nombre de visualización",
+    "static.username.username": "Nombre de usuario",
+    "static.checkbox.active": "Está activo"
     
 }

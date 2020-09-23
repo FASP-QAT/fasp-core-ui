@@ -9,6 +9,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import '../Forms/ValidationForms/ValidationForms.css';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import { LABEL_REGEX, ALPHABETS_REGEX } from '../../Constants.js';
+import { ALPHABET_NUMBER_REGEX, SPACE_REGEX } from '../../Constants.js';
 
 
 let initialValues = {

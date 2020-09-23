@@ -13,6 +13,7 @@ import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import { LABEL_REGEX } from '../../Constants.js';
+import { ALPHABET_NUMBER_REGEX, SPACE_REGEX } from '../../Constants.js';
 import classNames from 'classnames';
 
 const initialValues = {

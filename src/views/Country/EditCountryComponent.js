@@ -634,6 +634,7 @@ import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import getLabelText from '../../CommonComponent/getLabelText';
 import { LABEL_REGEX, ALPHABETS_REGEX } from '../../Constants.js';
+import { ALPHABET_NUMBER_REGEX, SPACE_REGEX } from '../../Constants.js';
 
 
 const entityname = i18n.t('static.country.countryMaster');

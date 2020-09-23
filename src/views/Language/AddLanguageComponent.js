@@ -13,6 +13,7 @@ import LanguageService from '../../api/LanguageService.js'
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import { LABEL_REGEX, ALPHABETS_REGEX } from '../../Constants.js';
+import { ALPHABET_NUMBER_REGEX, SPACE_REGEX } from '../../Constants.js';
 
 const initialValues = {
     languageName: "",

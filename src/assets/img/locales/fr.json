@@ -580,7 +580,7 @@
     "static.program.version":"V ~",
     "static.program.errorSelectAtleastOneProgram":"Veuillez sélectionner au moins un programme à télécharger.",
     "static.program.errorSelectProgramIfYouSelectVersion":"Veuillez sélectionner le programme si vous sélectionnez la version.",
-    "static.common.download":"Télécharger",
+    "static.common.download":"Charge",
     "static.dashboard.report":"Rapports",
     "static.dashboard.productcatalog":"Catalogue de produits du programme",
     "static.common.issync":"Synchronisation en ligne taux de conversion ",
@@ -1100,5 +1100,11 @@
     "static.report.shipmentReports": "Rapports d'expédition",
     "static.country.countrycode2": "Nom d'affichage du pays2",
     "static.country.countrycodetext2": "Entrez le nom d'affichage du pays2",
-    "static.ticket.addUpdateUser": "Ajouter / mettre à jour un utilisateur"
+    "static.ticket.addUpdateUser": "Ajouter / mettre à jour un utilisateur",
+    "static.common.spacenotallowed":"Espaces non autorisés au début et à la fin",
+    "static.datasource.datasourcetype": "Type de source de données",
+    "static.technicalArea.technicalAreaDisplayName": "Nom d'affichage de la zone technique",
+    "static.common.displayName": "Entrez le nom d'affichage",
+    "static.username.username": "Nom d'utilisateur",
+    "static.checkbox.active": "C'est actif"
 }

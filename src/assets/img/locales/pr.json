@@ -633,7 +633,7 @@
     "static.program.version": "V~",
     "static.program.errorSelectAtleastOneProgram": "Selecione pelo menos um programa para download.",
     "static.program.errorSelectProgramIfYouSelectVersion": "Por favor, selecione o programa se você estiver selecionando a versão.",
-    "static.common.download": "Baixar",
+    "static.common.download": "Carga",
     "static.dashboard.productcatalog": "Catálogo de produtos",
     "static.common.issync": "Sincronizar taxa de cobertura on-line",
     "static.message.oldPassword": "Digite a senha antiga",
@@ -703,7 +703,7 @@
     "static.ticket.ticketcreated": "O ingresso foi criado.",
     "static.ticket.ticketcode": "Código de Ingresso",
     "static.ticket.addUpdateMasterData": "Adicionar / atualizar dados mestre",
-    "static.userHead.user": "User",
+    "static.userHead.user": "Do utilizador",
     "static.roleHead.role": "Função",
     "static.dataSourceTypeHead.dataSourceType": "Tipo de fonte de dados",
     "static.fundingSourceHead.fundingSource": "Fonte de financiamento",
@@ -722,5 +722,14 @@
     "static.country.countrycode2": "Nome de exibição do país 2",
     "static.country.countrycodetext2": "Insira o nome de exibição do país 2",
     "static.message.rolenamevalidtext": "Somente letras e espaços são permitidos",
-    "static.ticket.addUpdateUser": "Adicionar / atualizar usuário"
+    "static.ticket.addUpdateUser": "Adicionar / atualizar usuário",
+    "static.common.spacenotallowed":"Espaços não permitidos no início e no final",
+    "static.fundingsource.fundingsourceCode": "Nome de exibição da fonte de financiamento",
+    "static.fundingsource.fundingsourceCodeText": "Insira o nome de exibição da fonte de financiamento",
+    "static.procurementagent.procurementAgentColorCode": "Código de cores",
+    "static.program.validBudgetAmount": "Insira números positivos válidos",
+    "static.technicalArea.technicalAreaDisplayName": "Nome de exibição da área técnica",
+    "static.common.displayName": "Digite o nome de exibição",
+    "static.username.username": "Nome do usuário",
+    "static.checkbox.active": "Está ativo"
 }

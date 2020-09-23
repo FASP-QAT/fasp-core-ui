@@ -586,7 +586,7 @@
     "static.program.version": "V~",
     "static.program.errorSelectAtleastOneProgram": "Select at least one program for download",
     "static.program.errorSelectProgramIfYouSelectVersion": "Select a Program, if you are selecting a version",
-    "static.common.download": "Download",
+    "static.common.download": "Load",
     "static.dashboard.report": "Reports",
     "static.dashboard.productcatalog": "Program Planning Unit Catalog",
     "static.common.issync": "Sync online conversion rate",
@@ -656,7 +656,7 @@
     "static.consumption.consumptionadd": "Consumption details",
     "static.consumption.program": "Program",
     "static.consumption.planningunit": "Planning Unit",
-    "static.common.addRow": "Add row",
+    "static.common.addRow": "Add Row",
     "static.message.invalidnumber": "Invalid number",
     "static.message.invaliddate": "Invalid date",
     "static.consumption.consumptionqty": "Consumption quantity",
@@ -1171,5 +1171,7 @@
     "static.ticket.header": "Service Desk",
     "static.ticket.subheader": "WE ARE HERE TO HELP YOU WITH YOUR QUERY",
     "static.ticket.uploadScreenshot": "Upload Screenshot",
-    "static.message.supplyplanversionapprovedsuccess":"Supply Plan status updated successfully"
+    "static.message.supplyplanversionapprovedsuccess":"Supply Plan status updated successfully",
+    "static.username.username": "Username",
+    "static.checkbox.active": "Is Active"
 }
