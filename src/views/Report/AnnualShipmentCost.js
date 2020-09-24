@@ -220,7 +220,7 @@ class AnnualShipmentCost extends Component {
                                                     if (reportbaseValue == 1) {
                                                         list2 = list.filter(c => (c.plannedDate >= dtstr && c.plannedDate <= enddtStr));
                                                     } else {
-                                                        list2 = list.filter(c => (c.receivedDate >= dtstr && c.receivedDate <= enddtStr || c.expectedDeliveryDate >= dtstr && c.enddtStr <= endDate));
+                                                        list2 = list.filter(c =>c.receivedDate==null||c.receivedDate==""? ( c.expectedDeliveryDate >= dtstr && c.expectedDeliveryDate <= enddtStr):(c.receivedDate >= dtstr && c.receivedDate <= enddtStr ));
                                                     }
                                                     console.log(list2)
                                                     var cost = 0;
@@ -781,9 +781,15 @@ class AnnualShipmentCost extends Component {
             totalAmount[year.length] = totalAmount[x] == null ? total : totalAmount[year.length] + total
             GrandTotalAmount[year.length] = GrandTotalAmount[year.length] == null ? total : GrandTotalAmount[year.length] + total
             if (j < data.length - 1) {
+               
                 if (data[j].PROCUREMENT_AGENT_ID != data[j + 1].PROCUREMENT_AGENT_ID || data[j].FUNDING_SOURCE_ID != data[j + 1].FUNDING_SOURCE_ID) {
                     console.log("in this if=======");
                     yindex = yindex + 40
+                    if (yindex > doc.internal.pageSize.height - 100) {
+                        doc.addPage();
+                        yindex = 80;
+    
+                    }
                     initalvalue = 10
                     doc.setLineDash([2, 2], 0);
                     doc.line(doc.internal.pageSize.width / 8, yindex, doc.internal.pageSize.width - 50, yindex);
@@ -807,6 +813,11 @@ class AnnualShipmentCost extends Component {
             } if (j == data.length - 1) {
                 console.log("in this second if=======");
                 yindex = yindex + 80
+                if (yindex > doc.internal.pageSize.height - 100) {
+                    doc.addPage();
+                    yindex = 80;
+
+                }
                 initalvalue = 10
                 doc.setLineDash([2, 2], 0);
                 doc.line(doc.internal.pageSize.width / 8, yindex, doc.internal.pageSize.width - 50, yindex);
@@ -825,6 +836,11 @@ class AnnualShipmentCost extends Component {
                 }
             }
             yindex = yindex + 40
+            if (yindex > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                yindex = 80;
+
+            }
             initalvalue = 10
 
         }
