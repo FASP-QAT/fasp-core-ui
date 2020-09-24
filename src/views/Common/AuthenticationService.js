@@ -331,13 +331,13 @@ class AuthenticationService {
             var curDate = moment(new Date());
             const diff = curDate.diff(lastActionTaken);
             const diffDuration = moment.duration(diff);
-            // console.log("Total Duration in millis:", diffDuration.asMilliseconds());
-            // console.log("Days:", diffDuration.days());
-            // console.log("Hours:", diffDuration.hours());
-            // console.log("Minutes:", diffDuration.minutes());
-            // console.log("Seconds:", diffDuration.seconds());
+            console.log("Total Duration in millis:", diffDuration.asMilliseconds());
+            console.log("Days:", diffDuration.days());
+            console.log("Hours:", diffDuration.hours());
+            console.log("Minutes:", diffDuration.minutes());
+            console.log("Seconds:", diffDuration.seconds());
             if (diffDuration.minutes() < 30) {
-                // if (diffDuration.minutes() < 10) {
+                console.log("last action taken less than 30 minutes");
                 return true;
             }
             return false;
