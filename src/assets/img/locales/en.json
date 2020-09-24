@@ -1176,8 +1176,6 @@
     "static.username.username": "Username",
     "static.checkbox.active": "Is Active",
     "static.message.inventorySaved": "Inventory data saved",
-    "static.report.planningUOM": "Planning Unit (UoM)",
-    "static.report.forcastingUOM": "Forecasting Unit (UoM)",
     "static.program.savedOn":"saved on",
     "static.program.savedBy":"by",
     "static.program.as":"as",
