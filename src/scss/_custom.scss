@@ -3412,3 +3412,33 @@ margin-left: -45px;
 .removeMarginLeftCheckbox{
   margin-left: 0px!important;
 }
+.ml-procumnentAgentTicket {
+  margin-left: 170px!important;
+}
+@media (min-width: 992px)
+{
+  .sidebar-minimized .sidebar .nav-dropdown-items .nav-item {
+    width: 268px!important;
+}
+// .sidebar-minimized .sidebar .nav-dropdown-items .nav-item {
+//   width: 242px;
+// }
+// .sidebar-minimized .sidebar .nav-link:hover {
+//   width: 329px!important;
+//   background: #20a8d8;
+// }
+.sidebar-minimized .sidebar .nav-link:hover {
+  width: 318px!important;
+  background: #20a8d8;
+}
+
+.sidebar-minimized .sidebar .nav-link {
+  width: 318px !important;
+  // background: #20a8d8;
+}
+
+.sidebar-minimized .sidebar .nav-dropdown-items .nav-item .nav-link {
+  width: 268px !important;
+}
+
+}

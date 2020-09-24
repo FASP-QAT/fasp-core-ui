@@ -365,7 +365,7 @@ export default class ProcurementAgentTicketComponent extends Component {
                                     </FormGroup>
                                     <FormGroup>
                                         <Label className="P-absltRadio">{i18n.t('static.procurementAgent.localProcurementAgent')}  </Label>
-                                        <FormGroup check inline className="ml-12">
+                                        <FormGroup check inline className="ml-12 ml-procumnentAgentTicket">
                                             <Input
                                                 className="form-check-input"
                                                 type="radio"
