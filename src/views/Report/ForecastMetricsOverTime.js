@@ -1952,9 +1952,9 @@ if(value!=null){
 
                   for (var l = 0; l < conlist.length; l++) {
                     if (conlist[l].actualFlag.toString() == 'true') {
-                      actconsumption = actconsumption + conlist[l].consumptionQty
+                      actconsumption = actconsumption + parseInt(conlist[l].consumptionQty)
                     } else {
-                      forConsumption = forConsumption + conlist[l].consumptionQty
+                      forConsumption = forConsumption + parseInt(conlist[l].consumptionQty)
                     }
                   }
                   actualconsumption = actualconsumption + actconsumption
