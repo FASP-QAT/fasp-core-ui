@@ -329,6 +329,7 @@ class AuthenticationService {
             var lastActionTaken = moment(lastActionTakenStorage);
             // console.log("lastActionTakenStorage---", lastActionTakenStorage);
             var curDate = moment(new Date());
+            console.log("curdate:", curDate);
             const diff = curDate.diff(lastActionTaken);
             const diffDuration = moment.duration(diff);
             console.log("Total Duration in millis:", diffDuration.asMilliseconds());
