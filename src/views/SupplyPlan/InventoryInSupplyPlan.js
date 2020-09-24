@@ -26,6 +26,8 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         this.checkValidationInventory = this.checkValidationInventory.bind(this);
         this.saveInventory = this.saveInventory.bind(this);
         this.showOnlyErrors = this.showOnlyErrors.bind(this);
+        this.addRowInJexcel = this.addRowInJexcel.bind(this);
+        this.addBatchRowInJexcel = this.addBatchRowInJexcel.bind(this);
         this.state = {
             inventoryEl: "",
             inventoryBatchInfoTableEl: ""
@@ -204,6 +206,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         data[16] = 0;
                         inventoryDataArr[j] = data;
                     }
+                    var regionList = this.props.items.regionList;
                     if (inventoryList.length == 0) {
                         data = [];
                         if (this.props.inventoryPage != "inventoryDataEntry") {
@@ -211,14 +214,14 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                             data[1] = this.props.items.inventoryRegion; //B                        
                         } else {
                             data[0] = "";
-                            data[1] = "";
+                            data[1] = regionList.length == 1 ? regionList[0].id : "";
                         }
                         data[2] = ""; //C
-                        data[3] = ""; //D
+                        data[3] = realmCountryPlanningUnitList.length == 1 ? realmCountryPlanningUnitList[0].id : ""; //D
                         data[4] = adjustmentType; //E
                         data[5] = ""; //F
                         data[6] = ""; //G
-                        data[7] = ""; //H
+                        data[7] = realmCountryPlanningUnitList.length == 1 ? realmCountryPlanningUnitList[0].multiplier : "";; //H
                         data[8] = `=F${parseInt(0) + 1}*H${parseInt(0) + 1}`; //I
                         data[9] = `=G${parseInt(0) + 1}*H${parseInt(0) + 1}`; //J
                         data[10] = "";
@@ -456,16 +459,8 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                                         items.push({
                                                             title: i18n.t('static.supplyPlan.addNewBatchInfo'),
                                                             onclick: function () {
-                                                                var data = [];
-                                                                data[0] = "";
-                                                                data[1] = "";
-                                                                data[2] = adjustmentType;
-                                                                data[3] = "";
-                                                                data[4] = "";
-                                                                data[5] = 0;
-                                                                data[6] = y;
-                                                                obj.insertRow(data);
-                                                            }
+                                                                this.addBatchRowInJexcel();
+                                                            }.bind(this)
                                                         });
                                                     }
 
@@ -503,44 +498,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                         items.push({
                                             title: this.props.items.inventoryType == 1 ? i18n.t('static.supplyPlan.addNewInventory') : i18n.t('static.supplyPlan.addNewAdjustments'),
                                             onclick: function () {
-                                                var json = obj.getJson();
-                                                var map = new Map(Object.entries(json[0]));
-                                                var data = [];
-                                                if (this.props.inventoryPage != "inventoryDataEntry") {
-                                                    data[0] = moment(this.props.items.inventoryEndDate).format("YYYY-MM-DD"); //A
-                                                    data[1] = this.props.items.inventoryRegion; //B        
-                                                } else {
-                                                    data[0] = "";
-                                                    data[1] = "";
-                                                }
-                                                data[2] = ""; //C
-                                                data[3] = ""; //D
-                                                data[4] = map.get("4"); //E
-                                                data[5] = ""; //F
-                                                data[6] = ""; //G
-                                                data[7] = ""; //H
-                                                data[8] = `=F${parseInt(json.length) + 1}*H${parseInt(json.length) + 1}`; //I
-                                                data[9] = `=G${parseInt(json.length) + 1}*H${parseInt(json.length) + 1}`; //J
-                                                data[10] = "";
-                                                data[11] = true;
-                                                if (this.props.inventoryPage != "inventoryDataEntry") {
-                                                    data[12] = this.props.items.inventoryEndDate;
-                                                } else {
-                                                    data[12] = "";
-                                                }
-                                                data[13] = "";
-                                                data[14] = -1;
-                                                data[15] = 1;
-                                                data[16] = 0;
-                                                obj.insertRow(data);
-                                                if (this.props.inventoryPage == "inventoryDataEntry") {
-                                                    var showOption = (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
-                                                    console.log("showOption", showOption);
-                                                    if (showOption != 5000000) {
-                                                        var pageNo = parseInt(parseInt(json.length) / parseInt(showOption));
-                                                        obj.page(pageNo);
-                                                    }
-                                                }
+                                                this.addRowInJexcel();
                                             }.bind(this)
                                         });
                                     }
@@ -570,6 +528,67 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 }.bind(this)
             }.bind(this)
         }.bind(this);
+    }
+
+    addRowInJexcel() {
+        var obj = this.state.inventoryEl;
+        var json = obj.getJson();
+        var map = new Map(Object.entries(json[0]));
+        var regionList = (this.props.items.regionList);
+        var realmCountryPlanningUnitList = this.state.realmCountryPlanningUnitList;
+        var data = [];
+        if (this.props.inventoryPage != "inventoryDataEntry") {
+            data[0] = moment(this.props.items.inventoryEndDate).format("YYYY-MM-DD"); //A
+            data[1] = this.props.items.inventoryRegion; //B        
+        } else {
+            data[0] = "";
+            data[1] = regionList.length == 1 ? regionList[0].id : "";
+        }
+        data[2] = ""; //C
+        data[3] = realmCountryPlanningUnitList.length == 1 ? realmCountryPlanningUnitList[0].id : ""; //D
+        data[4] = map.get("4"); //E
+        data[5] = ""; //F
+        data[6] = ""; //G
+        data[7] = realmCountryPlanningUnitList.length == 1 ? realmCountryPlanningUnitList[0].multiplier : ""; //H
+        data[8] = `=F${parseInt(json.length) + 1}*H${parseInt(json.length) + 1}`; //I
+        data[9] = `=G${parseInt(json.length) + 1}*H${parseInt(json.length) + 1}`; //J
+        data[10] = "";
+        data[11] = true;
+        if (this.props.inventoryPage != "inventoryDataEntry") {
+            data[12] = this.props.items.inventoryEndDate;
+        } else {
+            data[12] = "";
+        }
+        data[13] = "";
+        data[14] = -1;
+        data[15] = 1;
+        data[16] = 0;
+        obj.insertRow(data);
+        if (this.props.inventoryPage == "inventoryDataEntry") {
+            var showOption = (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+            console.log("showOption", showOption);
+            if (showOption != 5000000) {
+                var pageNo = parseInt(parseInt(json.length) / parseInt(showOption));
+                obj.page(pageNo);
+            }
+        }
+    }
+
+    addBatchRowInJexcel() {
+        var obj = this.state.inventoryBatchInfoTableEl;
+        var adjustmentType = this.props.items.inventoryType;
+        var rowData = obj.getRowData(0);
+        var data = [];
+        data[0] = "";
+        data[1] = "";
+        data[2] = adjustmentType;
+        data[3] = "";
+        data[4] = "";
+        data[5] = 0;
+        data[6] = rowData[6];
+        data[7] = rowData[7];
+        obj.insertRow(data);
+
     }
 
     filterDataSource = function (instance, cell, c, r, source) {
