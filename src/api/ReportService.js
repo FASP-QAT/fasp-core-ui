@@ -102,5 +102,9 @@ class ReportService {
         return axios.post(`${API_URL}/api/report/stockStatusAcrossProducts`, json, {}
         );
     }
+    getExpiredStock(json) {
+        return axios.post(`${API_URL}/api/report/expiredStock`, json, {}
+        );
+    }
 }
 export default new ReportService();

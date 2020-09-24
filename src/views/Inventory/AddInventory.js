@@ -36,8 +36,8 @@ export default class AddInventory extends Component {
             inventoryChangedFlag: 0,
             inventoryDataType: { value: 1, label: i18n.t('static.inventory.inventory') },
             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() },
-            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth()+2 },
+            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() },
         }
         this.options = props.options;
         this.formSubmit = this.formSubmit.bind(this);
