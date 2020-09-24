@@ -31,8 +31,12 @@ const validationSchema = function (values) {
         procurementAgentName: Yup.string()
             .required(i18n.t('static.procurementAgent.procurementagentnametext')),
         submittedToApprovedLeadTime: Yup.string()
+            .min(0, i18n.t('static.program.validvaluetext'))
+            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount'))
             .required(i18n.t('static.procurementagent.submitToApproveLeadTime')),
         approvedToShippedLeadTime: Yup.string()
+            .min(0, i18n.t('static.program.validvaluetext'))
+            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount'))
             .required(i18n.t('static.procurementagent.approvedToShippedLeadTime')),
         // notes: Yup.string()
         //     .required(i18n.t('static.common.notestext'))
@@ -365,7 +369,8 @@ export default class ProcurementAgentTicketComponent extends Component {
                                     </FormGroup>
                                     <FormGroup>
                                         <Label className="P-absltRadio">{i18n.t('static.procurementAgent.localProcurementAgent')}  </Label>
-                                        <FormGroup check inline className="ml-12 ml-procumnentAgentTicket">
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                        <FormGroup check inline className="ml-12">
                                             <Input
                                                 className="form-check-input"
                                                 type="radio"

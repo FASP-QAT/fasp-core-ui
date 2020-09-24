@@ -292,12 +292,12 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             paginationArray = [10, 25, 50];
                                         }
                                         console.log("Shipment list------------------------------->", shipmentList);
+                                        var erpType = "hidden";
                                         for (var i = 0; i < shipmentList.length; i++) {
                                             var shipmentMode = 1;
                                             if (shipmentList[i].shipmentMode == "Air") {
                                                 shipmentMode = 2;
                                             }
-                                            var erpType = "hidden";
                                             if (shipmentList[i].erpFlag.toString() == "true" && this.props.shipmentPage != "shipmentDataEntry") {
                                                 erpType = "text";
                                             }
@@ -1814,6 +1814,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         tr.children[12].classList.add('AsteriskTheadtrTd');
         tr.children[13].classList.add('AsteriskTheadtrTd');
         var shipmentInstance = (instance).jexcel;
+        shipmentInstance.orderBy(1, 0);
         var json = shipmentInstance.getJson();
         var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X']
         for (var i = 0; i < json.length; i++) {

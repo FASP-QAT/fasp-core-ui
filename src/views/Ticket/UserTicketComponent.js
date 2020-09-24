@@ -14,6 +14,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import classNames from 'classnames';
+import { LABEL_REGEX } from '../../Constants';
 
 const initialValues = {
     summary: "Add / Update User",
@@ -33,7 +34,8 @@ const validationSchema = function (values) {
         realm: Yup.string()
             .required(i18n.t('static.common.realmtext')),
         name: Yup.string()
-            .required(i18n.t('static.user.validusername')),
+            .required(i18n.t('static.user.validusername'))
+            .matches(LABEL_REGEX, i18n.t('static.message.rolenamevalidtext')),
         emailId: Yup.string()
             .email(i18n.t('static.user.invalidemail'))
             .required(i18n.t('static.user.validemail')),
@@ -56,6 +58,19 @@ const validationSchema = function (values) {
             .required(i18n.t('static.user.validlanguage')),
         // notes: Yup.string()
         //     .required(i18n.t('static.common.notestext'))
+        needPhoneValidation: Yup.boolean(),
+        phoneNumber: Yup.string()
+            .when("needPhoneValidation", {
+                is: val => {
+                    return document.getElementById("needPhoneValidation").value === "true";
+
+                },
+                then: Yup.string().min(4, i18n.t('static.user.validphonemindigit'))
+                    .max(15, i18n.t('static.user.validphonemaxdigit'))
+                    .matches(/^[0-9]*$/, i18n.t('static.user.validnumber'))
+                    .required(i18n.t('static.user.validphone')),
+                otherwise: Yup.string().notRequired()
+            }),
     })
 }
 
@@ -447,6 +462,13 @@ export default class UserTicketComponent extends Component {
                                         name="roleValid"
                                         id="roleValid"
                                     />
+                                    <Input
+                                        type="hidden"
+                                        name="needPhoneValidation"
+                                        id="needPhoneValidation"
+                                        value={(this.state.user.phoneNumber === '' ? false : true)}
+                                    />
+                                                    
                                     < FormGroup >
                                         <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
                                         <Input type="text" name="summary" id="summary"
@@ -503,12 +525,12 @@ export default class UserTicketComponent extends Component {
                                         <Label for="phoneNumber">{i18n.t('static.user.phoneNumber')}</Label>
                                         <Input type="text" name="phoneNumber" id="phoneNumber"
                                             bsSize="sm"
-                                            // valid={!errors.phoneNumber && this.state.user.phoneNumber != ''}
-                                            // invalid={touched.phoneNumber && !!errors.phoneNumber}
+                                            valid={!errors.phoneNumber && this.state.user.phoneNumber != ''}
+                                            invalid={touched.phoneNumber && !!errors.phoneNumber}
                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                             onBlur={handleBlur}
                                             value={this.state.user.phoneNumber}
-                                            // required 
+                                            required 
                                             />
                                         <FormFeedback className="red">{errors.phoneNumber}</FormFeedback>
                                     </FormGroup>

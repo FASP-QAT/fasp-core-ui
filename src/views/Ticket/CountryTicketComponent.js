@@ -9,6 +9,7 @@ import * as Yup from 'yup';
 import JiraTikcetService from '../../api/JiraTikcetService';
 import getLabelText from '../../CommonComponent/getLabelText';
 import CurrencyService from '../../api/CurrencyService';
+import { LABEL_REGEX, ALPHABETS_REGEX } from '../../Constants';
 
 const initialValues = {
     summary: "Add / Update Country",
@@ -24,11 +25,14 @@ const validationSchema = function (values) {
         summary: Yup.string()
             .required(i18n.t('static.common.summarytext')),
         countryName: Yup.string()
-            .required(i18n.t('static.country.countrytext')),
+            .required(i18n.t('static.country.countrytext'))
+            .matches(LABEL_REGEX, i18n.t('static.message.rolenamevalidtext')),
         countryCode: Yup.string()
-            .required(i18n.t('static.country.countrycodetext')),
+            .required(i18n.t('static.country.countrycodetext'))
+            .matches(ALPHABETS_REGEX, i18n.t('static.common.alphabetsOnly')),
         countryCode2: Yup.string()
-            .required(i18n.t('static.country.countrycodetext')),
+            .required(i18n.t('static.country.countrycodetext'))
+            .matches(ALPHABETS_REGEX, i18n.t('static.common.alphabetsOnly')),
         currency: Yup.string()
             .required(i18n.t('static.country.currencytext')),        
         // notes: Yup.string()
