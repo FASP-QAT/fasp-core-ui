@@ -1521,7 +1521,7 @@ class SupplierLeadTimes extends Component {
         console.log("output list--->", this.state.outPutList);
         this.state.outPutList.map(
             ele => A.push([
-                (getLabelText(ele.country.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
+              //  (getLabelText(ele.country.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
                 (getLabelText(ele.program.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
                 (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
                 (ele.procurementAgent.code== null ? '' : ele.procurementAgent.code.replaceAll(',', ' ')).replaceAll(' ', '%20'),
@@ -1661,7 +1661,7 @@ class SupplierLeadTimes extends Component {
         const headers = [];
         columns.map((item, idx) => { headers[idx] = (item.text) });
         let data = this.state.outPutList.map(ele => [
-            getLabelText(ele.country.label, this.state.lang),
+          //  getLabelText(ele.country.label, this.state.lang),
             getLabelText(ele.program.label, this.state.lang),
             getLabelText(ele.planningUnit.label, this.state.lang),
             getLabelText(ele.procurementAgent.label, this.state.lang),
