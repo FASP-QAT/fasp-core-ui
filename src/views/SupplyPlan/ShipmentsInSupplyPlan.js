@@ -479,14 +479,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                     }.bind(this)
                                                 });
                                                 var rowData = obj.getRowData(y);
-                                                if (rowData[2] != "") {
-                                                    items.push({
-                                                        title: i18n.t('static.supplyPlan.qtyCalculator'),
-                                                        onclick: function () {
-
-                                                        }.bind(this)
-                                                    });
-                                                }
                                                 if (rowData[2] != "" && rowData[7] != "") {
                                                     items.push({
                                                         title: i18n.t('static.supplyPlan.showShipmentDates'),
