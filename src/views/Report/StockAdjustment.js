@@ -1015,8 +1015,8 @@ class StockAdjustmentComponent extends Component {
             data: [],
             lang: localStorage.getItem('lang'),
             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate:{year:  new Date().getFullYear()-3, month: new Date().getMonth()},
-            maxDate:{year:  new Date().getFullYear()+3, month: new Date().getMonth()+1},
+            minDate:{year:  new Date().getFullYear()-3, month: new Date().getMonth()+2},
+            maxDate:{year:  new Date().getFullYear()+3, month: new Date().getMonth()},
             loading: true
         }
         this.formatLabel = this.formatLabel.bind(this);
@@ -1676,8 +1676,8 @@ class StockAdjustmentComponent extends Component {
                 var inputjson = {
                     programId: programId,
                     versionId: versionId,
-                    startDate: new moment(startDate),
-                    stopDate: new moment(endDate),
+                    startDate: startDate,
+                    stopDate: endDate,
                     planningUnitIds: planningUnitIds
                 }
                 AuthenticationService.setupAxiosInterceptors();
