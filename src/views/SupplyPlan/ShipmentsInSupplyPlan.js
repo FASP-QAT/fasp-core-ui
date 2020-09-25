@@ -418,11 +418,11 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                 { type: 'hidden', title: i18n.t('static.supplyPlan.batchInfo'), width: 200 },
                                                 { type: 'hidden', title: i18n.t('static.supplyPlan.totalQtyBatchInfo'), width: 0 },
                                                 { type: 'hidden', title: i18n.t('static.supplyPlan.emergencyOrder'), width: 0 },
-                                                { type: 'checkbox', title: i18n.t('static.common.accountFlag'), width: 0 },
+                                                { type: 'checkbox', title: i18n.t('static.common.accountFlag'), width: 80 },
                                                 { type: 'hidden', title: i18n.t('static.supplyPlan.shipmentDatesJson'), width: 0 },
                                                 { type: 'hidden' },
                                                 { type: 'hidden' },
-                                                { title: i18n.t('static.inventory.active'), type: 'hidden', width: 100 },
+                                                { title: i18n.t('static.inventory.active'), type: 'hidden', width: 0 },
                                                 { type: 'hidden' }
                                             ],
                                             pagination: paginationOption,
