@@ -78,7 +78,7 @@ export default class AuthenticationServiceComponent extends Component {
                                         this.props.history.push(`/accessDenied`)
                                         break;
                                     case 401:
-                                        console.log("common component 401--->", error);
+                                        console.log("common component 401 session expired--->", error);
                                         this.props.history.push(`/login/static.message.sessionExpired`)
                                         break;
                                     case 500:
@@ -110,7 +110,7 @@ export default class AuthenticationServiceComponent extends Component {
                     } else {
                         var lastActionTakenStorage = CryptoJS.AES.decrypt(localStorage.getItem('lastActionTaken').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
                         var lastActionTaken = moment(lastActionTakenStorage);
-                        console.log("last action taken common component---", lastActionTaken);
+                        console.log("last action taken common component session expired---", lastActionTaken);
                         localStorage.removeItem('lastActionTaken');
                         this.props.history.push(`/logout/static.message.sessionExpired`)
                     }
@@ -124,6 +124,7 @@ export default class AuthenticationServiceComponent extends Component {
                     localStorage.removeItem('lastActionTaken');
                     localStorage.setItem('lastActionTaken', CryptoJS.AES.encrypt((moment(new Date()).format("YYYY-MM-DD HH:mm:ss")).toString(), `${SECRET_KEY}`));
                 } else {
+                    console.log("common component offline session expired");
                     this.props.history.push(`/logout/static.message.sessionExpired`)
                 }
             }
