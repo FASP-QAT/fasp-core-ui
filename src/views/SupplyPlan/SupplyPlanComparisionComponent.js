@@ -1808,12 +1808,12 @@ export default class SupplyPlanComponent extends React.Component {
 
                             </div>
                         </Row>
-                        <Row>
+                        {/* <Row> */}
                             <div className="col-md-12">
                                 <span className="supplyplan-larrow" onClick={this.leftClicked}> <i className="cui-arrow-left icons " > </i> {i18n.t('static.supplyPlan.scrollToLeft')} </span>
                                 <span className="supplyplan-rarrow" onClick={this.rightClicked}> {i18n.t('static.supplyPlan.scrollToRight')} <i className="cui-arrow-right icons" ></i> </span>
                             </div>
-                        </Row>
+                        {/* </Row> */}
 
                         <Table className="table-bordered text-center mt-2 overflowhide" bordered responsive size="sm" options={this.options}>
                             <thead>
