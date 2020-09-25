@@ -2383,7 +2383,7 @@ export default class WhatIfReportComponent extends React.Component {
                 var planningUnitId = document.getElementById("planningUnitId").value;
                 var programPlanningUnit = ((this.state.programPlanningUnitList).filter(p => p.planningUnit.id == planningUnitId))[0];
                 var shelfLife = programPlanningUnit.shelfLife;
-                if (month != "") {
+                if (month != "" && quantity != 0) {
                     var suggestedShipmentList = this.state.suggestedShipmentsTotalData.filter(c => c.month == month && c.suggestedOrderQty != "");
                 } else {
                     var suggestedShipmentList = [];
@@ -2806,15 +2806,15 @@ export default class WhatIfReportComponent extends React.Component {
                                         }
                                     </tr>
 
-                                    <tr className="totalShipments hoverTd">
+                                    <tr className="totalShipments">
                                         <td className="BorderNoneSupplyPlan" onClick={() => this.toggleAccordionManualShipments()}>
                                             {this.state.showManualShipment ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
                                         </td>
-                                        <td align="left" onClick={() => this.toggleLarge('SuggestedShipments', "", 0, '', '', "0")}>&emsp;&emsp;{i18n.t('static.supplyPlan.manualEntryShipments')}</td>
+                                        <td align="left">&emsp;&emsp;{i18n.t('static.supplyPlan.manualEntryShipments')}</td>
                                         {
-                                            this.state.manualShipmentsTotalData.map(item1 => (
-                                                <td align="right" onClick={() => this.toggleLarge('SuggestedShipments', "", 0, '', '', "0")}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
-                                            ))
+                                            this.state.manualShipmentsTotalData.map((item1, count) => {
+                                                return (<td align="right" className=" hoverTd" onClick={() => this.toggleLarge('SuggestedShipments', this.state.monthsArray[count].startDate, 0, '', '', "0")}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>)
+                                            })
                                         }
                                     </tr>
 
