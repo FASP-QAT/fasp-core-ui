@@ -2127,7 +2127,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
 
     saveShipmentsDate() {
         this.props.updateState("loading", true);
-        var validation = this.checkValidationForShipmentDates();
+        var validation = true;
         if (validation == true) {
             var elInstance = this.state.shipmentDatesTableEl;
             var json = elInstance.getJson();
