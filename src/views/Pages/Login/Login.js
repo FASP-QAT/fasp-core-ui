@@ -99,6 +99,7 @@ class Login extends Component {
 
   componentDidMount() {
     console.log("------componentDidMount------------");
+    // AuthenticationService.clearLocalStorage();
     this.logoutMessagehide();
     LoginService.getApiVersion()
       .then(response => {
@@ -364,6 +365,7 @@ class Login extends Component {
 
                 </CardGroup>
                           {/* <h5 className="text-right versionColor">{i18n.t('static.common.version')}{APP_VERSION_REACT} | {this.state.apiVersion}</h5> */}
+                          <h5 className="text-right versionColor">{i18n.t('static.common.version')}{APP_VERSION_REACT}</h5>
               </Col>
 
 
