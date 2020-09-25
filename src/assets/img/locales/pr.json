@@ -771,5 +771,6 @@
     "static.supplyPlan.batchInfo": "Informação de lote",
     "static.supplyPlan.index": "Índice",
     "static.pipeline.programData": "Dados do Programa",
-    "static.dashboard.programs": "Programas"
+    "static.dashboard.programs": "Programas",
+    "static.common.version":"Ver.:"
 }

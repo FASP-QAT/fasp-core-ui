@@ -1129,5 +1129,6 @@
     "static.supplyPlan.alternatePlanningUnit": " Unité de rapport alternative",
     "static.supplyPlan.quantityCountryProduct": " Quantité (autre unité de déclaration)",
     "static.supplyPlan.quantityQATProduct": " Quantité (Unité de planification QAT)",
-    "static.dashboard.programs": "Programmes"
+    "static.dashboard.programs": "Programmes",
+    "static.common.version":"Ver.:"
 }
