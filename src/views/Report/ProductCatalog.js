@@ -1543,6 +1543,9 @@ class ProductCatalog extends Component {
         this.getProductCategories = this.getProductCategories.bind(this);
         this.getTracerCategoryList = this.getTracerCategoryList.bind(this);
     }
+    addDoubleQuoteToRowContent=(arr)=>{
+        return arr.map(ele=>'"'+ele+'"')
+     }
 
     exportCSV(columns) {
         var csvRow = [];
@@ -1558,9 +1561,9 @@ class ProductCatalog extends Component {
         const headers = [];
         columns.map((item, idx) => { headers[idx] = ((item.text).replaceAll(' ', '%20')) });
 
-        var A = [headers];
+        var A = [this.addDoubleQuoteToRowContent(headers)];
         this.state.outPutList.map(
-            ele => A.push([
+            ele => A.push(this.addDoubleQuoteToRowContent([
                 (getLabelText(ele.program.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
                 (getLabelText(ele.productCategory.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
                 (getLabelText(ele.tracerCategory.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
@@ -1575,7 +1578,7 @@ class ProductCatalog extends Component {
                 ele.shelfLife,
                 ele.catalogPrice,
                 ele.active ? i18n.t('static.common.active') : i18n.t('static.common.disabled')
-            ]));
+            ])));
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
         }

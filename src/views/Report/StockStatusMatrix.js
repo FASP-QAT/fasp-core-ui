@@ -751,7 +751,9 @@ export default class StockStatusMatrix extends React.Component {
       return ''
     }
   }
-
+  addDoubleQuoteToRowContent=(arr)=>{
+    return arr.map(ele=>'"'+ele+'"')
+ }
   exportCSV(columns) {
 
     var csvRow = [];
@@ -769,9 +771,9 @@ export default class StockStatusMatrix extends React.Component {
 
     const headers = [];
     columns.map((item, idx) => { headers[idx] = ((item.text).replaceAll(' ', '%20')) });
-    var A = [headers]
+    var A = [this.addDoubleQuoteToRowContent(headers)]
     var re = this.state.data
-    this.state.data.map(ele => A.push([(getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.unit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.minMonthsOfStock, ele.reorderFrequency, ele.year, this.roundN(ele.jan), this.roundN(ele.feb), this.roundN(ele.mar), this.roundN(ele.apr), this.roundN(ele.may), this.roundN(ele.jun), this.roundN(ele.jul), this.roundN(ele.aug), this.roundN(ele.sep), this.roundN(ele.oct), this.roundN(ele.nov), this.roundN(ele.dec)]));
+    this.state.data.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.unit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.minMonthsOfStock, ele.reorderFrequency, ele.year, this.roundN(ele.jan), this.roundN(ele.feb), this.roundN(ele.mar), this.roundN(ele.apr), this.roundN(ele.may), this.roundN(ele.jun), this.roundN(ele.jul), this.roundN(ele.aug), this.roundN(ele.sep), this.roundN(ele.oct), this.roundN(ele.nov), this.roundN(ele.dec)])));
     for (var i = 0; i < A.length; i++) {
       console.log(A[i])
       csvRow.push(A[i].join(","))
@@ -881,7 +883,7 @@ export default class StockStatusMatrix extends React.Component {
 
     var startY = 150 + (this.state.planningUnitValues.length * 3)
     let content = {
-      margin: { top: 80, bottom: 50 },
+      margin: { top: 80, bottom: 90 },
       startY: startY,
       head: header,
       body: data,

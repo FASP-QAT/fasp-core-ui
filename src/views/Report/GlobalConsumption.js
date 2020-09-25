@@ -198,6 +198,10 @@ class GlobalConsumption extends Component {
     return '?'
   }
 
+  addDoubleQuoteToRowContent=(arr)=>{
+    return arr.map(ele=>'"'+ele+'"')
+ }
+
   exportCSV() {
 
     var csvRow = [];
@@ -216,12 +220,12 @@ class GlobalConsumption extends Component {
     csvRow.push('')
     var re;
 
-    var A = [[(i18n.t('static.dashboard.country')).replaceAll(' ', '%20'), (i18n.t('static.report.month')).replaceAll(' ', '%20'), (i18n.t('static.consumption.consumptionqty')+' '+i18n.t('static.report.inmillions')).replaceAll(' ', '%20')]]
+    var A = [this.addDoubleQuoteToRowContent([(i18n.t('static.dashboard.country')).replaceAll(' ', '%20'), (i18n.t('static.report.month')).replaceAll(' ', '%20'), (i18n.t('static.consumption.consumptionqty')+' '+i18n.t('static.report.inmillions')).replaceAll(' ', '%20')])]
 
     re = this.state.consumptions
 
     for (var item = 0; item < re.length; item++) {
-      A.push([[getLabelText(re[item].realmCountry.label), re[item].consumptionDateString, re[item].planningUnitQty]])
+      A.push([this.addDoubleQuoteToRowContent([getLabelText(re[item].realmCountry.label), re[item].consumptionDateString, re[item].planningUnitQty])])
     }
     for (var i = 0; i < A.length; i++) {
       csvRow.push(A[i].join(","))
