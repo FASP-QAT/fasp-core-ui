@@ -2042,48 +2042,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         var y = 1;
         var rowData = elInstance.getRowData(y);
 
-        var validation = checkValidtion("date", "B", y, rowData[1], elInstance);
-        if (validation == false) {
-            valid = false;
-        }
-
-        var validation = checkValidtion("date", "C", y, rowData[2], elInstance);
-        if (validation == false) {
-            valid = false;
-        } else {
-            if (moment(rowData[1]).format("YYYY-MM-DD") > moment(rowData[2]).format("YYYY-MM-DD")) {
-                inValid("C", y, i18n.t('static.message.invaliddate'), elInstance);
-                valid = false;
-            }
-        }
-
-        var validation = checkValidtion("date", "D", y, rowData[3], elInstance);
-        if (validation == false) {
-            valid = false;
-        } else {
-            if (moment(rowData[2]).format("YYYY-MM-DD") > moment(rowData[2]).format("YYYY-MM-DD")) {
-                inValid("D", y, i18n.t('static.message.invaliddate'), elInstance);
-                valid = false;
-            }
-        }
-        var validation = checkValidtion("date", "E", y, rowData[4], elInstance);
-        if (validation == false) {
-            valid = false;
-        } else {
-            if (moment(rowData[3]).format("YYYY-MM-DD") > moment(rowData[4]).format("YYYY-MM-DD")) {
-                inValid("E", y, i18n.t('static.message.invaliddate'), elInstance);
-                valid = false;
-            }
-        }
-        var validation = checkValidtion("date", "F", y, rowData[5], elInstance);
-        if (validation == false) {
-            valid = false;
-        } else {
-            if (moment(rowData[4]).format("YYYY-MM-DD") > moment(rowData[5]).format("YYYY-MM-DD")) {
-                inValid("F", y, i18n.t('static.message.invaliddate'), elInstance);
-                valid = false;
-            }
-        }
+        
         var validation = checkValidtion("date", "G", y, rowData[6], elInstance);
         if (validation == false) {
             valid = false;
