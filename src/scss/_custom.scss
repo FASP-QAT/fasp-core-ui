@@ -987,7 +987,7 @@ font-size: 14px;
 
  .expiredInventorySearchposition{
   position: absolute;
-  top: 45px;
+  top: 55px;
   right: 2%;
  } 
 
@@ -1209,6 +1209,9 @@ a:hover {
 
 .modalWidth {
   max-width: 80% !important;
+}
+.modalWidthExpiredStock{
+  max-width: 50% !important;
 }
 
 .table-responsive {
@@ -3412,3 +3415,7 @@ margin-left: -45px;
 .removeMarginLeftCheckbox{
   margin-left: 0px!important;
 }
+.ml-procumnentAgentTicket {
+  margin-left: 170px!important;
+}
+
