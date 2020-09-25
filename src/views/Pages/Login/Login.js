@@ -364,8 +364,8 @@ class Login extends Component {
                   </div>
 
                 </CardGroup>
-                          {/* <h5 className="text-right versionColor">{i18n.t('static.common.version')}{APP_VERSION_REACT} | {this.state.apiVersion}</h5> */}
-                          <h5 className="text-right versionColor">{i18n.t('static.common.version')}{APP_VERSION_REACT}</h5>
+                          <h5 className="text-right versionColor">{i18n.t('static.common.version')}{APP_VERSION_REACT} | {this.state.apiVersion}</h5>
+                          {/* <h5 className="text-right versionColor">{i18n.t('static.common.version')}{APP_VERSION_REACT}</h5> */}
               </Col>
 
 
