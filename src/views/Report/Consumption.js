@@ -1437,11 +1437,12 @@ class Consumption extends Component {
 
   }
 
-  storeProduct(planningUnitId) {
+  storeProduct() {
 
-    let productId = planningUnitId;
+    let productId = document.getElementById("planningUnitId").value;
     // let productFilter = this.state.productList.filter(c => (c.planningUnit.id == productId));
     // console.log("EEEEEEEEE--------", productId);
+    if(productId!=0){
     if (navigator.onLine) {
       RealmService.getRealmListAll()
         .then(response => {
@@ -1450,13 +1451,14 @@ class Consumption extends Component {
               realmId: response.data[0].realmId,
             })
 
-            PlanningUnitService.getPlanningUnitByRealmId(this.state.realmId).then(response => {
-              // console.log("RESP-----", response.data)
-              let productFilter = response.data.filter(c => (c.planningUnitId == productId));
+            PlanningUnitService.getPlanningUnitById(productId).then(response => {
+               console.log("RESP-----", response.data)
+              //let productFilter = response.data.filter(c => (c.planningUnitId == productId));
               this.setState({
-                multiplier: productFilter[0].multiplier,
+                multiplier: response.data.multiplier,
               },
                 () => {
+                  this.filterData()
                   console.log("MULTIPLIER----", this.state.multiplier);
                 })
             })
@@ -1493,12 +1495,13 @@ class Consumption extends Component {
             multiplier: productFilter[0].multiplier,
           },
             () => {
+              this.filterData()
               console.log("MULTIPLIER----", this.state.multiplier);
             })
         }.bind(this);
       }.bind(this)
     }
-
+  }
   }
 
 
@@ -1521,6 +1524,9 @@ class Consumption extends Component {
     }
     return x1 + x2;
   }
+  addDoubleQuoteToRowContent=(arr)=>{
+    return arr.map(ele=>'"'+ele+'"')
+ }
 
   exportCSV() {
 
@@ -1572,9 +1578,9 @@ class Consumption extends Component {
       }
     }
     var A = [];
-    A[0] = head;
-    A[1] = row1;
-    A[2] = row2;
+    A[0] =this.addDoubleQuoteToRowContent( head);
+    A[1] = this.addDoubleQuoteToRowContent(row1);
+    A[2] = this.addDoubleQuoteToRowContent(row2);
 
 
     for (var i = 0; i < A.length; i++) {
@@ -1923,7 +1929,7 @@ class Consumption extends Component {
     let planningUnitId = document.getElementById("planningUnitId").value;
     let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
     let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month , 0).getDate();
-
+    console.log('values =>',planningUnitId, programId ,versionId );
     if (planningUnitId > 0 && programId > 0 && versionId != 0) {
       if (versionId.includes('Local')) {
         this.setState({ loading: true })
@@ -2043,13 +2049,22 @@ class Consumption extends Component {
                 transDate = objForecast[0].consumptionDate;
               }
 
+              if (viewById == 2) {
+              //  this.toggleView();
+              let json = {
+                "transDate": transDate,
+                "actualConsumption": actualValue* this.state.multiplier,
+                "forecastedConsumption": forecastValue*this.state.multiplier
+              }
+                finalOfflineConsumption.push(json);
+              }else{
               let json = {
                 "transDate": transDate,
                 "actualConsumption": actualValue,
                 "forecastedConsumption": forecastValue
               }
               finalOfflineConsumption.push(json);
-
+            }
             }
 
 
@@ -2102,13 +2117,13 @@ class Consumption extends Component {
               consumptions: finalOfflineConsumption,
               message: '',
               loading: false
-            },
-              () => {
-                this.storeProduct(planningUnitId);
-                if (viewById == 2) {
-                  this.toggleView();
-                }
-              });
+            })
+              // () => {
+              //   this.storeProduct(planningUnitId);
+              //   if (viewById == 2) {
+              //     this.toggleView();
+              //   }
+              // });
 
           }.bind(this)
         }.bind(this)
@@ -2139,7 +2154,7 @@ class Consumption extends Component {
               loading: false
             },
               () => {
-                this.storeProduct(planningUnitId);
+              //  this.storeProduct(planningUnitId);
                 // if (viewById == 2) {
                 //   this.toggleView();
                 // }
@@ -2148,13 +2163,13 @@ class Consumption extends Component {
       }
 
     } else if (programId == -1) {
-      this.setState({ message: i18n.t('static.common.selectProgram'), consumptions: [] });
+      this.setState({ message: i18n.t('static.common.selectProgram'), consumptions: [],offlineConsumptionList:[] });
 
     } else if (versionId == 0) {
-      this.setState({ message: i18n.t('static.program.validversion'), consumptions: [] });
+      this.setState({ message: i18n.t('static.program.validversion'), consumptions: [] ,offlineConsumptionList:[]});
 
     } else {
-      this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), consumptions: [] });
+      this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), consumptions: [] ,offlineConsumptionList:[]});
 
     }
   }
@@ -2481,7 +2496,7 @@ class Consumption extends Component {
         planningUnitLabels: []
       })
     }
-    this.filterData();
+   
   }
   consolidatedVersionList = (programId) => {
     const lan = 'en';
@@ -2524,7 +2539,7 @@ class Consumption extends Component {
           versions: verList.filter(function (x, i, a) {
             return a.indexOf(x) === i;
           })
-        })
+        },()=>{this.filterData()})
 
       }.bind(this);
     }.bind(this)
@@ -2879,7 +2894,7 @@ class Consumption extends Component {
                                 id="planningUnitId"
                                 bsSize="sm"
                                 onChange={this.filterData}
-                              // onChange={(e) => { this.storeProduct(e); this.filterData(); }}
+                               onChange={(e) => { this.storeProduct(e);  }}
                               >
                                 <option value="0">{i18n.t('static.common.select')}</option>
                                 {planningUnits.length > 0
@@ -2908,7 +2923,7 @@ class Consumption extends Component {
                                 name="planningUnitId"
                                 id="planningUnitId"
                                 bsSize="sm"
-                                onChange={this.filterData}
+                                onChange={(e) => { this.storeProduct(e);  }}
                               >
                                 <option value="0">{i18n.t('static.common.select')}</option>
                                 {offlinePlanningUnitList.length > 0
