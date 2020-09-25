@@ -1130,5 +1130,7 @@
     "static.supplyPlan.quantityCountryProduct": " Quantité (autre unité de déclaration)",
     "static.supplyPlan.quantityQATProduct": " Quantité (Unité de planification QAT)",
     "static.dashboard.programs": "Programmes",
+    "static.jexcel.search":"chercher",
+    "static.jexcel.clear":"Clair",
     "static.common.version":"Ver.:"
 }

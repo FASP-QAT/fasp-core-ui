@@ -16,13 +16,16 @@ const initialValues = {
     minMosMinGaurdrail: '',
     minMosMaxGaurdrail: '',
     maxMosMaxGaurdrail: ''
-}
+} 
 
 const validationSchema = function (values) {
     return Yup.object().shape({
         realmCode: Yup.string()
-            .required(i18n.t('static.realm.realmCodeText')).max(6, i18n.t('static.realm.realmCodeLength')),
-        label: Yup.string()
+        .matches(/^\S*$/,i18n.t('static.validNoSpace.string'))
+        .required(i18n.t('static.realm.realmCodeText'))
+        .max(6, i18n.t('static.realm.realmCodeLength')),
+        label: Yup.string() 
+            .matches(/^\S+(?: \S+)*$/,i18n.t('static.validSpace.string'))
             .required(i18n.t('static.realm.realmNameText')),
         minMosMinGaurdrail: Yup.number()
             .typeError(i18n.t('static.procurementUnit.validNumberText'))
