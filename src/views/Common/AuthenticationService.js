@@ -1153,6 +1153,13 @@ class AuthenticationService {
         throw new Error('Bad Hex');
     }
 
+    clearLocalStorage(){
+        console.log("################ Clear local storage started ################");
+        let keysToRemove = ["token-" + AuthenticationService.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken"];
+        keysToRemove.forEach(k => localStorage.removeItem(k));
+        console.log("################ Clear local storage completed ################");
+    }
+
 }
 
 
