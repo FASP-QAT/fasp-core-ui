@@ -39,10 +39,12 @@ const validationSchema = function (values) {
         budgetName: Yup.string()
             .required(i18n.t('static.budget.budgetdesctext')),
         budgetCode: Yup.string()
+            .max(10, i18n.t('static.common.max10digittext'))
             .required(i18n.t('static.budget.budgetCodeText')),
         currency: Yup.string()
             .required(i18n.t('static.country.currencytext')),
         budgetAmount: Yup.string()
+            .matches(/^[0-9]+([,\.][0-9]+)?/, i18n.t('static.program.validBudgetAmount'))
             .required(i18n.t('static.budget.budgetamounttext')),
         // notes: Yup.string()
         //     .required(i18n.t('static.common.notestext'))

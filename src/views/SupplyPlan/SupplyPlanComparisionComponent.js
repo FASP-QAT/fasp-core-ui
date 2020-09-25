@@ -261,8 +261,8 @@ export default class SupplyPlanComponent extends React.Component {
 
     exportCSV = () => {
         var csvRow = [];
-        csvRow.push(i18n.t('static.program.program') + ' , ' + ((document.getElementById("programId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
-        csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+        csvRow.push(i18n.t('static.program.program') + ' , ' + ((this.props.items.programSelect.label).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+        csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((this.props.items.planningUnitName).replaceAll(',', '%20')).replaceAll(' ', '%20'))
         csvRow.push('')
         csvRow.push('')
         csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
@@ -274,31 +274,31 @@ export default class SupplyPlanComponent extends React.Component {
         )]
         var A = [header]
 
-        var openningArr = [...[i18n.t('static.supplyPlan.openingBalance').replaceAll(' ', '%20')], ... this.state.openingBalanceArray]
-        var consumptionArr = [...[("-" + i18n.t('static.supplyPlan.consumption')).replaceAll(' ', '%20')], ...this.state.consumptionTotalData]
-        var shipmentArr = [...[("+" + i18n.t('static.dashboard.shipments')).replaceAll(' ', '%20')], ...this.state.shipmentsTotalData]
-        var suggestedArr = [...[("   " + i18n.t('static.supplyPlan.suggestedShipments')).replaceAll(' ', '%20')], ...this.state.suggestedShipmentsTotalData.map(item => item.suggestedOrderQty)]
-        var manualEntryShipmentsArr = [...[("  " + i18n.t('static.supplyPlan.manualEntryShipments')).replaceAll(' ', '%20')], ...this.state.manualShipmentsTotalData]
+        var openningArr = [...["\"" + i18n.t('static.supplyPlan.openingBalance').replaceAll(' ', '%20') + "\""], ... this.state.openingBalanceArray]
+        var consumptionArr = [...["\"" + ("-" + i18n.t('static.supplyPlan.consumption')).replaceAll(' ', '%20') + "\""], ...this.state.consumptionTotalData]
+        var shipmentArr = [...["\"" + ("+" + i18n.t('static.dashboard.shipments')).replaceAll(' ', '%20') + "\""], ...this.state.shipmentsTotalData]
+        var suggestedArr = [...["\"" + ("   " + i18n.t('static.supplyPlan.suggestedShipments')).replaceAll(' ', '%20') + "\""], ...this.state.suggestedShipmentsTotalData.map(item => item.suggestedOrderQty)]
+        var manualEntryShipmentsArr = [...["\"" + ("  " + i18n.t('static.supplyPlan.manualEntryShipments')).replaceAll(' ', '%20') + "\""], ...this.state.manualShipmentsTotalData]
 
-        var deliveredShipmentArr = [...[("     " + i18n.t('static.supplyPlan.delivered')).replaceAll(' ', '%20')], ...this.state.deliveredShipmentsTotalData.map(item => item.qty)]
-        var shippedShipmentArr = [...[("     " + i18n.t('static.supplyPlan.shipped')).replaceAll(' ', '%20')], ...this.state.shippedShipmentsTotalData.map(item => item.qty)]
-        var orderedShipmentArr = [...[("     " + i18n.t('static.supplyPlan.ordered')).replaceAll(' ', '%20')], ...this.state.orderedShipmentsTotalData.map(item => item.qty)]
-        var plannedShipmentArr = [...[("     " + i18n.t('static.supplyPlan.planned')).replaceAll(' ', '%20')], ...this.state.plannedShipmentsTotalData.map(item => item.qty)]
+        var deliveredShipmentArr = [...["\"" + ("     " + i18n.t('static.supplyPlan.delivered')).replaceAll(' ', '%20') + "\""], ...this.state.deliveredShipmentsTotalData.map(item => item.qty)]
+        var shippedShipmentArr = [...["\"" + ("     " + i18n.t('static.supplyPlan.shipped')).replaceAll(' ', '%20') + "\""], ...this.state.shippedShipmentsTotalData.map(item => item.qty)]
+        var orderedShipmentArr = [...["\"" + ("     " + i18n.t('static.supplyPlan.ordered')).replaceAll(' ', '%20') + "\""], ...this.state.orderedShipmentsTotalData.map(item => item.qty)]
+        var plannedShipmentArr = [...["\"" + ("     " + i18n.t('static.supplyPlan.planned')).replaceAll(' ', '%20') + "\""], ...this.state.plannedShipmentsTotalData.map(item => item.qty)]
 
-        var erpShipmentsArr = [...[("  " + i18n.t('static.supplyPlan.erpShipments')).replaceAll(' ', '%20')], ...this.state.erpShipmentsTotalData]
-        var deliveredErpShipmentArr = [...[("     " + i18n.t('static.supplyPlan.delivered')).replaceAll(' ', '%20')], ...this.state.deliveredErpShipmentsTotalData.map(item => item.qty)]
-        var shippedErpShipmentArr = [...[("     " + i18n.t('static.supplyPlan.shipped')).replaceAll(' ', '%20')], ...this.state.shippedErpShipmentsTotalData.map(item => item.qty)]
-        var orderedErpShipmentArr = [...[("     " + i18n.t('static.supplyPlan.ordered')).replaceAll(' ', '%20')], ...this.state.orderedErpShipmentsTotalData.map(item => item.qty)]
-        var plannedErpShipmentArr = [...[("     " + i18n.t('static.supplyPlan.planned')).replaceAll(' ', '%20')], ...this.state.plannedErpShipmentsTotalData.map(item => item.qty)]
+        var erpShipmentsArr = [...["\"" + ("  " + i18n.t('static.supplyPlan.erpShipments')).replaceAll(' ', '%20') + "\""], ...this.state.erpShipmentsTotalData]
+        var deliveredErpShipmentArr = [...["\"" + ("     " + i18n.t('static.supplyPlan.delivered')).replaceAll(' ', '%20') + "\""], ...this.state.deliveredErpShipmentsTotalData.map(item => item.qty)]
+        var shippedErpShipmentArr = [...["\"" + ("     " + i18n.t('static.supplyPlan.shipped')).replaceAll(' ', '%20') + "\""], ...this.state.shippedErpShipmentsTotalData.map(item => item.qty)]
+        var orderedErpShipmentArr = [...["\"" + ("     " + i18n.t('static.supplyPlan.ordered')).replaceAll(' ', '%20') + "\""], ...this.state.orderedErpShipmentsTotalData.map(item => item.qty)]
+        var plannedErpShipmentArr = [...["\"" + ("     " + i18n.t('static.supplyPlan.planned')).replaceAll(' ', '%20') + "\""], ...this.state.plannedErpShipmentsTotalData.map(item => item.qty)]
 
-        var inventoryArr = [...[(i18n.t('static.supplyPlan.adjustments')).replaceAll(' ', '%20')], ...this.state.inventoryTotalData]
-        var closingBalanceArr = [...[(i18n.t('static.supplyPlan.endingBalance')).replaceAll(' ', '%20')], ...this.state.closingBalanceArray]
-        var monthsOfStockArr = [...[(i18n.t('static.supplyPlan.monthsOfStock')).replaceAll(' ', '%20')], ... this.state.monthsOfStockArray]
-        var amcgArr = [...[(i18n.t('static.supplyPlan.amc')).replaceAll(' ', '%20')], ...this.state.amcTotalData]
+        var inventoryArr = [...["\"" + (i18n.t('static.supplyPlan.adjustments')).replaceAll(' ', '%20') + "\""], ...this.state.inventoryTotalData]
+        var closingBalanceArr = [...["\"" + (i18n.t('static.supplyPlan.endingBalance')).replaceAll(' ', '%20') + "\""], ...this.state.closingBalanceArray]
+        var monthsOfStockArr = [...["\"" + (i18n.t('static.supplyPlan.monthsOfStock')).replaceAll(' ', '%20') + "\""], ... this.state.monthsOfStockArray]
+        var amcgArr = [...["\"" + (i18n.t('static.supplyPlan.amc')).replaceAll(' ', '%20') + "\""], ...this.state.amcTotalData]
 
-        var minStocArr = [...[(i18n.t('static.supplyPlan.minStockMos')).replaceAll(' ', '%20')], ...this.state.minStockMoS]
-        var maxStockArr = [...[(i18n.t('static.supplyPlan.maxStockMos')).replaceAll(' ', '%20')], ...this.state.maxStockMoS]
-        var unmetDemandArr = [...[(i18n.t('static.supplyPlan.unmetDemandStr')).replaceAll(' ', '%20')], ...this.state.unmetDemand]
+        var minStocArr = [...["\"" + (i18n.t('static.supplyPlan.minStockMos')).replaceAll(' ', '%20') + "\""], ...this.state.minStockMoS]
+        var maxStockArr = [...["\"" + (i18n.t('static.supplyPlan.maxStockMos')).replaceAll(' ', '%20') + "\""], ...this.state.maxStockMoS]
+        var unmetDemandArr = [...["\"" + (i18n.t('static.supplyPlan.unmetDemandStr')).replaceAll(' ', '%20') + "\""], ...this.state.unmetDemand]
 
 
         A.push(openningArr)
@@ -381,10 +381,11 @@ export default class SupplyPlanComponent extends React.Component {
                 })
                 if (i == 1) {
                     doc.setFontSize(8)
-                    doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 80, {
+                    doc.setFont('helvetica', 'normal')
+                    doc.text(i18n.t('static.program.program') + ' : ' + (this.props.items.programSelect.label), doc.internal.pageSize.width / 8, 80, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 90, {
+                    doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + (this.props.items.planningUnitName), doc.internal.pageSize.width / 8, 90, {
                         align: 'left'
                     })
                 }
@@ -806,9 +807,9 @@ export default class SupplyPlanComponent extends React.Component {
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                     var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                                     paColor = procurementAgent.colorHtmlCode;
-                                                    var index = paColors.findIndex(c => c.color ==  paColor);
+                                                    var index = paColors.findIndex(c => c.color == paColor);
                                                     if (index == -1) {
-                                                        paColors.push({ color:  paColor, text: procurementAgent.procurementAgentCode })
+                                                        paColors.push({ color: paColor, text: procurementAgent.procurementAgentCode })
                                                     }
                                                 } else {
                                                     if (shipmentDetails[i].procurementAgent.id != "") {
@@ -829,9 +830,9 @@ export default class SupplyPlanComponent extends React.Component {
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                     var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                                     paColor = procurementAgent.colorHtmlCode;
-                                                    var index = paColors.findIndex(c => c.color ==  paColor);
+                                                    var index = paColors.findIndex(c => c.color == paColor);
                                                     if (index == -1) {
-                                                        paColors.push({ color:  paColor, text: procurementAgent.procurementAgentCode })
+                                                        paColors.push({ color: paColor, text: procurementAgent.procurementAgentCode })
                                                     }
                                                 } else {
                                                     if (shipmentDetails[i].procurementAgent.id != "") {
@@ -852,9 +853,9 @@ export default class SupplyPlanComponent extends React.Component {
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                     var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                                     paColor = procurementAgent.colorHtmlCode;
-                                                    var index = paColors.findIndex(c => c.color ==  paColor);
+                                                    var index = paColors.findIndex(c => c.color == paColor);
                                                     if (index == -1) {
-                                                        paColors.push({ color:  paColor, text: procurementAgent.procurementAgentCode })
+                                                        paColors.push({ color: paColor, text: procurementAgent.procurementAgentCode })
                                                     }
                                                 } else {
                                                     if (shipmentDetails[i].procurementAgent.id != "") {
@@ -875,9 +876,9 @@ export default class SupplyPlanComponent extends React.Component {
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                     var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                                     paColor = procurementAgent.colorHtmlCode;
-                                                    var index = paColors.findIndex(c => c.color ==  paColor);
+                                                    var index = paColors.findIndex(c => c.color == paColor);
                                                     if (index == -1) {
-                                                        paColors.push({ color:  paColor, text: procurementAgent.procurementAgentCode })
+                                                        paColors.push({ color: paColor, text: procurementAgent.procurementAgentCode })
                                                     }
                                                 } else {
                                                     if (shipmentDetails[i].procurementAgent.id != "") {
@@ -952,9 +953,9 @@ export default class SupplyPlanComponent extends React.Component {
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                     var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                                     paColor = procurementAgent.colorHtmlCode;
-                                                    var index = paColors.findIndex(c => c.color ==  paColor);
+                                                    var index = paColors.findIndex(c => c.color == paColor);
                                                     if (index == -1) {
-                                                        paColors.push({ color:  paColor, text: procurementAgent.procurementAgentCode })
+                                                        paColors.push({ color: paColor, text: procurementAgent.procurementAgentCode })
                                                     }
                                                 } else {
                                                     if (shipmentDetails[i].procurementAgent.id != "") {
@@ -975,9 +976,9 @@ export default class SupplyPlanComponent extends React.Component {
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                     var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                                     paColor = procurementAgent.colorHtmlCode;
-                                                    var index = paColors.findIndex(c => c.color ==  paColor);
+                                                    var index = paColors.findIndex(c => c.color == paColor);
                                                     if (index == -1) {
-                                                        paColors.push({ color:  paColor, text: procurementAgent.procurementAgentCode })
+                                                        paColors.push({ color: paColor, text: procurementAgent.procurementAgentCode })
                                                     }
                                                 } else {
                                                     if (shipmentDetails[i].procurementAgent.id != "") {
@@ -998,9 +999,9 @@ export default class SupplyPlanComponent extends React.Component {
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                     var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                                     paColor = procurementAgent.colorHtmlCode;
-                                                    var index = paColors.findIndex(c => c.color ==  paColor);
+                                                    var index = paColors.findIndex(c => c.color == paColor);
                                                     if (index == -1) {
-                                                        paColors.push({ color:  paColor, text: procurementAgent.procurementAgentCode })
+                                                        paColors.push({ color: paColor, text: procurementAgent.procurementAgentCode })
                                                     }
                                                 } else {
                                                     if (shipmentDetails[i].procurementAgent.id != "") {
@@ -1021,9 +1022,9 @@ export default class SupplyPlanComponent extends React.Component {
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                     var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                                     paColor = procurementAgent.colorHtmlCode;
-                                                    var index = paColors.findIndex(c => c.color ==  paColor);
+                                                    var index = paColors.findIndex(c => c.color == paColor);
                                                     if (index == -1) {
-                                                        paColors.push({ color:  paColor, text: procurementAgent.procurementAgentCode })
+                                                        paColors.push({ color: paColor, text: procurementAgent.procurementAgentCode })
                                                     }
                                                 } else {
                                                     if (shipmentDetails[i].procurementAgent.id != "") {
@@ -1085,8 +1086,8 @@ export default class SupplyPlanComponent extends React.Component {
 
                                     inventoryTotalData.push(jsonList[0].adjustmentQty == 0 ? "" : jsonList[0].adjustmentQty);
                                     totalExpiredStockArr.push({ qty: jsonList[0].expiredStock, details: jsonList[0].batchDetails, month: m[n] });
-                                    monthsOfStockArray.push(parseFloat(jsonList[0].mos).toFixed(2));
-                                    amcTotalData.push((jsonList[0].amc).toFixed(2))
+                                    monthsOfStockArray.push(parseFloat(jsonList[0].mos).toFixed(1));
+                                    amcTotalData.push(Math.round(parseFloat(jsonList[0].amc)))
                                     minStockMoS.push(jsonList[0].minStockMoS)
                                     maxStockMoS.push(jsonList[0].maxStockMoS)
                                     unmetDemand.push(jsonList[0].unmetDemand == 0 ? "" : jsonList[0].unmetDemand);
@@ -1205,7 +1206,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         inventoryArrayForRegion.push({ "regionId": regionListFiltered[r].id, "adjustmentsQty": adjustmentsQtyForRegion, "actualQty": actualQtyForRegion, "month": m[n] })
                                     }
                                     consumptionArrayForRegion.push({ "regionId": -1, "qty": consumptionTotalForRegion, "actualFlag": true, "month": m[n] })
-                                    
+
                                     var projectedInventoryForRegion = jsonList[0].closingBalance - (jsonList[0].nationalAdjustment != "" ? jsonList[0].nationalAdjustment : 0);
                                     console.log("project Inventory", projectedInventoryForRegion);
                                     if (regionsReportingActualInventory.length != totalNoOfRegions) {
@@ -1324,7 +1325,8 @@ export default class SupplyPlanComponent extends React.Component {
 
 
 
-    toggleLarge(supplyPlanType, month, quantity, startDate, endDate, isEmergencyOrder, shipmentType) {
+    toggleLarge(supplyPlanType, month, quantity, startDate, endDate, isEmergencyOrder, shipmentType, count) {
+        console.log("Aupplu plan type", supplyPlanType);
         var supplyPlanType = supplyPlanType;
         this.setState({
             consumptionError: '',
@@ -1365,7 +1367,8 @@ export default class SupplyPlanComponent extends React.Component {
 
         })
         if (supplyPlanType == 'Consumption') {
-            var monthCountConsumption = this.state.monthCount;
+            console.log("In consumption");
+            var monthCountConsumption = count - 2;
             this.setState({
                 consumption: !this.state.consumption,
                 monthCountConsumption: monthCountConsumption,
@@ -1382,7 +1385,7 @@ export default class SupplyPlanComponent extends React.Component {
             });
             this.shipmentsDetailsClicked(shipmentType, startDate, endDate);
         } else if (supplyPlanType == 'Adjustments') {
-            var monthCountAdjustments = this.state.monthCount;
+            var monthCountAdjustments = count - 2;
             this.setState({
                 adjustments: !this.state.adjustments,
                 monthCountAdjustments: monthCountAdjustments
@@ -1805,12 +1808,12 @@ export default class SupplyPlanComponent extends React.Component {
 
                             </div>
                         </Row>
-                        <Row>
+                        {/* <Row> */}
                             <div className="col-md-12">
                                 <span className="supplyplan-larrow" onClick={this.leftClicked}> <i className="cui-arrow-left icons " > </i> {i18n.t('static.supplyPlan.scrollToLeft')} </span>
                                 <span className="supplyplan-rarrow" onClick={this.rightClicked}> {i18n.t('static.supplyPlan.scrollToRight')} <i className="cui-arrow-right icons" ></i> </span>
                             </div>
-                        </Row>
+                        {/* </Row> */}
 
                         <Table className="table-bordered text-center mt-2 overflowhide" bordered responsive size="sm" options={this.options}>
                             <thead>
@@ -1835,13 +1838,13 @@ export default class SupplyPlanComponent extends React.Component {
                                         ))
                                     }
                                 </tr>
-                                <tr className="hoverTd" onClick={() => this.toggleLarge('Consumption', '', '')}>
+                                <tr>
                                     <td className="BorderNoneSupplyPlan"></td>
                                     <td align="left"><b>- {i18n.t('static.supplyPlan.consumption')}</b></td>
                                     {
-                                        this.state.consumptionTotalData.map(item1 => (
-                                            <td align="right" style={{ color: item1.textColor }}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.consumptionQty} /></td>
-                                        ))
+                                        this.state.consumptionTotalData.map((item1, count) => {
+                                            return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Consumption', '', '', '', '', '', '', count)} style={{ color: item1.textColor }}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.consumptionQty} /></td>)
+                                        })
                                     }
                                 </tr>
                                 <tr>
@@ -2006,13 +2009,13 @@ export default class SupplyPlanComponent extends React.Component {
                                         })
                                     }
                                 </tr>
-                                <tr className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '')}>
+                                <tr>
                                     <td className="BorderNoneSupplyPlan"></td>
                                     <td align="left"><b>+/- {i18n.t('static.supplyPlan.adjustments')}</b></td>
                                     {
-                                        this.state.inventoryTotalData.map(item1 => (
-                                            <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
-                                        ))
+                                        this.state.inventoryTotalData.map((item1, count) => {
+                                            return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>)
+                                        })
                                     }
                                 </tr>
                                 <tr>
@@ -2136,9 +2139,11 @@ export default class SupplyPlanComponent extends React.Component {
                                     <tr>
                                         <th className="regionTdWidthConsumption"></th>
                                         {
-                                            this.state.monthsArray.map(item => (
-                                                <th className="supplyplanTdWidthForMonths">{item.monthName.concat(" ").concat(item.monthYear)}</th>
-                                            ))
+                                            this.state.monthsArray.map((item, count) => {
+                                                if (count < 7) {
+                                                    return (<th className="supplyplanTdWidthForMonths">{item.monthName.concat(" ").concat(item.monthYear)}</th>)
+                                                }
+                                            })
                                         }
                                     </tr>
                                 </thead>
@@ -2148,15 +2153,17 @@ export default class SupplyPlanComponent extends React.Component {
                                             <tr>
                                                 <td align="left">{item.name}</td>
                                                 {
-                                                    this.state.consumptionFilteredArray.filter(c => c.regionId == item.id).map(item1 => {
-                                                        if (item1.qty.toString() != '') {
-                                                            if (item1.actualFlag.toString() == 'true') {
-                                                                return (<td align="right" className="hoverTd" onClick={() => this.consumptionDetailsClicked(`${item1.month.startDate}`, `${item1.month.endDate}`, `${item1.regionId}`, `${item1.actualFlag}`, `${item1.month.month}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                    this.state.consumptionFilteredArray.filter(c => c.regionId == item.id).map((item1, count) => {
+                                                        if (count < 7) {
+                                                            if (item1.qty.toString() != '') {
+                                                                if (item1.actualFlag.toString() == 'true') {
+                                                                    return (<td align="right" className="hoverTd" onClick={() => this.consumptionDetailsClicked(`${item1.month.startDate}`, `${item1.month.endDate}`, `${item1.regionId}`, `${item1.actualFlag}`, `${item1.month.month}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                                } else {
+                                                                    return (<td align="right" style={{ color: 'rgb(170, 85, 161)' }} className="hoverTd" onClick={() => this.consumptionDetailsClicked(`${item1.month.startDate}`, `${item1.month.endDate}`, `${item1.regionId}`, `${item1.actualFlag}`, `${item1.month.month}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                                }
                                                             } else {
-                                                                return (<td align="right" style={{ color: 'rgb(170, 85, 161)' }} className="hoverTd" onClick={() => this.consumptionDetailsClicked(`${item1.month.startDate}`, `${item1.month.endDate}`, `${item1.regionId}`, `${item1.actualFlag}`, `${item1.month.month}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                                return (<td align="right"></td>)
                                                             }
-                                                        } else {
-                                                            return (<td align="right" className="hoverTd" onClick={() => this.consumptionDetailsClicked(`${item1.month.startDate}`, `${item1.month.endDate}`, `${item1.regionId}`, ``, `${item1.month.month}`)}></td>)
                                                         }
                                                     })
                                                 }
@@ -2169,9 +2176,11 @@ export default class SupplyPlanComponent extends React.Component {
                                     <tr>
                                         <th style={{ textAlign: 'left' }}>{i18n.t('static.supplyPlan.total')}</th>
                                         {
-                                            this.state.consumptionFilteredArray.filter(c => c.regionId == -1).map(item => (
-                                                <th style={{ textAlign: 'right' }}><NumberFormat displayType={'text'} thousandSeparator={true} value={item.qty} /></th>
-                                            ))
+                                            this.state.consumptionFilteredArray.filter(c => c.regionId == -1).map((item, count) => {
+                                                if (count < 7) {
+                                                    return (<th style={{ textAlign: 'right' }}><NumberFormat displayType={'text'} thousandSeparator={true} value={item.qty} /></th>)
+                                                }
+                                            })
                                         }
                                     </tr>
                                 </tfoot>
@@ -2224,7 +2233,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         <th className="regionTdWidthAdjustments"></th>
                                         {
                                             this.state.monthsArray.map((item, count) => {
-                                                if (count >= 3 && count <= 9) {
+                                                if (count < 7) {
                                                     return (<th colSpan="2">{item.monthName.concat(" ").concat(item.monthYear)}</th>)
                                                 }
                                             })
@@ -2234,7 +2243,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         <th></th>
                                         {
                                             this.state.monthsArray.map((item, count) => {
-                                                if (count >= 3 && count <= 9) {
+                                                if (count < 7) {
                                                     return (
                                                         <>
                                                             <th>{i18n.t("static.inventoryType.adjustment")}</th>
@@ -2252,7 +2261,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                 <td style={{ textAlign: 'left' }}>{item.name}</td>
                                                 {
                                                     this.state.inventoryFilteredArray.filter(c => c.regionId == item.id).map((item1, count) => {
-                                                        if (count >= 3 && count <= 9) {
+                                                        if (count < 7) {
                                                             if (item1.adjustmentsQty.toString() != '' && (item1.actualQty.toString() != "" || item1.actualQty.toString() != 0)) {
                                                                 return (
                                                                     <>
@@ -2261,53 +2270,22 @@ export default class SupplyPlanComponent extends React.Component {
                                                                     </>
                                                                 )
                                                             } else if (item1.adjustmentsQty.toString() != '' && (item1.actualQty.toString() == "" || item1.actualQty.toString() == 0)) {
-                                                                var lastActualConsumptionDate = moment(((this.state.lastActualConsumptionDateArr.filter(c => item1.regionId == c.region))[0]).lastActualConsumptionDate).format("YYYY-MM");
-                                                                var currentMonthDate = moment(item1.month.startDate).format("YYYY-MM");
-                                                                if (currentMonthDate > lastActualConsumptionDate) {
-                                                                    return (
-                                                                        <>
-                                                                            <td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 2)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.adjustmentsQty} /></td>
-                                                                            <td align="right"></td>
-                                                                        </>
-                                                                    )
-                                                                } else {
-                                                                    return (
-                                                                        <>
-                                                                            <td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 2)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.adjustmentsQty} /></td>
-                                                                            <td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 1)}></td>
-                                                                        </>
-                                                                    )
-                                                                }
-
+                                                                return (
+                                                                    <>
+                                                                        <td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 2)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.adjustmentsQty} /></td>
+                                                                        <td align="right"></td>
+                                                                    </>
+                                                                )
                                                             } else if (item1.adjustmentsQty.toString() == '' && (item1.actualQty.toString() != "" || item1.actualQty.toString() != 0)) {
-                                                                var lastActualConsumptionDate = moment(((this.state.lastActualConsumptionDateArr.filter(c => item1.regionId == c.region))[0]).lastActualConsumptionDate).format("YYYY-MM");
-                                                                var currentMonthDate = moment(item1.month.startDate).format("YYYY-MM");
-                                                                if (currentMonthDate > lastActualConsumptionDate) {
-                                                                    return (
-                                                                        <>
-                                                                            <td align="right"></td>
-                                                                            <td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 1)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.actualQty} /></td>
+                                                                return (
+                                                                    <>
+                                                                        <td align="right"></td>
+                                                                        <td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 1)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.actualQty} /></td>
 
-                                                                        </>
-                                                                    )
-                                                                } else {
-                                                                    return (
-                                                                        <>
-                                                                            <td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 2)}></td>
-                                                                            <td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 1)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.actualQty} /></td>
-                                                                        </>
-                                                                    )
-                                                                }
+                                                                    </>
+                                                                )
                                                             } else {
-                                                                var lastActualConsumptionDate = moment(((this.state.lastActualConsumptionDateArr.filter(c => item1.regionId == c.region))[0]).lastActualConsumptionDate).format("YYYY-MM");
-                                                                var currentMonthDate = moment(item1.month.startDate).format("YYYY-MM");
-                                                                if (currentMonthDate > lastActualConsumptionDate) {
-                                                                    return (<><td align="right"></td><td align="right"></td></>)
-                                                                } else {
-                                                                    return (<><td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 2)}></td>
-                                                                        <td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 1)}></td>
-                                                                    </>)
-                                                                }
+                                                                return (<><td align="right"></td><td align="right"></td></>)
                                                             }
                                                         }
                                                     })
@@ -2321,7 +2299,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         <td style={{ textAlign: 'left' }}>{i18n.t('static.supplyPlan.total')}</td>
                                         {
                                             this.state.inventoryFilteredArray.filter(c => c.regionId == -1).map((item, count) => {
-                                                if (count >= 3 && count <= 9) {
+                                                if (count < 7) {
                                                     return (
                                                         <>
                                                             <td style={{ textAlign: 'right' }}><NumberFormat displayType={'text'} thousandSeparator={true} value={item.adjustmentsQty} />
@@ -2340,7 +2318,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         <td align="left">{i18n.t("static.supplyPlan.projectedInventory")}</td>
                                         {
                                             this.state.inventoryFilteredArray.filter(c => c.regionId == -1).map((item, count) => {
-                                                if (count >= 3 && count <= 9) {
+                                                if (count < 7) {
                                                     return (
                                                         <td colSpan="2"><NumberFormat displayType={'text'} thousandSeparator={true} value={item.projectedInventory} /></td>
                                                     )
@@ -2353,7 +2331,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         <td align="left">{i18n.t("static.supplyPlan.autoAdjustment")}</td>
                                         {
                                             this.state.inventoryFilteredArray.filter(c => c.regionId == -1).map((item1, count) => {
-                                                if (count >= 3 && count <= 9) {
+                                                if (count < 7) {
                                                     if (item1.autoAdjustments.toString() != '') {
                                                         return (<td colSpan="2" ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.autoAdjustments} /></td>)
                                                     } else {
@@ -2367,7 +2345,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         <td align="left">{i18n.t("static.supplyPlan.finalInventory")}</td>
                                         {
                                             this.state.closingBalanceArray.map((item, count) => {
-                                                if (count >= 3 && count <= 9) {
+                                                if (count < 7) {
                                                     return (
                                                         <td colSpan="2"><NumberFormat displayType={'text'} thousandSeparator={true} value={item} /></td>
                                                     )
@@ -2414,7 +2392,7 @@ export default class SupplyPlanComponent extends React.Component {
                 <Modal isOpen={this.state.shipments}
                     className={'modal-lg ' + this.props.className, "modalWidth"}>
                     <ModalHeader toggle={() => this.toggleLarge('shipments')} className="modalHeaderSupplyPlan">
-                        <strong>{i18n.t('static.supplyPlan.shipmentsDetails')} -  {i18n.t('static.planningunit.planningunit')} - {this.state.planningUnitName} </strong>
+                        <strong>{i18n.t('static.supplyPlan.shipmentsDetails')} -  {i18n.t('static.planningunit.planningunit')} - {this.props.items.planningUnitName} </strong>
                         <ul className="legendcommitversion list-group" style={{ display: 'inline-flex' }}>
                             <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyOrder')}</span></li>
                             <li><span className=" greylegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.doNotIncludeInProjectedShipment')} </span></li>
@@ -2476,7 +2454,7 @@ export default class SupplyPlanComponent extends React.Component {
                 {/* Shipments modal */}
                 {/* Expired Stock modal */}
                 <Modal isOpen={this.state.expiredStockModal}
-                    className={'modal-md ' + this.props.className}>
+                    className={'modal-md modalWidthExpiredStock'}>
                     <ModalHeader toggle={() => this.toggleLarge('expiredStock')} className="modalHeaderSupplyPlan">
                         <strong>{i18n.t('static.dashboard.expiryDetails')}</strong>
                     </ModalHeader>
@@ -2486,6 +2464,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 <thead>
                                     <tr>
                                         <th>{i18n.t('static.inventory.batchNumber')}</th>
+                                        <th>{i18n.t('static.report.createdDate')}</th>
                                         <th>{i18n.t('static.inventory.expireDate')}</th>
                                         <th>{i18n.t('static.supplyPlan.qatGenerated')}</th>
                                         <th>{i18n.t('static.supplyPlan.expiredQty')}</th>
@@ -2496,6 +2475,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         this.state.expiredStockDetails.map(item => (
                                             <tr>
                                                 <td align="left">{item.batchNo}</td>
+                                                <td align="left">{moment(item.createdDate).format(DATE_FORMAT_CAP)}</td>
                                                 <td align="left">{moment(item.expiryDate).format(DATE_FORMAT_CAP)}</td>
                                                 <td align="left">{(item.autoGenerated) ? i18n.t("static.program.yes") : i18n.t("static.program.no")}</td>
                                                 <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item.expiredQty} /></td>
@@ -2506,7 +2486,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 </tbody>
                                 <tfoot>
                                     <tr>
-                                        <th style={{ textAlign: 'left' }} colSpan="3">{i18n.t('static.supplyPlan.total')}</th>
+                                        <th style={{ textAlign: 'left' }} colSpan="4">{i18n.t('static.supplyPlan.total')}</th>
                                         <th style={{ textAlign: 'right' }}><NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.expiredStockDetailsTotal} /></th>
                                     </tr>
                                 </tfoot>

@@ -1401,8 +1401,8 @@ class ForcastMatrixOverTime extends Component {
       show: false,
       singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
       rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-      minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() },
-      maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() + 1 },
+      minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth()+2 },
+      maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth()  },
 
 
     };
@@ -1436,7 +1436,7 @@ if(value!=null){
     }
     return x1 + x2;
   }else{
-    return 0;
+    return '';
   }
   }
   dateFormatter = value => {
@@ -1937,7 +1937,7 @@ if(value!=null){
                 var forcastConsumption = 0;
                 var montcnt = 0
                 var absvalue = 0;
-                var currentActualconsumption = 0;
+                var currentActualconsumption = null;
                 var currentForcastConsumption = 0;
                 for (var i = month, j = 0; j <= monthInCalc; i-- , j++) {
                   if (i == 0) {
@@ -1952,15 +1952,22 @@ if(value!=null){
 
                   for (var l = 0; l < conlist.length; l++) {
                     if (conlist[l].actualFlag.toString() == 'true') {
-                      actconsumption = actconsumption + conlist[l].consumptionQty
+                      actconsumption = actconsumption + parseInt(conlist[l].consumptionQty)
                     } else {
-                      forConsumption = forConsumption + conlist[l].consumptionQty
+                      forConsumption = forConsumption + parseInt(conlist[l].consumptionQty)
                     }
                   }
                   actualconsumption = actualconsumption + actconsumption
                   forcastConsumption = forcastConsumption + forConsumption
                   if (j == 0) {
+                    console.log(currentActualconsumption,' ',actconsumption)
+                    if(currentActualconsumption==null && actconsumption>0)
+                    {
+                      currentActualconsumption=0
+                    }
+                    if(currentActualconsumption!=null){
                     currentActualconsumption = currentActualconsumption + actconsumption
+                    }
                     currentForcastConsumption = currentForcastConsumption + forConsumption
                   }
                   if (actconsumption > 0 && forConsumption > 0)
@@ -2177,7 +2184,7 @@ if(value!=null){
         <Row>
           <Col lg="12">
             <Card style={{ display: this.state.loading ? "none" : "block" }}>
-              <div className="Card-header-reporticon pb-3">
+              <div className="Card-header-reporticon pb-2">
                 <div className="card-header-actions">
                   <a className="card-header-action">
                     <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggleForecastMatrix() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span>
