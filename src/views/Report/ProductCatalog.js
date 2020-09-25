@@ -2018,7 +2018,7 @@ class ProductCatalog extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            // colWidths: [150, 150, 100],
+            colWidths: [80, 80, 80,90,0,80,80,80,0,0,80,80,80,70],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
@@ -2032,7 +2032,7 @@ class ProductCatalog extends Component {
                     readOnly: true
                 },
                 {
-                    title: i18n.t('static.dashboard.tracercategory'),
+                    title: i18n.t('static.tracercategory.tracercategory'),
                     type: 'text',
                     readOnly: true
                 },
@@ -2042,7 +2042,7 @@ class ProductCatalog extends Component {
                     type: 'text',
                     readOnly: true
                 }, {
-                    title: i18n.t('static.unit.unit'),
+                    title: i18n.t('static.report.forcastingUOM'),
                     type: 'text',
                     readOnly: true
                 }, {
@@ -2058,7 +2058,7 @@ class ProductCatalog extends Component {
                     type: 'text',
                     readOnly: true
                 }, {
-                    title: i18n.t('static.unit.unit'),
+                    title: i18n.t('static.report.planningUOM'),
                     type: 'text',
                     readOnly: true
                 }, {
@@ -2182,13 +2182,15 @@ class ProductCatalog extends Component {
                         }
                     );
             } else {
+                this.setState({ loading: true })
                 var db1;
                 var storeOS;
                 getDatabase();
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                 openRequest.onerror = function (event) {
                     this.setState({
-                        message: i18n.t('static.program.errortext')
+                        message: i18n.t('static.program.errortext'),
+                        loading: false
                     })
                 }.bind(this);
                 openRequest.onsuccess = function (e) {
@@ -2202,6 +2204,11 @@ class ProductCatalog extends Component {
                         })
                     }.bind(this);
 
+                    programRequest.onerror = function (event) {
+                        this.setState({
+                            loading: false
+                        })
+                    }.bind(this);
                     programRequest.onsuccess = function (e) {
                         var result = programRequest.result;
                         console.log("1------>", result);
@@ -2215,6 +2222,11 @@ class ProductCatalog extends Component {
                             })
                         }.bind(this);
 
+                        fuRequest.onerror = function (event) {
+                            this.setState({
+                                loading: false
+                            })
+                        }.bind(this);
                         fuRequest.onsuccess = function (e) {
                             var result1 = fuRequest.result;
                             console.log("2------>", result1);
@@ -2228,6 +2240,11 @@ class ProductCatalog extends Component {
                                 })
                             }.bind(this);
 
+                            puRequest.onerror = function (event) {
+                                this.setState({
+                                    loading: false
+                                })
+                            }.bind(this);
                             puRequest.onsuccess = function (e) {
                                 var result2 = puRequest.result;
                                 console.log("3------>", result2);
@@ -2241,6 +2258,11 @@ class ProductCatalog extends Component {
                                     })
                                 }.bind(this);
 
+                                ppuRequest.onerror = function (event) {
+                                    this.setState({
+                                        loading: false
+                                    })
+                                }.bind(this);
                                 ppuRequest.onsuccess = function (e) {
                                     // this.setState({ loading: true })
                                     var result3 = ppuRequest.result;
@@ -2378,7 +2400,7 @@ class ProductCatalog extends Component {
             },
             {
                 dataField: 'tracerCategory.label',
-                text: i18n.t('static.dashboard.tracercategory'),
+                text: i18n.t('static.tracercategory.tracercategory'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -2398,7 +2420,7 @@ class ProductCatalog extends Component {
             },
             {
                 dataField: 'fUnit.label',
-                text: i18n.t('static.unit.unit'),
+                text: i18n.t('static.report.forcastingUOM'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -2437,7 +2459,7 @@ class ProductCatalog extends Component {
 
             {
                 dataField: 'pUnit.label',
-                text: i18n.t('static.unit.unit'),
+                text: i18n.t('static.report.planningUOM'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',

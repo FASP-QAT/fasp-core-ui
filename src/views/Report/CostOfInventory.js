@@ -1504,13 +1504,15 @@ export default class CostOfInventory extends Component {
                 let startDate = (this.state.singleValue2.year) + '-' + this.state.singleValue2.month + '-01';
                 let endDate = this.state.singleValue2.year + '-' + this.state.singleValue2.month + '-' + new Date(this.state.singleValue2.year, this.state.singleValue2.month + 1, 0).getDate();
 
+                this.setState({ loading: true })
                 var db1;
                 var storeOS;
                 getDatabase();
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                 openRequest.onerror = function (event) {
                     this.setState({
-                        message: i18n.t('static.program.errortext')
+                        message: i18n.t('static.program.errortext'),
+                        loading:false
                     })
                 }.bind(this);
                 openRequest.onsuccess = function (e) {
@@ -1525,7 +1527,8 @@ export default class CostOfInventory extends Component {
                     var programRequest = programDataOs.get(program);
                     programRequest.onerror = function (event) {
                         this.setState({
-                            message: i18n.t('static.program.errortext')
+                            message: i18n.t('static.program.errortext'),
+                            loading:false
                         })
                     }.bind(this);
                     programRequest.onsuccess = function (e) {
@@ -1540,6 +1543,9 @@ export default class CostOfInventory extends Component {
                         var planningunitRequest = planningunitOs.getAll();
                         planningunitRequest.onerror = function (event) {
                             // Handle errors!
+                            this.setState({
+                                loading:false
+                            })
                         };
                         planningunitRequest.onsuccess = function (e) {
                             var myResult = [];
@@ -1745,7 +1751,7 @@ export default class CostOfInventory extends Component {
                                 <Form >
                                     <div className=" pl-0">
                                         <div className="row ">
-                                        <FormGroup className="col-md-3">
+                                        <FormGroup className="col-md-3 pl-0">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.report.month')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                                                 <div className="controls edit">
                                                     <Picker

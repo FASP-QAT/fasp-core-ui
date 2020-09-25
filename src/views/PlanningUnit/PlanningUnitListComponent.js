@@ -448,12 +448,21 @@ export default class PlanningUnitListComponent extends Component {
         var forecastingUnitList = this.state.forecastingUnitListAll;
         var tracerCategoryId = document.getElementById("tracerCategoryId").value;
         var productCategoryId = document.getElementById("productCategoryId").value;
+        var pc = this.state.productCategoryListAll.filter(c => c.payload.productCategoryId == productCategoryId)[0]
+        console.log("Pc---------->", pc);
+        var pcList = this.state.productCategoryListAll.filter(c => c.payload.productCategoryId == pc.payload.productCategoryId || c.parentId == pc.id);
+        console.log("PcList", pcList);
+        var pcIdArray = [];
+        for (var pcu = 0; pcu < pcList.length; pcu++) {
+            pcIdArray.push(pcList[pcu].payload.productCategoryId);
+        }
+        console.log("pcIdArray", pcIdArray);
         if (tracerCategoryId != 0) {
             forecastingUnitList = forecastingUnitList.filter(c => c.tracerCategory.id == tracerCategoryId);
         }
 
         if (productCategoryId != 0) {
-            forecastingUnitList = forecastingUnitList.filter(c => c.productCategory.id == productCategoryId);
+            forecastingUnitList = forecastingUnitList.filter(c => pcIdArray.includes(c.productCategory.id));
         }
         this.setState({
             forecastingUnits: forecastingUnitList
@@ -468,7 +477,7 @@ export default class PlanningUnitListComponent extends Component {
             planningUnitList = planningUnitList.filter(c => c.forecastingUnit.tracerCategory.id == tracerCategoryId);
         }
         if (productCategoryId != 0) {
-            planningUnitList = planningUnitList.filter(c => c.forecastingUnit.productCategory.id == productCategoryId);
+            planningUnitList = planningUnitList.filter(c => pcIdArray.includes(c.forecastingUnit.productCategory.id));
         }
 
         const selSource = planningUnitList
@@ -480,6 +489,7 @@ export default class PlanningUnitListComponent extends Component {
     }
 
     dataChangeForRealm(event) {
+        this.setState({loading:true})
         this.filterDataForRealm(event.target.value);
     }
 
@@ -741,9 +751,9 @@ export default class PlanningUnitListComponent extends Component {
                 );
         } else {
             document.getElementById("realmDiv").style.display = "none"
-            this.setState({
-                loading: false
-            })
+            // this.setState({
+            //     loading: false
+            // })
             this.filterDataForRealm(AuthenticationService.getRealmId());
         }
     }
@@ -1001,8 +1011,8 @@ export default class PlanningUnitListComponent extends Component {
                         {/* <div id="loader" className="center"></div> */}
                         <div className="shipmentconsumptionSearchMarginTop">
                             <div id="tableDiv" className="jexcelremoveReadonlybackground"></div>
-                            </div>
-                        
+                        </div>
+
 
 
 

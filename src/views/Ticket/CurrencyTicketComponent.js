@@ -7,6 +7,7 @@ import { Formik } from 'formik';
 import i18n from '../../i18n';
 import * as Yup from 'yup';
 import JiraTikcetService from '../../api/JiraTikcetService';
+import { DECIMAL_NO_REGEX, ALPHABETS_REGEX, SPACE_REGEX } from '../../Constants';
 
 const initialValues = {
     summary: "Add / Update Currency",
@@ -21,11 +22,14 @@ const validationSchema = function (values) {
         summary: Yup.string()
             .required(i18n.t('static.common.summarytext')),
         currencyName: Yup.string()
-            .required(i18n.t('static.currency.currencytext')),
+            .required(i18n.t('static.currency.currencytext'))
+            .matches(SPACE_REGEX, i18n.t('static.message.rolenamevalidtext')),
         currencyCode: Yup.string()
-            .required(i18n.t('static.currency.currencycodetext')),
+            .required(i18n.t('static.currency.currencycodetext'))
+            .matches(ALPHABETS_REGEX, i18n.t('static.common.alphabetsOnly')),
         conversionRatetoUSD: Yup.string()
-            .required(i18n.t('static.currency.currencyconversiontext')),        
+            .required(i18n.t('static.currency.currencyconversiontext'))
+            .matches(DECIMAL_NO_REGEX, i18n.t('static.currency.conversionrateNumberDecimalPlaces')),        
         // notes: Yup.string()
         //     .required(i18n.t('static.common.notestext'))
     })
@@ -65,7 +69,8 @@ export default class CurrencyTicketComponent extends Component {
                 conversionRatetoUSD: "",
                 notes: ''
             },
-            message : ''
+            message : '',
+            loading: false
         }        
         this.dataChange = this.dataChange.bind(this);        
         this.resetClicked = this.resetClicked.bind(this);
@@ -154,16 +159,20 @@ export default class CurrencyTicketComponent extends Component {
                 <h5 style={{ color: "green" }} id="div2">{i18n.t(this.state.message)}</h5>                
                 <h4>{i18n.t('static.currency.currencyMaster')}</h4>
                 <br></br>
+                <div style={{ display: this.state.loading ? "none" : "block" }}>
                 <Formik
                     initialValues={initialValues}
                     validate={validate(validationSchema)}
                     onSubmit={(values, { setSubmitting, setErrors }) => {   
+                        this.setState({
+                            loading: true
+                        })
                         JiraTikcetService.addEmailRequestIssue(values).then(response => {                                         
                             console.log("Response :",response.status, ":" ,JSON.stringify(response.data));
                             if (response.status == 200 || response.status == 201) {
                                 var msg = response.data.key;
                                 this.setState({
-                                    message: msg
+                                    message: msg, loading: false
                                 },
                                     () => {
                                         this.resetClicked();
@@ -172,7 +181,7 @@ export default class CurrencyTicketComponent extends Component {
                             } else {
                                 this.setState({
                                     // message: response.data.messageCode
-                                    message: 'Error while creating query'
+                                    message: 'Error while creating query', loading: false
                                 },
                                     () => {
                                         this.resetClicked();
@@ -283,6 +292,15 @@ export default class CurrencyTicketComponent extends Component {
                                     </ModalFooter>
                                 </Form>
                             )} />
+                            </div>
+                            <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                    <div class="align-items-center">
+                                        <div ><h4> <strong>Loading...</strong></h4></div>
+                                        <div class="spinner-border blue ml-4" role="status"></div>
+                                    </div>
+                                </div> 
+                            </div>
             </div>
         );
     }

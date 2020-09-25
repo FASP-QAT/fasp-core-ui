@@ -1354,20 +1354,19 @@ class SupplierLeadTimes extends Component {
 
         for (var j = 0; j < outPutList.length; j++) {
             data = [];
-            data[0] = getLabelText(outPutList[j].country.label, this.state.lang)
-            data[1] = getLabelText(outPutList[j].program.label, this.state.lang)
-            data[2] = getLabelText(outPutList[j].planningUnit.label, this.state.lang)
-            data[3] = getLabelText(outPutList[j].procurementAgent.label, this.state.lang)
-            data[4] = outPutList[j].plannedSubmittedLeadTime
-            data[5] = outPutList[j].submittedToApprovedLeadTime
-            data[6] = outPutList[j].approvedToShippedLeadTime
-            data[7] = outPutList[j].shippedToArrivedBySeaLeadTime
+            data[0] = getLabelText(outPutList[j].program.label, this.state.lang)
+            data[1] = getLabelText(outPutList[j].planningUnit.label, this.state.lang)
+            data[2] =outPutList[j].procurementAgent.code 
+            data[3] = outPutList[j].plannedSubmittedLeadTime
+            data[4] = outPutList[j].submittedToApprovedLeadTime
+            data[5] = outPutList[j].approvedToShippedLeadTime
+            data[6] = outPutList[j].shippedToArrivedBySeaLeadTime
 
-            data[8] = outPutList[j].shippedToArrivedByAirLeadTime
-            data[9] = outPutList[j].arrivedToDeliveredLeadTime
-            data[10] = outPutList[j].totalSeaLeadTime
-            data[11] = outPutList[j].totalAirLeadTime
-            data[12] = outPutList[j].localProcurementAgentLeadTime
+            data[7] = outPutList[j].shippedToArrivedByAirLeadTime
+            data[8] = outPutList[j].arrivedToDeliveredLeadTime
+            data[9] = outPutList[j].totalSeaLeadTime
+            data[10] = outPutList[j].totalAirLeadTime
+            data[11] = outPutList[j].localProcurementAgentLeadTime
             // data[13] = outPutList[j].
             outPutArray[count] = data;
             count++;
@@ -1388,12 +1387,7 @@ class SupplierLeadTimes extends Component {
             // colWidths: [150, 150, 100],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
-                {
-                    title: i18n.t('static.program.realmcountry'),
-                    type: 'text',
-                    readOnly: true
-                },
-                {
+               {
                     title: i18n.t('static.program.program'),
                     type: 'text',
                     readOnly: true
@@ -1527,10 +1521,10 @@ class SupplierLeadTimes extends Component {
         console.log("output list--->", this.state.outPutList);
         this.state.outPutList.map(
             ele => A.push([
-                (getLabelText(ele.country.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
+              //  (getLabelText(ele.country.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
                 (getLabelText(ele.program.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
                 (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
-                (getLabelText(ele.procurementAgent.label, this.state.lang) == null ? '' : getLabelText(ele.procurementAgent.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
+                (ele.procurementAgent.code== null ? '' : ele.procurementAgent.code.replaceAll(',', ' ')).replaceAll(' ', '%20'),
                 ele.plannedSubmittedLeadTime,
                 // ele.draftToSubmittedLeadTime,
                 ele.submittedToApprovedLeadTime,
@@ -1667,7 +1661,7 @@ class SupplierLeadTimes extends Component {
         const headers = [];
         columns.map((item, idx) => { headers[idx] = (item.text) });
         let data = this.state.outPutList.map(ele => [
-            getLabelText(ele.country.label, this.state.lang),
+          //  getLabelText(ele.country.label, this.state.lang),
             getLabelText(ele.program.label, this.state.lang),
             getLabelText(ele.planningUnit.label, this.state.lang),
             getLabelText(ele.procurementAgent.label, this.state.lang),
@@ -2213,6 +2207,7 @@ class SupplierLeadTimes extends Component {
             } else {
                 planningUnitIds = this.state.planningUnitValues.map(ele => (ele.value).toString());
                 procurementAgentIds = this.state.procurementAgenttValues.map(ele => (ele.value).toString());
+                this.setState({ loading: true })
 
                 var db1;
                 var storeOS;
@@ -2221,7 +2216,8 @@ class SupplierLeadTimes extends Component {
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                 openRequest.onerror = function (event) {
                     this.setState({
-                        message: i18n.t('static.program.errortext')
+                        message: i18n.t('static.program.errortext'),
+                        loading: false
                     })
                 }.bind(this);
                 openRequest.onsuccess = function (e) {
@@ -2231,7 +2227,8 @@ class SupplierLeadTimes extends Component {
                     var programRequest = programDataOs.get(parseInt(document.getElementById("programId").value));
                     programRequest.onerror = function (event) {
                         this.setState({
-                            message: i18n.t('static.program.errortext')
+                            message: i18n.t('static.program.errortext'),
+                            loading:false
                         })
                     }.bind(this);
 
@@ -2244,7 +2241,8 @@ class SupplierLeadTimes extends Component {
                         var ppuRequest = ppuOs.getAll();
                         ppuRequest.onerror = function (event) {
                             this.setState({
-                                message: i18n.t('static.program.errortext')
+                                message: i18n.t('static.program.errortext'),
+                                loading:false
                             })
                         }.bind(this);
                         ppuRequest.onsuccess = function (e) {
@@ -2268,7 +2266,8 @@ class SupplierLeadTimes extends Component {
                             var papuRequest = papuOs.getAll();
                             papuRequest.onerror = function (event) {
                                 this.setState({
-                                    message: i18n.t('static.program.errortext')
+                                    message: i18n.t('static.program.errortext'),
+                                    loading:false
                                 })
                             }.bind(this);
 
@@ -2292,7 +2291,8 @@ class SupplierLeadTimes extends Component {
                                 var paRequest = paOs.getAll();
                                 paRequest.onerror = function (event) {
                                     this.setState({
-                                        message: i18n.t('static.program.errortext')
+                                        message: i18n.t('static.program.errortext'),
+                                        loading:false
                                     })
                                 }.bind(this);
 
@@ -2430,21 +2430,11 @@ class SupplierLeadTimes extends Component {
         const { procurementAgents } = this.state
         let procurementAgentList = procurementAgents.length > 0
             && procurementAgents.map((item, i) => {
-                return ({ label: getLabelText(item.label, this.state.lang), value: item.procurementAgentId })
+                return ({ label: item.procurementAgentCode, value: item.procurementAgentId })
 
             }, this);
         const columns = [
-            {
-                dataField: 'country.label',
-                text: i18n.t('static.report.country'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { width: '150px' },
-                formatter: (cell, row) => {
-                    return getLabelText(cell, this.state.lang);
-                }
-            },
+            
             {
                 dataField: 'program.label',
                 text: i18n.t('static.program.program'),
@@ -2468,15 +2458,15 @@ class SupplierLeadTimes extends Component {
                 }
             },
             {
-                dataField: 'procurementAgent.label',
+                dataField: 'procurementAgent.procurementAgentCode',
                 text: i18n.t('static.report.procurementAgentName'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
                 style: { width: '300px' },
-                formatter: (cell, row) => {
-                    return getLabelText(cell, this.state.lang);
-                }
+                // formatter: (cell, row) => {
+                //     return getLabelText(cell, this.state.lang);
+                // }
             },
             {
                 dataField: 'plannedSubmittedLeadTime',
@@ -2650,7 +2640,7 @@ class SupplierLeadTimes extends Component {
                                             </div>
                                         </FormGroup>
                                     </Online> */}
-                                <FormGroup className="col-md-3">
+                                <FormGroup className="col-md-3 pl-0">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                     <div className="controls">
                                         <InputGroup>

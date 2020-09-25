@@ -14,6 +14,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import classNames from 'classnames';
+import { LABEL_REGEX } from '../../Constants';
 
 const initialValues = {
     summary: "Add / Update User",
@@ -33,15 +34,16 @@ const validationSchema = function (values) {
         realm: Yup.string()
             .required(i18n.t('static.common.realmtext')),
         name: Yup.string()
-            .required(i18n.t('static.user.validusername')),
+            .required(i18n.t('static.user.validusername'))
+            .matches(LABEL_REGEX, i18n.t('static.message.rolenamevalidtext')),
         emailId: Yup.string()
             .email(i18n.t('static.user.invalidemail'))
             .required(i18n.t('static.user.validemail')),
-        phoneNumber: Yup.string()
-            .min(4, i18n.t('static.user.validphonemindigit'))
-            .max(15, i18n.t('static.user.validphonemaxdigit'))
-            .matches(/^[0-9]*$/, i18n.t('static.user.validnumber'))
-            .required(i18n.t('static.user.validphone')),
+        // phoneNumber: Yup.string()
+        //     .min(4, i18n.t('static.user.validphonemindigit'))
+        //     .max(15, i18n.t('static.user.validphonemaxdigit'))
+        //     .matches(/^[0-9]*$/, i18n.t('static.user.validnumber'))
+        //     .required(i18n.t('static.user.validphone')),
         role: Yup.string()
             .test('roleValid', i18n.t('static.common.roleinvalidtext'),
                 function (value) {
@@ -56,6 +58,19 @@ const validationSchema = function (values) {
             .required(i18n.t('static.user.validlanguage')),
         // notes: Yup.string()
         //     .required(i18n.t('static.common.notestext'))
+        needPhoneValidation: Yup.boolean(),
+        phoneNumber: Yup.string()
+            .when("needPhoneValidation", {
+                is: val => {
+                    return document.getElementById("needPhoneValidation").value === "true";
+
+                },
+                then: Yup.string().min(4, i18n.t('static.user.validphonemindigit'))
+                    .max(15, i18n.t('static.user.validphonemaxdigit'))
+                    .matches(/^[0-9]*$/, i18n.t('static.user.validnumber'))
+                    .required(i18n.t('static.user.validphone')),
+                otherwise: Yup.string().notRequired()
+            }),
     })
 }
 
@@ -103,7 +118,8 @@ export default class UserTicketComponent extends Component {
             message: '',
             realmId: '',
             roleId: '',
-            languageId: ''
+            languageId: '',
+            loading: false
         }
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
@@ -372,18 +388,22 @@ export default class UserTicketComponent extends Component {
         return (
             <div className="col-md-12">
                 <h5 style={{ color: "green" }} id="div2">{i18n.t(this.state.message)}</h5>
-                <h4>{i18n.t('static.user.user')}</h4>
+                <h4>{i18n.t('static.ticket.addUpdateUser')}</h4>
                 <br></br>
+                <div style={{ display: this.state.loading ? "none" : "block" }}>
                 <Formik
                     initialValues={initialValues}
                     validate={validate(validationSchema)}
                     onSubmit={(values, { setSubmitting, setErrors }) => {
-                        JiraTikcetService.addEmailRequestIssue(this.state.user).then(response => {
+                        this.setState({
+                            loading: true
+                        })
+                        JiraTikcetService.addUpdateUserRequest(this.state.user).then(response => {
                             console.log("Response :", response.status, ":", JSON.stringify(response.data));
                             if (response.status == 200 || response.status == 201) {
                                 var msg = response.data.key;
                                 this.setState({
-                                    message: msg
+                                    message: msg, loading: false
                                 },
                                     () => {
                                         this.resetClicked();
@@ -392,7 +412,7 @@ export default class UserTicketComponent extends Component {
                             } else {
                                 this.setState({
                                     // message: response.data.messageCode
-                                    message: 'Error while creating query'
+                                    message: 'Error while creating query', loading: false
                                 },
                                     () => {
                                         this.resetClicked();
@@ -442,6 +462,13 @@ export default class UserTicketComponent extends Component {
                                         name="roleValid"
                                         id="roleValid"
                                     />
+                                    <Input
+                                        type="hidden"
+                                        name="needPhoneValidation"
+                                        id="needPhoneValidation"
+                                        value={(this.state.user.phoneNumber === '' ? false : true)}
+                                    />
+                                                    
                                     < FormGroup >
                                         <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
                                         <Input type="text" name="summary" id="summary"
@@ -495,7 +522,7 @@ export default class UserTicketComponent extends Component {
                                         <FormFeedback className="red">{errors.emailId}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup>
-                                        <Label for="phoneNumber">{i18n.t('static.user.phoneNumber')}<span class="red Reqasterisk">*</span></Label>
+                                        <Label for="phoneNumber">{i18n.t('static.user.phoneNumber')}</Label>
                                         <Input type="text" name="phoneNumber" id="phoneNumber"
                                             bsSize="sm"
                                             valid={!errors.phoneNumber && this.state.user.phoneNumber != ''}
@@ -503,7 +530,8 @@ export default class UserTicketComponent extends Component {
                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                             onBlur={handleBlur}
                                             value={this.state.user.phoneNumber}
-                                            required />
+                                            required 
+                                            />
                                         <FormFeedback className="red">{errors.phoneNumber}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup className="Selectcontrol-bdrNone">
@@ -556,12 +584,21 @@ export default class UserTicketComponent extends Component {
                                         <FormFeedback className="red">{errors.notes}</FormFeedback>
                                     </FormGroup>
                                     <ModalFooter className="pb-0 pr-0">
-                                        <Button type="button" size="md" color="info" className=" mr-1" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
+                                        <Button type="button" size="md" color="info" className=" mr-1" onClick={this.props.toggleMain}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
                                         <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                         <Button type="submit" size="md" color="success" className=" mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                     </ModalFooter>
                                 </Form>
                             )} />
+                            </div>
+                            <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                    <div class="align-items-center">
+                                        <div ><h4> <strong>Loading...</strong></h4></div>
+                                        <div class="spinner-border blue ml-4" role="status"></div>
+                                    </div>
+                                </div> 
+                            </div>
             </div>
         );
     }

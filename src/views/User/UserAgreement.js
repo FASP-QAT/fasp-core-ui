@@ -104,9 +104,9 @@ All other rights, privileges, duties, and obligations of the Owner pursuant to G
       <div className="rounded-list list-group">
       The Software automatically communicates with QAT servers for three purposes : 
   <ol className="list-group">
-    <li class=""> &nbsp;&nbsp;<p>updating the Software</p></li>
-    <li class=" ">&nbsp; &nbsp; <p>sending error reports and</p></li>
-    <li class=" "> &nbsp; &nbsp;<p>sending anonymized usage data so we may improve the Software.</p></li>
+    <li class=""> &nbsp;&nbsp;<p>Updating the Software</p></li>
+    <li class=" ">&nbsp; &nbsp; <p>Sending error reports and</p></li>
+    <li class=" "> &nbsp; &nbsp;<p>Sending anonymized usage data so we may improve the Software.</p></li>
     <li class=" "> &nbsp; &nbsp;<p>If you would like to learn more about the specific information we send,<br></br> please visit <a href="https://desktop.QAT.org/usage-data/" target=" /blank">https://desktop.QAT.org/usage-data/</a>.</p></li>
   </ol>
   </div>

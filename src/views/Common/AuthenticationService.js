@@ -329,15 +329,16 @@ class AuthenticationService {
             var lastActionTaken = moment(lastActionTakenStorage);
             // console.log("lastActionTakenStorage---", lastActionTakenStorage);
             var curDate = moment(new Date());
+            console.log("curdate:", curDate);
             const diff = curDate.diff(lastActionTaken);
             const diffDuration = moment.duration(diff);
-            // console.log("Total Duration in millis:", diffDuration.asMilliseconds());
-            // console.log("Days:", diffDuration.days());
-            // console.log("Hours:", diffDuration.hours());
-            // console.log("Minutes:", diffDuration.minutes());
-            // console.log("Seconds:", diffDuration.seconds());
+            console.log("Total Duration in millis:", diffDuration.asMilliseconds());
+            console.log("Days:", diffDuration.days());
+            console.log("Hours:", diffDuration.hours());
+            console.log("Minutes:", diffDuration.minutes());
+            console.log("Seconds:", diffDuration.seconds());
             if (diffDuration.minutes() < 30) {
-                // if (diffDuration.minutes() < 10) {
+                console.log("last action taken less than 30 minutes");
                 return true;
             }
             return false;
@@ -1050,7 +1051,7 @@ class AuthenticationService {
                     break;
                 case "/report/supplyPlanVersionAndReview":
                 case "/report/editStatus/:programId/:versionId":
-                case "/report/supplyPlanVersionAndReview/:message":
+                case "/report/supplyPlanVersionAndReview/:color/:message":
                     if (bfunction.includes("ROLE_BF_SUPPLY_PLAN_VERSION_AND_REVIEW")) {
                         return true;
                     }

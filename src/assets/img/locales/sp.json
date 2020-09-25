@@ -1099,6 +1099,7 @@
     "static.report.inventoryReports": "Informes de inventario",
     "static.report.shipmentReports": "Informes de envío",
     "static.country.countrycode2": "Nombre de visualización del país2",
-    "static.country.countrycodetext2": "Ingrese el nombre de visualización del país2"
-    
+    "static.country.countrycodetext2": "Ingrese el nombre de visualización del país2",
+    "static.ticket.addUpdateUser": "Agregar / actualizar usuario",
+    "static.common.version":"Ver.:"
 }

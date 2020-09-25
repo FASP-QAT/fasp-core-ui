@@ -31,8 +31,12 @@ const validationSchema = function (values) {
         procurementAgentName: Yup.string()
             .required(i18n.t('static.procurementAgent.procurementagentnametext')),
         submittedToApprovedLeadTime: Yup.string()
+            .min(0, i18n.t('static.program.validvaluetext'))
+            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount'))
             .required(i18n.t('static.procurementagent.submitToApproveLeadTime')),
         approvedToShippedLeadTime: Yup.string()
+            .min(0, i18n.t('static.program.validvaluetext'))
+            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount'))
             .required(i18n.t('static.procurementagent.approvedToShippedLeadTime')),
         // notes: Yup.string()
         //     .required(i18n.t('static.common.notestext'))
@@ -78,7 +82,8 @@ export default class ProcurementAgentTicketComponent extends Component {
             },
             message : '',
             realms: [],
-            realmId: ''
+            realmId: '',
+            loading: false
         }
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
@@ -198,16 +203,20 @@ export default class ProcurementAgentTicketComponent extends Component {
                 <h5 style={{ color: "green" }} id="div2">{i18n.t(this.state.message)}</h5>
                 <h4>{i18n.t('static.procurementagent.procurementagent')}</h4>
                 <br></br>
+                <div style={{ display: this.state.loading ? "none" : "block" }}>
                 <Formik
                     initialValues={initialValues}
                     validate={validate(validationSchema)}
                     onSubmit={(values, { setSubmitting, setErrors }) => {
+                        this.setState({
+                            loading: true
+                        })
                         JiraTikcetService.addEmailRequestIssue(this.state.procurementAgent).then(response => {                                         
                             console.log("Response :",response.status, ":" ,JSON.stringify(response.data));
                             if (response.status == 200 || response.status == 201) {
                                 var msg = response.data.key;
                                 this.setState({
-                                    message: msg
+                                    message: msg, loading: false
                                 },
                                     () => {
                                         this.resetClicked();
@@ -216,7 +225,7 @@ export default class ProcurementAgentTicketComponent extends Component {
                             } else {
                                 this.setState({
                                     // message: response.data.messageCode
-                                    message: 'Error while creating query'
+                                    message: 'Error while creating query', loading: false
                                 },
                                     () => {
                                         this.resetClicked();
@@ -360,6 +369,7 @@ export default class ProcurementAgentTicketComponent extends Component {
                                     </FormGroup>
                                     <FormGroup>
                                         <Label className="P-absltRadio">{i18n.t('static.procurementAgent.localProcurementAgent')}  </Label>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                         <FormGroup check inline className="ml-12">
                                             <Input
                                                 className="form-check-input"
@@ -413,6 +423,15 @@ export default class ProcurementAgentTicketComponent extends Component {
                                     </ModalFooter>
                                 </Form>
                             )} />
+                            </div>
+                            <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                    <div class="align-items-center">
+                                        <div ><h4> <strong>Loading...</strong></h4></div>
+                                        <div class="spinner-border blue ml-4" role="status"></div>
+                                    </div>
+                                </div> 
+                            </div>
             </div>
         );
     }

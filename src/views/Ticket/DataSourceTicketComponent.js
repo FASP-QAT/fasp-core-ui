@@ -11,6 +11,7 @@ import RealmService from '../../api/RealmService';
 import DataSourceTypeService from '../../api/DataSourceTypeService';
 import ProgramService from '../../api/ProgramService';
 import getLabelText from '../../CommonComponent/getLabelText';
+import { SPACE_REGEX } from '../../Constants';
 
 const initialValues = {
     summary: "Add / Update Data Source",
@@ -32,6 +33,7 @@ const validationSchema = function (values) {
         dataSourceType: Yup.string()
             .required(i18n.t('static.datasource.datasourcetypetext')),
         dataSourceName: Yup.string()
+            .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.datasource.datasourcetext')),                
         // notes: Yup.string()
         //     .required(i18n.t('static.common.notestext'))
@@ -79,7 +81,8 @@ export default class DataSourceTicketComponent extends Component {
             dataSourceTypes: [],
             realmId: '',
             programId: '',
-            dataSourceTypeId: ''
+            dataSourceTypeId: '',
+            loading: false
         }        
         this.dataChange = this.dataChange.bind(this);        
         this.resetClicked = this.resetClicked.bind(this);
@@ -241,16 +244,20 @@ export default class DataSourceTicketComponent extends Component {
                 <h5 style={{ color: "green" }} id="div2">{i18n.t(this.state.message)}</h5>                
                 <h4>{i18n.t('static.datasource.datasource')}</h4>
                 <br></br>
+                <div style={{ display: this.state.loading ? "none" : "block" }}>
                 <Formik
                     initialValues={initialValues}
                     validate={validate(validationSchema)}
-                    onSubmit={(values, { setSubmitting, setErrors }) => {   
+                    onSubmit={(values, { setSubmitting, setErrors }) => {  
+                        this.setState({
+                            loading: true
+                        }) 
                         JiraTikcetService.addEmailRequestIssue(this.state.dataSource).then(response => {                                         
                             console.log("Response :",response.status, ":" ,JSON.stringify(response.data));
                             if (response.status == 200 || response.status == 201) {
                                 var msg = response.data.key;
                                 this.setState({
-                                    message: msg
+                                    message: msg, loading: false
                                 },
                                     () => {
                                         this.resetClicked();
@@ -259,7 +266,7 @@ export default class DataSourceTicketComponent extends Component {
                             } else {
                                 this.setState({
                                     // message: response.data.messageCode
-                                    message: 'Error while creating query'
+                                    message: 'Error while creating query', loading: false
                                 },
                                     () => {
                                         this.resetClicked();
@@ -391,6 +398,15 @@ export default class DataSourceTicketComponent extends Component {
                                     </ModalFooter>
                                 </Form>
                             )} />
+                            </div>
+                            <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                    <div class="align-items-center">
+                                        <div ><h4> <strong>Loading...</strong></h4></div>
+                                        <div class="spinner-border blue ml-4" role="status"></div>
+                                    </div>
+                                </div> 
+                            </div>
             </div>
         );
     }

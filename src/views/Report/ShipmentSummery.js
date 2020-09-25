@@ -1061,8 +1061,8 @@ class ShipmentSummery extends Component {
             message: '',
             viewById: 1,
             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate:{year:  new Date().getFullYear()-3, month: new Date().getMonth()},
-            maxDate:{year:  new Date().getFullYear()+3, month: new Date().getMonth()+1},
+            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth()+2 },
+            maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth()  },
             loading: true
         };
         this.formatLabel = this.formatLabel.bind(this);
@@ -1187,7 +1187,7 @@ class ShipmentSummery extends Component {
             viewById == 1 ? parseFloat(re[item].productCost).toFixed(2) : parseFloat(re[item].productCost * re[item].multiplier).toFixed(2),
             viewById == 1 ? parseFloat(re[item].freightCost).toFixed(2) : parseFloat(re[item].freightCost * re[item].multiplier).toFixed(2),
             viewById == 1 ? parseFloat(re[item].totalCost).toFixed(2) : parseFloat(re[item].totalCost * re[item].multiplier).toFixed(2),
-            re[item].notes
+            ((re[item].notes).replaceAll(',', ' ')).replaceAll(' ', '%20')
             ])
         }
         for (var i = 0; i < B.length; i++) {
@@ -1291,7 +1291,7 @@ class ShipmentSummery extends Component {
             startY: height,
             styles: { lineWidth: 1, fontSize: 8, cellWidth: 190, halign: 'center' },
             columnStyles: {
-                 0: { cellWidth: 191.89 },
+                0: { cellWidth: 191.89 },
             },
             html: '#mytable1',
 
@@ -1546,80 +1546,80 @@ class ShipmentSummery extends Component {
             if (versionId == 0) {
                 this.setState({ message: i18n.t('static.program.validversion'), data: [] });
             } else {
-            if (versionId.includes('Local')) {
-                const lan = 'en';
-                var db1;
-                var storeOS;
-                getDatabase();
-                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                openRequest.onsuccess = function (e) {
-                    db1 = e.target.result;
-                    var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
-                    var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
-                    var planningunitRequest = planningunitOs.getAll();
-                    var planningList = []
-                    planningunitRequest.onerror = function (event) {
-                        // Handle errors!
-                    };
-                    planningunitRequest.onsuccess = function (e) {
-                        var myResult = [];
-                        myResult = planningunitRequest.result;
-                        var programId = (document.getElementById("programId").value).split("_")[0];
-                        var proList = []
-                        // console.log(myResult)
-                        for (var i = 0; i < myResult.length; i++) {
-                            if (myResult[i].program.id == programId) {
+                if (versionId.includes('Local')) {
+                    const lan = 'en';
+                    var db1;
+                    var storeOS;
+                    getDatabase();
+                    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                    openRequest.onsuccess = function (e) {
+                        db1 = e.target.result;
+                        var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+                        var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
+                        var planningunitRequest = planningunitOs.getAll();
+                        var planningList = []
+                        planningunitRequest.onerror = function (event) {
+                            // Handle errors!
+                        };
+                        planningunitRequest.onsuccess = function (e) {
+                            var myResult = [];
+                            myResult = planningunitRequest.result;
+                            var programId = (document.getElementById("programId").value).split("_")[0];
+                            var proList = []
+                            // console.log(myResult)
+                            for (var i = 0; i < myResult.length; i++) {
+                                if (myResult[i].program.id == programId) {
 
-                                proList[i] = myResult[i]
+                                    proList[i] = myResult[i]
+                                }
                             }
-                        }
+                            this.setState({
+                                planningUnits: proList, message: ''
+                            }, () => {
+                                this.fetchData();
+                            })
+                        }.bind(this);
+                    }.bind(this)
+
+
+                }
+                else {
+                    AuthenticationService.setupAxiosInterceptors();
+
+                    //let productCategoryId = document.getElementById("productCategoryId").value;
+                    ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
+                        // console.log('**' + JSON.stringify(response.data))
                         this.setState({
-                            planningUnits: proList, message: ''
+                            planningUnits: response.data, message: ''
                         }, () => {
                             this.fetchData();
                         })
-                    }.bind(this);
-                }.bind(this)
-
-
-            }
-            else {
-                AuthenticationService.setupAxiosInterceptors();
-
-                //let productCategoryId = document.getElementById("productCategoryId").value;
-                ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
-                    // console.log('**' + JSON.stringify(response.data))
-                    this.setState({
-                        planningUnits: response.data, message: ''
-                    }, () => {
-                        this.fetchData();
                     })
-                })
-                    .catch(
-                        error => {
-                            this.setState({
-                                planningUnits: [],
-                            })
-                            if (error.message === "Network Error") {
-                                this.setState({ message: error.message });
-                            } else {
-                                switch (error.response ? error.response.status : "") {
-                                    case 500:
-                                    case 401:
-                                    case 404:
-                                    case 406:
-                                    case 412:
-                                        this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
-                                        break;
-                                    default:
-                                        this.setState({ message: 'static.unkownError' });
-                                        break;
+                        .catch(
+                            error => {
+                                this.setState({
+                                    planningUnits: [],
+                                })
+                                if (error.message === "Network Error") {
+                                    this.setState({ message: error.message });
+                                } else {
+                                    switch (error.response ? error.response.status : "") {
+                                        case 500:
+                                        case 401:
+                                        case 404:
+                                        case 406:
+                                        case 412:
+                                            this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
+                                            break;
+                                        default:
+                                            this.setState({ message: 'static.unkownError' });
+                                            break;
+                                    }
                                 }
                             }
-                        }
-                    );
+                        );
+                }
             }
-        }
         });
 
     }
@@ -1668,7 +1668,8 @@ class ShipmentSummery extends Component {
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                 openRequest.onerror = function (event) {
                     this.setState({
-                        message: i18n.t('static.program.errortext')
+                        message: i18n.t('static.program.errortext'),
+                        loading: false
                     })
                 }.bind(this);
                 openRequest.onsuccess = function (e) {
@@ -1683,23 +1684,24 @@ class ShipmentSummery extends Component {
                     var programRequest = programDataOs.get(program);
                     programRequest.onerror = function (event) {
                         this.setState({
-                            message: i18n.t('static.program.errortext')
+                            message: i18n.t('static.program.errortext'),
+                            loading: false
                         })
                     }.bind(this);
                     programRequest.onsuccess = function (e) {
-                        // this.setState({ loading: true })
+                        this.setState({ loading: true })
                         // console.log("2----", programRequest)
                         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         var programJson = JSON.parse(programData);
                         var shipmentList = (programJson.shipmentList);
                         console.log("shipmentList------>", shipmentList);
-                        const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true"));
+                        const activeFilter = shipmentList.filter(c => c.active == true);
                         // const activeFilter = shipmentList;
-
+                        console.log(startDate,endDate)
                         // let dateFilter = activeFilter.filter(c => moment(c.deliveredDate).isBetween(startDate, endDate, null, '[)'))
-                        let dateFilter = activeFilter.filter(c => moment((c.receivedDate == null || c.receivedDate == "") ? c.expectedDeliveryDate : c.receivedDate).isBetween(startDate, endDate, null, '[)'))
-
+                        let dateFilter = activeFilter.filter(c =>(c.receivedDate == null || c.receivedDate == "") ? ( c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate ):  (c.receivedDate >= startDate && c.receivedDate <= endDate))
+console.log(dateFilter)
                         let data = [];
                         let planningUnitFilter = [];
                         for (let i = 0; i < planningUnitIds.length; i++) {
@@ -1717,6 +1719,9 @@ class ShipmentSummery extends Component {
 
                         planningunitRequest.onerror = function (event) {
                             // Handle errors!
+                            this.setState({
+                                loading: false
+                            })
                         };
 
 
@@ -1896,7 +1901,7 @@ class ShipmentSummery extends Component {
         //Graph start
         let shipmentStatus = [...new Set(this.state.data.map(ele => (getLabelText(ele.shipmentStatus.label, this.state.lang))))];
         console.log("shipmentStatus=======>>>", shipmentStatus.sort());
-
+        shipmentStatus=shipmentStatus.sort()
         let shipmentSummerydata = [];
         let data = [];
         var mainData = this.state.data;
@@ -2133,7 +2138,7 @@ class ShipmentSummery extends Component {
                                                     {/* <InputGroup> */}
                                                     <Picker
                                                         ref="pickRange"
-                                                        years={{min: this.state.minDate, max: this.state.maxDate}}
+                                                        years={{ min: this.state.minDate, max: this.state.maxDate }}
                                                         value={rangeValue}
                                                         lang={pickerLang}
                                                         //theme="light"
@@ -2328,17 +2333,17 @@ class ShipmentSummery extends Component {
                                                 <Table id="mytable2" responsive className="table-striped table-hover table-bordered text-center mt-2">
                                                     <thead>
                                                         <tr>
-                                                            <th style={{ 'text-align': 'left' }}>{i18n.t('static.report.planningUnit/ForecastingUnit')}</th>
-                                                            <th style={{ 'width': '87px' }}>{i18n.t('static.report.id')}</th>
-                                                            <th>{i18n.t('static.report.procurementAgentName')}</th>
-                                                            <th>{i18n.t('static.budget.fundingsource')}</th>
-                                                            <th>{i18n.t('static.common.status')}</th>
-                                                            <th style={{ 'text-align': 'right' }}>{i18n.t('static.report.qty')}</th>
-                                                            <th>{i18n.t('static.report.expectedReceiveddate')}</th>
-                                                            <th style={{ 'text-align': 'right' }}>{i18n.t('static.report.productCost')}</th>
-                                                            <th style={{ 'text-align': 'right' }}>{i18n.t('static.report.freightCost')}</th>
-                                                            <th style={{ 'text-align': 'right' }}>{i18n.t('static.report.totalCost')}</th>
-                                                            <th>{i18n.t('static.program.notes')}</th>
+                                                            <th style={{ 'text-align': 'center' }}>{i18n.t('static.report.planningUnit/ForecastingUnit')}</th>
+                                                            <th style={{ 'width': '87px', 'text-align': 'center' }}>{i18n.t('static.report.id')}</th>
+                                                            <th style={{ 'text-align': 'center' }}>{i18n.t('static.report.procurementAgentName')}</th>
+                                                            <th style={{ 'text-align': 'center' }}>{i18n.t('static.budget.fundingsource')}</th>
+                                                            <th style={{ 'text-align': 'center' }}>{i18n.t('static.common.status')}</th>
+                                                            <th style={{ 'text-align': 'center' }}>{i18n.t('static.report.qty')}</th>
+                                                            <th style={{ 'text-align': 'center' }}>{i18n.t('static.report.expectedReceiveddate')}</th>
+                                                            <th style={{ 'text-align': 'center' }}>{i18n.t('static.report.productCost')}</th>
+                                                            <th style={{ 'text-align': 'center' }}>{i18n.t('static.report.freightCost')}</th>
+                                                            <th style={{ 'text-align': 'center' }}>{i18n.t('static.report.totalCost')}</th>
+                                                            <th style={{ 'text-align': 'center' }}>{i18n.t('static.program.notes')}</th>
                                                         </tr>
 
                                                     </thead>
@@ -2395,17 +2400,17 @@ class ShipmentSummery extends Component {
                                                             this.state.data.map((item, idx) =>
                                                                 <tr id="addr0" key={idx} >
                                                                     <td style={{ 'text-align': 'left' }}>{getLabelText(this.state.data[idx].planningUnit.label, this.state.lang)}</td>
-                                                                    <td>{this.state.data[idx].shipmentId}</td>
-                                                                    <td>{getLabelText(this.state.data[idx].procurementAgent.label, this.state.lang)}</td>
-                                                                    <td>{getLabelText(this.state.data[idx].fundingSource.label, this.state.lang)}</td>
-                                                                    <td>{getLabelText(this.state.data[idx].shipmentStatus.label, this.state.lang)}</td>
-                                                                    <td style={{ 'text-align': 'right' }}>{(this.state.data[idx].shipmentQty).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
-                                                                    <td>{moment(this.state.data[idx].expectedDeliveryDate, 'yyyy-MM-dd').format('MMM YYYY')}</td>
-                                                                    <td style={{ 'text-align': 'right' }}>{viewById == 1 ? (parseFloat(this.state.data[idx].productCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : (parseFloat(this.state.data[idx].productCost * this.state.data[idx].multiplier).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                                    <td  style={{ 'text-align': 'center' }}>{this.state.data[idx].shipmentId}</td>
+                                                                    <td  style={{ 'text-align': 'center' }}>{getLabelText(this.state.data[idx].procurementAgent.label, this.state.lang)}</td>
+                                                                    <td  style={{ 'text-align': 'center' }}>{getLabelText(this.state.data[idx].fundingSource.label, this.state.lang)}</td>
+                                                                    <td  style={{ 'text-align': 'center' }}>{getLabelText(this.state.data[idx].shipmentStatus.label, this.state.lang)}</td>
+                                                                    <td style={{ 'text-align': 'center' }}>{(this.state.data[idx].shipmentQty).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                                    <td  style={{ 'text-align': 'center' }}>{moment(this.state.data[idx].expectedDeliveryDate, 'yyyy-MM-dd').format('MMM YYYY')}</td>
+                                                                    <td style={{ 'text-align': 'center' }}>{viewById == 1 ? (parseFloat(this.state.data[idx].productCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : (parseFloat(this.state.data[idx].productCost * this.state.data[idx].multiplier).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
                                                                     <td style={{ 'text-align': 'right' }}>{viewById == 1 ? (parseFloat(this.state.data[idx].freightCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : (parseFloat(this.state.data[idx].freightCost * this.state.data[idx].multiplier).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
                                                                     {/* <td style={{ 'text-align': 'right' }}>{viewById == 1 ? (parseFloat(this.state.data[idx].productCost+this.state.data[idx].freightCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : (parseFloat((this.state.data[idx].productCost+this.state.data[idx].freightCost) * this.state.data[idx].multiplier).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td> */}
-                                                                    <td style={{ 'text-align': 'right' }}>{viewById == 1 ? (parseFloat(this.state.data[idx].totalCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : (parseFloat((this.state.data[idx].totalCost) * this.state.data[idx].multiplier).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
-                                                                    <td style={{ 'text-align': 'right' }}>{this.state.data[idx].notes}</td>
+                                                                    <td style={{ 'text-align': 'center' }}>{viewById == 1 ? (parseFloat(this.state.data[idx].totalCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : (parseFloat((this.state.data[idx].totalCost) * this.state.data[idx].multiplier).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                                    <td style={{ 'text-align': 'center' }}>{this.state.data[idx].notes}</td>
                                                                 </tr>
                                                             )}
                                                     </tbody>

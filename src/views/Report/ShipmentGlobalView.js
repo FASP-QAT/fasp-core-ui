@@ -1516,8 +1516,8 @@ class ShipmentGlobalView extends Component {
             table1Headers: [],
             viewby: 1,
             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate:{year:  new Date().getFullYear()-3, month: new Date().getMonth()},
-            maxDate:{year:  new Date().getFullYear()+3, month: new Date().getMonth()+1},
+            minDate:{year:  new Date().getFullYear()-3, month: new Date().getMonth()+2},
+            maxDate:{year:  new Date().getFullYear()+3, month: new Date().getMonth()},
             loading: true
 
 
@@ -1764,7 +1764,7 @@ class ShipmentGlobalView extends Component {
         doc.autoTable(content1);
 
         let content2 = {
-            margin: { top: 80, left: 100, bottom: 50 },
+            margin: { top: 80, bottom: 50 },
             startY: doc.autoTableEndPosY() + 50,
             pageBreak: 'auto',
             styles: { lineWidth: 1, fontSize: 8, cellWidth: 120, halign: 'center' },

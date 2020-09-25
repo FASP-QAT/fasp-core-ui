@@ -1587,8 +1587,8 @@ class ShipmentGlobalDemandView extends Component {
             show: false,
             message: '',
             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() },
-            maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() + 1 },
+            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth()+2 },
+            maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
             loading: true
         };
 
@@ -2076,7 +2076,8 @@ class ShipmentGlobalDemandView extends Component {
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                 openRequest.onerror = function (event) {
                     this.setState({
-                        message: i18n.t('static.program.errortext')
+                        message: i18n.t('static.program.errortext'),
+                        loading: false
                     })
                 }.bind(this);
                 openRequest.onsuccess = function (e) {
@@ -2091,10 +2092,12 @@ class ShipmentGlobalDemandView extends Component {
                     var programRequest = programDataOs.get(program);
                     programRequest.onerror = function (event) {
                         this.setState({
-                            message: i18n.t('static.program.errortext')
+                            message: i18n.t('static.program.errortext'),
+                            loading: false
                         })
                     }.bind(this);
                     programRequest.onsuccess = function (e) {
+                        this.setState({ loading: true })
                         // console.log("2----", programRequest)
                         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
@@ -2140,6 +2143,9 @@ class ShipmentGlobalDemandView extends Component {
 
                         procurementAgentRequest.onerror = function (event) {
                             // Handle errors!
+                            this.setState({
+                                loading: false
+                            })
                         };
 
 
@@ -2280,6 +2286,7 @@ class ShipmentGlobalDemandView extends Component {
                                 planningUnitSplit: planningUnitSplit,
                                 procurementAgentSplit: procurementAgentSplit,
                                 table1Headers: table1Headers,
+                                loading: false
                             }, () => {
 
                                 console.log("procurementAgentSplit----->", this.state.procurementAgentSplit);
@@ -2809,6 +2816,7 @@ class ShipmentGlobalDemandView extends Component {
     }
 
     handlePlanningUnitChange = (planningUnitIds) => {
+        console.log(planningUnitIds)
         planningUnitIds = planningUnitIds.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
         })

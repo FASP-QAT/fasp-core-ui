@@ -8,6 +8,7 @@ import ForecastingUnitService from '../../api/ForecastingUnitService.js';
 import i18n from '../../i18n';
 import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
+import { SPACE_REGEX } from '../../Constants.js';
 
 let initialValues = {
     label: ''
@@ -17,6 +18,7 @@ const entityname = i18n.t('static.forecastingunit.forecastingunit');
 const validationSchema = function (values) {
     return Yup.object().shape({
         label: Yup.string()
+            .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.forecastingunit.forecastingunittext'))
     })
 }

@@ -203,7 +203,7 @@ class AddSupplierComponent extends Component {
                               required
                               value={this.state.supplier.realm.id}
                             >
-                              <option value="0">{i18n.t('static.common.select')}</option>
+                              <option value="">{i18n.t('static.common.select')}</option>
                               {realmList}
                             </Input>
                             <FormFeedback className="red">{errors.realmId}</FormFeedback>
@@ -250,10 +250,10 @@ class AddSupplierComponent extends Component {
             </div>
           </div>
         </div>
-        <div>
+        {/* <div>
           <h6>{i18n.t(this.state.message)}</h6>
           <h6>{i18n.t(this.props.match.params.message)}</h6>
-        </div>
+        </div> */}
       </div>
     );
   }

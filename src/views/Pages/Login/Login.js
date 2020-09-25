@@ -16,7 +16,7 @@ import image3 from '../../../assets/img/PEPFAR-logo.png';
 import image1 from '../../../assets/img/QAT-login-logo.png';
 import image4 from '../../../assets/img/USAID-presidents-malaria-initiative.png';
 import image2 from '../../../assets/img/wordmark.png';
-import { SECRET_KEY } from '../../../Constants.js';
+import { SECRET_KEY, APP_VERSION_REACT } from '../../../Constants.js';
 import AuthenticationService from '../../Common/AuthenticationService.js';
 import '../../Forms/ValidationForms/ValidationForms.css';
 
@@ -65,8 +65,9 @@ class Login extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      message: '', 
-      loading: false
+      message: '',
+      loading: false,
+      apiVersion:''
     }
     this.forgotPassword = this.forgotPassword.bind(this);
     this.incorrectPassmessageHide = this.incorrectPassmessageHide.bind(this);
@@ -98,7 +99,16 @@ class Login extends Component {
 
   componentDidMount() {
     console.log("------componentDidMount------------");
+    // AuthenticationService.clearLocalStorage();
     this.logoutMessagehide();
+    LoginService.getApiVersion()
+      .then(response => {
+        this.setState({
+          apiVersion : response.data.app.version
+          
+        })
+        console.log("response---", response.data.app.version)
+      })
   }
 
   forgotPassword() {
@@ -225,7 +235,7 @@ class Login extends Component {
                                         this.setState({ message: error.response.data.messageCode });
                                         break;
                                       case 406:
-                                        console.log("Login page password expired-----------")
+                                        console.log("Login page password expired----------->" + emailId)
                                         this.props.history.push({
                                           pathname: "/updateExpiredPassword",
                                           state: {
@@ -350,9 +360,12 @@ class Login extends Component {
                               </Form>
                             )} />
                     </CardBody>
+
                   </div>
 
                 </CardGroup>
+                          <h5 className="text-right versionColor">{i18n.t('static.common.version')}{APP_VERSION_REACT} | {this.state.apiVersion}</h5>
+                          {/* <h5 className="text-right versionColor">{i18n.t('static.common.version')}{APP_VERSION_REACT}</h5> */}
               </Col>
 
 
@@ -367,8 +380,8 @@ class Login extends Component {
                   and delivers health commodities, offers comprehensive technical assistance to strengthen
                   national supply chain systems, and provides global supply chain leadership. For more
                   information, visit <a href="https://www.ghsupplychain.org/" target="_blank">ghsupplychain.org</a>. The information provided in this tool is not
-                                                                        official U.S. government information and does not represent the views or positions of the
-                                                                        Agency for International Development or the U.S. government.
+                                                                            official U.S. government information and does not represent the views or positions of the
+                                                                            Agency for International Development or the U.S. government.
               </p>
                 </CardBody>
                 <Row className="text-center Login-bttom-logo">

@@ -976,8 +976,8 @@ export default class InventoryTurns extends Component {
             versions: [],
             message: '',
             singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
-            minDate:{year:  new Date().getFullYear()-3, month: new Date().getMonth()},
-            maxDate:{year:  new Date().getFullYear()+3, month: new Date().getMonth()+1},
+            minDate:{year:  new Date().getFullYear()-3, month: new Date().getMonth()+2},
+            maxDate:{year:  new Date().getFullYear()+3, month: new Date().getMonth()},
            loading: true
 
         }
@@ -1506,7 +1506,8 @@ export default class InventoryTurns extends Component {
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                 openRequest.onerror = function (event) {
                     this.setState({
-                        message: i18n.t('static.program.errortext')
+                        message: i18n.t('static.program.errortext'),
+                        loading:false
                     })
                 }.bind(this);
                 openRequest.onsuccess = function (e) {
@@ -1521,11 +1522,12 @@ export default class InventoryTurns extends Component {
                     var programRequest = programDataOs.get(program);
                     programRequest.onerror = function (event) {
                         this.setState({
-                            message: i18n.t('static.program.errortext')
+                            message: i18n.t('static.program.errortext'),
+                            loading:false
                         })
                     }.bind(this);
                     programRequest.onsuccess = function (e) {
-                        // this.setState({ loading: true })
+                        this.setState({ loading: true })
                         console.log(programRequest)
                         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
@@ -1536,6 +1538,9 @@ export default class InventoryTurns extends Component {
                         var planningunitRequest = planningunitOs.getAll();
                         planningunitRequest.onerror = function (event) {
                             // Handle errors!
+                            this.setState({
+                                loading:false
+                            })
                         };
                         planningunitRequest.onsuccess = function (e) {
                             var myResult = [];
@@ -1557,25 +1562,27 @@ export default class InventoryTurns extends Component {
                             var monthcnt = 0;
                             var totalConsumption = 0;
                             var totalClosingBalance = 0;
+                            var reportList=[]
                             for (var n = 0; n < 12; n++) {
                                var dtstr = m[n].startDate
                                 var enddtStr = m[n].endDate
                                
                                 var dt = dtstr
                                 var list = programJson.supplyPlan.filter(c => c.planningUnitId ==planningUnit.planningUnit.id && c.transDate == dt)
-                                console.log(dtstr, ' ', enddtStr,' list',list)
+                                //console.log(dtstr, ' ', enddtStr,' list',list)
+                                reportList=[...reportList,...list]
                             if(list.length>0){
                                 if(document.getElementById("includePlanningShipments").value.toString() == 'true'){
                                 endingBalanceArray[n] = list[0].closingBalance
-                                totalConsumption = totalConsumption + list[0].consumptionQty
-                                if(list[0].consumptionQty>0){
+                                totalConsumption = totalConsumption + parseInt(list[0].consumptionQty)
+                                if(list[0].consumptionQty>0|| list[0].closingBalance>0){
                                     monthcnt++
-                                    totalClosingBalance=totalClosingBalance+list[0].closingBalance
+                                    totalClosingBalance=totalClosingBalance+parseInt(list[0].closingBalance)
                                 }
                             }else{
                                 endingBalanceArray[n] = list[0].closingBalanceWps
-                                totalConsumption = totalConsumption + list[0].consumptionQty
-                                if(list[0].consumptionQty>0){
+                                totalConsumption = totalConsumption + parseInt(list[0].consumptionQty)
+                                if(list[0].consumptionQty>0|| list[0].closingBalance>0){
                                     monthcnt++
                                     totalClosingBalance=totalClosingBalance+list[0].closingBalanceWps
                                 }
@@ -1600,7 +1607,7 @@ export default class InventoryTurns extends Component {
                             //     }
                             // }
 
-
+console.log(reportList)
                             var avergeStock =monthcnt>0? totalClosingBalance / (monthcnt):0
 
                           
@@ -1803,7 +1810,7 @@ var inputJson={
                                 <Form >
                                     <div className="pl-0">
                                         <div className="row">
-                                        <FormGroup className="col-md-3">
+                                        <FormGroup className="col-md-3 pl-0">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.report.month')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                                                 <div className="controls edit">
                                                     <Picker

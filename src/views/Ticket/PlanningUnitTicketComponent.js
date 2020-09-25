@@ -9,6 +9,7 @@ import * as Yup from 'yup';
 import JiraTikcetService from '../../api/JiraTikcetService';
 import UnitService from '../../api/UnitService';
 import ForecastingUnitService from '../../api/ForecastingUnitService';
+import { SPACE_REGEX } from '../../Constants';
 
 const initialValues = {
     summary: "Add / Update Planning Unit",
@@ -24,12 +25,14 @@ const validationSchema = function (values) {
         summary: Yup.string()
             .required(i18n.t('static.common.summarytext')),
         planningUnitDesc: Yup.string()
+            .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.planningunit.planningunittext')),
         forecastingUnitDesc: Yup.string()
             .required(i18n.t('static.planningunit.forcastingunittext')),
         unit: Yup.string()
             .required(i18n.t('static.procurementUnit.validUnitIdText')),
-        multiplier: Yup.string()
+        multiplier: Yup.number()
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
             .required(i18n.t('static.planningunit.multipliertext')),
         // notes: Yup.string()
         //     .required(i18n.t('static.common.notestext'))
@@ -75,7 +78,8 @@ export default class PlanningUnitTicketComponent extends Component {
             units: [],
             forecastingUnits: [],
             unitId: '',
-            forecastingUnitId: ''
+            forecastingUnitId: '',
+            loading: false
         }        
         this.dataChange = this.dataChange.bind(this);        
         this.resetClicked = this.resetClicked.bind(this);
@@ -217,16 +221,20 @@ export default class PlanningUnitTicketComponent extends Component {
                 <h5 style={{ color: "green" }} id="div2">{i18n.t(this.state.message)}</h5>                
                 <h4>{i18n.t('static.planningunit.planningunit')}</h4>
                 <br></br>
+                <div style={{ display: this.state.loading ? "none" : "block" }}>
                 <Formik
                     initialValues={initialValues}
                     validate={validate(validationSchema)}
                     onSubmit={(values, { setSubmitting, setErrors }) => {   
+                        this.setState({
+                            loading: true
+                        })
                         JiraTikcetService.addEmailRequestIssue(this.state.planningUnit).then(response => {                                         
                             console.log("Response :",response.status, ":" ,JSON.stringify(response.data));
                             if (response.status == 200 || response.status == 201) {
                                 var msg = response.data.key;
                                 this.setState({
-                                    message: msg
+                                    message: msg, loading: false
                                 },
                                     () => {
                                         this.resetClicked();
@@ -235,7 +243,7 @@ export default class PlanningUnitTicketComponent extends Component {
                             } else {
                                 this.setState({
                                     // message: response.data.messageCode
-                                    message: 'Error while creating query'
+                                    message: 'Error while creating query', loading: false
                                 },
                                     () => {
                                         this.resetClicked();
@@ -290,18 +298,6 @@ export default class PlanningUnitTicketComponent extends Component {
                                         required />
                                         <FormFeedback className="red">{errors.summary}</FormFeedback>
                                     </FormGroup>
-                                    <FormGroup>
-                                        <Label for="planningUnitDesc">{i18n.t('static.planningUnit.planningUnitName')}<span class="red Reqasterisk">*</span></Label>
-                                        <Input type="text" name="planningUnitDesc" id="planningUnitDesc"
-                                        bsSize="sm"
-                                        valid={!errors.planningUnitDesc && this.state.planningUnit.planningUnitDesc != ''}
-                                        invalid={touched.planningUnitDesc && !!errors.planningUnitDesc}
-                                        onChange={(e) => { handleChange(e); this.dataChange(e);}}
-                                        onBlur={handleBlur}
-                                        value={this.state.planningUnit.planningUnitDesc}
-                                        required />
-                                        <FormFeedback className="red">{errors.planningUnitDesc}</FormFeedback>
-                                    </FormGroup>
                                     < FormGroup >
                                         <Label for="forecastingUnitDesc">{i18n.t('static.forecastingUnit.forecastingUnitName')}<span class="red Reqasterisk">*</span></Label>
                                         <Input type="select" name="forecastingUnitDesc" id="forecastingUnitDesc"
@@ -318,6 +314,30 @@ export default class PlanningUnitTicketComponent extends Component {
                                         <FormFeedback className="red">{errors.forecastingUnitDesc}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup>
+                                        <Label for="multiplier">{i18n.t('static.unit.multiplier')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="number" name="multiplier" id="multiplier"
+                                        bsSize="sm"
+                                        valid={!errors.multiplier && this.state.planningUnit.multiplier != ''}
+                                        invalid={touched.multiplier && !!errors.multiplier}
+                                        onChange={(e) => { handleChange(e); this.dataChange(e);}}
+                                        onBlur={handleBlur}
+                                        value={this.state.planningUnit.multiplier}
+                                        required />
+                                        <FormFeedback className="red">{errors.multiplier}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label for="planningUnitDesc">{i18n.t('static.planningUnit.planningUnitName')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="text" name="planningUnitDesc" id="planningUnitDesc"
+                                        bsSize="sm"
+                                        valid={!errors.planningUnitDesc && this.state.planningUnit.planningUnitDesc != ''}
+                                        invalid={touched.planningUnitDesc && !!errors.planningUnitDesc}
+                                        onChange={(e) => { handleChange(e); this.dataChange(e);}}
+                                        onBlur={handleBlur}
+                                        value={this.state.planningUnit.planningUnitDesc}
+                                        required />
+                                        <FormFeedback className="red">{errors.planningUnitDesc}</FormFeedback>
+                                    </FormGroup>                                    
+                                    <FormGroup>
                                         <Label for="unit">{i18n.t('static.unit.unit')}<span class="red Reqasterisk">*</span></Label>
                                         <Input type="select" name="unit" id="unit"
                                         bsSize="sm"
@@ -331,19 +351,7 @@ export default class PlanningUnitTicketComponent extends Component {
                                             {unitList}
                                         </Input>
                                         <FormFeedback className="red">{errors.unit}</FormFeedback>
-                                    </FormGroup>                                    
-                                    <FormGroup>
-                                        <Label for="multiplier">{i18n.t('static.unit.multiplier')}<span class="red Reqasterisk">*</span></Label>
-                                        <Input type="number" name="multiplier" id="multiplier"
-                                        bsSize="sm"
-                                        valid={!errors.multiplier && this.state.planningUnit.multiplier != ''}
-                                        invalid={touched.multiplier && !!errors.multiplier}
-                                        onChange={(e) => { handleChange(e); this.dataChange(e);}}
-                                        onBlur={handleBlur}
-                                        value={this.state.planningUnit.multiplier}
-                                        required />
-                                        <FormFeedback className="red">{errors.multiplier}</FormFeedback>
-                                    </FormGroup>
+                                    </FormGroup>                                                                        
                                     <FormGroup>
                                         <Label for="notes">{i18n.t('static.common.notes')}</Label>
                                         <Input type="textarea" name="notes" id="notes"
@@ -364,6 +372,15 @@ export default class PlanningUnitTicketComponent extends Component {
                                     </ModalFooter>
                                 </Form>
                             )} />
+                            </div>
+                            <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                    <div class="align-items-center">
+                                        <div ><h4> <strong>Loading...</strong></h4></div>
+                                        <div class="spinner-border blue ml-4" role="status"></div>
+                                    </div>
+                                </div> 
+                            </div>
             </div>
         );
     }

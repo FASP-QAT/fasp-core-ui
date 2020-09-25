@@ -8,6 +8,7 @@ import i18n from '../../i18n';
 import * as Yup from 'yup';
 import JiraTikcetService from '../../api/JiraTikcetService';
 import RealmService from '../../api/RealmService';
+import { LABEL_REGEX } from '../../Constants';
 
 const initialValues = {
     summary: "Add / Update Funding Source",
@@ -24,8 +25,10 @@ const validationSchema = function (values) {
         realmName: Yup.string()
             .required(i18n.t('static.common.realmtext')),
         fundingSourceName: Yup.string()
+            .matches(LABEL_REGEX, i18n.t('static.message.rolenamevalidtext'))
             .required(i18n.t('static.fundingsource.fundingsourcetext')),
         fundingSourceCode: Yup.string()
+            .matches(/^[a-zA-Z]+$/, i18n.t('static.common.alphabetsOnly'))
             .required(i18n.t('static.fundingsource.fundingsourceCodeText')),        
         // notes: Yup.string()
         //     .required(i18n.t('static.common.notestext'))
@@ -68,7 +71,8 @@ export default class FundingSourceTicketComponent extends Component {
             },
             message : '',
             realms: [],
-            realmId: ''
+            realmId: '',
+            loading: false
         }        
         this.dataChange = this.dataChange.bind(this);        
         this.resetClicked = this.resetClicked.bind(this);
@@ -175,16 +179,20 @@ export default class FundingSourceTicketComponent extends Component {
                 <h5 style={{ color: "green" }} id="div2">{i18n.t(this.state.message)}</h5>                
                 <h4>{i18n.t('static.fundingsource.fundingsource')}</h4>
                 <br></br>
+                <div style={{ display: this.state.loading ? "none" : "block" }}>
                 <Formik
                     initialValues={initialValues}
                     validate={validate(validationSchema)}
                     onSubmit={(values, { setSubmitting, setErrors }) => {   
+                        this.setState({
+                            loading: true
+                        })
                         JiraTikcetService.addEmailRequestIssue(this.state.fundingSource).then(response => {                                         
                             console.log("Response :",response.status, ":" ,JSON.stringify(response.data));
                             if (response.status == 200 || response.status == 201) {
                                 var msg = response.data.key;
                                 this.setState({
-                                    message: msg
+                                    message: msg, loading: false
                                 },
                                     () => {
                                         this.resetClicked();
@@ -193,7 +201,7 @@ export default class FundingSourceTicketComponent extends Component {
                             } else {
                                 this.setState({
                                     // message: response.data.messageCode
-                                    message: 'Error while creating query'
+                                    message: 'Error while creating query', loading: false
                                 },
                                     () => {
                                         this.resetClicked();
@@ -307,6 +315,15 @@ export default class FundingSourceTicketComponent extends Component {
                                     </ModalFooter>
                                 </Form>
                             )} />
+                            </div>
+                            <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                    <div class="align-items-center">
+                                        <div ><h4> <strong>Loading...</strong></h4></div>
+                                        <div class="spinner-border blue ml-4" role="status"></div>
+                                    </div>
+                                </div> 
+                            </div>
             </div>
         );
     }
