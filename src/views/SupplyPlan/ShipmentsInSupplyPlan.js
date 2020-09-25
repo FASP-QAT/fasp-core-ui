@@ -903,7 +903,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     positiveValidation("C", y, elInstance);
                     positiveValidation("D", y, elInstance);
                 }
-                console.log("rowData[1]",rowData[1])
+                console.log("rowData[1]", rowData[1])
                 if (rowData[16] == -1 && (rowData[1] == "" || rowData[1] == null || rowData[1] == undefined)) {
                     this.calculateLeadTimesOnChange(y);
                 }
@@ -2262,7 +2262,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     }
                 }
 
-                var validation = checkValidtion("text", "B", y, rowData[1], elInstance);
+                var validation = checkValidtion("date", "B", y, rowData[1], elInstance);
                 if (validation == false) {
                     valid = false;
                 }
