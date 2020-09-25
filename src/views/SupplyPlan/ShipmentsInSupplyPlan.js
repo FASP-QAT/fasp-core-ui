@@ -1729,53 +1729,70 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
     shipmentDatesChanged = function (instance, cell, x, y, value) {
         this.props.updateState("shipmentDatesError", "");
         this.props.updateState("shipmentDatesChangedFlag", 1);
+        console.log("In change")
         var elInstance = this.state.shipmentDatesTableEl;
         var shipmentInstance = "";
         var rowDataForDates = elInstance.getRowData(y);
         shipmentInstance = this.state.shipmentsEl;
         var rowData = shipmentInstance.getRowData(rowDataForDates[7]);
+        var shipmentStatus = rowData[0];
         if (x == 1) {
-            var valid = checkValidtion("date", "B", y, rowDataForDates[1], elInstance);
+            if (y == 1) {
+                var valid = checkValidtion("date", "B", y, rowDataForDates[1], elInstance);
+            }
         }
         if (x == 2) {
-            var valid = checkValidtion("date", "C", y, rowDataForDates[2], elInstance);
-            if (valid == true) {
-                if (moment(rowDataForDates[1]).format("YYYY-MM-DD") > moment(value).format("YYYY-MM-DD") && y != 0) {
-                    inValid("C", y, i18n.t('static.message.invaliddate'), elInstance);
-                } else {
+            if (y == 1 && shipmentStatus != PLANNED_SHIPMENT_STATUS) {
+                var valid = checkValidtion("date", "C", y, rowDataForDates[2], elInstance);
+                if (valid == true) {
+                    if (moment(rowDataForDates[1]).format("YYYY-MM-DD") > moment(value).format("YYYY-MM-DD") && y != 0) {
+                        inValid("C", y, i18n.t('static.message.invaliddate'), elInstance);
+                    } else {
+                    }
                 }
             }
         }
         if (x == 3) {
-            var valid = checkValidtion("date", "D", y, rowDataForDates[3], elInstance);
-            if (valid == true) {
-                if (moment(rowDataForDates[2]).format("YYYY-MM-DD") > moment(value).format("YYYY-MM-DD")) {
-                    inValid("D", y, i18n.t('static.message.invaliddate'), elInstance);
-                } else {
+            if (y == 1 && shipmentStatus != PLANNED_SHIPMENT_STATUS && shipmentStatus != SUBMITTED_SHIPMENT_STATUS) {
+                var valid = checkValidtion("date", "D", y, rowDataForDates[3], elInstance);
+                if (valid == true) {
+                    if (moment(rowDataForDates[2]).format("YYYY-MM-DD") > moment(value).format("YYYY-MM-DD")) {
+                        inValid("D", y, i18n.t('static.message.invaliddate'), elInstance);
+                    } else {
+                    }
                 }
             }
         }
         if (x == 4) {
-            var valid = checkValidtion("date", "E", y, rowDataForDates[4], elInstance);
-            if (valid == true) {
-                if (moment(rowDataForDates[3]).format("YYYY-MM-DD") > moment(value).format("YYYY-MM-DD")) {
-                    inValid("E", y, i18n.t('static.message.invaliddate'), elInstance);
-                } else {
+            if (y == 1 && shipmentStatus != PLANNED_SHIPMENT_STATUS && shipmentStatus != SUBMITTED_SHIPMENT_STATUS && shipmentStatus != APPROVED_SHIPMENT_STATUS) {
+                var valid = checkValidtion("date", "E", y, rowDataForDates[4], elInstance);
+                if (valid == true) {
+                    if (moment(rowDataForDates[3]).format("YYYY-MM-DD") > moment(value).format("YYYY-MM-DD")) {
+                        inValid("E", y, i18n.t('static.message.invaliddate'), elInstance);
+                    } else {
+                    }
                 }
             }
         }
         if (x == 5) {
-            var valid = checkValidtion("date", "F", y, rowDataForDates[5], elInstance);
-            if (valid == true) {
-                if (moment(rowDataForDates[4]).format("YYYY-MM-DD") > moment(value).format("YYYY-MM-DD")) {
-                    inValid("F", y, i18n.t('static.message.invaliddate'), elInstance);
-                } else {
+            if (shipmentStatus != PLANNED_SHIPMENT_STATUS && shipmentStatus != SUBMITTED_SHIPMENT_STATUS && shipmentStatus != APPROVED_SHIPMENT_STATUS && shipmentStatus != SHIPPED_SHIPMENT_STATUS) {
+                var valid = checkValidtion("date", "F", y, rowDataForDates[5], elInstance);
+                if (valid == true) {
+                    if (moment(rowDataForDates[4]).format("YYYY-MM-DD") > moment(value).format("YYYY-MM-DD")) {
+                        inValid("F", y, i18n.t('static.message.invaliddate'), elInstance);
+                    } else {
+                    }
                 }
             }
         }
         if (x == 6) {
             console.log(" in x 6")
-            var valid = checkValidtion("date", "G", y, rowDataForDates[6], elInstance);
+            if (y == 0) {
+                var valid = checkValidtion("date", "G", y, rowDataForDates[6], elInstance);
+            } else if (shipmentStatus != PLANNED_SHIPMENT_STATUS && shipmentStatus != SUBMITTED_SHIPMENT_STATUS && shipmentStatus != APPROVED_SHIPMENT_STATUS && shipmentStatus != SHIPPED_SHIPMENT_STATUS && shipmentStatus != ARRIVED_SHIPMENT_STATUS) {
+                var valid = checkValidtion("date", "G", y, rowDataForDates[6], elInstance);
+            }
+
             if (valid == true) {
                 console.log("In if")
                 if (y == 0) {
