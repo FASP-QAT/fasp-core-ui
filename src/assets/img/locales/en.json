@@ -979,7 +979,7 @@
     "static.report.forecastingtoPlanningUnitMultiplier": "Forecasting Unit to Planning Unit multiplier",
     "static.report.planningUnit": "Planning Unit",
     "static.report.min": "Min",
-    "static.report.reorderFrequencyInMonths": "Reorder Frequency",
+    "static.report.reorderFrequencyInMonths": "Reorder Frequency (months)",
     "static.report.shelfLife": "Shelf Life (months)",
     "static.report.procurementAgentName": "Procurement Agent",
     "static.report.planningUnit/ForecastingUnit": "Planning Unit/Forecasting Unit",

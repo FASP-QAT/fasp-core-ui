@@ -26,6 +26,8 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         this.checkValidationConsumption = this.checkValidationConsumption.bind(this);
         this.saveConsumption = this.saveConsumption.bind(this);
         this.showOnlyErrors = this.showOnlyErrors.bind(this);
+        this.addRowInJexcel = this.addRowInJexcel.bind(this);
+        this.addBatchRowInJexcel = this.addBatchRowInJexcel.bind(this)
         this.state = {
             consumptionEl: "",
             consumptionBatchInfoTableEl: ""
@@ -164,8 +166,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                     if (this.props.consumptionPage == "consumptionDataEntry") {
                         readonlyRegionAndMonth = false;
                     }
-
-
+                    var regionList = (this.props.items.regionList);
                     for (var j = 0; j < consumptionList.length; j++) {
                         data = [];
                         var consumptionFlag = 1;
@@ -203,17 +204,17 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                     if (consumptionList.length == 0) {
                         data = [];
                         if (this.props.consumptionPage != "consumptionDataEntry") {
-                            data[0] = moment(this.props.items.consumptionStartDate).endOf('month').format("YYYY-MM-DD"); //A
+                            data[0] = moment(this.props.items.consumptionStartDate).startOf('month').format("YYYY-MM-DD"); //A
                             data[1] = this.props.items.consumptionRegion; //B                        
                         } else {
                             data[0] = "";
-                            data[1] = "";
+                            data[1] = regionList.length == 1 ? regionList[0].id : "";
                         }
                         data[2] = "";
                         data[3] = ""; //C
-                        data[4] = ""; //D
+                        data[4] = realmCountryPlanningUnitList.length == 1 ? realmCountryPlanningUnitList[0].id : ""; //D
                         data[5] = ""; //E
-                        data[6] = ""; //F
+                        data[6] = realmCountryPlanningUnitList.length == 1 ? realmCountryPlanningUnitList[0].multiplier : "";; //F
                         data[7] = `=F${parseInt(0) + 1}*G${parseInt(0) + 1}`; //I
                         data[8] = "";
                         data[9] = "";
@@ -256,6 +257,8 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         allowManualInsertRow: false,
                         allowExport: false,
                         copyCompatibility: true,
+                        // filters: true,
+                        // license: 'NjBkYTU0YmJhMDI5MzUzODc3ZmY0OTg2NjFiYjQ4ZmQ4YTgxZjlmMGIxOTI5M2RiZTI5NGIyYzJkMDhmNDYwN2Y0NzFmNmFjYzEyNzZmNGJhN2ZiZjVjOTk0ZjFiMzc2ZTEyZjU5YTY2MzUwZGI1MjNiMDVjNThkNGIyNzY5NzgsZXlKdVlXMWxJam9pUVd0cGJDQk5ZV2hwYlhkaGJHRWlMQ0prWVhSbElqb3hOakF6TkRBM05qQXdMQ0prYjIxaGFXNGlPbHNpYkc5allXeG9iM04wSWl3aWJHOWpZV3hvYjNOMElsMHNJbkJzWVc0aU9qQjk=',
                         text: {
                             // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
                             showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
@@ -395,14 +398,8 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                                                         items.push({
                                                             title: i18n.t('static.supplyPlan.addNewBatchInfo'),
                                                             onclick: function () {
-                                                                var data = [];
-                                                                data[0] = "";
-                                                                data[1] = ""
-                                                                data[2] = "";
-                                                                data[3] = 0;
-                                                                data[4] = y;
-                                                                obj.insertRow(data);
-                                                            }
+                                                                this.addBatchRowInJexcel()
+                                                            }.bind(this)
                                                         });
                                                     }
                                                     if (obj.options.allowDeleteRow == true && obj.getJson().length > 1) {
@@ -441,38 +438,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                                         items.push({
                                             title: i18n.t('static.supplyPlan.addNewConsumption'),
                                             onclick: function () {
-                                                var json = obj.getJson();
-                                                var map = new Map(Object.entries(json[0]));
-                                                var data = [];
-                                                if (this.props.consumptionPage != "consumptionDataEntry") {
-                                                    data[0] = moment(this.props.items.consumptionStartDate).endOf('month').format("YYYY-MM-DD"); //A
-                                                    data[1] = this.props.items.consumptionRegion; //B                        
-                                                } else {
-                                                    data[0] = "";
-                                                    data[1] = "";
-                                                }
-                                                data[2] = "";
-                                                data[3] = ""; //C
-                                                data[4] = ""; //D
-                                                data[5] = ""; //E
-                                                data[6] = ""; //F
-                                                data[7] = `=F${parseInt(json.length) + 1}*G${parseInt(json.length) + 1}`; //I
-                                                data[8] = "";
-                                                data[9] = "";
-                                                data[10] = true;
-                                                data[11] = "";
-                                                data[12] = -1;
-                                                data[13] = 1;
-                                                data[14] = 0;
-                                                obj.insertRow(data);
-                                                if (this.props.consumptionPage == "consumptionDataEntry") {
-                                                    var showOption = (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
-                                                    console.log("showOption", showOption);
-                                                    if (showOption != 5000000) {
-                                                        var pageNo = parseInt(parseInt(json.length) / parseInt(showOption));
-                                                        obj.page(pageNo);
-                                                    }
-                                                }
+                                                this.addRowInJexcel()
                                             }.bind(this)
                                         });
                                     }
@@ -503,6 +469,56 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                 }.bind(this)
             }.bind(this)
         }.bind(this);
+    }
+
+    addRowInJexcel() {
+        var obj = this.state.consumptionEl;
+        var json = obj.getJson();
+        var regionList = (this.props.items.regionList);
+        var realmCountryPlanningUnitList = this.state.realmCountryPlanningUnitList;
+        var data = [];
+        if (this.props.consumptionPage != "consumptionDataEntry") {
+            data[0] = moment(this.props.items.consumptionStartDate).startOf('month').format("YYYY-MM-DD"); //A
+            data[1] = this.props.items.consumptionRegion; //B                        
+        } else {
+            data[0] = "";
+            data[1] = regionList.length == 1 ? regionList[0].id : "";
+        }
+        data[2] = "";
+        data[3] = ""; //C
+        data[4] = realmCountryPlanningUnitList.length == 1 ? realmCountryPlanningUnitList[0].id : ""; //D
+        data[5] = ""; //E
+        data[6] = realmCountryPlanningUnitList.length == 1 ? realmCountryPlanningUnitList[0].multiplier : "";; //F
+        data[7] = `=F${parseInt(json.length) + 1}*G${parseInt(json.length) + 1}`; //I
+        data[8] = "";
+        data[9] = "";
+        data[10] = true;
+        data[11] = "";
+        data[12] = -1;
+        data[13] = 1;
+        data[14] = 0;
+        obj.insertRow(data);
+        if (this.props.consumptionPage == "consumptionDataEntry") {
+            var showOption = (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+            console.log("showOption", showOption);
+            if (showOption != 5000000) {
+                var pageNo = parseInt(parseInt(json.length) / parseInt(showOption));
+                obj.page(pageNo);
+            }
+        }
+    }
+
+    addBatchRowInJexcel() {
+        var obj = this.state.consumptionBatchInfoTableEl;
+        var rowData = obj.getRowData(0);
+        var data = [];
+        data[0] = "";
+        data[1] = ""
+        data[2] = "";
+        data[3] = 0;
+        data[4] = rowData[4];
+        data[5] = rowData[5];
+        obj.insertRow(data);
     }
 
     loadedConsumption = function (instance, cell, x, y, value) {
@@ -543,30 +559,17 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         this.props.updateState("consumptionError", "");
         this.props.updateState("consumptionDuplicateError", "");
         this.props.updateState("consumptionChangedFlag", 1);
-        if (x != 13 && x != 14) {
-            elInstance.setValueFromCoords(14, y, 0, true);
-
-        }
-        if (x != 13) {
+        if (x != 13 && rowData[13] != 1) {
             elInstance.setValueFromCoords(13, y, 1, true);
         }
         if (x == 0) {
             var valid = checkValidtion("date", "A", y, rowData[0], elInstance);
-            if (valid == false) {
-                elInstance.setValueFromCoords(14, y, 1, true);
-            }
         }
         if (x == 1) {
             var valid = checkValidtion("text", "B", y, rowData[1], elInstance);
-            if (valid == false) {
-                elInstance.setValueFromCoords(14, y, 1, true);
-            }
         }
         if (x == 3) {
             var valid = checkValidtion("text", "D", y, rowData[3], elInstance);
-            if (valid == false) {
-                elInstance.setValueFromCoords(14, y, 1, true);
-            }
         }
         if (x == 4) {
             elInstance.setValueFromCoords(6, y, "", true);
@@ -574,22 +577,14 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             if (valid == true) {
                 var multiplier = (this.state.realmCountryPlanningUnitList.filter(c => c.id == rowData[4])[0]).multiplier;
                 elInstance.setValueFromCoords(6, y, multiplier, true);
-            } else {
-                elInstance.setValueFromCoords(14, y, 1, true);
             }
         }
         if (x == 5) {
             var valid = checkValidtion("number", "F", y, rowData[5], elInstance, INTEGER_NO_REGEX, 1, 1);
-            if (valid == false) {
-                elInstance.setValueFromCoords(14, y, 1, true);
-            }
         }
 
         if (x == 8) {
             var valid = checkValidtion("numberNotRequired", "I", y, rowData[8], elInstance, INTEGER_NO_REGEX, 1, 1);
-            if (valid == false) {
-                elInstance.setValueFromCoords(14, y, 1, true);
-            }
         }
         if (x == 2) {
             var dataSource = rowData[3];
@@ -604,9 +599,6 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             }
             elInstance.setValueFromCoords(11, y, "", true);
             var valid = checkValidtion("text", "C", y, rowData[2], elInstance);
-            if (valid == false) {
-                elInstance.setValueFromCoords(14, y, 1, true);
-            }
         }
         // this.showOnlyErrors();
     }

@@ -261,8 +261,8 @@ export default class SupplyPlanComponent extends React.Component {
 
     exportCSV = () => {
         var csvRow = [];
-        csvRow.push(i18n.t('static.program.program') + ' , ' + ((document.getElementById("programId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
-        csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+        csvRow.push(i18n.t('static.program.program') + ' , ' + ((this.props.items.programSelect.label).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+        csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((this.props.items.planningUnitName).replaceAll(',', '%20')).replaceAll(' ', '%20'))
         csvRow.push('')
         csvRow.push('')
         csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
@@ -381,10 +381,11 @@ export default class SupplyPlanComponent extends React.Component {
                 })
                 if (i == 1) {
                     doc.setFontSize(8)
-                    doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 80, {
+                    doc.setFont('helvetica', 'normal')
+                    doc.text(i18n.t('static.program.program') + ' : ' + (this.props.items.programSelect.label), doc.internal.pageSize.width / 8, 80, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 90, {
+                    doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + (this.props.items.planningUnitName), doc.internal.pageSize.width / 8, 90, {
                         align: 'left'
                     })
                 }
@@ -806,9 +807,9 @@ export default class SupplyPlanComponent extends React.Component {
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                     var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                                     paColor = procurementAgent.colorHtmlCode;
-                                                    var index = paColors.findIndex(c => c.color ==  paColor);
+                                                    var index = paColors.findIndex(c => c.color == paColor);
                                                     if (index == -1) {
-                                                        paColors.push({ color:  paColor, text: procurementAgent.procurementAgentCode })
+                                                        paColors.push({ color: paColor, text: procurementAgent.procurementAgentCode })
                                                     }
                                                 } else {
                                                     if (shipmentDetails[i].procurementAgent.id != "") {
@@ -829,9 +830,9 @@ export default class SupplyPlanComponent extends React.Component {
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                     var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                                     paColor = procurementAgent.colorHtmlCode;
-                                                    var index = paColors.findIndex(c => c.color ==  paColor);
+                                                    var index = paColors.findIndex(c => c.color == paColor);
                                                     if (index == -1) {
-                                                        paColors.push({ color:  paColor, text: procurementAgent.procurementAgentCode })
+                                                        paColors.push({ color: paColor, text: procurementAgent.procurementAgentCode })
                                                     }
                                                 } else {
                                                     if (shipmentDetails[i].procurementAgent.id != "") {
@@ -852,9 +853,9 @@ export default class SupplyPlanComponent extends React.Component {
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                     var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                                     paColor = procurementAgent.colorHtmlCode;
-                                                    var index = paColors.findIndex(c => c.color ==  paColor);
+                                                    var index = paColors.findIndex(c => c.color == paColor);
                                                     if (index == -1) {
-                                                        paColors.push({ color:  paColor, text: procurementAgent.procurementAgentCode })
+                                                        paColors.push({ color: paColor, text: procurementAgent.procurementAgentCode })
                                                     }
                                                 } else {
                                                     if (shipmentDetails[i].procurementAgent.id != "") {
@@ -875,9 +876,9 @@ export default class SupplyPlanComponent extends React.Component {
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                     var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                                     paColor = procurementAgent.colorHtmlCode;
-                                                    var index = paColors.findIndex(c => c.color ==  paColor);
+                                                    var index = paColors.findIndex(c => c.color == paColor);
                                                     if (index == -1) {
-                                                        paColors.push({ color:  paColor, text: procurementAgent.procurementAgentCode })
+                                                        paColors.push({ color: paColor, text: procurementAgent.procurementAgentCode })
                                                     }
                                                 } else {
                                                     if (shipmentDetails[i].procurementAgent.id != "") {
@@ -952,9 +953,9 @@ export default class SupplyPlanComponent extends React.Component {
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                     var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                                     paColor = procurementAgent.colorHtmlCode;
-                                                    var index = paColors.findIndex(c => c.color ==  paColor);
+                                                    var index = paColors.findIndex(c => c.color == paColor);
                                                     if (index == -1) {
-                                                        paColors.push({ color:  paColor, text: procurementAgent.procurementAgentCode })
+                                                        paColors.push({ color: paColor, text: procurementAgent.procurementAgentCode })
                                                     }
                                                 } else {
                                                     if (shipmentDetails[i].procurementAgent.id != "") {
@@ -975,9 +976,9 @@ export default class SupplyPlanComponent extends React.Component {
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                     var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                                     paColor = procurementAgent.colorHtmlCode;
-                                                    var index = paColors.findIndex(c => c.color ==  paColor);
+                                                    var index = paColors.findIndex(c => c.color == paColor);
                                                     if (index == -1) {
-                                                        paColors.push({ color:  paColor, text: procurementAgent.procurementAgentCode })
+                                                        paColors.push({ color: paColor, text: procurementAgent.procurementAgentCode })
                                                     }
                                                 } else {
                                                     if (shipmentDetails[i].procurementAgent.id != "") {
@@ -998,9 +999,9 @@ export default class SupplyPlanComponent extends React.Component {
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                     var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                                     paColor = procurementAgent.colorHtmlCode;
-                                                    var index = paColors.findIndex(c => c.color ==  paColor);
+                                                    var index = paColors.findIndex(c => c.color == paColor);
                                                     if (index == -1) {
-                                                        paColors.push({ color:  paColor, text: procurementAgent.procurementAgentCode })
+                                                        paColors.push({ color: paColor, text: procurementAgent.procurementAgentCode })
                                                     }
                                                 } else {
                                                     if (shipmentDetails[i].procurementAgent.id != "") {
@@ -1021,9 +1022,9 @@ export default class SupplyPlanComponent extends React.Component {
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                     var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                                     paColor = procurementAgent.colorHtmlCode;
-                                                    var index = paColors.findIndex(c => c.color ==  paColor);
+                                                    var index = paColors.findIndex(c => c.color == paColor);
                                                     if (index == -1) {
-                                                        paColors.push({ color:  paColor, text: procurementAgent.procurementAgentCode })
+                                                        paColors.push({ color: paColor, text: procurementAgent.procurementAgentCode })
                                                     }
                                                 } else {
                                                     if (shipmentDetails[i].procurementAgent.id != "") {
@@ -1205,7 +1206,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         inventoryArrayForRegion.push({ "regionId": regionListFiltered[r].id, "adjustmentsQty": adjustmentsQtyForRegion, "actualQty": actualQtyForRegion, "month": m[n] })
                                     }
                                     consumptionArrayForRegion.push({ "regionId": -1, "qty": consumptionTotalForRegion, "actualFlag": true, "month": m[n] })
-                                    
+
                                     var projectedInventoryForRegion = jsonList[0].closingBalance - (jsonList[0].nationalAdjustment != "" ? jsonList[0].nationalAdjustment : 0);
                                     console.log("project Inventory", projectedInventoryForRegion);
                                     if (regionsReportingActualInventory.length != totalNoOfRegions) {
@@ -1325,6 +1326,7 @@ export default class SupplyPlanComponent extends React.Component {
 
 
     toggleLarge(supplyPlanType, month, quantity, startDate, endDate, isEmergencyOrder, shipmentType) {
+        console.log("Aupplu plan type", supplyPlanType);
         var supplyPlanType = supplyPlanType;
         this.setState({
             consumptionError: '',
@@ -1365,6 +1367,7 @@ export default class SupplyPlanComponent extends React.Component {
 
         })
         if (supplyPlanType == 'Consumption') {
+            console.log("In consumption");
             var monthCountConsumption = this.state.monthCount;
             this.setState({
                 consumption: !this.state.consumption,
@@ -2156,7 +2159,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                                 return (<td align="right" style={{ color: 'rgb(170, 85, 161)' }} className="hoverTd" onClick={() => this.consumptionDetailsClicked(`${item1.month.startDate}`, `${item1.month.endDate}`, `${item1.regionId}`, `${item1.actualFlag}`, `${item1.month.month}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                                             }
                                                         } else {
-                                                            return (<td align="right" className="hoverTd" onClick={() => this.consumptionDetailsClicked(`${item1.month.startDate}`, `${item1.month.endDate}`, `${item1.regionId}`, ``, `${item1.month.month}`)}></td>)
+                                                            return (<td align="right"></td>)
                                                         }
                                                     })
                                                 }
@@ -2261,53 +2264,22 @@ export default class SupplyPlanComponent extends React.Component {
                                                                     </>
                                                                 )
                                                             } else if (item1.adjustmentsQty.toString() != '' && (item1.actualQty.toString() == "" || item1.actualQty.toString() == 0)) {
-                                                                var lastActualConsumptionDate = moment(((this.state.lastActualConsumptionDateArr.filter(c => item1.regionId == c.region))[0]).lastActualConsumptionDate).format("YYYY-MM");
-                                                                var currentMonthDate = moment(item1.month.startDate).format("YYYY-MM");
-                                                                if (currentMonthDate > lastActualConsumptionDate) {
-                                                                    return (
-                                                                        <>
-                                                                            <td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 2)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.adjustmentsQty} /></td>
-                                                                            <td align="right"></td>
-                                                                        </>
-                                                                    )
-                                                                } else {
-                                                                    return (
-                                                                        <>
-                                                                            <td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 2)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.adjustmentsQty} /></td>
-                                                                            <td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 1)}></td>
-                                                                        </>
-                                                                    )
-                                                                }
-
+                                                                return (
+                                                                    <>
+                                                                        <td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 2)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.adjustmentsQty} /></td>
+                                                                        <td align="right"></td>
+                                                                    </>
+                                                                )
                                                             } else if (item1.adjustmentsQty.toString() == '' && (item1.actualQty.toString() != "" || item1.actualQty.toString() != 0)) {
-                                                                var lastActualConsumptionDate = moment(((this.state.lastActualConsumptionDateArr.filter(c => item1.regionId == c.region))[0]).lastActualConsumptionDate).format("YYYY-MM");
-                                                                var currentMonthDate = moment(item1.month.startDate).format("YYYY-MM");
-                                                                if (currentMonthDate > lastActualConsumptionDate) {
-                                                                    return (
-                                                                        <>
-                                                                            <td align="right"></td>
-                                                                            <td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 1)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.actualQty} /></td>
+                                                                return (
+                                                                    <>
+                                                                        <td align="right"></td>
+                                                                        <td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 1)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.actualQty} /></td>
 
-                                                                        </>
-                                                                    )
-                                                                } else {
-                                                                    return (
-                                                                        <>
-                                                                            <td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 2)}></td>
-                                                                            <td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 1)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.actualQty} /></td>
-                                                                        </>
-                                                                    )
-                                                                }
+                                                                    </>
+                                                                )
                                                             } else {
-                                                                var lastActualConsumptionDate = moment(((this.state.lastActualConsumptionDateArr.filter(c => item1.regionId == c.region))[0]).lastActualConsumptionDate).format("YYYY-MM");
-                                                                var currentMonthDate = moment(item1.month.startDate).format("YYYY-MM");
-                                                                if (currentMonthDate > lastActualConsumptionDate) {
-                                                                    return (<><td align="right"></td><td align="right"></td></>)
-                                                                } else {
-                                                                    return (<><td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 2)}></td>
-                                                                        <td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 1)}></td>
-                                                                    </>)
-                                                                }
+                                                                return (<><td align="right"></td><td align="right"></td></>)
                                                             }
                                                         }
                                                     })
@@ -2414,7 +2386,7 @@ export default class SupplyPlanComponent extends React.Component {
                 <Modal isOpen={this.state.shipments}
                     className={'modal-lg ' + this.props.className, "modalWidth"}>
                     <ModalHeader toggle={() => this.toggleLarge('shipments')} className="modalHeaderSupplyPlan">
-                        <strong>{i18n.t('static.supplyPlan.shipmentsDetails')} -  {i18n.t('static.planningunit.planningunit')} - {this.state.planningUnitName} </strong>
+                        <strong>{i18n.t('static.supplyPlan.shipmentsDetails')} -  {i18n.t('static.planningunit.planningunit')} - {this.props.items.planningUnitName} </strong>
                         <ul className="legendcommitversion list-group" style={{ display: 'inline-flex' }}>
                             <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyOrder')}</span></li>
                             <li><span className=" greylegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.doNotIncludeInProjectedShipment')} </span></li>
