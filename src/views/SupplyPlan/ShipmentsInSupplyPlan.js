@@ -903,7 +903,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     positiveValidation("C", y, elInstance);
                     positiveValidation("D", y, elInstance);
                 }
-                if (rowData[16] == -1 && rowData[1] != "" && rowData[1] != null && rowData[1] != undefined) {
+                console.log("rowData[1]",rowData[1])
+                if (rowData[16] == -1 && (rowData[1] == "" || rowData[1] == null || rowData[1] == undefined)) {
                     this.calculateLeadTimesOnChange(y);
                 }
 
@@ -959,7 +960,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         elInstance.setValueFromCoords(10, y, pricePerUnit, true);
                     }
                 }
-                if (rowData[16] == -1 && rowData[1] != "" && rowData[1] != null && rowData[1] != undefined) {
+                if (rowData[16] == -1 && (rowData[1] == "" || rowData[1] == null || rowData[1] == undefined)) {
                     this.calculateLeadTimesOnChange(y);
                 }
             } else {
@@ -1031,7 +1032,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         elInstance.setValueFromCoords(12, y, freightCost.toFixed(2), true);
                     }
                 }
-                if (rowData[16] == -1 && rowData[1] != "" && rowData[1] != null && rowData[1] != undefined) {
+                if (rowData[16] == -1 && (rowData[1] == "" || rowData[1] == null || rowData[1] == undefined)) {
                     this.calculateLeadTimesOnChange(y);
                 }
             } else {
@@ -2259,6 +2260,11 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             positiveValidation("D", y, elInstance);
                         }
                     }
+                }
+
+                var validation = checkValidtion("text", "B", y, rowData[1], elInstance);
+                if (validation == false) {
+                    valid = false;
                 }
 
                 var validation = checkValidtion("text", "G", y, rowData[6], elInstance);
