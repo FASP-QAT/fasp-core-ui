@@ -38,8 +38,8 @@ export default class ConsumptionDetails extends React.Component {
             showConsumption: 0,
             consumptionChangedFlag: 0,
             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth()+2 },
-            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth()  },
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
+            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() },
         }
 
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
@@ -472,7 +472,7 @@ export default class ConsumptionDetails extends React.Component {
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
-                            <div ><h4> <strong>Loading...</strong></h4></div>
+                            <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
 
                             <div class="spinner-border blue ml-4" role="status">
 
