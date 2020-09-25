@@ -903,7 +903,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     positiveValidation("C", y, elInstance);
                     positiveValidation("D", y, elInstance);
                 }
-                if (rowData[16] == -1) {
+                if (rowData[16] == -1 && rowData[1] != "" && rowData[1] != null && rowData[1] != undefined) {
                     this.calculateLeadTimesOnChange(y);
                 }
 
@@ -959,7 +959,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         elInstance.setValueFromCoords(10, y, pricePerUnit, true);
                     }
                 }
-                if (rowData[16] == -1) {
+                if (rowData[16] == -1 && rowData[1] != "" && rowData[1] != null && rowData[1] != undefined) {
                     this.calculateLeadTimesOnChange(y);
                 }
             } else {
@@ -1031,7 +1031,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         elInstance.setValueFromCoords(12, y, freightCost.toFixed(2), true);
                     }
                 }
-                if (rowData[16] == -1) {
+                if (rowData[16] == -1 && rowData[1] != "" && rowData[1] != null && rowData[1] != undefined) {
                     this.calculateLeadTimesOnChange(y);
                 }
             } else {
@@ -2042,7 +2042,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         var y = 1;
         var rowData = elInstance.getRowData(y);
 
-        
+
         var validation = checkValidtion("date", "G", y, rowData[6], elInstance);
         if (validation == false) {
             valid = false;
