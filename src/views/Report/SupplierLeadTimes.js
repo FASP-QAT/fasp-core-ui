@@ -1483,7 +1483,9 @@ class SupplierLeadTimes extends Component {
         })
     }
 
-
+    addDoubleQuoteToRowContent=(arr)=>{
+        return arr.map(ele=>'"'+ele+'"')
+     }
 
     exportCSV(columns) {
         var csvRow = [];
@@ -1516,11 +1518,11 @@ class SupplierLeadTimes extends Component {
         csvRow.push('')
         const headers = [];
         columns.map((item, idx) => { headers[idx] = ((item.text).replaceAll(' ', '%20')) });
-        var A = [headers];
+        var A = [this.addDoubleQuoteToRowContent(headers)];
 
         console.log("output list--->", this.state.outPutList);
         this.state.outPutList.map(
-            ele => A.push([
+            ele => A.push(this.addDoubleQuoteToRowContent([
               //  (getLabelText(ele.country.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
                 (getLabelText(ele.program.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
                 (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
@@ -1540,7 +1542,7 @@ class SupplierLeadTimes extends Component {
                 // ele.stockAdjustemntQty,
                 // ele.lastModifiedBy.username,
                 // new moment(ele.lastModifiedDate).format('MMM-DD-YYYY'), ele.notes
-            ]));
+            ])));
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
         }

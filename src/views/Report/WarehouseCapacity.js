@@ -588,6 +588,9 @@ class warehouseCapacity extends Component {
     formatLabel(cell, row) {
         return getLabelText(cell, this.state.lang);
     }
+    addDoubleQuoteToRowContent=(arr)=>{
+        return arr.map(ele=>'"'+ele+'"')
+     }
 
     exportCSV() {
 
@@ -608,16 +611,16 @@ class warehouseCapacity extends Component {
         csvRow.push('')
 
         var re;
-        var A = [[(i18n.t('static.region.country')).replaceAll(' ', '%20'), (i18n.t('static.region.region')).replaceAll(' ', '%20'), (i18n.t('static.program.program')).replaceAll(' ', '%20'), (i18n.t('static.region.gln')).replaceAll(' ', '%20'), (i18n.t('static.region.capacitycbm')).replaceAll(' ', '%20')]]
+        var A = [this.addDoubleQuoteToRowContent([(i18n.t('static.region.country')).replaceAll(' ', '%20'), (i18n.t('static.region.region')).replaceAll(' ', '%20'), (i18n.t('static.program.program')).replaceAll(' ', '%20'), (i18n.t('static.region.gln')).replaceAll(' ', '%20'), (i18n.t('static.region.capacitycbm')).replaceAll(' ', '%20')])]
 
         re = this.state.data;
         // console.log("DATA--------",re);
 
         for (var item = 0; item < re.length; item++) {
             // A.push([(getLabelText(re[item].realmCountry.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),(getLabelText(re[item].region.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),(getLabelText(re[item].programList.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),re[item].gln, re[item].capacityCbm])
-            A.push([(getLabelText(re[item].realmCountry.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(re[item].region.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(re[item].programList[0].label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), re[item].gln, re[item].capacityCbm])
+            A.push(this.addDoubleQuoteToRowContent([(getLabelText(re[item].realmCountry.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(re[item].region.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(re[item].programList[0].label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), re[item].gln, re[item].capacityCbm]))
             for (var item1 = 1; item1 < re[item].programList.length; item1++) {
-                A.push(['', '', (getLabelText(re[item].programList[item1].label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), '', ''])
+                A.push(this.addDoubleQuoteToRowContent(['', '', (getLabelText(re[item].programList[item1].label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), '', '']))
             }
         }
 
