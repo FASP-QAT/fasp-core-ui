@@ -2696,8 +2696,8 @@ class ShipmentGlobalDemandView extends Component {
         ProductService.getProductCategoryList(realmId)
             .then(response => {
                 // console.log(response.data)
-                // var list = response.data.slice(1);
-                var list = response.data;
+                var list = response.data.slice(1);
+                // var list = response.data;
                 this.setState({
                     productCategories: list, loading: false
                 })

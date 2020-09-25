@@ -11,7 +11,7 @@ import DimensionService from '../../api/DimensionService.js';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { SPACE_REGEX } from '../../Constants.js';
-
+ 
 const initialValues = {
     label: ""
 }
@@ -19,9 +19,10 @@ const entityname = i18n.t('static.dimension.dimension');
 const validationSchema = function (values) {
     return Yup.object().shape({
         label: Yup.string()
-            .matches(SPACE_REGEX, i18n.t('static.message.spacetext'))
-            .required('Please enter Dimension')
-    })
+            // .matches(SPACE_REGEX, i18n.t('static.message.spacetext'))
+            .matches(/^\S+(?: \S+)*$/,i18n.t('static.validSpace.string'))
+            .required(i18n.t('static.dimension.dimensiontext'))
+    }) 
 }
 
 const validate = (getValidationSchema) => {

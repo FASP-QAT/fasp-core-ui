@@ -380,7 +380,7 @@ export default class AddInventory extends Component {
                 <h5 className={this.state.color} id="div1">{i18n.t(this.state.message, { entityname }) || this.state.supplyPlanError}</h5>
                 <h5 className="red" id="div2">{this.state.inventoryDuplicateError || this.state.inventoryNoStockError || this.state.inventoryError}</h5>
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
-                    <CardBody className="pb-lg-5 pt-lg-2" >
+                    <CardBody className="pb-lg-2 pt-lg-2" >
                         <Formik
                             render={
                                 ({

@@ -1500,9 +1500,9 @@ export default class WhatIfReportComponent extends React.Component {
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                     var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                                     paColor = procurementAgent.colorHtmlCode;
-                                                    var index = paColors.findIndex(c => c.color == "#" + paColor);
+                                                    var index = paColors.findIndex(c => c.color ==  paColor);
                                                     if (index == -1) {
-                                                        paColors.push({ color: "#" + paColor, text: procurementAgent.procurementAgentCode })
+                                                        paColors.push({ color:  paColor, text: procurementAgent.procurementAgentCode })
                                                     }
                                                 } else {
                                                     if (shipmentDetails[i].procurementAgent.id != "") {
@@ -1523,9 +1523,9 @@ export default class WhatIfReportComponent extends React.Component {
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                     var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                                     paColor = procurementAgent.colorHtmlCode;
-                                                    var index = paColors.findIndex(c => c.color == "#" + paColor);
+                                                    var index = paColors.findIndex(c => c.color ==  paColor);
                                                     if (index == -1) {
-                                                        paColors.push({ color: "#" + paColor, text: procurementAgent.procurementAgentCode })
+                                                        paColors.push({ color:  paColor, text: procurementAgent.procurementAgentCode })
                                                     }
                                                 } else {
                                                     if (shipmentDetails[i].procurementAgent.id != "") {
@@ -1546,9 +1546,9 @@ export default class WhatIfReportComponent extends React.Component {
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                     var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                                     paColor = procurementAgent.colorHtmlCode;
-                                                    var index = paColors.findIndex(c => c.color == "#" + paColor);
+                                                    var index = paColors.findIndex(c => c.color ==  paColor);
                                                     if (index == -1) {
-                                                        paColors.push({ color: "#" + paColor, text: procurementAgent.procurementAgentCode })
+                                                        paColors.push({ color:  paColor, text: procurementAgent.procurementAgentCode })
                                                     }
                                                 } else {
                                                     if (shipmentDetails[i].procurementAgent.id != "") {
@@ -1569,9 +1569,9 @@ export default class WhatIfReportComponent extends React.Component {
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                     var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                                     paColor = procurementAgent.colorHtmlCode;
-                                                    var index = paColors.findIndex(c => c.color == "#" + paColor);
+                                                    var index = paColors.findIndex(c => c.color ==  paColor);
                                                     if (index == -1) {
-                                                        paColors.push({ color: "#" + paColor, text: procurementAgent.procurementAgentCode })
+                                                        paColors.push({ color:  paColor, text: procurementAgent.procurementAgentCode })
                                                     }
                                                 } else {
                                                     if (shipmentDetails[i].procurementAgent.id != "") {
@@ -1646,9 +1646,9 @@ export default class WhatIfReportComponent extends React.Component {
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                     var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                                     paColor = procurementAgent.colorHtmlCode;
-                                                    var index = paColors.findIndex(c => c.color == "#" + paColor);
+                                                    var index = paColors.findIndex(c => c.color ==  paColor);
                                                     if (index == -1) {
-                                                        paColors.push({ color: "#" + paColor, text: procurementAgent.procurementAgentCode })
+                                                        paColors.push({ color:  paColor, text: procurementAgent.procurementAgentCode })
                                                     }
                                                 } else {
                                                     if (shipmentDetails[i].procurementAgent.id != "") {
@@ -1669,9 +1669,9 @@ export default class WhatIfReportComponent extends React.Component {
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                     var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                                     paColor = procurementAgent.colorHtmlCode;
-                                                    var index = paColors.findIndex(c => c.color == "#" + paColor);
+                                                    var index = paColors.findIndex(c => c.color ==  paColor);
                                                     if (index == -1) {
-                                                        paColors.push({ color: "#" + paColor, text: procurementAgent.procurementAgentCode })
+                                                        paColors.push({ color:  paColor, text: procurementAgent.procurementAgentCode })
                                                     }
                                                 } else {
                                                     if (shipmentDetails[i].procurementAgent.id != "") {
@@ -1692,9 +1692,9 @@ export default class WhatIfReportComponent extends React.Component {
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                     var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                                     paColor = procurementAgent.colorHtmlCode;
-                                                    var index = paColors.findIndex(c => c.color == "#" + paColor);
+                                                    var index = paColors.findIndex(c => c.color ==  paColor);
                                                     if (index == -1) {
-                                                        paColors.push({ color: "#" + paColor, text: procurementAgent.procurementAgentCode })
+                                                        paColors.push({ color:  paColor, text: procurementAgent.procurementAgentCode })
                                                     }
                                                 } else {
                                                     if (shipmentDetails[i].procurementAgent.id != "") {
@@ -1715,9 +1715,9 @@ export default class WhatIfReportComponent extends React.Component {
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                     var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                                     paColor = procurementAgent.colorHtmlCode;
-                                                    var index = paColors.findIndex(c => c.color == "#" + paColor);
+                                                    var index = paColors.findIndex(c => c.color ==  paColor);
                                                     if (index == -1) {
-                                                        paColors.push({ color: "#" + paColor, text: procurementAgent.procurementAgentCode })
+                                                        paColors.push({ color:  paColor, text: procurementAgent.procurementAgentCode })
                                                     }
                                                 } else {
                                                     if (shipmentDetails[i].procurementAgent.id != "") {

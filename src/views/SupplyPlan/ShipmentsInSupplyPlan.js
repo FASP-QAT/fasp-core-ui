@@ -374,7 +374,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             data[7] = "";
                                             data[8] = 0;
                                             data[9] = "";
-                                            data[10] = "";
+                                            data[10] = this.props.items.catalogPrice;
                                             data[11] = `=ROUND(K${parseInt(0) + 1}*I${parseInt(0) + 1},2)`;
                                             data[12] = "";
                                             data[13] = "";
@@ -474,7 +474,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                         data[7] = "";
                                                         data[8] = 0;
                                                         data[9] = "";
-                                                        data[10] = "";
+                                                        data[10] = this.props.items.catalogPrice;
                                                         data[11] = `=ROUND(K${parseInt(json.length) + 1}*I${parseInt(json.length) + 1},2)`;
                                                         data[12] = "";
                                                         data[13] = "";
@@ -828,6 +828,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                             data[5] = arrivedDate;
                                                             data[6] = receivedDate;
                                                             data[7] = y;
+                                                            data[8] = i18n.t("static.consumption.actual")
                                                             json.push(data);
                                                             data = [];
                                                             data[0] = i18n.t("static.supplyPlan.estimated")
@@ -838,15 +839,16 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                             data[5] = expectedArrivedDate;
                                                             data[6] = expectedDeliveryDate;
                                                             data[7] = y;
+                                                            data[8] = i18n.t("static.supplyPlan.estimated")
                                                             json.push(data);
                                                             var options = {
                                                                 data: json,
                                                                 columnDrag: true,
-                                                                colWidths: [80, 100, 100, 100, 100, 100, 100],
+                                                                colWidths: [80, 100, 100, 100, 100, 100, 100, 0, 80],
                                                                 columns: [
                                                                     {
                                                                         title: i18n.t('static.supplyPlan.type'),
-                                                                        type: 'text',
+                                                                        type: 'hidden',
                                                                         readOnly: true
                                                                     },
                                                                     {
@@ -900,7 +902,12 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                     {
                                                                         title: i18n.t('static.supplyPlan.rowNumber'),
                                                                         type: 'hidden',
-                                                                    }
+                                                                    },
+                                                                    {
+                                                                        title: i18n.t('static.supplyPlan.type'),
+                                                                        type: 'text',
+                                                                        readOnly: true
+                                                                    },
                                                                 ],
                                                                 pagination: false,
                                                                 search: false,
@@ -2092,6 +2099,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         if (x == 18) {
             if (value != 0) {
                 var adjustedQty = ((elInstance.getCell(`I${parseInt(y) + 1}`)).innerHTML).toString().replaceAll("\,", "");
+                console.log("Adjusted Qty", adjustedQty);
+                console.log("Value", value);
                 if (value != adjustedQty) {
                     inValid("I", y, i18n.t('static.supplyPlan.batchNumberMissing'), elInstance);
                     this.props.updateState("shipmentBatchError", i18n.t('static.supplyPlan.batchNumberMissing'));
@@ -2160,7 +2169,24 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             var shipmentQty = ((elInstance.getCell(`F${parseInt(0) + 1}`)).innerHTML).toString().replaceAll("\,", "");
             var rowNumber = rowData[6];
             var shipmentInstance = this.state.shipmentsEl;
+            var batchDetails = shipmentInstance.getRowData(rowNumber)[17];
+            console.log("BatchDetails.length", batchDetails);
+            console.log("BatchDetails.length", batchDetails.length);
+            if (batchDetails.length == 1) {
+                console.log("batchDetails[0].batch.autoGenerated", batchDetails[0].batch.autoGenerated);
+                if (batchDetails[0].batch.autoGenerated.toString() == "true") {
+                    batchDetails[0].shipmentQty = shipmentQty;
+                    console.log("BatchDetails[0", batchDetails[0].shipmentQty);
+                }
+            }
             shipmentInstance.setValueFromCoords(8, rowNumber, shipmentQty, true);
+            if (batchDetails.length == 1) {
+                console.log("batchDetails[0].batch.autoGenerated", batchDetails[0].batch.autoGenerated);
+                if (batchDetails[0].batch.autoGenerated.toString() == "true") {
+                    shipmentInstance.setValueFromCoords(17, rowNumber, batchDetails, true);
+                    shipmentInstance.setValueFromCoords(18, rowNumber, shipmentQty, true);
+                }
+            }
             this.props.updateState("shipmentQtyChangedFlag", 0);
             this.props.updateState("shipmentChangedFlag", 1);
             this.props.updateState("qtyCalculatorTableEl", "");
