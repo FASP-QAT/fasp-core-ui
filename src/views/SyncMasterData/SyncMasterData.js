@@ -20,6 +20,7 @@ import CryptoJS from 'crypto-js'
 import UserService from '../../api/UserService';
 import { qatProblemActions } from '../../CommonComponent/QatProblemActions'
 import { calculateSupplyPlan } from '../SupplyPlan/SupplyPlanCalculations';
+import QatProblemActions from '../../CommonComponent/QatProblemActions'
 
 export default class SyncMasterData extends Component {
 
@@ -86,6 +87,7 @@ export default class SyncMasterData extends Component {
     render() {
         return (
             <div className="animated fadeIn">
+                <QatProblemActions ref="problemListChild" updateState={undefined} fetchData={undefined}></QatProblemActions>
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5 className="pl-md-5" style={{ color: "red" }} id="div2">{this.state.message != "" && i18n.t('static.masterDataSync.masterDataSyncFailed')}</h5>
                 <div className="col-md-12" style={{ display: this.state.loading ? "none" : "block" }}>
@@ -144,6 +146,7 @@ export default class SyncMasterData extends Component {
         var valid = true;
         for (var i = 0; i < programList.length; i++) {
             AuthenticationService.setupAxiosInterceptors();
+            this.refs.problemListChild.qatProblemActions(programList[i].id);
             if (navigator.onLine) {
                 //Code to Sync Country list
                 MasterSyncService.syncProgram(programList[i].programId, programList[i].version, date)
@@ -218,6 +221,7 @@ export default class SyncMasterData extends Component {
                                 }.bind(this);
                                 putRequest.onsuccess = function (event) {
                                     console.log("Planning unit list", planningUnitList);
+                                  
                                     calculateSupplyPlan(prog.id, 0, 'programData', 'masterDataSync', '', planningUnitList, minDate);
                                 }
                             }
