@@ -1176,6 +1176,9 @@ class ForecastMetrics extends Component {
       return "0%"
     }
   }
+  addDoubleQuoteToRowContent=(arr)=>{
+    return arr.map(ele=>'"'+ele+'"')
+ }
   exportCSV() {
 
     var csvRow = [];
@@ -1195,17 +1198,17 @@ class ForecastMetrics extends Component {
     csvRow.push('')
     var re;
 
-    var A = [[(i18n.t('static.program.program')).replaceAll(' ', '%20'), (i18n.t('static.dashboard.planningunit')).replaceAll(' ', '%20'),
+    var A = [this.addDoubleQuoteToRowContent([(i18n.t('static.program.program')).replaceAll(' ', '%20'), (i18n.t('static.dashboard.planningunit')).replaceAll(' ', '%20'),
     //(i18n.t('static.report.historicalConsumptionDiff')).replaceAll(' ','%20'),(i18n.t('static.report.historicalConsumptionActual')).replaceAll(' ','%20'),
-    (i18n.t('static.report.error')).replaceAll(' ', '%20'), (i18n.t('static.report.noofmonth')).replaceAll(' ', '%20')]]
+    (i18n.t('static.report.error')).replaceAll(' ', '%20'), (i18n.t('static.report.noofmonth')).replaceAll(' ', '%20')])]
 
     re = this.state.consumptions
 
     for (var item = 0; item < re.length; item++) {
       console.log(re[item].planningUnit)
-      A.push([[(getLabelText(re[item].program.label).replaceAll(',', '%20')).replaceAll(' ', '%20'), re[item].planningUnit.id == 0 ? '' : (getLabelText(re[item].planningUnit.label).replaceAll(',', '%20')).replaceAll(' ', '%20'),
+      A.push([this.addDoubleQuoteToRowContent([(getLabelText(re[item].program.label).replaceAll(',', '%20')).replaceAll(' ', '%20'), re[item].planningUnit.id == 0 ? '' : (getLabelText(re[item].planningUnit.label).replaceAll(',', '%20')).replaceAll(' ', '%20'),
       // re[item].historicalConsumptionDiff,re[item].historicalConsumptionActual,
-      re[item].monthCount == 0 ? ("No data points containing both actual and forecast consumption").replaceAll(' ', '%20') : this.roundN(re[item].forecastError) + '%', re[item].monthCount]])
+      re[item].monthCount == 0 ? ("No data points containing both actual and forecast consumption").replaceAll(' ', '%20') : this.roundN(re[item].forecastError) + '%', re[item].monthCount])])
     }
     for (var i = 0; i < A.length; i++) {
       csvRow.push(A[i].join(","))
