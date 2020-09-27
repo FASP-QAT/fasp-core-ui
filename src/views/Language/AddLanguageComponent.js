@@ -23,8 +23,11 @@ const entityname = i18n.t('static.language.language');
 const validationSchema = function (values) {
     return Yup.object().shape({
 
+        // languageName: Yup.string()
+        //     .matches(LABEL_REGEX, i18n.t('static.message.rolenamevalidtext'))
+        //     .required(i18n.t('static.language.languagetext')),
         languageName: Yup.string()
-            .matches(LABEL_REGEX, i18n.t('static.message.rolenamevalidtext'))
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.language.languagetext')),
         languageCode: Yup.string()
             .matches(ALPHABETS_REGEX, i18n.t('static.common.alphabetsOnly'))

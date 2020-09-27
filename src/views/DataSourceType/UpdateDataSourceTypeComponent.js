@@ -16,7 +16,8 @@ const entityname = i18n.t('static.datasourcetype.datasourcetype');
 const validationSchema = function (values) {
     return Yup.object().shape({
         label: Yup.string()
-            .matches(/^([a-zA-Z]+\s)*[a-zA-Z]+$/, i18n.t('static.message.rolenamevalidtext'))
+            // .matches(/^([a-zA-Z]+\s)*[a-zA-Z]+$/, i18n.t('static.message.rolenamevalidtext'))
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.datasourcetype.datasourcetypetext'))
     })
 }

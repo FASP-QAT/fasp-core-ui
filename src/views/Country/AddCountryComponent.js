@@ -500,8 +500,11 @@ const initialValues = {
 
 const validationSchema = function (values) {
     return Yup.object().shape({
+        // label: Yup.string()
+        //     .matches(LABEL_REGEX, i18n.t('static.message.rolenamevalidtext'))
+        //     .required(i18n.t('static.country.countrytext')),
         label: Yup.string()
-            .matches(LABEL_REGEX, i18n.t('static.message.rolenamevalidtext'))
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.country.countrytext')),
         countryCode2: Yup.string()
             // .max(2, 'Country code 2 is 2 digit number')

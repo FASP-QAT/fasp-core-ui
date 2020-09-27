@@ -1394,8 +1394,8 @@ class Consumption extends Component {
       show: false,
       message: '',
       rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-      minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth()+2 },
-      maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth()  },
+      minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
+      maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
       loading: true
 
 
@@ -1632,7 +1632,7 @@ class Consumption extends Component {
         align: 'justify'
         });*/
         doc.setTextColor("#002f6c");
-        doc.text(i18n.t('static.report.consumptionReport'), doc.internal.pageSize.width / 2, 60, {
+        doc.text(i18n.t('static.dashboard.consumption'), doc.internal.pageSize.width / 2, 60, {
           align: 'center'
         })
         if (i == 1) {
@@ -1743,6 +1743,7 @@ class Consumption extends Component {
     addHeaders(doc)
     addFooters(doc)
     doc.save("Consumption.pdf")
+    doc.save(i18n.t('static.dashboard.consumption').concat('.pdf'));
     //creates PDF from img
     /* var doc = new jsPDF('landscape');
     doc.setFontSize(20);
@@ -1751,7 +1752,7 @@ class Consumption extends Component {
   }
 
   roundN = num => {
-    if (num != ''||num!=null) {
+    if (num != '' || num != null) {
       return parseFloat(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
     } else {
       return ''
@@ -1922,7 +1923,7 @@ class Consumption extends Component {
     // let productCategoryId = document.getElementById("productCategoryId").value;
     let planningUnitId = document.getElementById("planningUnitId").value;
     let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
-    let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month , 0).getDate();
+    let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
 
     if (planningUnitId > 0 && programId > 0 && versionId != 0) {
       if (versionId.includes('Local')) {
@@ -1936,7 +1937,7 @@ class Consumption extends Component {
         openRequest.onerror = function (event) {
           this.setState({
             message: i18n.t('static.program.errortext'),
-            loading:false
+            loading: false
           })
         }.bind(this);
         openRequest.onsuccess = function (e) {
@@ -1957,7 +1958,7 @@ class Consumption extends Component {
           programRequest.onerror = function (event) {
             this.setState({
               message: i18n.t('static.program.errortext'),
-              loading:false
+              loading: false
             })
           }.bind(this);
           programRequest.onsuccess = function (e) {
@@ -2262,11 +2263,11 @@ class Consumption extends Component {
       planningUnits: [],
       planningUnitValues: [],
       planningUnitLabels: [],
-      offlinePlanningUnitList:[]
+      offlinePlanningUnitList: []
     }, () => {
 
       if (versionId == 0) {
-        this.setState({ message: i18n.t('static.program.validversion'), consumptions: [],offlineConsumptionList:[] });
+        this.setState({ message: i18n.t('static.program.validversion'), consumptions: [], offlineConsumptionList: [] });
       } else {
         if (versionId.includes('Local')) {
           // alert("in if");
@@ -2289,7 +2290,7 @@ class Consumption extends Component {
               myResult = planningunitRequest.result;
               var programId = (document.getElementById("programId").value).split("_")[0];
               var proList = []
-              console.log("myResult===============",myResult)
+              console.log("myResult===============", myResult)
               for (var i = 0; i < myResult.length; i++) {
                 if (myResult[i].program.id == programId) {
 
@@ -2298,7 +2299,7 @@ class Consumption extends Component {
               }
               this.setState({
                 planningUnits: proList, message: '',
-                offlinePlanningUnitList:proList
+                offlinePlanningUnitList: proList
               }, () => {
                 this.filterData();
               })
@@ -2969,7 +2970,7 @@ class Consumption extends Component {
                           </div>
                           <div className="col-md-12">
                             <button className="mr-1 mb-2 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
-                              {this.state.show ? 'Hide Data' : 'Show Data'}
+                              {this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
                             </button>
 
                           </div>
@@ -2991,7 +2992,7 @@ class Consumption extends Component {
                           </div>
                           <div className="col-md-12">
                             <button className="mr-1 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
-                              {this.state.show ? 'Hide Data' : 'Show Data'}
+                              {this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
                             </button>
                           </div>
                         </div>}

@@ -28,9 +28,12 @@ const entityname = i18n.t('static.user.user')
 const validationSchema = function (values) {
     return Yup.object().shape({
 
+        // username: Yup.string()
+        //     .required(i18n.t('static.user.validusername'))
+        //     .matches(LABEL_REGEX, i18n.t('static.message.rolenamevalidtext')),
         username: Yup.string()
-            .required(i18n.t('static.user.validusername'))
-            .matches(LABEL_REGEX, i18n.t('static.message.rolenamevalidtext')),
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
+            .required(i18n.t('static.user.validusername')),
         showRealm: Yup.boolean(),
         realmId: Yup.string()
             .when("showRealm", {

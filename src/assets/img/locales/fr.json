@@ -1132,5 +1132,8 @@
     "static.dashboard.programs": "Programmes",
     "static.jexcel.search":"chercher",
     "static.jexcel.clear":"Clair",
-    "static.common.version":"Ver.:"
+    "static.common.version":"Ver.:",
+    "static.common.showData":"Afficher les données",
+    "static.common.hideData":"Masquer les données",
+    "static.period.selectPeriod":"Select Period"
 }

@@ -2209,7 +2209,7 @@ if(value!=null){
                       <div className=" pl-0">
                         <div className="row">
                           <FormGroup className="col-md-3">
-                            <Label htmlFor="appendedInputButton">Select Period</Label>
+                            <Label htmlFor="appendedInputButton">{i18n.t('static.period.selectPeriod')}</Label>
                             <div className="controls  edit">
 
                               <Picker
@@ -2313,7 +2313,7 @@ if(value!=null){
 
                             </FormGroup>*/}
                           <FormGroup className="col-md-3">
-                            <Label htmlFor="appendedInputButton">Version</Label>
+                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
                             <div className="controls">
                               <InputGroup>
                                 <Input
@@ -2366,7 +2366,7 @@ if(value!=null){
                             </div>
                             <div className="col-md-12">
                               <button className="mr-1 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
-                                {this.state.show ? 'Hide Data' : 'Show Data'}
+                                {this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
                               </button>
 
                             </div>

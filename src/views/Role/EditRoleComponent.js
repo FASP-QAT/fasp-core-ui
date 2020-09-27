@@ -23,8 +23,9 @@ const entityname = i18n.t('static.role.role');
 const validationSchema = function (values) {
     return Yup.object().shape({
         roleName: Yup.string()
-            .required(i18n.t('static.role.roletext'))
-            .matches(LABEL_REGEX, i18n.t('static.message.rolenamevalidtext')),
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
+            .required(i18n.t('static.role.roletext')),
+        // .matches(LABEL_REGEX, i18n.t('static.message.rolenamevalidtext')),
         businessFunctions: Yup.string()
             .required(i18n.t('static.role.businessfunctiontext')),
         canCreateRoles: Yup.string()
