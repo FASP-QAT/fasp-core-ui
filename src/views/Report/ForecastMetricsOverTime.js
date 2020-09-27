@@ -1462,7 +1462,9 @@ if(value!=null){
     }
   }
   toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
-
+  addDoubleQuoteToRowContent=(arr)=>{
+    return arr.map(ele=>'"'+ele+'"')
+ }
   exportCSV() {
 
     var csvRow = [];
@@ -1476,13 +1478,13 @@ if(value!=null){
     csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
     csvRow.push('')
     var re;
-    var A = [[(i18n.t('static.report.month')).replaceAll(' ', '%20'), (i18n.t('static.report.forecastConsumption')).replaceAll(' ', '%20'), (i18n.t('static.report.actualConsumption')).replaceAll(' ', '%20'), ((i18n.t('static.report.error')).replaceAll(' ', '%20')).replaceAll(' ', '%20')]]
+    var A = [this.addDoubleQuoteToRowContent([(i18n.t('static.report.month')).replaceAll(' ', '%20'), (i18n.t('static.report.forecastConsumption')).replaceAll(' ', '%20'), (i18n.t('static.report.actualConsumption')).replaceAll(' ', '%20'), ((i18n.t('static.report.error')).replaceAll(' ', '%20')).replaceAll(' ', '%20')])]
 
     re = this.state.matricsList
 
 
     for (var item = 0; item < re.length; item++) {
-      A.push([this.dateFormatter(re[item].month).replaceAll(' ', '%20'), re[item].forecastedConsumption, re[item].actualConsumption, this.PercentageFormatter(re[item].forecastError)])
+      A.push(this.addDoubleQuoteToRowContent([this.dateFormatter(re[item].month).replaceAll(' ', '%20'), re[item].forecastedConsumption, re[item].actualConsumption, this.PercentageFormatter(re[item].forecastError)]))
     }
     for (var i = 0; i < A.length; i++) {
       csvRow.push(A[i].join(","))

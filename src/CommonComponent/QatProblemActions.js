@@ -59,7 +59,10 @@ export default class QatProblemActions extends Component {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext')
                 });
-                this.props.updateState(false);
+                if(this.props.updateState != undefined){
+                    this.props.updateState(false);
+                }
+                
             };
             getRequest.onsuccess = function (event) {
                 // console.log("get request===>",getRequest.result);
@@ -109,7 +112,10 @@ export default class QatProblemActions extends Component {
                     this.setState({
                         supplyPlanError: i18n.t('static.program.errortext')
                     })
-                    this.props.updateState(false);
+                    // this.props.updateState(false);
+                    if(this.props.updateState != undefined){
+                        this.props.updateState(false);
+                    }
                 }.bind(this);
                 planningunitRequest.onsuccess = function (e) {
 
@@ -121,7 +127,10 @@ export default class QatProblemActions extends Component {
                         this.setState({
                             supplyPlanError: i18n.t('static.program.errortext')
                         })
-                        this.props.updateState(false);
+                        // this.props.updateState(false);
+                        if(this.props.updateState != undefined){
+                            this.props.updateState(false);
+                        }
                     }.bind(this);
                     problemRequest.onsuccess = function (e) {
 
@@ -145,13 +154,20 @@ export default class QatProblemActions extends Component {
                             this.setState({
                                 supplyPlanError: i18n.t('static.program.errortext')
                             })
-                            this.props.updateState(false);
+                            // this.props.updateState(false);
+                            if(this.props.updateState != undefined){
+                                this.props.updateState(false);
+                            }
                         }.bind(this);
                         puRequest.onsuccess = function (e) {
                             console.log("+++++++++++++", puRequest.result);
                             var planningUnitListAll = puRequest.result;
                             if (programList.length == 0) {
-                                this.props.updateState(false);
+
+                                // this.props.updateState(false);
+                                if(this.props.updateState != undefined){
+                                    this.props.updateState(false);
+                                }
                             }
                             for (var pp = 0; pp < programList.length; pp++) {
                                 console.log("=====>in for====>", programList[pp]);
@@ -161,6 +177,7 @@ export default class QatProblemActions extends Component {
                                 problemActionIndex = programList[pp].problemReportList.length;
                                 var regionList = programList[pp].regionList;
                                 problemList = problemRequest.result.filter(c => c.realm.id == programList[pp].realmCountry.realm.realmId);
+                                console.log("test=====>problem List===>",problemList);
                                 planningUnitList = planningUnitResult.filter(c => c.program.id == programList[pp].programId);
                                 // for (var r = 0; r < regionList.length; r++) {
                                 for (var p = 0; p < planningUnitList.length; p++) {
@@ -3577,14 +3594,22 @@ export default class QatProblemActions extends Component {
                                         message: i18n.t('static.program.errortext'),
                                         color: 'red'
                                     })
-                                    this.props.updateState(false);
+                                    // this.props.updateState(false);
+                                    if(this.props.updateState != undefined){
+                                        this.props.updateState(false);
+                                    }
                                 }.bind(this);
                                 putRequest.onsuccess = function (event) {
                                     // this.setState({executionStatus:1});
                                     // return executionStatus;
                                     console.log("time taken in sec===>", performance.now());
-                                    this.props.updateState(false);
-                                    this.props.fetchData(false);
+
+                                    // this.props.updateState(false);
+                                    // this.props.fetchData(false);
+                                    if(this.props.updateState != undefined){
+                                        this.props.updateState(false);
+                                        this.props.fetchData(false);
+                                    }
 
                                 }.bind(this);
 

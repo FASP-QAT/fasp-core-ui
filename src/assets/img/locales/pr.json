@@ -799,11 +799,11 @@
     "static.common.hideData":"Ocultar dados",
     "static.report.version": "Versão",
     "static.report.versiontype": "Tipo de Versão",
-    "static.dashboard.countryheader": "Countries",
-    "static.report.monthsOfStock": "Months of Stock (MOS)",
-    "static.report.inmillions": "(in millions)",
-    "static.common.youdatastart": "Your data has started from here",
-    "static.dashboard.months": "Months",
-    "static.report.timeWindow": "Time window",
-    "static.period.selectPeriod":"Select Period"
+    "static.dashboard.countryheader": "Países",
+    "static.report.monthsOfStock": "Meses de estoque (MOS)",
+    "static.report.inmillions": "(em milhões)",
+    "static.common.youdatastart": "Seus dados começaram aqui",
+    "static.dashboard.months": "Meses",
+    "static.report.timeWindow": "Janela de oportunidade",
+    "static.period.selectPeriod":"Selecione o período"
 }

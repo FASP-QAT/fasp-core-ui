@@ -1205,5 +1205,11 @@
     "static.common.version":"Ver.:",
     "static.common.showData":"Show Data",
     "static.common.hideData":"Hide Data",
-    "static.period.selectPeriod":"Select Period"
+    "static.period.selectPeriod":"Select Period",
+    "static.report.shipped": "Shipped",
+    "static.report.submitted": "Submitted",
+    "static.report.hold": "On-hold",
+    "static.report.planned": "Planned",
+    "static.report.arrived": "Arrived"
+    
 }
