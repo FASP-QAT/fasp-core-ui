@@ -464,7 +464,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                                         });
                                                     }
 
-                                                    if (obj.options.allowDeleteRow == true && obj.getJson().length > 1) {
+                                                    if (inventoryEditable && obj.options.allowDeleteRow == true && obj.getJson().length > 1) {
                                                         // region id
                                                         if (obj.getRowData(y)[5] == 0) {
                                                             items.push({
@@ -503,7 +503,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                         });
                                     }
 
-                                    if (obj.options.allowDeleteRow == true && obj.getJson().length > 1) {
+                                    if (inventoryEditable && obj.options.allowDeleteRow == true && obj.getJson().length > 1) {
                                         // region id
                                         if (obj.getRowData(y)[14] == -1) {
                                             items.push({

@@ -474,12 +474,14 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             }.bind(this),
                                             contextMenu: function (obj, x, y, e) {
                                                 var items = [];
-                                                items.push({
-                                                    title: i18n.t('static.supplyPlan.addNewShipment'),
-                                                    onclick: function () {
-                                                        this.addRowInJexcel();
-                                                    }.bind(this)
-                                                });
+                                                if (shipmentEditable) {
+                                                    items.push({
+                                                        title: i18n.t('static.supplyPlan.addNewShipment'),
+                                                        onclick: function () {
+                                                            this.addRowInJexcel();
+                                                        }.bind(this)
+                                                    });
+                                                }
 
                                                 // Add shipment batch info
                                                 var rowData = obj.getRowData(y);
@@ -596,7 +598,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                     if (y == null) {
                                                                     } else {
                                                                         // Insert new row
-                                                                        if (obj.options.allowInsertRow == true) {
+                                                                        if (shipmentEditable && obj.options.allowInsertRow == true) {
                                                                             items.push({
                                                                                 title: i18n.t('static.supplyPlan.addNewBatchInfo'),
                                                                                 onclick: function () {
@@ -604,7 +606,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                                 }.bind(this)
                                                                             });
                                                                         }
-                                                                        if (obj.options.allowDeleteRow == true && obj.getJson().length > 1) {
+                                                                        if (shipmentEditable && obj.options.allowDeleteRow == true && obj.getJson().length > 1) {
                                                                             // region id
                                                                             if (obj.getRowData(y)[5] == -1) {
                                                                                 items.push({
@@ -626,24 +628,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                         }.bind(this)
                                                     });
                                                 }
-                                                console.log("RowData-------->", rowData);
-                                                if (rowData[19].toString() == "true" && rowData[14].toString() == "false") {
-                                                    items.push({
-                                                        title: i18n.t('static.supplyPlan.doNotConsideAsEmergencyOrder'),
-                                                        onclick: function () {
-                                                            obj.setValueFromCoords(19, y, false, true);
-                                                        }.bind(this)
-                                                    });
-                                                }
-                                                if (rowData[19].toString() == "false" && rowData[14].toString() == "false") {
-                                                    items.push({
-                                                        title: i18n.t('static.supplyPlan.consideAsEmergencyOrder'),
-                                                        onclick: function () {
-                                                            obj.setValueFromCoords(19, y, true, true);
-                                                        }.bind(this)
-                                                    });
-                                                }
-                                                if (rowData[0].toString() == PLANNED_SHIPMENT_STATUS && rowData[16] != -1) {
+                                                if (shipmentEditable && rowData[0].toString() == PLANNED_SHIPMENT_STATUS && rowData[16] != -1) {
                                                     items.push({
                                                         title: i18n.t('static.common.deleterow'),
                                                         onclick: function () {
@@ -651,7 +636,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                         }.bind(this)
                                                     });
                                                 }
-                                                if (obj.options.allowDeleteRow == true && obj.getJson().length > 1) {
+                                                if (shipmentEditable && obj.options.allowDeleteRow == true && obj.getJson().length > 1) {
                                                     // region id
                                                     if (obj.getRowData(y)[16] == -1) {
                                                         items.push({
