@@ -70,6 +70,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
     }
 
     componentDidMount() {
+        console.log("In cvompionent")
     }
 
     showConsumptionData() {
@@ -77,6 +78,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         var consumptionListUnFiltered = this.props.items.consumptionListUnFiltered;
         var consumptionList = this.props.items.consumptionList;
         var programJson = this.props.items.programJson;
+        console.log("Program Json", this.props.items);
         var db1;
         var dataSourceList = [];
         var realmCountryPlanningUnitList = [];

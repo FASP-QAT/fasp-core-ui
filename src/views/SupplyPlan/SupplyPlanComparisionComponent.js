@@ -792,7 +792,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     manualShipmentsTotalData.push(jsonList[0].manualTotalQty);
 
                                     // Tomorrow begin from here
-                                    var shipmentDetails = programJson.shipmentList.filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag == true && (c.expectedDeliveryDate >= m[n].startDate && c.expectedDeliveryDate <= m[n].endDate) && c.erpFlag.toString() == "false");
+                                    var shipmentDetails = programJson.shipmentList.filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag == true && (c.shipmentStatus.id!=DELIVERED_SHIPMENT_STATUS?(c.expectedDeliveryDate >= m[n].startDate && c.expectedDeliveryDate <= m[n].endDate):(c.receivedDate >= m[n].startDate && c.receivedDate <= m[n].endDate)) && c.erpFlag.toString() == "false");
 
                                     var sd1 = [];
                                     var sd2 = [];
@@ -940,7 +940,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     erpShipmentsTotalData.push(jsonList[0].erpTotalQty);
 
 
-                                    var shipmentDetails = programJson.shipmentList.filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag == true && (c.expectedDeliveryDate >= m[n].startDate && c.expectedDeliveryDate <= m[n].endDate) && c.erpFlag.toString() == "true");
+                                    var shipmentDetails = programJson.shipmentList.filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag == true && (c.shipmentStatus.id!=DELIVERED_SHIPMENT_STATUS?(c.expectedDeliveryDate >= m[n].startDate && c.expectedDeliveryDate <= m[n].endDate):(c.receivedDate >= m[n].startDate && c.receivedDate <= m[n].endDate)) && c.erpFlag.toString() == "true");
                                     var sd1 = [];
                                     var sd2 = [];
                                     var sd3 = [];
@@ -1182,7 +1182,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         var actualCount = 0;
                                         var adjustmentsCount = 0;
                                         for (var cr = 0; cr < inventoryListForRegionalDetails.length; cr++) {
-                                            if (inventoryListForRegionalDetails[cr].actualQty != 0 && inventoryListForRegionalDetails[cr].actualQty != null && inventoryListForRegionalDetails[cr].actualQty != "") {
+                                            if (inventoryListForRegionalDetails[cr].actualQty != undefined && inventoryListForRegionalDetails[cr].actualQty != null && inventoryListForRegionalDetails[cr].actualQty != "") {
                                                 actualCount += 1;
                                                 actualQtyForRegion += parseInt(inventoryListForRegionalDetails[cr].actualQty) * parseInt(inventoryListForRegionalDetails[cr].multiplier);
                                                 totalActualQtyForRegion += parseInt(inventoryListForRegionalDetails[cr].actualQty) * parseInt(inventoryListForRegionalDetails[cr].multiplier);
@@ -1191,7 +1191,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                     regionsReportingActualInventory.push(regionListFiltered[r].id)
                                                 }
                                             }
-                                            if (inventoryListForRegionalDetails[cr].adjustmentQty != 0 && inventoryListForRegionalDetails[cr].adjustmentQty != null && inventoryListForRegionalDetails[cr].adjustmentQty != "") {
+                                            if (inventoryListForRegionalDetails[cr].adjustmentQty != undefined && inventoryListForRegionalDetails[cr].adjustmentQty != null && inventoryListForRegionalDetails[cr].adjustmentQty != "") {
                                                 adjustmentsCount += 1;
                                                 adjustmentsQtyForRegion += parseInt(inventoryListForRegionalDetails[cr].adjustmentQty) * parseInt(inventoryListForRegionalDetails[cr].multiplier);
                                                 totalAdjustmentsQtyForRegion += parseInt(inventoryListForRegionalDetails[cr].adjustmentQty) * parseInt(inventoryListForRegionalDetails[cr].multiplier);
@@ -1619,9 +1619,9 @@ export default class SupplyPlanComponent extends React.Component {
                     c.region.id == region &&
                     moment(c.inventoryDate).format("MMM YY") == month);
                 if (inventoryType == 1) {
-                    inventoryList = inventoryList.filter(c => c.actualQty != "" && c.actualQty != 0 && c.actualQty != null);
+                    inventoryList = inventoryList.filter(c => c.actualQty != "" && c.actualQty != undefined && c.actualQty != null);
                 } else {
-                    inventoryList = inventoryList.filter(c => c.adjustmentQty != "" && c.adjustmentQty != 0 && c.adjustmentQty != null);
+                    inventoryList = inventoryList.filter(c => c.adjustmentQty != "" && c.adjustmentQty != undefined && c.adjustmentQty != null);
                 }
                 this.setState({
                     batchInfoList: batchInfoList,
@@ -2185,7 +2185,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     </tr>
                                 </tfoot>
                             </Table>
-                            {this.state.showConsumption == 1 && <ConsumptionInSupplyPlanComponent ref="consumptionChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} consumptionPage="supplyPlan" />}
+                            {this.state.showConsumption == 1 && <ConsumptionInSupplyPlanComponent ref="consumptionChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} consumptionPage="supplyPlanCompare" />}
                             <div className="table-responsive mt-3">
                                 <div id="consumptionTable" />
                             </div>
@@ -2355,7 +2355,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     </tr>
                                 </tbody>
                             </Table>
-                            {this.state.showInventory == 1 && <InventoryInSupplyPlanComponent ref="inventoryChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} inventoryPage="supplyPlan" hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} adjustmentsDetailsClicked={this.adjustmentsDetailsClicked} />}
+                            {this.state.showInventory == 1 && <InventoryInSupplyPlanComponent ref="inventoryChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} inventoryPage="supplyPlanCompare" hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} adjustmentsDetailsClicked={this.adjustmentsDetailsClicked} />}
                             <div className="table-responsive mt-3">
                                 <div id="adjustmentsTable" className="table-responsive " />
                             </div>
@@ -2400,7 +2400,7 @@ export default class SupplyPlanComponent extends React.Component {
                     </ModalHeader>
                     <div style={{ display: this.state.loading ? "none" : "block" }}>
                         <ModalBody>
-                            {this.state.showShipments && <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} hideFourthComponent={this.hideFourthComponent} hideFifthComponent={this.hideFifthComponent} shipmentPage="supplyPlan" />}
+                            {this.state.showShipments && <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} hideFourthComponent={this.hideFourthComponent} hideFifthComponent={this.hideFifthComponent} shipmentPage="supplyPlanCompare" />}
                             <h6 className="red" id="div2">{this.state.noFundsBudgetError || this.state.shipmentBatchError || this.state.shipmentError}</h6>
                             <div className="table-responsive">
                                 <div id="shipmentsDetailsTable" />
@@ -2550,7 +2550,7 @@ export default class SupplyPlanComponent extends React.Component {
                 var shipmentList = [];
                 // var tableEditableBasedOnSupplyPlan = true;
                 if (supplyPlanType == 'deliveredShipments') {
-                    shipmentList = programJson.shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS));
+                    shipmentList = programJson.shipmentList.filter(c => c.receivedDate >= startDate && c.receivedDate <= endDate && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS));
                 } else if (supplyPlanType == 'shippedShipments') {
                     shipmentList = programJson.shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || c.shipmentStatus.id == ARRIVED_SHIPMENT_STATUS));
                 } else if (supplyPlanType == 'orderedShipments') {
@@ -2558,7 +2558,7 @@ export default class SupplyPlanComponent extends React.Component {
                 } else if (supplyPlanType == 'plannedShipments') {
                     shipmentList = programJson.shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS));
                 } else if (supplyPlanType == 'deliveredErpShipments') {
-                    shipmentList = shipmentList = programJson.shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS));
+                    shipmentList = shipmentList = programJson.shipmentList.filter(c => c.receivedDate >= startDate && c.receivedDate <= endDate && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS));
                 } else if (supplyPlanType == 'shippedErpShipments') {
                     shipmentList = shipmentList = programJson.shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || c.shipmentStatus.id == ARRIVED_SHIPMENT_STATUS));
                 } else if (supplyPlanType == 'orderedErpShipments') {

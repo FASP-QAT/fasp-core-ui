@@ -186,7 +186,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                         // Getting shipments list for planning unit
                         var shipmentList = (programJsonForStoringTheResult.shipmentList).filter(c => c.active == true && c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag == true);
                         // Getting shipment list for a month
-                        var shipmentArr = shipmentList.filter(c => (c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate))
+                        var shipmentArr = shipmentList.filter(c => (c.shipmentStatus.id != DELIVERED_SHIPMENT_STATUS) ? (c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate) : (c.receivedDate >= startDate && c.receivedDate <= endDate))
                         var shipmentTotalQty = 0;
                         var shipmentTotalQtyWps = 0;
                         var manualTotalQty = 0;
@@ -311,7 +311,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                             var inventoryListForRegion = inventoryList.filter(c => c.region != null && c.region.id != 0 && c.region.id == regionList[r].id);
                             console.log("inventiryListForRegion", inventoryListForRegion);
                             // Check how many regions have reported actual stock count
-                            var noOfEntriesOfActualStockCount = (inventoryListForRegion.filter(c => c.actualQty != 0 && c.actualQty != null && c.actualQty != "")).length;
+                            var noOfEntriesOfActualStockCount = (inventoryListForRegion.filter(c => c.actualQty != undefined && c.actualQty != null && c.actualQty != "")).length;
                             // Adding count of regions reporting actual inventory
                             if (noOfEntriesOfActualStockCount > 0) {
                                 regionsReportingActualInventory += 1;
@@ -320,7 +320,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                 // If region have reported actual stock count that only consider actual stock count
                                 if (noOfEntriesOfActualStockCount > 0) {
                                     console.log("Actual stock count", actualStockCount);
-                                    if (inventoryListForRegion[inv].actualQty != "" && inventoryListForRegion[inv].actualQty != null && inventoryListForRegion[inv].actualQty != 0) {
+                                    if (inventoryListForRegion[inv].actualQty != "" && inventoryListForRegion[inv].actualQty != null && inventoryListForRegion[inv].actualQty != undefined) {
                                         actualStockCount += Math.round(parseFloat(inventoryListForRegion[inv].actualQty) * parseFloat(inventoryListForRegion[inv].multiplier));
                                     }
                                     var batchListForInventory = inventoryListForRegion[inv].batchInfoList;
@@ -354,7 +354,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     }
                                 } else {
                                     // If region has not reported actual stock count we will only consider adjustments
-                                    if (inventoryListForRegion[inv].adjustmentQty != "" && inventoryListForRegion[inv].adjustmentQty != null && inventoryListForRegion[inv].adjustmentQty != 0) {
+                                    if (inventoryListForRegion[inv].adjustmentQty != "" && inventoryListForRegion[inv].adjustmentQty != null && inventoryListForRegion[inv].adjustmentQty != undefined) {
                                         adjustmentQty += Math.round(parseFloat(inventoryListForRegion[inv].adjustmentQty) * parseFloat(inventoryListForRegion[inv].multiplier));
                                     }
                                     // Check batch details for adjustments if available
@@ -681,6 +681,8 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                         var mos = "";
                         if (closingBalance != 0) {
                             mos = parseFloat(closingBalance / amc).toFixed(4);
+                        } else {
+                            mos = 0;
                         }
 
                         var json = {
