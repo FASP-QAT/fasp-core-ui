@@ -376,7 +376,7 @@ class GlobalConsumption extends Component {
 
 
 
-    const title = "Consumption Report";
+    const title = i18n.t('static.dashboard.globalconsumption');
     var canvas = document.getElementById("cool-canvas");
     //creates image
 
@@ -417,7 +417,7 @@ class GlobalConsumption extends Component {
     doc.autoTable(content);
     addHeaders(doc)
     addFooters(doc)
-    doc.save("Consumption (Realm View).pdf")
+    doc.save(i18n.t('static.dashboard.globalconsumption').concat('.pdf'));
     //creates PDF from img
     /*  var doc = new jsPDF('landscape');
       doc.setFontSize(20);
@@ -1171,7 +1171,7 @@ class GlobalConsumption extends Component {
                         </div>
                         <div className="col-md-12">
                           <button className="mr-1 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
-                            {this.state.show ? 'Hide Data' : 'Show Data'}
+                            {this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
                           </button>
 
                         </div>

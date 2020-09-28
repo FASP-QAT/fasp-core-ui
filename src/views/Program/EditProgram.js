@@ -43,6 +43,7 @@ let initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         programName: Yup.string()
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.program.validprogramtext')),
         realmId: Yup.string()
             .required(i18n.t('static.common.realmtext')),
@@ -239,6 +240,7 @@ export default class EditProgram extends Component {
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
         ProgramService.getProgramById(this.props.match.params.programId).then(response => {
+            console.log("program obj===>",response.data);
             this.setState({
                 program: response.data, loading: false
             })
@@ -785,7 +787,7 @@ export default class EditProgram extends Component {
                                                     <FormGroup>
                                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
                                                         <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>Update</Button>
+                                                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                                         &nbsp;
                                             </FormGroup>
                                                 </CardFooter>
