@@ -2084,7 +2084,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                                 var maxDate = moments.length > 0 ? moment.max(moments) : ''
                                 var dtstr = startDate.startOf('month').format('YYYY-MM-DD')
                                 var list = programJson.supplyPlan.filter(c => c.planningUnitId == planningUnit.planningUnit.id && c.transDate == dtstr)
-                                console.log( planningUnit.planningUnit.id,list)
+                                console.log( planningUnit)
                                 if (list.length > 0) {
                                     var json = {
                                         planningUnit: planningUnit.planningUnit,
@@ -2102,8 +2102,8 @@ class StockStatusAcrossPlanningUnits extends Component {
                                         planningUnit: planningUnit.planningUnit,
                                         lastStockCount: maxDate == '' ? '' : maxDate.format('MMM-DD-YYYY'),
                                         mos: '',
-                                        minMos: '',
-                                        maxMos: '',
+                                        minMos: planningUnit.minMonthsOfStock,
+                                        maxMos: planningUnit.minMonthsOfStock+planningUnit.reorderFrequencyInMonths,
                                         stock: 0,
                                         amc: 0
                                     }
