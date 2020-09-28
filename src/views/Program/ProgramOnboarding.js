@@ -130,11 +130,11 @@ export default class ProgramOnboarding extends Component {
                 this.refs.sixChild.getProgramManagerList();
                 this.refs.child.getRealmId();
             });
-            document.getElementById('realmId').disabled=true;
+            document.getElementById('realmId').disabled = true;
 
         } else {
             console.log("in else");
-            document.getElementById('realmId').disabled=false;
+            document.getElementById('realmId').disabled = false;
         }
 
         document.getElementById('stepOne').style.display = 'block';
@@ -900,11 +900,11 @@ export default class ProgramOnboarding extends Component {
                                 <div id="stepSeven">
                                     <MapPlanningUnits ref="child" message={this.state.message} removeMessageText={this.removeMessageText} items={this.state}></MapPlanningUnits>
                                     <FormGroup className="mt-2">
-                                        <Button color="success" size="md" className="float-right mr-1" type="button" name="regionSub" id="regionSub" onClick={this.finishedStepSeven}> <i className="fa fa-check"></i> Submit</Button>
+                                        <Button color="success" size="md" className="float-right mr-1" type="button" name="regionSub" id="regionSub" onClick={this.finishedStepSeven}> <i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                         &nbsp;
-                                        <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.addRowInJexcel}> <i className="fa fa-plus"></i> Add Row</Button>
+                                        <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.addRowInJexcel}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>
                                         &nbsp;
-                                        <Button color="info" size="md" className="float-left mr-1 px-4" type="button" name="regionPrevious" id="regionPrevious" onClick={this.previousToStepSix} > <i className="fa fa-angle-double-left "></i> Back</Button>
+                                        <Button color="info" size="md" className="float-left mr-1 px-4" type="button" name="regionPrevious" id="regionPrevious" onClick={this.previousToStepSix} > <i className="fa fa-angle-double-left "></i>{i18n.t('static.common.back')}</Button>
                                         &nbsp;
                                     </FormGroup>
                                 </div>

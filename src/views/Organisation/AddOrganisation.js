@@ -29,7 +29,8 @@ const validationSchema = function (values) {
         realmId: Yup.string()
             .required(i18n.t('static.common.realmtext')),
         organisationName: Yup.string()
-            .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
+            // .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
+            .matches(/^\S+(?: \S+)*$/,i18n.t('static.validSpace.string'))
             .required(i18n.t('static.organisation.organisationtext')),
         organisationCode: Yup.string()
             .matches(ALPHABET_NUMBER_REGEX, i18n.t('static.message.alphabetnumerallowed'))

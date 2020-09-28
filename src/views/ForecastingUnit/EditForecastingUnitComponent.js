@@ -18,8 +18,12 @@ const entityname = i18n.t('static.forecastingunit.forecastingunit');
 const validationSchema = function (values) {
     return Yup.object().shape({
         label: Yup.string()
-            .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
-            .required(i18n.t('static.forecastingunit.forecastingunittext'))
+            // .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
+            .required(i18n.t('static.forecastingunit.forecastingunittext')),
+        genericLabel: Yup.string()
+            // .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
     })
 }
 

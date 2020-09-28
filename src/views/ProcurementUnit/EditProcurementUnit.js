@@ -750,52 +750,70 @@ let initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         procurementUnitName: Yup.string()
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.procurementUnit.validProcurementUnitText')),
         planningUnitId: Yup.string()
             .required(i18n.t('static.procurementUnit.validPlanningUnitText')),
-        multiplier: Yup.number()
-            .typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .required(i18n.t('static.procurementUnit.validMultiplierText')).min(0, i18n.t('static.procurementUnit.validValueText')),
+        multiplier: Yup.string()
+            // .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .matches(/^\s*(?=.*[1-9])\d*(?:\.\d{1,2})?\s*$/, i18n.t('static.currency.conversionrateNumberTwoDecimalPlaces'))
+            .required(i18n.t('static.procurementUnit.validMultiplierText'))
+            .min(0, i18n.t('static.procurementUnit.validValueText')),
+            // .max(12, i18n.t("Eneter valid number with digits less then 10.")),
         unitId: Yup.string()
             .required(i18n.t('static.procurementUnit.validUnitIdText')),
         supplierId: Yup.string()
             .required(i18n.t('static.procurementUnit.validSupplierIdText')),
-        heightQty: Yup.number()
-            .typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
-            // .matches(DECIMAL_NO_REGEX, i18n.t('static.realm.decimalNotAllow'))
-            .decimal(i18n.t('static.realm.decimalNotAllow'))
-            .min(0, i18n.t('static.program.validvaluetext')),
-        lengthQty: Yup.number()
-            .typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
-            .decimal(i18n.t('static.realm.decimalNotAllow'))
-            .min(0, i18n.t('static.program.validvaluetext')),
-        widthQty: Yup.number()
-            .typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
-            .decimal(i18n.t('static.realm.decimalNotAllow'))
-            .min(0, i18n.t('static.program.validvaluetext')),
-        weightQty: Yup.number()
-            .typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
-            .decimal(i18n.t('static.realm.decimalNotAllow'))
-            .min(0, i18n.t('static.program.validvaluetext')),
-        unitsPerCase: Yup.number()
-            .typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
-            .decimal(i18n.t('static.realm.decimalNotAllow'))
-            .min(0, i18n.t('static.program.validvaluetext')),
-        unitsPerPallet: Yup.number()
-            .typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
-            .decimal(i18n.t('static.realm.decimalNotAllow'))
-            .min(0, i18n.t('static.program.validvaluetext')),
-        unitsPerContainer: Yup.number()
-            .typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
-            .decimal(i18n.t('static.realm.decimalNotAllow'))
-            .min(0, i18n.t('static.program.validvaluetext')),
+        heightQty: Yup.string()
+            // .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            // .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
+            // // .matches(DECIMAL_NO_REGEX, i18n.t('static.realm.decimalNotAllow'))
+            // .decimal(i18n.t('static.realm.decimalNotAllow'))
+            // .min(0, i18n.t('static.program.validvaluetext')),
+            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.currency.conversionrateNumberTwoDecimalPlaces'))
+            .min(0, i18n.t('static.procurementUnit.validValueText')),
+        lengthQty: Yup.string()
+            // .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            // .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
+            // .decimal(i18n.t('static.realm.decimalNotAllow'))
+            // .min(0, i18n.t('static.program.validvaluetext')),
+            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.currency.conversionrateNumberTwoDecimalPlaces'))
+            .min(0, i18n.t('static.procurementUnit.validValueText')),
+        widthQty: Yup.string()
+            // .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            // .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
+            // .decimal(i18n.t('static.realm.decimalNotAllow'))
+            // .min(0, i18n.t('static.program.validvaluetext')),
+            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.currency.conversionrateNumberTwoDecimalPlaces'))
+            .min(0, i18n.t('static.procurementUnit.validValueText')),
+        weightQty: Yup.string()
+            // .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            // .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
+            // .decimal(i18n.t('static.realm.decimalNotAllow'))
+            // .min(0, i18n.t('static.program.validvaluetext')),
+            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.currency.conversionrateNumberTwoDecimalPlaces'))
+            .min(0, i18n.t('static.procurementUnit.validValueText')),
+        unitsPerCase: Yup.string()
+            // .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            // .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
+            // .decimal(i18n.t('static.realm.decimalNotAllow'))
+            // .min(0, i18n.t('static.program.validvaluetext')),
+            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.currency.conversionrateNumberTwoDecimalPlaces'))
+            .min(0, i18n.t('static.procurementUnit.validValueText')),
+        unitsPerPallet: Yup.string()
+            // .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            // .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
+            // .decimal(i18n.t('static.realm.decimalNotAllow'))
+            // .min(0, i18n.t('static.program.validvaluetext')),
+            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.currency.conversionrateNumberTwoDecimalPlaces'))
+            .min(0, i18n.t('static.procurementUnit.validValueText')),
+        unitsPerContainer: Yup.string()
+            // .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            // .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
+            // .decimal(i18n.t('static.realm.decimalNotAllow'))
+            // .min(0, i18n.t('static.program.validvaluetext')),
+            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.currency.conversionrateNumberTwoDecimalPlaces'))
+            .min(0, i18n.t('static.procurementUnit.validValueText')),
     })
 }
 
@@ -1219,6 +1237,7 @@ export default class EditProcurementUnit extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.procurementUnit.lengthUnit.id}
+                                                            
                                                             type="select" name="lengthUnitId" id="lengthUnitId">
                                                             <option value="">{i18n.t('static.common.select')}</option>
                                                             {units}

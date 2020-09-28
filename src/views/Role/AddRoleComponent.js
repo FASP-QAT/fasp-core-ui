@@ -433,6 +433,7 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import { LABEL_REGEX } from '../../Constants.js';
+import { ALPHABET_NUMBER_REGEX, SPACE_REGEX } from '../../Constants.js';
 import classNames from 'classnames';
 
 const initialValues = {
@@ -443,9 +444,12 @@ const initialValues = {
 const entityname = i18n.t('static.role.role');
 const validationSchema = function (values) {
     return Yup.object().shape({
+        // roleName: Yup.string()
+        //     .required(i18n.t('static.role.roletext'))
+        //     .matches(LABEL_REGEX, i18n.t('static.message.rolenamevalidtext')),
         roleName: Yup.string()
-            .required(i18n.t('static.role.roletext'))
-            .matches(LABEL_REGEX, i18n.t('static.message.rolenamevalidtext')),
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
+            .required(i18n.t('static.role.roletext')),
         businessFunctions: Yup.string()
             .required(i18n.t('static.role.businessfunctiontext')),
         canCreateRoles: Yup.string()
@@ -810,7 +814,7 @@ class AddRoleComponent extends Component {
                                                     </FormGroup>
                                                     <FormGroup className="Selectcontrol-bdrNone">
                                                         <Label htmlFor="canCreateRoles">{i18n.t('static.role.cancreaterole')}<span className="red Reqasterisk">*</span> </Label>
-                                            
+
                                                         <Select
                                                             className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
                                                                 { 'is-valid': !errors.canCreateRoles && this.state.role.canCreateRoles.length != 0 },

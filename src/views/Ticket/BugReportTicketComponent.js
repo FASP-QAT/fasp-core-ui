@@ -7,6 +7,7 @@ import { Formik } from 'formik';
 import i18n from '../../i18n';
 import * as Yup from 'yup';
 import JiraTikcetService from '../../api/JiraTikcetService';
+import { SPACE_REGEX } from '../../Constants';
 
 const initialValues = {
     summary: "Report a bug",
@@ -16,6 +17,7 @@ const entityname = i18n.t('static.program.realmcountry');
 const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()
+            .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.common.summarytext')),
         description: Yup.string()
             .required(i18n.t('static.common.descriptiontext')),
@@ -121,7 +123,7 @@ export default class BugReportTicketComponent extends Component {
 
     resetClicked() {
         let { bugReport } = this.state;
-        bugReport.summary = '';
+        // bugReport.summary = '';
         bugReport.description = '';
         bugReport.file= '';
         bugReport.attachFile= '';
@@ -135,7 +137,7 @@ export default class BugReportTicketComponent extends Component {
 
         return (
             <div className="col-md-12">                
-                <h5 style={{ color: "green" }} id="div2">{i18n.t(this.state.message)}</h5>
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
                 <h4>{i18n.t('static.common.bugreport')}</h4>
                 <br></br>
                 <div style={{ display: this.state.loading ? "none" : "block" }}>
@@ -162,36 +164,26 @@ export default class BugReportTicketComponent extends Component {
                                         this.hideSecondComponent();
                                     })                                
                             } else {
-                                this.setState({
-                                    // message: response.data.messageCode
-                                    message: 'Error while creating query', loading: false
+                                this.setState({                                    
+                                    message: i18n.t('static.unkownError'), loading: false
                                 },
-                                    () => {
-                                        this.resetClicked();
+                                    () => {                                        
                                         this.hideSecondComponent();
                                     })                                
                             }
                             this.props.togglehelp();
                             this.props.toggleSmall(this.state.message);
                         })
-                        // .catch(
-                        //         error => {
-                        //             switch (error.message) {
-                        //                 case "Network Error":
-                        //                     this.setState({
-                        //                         message: 'Network Error'
-                        //                     })
-                        //                     break
-                        //                 default:
-                        //                     this.setState({
-                        //                         message: 'Error'
-                        //                     })
-                        //                     break
-                        //             }
-                        //             alert(this.state.message);
-                        //             this.props.togglehelp();
-                        //         }
-                        //     );
+                        .catch(
+                                error => {
+                                    this.setState({                                        
+                                        message: i18n.t('static.unkownError'), loading: false
+                                    },
+                                    () => {                                        
+                                        this.hideSecondComponent();                                     
+                                    });                                    
+                                }
+                            );
                     }}
                     render={
                         ({
@@ -209,7 +201,7 @@ export default class BugReportTicketComponent extends Component {
                                 <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm'>
                                     < FormGroup >
                                         <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
-                                        <Input type="text" name="summary" id="summary"
+                                        <Input type="text" name="summary" id="summary" readOnly = {true}
                                             bsSize="sm"
                                             valid={!errors.summary && this.state.bugReport.summary != ''}
                                             invalid={touched.summary && !!errors.summary}

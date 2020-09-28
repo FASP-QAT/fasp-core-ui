@@ -467,7 +467,9 @@ class RegionListComponent extends Component {
         addFooters(doc)
         doc.save(i18n.t('static.region.region') + '.pdf')
     }
-
+    addDoubleQuoteToRowContent=(arr)=>{
+        return arr.map(ele=>'"'+ele+'"')
+     }
     exportCSV() {
 
         var csvRow = [];
@@ -484,8 +486,8 @@ class RegionListComponent extends Component {
         headers.push(i18n.t('static.region.gln'));
         headers.push(i18n.t('static.common.status'));
 
-        var A = [headers]
-        this.state.selRegion.map(ele => A.push([(getLabelText(ele.realmCountry.country.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.capacityCbm, ele.gln, (ele.active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'))]));
+        var A = [this.addDoubleQuoteToRowContent(headers)]
+        this.state.selRegion.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.realmCountry.country.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.capacityCbm, ele.gln, (ele.active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'))])));
         for (var i = 0; i < A.length; i++) {
             // console.log(A[i])
             csvRow.push(A[i].join(","))
