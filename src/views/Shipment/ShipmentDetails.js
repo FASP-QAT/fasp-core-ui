@@ -44,8 +44,8 @@ export default class ShipmentDetails extends React.Component {
             shipmentModalTitle: "",
             shipmentType: { value: 1, label: i18n.t('static.shipment.manualShipments') },
             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() },
-            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth()+2 },
+            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth()  },
         }
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this)
         this.formSubmit = this.formSubmit.bind(this);
@@ -483,7 +483,8 @@ export default class ShipmentDetails extends React.Component {
                     <CardFooter>
                         <FormGroup>
                             <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                            {this.state.shipmentChangedFlag == 1 && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipments()}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>}
+                            {this.state.shipmentChangedFlag == 1 && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipments()}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>}&nbsp;
+                            {this.refs.shipmentChild != undefined && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.refs.shipmentChild.addRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
                             &nbsp;
                         </FormGroup>
                     </CardFooter>
@@ -516,6 +517,7 @@ export default class ShipmentDetails extends React.Component {
                     <ModalFooter>
                         <div id="showShipmentBatchInfoButtonsDiv" style={{ display: 'none' }}>
                             {this.state.shipmentBatchInfoChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentBatchInfo()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBatchInfo')}</Button>}
+                            {this.refs.shipmentChild != undefined && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.refs.shipmentChild.addBatchRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
                         </div>
                         <div id="showSaveShipmentsDatesButtonsDiv" style={{ display: 'none' }}>
                             {this.state.shipmentDatesChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentsDate()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveShipmentDates')}</Button>}

@@ -1015,8 +1015,8 @@ class StockAdjustmentComponent extends Component {
             data: [],
             lang: localStorage.getItem('lang'),
             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate:{year:  new Date().getFullYear()-3, month: new Date().getMonth()},
-            maxDate:{year:  new Date().getFullYear()+3, month: new Date().getMonth()+1},
+            minDate:{year:  new Date().getFullYear()-3, month: new Date().getMonth()+2},
+            maxDate:{year:  new Date().getFullYear()+3, month: new Date().getMonth()},
             loading: true
         }
         this.formatLabel = this.formatLabel.bind(this);
@@ -1352,6 +1352,10 @@ class StockAdjustmentComponent extends Component {
         return x1 + x2;
     }
 
+    addDoubleQuoteToRowContent=(arr)=>{
+        return arr.map(ele=>'"'+ele+'"')
+     }
+
     exportCSV(columns) {
 
         var csvRow = [];
@@ -1370,8 +1374,8 @@ class StockAdjustmentComponent extends Component {
         columns.map((item, idx) => { headers[idx] = ((item.text).replaceAll(' ', '%20')) });
 
 
-        var A = [headers]
-        this.state.data.map(ele => A.push([(getLabelText(ele.dataSource.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (new moment(ele.inventoryDate).format('MMM YYYY')).replaceAll(' ', '%20'), ele.stockAdjustemntQty, ele.lastModifiedBy.username, new moment(ele.lastModifiedDate).format(`${DATE_FORMAT_CAP}`), ele.notes]));
+        var A = [this.addDoubleQuoteToRowContent(headers)]
+        this.state.data.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.dataSource.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (new moment(ele.inventoryDate).format('MMM YYYY')).replaceAll(' ', '%20'), ele.stockAdjustemntQty, ele.lastModifiedBy.username, new moment(ele.lastModifiedDate).format(`${DATE_FORMAT_CAP}`), ele.notes])));
         for (var i = 0; i < A.length; i++) {
             // console.log(A[i])
             csvRow.push(A[i].join(","))
@@ -1676,8 +1680,8 @@ class StockAdjustmentComponent extends Component {
                 var inputjson = {
                     programId: programId,
                     versionId: versionId,
-                    startDate: new moment(startDate),
-                    stopDate: new moment(endDate),
+                    startDate: startDate,
+                    stopDate: endDate,
                     planningUnitIds: planningUnitIds
                 }
                 AuthenticationService.setupAxiosInterceptors();

@@ -243,13 +243,27 @@ export default class ProductCategoryTree extends Component {
         let children = this.state.treeData[0].children;
         let duplicate = 0;
         console.log("children--------->", children);
+        let unsortedFlatTreeData = getFlatDataFromTree({
+            treeData: this.state.treeData,
+            getNodeKey: ({ node }) => node.id,
+            ignoreCollapsed: false
+        });
         if (children != undefined) {
-            for (let i = 0; i < children.length; i++) {
-                if (this.state.nodename.localeCompare(children[i].payload.label.label_en) == 0) {//same
+            // for (let i = 0; i < children.length; i++) {
+            //     if (this.state.nodename.localeCompare(children[i].payload.label.label_en) == 0) {//same
+            //         // console.log("Children Duplicate");
+            //         duplicate = 1;
+            //     }
+            // }
+
+            for (let i = 0; i < unsortedFlatTreeData.length; i++) {
+                if (this.state.nodename.localeCompare(unsortedFlatTreeData[i].node.payload.label.label_en) == 0) {//same
                     // console.log("Children Duplicate");
                     duplicate = 1;
                 }
             }
+
+
         }
         if (duplicate == 0) {//not duplicate found
 
@@ -668,7 +682,7 @@ export default class ProductCategoryTree extends Component {
                                                                     <FormFeedback className="red">{errors.productCategory}</FormFeedback>
                                                                 </Col>
                                                                 <Col className="pl-lg-0" md={2} style={{ paddingTop: '27px' }}>
-                                                                    <Button className="text-white" type="submit" size="sm" color="success" onClick={() => this.touchAll(errors)}><i className="fa fa-plus"></i> Add</Button>
+                                                                    <Button className="text-white" type="submit" size="sm" color="success" onClick={() => this.touchAll(errors)}><i className="fa fa-plus"></i>{i18n.t('static.common.add')}</Button>
                                                                 </Col>
                                                             </Row>}
                                                     </FormGroup>
@@ -697,7 +711,7 @@ export default class ProductCategoryTree extends Component {
                                     <Label for="product category">{i18n.t('static.productCategory.productCategoryTree')}</Label>
                                     <div style={{ height: 450 }}>
                                         <SortableTree
-                                            canDrop={({ nextParent }) => nextParent !=null }
+                                            canDrop={({ nextParent }) => nextParent != null}
                                             getNodeKey={({ node }) => node.id}
                                             treeData={this.state.treeData}
                                             searchQuery={this.state.searchQuery}

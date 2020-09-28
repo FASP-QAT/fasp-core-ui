@@ -2055,8 +2055,8 @@ class StockStatus extends Component {
       versions: [],
       show: false,
       rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-      minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() },
-      maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() + 1 },
+      minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth()+2 },
+      maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth()  },
 
     };
     this.filterData = this.filterData.bind(this);
@@ -2096,6 +2096,11 @@ class StockStatus extends Component {
   dateFormatter = value => {
     return moment(value).format('MMM YY')
   }
+
+  addDoubleQuoteToRowContent=(arr)=>{
+    return arr.map(ele=>'"'+ele+'"')
+ }
+
   exportCSV() {
 
     var csvRow = [];
@@ -2109,7 +2114,7 @@ class StockStatus extends Component {
     csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
     csvRow.push('')
 
-    const headers = [[i18n.t('static.report.month').replaceAll(' ', '%20'),
+    const headers = [this.addDoubleQuoteToRowContent([i18n.t('static.report.month').replaceAll(' ', '%20'),
     i18n.t('static.dashboard.consumption').replaceAll(' ', '%20'),
     i18n.t('static.consumption.actual').replaceAll(' ', '%20'),
     i18n.t('static.supplyPlan.shipmentQty').replaceAll(' ', '%20'),
@@ -2118,17 +2123,17 @@ class StockStatus extends Component {
     i18n.t('static.supplyPlan.endingBalance').replaceAll(' ', '%20'),
     i18n.t('static.report.mos').replaceAll(' ', '%20'),
     i18n.t('static.report.minmonth').replaceAll(' ', '%20'),
-    i18n.t('static.report.maxmonth').replaceAll(' ', '%20')]];
+    i18n.t('static.report.maxmonth').replaceAll(' ', '%20')])];
 
     var A = headers
     var re;
-    this.state.stockStatusList.map(ele => A.push([this.dateFormatter(ele.dt).replaceAll(' ', '%20'), ele.consumptionQty, ele.actualConsumption ? 'Yes' : '', ele.shipmentQty,
+    this.state.stockStatusList.map(ele => A.push(this.addDoubleQuoteToRowContent([this.dateFormatter(ele.dt).replaceAll(' ', '%20'), ele.consumptionQty, ele.actualConsumption ? 'Yes' : '', ele.shipmentQty,
     ((ele.shipmentInfo.map(item => {
       return (
         " [ " + getLabelText(item.fundingSource.label, this.state.lang) + " : " + getLabelText(item.shipmentStatus.label, this.state.lang) + " ] "
       )
     }).toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')
-      , ele.adjustment, ele.closingBalance, this.roundN(ele.mos), ele.minMos, ele.maxMos]));
+      , ele.adjustment, ele.closingBalance, this.roundN(ele.mos), ele.minMos, ele.maxMos])));
 
     /*for(var item=0;item<re.length;item++){
       A.push([re[item].consumption_date,re[item].forcast,re[item].Actual])
@@ -2316,7 +2321,7 @@ class StockStatus extends Component {
                 var list = programJson.supplyPlan.filter(c => c.planningUnitId == planningUnitId && c.transDate == dt)
 
                 if (list.length > 0) {
-                  var shiplist = shipmentList.filter(c => c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr)
+                  var shiplist = shipmentList.filter(c => c.receivedDate==null ||c.receivedDate==""?(c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr):(c.receivedDate >= dt && c.receivedDate <= enddtStr))
 
                   var json = {
                     dt: new Date(from, month - 1),
@@ -2345,7 +2350,7 @@ class StockStatus extends Component {
                   }
                 }
                 data.push(json)
-                console.log(data)
+                console.log(json)
                 if (month == this.state.rangeValue.to.month && from == to) {
                   this.setState({
                     stockStatusList: data,
@@ -2883,7 +2888,7 @@ class StockStatus extends Component {
           data: this.state.stockStatusList.map((item, index) => (item.consumptionQty))
         },*/
         {
-          label: 'Delivered',
+          label: i18n.t('static.supplyPlan.delivered'),
           yAxisID: 'A',
           stack: 1,
           backgroundColor: '#042e6a',
@@ -2902,7 +2907,7 @@ class StockStatus extends Component {
           })
         },
         {
-          label: 'Shipped',
+          label: i18n.t('static.supplyPlan.shipped'),
           yAxisID: 'A',
           stack: 1,
           backgroundColor: '#6a82a8',
@@ -2921,7 +2926,7 @@ class StockStatus extends Component {
         },
 
         {
-          label: 'Ordered',
+          label: i18n.t('static.supplyPlan.ordered'),
           yAxisID: 'A',
           stack: 1,
           backgroundColor: '#8aa9e6',
@@ -2939,7 +2944,7 @@ class StockStatus extends Component {
           })
         },
         {
-          label: 'Planned',
+          label: i18n.t('static.supplyPlan.planned'),
           backgroundColor: '#cfd5ea',
           borderColor: 'rgba(179,181,198,1)',
           pointBackgroundColor: 'rgba(179,181,198,1)',
@@ -2957,10 +2962,10 @@ class StockStatus extends Component {
           })
         },
         {
-          label: "Stock",
+          label:i18n.t('static.report.stock'),
           yAxisID: 'A',
           type: 'line',
-          borderColor: 'transparent',
+          borderColor: '#d0cece',
           ticks: {
             fontSize: 2,
             fontColor: 'transparent',

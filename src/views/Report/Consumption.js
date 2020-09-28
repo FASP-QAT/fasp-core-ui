@@ -1394,8 +1394,8 @@ class Consumption extends Component {
       show: false,
       message: '',
       rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-      minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() },
-      maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() + 1 },
+      minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
+      maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
       loading: true
 
 
@@ -1437,11 +1437,12 @@ class Consumption extends Component {
 
   }
 
-  storeProduct(planningUnitId) {
+  storeProduct() {
 
-    let productId = planningUnitId;
+    let productId = document.getElementById("planningUnitId").value;
     // let productFilter = this.state.productList.filter(c => (c.planningUnit.id == productId));
     // console.log("EEEEEEEEE--------", productId);
+    if(productId!=0){
     if (navigator.onLine) {
       RealmService.getRealmListAll()
         .then(response => {
@@ -1450,13 +1451,14 @@ class Consumption extends Component {
               realmId: response.data[0].realmId,
             })
 
-            PlanningUnitService.getPlanningUnitByRealmId(this.state.realmId).then(response => {
-              // console.log("RESP-----", response.data)
-              let productFilter = response.data.filter(c => (c.planningUnitId == productId));
+            PlanningUnitService.getPlanningUnitById(productId).then(response => {
+               console.log("RESP-----", response.data)
+              //let productFilter = response.data.filter(c => (c.planningUnitId == productId));
               this.setState({
-                multiplier: productFilter[0].multiplier,
+                multiplier: response.data.multiplier,
               },
                 () => {
+                  this.filterData()
                   console.log("MULTIPLIER----", this.state.multiplier);
                 })
             })
@@ -1493,12 +1495,13 @@ class Consumption extends Component {
             multiplier: productFilter[0].multiplier,
           },
             () => {
+              this.filterData()
               console.log("MULTIPLIER----", this.state.multiplier);
             })
         }.bind(this);
       }.bind(this)
     }
-
+  }
   }
 
 
@@ -1521,6 +1524,9 @@ class Consumption extends Component {
     }
     return x1 + x2;
   }
+  addDoubleQuoteToRowContent=(arr)=>{
+    return arr.map(ele=>'"'+ele+'"')
+ }
 
   exportCSV() {
 
@@ -1572,9 +1578,9 @@ class Consumption extends Component {
       }
     }
     var A = [];
-    A[0] = head;
-    A[1] = row1;
-    A[2] = row2;
+    A[0] =this.addDoubleQuoteToRowContent( head);
+    A[1] = this.addDoubleQuoteToRowContent(row1);
+    A[2] = this.addDoubleQuoteToRowContent(row2);
 
 
     for (var i = 0; i < A.length; i++) {
@@ -1632,7 +1638,7 @@ class Consumption extends Component {
         align: 'justify'
         });*/
         doc.setTextColor("#002f6c");
-        doc.text(i18n.t('static.report.consumptionReport'), doc.internal.pageSize.width / 2, 60, {
+        doc.text(i18n.t('static.dashboard.consumption'), doc.internal.pageSize.width / 2, 60, {
           align: 'center'
         })
         if (i == 1) {
@@ -1685,7 +1691,7 @@ class Consumption extends Component {
     const headers = [[i18n.t('static.report.consumptionDate'),
     i18n.t('static.report.forecasted'),
     i18n.t('static.report.actual')]];
-    const data = navigator.onLine ? this.state.consumptions.map(elt => [moment(elt.transDate, 'yyyy-MM-dd').format('MMM YYYY'), this.formatter(this.roundN(elt.forecastedConsumption)), this.formatter(this.roundN(elt.actualConsumption))]) : this.state.offlineConsumptionList.map(elt => [elt.transDate, this.formatter(this.roundN(elt.forecastedConsumption)), this.formatter(this.roundN(elt.actualConsumption))]);
+    const data = navigator.onLine ? this.state.consumptions.map(elt => [moment(elt.transDate, 'yyyy-MM-dd').format('MMM YYYY'), this.formatter(elt.forecastedConsumption), this.formatter(elt.actualConsumption)]) : this.state.offlineConsumptionList.map(elt => [elt.transDate, this.formatter(elt.forecastedConsumption), this.formatter(elt.actualConsumption)]);
     // let content = {
     //   margin: { top: 80 },
     //   startY: height,
@@ -1708,8 +1714,8 @@ class Consumption extends Component {
       row2.push(i18n.t('static.report.actual'));
       for (let i = 0; i < consumptionArray.length; i++) {
         head.push((moment(consumptionArray[i].transDate, 'yyyy-MM-dd').format('MMM YYYY')));
-        row1.push(this.formatter(this.roundN(consumptionArray[i].forecastedConsumption)));
-        row2.push(this.formatter(this.roundN(consumptionArray[i].actualConsumption)));
+        row1.push(this.formatter(consumptionArray[i].forecastedConsumption));
+        row2.push(this.formatter(consumptionArray[i].actualConsumption));
       }
     } else {
       let consumptionArray = this.state.offlineConsumptionList;
@@ -1718,8 +1724,8 @@ class Consumption extends Component {
       row2.push(i18n.t('static.report.actual'));
       for (let i = 0; i < consumptionArray.length; i++) {
         head.push((moment(consumptionArray[i].transDate, 'yyyy-MM-dd').format('MMM YYYY')));
-        row1.push(this.formatter(this.roundN(consumptionArray[i].forecastedConsumption)));
-        row2.push(this.formatter(this.roundN(consumptionArray[i].actualConsumption)));
+        row1.push(this.formatter(consumptionArray[i].forecastedConsumption));
+        row2.push(this.formatter(consumptionArray[i].actualConsumption));
       }
     }
     head1[0] = head;
@@ -1743,6 +1749,7 @@ class Consumption extends Component {
     addHeaders(doc)
     addFooters(doc)
     doc.save("Consumption.pdf")
+    doc.save(i18n.t('static.dashboard.consumption').concat('.pdf'));
     //creates PDF from img
     /* var doc = new jsPDF('landscape');
     doc.setFontSize(20);
@@ -1751,7 +1758,7 @@ class Consumption extends Component {
   }
 
   roundN = num => {
-    if (num != ''||num!=null) {
+    if (num != '' || num != null) {
       return parseFloat(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
     } else {
       return ''
@@ -1922,8 +1929,8 @@ class Consumption extends Component {
     // let productCategoryId = document.getElementById("productCategoryId").value;
     let planningUnitId = document.getElementById("planningUnitId").value;
     let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
-    let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
-
+    let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month , 0).getDate();
+    console.log('values =>',planningUnitId, programId ,versionId );
     if (planningUnitId > 0 && programId > 0 && versionId != 0) {
       if (versionId.includes('Local')) {
         this.setState({ loading: true })
@@ -1936,7 +1943,7 @@ class Consumption extends Component {
         openRequest.onerror = function (event) {
           this.setState({
             message: i18n.t('static.program.errortext'),
-            loading:false
+            loading: false
           })
         }.bind(this);
         openRequest.onsuccess = function (e) {
@@ -1957,7 +1964,7 @@ class Consumption extends Component {
           programRequest.onerror = function (event) {
             this.setState({
               message: i18n.t('static.program.errortext'),
-              loading:false
+              loading: false
             })
           }.bind(this);
           programRequest.onsuccess = function (e) {
@@ -2043,13 +2050,22 @@ class Consumption extends Component {
                 transDate = objForecast[0].consumptionDate;
               }
 
+              if (viewById == 2) {
+              //  this.toggleView();
+              let json = {
+                "transDate": transDate,
+                "actualConsumption": actualValue* this.state.multiplier,
+                "forecastedConsumption": forecastValue*this.state.multiplier
+              }
+                finalOfflineConsumption.push(json);
+              }else{
               let json = {
                 "transDate": transDate,
                 "actualConsumption": actualValue,
                 "forecastedConsumption": forecastValue
               }
               finalOfflineConsumption.push(json);
-
+            }
             }
 
 
@@ -2102,13 +2118,13 @@ class Consumption extends Component {
               consumptions: finalOfflineConsumption,
               message: '',
               loading: false
-            },
-              () => {
-                this.storeProduct(planningUnitId);
-                if (viewById == 2) {
-                  this.toggleView();
-                }
-              });
+            })
+              // () => {
+              //   this.storeProduct(planningUnitId);
+              //   if (viewById == 2) {
+              //     this.toggleView();
+              //   }
+              // });
 
           }.bind(this)
         }.bind(this)
@@ -2139,7 +2155,7 @@ class Consumption extends Component {
               loading: false
             },
               () => {
-                this.storeProduct(planningUnitId);
+              //  this.storeProduct(planningUnitId);
                 // if (viewById == 2) {
                 //   this.toggleView();
                 // }
@@ -2148,13 +2164,13 @@ class Consumption extends Component {
       }
 
     } else if (programId == -1) {
-      this.setState({ message: i18n.t('static.common.selectProgram'), consumptions: [] });
+      this.setState({ message: i18n.t('static.common.selectProgram'), consumptions: [],offlineConsumptionList:[] });
 
     } else if (versionId == 0) {
-      this.setState({ message: i18n.t('static.program.validversion'), consumptions: [] });
+      this.setState({ message: i18n.t('static.program.validversion'), consumptions: [] ,offlineConsumptionList:[]});
 
     } else {
-      this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), consumptions: [] });
+      this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), consumptions: [] ,offlineConsumptionList:[]});
 
     }
   }
@@ -2262,11 +2278,11 @@ class Consumption extends Component {
       planningUnits: [],
       planningUnitValues: [],
       planningUnitLabels: [],
-      offlinePlanningUnitList:[]
+      offlinePlanningUnitList: []
     }, () => {
 
       if (versionId == 0) {
-        this.setState({ message: i18n.t('static.program.validversion'), consumptions: [],offlineConsumptionList:[] });
+        this.setState({ message: i18n.t('static.program.validversion'), consumptions: [], offlineConsumptionList: [] });
       } else {
         if (versionId.includes('Local')) {
           // alert("in if");
@@ -2289,7 +2305,7 @@ class Consumption extends Component {
               myResult = planningunitRequest.result;
               var programId = (document.getElementById("programId").value).split("_")[0];
               var proList = []
-              console.log("myResult===============",myResult)
+              console.log("myResult===============", myResult)
               for (var i = 0; i < myResult.length; i++) {
                 if (myResult[i].program.id == programId) {
 
@@ -2298,7 +2314,7 @@ class Consumption extends Component {
               }
               this.setState({
                 planningUnits: proList, message: '',
-                offlinePlanningUnitList:proList
+                offlinePlanningUnitList: proList
               }, () => {
                 this.filterData();
               })
@@ -2481,7 +2497,7 @@ class Consumption extends Component {
         planningUnitLabels: []
       })
     }
-    this.filterData();
+   
   }
   consolidatedVersionList = (programId) => {
     const lan = 'en';
@@ -2524,7 +2540,7 @@ class Consumption extends Component {
           versions: verList.filter(function (x, i, a) {
             return a.indexOf(x) === i;
           })
-        })
+        },()=>{this.filterData()})
 
       }.bind(this);
     }.bind(this)
@@ -2879,7 +2895,7 @@ class Consumption extends Component {
                                 id="planningUnitId"
                                 bsSize="sm"
                                 onChange={this.filterData}
-                              // onChange={(e) => { this.storeProduct(e); this.filterData(); }}
+                               onChange={(e) => { this.storeProduct(e);  }}
                               >
                                 <option value="0">{i18n.t('static.common.select')}</option>
                                 {planningUnits.length > 0
@@ -2908,7 +2924,7 @@ class Consumption extends Component {
                                 name="planningUnitId"
                                 id="planningUnitId"
                                 bsSize="sm"
-                                onChange={this.filterData}
+                                onChange={(e) => { this.storeProduct(e);  }}
                               >
                                 <option value="0">{i18n.t('static.common.select')}</option>
                                 {offlinePlanningUnitList.length > 0
@@ -2969,7 +2985,7 @@ class Consumption extends Component {
                           </div>
                           <div className="col-md-12">
                             <button className="mr-1 mb-2 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
-                              {this.state.show ? 'Hide Data' : 'Show Data'}
+                              {this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
                             </button>
 
                           </div>
@@ -2991,7 +3007,7 @@ class Consumption extends Component {
                           </div>
                           <div className="col-md-12">
                             <button className="mr-1 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
-                              {this.state.show ? 'Hide Data' : 'Show Data'}
+                              {this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
                             </button>
                           </div>
                         </div>}
@@ -3029,7 +3045,7 @@ class Consumption extends Component {
                                     &&
                                     this.state.consumptions.map((item, idx) =>
                                       <td id="addr0" key={idx}>
-                                        {this.formatter(this.roundN(this.state.consumptions[idx].forecastedConsumption))}
+                                        {this.formatter(this.state.consumptions[idx].forecastedConsumption)}
                                       </td>
                                     )
                                   }
@@ -3042,7 +3058,7 @@ class Consumption extends Component {
                                     &&
                                     this.state.consumptions.map((item, idx) =>
                                       <td id="addr0" key={idx}>
-                                        {this.formatter(this.roundN(this.state.consumptions[idx].actualConsumption))}
+                                        {this.formatter(this.state.consumptions[idx].actualConsumption)}
                                       </td>
                                     )
                                   }
@@ -3078,7 +3094,7 @@ class Consumption extends Component {
                                     &&
                                     this.state.offlineConsumptionList.map((item, idx) =>
                                       <td id="addr0" key={idx}>
-                                        {this.formatter(this.roundN(this.state.offlineConsumptionList[idx].forecastedConsumption))}
+                                        {this.formatter(this.state.offlineConsumptionList[idx].forecastedConsumption)}
                                       </td>
                                     )
                                   }
@@ -3091,7 +3107,7 @@ class Consumption extends Component {
                                     &&
                                     this.state.offlineConsumptionList.map((item, idx) =>
                                       <td id="addr0" key={idx}>
-                                        {this.formatter(this.roundN(this.state.offlineConsumptionList[idx].actualConsumption))}
+                                        {this.formatter(this.state.offlineConsumptionList[idx].actualConsumption)}
                                       </td>
                                     )
                                   }

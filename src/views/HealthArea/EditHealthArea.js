@@ -30,7 +30,8 @@ const validationSchema = function (values) {
         realmId: Yup.string()
             .required(i18n.t('static.common.realmtext')),
         healthAreaName: Yup.string()
-            .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
+            // .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.healtharea.healthareatext')),
         healthAreaCode: Yup.string()
             .matches(ALPHABET_NUMBER_REGEX, i18n.t('static.message.alphabetnumerallowed'))

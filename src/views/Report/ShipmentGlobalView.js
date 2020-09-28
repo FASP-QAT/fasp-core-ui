@@ -1516,8 +1516,8 @@ class ShipmentGlobalView extends Component {
             table1Headers: [],
             viewby: 1,
             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate:{year:  new Date().getFullYear()-3, month: new Date().getMonth()},
-            maxDate:{year:  new Date().getFullYear()+3, month: new Date().getMonth()+1},
+            minDate:{year:  new Date().getFullYear()-3, month: new Date().getMonth()+2},
+            maxDate:{year:  new Date().getFullYear()+3, month: new Date().getMonth()},
             loading: true
 
 
@@ -1539,7 +1539,9 @@ class ShipmentGlobalView extends Component {
         if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
         return '?'
     }
-
+    addDoubleQuoteToRowContent=(arr)=>{
+        return arr.map(ele=>'"'+ele+'"')
+     }
     exportCSV() {
 
         var csvRow = [];
@@ -1576,10 +1578,10 @@ class ShipmentGlobalView extends Component {
             for (var i = 0; i < tableHead.length; i++) {
                 tableHeadTemp.push((tableHead[i].replaceAll(',', ' ')).replaceAll(' ', '%20'));
             }
-            A[0] = tableHeadTemp;
+            A[0] = this.addDoubleQuoteToRowContent(tableHeadTemp);
             re = this.state.table1Body
             for (var item = 0; item < re.length; item++) {
-                A.push([[(getLabelText(re[item].country.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), re[item].amount]])
+                A.push([this.addDoubleQuoteToRowContent([(getLabelText(re[item].country.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), re[item].amount])])
             }
             for (var i = 0; i < A.length; i++) {
                 csvRow.push(A[i].join(","))
@@ -1596,10 +1598,10 @@ class ShipmentGlobalView extends Component {
             } else {
                 tempLabel = i18n.t('static.procurementagent.procurementagent');
             }
-            var B = [[(i18n.t('static.dashboard.months').replaceAll(',', ' ')).replaceAll(' ', '%20'), (i18n.t('static.program.realmcountry').replaceAll(',', ' ')).replaceAll(' ', '%20'), (i18n.t('static.supplyPlan.amountInUSD').replaceAll(',', ' ')).replaceAll(' ', '%20'), (tempLabel.replaceAll(',', ' ')).replaceAll(' ', '%20'), (i18n.t('static.common.status').replaceAll(',', ' ')).replaceAll(' ', '%20')]];
+            var B = [this.addDoubleQuoteToRowContent([(i18n.t('static.dashboard.months').replaceAll(',', ' ')).replaceAll(' ', '%20'), (i18n.t('static.program.realmcountry').replaceAll(',', ' ')).replaceAll(' ', '%20'), (i18n.t('static.supplyPlan.amountInUSD').replaceAll(',', ' ')).replaceAll(' ', '%20'), (tempLabel.replaceAll(',', ' ')).replaceAll(' ', '%20'), (i18n.t('static.common.status').replaceAll(',', ' ')).replaceAll(' ', '%20')])];
             re = this.state.shipmentList;
             for (var item = 0; item < re.length; item++) {
-                B.push([[(moment(re[item].transDate, 'YYYY-MM-dd').format('MMM YYYY').replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(re[item].country.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), re[item].amount, (getLabelText(re[item].fundingSourceProcurementAgent.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(re[item].shipmentStatus.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20')]])
+                B.push([this.addDoubleQuoteToRowContent([(moment(re[item].transDate, 'YYYY-MM-dd').format('MMM YYYY').replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(re[item].country.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), re[item].amount, (getLabelText(re[item].fundingSourceProcurementAgent.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(re[item].shipmentStatus.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20')])])
             }
             for (var i = 0; i < B.length; i++) {
                 csvRow.push(B[i].join(","))

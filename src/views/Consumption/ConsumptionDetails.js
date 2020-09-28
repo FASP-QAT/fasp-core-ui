@@ -38,8 +38,8 @@ export default class ConsumptionDetails extends React.Component {
             showConsumption: 0,
             consumptionChangedFlag: 0,
             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() },
-            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
+            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() },
         }
 
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
@@ -445,6 +445,7 @@ export default class ConsumptionDetails extends React.Component {
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 {this.state.consumptionChangedFlag == 1 && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.refs.consumptionChild.saveConsumption}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>}
                                 &nbsp;
+                                {this.refs.consumptionChild != undefined && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.refs.consumptionChild.addRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}&nbsp;
                         </FormGroup>
                         </FormGroup>
                     </CardFooter>
@@ -463,7 +464,8 @@ export default class ConsumptionDetails extends React.Component {
                     </ModalBody>
                     <ModalFooter>
                         <div id="showConsumptionBatchInfoButtonsDiv" style={{ display: 'none' }}>
-                            {this.state.consumptionBatchInfoChangedFlag == 1 && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.refs.consumptionChild.saveConsumptionBatchInfo}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>}{' '}
+                            {this.state.consumptionBatchInfoChangedFlag == 1 && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.refs.consumptionChild.saveConsumptionBatchInfo}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>}
+                            {this.refs.consumptionChild != undefined && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.refs.consumptionChild.addBatchRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
                         </div>
                         <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceled()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                     </ModalFooter>
@@ -472,7 +474,7 @@ export default class ConsumptionDetails extends React.Component {
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
-                            <div ><h4> <strong>Loading...</strong></h4></div>
+                            <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
 
                             <div class="spinner-border blue ml-4" role="status">
 

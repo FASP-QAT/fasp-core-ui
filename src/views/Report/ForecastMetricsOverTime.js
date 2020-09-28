@@ -1401,8 +1401,8 @@ class ForcastMatrixOverTime extends Component {
       show: false,
       singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
       rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-      minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() },
-      maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() + 1 },
+      minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth()+2 },
+      maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth()  },
 
 
     };
@@ -1436,7 +1436,7 @@ if(value!=null){
     }
     return x1 + x2;
   }else{
-    return 0;
+    return '';
   }
   }
   dateFormatter = value => {
@@ -1462,7 +1462,9 @@ if(value!=null){
     }
   }
   toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
-
+  addDoubleQuoteToRowContent=(arr)=>{
+    return arr.map(ele=>'"'+ele+'"')
+ }
   exportCSV() {
 
     var csvRow = [];
@@ -1476,13 +1478,13 @@ if(value!=null){
     csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
     csvRow.push('')
     var re;
-    var A = [[(i18n.t('static.report.month')).replaceAll(' ', '%20'), (i18n.t('static.report.forecastConsumption')).replaceAll(' ', '%20'), (i18n.t('static.report.actualConsumption')).replaceAll(' ', '%20'), ((i18n.t('static.report.error')).replaceAll(' ', '%20')).replaceAll(' ', '%20')]]
+    var A = [this.addDoubleQuoteToRowContent([(i18n.t('static.report.month')).replaceAll(' ', '%20'), (i18n.t('static.report.forecastConsumption')).replaceAll(' ', '%20'), (i18n.t('static.report.actualConsumption')).replaceAll(' ', '%20'), ((i18n.t('static.report.error')).replaceAll(' ', '%20')).replaceAll(' ', '%20')])]
 
     re = this.state.matricsList
 
 
     for (var item = 0; item < re.length; item++) {
-      A.push([this.dateFormatter(re[item].month).replaceAll(' ', '%20'), re[item].forecastedConsumption, re[item].actualConsumption, this.PercentageFormatter(re[item].forecastError)])
+      A.push(this.addDoubleQuoteToRowContent([this.dateFormatter(re[item].month).replaceAll(' ', '%20'), re[item].forecastedConsumption, re[item].actualConsumption, this.PercentageFormatter(re[item].forecastError)]))
     }
     for (var i = 0; i < A.length; i++) {
       csvRow.push(A[i].join(","))
@@ -1937,7 +1939,7 @@ if(value!=null){
                 var forcastConsumption = 0;
                 var montcnt = 0
                 var absvalue = 0;
-                var currentActualconsumption = 0;
+                var currentActualconsumption = null;
                 var currentForcastConsumption = 0;
                 for (var i = month, j = 0; j <= monthInCalc; i-- , j++) {
                   if (i == 0) {
@@ -1952,15 +1954,22 @@ if(value!=null){
 
                   for (var l = 0; l < conlist.length; l++) {
                     if (conlist[l].actualFlag.toString() == 'true') {
-                      actconsumption = actconsumption + conlist[l].consumptionQty
+                      actconsumption = actconsumption + parseInt(conlist[l].consumptionQty)
                     } else {
-                      forConsumption = forConsumption + conlist[l].consumptionQty
+                      forConsumption = forConsumption + parseInt(conlist[l].consumptionQty)
                     }
                   }
                   actualconsumption = actualconsumption + actconsumption
                   forcastConsumption = forcastConsumption + forConsumption
                   if (j == 0) {
+                    console.log(currentActualconsumption,' ',actconsumption)
+                    if(currentActualconsumption==null && actconsumption>0)
+                    {
+                      currentActualconsumption=0
+                    }
+                    if(currentActualconsumption!=null){
                     currentActualconsumption = currentActualconsumption + actconsumption
+                    }
                     currentForcastConsumption = currentForcastConsumption + forConsumption
                   }
                   if (actconsumption > 0 && forConsumption > 0)
@@ -2202,7 +2211,7 @@ if(value!=null){
                       <div className=" pl-0">
                         <div className="row">
                           <FormGroup className="col-md-3">
-                            <Label htmlFor="appendedInputButton">Select Period</Label>
+                            <Label htmlFor="appendedInputButton">{i18n.t('static.period.selectPeriod')}</Label>
                             <div className="controls  edit">
 
                               <Picker
@@ -2306,7 +2315,7 @@ if(value!=null){
 
                             </FormGroup>*/}
                           <FormGroup className="col-md-3">
-                            <Label htmlFor="appendedInputButton">Version</Label>
+                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
                             <div className="controls">
                               <InputGroup>
                                 <Input
@@ -2359,7 +2368,7 @@ if(value!=null){
                             </div>
                             <div className="col-md-12">
                               <button className="mr-1 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
-                                {this.state.show ? 'Hide Data' : 'Show Data'}
+                                {this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
                               </button>
 
                             </div>

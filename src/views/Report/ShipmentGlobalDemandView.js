@@ -1587,8 +1587,8 @@ class ShipmentGlobalDemandView extends Component {
             show: false,
             message: '',
             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() },
-            maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() + 1 },
+            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth()+2 },
+            maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
             loading: true
         };
 
@@ -1607,7 +1607,10 @@ class ShipmentGlobalDemandView extends Component {
         if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
         return '?'
     }
-
+    addDoubleQuoteToRowContent=(arr)=>{
+        return arr.map(ele=>'"'+ele+'"')
+     }
+     
     exportCSV() {
 
         var csvRow = [];
@@ -1659,11 +1662,11 @@ class ShipmentGlobalDemandView extends Component {
             }
             tableHeadTemp.push("Total");
 
-            A[0] = tableHeadTemp;
+            A[0] = this.addDoubleQuoteToRowContent(tableHeadTemp);
             re = this.state.procurementAgentSplit;
             for (var item = 0; item < re.length; item++) {
                 let item1 = Object.values(re[item].procurementAgentQty);
-                A.push([[(getLabelText(re[item].planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), item1, re[item].total]])
+                A.push([this.addDoubleQuoteToRowContent([(getLabelText(re[item].planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), item1, re[item].total])])
             }
             for (var i = 0; i < A.length; i++) {
                 csvRow.push(A[i].join(","))
@@ -2362,15 +2365,15 @@ class ShipmentGlobalDemandView extends Component {
     componentDidMount() {
 
         if (navigator.onLine) {
-            this.getProductCategories();
+            this.getRelamList();
             this.getFundingSource();
             this.getShipmentStatusList();
-            this.getRelamList();
         } else {
             this.setState({ loading: false })
             this.getPrograms();
-            this.getShipmentStatusList();
             this.getFundingSource();
+            this.getShipmentStatusList();
+          
         }
 
     }
@@ -2692,12 +2695,12 @@ class ShipmentGlobalDemandView extends Component {
 
     getProductCategories() {
         AuthenticationService.setupAxiosInterceptors();
-        let realmId = AuthenticationService.getRealmId();
+        let realmId = document.getElementById("realmId").value;
         ProductService.getProductCategoryList(realmId)
             .then(response => {
                 // console.log(response.data)
-                // var list = response.data.slice(1);
-                var list = response.data;
+                var list = response.data.slice(1);
+                // var list = response.data;
                 this.setState({
                     productCategories: list, loading: false
                 })
@@ -2816,6 +2819,7 @@ class ShipmentGlobalDemandView extends Component {
     }
 
     handlePlanningUnitChange = (planningUnitIds) => {
+        console.log(planningUnitIds)
         planningUnitIds = planningUnitIds.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
         })
@@ -3104,7 +3108,7 @@ class ShipmentGlobalDemandView extends Component {
                                                         <Input
                                                             bsSize="sm"
                                                             type="select" name="realmId" id="realmId"
-                                                            onChange={(e) => { this.fetchData(); }}
+                                                            onChange={(e) => {  this.getProductCategories();this.fetchData(); }}
                                                         >
                                                             <option value="">{i18n.t('static.common.select')}</option>
                                                             {realms}
