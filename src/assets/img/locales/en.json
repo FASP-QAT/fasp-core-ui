@@ -1210,6 +1210,8 @@
     "static.report.submitted": "Submitted",
     "static.report.hold": "On-hold",
     "static.report.planned": "Planned",
-    "static.report.arrived": "Arrived"
+    "static.report.arrived": "Arrived",
+    "static.ticket.requestTo": "Request a new / update to...",
+    "static.ticket.drodownvaluenotfound": "Note: If you don't see the desired XYZ you want, submit a ticket for this item"
     
 }
