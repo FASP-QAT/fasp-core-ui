@@ -1223,6 +1223,9 @@ export default class InventoryTurns extends Component {
         }
         return x1 + x2;
     }
+    addDoubleQuoteToRowContent=(arr)=>{
+        return arr.map(ele=>'"'+ele+'"')
+     }
     exportCSV = (columns) => {
 
         var csvRow = [];
@@ -1239,8 +1242,8 @@ export default class InventoryTurns extends Component {
         const headers = [];
         columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ', '%20') });
 
-        var A = [headers]
-        this.state.costOfInventory.map(ele => A.push([(getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.totalConsumption, this.round(ele.avergeStock), ele.noOfMonths, this.roundN(ele.inventoryTurns)]));
+        var A = [this.addDoubleQuoteToRowContent(headers)]
+        this.state.costOfInventory.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.totalConsumption, this.round(ele.avergeStock), ele.noOfMonths, this.roundN(ele.inventoryTurns)])));
 
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
@@ -1574,18 +1577,22 @@ export default class InventoryTurns extends Component {
                             if(list.length>0){
                                 if(document.getElementById("includePlanningShipments").value.toString() == 'true'){
                                 endingBalanceArray[n] = list[0].closingBalance
-                                totalConsumption = totalConsumption + parseInt(list[0].consumptionQty)
-                                if(list[0].consumptionQty>0|| list[0].closingBalance>0){
-                                    monthcnt++
-                                    totalClosingBalance=totalClosingBalance+parseInt(list[0].closingBalance)
-                                }
+                                totalConsumption = totalConsumption + parseInt(list[0].consumptionQty==null?0:list[0].consumptionQty)
+                                totalClosingBalance=totalClosingBalance+parseInt(list[0].closingBalance)
+                                monthcnt++
+                                // if(list[0].consumptionQty>0|| list[0].closingBalance>0){
+                                //     monthcnt++
+                                    
+                                // }
                             }else{
                                 endingBalanceArray[n] = list[0].closingBalanceWps
-                                totalConsumption = totalConsumption + parseInt(list[0].consumptionQty)
-                                if(list[0].consumptionQty>0|| list[0].closingBalance>0){
-                                    monthcnt++
-                                    totalClosingBalance=totalClosingBalance+list[0].closingBalanceWps
-                                }
+                                totalConsumption = totalConsumption + parseInt(list[0].consumptionQty==null?0:list[0].consumptionQty)
+                                monthcnt++
+                                // totalClosingBalance=totalClosingBalance+list[0].closingBalanceWps
+                                // if(list[0].consumptionQty>0|| list[0].closingBalanceWps>0){
+                                //     monthcnt++
+                                   
+                                // }
                             }}else{
                                 endingBalanceArray[n] = ''
                             }  
@@ -1836,7 +1843,7 @@ var inputJson={
                                                             name="programId"
                                                             id="programId"
                                                             bsSize="sm"
-                                                            onChange={(e) => { this.dataChange(e); this.filterVersion(); this.formSubmit() }}
+                                                            onChange={(e) => { this.dataChange(e); this.filterVersion(); }}
                                                         >
                                                             <option value="0">{i18n.t('static.common.select')}</option>
                                                             {programList}
@@ -1854,7 +1861,7 @@ var inputJson={
                                                             name="versionId"
                                                             id="versionId"
                                                             bsSize="sm"
-                                                            onChange={(e) => { this.dataChange(e); this.formSubmit() }}
+                                                            onChange={(e) => { this.dataChange(e)}}
                                                         >
                                                             <option value="0">{i18n.t('static.common.select')}</option>
                                                             {versionList}
@@ -1874,7 +1881,7 @@ var inputJson={
                                                             name="includePlanningShipments"
                                                             id="includePlanningShipments"
                                                             bsSize="sm"
-                                                            onChange={(e) => { this.dataChange(e); this.formSubmit() }}
+                                                            onChange={(e) => { this.dataChange(e);  }}
                                                         >
                                                             <option value="true">{i18n.t('static.program.yes')}</option>
                                                             <option value="false">{i18n.t('static.program.no')}</option>

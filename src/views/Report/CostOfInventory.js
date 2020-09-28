@@ -1244,6 +1244,10 @@ export default class CostOfInventory extends Component {
         }
         return x1 + x2;
     }
+
+    addDoubleQuoteToRowContent=(arr)=>{
+        return arr.map(ele=>'"'+ele+'"')
+     }
     exportCSV = (columns) => {
 
         var csvRow = [];
@@ -1261,8 +1265,8 @@ export default class CostOfInventory extends Component {
         const headers = [];
         columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ', '%20') });
 
-        var A = [headers]
-        this.state.costOfInventory.map(ele => A.push([(getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.stock, ele.catalogPrice, ele.cost]));
+        var A = [this.addDoubleQuoteToRowContent(headers)]
+        this.state.costOfInventory.map(ele => A.push(this.addDoubleQuoteToRowContent[(getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.stock, ele.catalogPrice, ele.cost]));
 
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))

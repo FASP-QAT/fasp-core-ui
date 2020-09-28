@@ -481,7 +481,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                         // Check if all the regions have reported actual inventory and expected stock is not equal to actual stock make an national adjustment
                         if (regionsReportingActualInventory == totalNoOfRegions && expectedStock != actualStockCount) {
                             nationalAdjustment = actualStockCount - expectedStock;
-                        } else if (actualStockCount > (expectedStock + adjustmentQty)) {
+                        } else if (inventoryList.length != 0 && actualStockCount > (expectedStock + adjustmentQty)) {
                             // If actual stock count is greater than expected + adjustment qty that consider that stock as national adjustment
                             nationalAdjustment = actualStockCount - expectedStock;
                         } else if (regionsReportingActualInventory > 0 && expectedStock < 0) {
@@ -642,11 +642,16 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                         var closingBalanceWps = 0;
                         var unmetDemandQty = "";
                         var unmetDemandQtyWps = "";
+                        console.log("Expected stocvk", expectedStock);
+                        console.log("National adjutsment", nationalAdjustment);
                         if (regionsReportingActualInventory == totalNoOfRegions) {
+                            console.log("In if")
                             closingBalance = actualStockCount;
-                        } else if (actualStockCount > expectedStock + nationalAdjustment) {
+                        } else if (inventoryList.length != 0 && actualStockCount > expectedStock + nationalAdjustment) {
+                            console.log("in second if")
                             closingBalance = actualStockCount
                         } else {
+                            console.log("In else")
                             closingBalance = expectedStock + nationalAdjustment;
                         }
 
@@ -658,6 +663,9 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                         } else {
                             closingBalanceWps = expectedStockWps + nationalAdjustmentWps;
                         }
+
+                        console.log("Closing balance", closingBalance);
+                        console.log("Expected Stock", expectedStock);
 
                         // Calculations of unmet demand
                         if (closingBalance < 0) {

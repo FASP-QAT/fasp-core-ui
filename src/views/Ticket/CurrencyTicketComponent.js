@@ -20,13 +20,14 @@ const initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({        
         summary: Yup.string()
+            .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.common.summarytext')),
         currencyName: Yup.string()
             .required(i18n.t('static.currency.currencytext'))
             .matches(SPACE_REGEX, i18n.t('static.message.rolenamevalidtext')),
-        currencyCode: Yup.string()
-            .required(i18n.t('static.currency.currencycodetext'))
-            .matches(ALPHABETS_REGEX, i18n.t('static.common.alphabetsOnly')),
+        // currencyCode: Yup.string()
+        //     .required(i18n.t('static.currency.currencycodetext'))
+        //     .matches(ALPHABETS_REGEX, i18n.t('static.common.alphabetsOnly')),
         conversionRatetoUSD: Yup.string()
             .required(i18n.t('static.currency.currencyconversiontext'))
             .matches(DECIMAL_NO_REGEX, i18n.t('static.currency.conversionrateNumberDecimalPlaces')),        
@@ -141,7 +142,7 @@ export default class CurrencyTicketComponent extends Component {
 
     resetClicked() {        
         let { currency } = this.state;
-        currency.summary = '';
+        // currency.summary = '';
         currency.currencyName = '';
         currency.currencyCode = '';
         currency.conversionRatetoUSD = '';              
@@ -156,7 +157,7 @@ export default class CurrencyTicketComponent extends Component {
 
         return (
             <div className="col-md-12">
-                <h5 style={{ color: "green" }} id="div2">{i18n.t(this.state.message)}</h5>                
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>                
                 <h4>{i18n.t('static.currency.currencyMaster')}</h4>
                 <br></br>
                 <div style={{ display: this.state.loading ? "none" : "block" }}>
@@ -179,36 +180,26 @@ export default class CurrencyTicketComponent extends Component {
                                         this.hideSecondComponent();
                                     })                                
                             } else {
-                                this.setState({
-                                    // message: response.data.messageCode
-                                    message: 'Error while creating query', loading: false
+                                this.setState({                                    
+                                    message: i18n.t('static.unkownError'), loading: false
                                 },
-                                    () => {
-                                        this.resetClicked();
+                                    () => {                                        
                                         this.hideSecondComponent();
                                     })                                
                             }                            
                             this.props.togglehelp();
                             this.props.toggleSmall(this.state.message);
                         })
-                        // .catch(
-                        //     error => {
-                        //         switch (error.message) {
-                        //             case "Network Error":
-                        //                 this.setState({
-                        //                     message: 'Network Error'
-                        //                 })
-                        //                 break
-                        //             default:
-                        //                 this.setState({
-                        //                     message: 'Error'
-                        //                 })
-                        //                 break
-                        //         }
-                        //         alert(this.state.message);
-                        //         this.props.togglehelp();
-                        //     }
-                        // );       
+                        .catch(
+                            error => {
+                                this.setState({                                        
+                                    message: i18n.t('static.unkownError'), loading: false
+                                },
+                                () => {                                        
+                                    this.hideSecondComponent();                                     
+                                });                                    
+                            }
+                        ); 
                     }}
                     render={
                         ({
@@ -223,10 +214,10 @@ export default class CurrencyTicketComponent extends Component {
                             setTouched,
                             handleReset
                         }) => (
-                                <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm'>
+                                <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm' autocomplete="off">
                                     < FormGroup >
                                         <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
-                                        <Input type="text" name="summary" id="summary"
+                                        <Input type="text" name="summary" id="summary" readOnly = {true}
                                         bsSize="sm"
                                         valid={!errors.summary && this.state.currency.summary != ''}
                                         invalid={touched.summary && !!errors.summary}
@@ -249,15 +240,16 @@ export default class CurrencyTicketComponent extends Component {
                                         <FormFeedback className="red">{errors.currencyName}</FormFeedback>
                                     </FormGroup>
                                     < FormGroup >
-                                        <Label for="currencyCode">{i18n.t('static.currency.currencycode')}<span class="red Reqasterisk">*</span></Label>
+                                        <Label for="currencyCode">{i18n.t('static.currency.currencycode')}</Label>
                                         <Input type="text" name="currencyCode" id="currencyCode"
                                         bsSize="sm"
-                                        valid={!errors.currencyCode && this.state.currency.currencyCode != ''}
-                                        invalid={touched.currencyCode && !!errors.currencyCode}
+                                        // valid={!errors.currencyCode && this.state.currency.currencyCode != ''}
+                                        // invalid={touched.currencyCode && !!errors.currencyCode}
                                         onChange={(e) => { handleChange(e); this.dataChange(e);}}
                                         onBlur={handleBlur}
                                         value={this.state.currency.currencyCode}
-                                        required />
+                                        // required 
+                                        />
                                         <FormFeedback className="red">{errors.currencyCode}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup>
