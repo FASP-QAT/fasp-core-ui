@@ -8,6 +8,7 @@ import i18n from '../../i18n';
 import * as Yup from 'yup';
 import JiraTikcetService from '../../api/JiraTikcetService';
 import RealmService from '../../api/RealmService';
+import { SPACE_REGEX } from '../../Constants';
 
 const initialValues = {
     summary: "Add / Update Procurement Agent",
@@ -23,11 +24,12 @@ const initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()
+            .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.common.summarytext')),
         realmName: Yup.string()
             .required(i18n.t('static.common.realmtext')),
-        procurementAgentCode: Yup.string()
-            .required(i18n.t('static.procurementagent.codetext')),
+        // procurementAgentCode: Yup.string()
+            // .required(i18n.t('static.procurementagent.codetext')),
         procurementAgentName: Yup.string()
             .required(i18n.t('static.procurementAgent.procurementagentnametext')),
         submittedToApprovedLeadTime: Yup.string()
@@ -174,7 +176,7 @@ export default class ProcurementAgentTicketComponent extends Component {
 
     resetClicked() {
         let { procurementAgent } = this.state;
-        procurementAgent.summary = '';
+        // procurementAgent.summary = '';
         procurementAgent.realmName = '';
         procurementAgent.procurementAgentCode = '';
         procurementAgent.procurementAgentName = '';
@@ -200,7 +202,7 @@ export default class ProcurementAgentTicketComponent extends Component {
 
         return (
             <div className="col-md-12">
-                <h5 style={{ color: "green" }} id="div2">{i18n.t(this.state.message)}</h5>
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
                 <h4>{i18n.t('static.procurementagent.procurementagent')}</h4>
                 <br></br>
                 <div style={{ display: this.state.loading ? "none" : "block" }}>
@@ -223,36 +225,26 @@ export default class ProcurementAgentTicketComponent extends Component {
                                         this.hideSecondComponent();
                                     })                                
                             } else {
-                                this.setState({
-                                    // message: response.data.messageCode
-                                    message: 'Error while creating query', loading: false
+                                this.setState({                                    
+                                    message: i18n.t('static.unkownError'), loading: false
                                 },
-                                    () => {
-                                        this.resetClicked();
+                                    () => {                                        
                                         this.hideSecondComponent();
                                     })                                
                             }                            
                             this.props.togglehelp();
                             this.props.toggleSmall(this.state.message);
                         })
-                        // .catch(
-                        //     error => {
-                        //         switch (error.message) {
-                        //             case "Network Error":
-                        //                 this.setState({
-                        //                     message: 'Network Error'
-                        //                 })
-                        //                 break
-                        //             default:
-                        //                 this.setState({
-                        //                     message: 'Error'
-                        //                 })
-                        //                 break
-                        //         }
-                        //         alert(this.state.message);
-                        //         this.props.togglehelp();
-                        //     }
-                        // );  
+                        .catch(
+                            error => {
+                                this.setState({                                        
+                                    message: i18n.t('static.unkownError'), loading: false
+                                },
+                                () => {                                        
+                                    this.hideSecondComponent();                                     
+                                });                                    
+                            }
+                        ); 
                     }}
                     render={
                         ({
@@ -267,10 +259,10 @@ export default class ProcurementAgentTicketComponent extends Component {
                             setTouched,
                             handleReset
                         }) => (
-                                <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm'>
+                                <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm' autocomplete="off">
                                     < FormGroup >
                                         <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
-                                        <Input type="text" name="summary" id="summary"
+                                        <Input type="text" name="summary" id="summary" readOnly = {true}
                                             bsSize="sm"
                                             valid={!errors.summary && this.state.procurementAgent.summary != ''}
                                             invalid={touched.summary && !!errors.summary}
@@ -317,16 +309,16 @@ export default class ProcurementAgentTicketComponent extends Component {
                                         <FormFeedback className="red">{errors.procurementAgentName}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup>
-                                        <Label for="procurementAgentCode">{i18n.t('static.procurementagent.procurementagentcode')}<span className="red Reqasterisk">*</span></Label>
+                                        <Label for="procurementAgentCode">{i18n.t('static.procurementagent.procurementagentcode')}</Label>
                                         <Input type="text"
                                             bsSize="sm"
                                             name="procurementAgentCode"
                                             id="procurementAgentCode"
-                                            valid={!errors.procurementAgentCode && this.state.procurementAgent.procurementAgentCode != ''}
-                                            invalid={touched.procurementAgentCode && !!errors.procurementAgentCode}
+                                            // valid={!errors.procurementAgentCode && this.state.procurementAgent.procurementAgentCode != ''}
+                                            // invalid={touched.procurementAgentCode && !!errors.procurementAgentCode}
                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                             onBlur={handleBlur}
-                                            required
+                                            // required
                                             maxLength={6}
                                             value={this.state.procurementAgent.procurementAgentCode}
                                         />
@@ -421,6 +413,10 @@ export default class ProcurementAgentTicketComponent extends Component {
                                         <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                         <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>
                                     </ModalFooter>
+                                    <br></br><br></br>
+                                    <div className={this.props.className}>
+                                        <p>{i18n.t('static.ticket.drodownvaluenotfound')}</p>
+                                    </div>
                                 </Form>
                             )} />
                             </div>

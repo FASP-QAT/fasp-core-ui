@@ -1100,6 +1100,18 @@
     "static.report.shipmentReports": "Informes de envío",
     "static.country.countrycode2": "Nombre de visualización del país2",
     "static.country.countrycodetext2": "Ingrese el nombre de visualización del país2",
-    "static.ticket.addUpdateUser": "Agregar / actualizar usuario"
-    
+    "static.ticket.addUpdateUser": "Agregar / actualizar usuario",
+    "static.ticket.help": "Ayuda",
+    "static.ticket.header": "QAT Mesa de ayuda",
+    "static.ticket.subheader": "ESTAMOS AQUÍ PARA AYUDARLE CON SU CONSULTA",
+    "static.ticket.addUpdateMasterData": "Agregar / actualizar datos maestros",
+    "static.common.bugreport": "Reportar un error",
+    "static.ticket.requestTo": "Solicite una nueva / actualización de...",
+    "static.ticket.uploadScreenshot": "Sube una captura de pantalla",
+    "static.common.description": "la descripción",
+    "static.common.notes": "Notas",
+    "static.common.summary": "Resumen",
+    "static.ticket.ticketcreated": "El ticket ha sido creado.",
+    "static.ticket.ticketcode": "Boleto Código",
+    "static.ticket.drodownvaluenotfound": "Nota: Se você não vir o XYZ desejado que deseja, envie um tíquete para este item"
 }

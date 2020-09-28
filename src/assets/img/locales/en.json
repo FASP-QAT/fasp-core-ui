@@ -1175,5 +1175,7 @@
     "static.message.inventorySaved": "Inventory data saved",
     "static.program.savedOn":"saved on",
     "static.program.savedBy":"by",
-    "static.program.as":"as"
+    "static.program.as":"as",
+    "static.ticket.requestTo": "Request a new / update to...",
+    "static.ticket.drodownvaluenotfound": "Note: If you don't see the desired XYZ you want, submit a ticket for this item"
 }

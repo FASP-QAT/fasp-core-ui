@@ -722,5 +722,10 @@
     "static.country.countrycode2": "Nome de exibição do país 2",
     "static.country.countrycodetext2": "Insira o nome de exibição do país 2",
     "static.message.rolenamevalidtext": "Somente letras e espaços são permitidos",
-    "static.ticket.addUpdateUser": "Adicionar / atualizar usuário"
+    "static.ticket.addUpdateUser": "Adicionar / atualizar usuário",
+    "static.ticket.help": "Socorro",
+    "static.ticket.header": "QAT Central de Ajuda",
+    "static.ticket.subheader": "ESTAMOS AQUI PARA AJUDÁ-LO COM SUA PERGUNTA",
+    "static.ticket.requestTo": "Solicite uma nova / atualização para...",
+    "static.ticket.uploadScreenshot": "Faça upload de uma captura de tela"
 }

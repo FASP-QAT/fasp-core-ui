@@ -1100,5 +1100,18 @@
     "static.report.shipmentReports": "Rapports d'expédition",
     "static.country.countrycode2": "Nom d'affichage du pays2",
     "static.country.countrycodetext2": "Entrez le nom d'affichage du pays2",
-    "static.ticket.addUpdateUser": "Ajouter / mettre à jour un utilisateur"
+    "static.ticket.addUpdateUser": "Ajouter / mettre à jour un utilisateur",
+    "static.ticket.help": "Aidez",
+    "static.ticket.header": "QAT Bureau d'aide",
+    "static.ticket.subheader": "NOUS SOMMES ICI POUR VOUS AIDER AVEC VOTRE QUESTION",
+    "static.ticket.addUpdateMasterData": "Ajouter / mettre à jour les données de base",
+    "static.common.bugreport": "Signaler un bug",
+    "static.ticket.requestTo": "Demander une nouvelle / mise à jour de...",
+    "static.ticket.uploadScreenshot": "Téléchargez une capture d'écran",
+    "static.common.description": "La description",
+    "static.common.notes": "Remarques",
+    "static.common.summary": "Résumé",
+    "static.ticket.ticketcreated": "Le ticket a été créé.",
+    "static.ticket.ticketcode": "Code du billet",
+    "static.ticket.drodownvaluenotfound": "Remarque: si vous ne voyez pas le XYZ souhaité, veuillez soumettre un ticket pour cet article"
 }

@@ -144,7 +144,7 @@ export default class InitialTicketPageComponent extends Component {
       message: i18n.t('static.ticket.ticketcreated') + " " + i18n.t('static.ticket.ticketcode') + ": " + msg,
       buttons: [
         {
-          label: i18n.t('static.common.close')              
+          label: i18n.t('static.common.close')
         }
       ]
     });
@@ -170,7 +170,7 @@ export default class InitialTicketPageComponent extends Component {
 
   //Show User Master Page
   toggleUserMaster() {
-    this.setState({            
+    this.setState({
       initialPage: 0,
       showUserData: 1
     });
@@ -555,9 +555,9 @@ export default class InitialTicketPageComponent extends Component {
               <div className="mt-2 mb-2">
 
                 <ListGroup>
-                  <ListGroupItem className="list-group-item-help" tag="a" onClick={this.toggleUserMaster} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.ticket.addUpdateUser')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>                  
+                  <ListGroupItem className="list-group-item-help" tag="a" onClick={this.toggleUserMaster} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.ticket.addUpdateUser')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                   <ListGroupItem className="list-group-item-help" tag="a" onClick={this.togglechangemaster} action><i className="icon-list  icons helpclickicon mr-2"></i> {i18n.t('static.ticket.addUpdateMasterData')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
-                  <ListGroupItem className="list-group-item-help" tag="a" onClick={this.togglebugreport} action>  <i className="icon-list icons helpclickicon mr-2"></i>{i18n.t('static.common.bugreport')}</ListGroupItem>                  
+                  <ListGroupItem className="list-group-item-help" tag="a" onClick={this.togglebugreport} action>  <i className="icon-list icons helpclickicon mr-2"></i>{i18n.t('static.common.bugreport')}</ListGroupItem>
 
                 </ListGroup>
               </div>
@@ -578,11 +578,11 @@ export default class InitialTicketPageComponent extends Component {
               {/* <ModalHeader toggle={this.togglechangemaster} className="ModalHead modal-info-Headher"><strong>Help</strong></ModalHeader> */}
               <ModalBody>
                 {this.state.showOnlyMaster == 1 && <div className="mt-2 mb-2">
+                  <div><h4>{i18n.t('static.ticket.requestTo')}</h4></div><br></br>
                   <ListGroup>
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleSubMaster(1) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.dashboard.applicationmaster')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
-                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleSubMaster(2) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.dashboard.realmlevelmaster')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleSubMaster(3) }} action><i className="icon-note  icons helpclickicon mr-2"></i> {i18n.t('static.dashboard.programmaster')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
-
+                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleSubMaster(2) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.dashboard.realmlevelmaster')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                   </ListGroup>
                   <ModalFooter className="pb-0 pr-0">
                     <Button color="info" onClick={this.toggleMain1}><i className="fa fa-angle-double-left "></i>  Back</Button>
@@ -591,9 +591,10 @@ export default class InitialTicketPageComponent extends Component {
                 </div>}
 
                 {this.state.showOnlyApplicationMaster == 1 && <div className="mt-2 mb-2">
+                  <div><h4>{i18n.t('static.ticket.requestTo')}</h4></div><br></br>
                   <ListGroup>
                     {/* <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleApplicationChangeAdditional(1) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.user.user')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem> */}
-                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleApplicationChangeAdditional(2) }} action><i className="icon-note  icons helpclickicon mr-2"></i> {i18n.t('static.country.countryMaster')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
+                    {/* <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleApplicationChangeAdditional(2) }} action><i className="icon-note  icons helpclickicon mr-2"></i> {i18n.t('static.country.countryMaster')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem> */}
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleApplicationChangeAdditional(3) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.currency.currencyMaster')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleApplicationChangeAdditional(4) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.unit.unit')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                   </ListGroup>
@@ -604,16 +605,17 @@ export default class InitialTicketPageComponent extends Component {
                 </div>}
 
                 {this.state.showOnlyRealmMaster == 1 && <div className="mt-2 mb-2">
+                  <div><h4>{i18n.t('static.ticket.requestTo')}</h4></div><br></br>
                   <ListGroup>
-                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleRealmChangeAdditional(1) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.realm.realm')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
-                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleRealmChangeAdditional(2) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.dashboard.realmcountry')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleRealmChangeAdditional(3) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.datasource.datasource')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleRealmChangeAdditional(4) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.fundingsource.fundingsource')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
-                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleRealmChangeAdditional(5) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.procurementagent.procurementagent')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
-                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleRealmChangeAdditional(6) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.supplier.supplier')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
-                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleRealmChangeAdditional(7) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.healtharea.healtharea')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
+                    {/* <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleRealmChangeAdditional(6) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.supplier.supplier')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem> */}
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleRealmChangeAdditional(8) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.organisation.organisation')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
+                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleRealmChangeAdditional(5) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.procurementagent.procurementagent')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
+                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleRealmChangeAdditional(1) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.realm.realm')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
+                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleRealmChangeAdditional(2) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.dashboard.realmcountry')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleRealmChangeAdditional(9) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.dashboad.regioncountry')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
+                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleRealmChangeAdditional(7) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.healtharea.healtharea')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                   </ListGroup>
                   <ModalFooter className="pb-0 pr-0">
                     <Button color="info" onClick={() => { this.toggleMasterInitial(2) }}><i className="fa fa-angle-double-left "></i>  Back</Button>
@@ -622,14 +624,15 @@ export default class InitialTicketPageComponent extends Component {
                 </div>}
 
                 {this.state.showOnlyProgramMaster == 1 && <div className="mt-2 mb-2">
+                  <div><h4>{i18n.t('static.ticket.requestTo')}</h4></div><br></br>
                   <ListGroup>
-                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleProgramChangeAdditional(1) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.program.programMaster')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleProgramChangeAdditional(2) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.dashboard.budget')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
-                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleProgramChangeAdditional(3) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.tracercategory.tracercategory')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
-                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleProgramChangeAdditional(4) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.product.productcategory')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleProgramChangeAdditional(5) }} action><i className="icon-note  icons helpclickicon mr-2"></i> {i18n.t('static.forecastingunit.forecastingunit')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleProgramChangeAdditional(6) }} action><i className="icon-note  icons helpclickicon mr-2"></i> {i18n.t('static.planningunit.planningunit')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
-                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleProgramChangeAdditional(7) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.procurementUnit.procurementUnit')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
+                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleProgramChangeAdditional(4) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.product.productcategory')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
+                    {/* <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleProgramChangeAdditional(7) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.procurementUnit.procurementUnit')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem> */}
+                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleProgramChangeAdditional(1) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.program.programMaster')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
+                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleProgramChangeAdditional(3) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.tracercategory.tracercategory')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                   </ListGroup>
                   <ModalFooter className="pb-0 pr-0">
                     <Button color="info" onClick={() => { this.toggleMasterInitial(3) }}><i className="fa fa-angle-double-left "></i>  Back</Button>
@@ -639,7 +642,7 @@ export default class InitialTicketPageComponent extends Component {
 
                 {/* Application Master */}
                 {this.state.showUserData == 1 && <UserTicketComponent toggleMaster={() => this.toggleApplicationMasterForm(1)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} toggleMain={this.toggleMain} />}
-                {this.state.showCountryData == 1 && <CountryTicketComponent toggleMaster={() => this.toggleApplicationMasterForm(2)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
+                {/* {this.state.showCountryData == 1 && <CountryTicketComponent toggleMaster={() => this.toggleApplicationMasterForm(2)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />} */}
                 {this.state.showCurrencyData == 1 && <CurrencyTicketComponent toggleMaster={() => this.toggleApplicationMasterForm(3)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
                 {this.state.showUnitData == 1 && <UnitsTicketComponent toggleMaster={() => this.toggleApplicationMasterForm(4)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
 
@@ -649,7 +652,7 @@ export default class InitialTicketPageComponent extends Component {
                 {this.state.showDataSourceData == 1 && <DataSourceTicketComponent toggleMaster={() => this.toggleRealmMasterForm(3)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
                 {this.state.showFundingSourceData == 1 && <FundingSourceTicketComponent toggleMaster={() => this.toggleRealmMasterForm(4)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
                 {this.state.showProcurementAgentData == 1 && <ProcurementAgentTicketComponent toggleMaster={() => this.toggleRealmMasterForm(5)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
-                {this.state.showSupplierData == 1 && <SuppliersTicketComponent toggleMaster={() => this.toggleRealmMasterForm(6)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
+                {/* {this.state.showSupplierData == 1 && <SuppliersTicketComponent toggleMaster={() => this.toggleRealmMasterForm(6)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />} */}
                 {this.state.showTechnicalAreaData == 1 && <TechnicalAreaTicketComponent toggleMaster={() => this.toggleRealmMasterForm(7)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
                 {this.state.showOrganizationData == 1 && <OrganisationTicketComponent toggleMaster={() => this.toggleRealmMasterForm(8)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
                 {this.state.showRealmCountryRegionData == 1 && <RealmCountryRegionTicketComponent toggleMaster={() => this.toggleRealmMasterForm(9)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
@@ -661,7 +664,7 @@ export default class InitialTicketPageComponent extends Component {
                 {this.state.showProductCategoryData == 1 && <ProductCategoryTicketComponent toggleMaster={() => this.toggleProgramMasterForm(4)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
                 {this.state.showForecastingUnitData == 1 && <ForecastingUnitTicketComponent toggleMaster={() => this.toggleProgramMasterForm(5)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
                 {this.state.showPlanningUnitData == 1 && <PlanningUnitTicketComponent toggleMaster={() => this.toggleProgramMasterForm(6)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
-                {this.state.showProcurementUnitData == 1 && <ProcurementUnitTicketComponent toggleMaster={() => this.toggleProgramMasterForm(7)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
+                {/* {this.state.showProcurementUnitData == 1 && <ProcurementUnitTicketComponent toggleMaster={() => this.toggleProgramMasterForm(7)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />} */}
               </ModalBody>
 
             </div>
