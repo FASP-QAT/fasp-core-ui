@@ -821,7 +821,13 @@ export default class SupplyPlanComponent extends React.Component {
                                     <td align="left">&emsp;&emsp;{i18n.t('static.supplyPlan.manualEntryShipments')}</td>
                                     {
                                         this.state.manualShipmentsTotalData.map((item1, count) => {
-                                            return (<td align="right" className=" hoverTd" onClick={() => this.toggleLarge('SuggestedShipments', this.state.monthsArray[count].startDate, 0, '', '', "0")}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>)
+                                            var currentMonthDate = moment(Date.now()).format("YYYY-MM");
+                                            var manualEntryDate = moment(this.state.monthsArray[count].startDate).format("YYYY-MM");
+                                            if (manualEntryDate >= currentMonthDate) {
+                                                return (<td align="right" className=" hoverTd" onClick={() => this.toggleLarge('SuggestedShipments', this.state.monthsArray[count].startDate, 0, '', '', "0")}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>)
+                                            } else {
+                                                return (<td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>)
+                                            }
                                         })
                                     }
                                 </tr>
@@ -1200,53 +1206,23 @@ export default class SupplyPlanComponent extends React.Component {
                                                                         </>
                                                                     )
                                                                 } else if (item1.adjustmentsQty.toString() != '' && (item1.actualQty.toString() == "" || item1.actualQty.toString() == 0)) {
-                                                                    var lastActualConsumptionDate = moment(((this.state.lastActualConsumptionDateArr.filter(c => item1.regionId == c.region))[0]).lastActualConsumptionDate).format("YYYY-MM");
-                                                                    var currentMonthDate = moment(item1.month.startDate).format("YYYY-MM");
-                                                                    if (currentMonthDate > lastActualConsumptionDate) {
-                                                                        return (
-                                                                            <>
-                                                                                <td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 2)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.adjustmentsQty} /></td>
-                                                                                <td align="right"></td>
-                                                                            </>
-                                                                        )
-                                                                    } else {
-                                                                        return (
-                                                                            <>
-                                                                                <td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 2)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.adjustmentsQty} /></td>
-                                                                                <td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 1)}></td>
-                                                                            </>
-                                                                        )
-                                                                    }
-
-                                                                } else if (item1.adjustmentsQty.toString() == '' && (item1.actualQty.toString() != "" || item1.actualQty.toString() != 0)) {
-                                                                    var lastActualConsumptionDate = moment(((this.state.lastActualConsumptionDateArr.filter(c => item1.regionId == c.region))[0]).lastActualConsumptionDate).format("YYYY-MM");
-                                                                    var currentMonthDate = moment(item1.month.startDate).format("YYYY-MM");
-                                                                    if (currentMonthDate > lastActualConsumptionDate) {
-                                                                        return (
-                                                                            <>
-                                                                                <td align="right"></td>
-                                                                                <td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 1)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.actualQty} /></td>
-
-                                                                            </>
-                                                                        )
-                                                                    } else {
-                                                                        return (
-                                                                            <>
-                                                                                <td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 2)}></td>
-                                                                                <td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 1)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.actualQty} /></td>
-                                                                            </>
-                                                                        )
-                                                                    }
-                                                                } else {
-                                                                    var lastActualConsumptionDate = moment(((this.state.lastActualConsumptionDateArr.filter(c => item1.regionId == c.region))[0]).lastActualConsumptionDate).format("YYYY-MM");
-                                                                    var currentMonthDate = moment(item1.month.startDate).format("YYYY-MM");
-                                                                    if (currentMonthDate > lastActualConsumptionDate) {
-                                                                        return (<><td align="right"></td><td align="right"></td></>)
-                                                                    } else {
-                                                                        return (<><td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 2)}></td>
+                                                                    return (
+                                                                        <>
+                                                                            <td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 2)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.adjustmentsQty} /></td>
                                                                             <td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 1)}></td>
-                                                                        </>)
-                                                                    }
+                                                                        </>
+                                                                    )
+                                                                } else if (item1.adjustmentsQty.toString() == '' && (item1.actualQty.toString() != "" || item1.actualQty.toString() != 0)) {
+                                                                    return (
+                                                                        <>
+                                                                            <td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 2)}></td>
+                                                                            <td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 1)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.actualQty} /></td>
+                                                                        </>
+                                                                    )
+                                                                } else {
+                                                                    return (<><td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 2)}></td>
+                                                                        <td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 1)}></td>
+                                                                    </>)
                                                                 }
                                                             }
                                                         })
@@ -1869,6 +1845,9 @@ export default class SupplyPlanComponent extends React.Component {
                         console.log("SupplyPlanData--------------->", supplyPlanData);
                         if (supplyPlanData.length > 0) {
                             var lastClosingBalance = 0;
+                            var finalMinMos = supplyPlanData[0].minStockMoS;
+                            var finalMaxMos = supplyPlanData[0].maxStockMoS;
+
                             for (var n = 0; n < m.length; n++) {
                                 var jsonList = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM-DD") == moment(m[n].startDate).format("YYYY-MM-DD"));
                                 if (jsonList.length > 0) {
@@ -1878,7 +1857,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     manualShipmentsTotalData.push(jsonList[0].manualTotalQty);
 
                                     // Tomorrow begin from here
-                                    var shipmentDetails = programJson.shipmentList.filter(c => c.active == true && c.planningUnit.id == this.state.planningUnitId && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag == true && (c.expectedDeliveryDate >= m[n].startDate && c.expectedDeliveryDate <= m[n].endDate) && c.erpFlag.toString() == "false");
+                                    var shipmentDetails = programJson.shipmentList.filter(c => c.active == true && c.planningUnit.id == this.state.planningUnitId && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag == true && (c.shipmentStatus.id != DELIVERED_SHIPMENT_STATUS ? (c.expectedDeliveryDate >= m[n].startDate && c.expectedDeliveryDate <= m[n].endDate) : (c.receivedDate >= m[n].startDate && c.receivedDate <= m[n].endDate)) && c.erpFlag.toString() == "false");
                                     var sd1 = [];
                                     var sd2 = [];
                                     var sd3 = [];
@@ -2025,7 +2004,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     erpShipmentsTotalData.push(jsonList[0].erpTotalQty);
 
 
-                                    var shipmentDetails = programJson.shipmentList.filter(c => c.active == true && c.planningUnit.id == this.state.planningUnitId && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag == true && (c.expectedDeliveryDate >= m[n].startDate && c.expectedDeliveryDate <= m[n].endDate) && c.erpFlag.toString() == "true");
+                                    var shipmentDetails = programJson.shipmentList.filter(c => c.active == true && c.planningUnit.id == this.state.planningUnitId && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag == true && (c.shipmentStatus.id != DELIVERED_SHIPMENT_STATUS ? (c.expectedDeliveryDate >= m[n].startDate && c.expectedDeliveryDate <= m[n].endDate) : (c.receivedDate >= m[n].startDate && c.receivedDate <= m[n].endDate)) && c.erpFlag.toString() == "true");
                                     var sd1 = [];
                                     var sd2 = [];
                                     var sd3 = [];
@@ -2266,7 +2245,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         var actualCount = 0;
                                         var adjustmentsCount = 0;
                                         for (var cr = 0; cr < inventoryListForRegionalDetails.length; cr++) {
-                                            if (inventoryListForRegionalDetails[cr].actualQty != 0 && inventoryListForRegionalDetails[cr].actualQty != null && inventoryListForRegionalDetails[cr].actualQty != "") {
+                                            if (inventoryListForRegionalDetails[cr].actualQty != undefined && inventoryListForRegionalDetails[cr].actualQty != null && inventoryListForRegionalDetails[cr].actualQty != "") {
                                                 actualCount += 1;
                                                 actualQtyForRegion += parseInt(inventoryListForRegionalDetails[cr].actualQty) * parseInt(inventoryListForRegionalDetails[cr].multiplier);
                                                 totalActualQtyForRegion += parseInt(inventoryListForRegionalDetails[cr].actualQty) * parseInt(inventoryListForRegionalDetails[cr].multiplier);
@@ -2275,7 +2254,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                     regionsReportingActualInventory.push(regionListFiltered[r].id)
                                                 }
                                             }
-                                            if (inventoryListForRegionalDetails[cr].adjustmentQty != 0 && inventoryListForRegionalDetails[cr].adjustmentQty != null && inventoryListForRegionalDetails[cr].adjustmentQty != "") {
+                                            if (inventoryListForRegionalDetails[cr].adjustmentQty != undefined && inventoryListForRegionalDetails[cr].adjustmentQty != null && inventoryListForRegionalDetails[cr].adjustmentQty != "") {
                                                 adjustmentsCount += 1;
                                                 adjustmentsQtyForRegion += parseInt(inventoryListForRegionalDetails[cr].adjustmentQty) * parseInt(inventoryListForRegionalDetails[cr].multiplier);
                                                 totalAdjustmentsQtyForRegion += parseInt(inventoryListForRegionalDetails[cr].adjustmentQty) * parseInt(inventoryListForRegionalDetails[cr].multiplier);
@@ -2336,8 +2315,8 @@ export default class SupplyPlanComponent extends React.Component {
                                     totalExpiredStockArr.push({ qty: 0, details: [], month: m[n] });
                                     monthsOfStockArray.push("")
                                     amcTotalData.push("");
-                                    minStockMoS.push("");
-                                    maxStockMoS.push("")
+                                    minStockMoS.push(finalMinMos);
+                                    maxStockMoS.push(finalMaxMos);
                                     unmetDemand.push("");
                                     closingBalanceArray.push(lastClosingBalance);
                                     for (var i = 0; i < this.state.regionListFiltered.length; i++) {
@@ -2452,7 +2431,7 @@ export default class SupplyPlanComponent extends React.Component {
             showConsumption: 0
         })
         if (supplyPlanType == 'Consumption') {
-            var monthCountConsumption = count - 2;
+            var monthCountConsumption = this.state.monthCount + count - 2;
             this.setState({
                 consumption: !this.state.consumption,
                 monthCountConsumption: monthCountConsumption,
@@ -2469,7 +2448,7 @@ export default class SupplyPlanComponent extends React.Component {
             });
             this.shipmentsDetailsClicked(shipmentType, startDate, endDate);
         } else if (supplyPlanType == 'Adjustments') {
-            var monthCountAdjustments = count - 2;
+            var monthCountAdjustments = this.state.monthCount + count - 2;
             this.setState({
                 adjustments: !this.state.adjustments,
                 monthCountAdjustments: monthCountAdjustments
@@ -2719,9 +2698,9 @@ export default class SupplyPlanComponent extends React.Component {
                     c.region.id == region &&
                     moment(c.inventoryDate).format("MMM YY") == month);
                 if (inventoryType == 1) {
-                    inventoryList = inventoryList.filter(c => c.actualQty != "" && c.actualQty != 0 && c.actualQty != null);
+                    inventoryList = inventoryList.filter(c => c.actualQty != "" && c.actualQty != undefined && c.actualQty != null);
                 } else {
-                    inventoryList = inventoryList.filter(c => c.adjustmentQty != "" && c.adjustmentQty != 0 && c.adjustmentQty != null);
+                    inventoryList = inventoryList.filter(c => c.adjustmentQty != "" && c.adjustmentQty != undefined && c.adjustmentQty != null);
                 }
                 this.setState({
                     batchInfoList: batchInfoList,
@@ -3015,10 +2994,10 @@ export default class SupplyPlanComponent extends React.Component {
                 this.setState({
                     shipmentListUnFiltered: shipmentListUnFiltered
                 })
-                var shipmentList = [];
+                var shipmentList = programJson.shipmentList.filter(c => c.active.toString() == "true");
                 // var tableEditableBasedOnSupplyPlan = true;
                 if (supplyPlanType == 'deliveredShipments') {
-                    shipmentList = programJson.shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS));
+                    shipmentList = programJson.shipmentList.filter(c => c.receivedDate >= startDate && c.receivedDate <= endDate && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS));
                 } else if (supplyPlanType == 'shippedShipments') {
                     shipmentList = programJson.shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || c.shipmentStatus.id == ARRIVED_SHIPMENT_STATUS));
                 } else if (supplyPlanType == 'orderedShipments') {
@@ -3026,7 +3005,7 @@ export default class SupplyPlanComponent extends React.Component {
                 } else if (supplyPlanType == 'plannedShipments') {
                     shipmentList = programJson.shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS));
                 } else if (supplyPlanType == 'deliveredErpShipments') {
-                    shipmentList = shipmentList = programJson.shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS));
+                    shipmentList = shipmentList = programJson.shipmentList.filter(c => c.receivedDate >= startDate && c.receivedDate <= endDate && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS));
                 } else if (supplyPlanType == 'shippedErpShipments') {
                     shipmentList = shipmentList = programJson.shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || c.shipmentStatus.id == ARRIVED_SHIPMENT_STATUS));
                 } else if (supplyPlanType == 'orderedErpShipments') {

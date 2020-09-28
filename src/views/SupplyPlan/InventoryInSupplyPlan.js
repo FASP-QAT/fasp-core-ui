@@ -464,7 +464,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                                         });
                                                     }
 
-                                                    if (obj.options.allowDeleteRow == true && obj.getJson().length > 1) {
+                                                    if (inventoryEditable && obj.options.allowDeleteRow == true && obj.getJson().length > 1) {
                                                         // region id
                                                         if (obj.getRowData(y)[5] == 0) {
                                                             items.push({
@@ -503,7 +503,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                         });
                                     }
 
-                                    if (obj.options.allowDeleteRow == true && obj.getJson().length > 1) {
+                                    if (inventoryEditable && obj.options.allowDeleteRow == true && obj.getJson().length > 1) {
                                         // region id
                                         if (obj.getRowData(y)[14] == -1) {
                                             items.push({
@@ -904,8 +904,8 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                             batchNo: elInstance.getCell(`A${parseInt(i) + 1}`).innerText,
                             expiryDate: moment(map.get("1")).format("YYYY-MM-DD")
                         },
-                        adjustmentQty: map.get("3").toString().replaceAll("\,", ""),
-                        actualQty: map.get("4").toString().replaceAll("\,", "")
+                        adjustmentQty: (map.get("2") == 1) ? (map.get("3")).toString().replaceAll("\,", "") : (map.get("3")).toString().replaceAll("\,", "") > 0 ? (map.get("3")).toString().replaceAll("\,", "") : null,
+                        actualQty: (map.get("2") == 1) ? (map.get("4")).toString().replaceAll("\,", "") : (map.get("3")).toString().replaceAll("\,", "") > 0 ? (map.get("3")).toString().replaceAll("\,", "") : null
                     }
                     batchInfoArray.push(batchInfoJson);
                 }
@@ -1138,8 +1138,8 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                             inventoryDataList[parseInt(map.get("14"))].dataSource.id = map.get("2");
                             inventoryDataList[parseInt(map.get("14"))].realmCountryPlanningUnit.id = map.get("3");
                             inventoryDataList[parseInt(map.get("14"))].multiplier = map.get("7");
-                            inventoryDataList[parseInt(map.get("14"))].adjustmentQty = (map.get("5")).toString().replaceAll("\,", "");
-                            inventoryDataList[parseInt(map.get("14"))].actualQty = (map.get("6")).toString().replaceAll("\,", "");
+                            inventoryDataList[parseInt(map.get("14"))].adjustmentQty = (map.get("4") == 2) ? (map.get("5")).toString().replaceAll("\,", "") : (map.get("5")).toString().replaceAll("\,", "") > 0 ? (map.get("5")).toString().replaceAll("\,", "") : null;
+                            inventoryDataList[parseInt(map.get("14"))].actualQty = (map.get("4") == 1) ? (map.get("6")).toString().replaceAll("\,", "") : (map.get("6")).toString().replaceAll("\,", "") > 0 ? (map.get("6")).toString().replaceAll("\,", "") : null;
                             inventoryDataList[parseInt(map.get("14"))].notes = map.get("10");
                             inventoryDataList[parseInt(map.get("14"))].active = map.get("11");
                             if (map.get("13") != "") {
@@ -1161,8 +1161,8 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                     id: map.get("1")
                                 },
                                 inventoryDate: moment(map.get("0")).endOf('month').format("YYYY-MM-DD"),
-                                adjustmentQty: map.get("5").toString().replaceAll("\,", ""),
-                                actualQty: map.get("6").toString().replaceAll("\,", ""),
+                                adjustmentQty: (map.get("4") == 2) ? (map.get("5")).toString().replaceAll("\,", "") : null,
+                                actualQty: (map.get("4") == 1) ? (map.get("6")).toString().replaceAll("\,", "") : null,
                                 active: map.get("11"),
                                 realmCountryPlanningUnit: {
                                     id: map.get("3"),

@@ -13,6 +13,7 @@ import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import HealthAreaService from '../../api/HealthAreaService';
 import classNames from 'classnames';
+import { SPACE_REGEX } from '../../Constants';
 
 const initialValues = {
     summary: "Add / Update Program",
@@ -37,6 +38,7 @@ const initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()
+            .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.common.summarytext')),
         programName: Yup.string()
             .required(i18n.t('static.program.validprogramtext')),
@@ -386,7 +388,7 @@ export default class ProgramTicketComponent extends Component {
 
     resetClicked() {
         let { program } = this.state;
-        program.summary = '';
+        // program.summary = '';
         program.programName = '';
         program.realmId = '';
         program.realmCountryId = '';
@@ -488,36 +490,26 @@ export default class ProgramTicketComponent extends Component {
                                         this.hideSecondComponent();
                                     })                                
                             } else {
-                                this.setState({
-                                    // message: response.data.messageCode
-                                    message: 'Error while creating query', loading: false
+                                this.setState({                                    
+                                    message: i18n.t('static.unkownError'), loading: false
                                 },
-                                    () => {
-                                        this.resetClicked();
+                                    () => {                                        
                                         this.hideSecondComponent();
                                     })                                
                             }                            
                             this.props.togglehelp();
                             this.props.toggleSmall(this.state.message);
                         })
-                        // .catch(
-                        //     error => {
-                        //         switch (error.message) {
-                        //             case "Network Error":
-                        //                 this.setState({
-                        //                     message: 'Network Error'
-                        //                 })
-                        //                 break
-                        //             default:
-                        //                 this.setState({
-                        //                     message: 'Error'
-                        //                 })
-                        //                 break
-                        //         }
-                        //         alert(this.state.message);
-                        //         this.props.togglehelp();
-                        //     }
-                        // );  
+                        .catch(
+                            error => {
+                                this.setState({                                        
+                                    message: i18n.t('static.unkownError'), loading: false
+                                },
+                                () => {                                        
+                                    this.hideSecondComponent();                                     
+                                });                                    
+                            }
+                        );   
                     }}
                     render={
                         ({
@@ -534,10 +526,10 @@ export default class ProgramTicketComponent extends Component {
                             setFieldValue,
                             setFieldTouched
                         }) => (
-                                <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm'>
+                                <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm' autocomplete="off">
                                     < FormGroup >
                                         <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
-                                        <Input type="text" name="summary" id="summary"
+                                        <Input type="text" name="summary" id="summary" readOnly = {true}
                                             bsSize="sm"
                                             valid={!errors.summary && this.state.program.summary != ''}
                                             invalid={touched.summary && !!errors.summary}
@@ -548,7 +540,7 @@ export default class ProgramTicketComponent extends Component {
                                         <FormFeedback className="red">{errors.summary}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup>
-                                        <Label for="programName">{i18n.t('static.program.program')}<span class="red Reqasterisk">*</span></Label>
+                                        <Label for="programName">{i18n.t('static.program.programName')}<span class="red Reqasterisk">*</span></Label>
                                         <Input type="text" name="programName" id="programName"
                                             bsSize="sm"
                                             valid={!errors.programName && this.state.program.programName != ''}
@@ -781,6 +773,10 @@ export default class ProgramTicketComponent extends Component {
                                         <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                         <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                     </ModalFooter>
+                                    <br></br><br></br>
+                                    <div className={this.props.className}>
+                                        <p>{i18n.t('static.ticket.drodownvaluenotfound')}</p>
+                                    </div>
                                 </Form>
                             )} />
                             </div>
