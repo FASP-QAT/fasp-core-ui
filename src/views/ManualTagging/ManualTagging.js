@@ -1115,7 +1115,7 @@ export default class ManualTagging extends Component {
         const columns = [
             {
                 dataField: 'shipmentId',
-                text: 'Shipment Id',
+                text: i18n.t('static.commit.shipmentId'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -1134,14 +1134,14 @@ export default class ManualTagging extends Component {
             },
             {
                 dataField: 'shipmentStatus.label.label_en',
-                text: 'Shipment Status',
+                text: i18n.t('static.supplyPlan.shipmentStatus'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
                 // formatter: this.formatLabel
             }, {
                 dataField: 'procurementAgent.code',
-                text: 'Procurement Agent',
+                text: i18n.t('static.report.procurementAgentName'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -1149,7 +1149,7 @@ export default class ManualTagging extends Component {
             },
             {
                 dataField: 'budget.label.label_en',
-                text: 'Budget',
+                text: i18n.t('static.budgetHead.budget'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -1157,7 +1157,7 @@ export default class ManualTagging extends Component {
             },
             {
                 dataField: 'shipmentQty',
-                text: 'Shipment Quantity',
+                text: i18n.t('static.supplyPlan.shipmentQty'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -1165,7 +1165,7 @@ export default class ManualTagging extends Component {
             },
             {
                 dataField: 'fundingSource.code',
-                text: 'Funding Source',
+                text: i18n.t('static.fundingSourceHead.fundingSource'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center'
@@ -1175,21 +1175,21 @@ export default class ManualTagging extends Component {
         const columns1 = [
             {
                 dataField: 'roNo',
-                text: 'RO No.',
+                text: i18n.t('static.manualTagging.RONO'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center'
             },
             {
                 dataField: 'roPrimeLineNo',
-                text: 'RO Prime Line No.',
+                text: i18n.t('static.manualTagging.ROPrimeline'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
                 // formatter: this.formatLabel
             }, {
                 dataField: 'orderType',
-                text: 'Order Type',
+                text: i18n.t('static.manualTagging.OrderType'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -1197,7 +1197,7 @@ export default class ManualTagging extends Component {
             },
             {
                 dataField: 'planningUnitSkuCode',
-                text: 'Planning Unit SKU Code',
+                text: i18n.t('static.manualTagging.planningUnitSKUCode'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -1205,14 +1205,14 @@ export default class ManualTagging extends Component {
             },
             {
                 dataField: 'procurementUnitSkuCode',
-                text: 'Procurement Unit SKU Code',
+                text: i18n.t('static.manualTagging.procurementUnitSKUCode'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center'
             },
             {
                 dataField: 'quantity',
-                text: 'Quantity',
+                text: i18n.t('static.shipment.qty'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -1220,7 +1220,7 @@ export default class ManualTagging extends Component {
             },
             {
                 dataField: 'currentEstimatedDeliveryDate',
-                text: 'Current Estimated Received Date',
+                text: i18n.t('static.manualTagging.currentEstimetedDeliveryDate'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -1228,21 +1228,21 @@ export default class ManualTagging extends Component {
             },
             {
                 dataField: 'supplierName',
-                text: 'Supplier Name',
+                text: i18n.t('static.supplier.supplierName'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center'
             },
             {
                 dataField: 'recipentCountry',
-                text: 'Recipient Country',
+                text: i18n.t('static.manualTagging.receipentCountry'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center'
             },
             {
                 dataField: 'price',
-                text: 'Price',
+                text: i18n.t('static.manualTagging.price'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -1250,7 +1250,7 @@ export default class ManualTagging extends Component {
             },
             {
                 dataField: 'shippingCost',
-                text: 'Shipping Cost',
+                text: i18n.t('static.manualTagging.shippingCost'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -1258,7 +1258,7 @@ export default class ManualTagging extends Component {
             },
             {
                 dataField: 'status',
-                text: 'Status',
+                text: i18n.t('static.status.status'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center'
@@ -1390,7 +1390,7 @@ export default class ManualTagging extends Component {
                         <Modal isOpen={this.state.manualTag}
                             className={'modal-lg ' + this.props.className, "modalWidth"}>
                             <ModalHeader toggle={() => this.toggleLarge()} className="modalHeaderSupplyPlan">
-                                <strong>Search ERP Orders</strong>
+                                <strong>{i18n.t('static.manualTagging.searchErpOrders')}</strong>
                             </ModalHeader>
                             <ModalBody>
                                 <Col md="12 pl-0">
@@ -1487,7 +1487,7 @@ export default class ManualTagging extends Component {
                             <ModalFooter>
 
                                 {this.state.reason == "" &&
-                                    <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.link}> <i className="fa fa-check"></i> Link</Button>
+                                    <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.link}> <i className="fa fa-check"></i>{i18n.t('static.manualTagging.link')}</Button>
                                 }
                                 <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.toggleLarge()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                             </ModalFooter>
@@ -1498,7 +1498,7 @@ export default class ManualTagging extends Component {
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
-                            <div ><h4> <strong>Loading...</strong></h4></div>
+                            <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
 
                             <div class="spinner-border blue ml-4" role="status">
 

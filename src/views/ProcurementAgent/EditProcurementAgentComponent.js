@@ -23,6 +23,7 @@ const initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         procurementAgentName: Yup.string()
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.procurementAgent.procurementagentnametext')),
         submittedToApprovedLeadTime: Yup.string()
             .required(i18n.t('static.procurementagent.submitToApproveLeadTime'))

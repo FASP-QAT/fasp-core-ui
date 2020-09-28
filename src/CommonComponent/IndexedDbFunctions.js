@@ -130,7 +130,7 @@ export function getDatabase() {
             storeOS = db1.createObjectStore('procurementAgentProcurementUnit', { keyPath: 'procurementAgentProcurementUnitId', autoIncrement: true });
         }
         if (!db1.objectStoreNames.contains('problem')) {
-            storeOS = db1.createObjectStore('problem', { keyPath: 'problemId', autoIncrement: true });
+            storeOS = db1.createObjectStore('problem', { keyPath: 'realmProblemId', autoIncrement: true });
         }
         console.log("indexed db 14----------------------")
         if (!db1.objectStoreNames.contains('problemStatus')) {

@@ -28,6 +28,7 @@ const initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()
+            .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.common.summarytext')),
         realmName: Yup.string()
             .required(i18n.t('static.common.realmtext')),
@@ -36,10 +37,10 @@ const validationSchema = function (values) {
         technicalAreaName: Yup.string()
             .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.healtharea.healthareatext')),
-        technicalAreaCode: Yup.string()
-            .matches(ALPHABET_NUMBER_REGEX, i18n.t('static.message.alphabetnumerallowed'))
-            .max(6, 'Display name length should be 6')
-            .required(i18n.t('static.technicalArea.technicalAreaCodeText')),
+        // technicalAreaCode: Yup.string()
+        //     .matches(ALPHABET_NUMBER_REGEX, i18n.t('static.message.alphabetnumerallowed'))
+        //     .max(6, 'Display name length should be 6')
+        //     .required(i18n.t('static.technicalArea.technicalAreaCodeText')),
         // notes: Yup.string()
         //     .required(i18n.t('static.common.notestext'))
     })
@@ -226,7 +227,7 @@ export default class TechnicalAreaTicketComponent extends Component {
 
     resetClicked() {
         let { technicalArea } = this.state;
-        technicalArea.summary = '';
+        // technicalArea.summary = '';
         technicalArea.realmName = '';
         technicalArea.countryName = '';
         technicalArea.technicalAreaName = '';
@@ -275,36 +276,26 @@ export default class TechnicalAreaTicketComponent extends Component {
                                         this.hideSecondComponent();
                                     })                                
                             } else {
-                                this.setState({
-                                    // message: response.data.messageCode
-                                    message: 'Error while creating query', loading: false
+                                this.setState({                                    
+                                    message: i18n.t('static.unkownError'), loading: false
                                 },
-                                    () => {
-                                        this.resetClicked();
+                                    () => {                                        
                                         this.hideSecondComponent();
                                     })                                
                             }                            
                             this.props.togglehelp();
                             this.props.toggleSmall(this.state.message);
                         })
-                            // .catch(
-                            //     error => {
-                            //         switch (error.message) {
-                            //             case "Network Error":
-                            //                 this.setState({
-                            //                     message: 'Network Error'
-                            //                 })
-                            //                 break
-                            //             default:
-                            //                 this.setState({
-                            //                     message: 'Error'
-                            //                 })
-                            //                 break
-                            //         }
-                            //         alert(this.state.message);
-                            //         this.props.togglehelp();
-                            //     }
-                            // );
+                        .catch(
+                            error => {
+                                this.setState({                                        
+                                    message: i18n.t('static.unkownError'), loading: false
+                                },
+                                () => {                                        
+                                    this.hideSecondComponent();                                     
+                                });                                    
+                            }
+                        );
                     }}
                     render={
                         ({
@@ -321,10 +312,10 @@ export default class TechnicalAreaTicketComponent extends Component {
                             setFieldValue,
                             setFieldTouched
                         }) => (
-                                <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm'>
+                                <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm' autocomplete="off">
                                     < FormGroup >
                                         <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
-                                        <Input type="text" name="summary" id="summary"
+                                        <Input type="text" name="summary" id="summary" readOnly = {true}
                                             bsSize="sm"
                                             valid={!errors.summary && this.state.technicalArea.summary != ''}
                                             invalid={touched.summary && !!errors.summary}
@@ -379,15 +370,16 @@ export default class TechnicalAreaTicketComponent extends Component {
                                         <FormFeedback className="red">{errors.technicalAreaName}</FormFeedback>
                                     </FormGroup>
                                     < FormGroup >
-                                        <Label for="technicalAreaCode">{i18n.t('static.technicalArea.technicalAreaCode')}<span class="red Reqasterisk">*</span></Label>
+                                        <Label for="technicalAreaCode">{i18n.t('static.technicalArea.technicalAreaCode')}</Label>
                                         <Input type="text" name="technicalAreaCode" id="technicalAreaCode"
                                             bsSize="sm"
-                                            valid={!errors.technicalAreaCode && this.state.technicalArea.technicalAreaCode != ''}
-                                            invalid={touched.technicalAreaCode && !!errors.technicalAreaCode}
+                                            // valid={!errors.technicalAreaCode && this.state.technicalArea.technicalAreaCode != ''}
+                                            // invalid={touched.technicalAreaCode && !!errors.technicalAreaCode}
                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                             onBlur={handleBlur}
                                             value={this.state.technicalArea.technicalAreaCode}
-                                            required />
+                                            // required 
+                                            />
                                         <FormFeedback className="red">{errors.technicalAreaCode}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup>
@@ -408,6 +400,10 @@ export default class TechnicalAreaTicketComponent extends Component {
                                         <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                         <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                     </ModalFooter>
+                                    <br></br><br></br>
+                                    <div className={this.props.className}>
+                                        <p>{i18n.t('static.ticket.drodownvaluenotfound')}</p>
+                                    </div>
                                 </Form>
                             )} />
                             </div>

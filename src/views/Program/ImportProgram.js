@@ -389,7 +389,7 @@ export default class ImportProgram extends Component {
                                                 <Col xs="12" md="4" className="custom-file">
                                                     {/* <Input type="file" id="file-input" name="file-input" /> */}
                                                     <Input type="file" className="custom-file-input" id="file-input" name="file-input" accept=".zip" />
-                                                    <label className="custom-file-label" id="file-input">Choose file</label>
+                                                    <label className="custom-file-label" id="file-input">{i18n.t('static.chooseFile.chooseFile')}</label>
                                                 </Col>
                                             </FormGroup>
                                             <FormGroup id="programIdDiv" className="col-md-4">
@@ -425,7 +425,7 @@ export default class ImportProgram extends Component {
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
-                            <div ><h4> <strong>Loading...</strong></h4></div>
+                            <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
 
                             <div class="spinner-border blue ml-4" role="status">
 

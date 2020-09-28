@@ -1,6 +1,6 @@
 import React, { Component, lazy, Suspense } from 'react';
 
-import { SECRET_KEY } from '../../Constants';
+// import { SECRET_KEY } from '../../Constants';
 import CryptoJS from 'crypto-js';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import AuthenticationService from '../../views/Common/AuthenticationService';
@@ -50,9 +50,11 @@ import DashboardService from "../../api/DashboardService";
 import Widget01 from '../../views/Widgets/Widget01';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME } from '../../Constants.js';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import BootstrapTable from 'react-bootstrap-table-next';
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
+
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
 
 const brandPrimary = getStyle('--primary')
@@ -209,7 +211,9 @@ class ApplicationDashboard extends Component {
       dropdownOpen: false,
       radioSelected: 2,
       activeIndex: 0,
+      activeIndexProgram: 0,
       problemActionList: [],
+      programList: [],
 
       message: '',
       dashboard: '',
@@ -222,6 +226,7 @@ class ApplicationDashboard extends Component {
     this.next = this.next.bind(this);
     this.previous = this.previous.bind(this);
     this.goToIndex = this.goToIndex.bind(this);
+    this.goToIndexProgram = this.goToIndexProgram.bind(this);
     this.onExiting = this.onExiting.bind(this);
     this.onExited = this.onExited.bind(this);
     this.problemAction = this.problemAction.bind(this);
@@ -229,6 +234,8 @@ class ApplicationDashboard extends Component {
     this.buttonFormatter = this.buttonFormatter.bind(this);
     this.addMapping = this.addMapping.bind(this);
     this.editProblem = this.editProblem.bind(this);
+    this.nextProgramSlide = this.nextProgramSlide.bind(this);
+    this.previousProgramSlide = this.previousProgramSlide.bind(this);
   }
 
   rowClassNameFormat(row, rowIdx) {
@@ -260,12 +267,12 @@ class ApplicationDashboard extends Component {
 
   hideFirstComponent() {
     this.timeout = setTimeout(function () {
-        document.getElementById('div1').style.display = 'none';
+      document.getElementById('div1').style.display = 'none';
     }, 8000);
-}
-componentWillUnmount() {
+  }
+  componentWillUnmount() {
     clearTimeout(this.timeout);
-}
+  }
 
   toggle() {
     this.setState({
@@ -315,6 +322,49 @@ componentWillUnmount() {
     }
     this.hideFirstComponent();
     console.log("====== in application dasboard =======");
+
+    var db1;
+    var storeOS;
+    getDatabase();
+    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+    openRequest.onsuccess = function (e) {
+      var programList = [];
+      db1 = e.target.result;
+      var transaction = db1.transaction(['programData'], 'readwrite');
+      var program = transaction.objectStore('programData');
+      var getRequest = program.getAll();
+      getRequest.onerror = function (event) {
+        this.setState({
+          // supplyPlanError: i18n.t('static.program.errortext')
+        });
+
+      };
+      getRequest.onsuccess = function (event) {
+
+        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+        var userId = userBytes.toString(CryptoJS.enc.Utf8);
+
+        let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+        let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+        let username = decryptedUser.username;
+
+        for (var i = 0; i < getRequest.result.length; i++) {
+          // console.log("QPA 2=====>  in for =======>",getRequest.result[i].userId,"=====>",userId);
+          if (getRequest.result[i].userId == userId) {
+            var programDataBytes = CryptoJS.AES.decrypt(getRequest.result[i].programData, SECRET_KEY);
+            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+            var programJson = JSON.parse(programData);
+            // console.log("QPA 2====>", programJson);
+            programList.push(programJson);
+            // programRequestList.push(getRequest.result[i]);
+            // versionIDs.push(getRequest.result[i].version);
+          }
+
+        }
+        console.log("program list in application dashboard===>", programList);
+        this.setState({ programList: programList });
+      }.bind(this)
+    }.bind(this)
 
     // var problemActionList = [];
     // var db1;
@@ -425,6 +475,25 @@ componentWillUnmount() {
     this.setState({ activeIndex: nextIndex });
   }
 
+  nextProgramSlide() {
+    if (this.animating) return;
+    const nextIndexProgram = this.state.activeIndexProgram === this.state.programList.length - 1 ? 0 :
+      this.state.activeIndexProgram + 1;
+    this.setState({ activeIndexProgram: nextIndexProgram });
+  }
+
+  previousProgramSlide() {
+    if (this.animating) return;
+    const nextIndexProgram = this.state.activeIndexProgram === 0 ? this.state.programList.length - 1 :
+      this.state.activeIndexProgram - 1;
+    this.setState({ activeIndexProgram: nextIndexProgram });
+  }
+
+  goToIndexProgram(newIndexProgram) {
+    if (this.animating) return;
+    this.setState({ activeIndexProgram: newIndexProgram });
+  }
+
   goToIndex(newIndex) {
     if (this.animating) return;
     this.setState({ activeIndex: newIndex });
@@ -434,6 +503,7 @@ componentWillUnmount() {
 
   render() {
     const { activeIndex } = this.state;
+    const { activeIndexProgram } = this.state;
     // const { problemActionlist } = this.state;
 
     const { SearchBar, ClearSearchButton } = Search;
@@ -656,6 +726,27 @@ componentWillUnmount() {
             </div>
             <div className='TextCont'>
               <CarouselCaption captionHeader={item.LABEL_EN} captionText={item.COUNT} />
+            </div>
+          </div>
+        </CarouselItem>
+      );
+    });
+
+    const programSlides = this.state.programList.map((item) => {
+
+      return (
+        <CarouselItem
+          onExiting={this.onExiting}
+          onExited={this.onExited}
+          key={'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22800%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20800%20400%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_1607923e7e2%20text%20%7B%20fill%3A%23555%3Bfont-weight%3Anormal%3Bfont-family%3AHelvetica%2C%20monospace%3Bfont-size%3A40pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_1607923e7e2%22%3E%3Crect%20width%3D%22800%22%20height%3D%22400%22%20fill%3D%22%23777%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22285.9296875%22%20y%3D%22217.75625%22%3EFirst%20slide%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E'}
+        >
+
+          <div className='carouselCont'>
+            <div className='ImgCont'>
+              <img width='100%' src={'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22800%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20800%20400%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_1607923e7e2%20text%20%7B%20fill%3A%23555%3Bfont-weight%3Anormal%3Bfont-family%3AHelvetica%2C%20monospace%3Bfont-size%3A40pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_1607923e7e2%22%3E%3Crect%20width%3D%22800%22%20height%3D%22400%22%20fill%3D%22%23777%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22285.9296875%22%20y%3D%22217.75625%22%3EFirst%20slide%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E'} />
+            </div>
+            <div className='TextCont'>
+              <CarouselCaption captionHeader={item.programCode} captionText={item.problemReportList.length} />
             </div>
           </div>
         </CarouselItem>
@@ -1004,6 +1095,41 @@ componentWillUnmount() {
                   </CardBody>
                 </Card>
               </Col>
+
+
+
+              {this.state.programList.length > 0 &&
+                <Col xs="12" sm="6" lg="3">
+                  <Card className=" CardHeight">
+
+                    <CardBody className="p-0">
+                      <div class="h1 text-muted text-left mb-0 m-3">
+                        <i class="fa fa-list-alt icon-color"></i>
+                        <ButtonGroup className="float-right BtnZindex">
+                          <Dropdown id='card9' isOpen={this.state.card9} toggle={() => { this.setState({ card9: !this.state.card9 }); }}>
+                            <DropdownToggle caret className="p-0" color="transparent">
+                              {/* <i className="icon-settings"></i> */}
+                            </DropdownToggle>
+                            <DropdownMenu right>
+                              <DropdownItem onClick={() => this.redirectToCrud("/report/problemList")}>QAT Probelm Action Report</DropdownItem>
+                              {/* <DropdownItem onClick={() => this.redirectToCrud("/user/addUser")}>Add User</DropdownItem> */}
+
+                            </DropdownMenu>
+                          </Dropdown>
+                        </ButtonGroup>
+                        <Carousel className='trustedMechCarousel' defaultWait={1000} activeIndex={activeIndexProgram} next={this.nextProgramSlide} previous={this.previousProgramSlide} ride="carousel">
+                          <CarouselIndicators items={this.state.programList} activeIndex={activeIndexProgram} onClickHandler={this.goToIndexProgram} />
+                          {programSlides}
+                        </Carousel>
+                        <div className="chart-wrapper " >
+                        </div>
+                      </div>
+
+                    </CardBody>
+
+                  </Card>
+                </Col>
+              }
 
               {/* <Col xs="12" sm="6" lg="3">
           <Card className=" CardHeight">

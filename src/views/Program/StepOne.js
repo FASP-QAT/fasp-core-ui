@@ -161,7 +161,7 @@ export default class StepOne extends Component {
                                     </FormGroup>
 
                                     <FormGroup className="pb-3">
-                                        <Button color="info" size="md" className="float-left mr-1" type="submit" onClick={() => this.touchAll(setTouched, errors)}>Next <i className="fa fa-angle-double-right"></i></Button>
+                                        <Button color="info" size="md" className="float-left mr-1" type="submit" onClick={() => this.touchAll(setTouched, errors)}>{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
                                     </FormGroup>
 
                                 </Form>

@@ -1543,6 +1543,9 @@ class ProductCatalog extends Component {
         this.getProductCategories = this.getProductCategories.bind(this);
         this.getTracerCategoryList = this.getTracerCategoryList.bind(this);
     }
+    addDoubleQuoteToRowContent=(arr)=>{
+        return arr.map(ele=>'"'+ele+'"')
+     }
 
     exportCSV(columns) {
         var csvRow = [];
@@ -1558,9 +1561,9 @@ class ProductCatalog extends Component {
         const headers = [];
         columns.map((item, idx) => { headers[idx] = ((item.text).replaceAll(' ', '%20')) });
 
-        var A = [headers];
+        var A = [this.addDoubleQuoteToRowContent(headers)];
         this.state.outPutList.map(
-            ele => A.push([
+            ele => A.push(this.addDoubleQuoteToRowContent([
                 (getLabelText(ele.program.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
                 (getLabelText(ele.productCategory.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
                 (getLabelText(ele.tracerCategory.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
@@ -1575,7 +1578,7 @@ class ProductCatalog extends Component {
                 ele.shelfLife,
                 ele.catalogPrice,
                 ele.active ? i18n.t('static.common.active') : i18n.t('static.common.disabled')
-            ]));
+            ])));
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
         }
@@ -1583,7 +1586,7 @@ class ProductCatalog extends Component {
         var a = document.createElement("a")
         a.href = 'data:attachment/csv,' + csvString
         a.target = "_Blank"
-        a.download = i18n.t('static.report.productCatalog') + '.csv';
+        a.download = i18n.t('static.dashboard.productcatalog') + '.csv';
         document.body.appendChild(a)
         a.click()
     }
@@ -1617,7 +1620,7 @@ class ProductCatalog extends Component {
                 doc.setPage(i)
                 doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
                 doc.setTextColor("#002f6c");
-                doc.text(i18n.t('static.report.productCatalogReport'), doc.internal.pageSize.width / 2, 60, {
+                doc.text(i18n.t('static.dashboard.productcatalog'), doc.internal.pageSize.width / 2, 60, {
                     align: 'center'
                 })
                 if (i == 1) {
@@ -1646,7 +1649,7 @@ class ProductCatalog extends Component {
         const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size, true);
         doc.setFontSize(8);
-        const title = i18n.t('static.report.productCatalogReport');
+        const title = i18n.t('static.dashboard.productcatalog');
         var width = doc.internal.pageSize.width;
         var height = doc.internal.pageSize.height;
         var h1 = 50;
@@ -1680,7 +1683,7 @@ class ProductCatalog extends Component {
         doc.autoTable(content);
         addHeaders(doc)
         addFooters(doc)
-        doc.save(i18n.t('static.report.productCatalog') + '.pdf')
+        doc.save(i18n.t('static.dashboard.productcatalog') + '.pdf')
     }
 
 

@@ -680,7 +680,7 @@ export default class ConsumptionDetails extends React.Component {
         this.getProblemListAfterCalculation = this.getProblemListAfterCalculation.bind(this);
 
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
-        
+
 
     }
 
@@ -1113,15 +1113,22 @@ export default class ConsumptionDetails extends React.Component {
                 }.bind(this)
             }.bind(this)
         }
+        else if (programId == 0) {
+            this.setState({ message: i18n.t('static.common.selectProgram'), data: [],loading:false },
+                () => {
+                    this.el = jexcel(document.getElementById("tableDiv"), '');
+                    this.el.destroy();
+                });
+        }
         else if (problemStatusId == 0) {
-            this.setState({ message: i18n.t('static.report.selectProblemStatus'), data: [] },
+            this.setState({ message: i18n.t('static.report.selectProblemStatus'), data: [],loading:false },
                 () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
                     this.el.destroy();
                 });
         }
         else if (problemTypeId == 0) {
-            this.setState({ message: i18n.t('static.report.selectProblemType'), data: [] },
+            this.setState({ message: i18n.t('static.report.selectProblemType'), data: [] ,loading:false},
                 () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
                     this.el.destroy();

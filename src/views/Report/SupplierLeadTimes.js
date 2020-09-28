@@ -1483,7 +1483,9 @@ class SupplierLeadTimes extends Component {
         })
     }
 
-
+    addDoubleQuoteToRowContent=(arr)=>{
+        return arr.map(ele=>'"'+ele+'"')
+     }
 
     exportCSV(columns) {
         var csvRow = [];
@@ -1516,11 +1518,11 @@ class SupplierLeadTimes extends Component {
         csvRow.push('')
         const headers = [];
         columns.map((item, idx) => { headers[idx] = ((item.text).replaceAll(' ', '%20')) });
-        var A = [headers];
+        var A = [this.addDoubleQuoteToRowContent(headers)];
 
         console.log("output list--->", this.state.outPutList);
         this.state.outPutList.map(
-            ele => A.push([
+            ele => A.push(this.addDoubleQuoteToRowContent([
               //  (getLabelText(ele.country.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
                 (getLabelText(ele.program.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
                 (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
@@ -1540,7 +1542,7 @@ class SupplierLeadTimes extends Component {
                 // ele.stockAdjustemntQty,
                 // ele.lastModifiedBy.username,
                 // new moment(ele.lastModifiedDate).format('MMM-DD-YYYY'), ele.notes
-            ]));
+            ])));
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
         }
@@ -1548,7 +1550,7 @@ class SupplierLeadTimes extends Component {
         var a = document.createElement("a")
         a.href = 'data:attachment/csv,' + csvString
         a.target = "_Blank"
-        a.download = i18n.t('static.report.procurmentAgentLeadTimeReport').concat('.csv')
+        a.download = i18n.t('static.dashboard.supplierLeadTimes').concat('.csv')
         // 'Procurement Agent Lead Times.csv'
         document.body.appendChild(a)
         a.click()
@@ -1582,7 +1584,7 @@ class SupplierLeadTimes extends Component {
                 doc.setPage(i)
                 doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
                 doc.setTextColor("#002f6c");
-                doc.text(i18n.t('static.report.procurmentAgentLeadTimeReport'), doc.internal.pageSize.width / 2, 60, {
+                doc.text(i18n.t('static.dashboard.supplierLeadTimes'), doc.internal.pageSize.width / 2, 60, {
                     align: 'center'
                 })
                 if (i == 1) {
@@ -1637,7 +1639,7 @@ class SupplierLeadTimes extends Component {
         }
 
         doc.setFontSize(8);
-        const title = i18n.t('static.report.procurmentAgentLeadTimeReport');
+        const title = i18n.t('static.dashboard.supplierLeadTimes');
         // var canvas = document.getElementById("cool-canvas");
         //creates image
         // var canvasImg = canvas.toDataURL("image/png", 1.0);
@@ -1693,7 +1695,7 @@ class SupplierLeadTimes extends Component {
         doc.autoTable(content);
         addHeaders(doc)
         addFooters(doc)
-        doc.save(i18n.t('static.report.procurmentAgentLeadTimeReport').concat('.pdf'));
+        doc.save(i18n.t('static.dashboard.supplierLeadTimes').concat('.pdf'));
     }
 
 
