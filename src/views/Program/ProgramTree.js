@@ -145,80 +145,80 @@ class Program extends Component {
                         //             this.setState({
                         //                 healthAreaList: response.data
                         //             })
-                                    ProgramService.getProgramList()
-                                        .then(response => {
-                                            if (response.status == 200) {
-                                                console.log("Program List",response.data);
-                                                this.setState({
-                                                    prgList: response.data,
-                                                    loading: false
-                                                })
-                                            } else {
-                                                this.setState({
-                                                    message: response.data.messageCode,
-                                                    loading: false,
-                                                    color: "red"
-                                                })
-                                                this.hideFirstComponent()
-                                            }
-                                        }).catch(
-                                            error => {
+                        ProgramService.getProgramList()
+                            .then(response => {
+                                if (response.status == 200) {
+                                    console.log("Program List", response.data);
+                                    this.setState({
+                                        prgList: response.data,
+                                        loading: false
+                                    })
+                                } else {
+                                    this.setState({
+                                        message: response.data.messageCode,
+                                        loading: false,
+                                        color: "red"
+                                    })
+                                    this.hideFirstComponent()
+                                }
+                            }).catch(
+                                error => {
 
-                                                if (error.message === "Network Error") {
-                                                    this.setState({ message: error.message });
-                                                    this.hideFirstComponent()
-                                                } else {
-                                                    switch (error.response ? error.response.status : "") {
-                                                        case 500:
-                                                        case 401:
-                                                        case 404:
-                                                        case 406:
-                                                        case 412:
-                                                            this.setState({ message: error.response.data.messageCode });
-                                                            this.hideFirstComponent()
-                                                            break;
-                                                        default:
-                                                            this.setState({ message: 'static.unkownError' });
-                                                            this.hideFirstComponent()
-                                                            console.log("Error code unkown");
-                                                            break;
-                                                    }
-                                                }
-                                                this.setState({ loading: false, color: "red" })
-                                            }
-                                        );
-                            //     } else {
-                            //         this.setState({
-                            //             message: response.data.messageCode,
-                            //             loading: false, color: "red"
-                            //         })
-                            //         this.hideFirstComponent()
-                            //     }
-                            // }).catch(
-                            //     error => {
-                            //         if (error.message === "Network Error") {
-                            //             this.setState({ message: error.message, loading: false, color: "red" });
-                            //             this.hideFirstComponent()
-                            //         } else {
-                            //             switch (error.response ? error.response.status : "") {
-                            //                 case 500:
-                            //                 case 401:
-                            //                 case 404:
-                            //                 case 406:
-                            //                 case 412:
-                            //                     this.setState({ message: error.response.data.messageCode, color: "red" });
-                            //                     this.hideFirstComponent()
-                            //                     break;
-                            //                 default:
-                            //                     this.setState({ message: 'static.unkownError', color: "red" });
-                            //                     this.hideFirstComponent()
-                            //                     console.log("Error code unkown");
-                            //                     break;
-                            //             }
-                            //             this.setState({ loading: false })
-                            //         }
-                            //     }
-                            // );
+                                    if (error.message === "Network Error") {
+                                        this.setState({ message: error.message });
+                                        this.hideFirstComponent()
+                                    } else {
+                                        switch (error.response ? error.response.status : "") {
+                                            case 500:
+                                            case 401:
+                                            case 404:
+                                            case 406:
+                                            case 412:
+                                                this.setState({ message: error.response.data.messageCode });
+                                                this.hideFirstComponent()
+                                                break;
+                                            default:
+                                                this.setState({ message: 'static.unkownError' });
+                                                this.hideFirstComponent()
+                                                console.log("Error code unkown");
+                                                break;
+                                        }
+                                    }
+                                    this.setState({ loading: false, color: "red" })
+                                }
+                            );
+                        //     } else {
+                        //         this.setState({
+                        //             message: response.data.messageCode,
+                        //             loading: false, color: "red"
+                        //         })
+                        //         this.hideFirstComponent()
+                        //     }
+                        // }).catch(
+                        //     error => {
+                        //         if (error.message === "Network Error") {
+                        //             this.setState({ message: error.message, loading: false, color: "red" });
+                        //             this.hideFirstComponent()
+                        //         } else {
+                        //             switch (error.response ? error.response.status : "") {
+                        //                 case 500:
+                        //                 case 401:
+                        //                 case 404:
+                        //                 case 406:
+                        //                 case 412:
+                        //                     this.setState({ message: error.response.data.messageCode, color: "red" });
+                        //                     this.hideFirstComponent()
+                        //                     break;
+                        //                 default:
+                        //                     this.setState({ message: 'static.unkownError', color: "red" });
+                        //                     this.hideFirstComponent()
+                        //                     console.log("Error code unkown");
+                        //                     break;
+                        //             }
+                        //             this.setState({ loading: false })
+                        //         }
+                        //     }
+                        // );
                     } else {
                         this.setState({
                             message: response.data.messageCode,
@@ -415,7 +415,7 @@ class Program extends Component {
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
-                            <div ><h4> <strong>Loading...</strong></h4></div>
+                            <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
 
                             <div class="spinner-border blue ml-4" role="status">
 

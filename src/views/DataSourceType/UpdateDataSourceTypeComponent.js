@@ -6,7 +6,8 @@ import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
 import DataSourceTypeService from '../../api/DataSourceTypeService.js';
 import i18n from '../../i18n';
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { ALPHABET_NUMBER_REGEX, SPACE_REGEX } from '../../Constants.js';
 
 let initialValues = {
     label: ''
@@ -15,7 +16,8 @@ const entityname = i18n.t('static.datasourcetype.datasourcetype');
 const validationSchema = function (values) {
     return Yup.object().shape({
         label: Yup.string()
-            .matches(/^([a-zA-Z]+\s)*[a-zA-Z]+$/, i18n.t('static.message.rolenamevalidtext'))
+            // .matches(/^([a-zA-Z]+\s)*[a-zA-Z]+$/, i18n.t('static.message.rolenamevalidtext'))
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.datasourcetype.datasourcetypetext'))
     })
 }

@@ -634,6 +634,7 @@ import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import getLabelText from '../../CommonComponent/getLabelText';
 import { LABEL_REGEX, ALPHABETS_REGEX } from '../../Constants.js';
+import { ALPHABET_NUMBER_REGEX, SPACE_REGEX } from '../../Constants.js';
 
 
 const entityname = i18n.t('static.country.countryMaster');
@@ -650,7 +651,7 @@ let initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         label: Yup.string()
-            .matches(LABEL_REGEX, i18n.t('static.message.rolenamevalidtext'))
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.country.countrytext')),
         countryCode: Yup.string()
             // .max(3, i18n.t('static.country.countrycodemax3digittext'))

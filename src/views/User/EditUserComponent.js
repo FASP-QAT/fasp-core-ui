@@ -13,6 +13,7 @@ import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import { LABEL_REGEX } from '../../Constants.js';
+import { ALPHABET_NUMBER_REGEX, SPACE_REGEX } from '../../Constants.js';
 import classNames from 'classnames';
 
 const initialValues = {
@@ -30,8 +31,8 @@ const validationSchema = function (values) {
             // .max(30, i18n.t('static.user.validpasswordlength'))
             // .matches(/^(?=.*[a-zA-Z]).*$/, i18n.t('static.user.alleast1alpha'))
             // .matches(/^\S*$/, i18n.t('static.user.nospace'))
-            .required(i18n.t('static.user.validusername'))
-            .matches(LABEL_REGEX, i18n.t('static.message.rolenamevalidtext')),
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
+            .required(i18n.t('static.user.validusername')),
         languageId: Yup.string()
             .required(i18n.t('static.user.validlanguage')),
         emailId: Yup.string()

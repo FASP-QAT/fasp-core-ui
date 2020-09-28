@@ -147,25 +147,25 @@ class RealmCountryRegion extends Component {
                             columns: [
 
                                 {
-                                    title: "Realm Country",
+                                    title: i18n.t('static.dashboard.realmcountry'),
                                     type: 'text',
                                     readOnly: true
                                 },
                                 {
-                                    title: "Region",
+                                    title: i18n.t('static.program.region'),
                                     type: 'text',
 
                                 },
                                 {
-                                    title: "Capacity (CBM)",
+                                    title: i18n.t('static.region.capacitycbm'),
                                     type: 'numeric',
                                 },
                                 {
-                                    title: "GLN",
+                                    title: i18n.t('static.region.gln'),
                                     type: 'number',
                                 },
                                 {
-                                    title: "Is Active",
+                                    title: i18n.t('static.checkbox.active'),
                                     type: 'checkbox'
                                 },
                                 {
@@ -418,7 +418,7 @@ class RealmCountryRegion extends Component {
                         label: {
                             label_en: map1.get("1"),
                         },
-                        capacityCbm: map1.get("2").replace(",",""),
+                        capacityCbm: map1.get("2").replace(",", ""),
                         gln: map1.get("3"),
                         active: map1.get("4"),
                         realmCountry: {
@@ -652,7 +652,7 @@ class RealmCountryRegion extends Component {
                             <FormGroup>
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> Add Row</Button>
+                                <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>
                                 &nbsp;
 </FormGroup>
                         </CardFooter>
