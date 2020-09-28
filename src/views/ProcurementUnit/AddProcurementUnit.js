@@ -711,36 +711,47 @@ const initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         procurementUnitName: Yup.string()
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.procurementUnit.validProcurementUnitText')),
         planningUnitId: Yup.string()
             .required(i18n.t('static.procurementUnit.validPlanningUnitText')),
-        multiplier: Yup.number()
-            .typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .required(i18n.t('static.procurementUnit.validMultiplierText')).min(0, i18n.t('static.procurementUnit.validValueText')),
+        multiplier: Yup.string()
+            // .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .matches(/^\s*(?=.*[1-9])\d*(?:\.\d{1,2})?\s*$/, i18n.t('static.currency.conversionrateNumberTwoDecimalPlaces'))
+            .required(i18n.t('static.procurementUnit.validMultiplierText'))
+            .min(0, i18n.t('static.procurementUnit.validValueText')),
+            // .max(10, i18n.t("Eneter valid number with digits less then 10.")),
         unitId: Yup.string()
             .required(i18n.t('static.procurementUnit.validUnitIdText')),
         supplierId: Yup.string()
             .required(i18n.t('static.procurementUnit.validSupplierIdText')),
-        heightQty: Yup.number()
-            .typeError(i18n.t('static.procurementUnit.validNumberText'))
+        heightQty: Yup.string()
+            // .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.currency.conversionrateNumberTwoDecimalPlaces'))
             .min(0, i18n.t('static.procurementUnit.validValueText')),
-        lengthQty: Yup.number()
-            .typeError(i18n.t('static.procurementUnit.validNumberText'))
+        lengthQty: Yup.string()
+            // .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.currency.conversionrateNumberTwoDecimalPlaces'))
             .min(0, i18n.t('static.procurementUnit.validValueText')),
-        widthQty: Yup.number()
-            .typeError(i18n.t('static.procurementUnit.validNumberText'))
+        widthQty: Yup.string()
+            // .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.currency.conversionrateNumberTwoDecimalPlaces'))
             .min(0, i18n.t('static.procurementUnit.validValueText')),
-        weightQty: Yup.number()
-            .typeError(i18n.t('static.procurementUnit.validNumberText'))
+        weightQty: Yup.string()
+            // .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.currency.conversionrateNumberTwoDecimalPlaces'))
             .min(0, i18n.t('static.procurementUnit.validValueText')),
-        unitsPerCase: Yup.number()
-            .typeError(i18n.t('static.procurementUnit.validNumberText'))
+        unitsPerCase: Yup.string()
+            // .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.currency.conversionrateNumberTwoDecimalPlaces'))
             .min(0, i18n.t('static.procurementUnit.validValueText')),
-        unitsPerPallet: Yup.number()
-            .typeError(i18n.t('static.procurementUnit.validNumberText'))
+        unitsPerPallet: Yup.string()
+            // .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.currency.conversionrateNumberTwoDecimalPlaces'))
             .min(0, i18n.t('static.procurementUnit.validValueText')),
-        unitsPerContainer: Yup.number()
-            .typeError(i18n.t('static.procurementUnit.validNumberText'))
+        unitsPerContainer: Yup.string()
+            // .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.currency.conversionrateNumberTwoDecimalPlaces'))
             .min(0, i18n.t('static.procurementUnit.validValueText')),
     })
 }
@@ -1099,6 +1110,7 @@ export default class AddProcurementUnit extends Component {
                                                             invalid={touched.multiplier && !!errors.multiplier}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
+                                                            pattern="[1-9]{1}[0-9]{9}"
                                                             value={this.state.procurementUnit.multiplier}
                                                             id="multiplier" />
                                                         <FormFeedback className="red">{errors.multiplier}</FormFeedback>

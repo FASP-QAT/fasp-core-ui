@@ -9,6 +9,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import '../Forms/ValidationForms/ValidationForms.css';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import { LABEL_REGEX, ALPHABETS_REGEX } from '../../Constants.js';
+import { ALPHABET_NUMBER_REGEX, SPACE_REGEX } from '../../Constants.js';
 
 
 let initialValues = {
@@ -20,7 +21,8 @@ const validationSchema = function (values) {
     return Yup.object().shape({
 
         languageName: Yup.string()
-            .matches(LABEL_REGEX, i18n.t('static.message.rolenamevalidtext'))
+            // .matches(LABEL_REGEX, i18n.t('static.message.rolenamevalidtext'))
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.language.languagetext')),
         languageCode: Yup.string()
             .matches(ALPHABETS_REGEX, i18n.t('static.common.alphabetsOnly'))

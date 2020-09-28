@@ -18,7 +18,7 @@ const entityname = i18n.t('static.fundingsource.fundingsource');
 const validationSchema = function (values) {
     return Yup.object().shape({
         fundingSource: Yup.string()
-            .matches(LABEL_REGEX, i18n.t('static.message.rolenamevalidtext'))
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.fundingsource.fundingsourcetext')),
         fundingSourceCode: Yup.string()
             .matches(/^[a-zA-Z]+$/, i18n.t('static.common.alphabetsOnly'))

@@ -14,7 +14,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import classNames from 'classnames';
-import { LABEL_REGEX } from '../../Constants';
+import { LABEL_REGEX, SPACE_REGEX } from '../../Constants';
 
 const initialValues = {
     summary: "Add / Update User",
@@ -30,6 +30,7 @@ const initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()
+            .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.common.summarytext')),
         realm: Yup.string()
             .required(i18n.t('static.common.realmtext')),
@@ -348,7 +349,7 @@ export default class UserTicketComponent extends Component {
 
     resetClicked() {
         let { user } = this.state;
-        user.summary = '';
+        // user.summary = '';
         user.realm = '';
         user.name = '';
         user.emailId = '';
@@ -387,7 +388,7 @@ export default class UserTicketComponent extends Component {
 
         return (
             <div className="col-md-12">
-                <h5 style={{ color: "green" }} id="div2">{i18n.t(this.state.message)}</h5>
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
                 <h4>{i18n.t('static.ticket.addUpdateUser')}</h4>
                 <br></br>
                 <div style={{ display: this.state.loading ? "none" : "block" }}>
@@ -411,35 +412,25 @@ export default class UserTicketComponent extends Component {
                                     })
                             } else {
                                 this.setState({
-                                    // message: response.data.messageCode
-                                    message: 'Error while creating query', loading: false
+                                    message: i18n.t('static.unkownError'), loading: false
                                 },
-                                    () => {
-                                        this.resetClicked();
+                                    () => {                                        
                                         this.hideSecondComponent();
                                     })
                             }
                             this.props.togglehelp();
                             this.props.toggleSmall(this.state.message);
                         })
-                        // .catch(
-                        //     error => {
-                        //         switch (error.message) {
-                        //             case "Network Error":
-                        //                 this.setState({
-                        //                     message: 'Network Error'
-                        //                 })
-                        //                 break
-                        //             default:
-                        //                 this.setState({
-                        //                     message: 'Error'
-                        //                 })
-                        //                 break
-                        //         }
-                        //         alert(this.state.message);
-                        //         this.props.togglehelp();
-                        //     }
-                        // );  
+                        .catch(
+                            error => {
+                                this.setState({                                        
+                                    message: i18n.t('static.unkownError'), loading: false
+                                },
+                                () => {                                        
+                                    this.hideSecondComponent();                                     
+                                });                                    
+                            }
+                        );  
                     }}
                     render={
                         ({
@@ -456,7 +447,7 @@ export default class UserTicketComponent extends Component {
                             setFieldValue,
                             setFieldTouched
                         }) => (
-                                <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm'>
+                                <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm' autocomplete="off">
                                     <Input
                                         type="hidden"
                                         name="roleValid"
@@ -471,7 +462,7 @@ export default class UserTicketComponent extends Component {
                                                     
                                     < FormGroup >
                                         <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
-                                        <Input type="text" name="summary" id="summary"
+                                        <Input type="text" name="summary" id="summary" readOnly = {true}
                                             bsSize="sm"
                                             valid={!errors.summary && this.state.user.summary != ''}
                                             invalid={touched.summary && !!errors.summary}
@@ -499,7 +490,7 @@ export default class UserTicketComponent extends Component {
                                     </FormGroup>
                                     < FormGroup >
                                         <Label for="name">{i18n.t('static.user.username')}<span class="red Reqasterisk">*</span></Label>
-                                        <Input type="text" name="name" id="name"
+                                        <Input type="text" name="name" id="name" autoComplete="nope"
                                             bsSize="sm"
                                             valid={!errors.name && this.state.user.name != ''}
                                             invalid={touched.name && !!errors.name}
@@ -523,7 +514,7 @@ export default class UserTicketComponent extends Component {
                                     </FormGroup>
                                     <FormGroup>
                                         <Label for="phoneNumber">{i18n.t('static.user.phoneNumber')}</Label>
-                                        <Input type="text" name="phoneNumber" id="phoneNumber"
+                                        <Input type="text" name="phoneNumber" id="phoneNumber" autoComplete="nope"
                                             bsSize="sm"
                                             valid={!errors.phoneNumber && this.state.user.phoneNumber != ''}
                                             invalid={touched.phoneNumber && !!errors.phoneNumber}
@@ -588,6 +579,10 @@ export default class UserTicketComponent extends Component {
                                         <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                         <Button type="submit" size="md" color="success" className=" mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                     </ModalFooter>
+                                    <br></br><br></br>
+                                    <div className={this.props.className}>
+                                        <p>{i18n.t('static.ticket.drodownvaluenotfound')}</p>
+                                    </div>
                                 </Form>
                             )} />
                             </div>

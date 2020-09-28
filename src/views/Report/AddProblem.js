@@ -383,7 +383,7 @@ class AddRoleComponent extends Component {
                   program: {
                     id: programObj.programId,
                     label: programObj.label,
-                    programCode: programObj.programCode
+                    code: programObj.programCode
                   },
                   versionId: programObj.currentVersion.versionId,
                   realmProblem: problemObj,

@@ -30,8 +30,10 @@ const validationSchema = function (values) {
         realmId: Yup.string()
             .required(i18n.t('static.common.realmtext')),
         procurementAgentCode: Yup.string()
+            .matches(/^\S*$/, i18n.t('static.validNoSpace.string'))
             .required(i18n.t('static.procurementagent.codetext')),
         procurementAgentName: Yup.string()
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.procurementAgent.procurementagentnametext')),
         // submittedToApprovedLeadTime: Yup.string()
         //     .matches(/^[0-9]*$/, i18n.t('static.procurementagent.onlynumberText'))

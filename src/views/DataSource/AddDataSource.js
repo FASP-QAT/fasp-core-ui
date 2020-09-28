@@ -26,8 +26,11 @@ const validationSchema = function (values) {
     return Yup.object().shape({
         realmId: Yup.string()
             .required(i18n.t('static.common.realmtext')),
+        // label: Yup.string()
+        //     .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
+        //     .required(i18n.t('static.datasource.datasourcetext')),
         label: Yup.string()
-            .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.datasource.datasourcetext')),
         dataSourceTypeId: Yup.string()
             .required(i18n.t('static.datasource.datasourcetypetext'))

@@ -11,6 +11,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import { LABEL_REGEX } from '../../Constants.js';
+import { ALPHABET_NUMBER_REGEX, SPACE_REGEX } from '../../Constants.js';
 import classNames from 'classnames';
 const initialValues = {
     roleName: "",
@@ -22,12 +23,13 @@ const entityname = i18n.t('static.role.role');
 const validationSchema = function (values) {
     return Yup.object().shape({
         roleName: Yup.string()
-            .required(i18n.t('static.role.roletext'))
-            .matches(LABEL_REGEX, i18n.t('static.message.rolenamevalidtext')),
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
+            .required(i18n.t('static.role.roletext')),
+        // .matches(LABEL_REGEX, i18n.t('static.message.rolenamevalidtext')),
         businessFunctions: Yup.string()
-            .required('Please select business functions'),
+            .required(i18n.t('static.role.businessfunctiontext')),
         canCreateRoles: Yup.string()
-            .required('Please select can create role')
+            .required(i18n.t('static.role.cancreateroletext'))
 
         // businessFunctions: Yup.array()
         //     .min(1, i18n.t('static.role.businessfunctiontext'))

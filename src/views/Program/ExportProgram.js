@@ -156,7 +156,7 @@ export default class ExportProgram extends Component {
                                     // zip.file(labelName + "_" + parseInt(j + 1) + ".txt", programData);
                                     console.log("Txt ", txt);
                                     console.log("Txt 1", txt1);
-                                    zip.file(labelName + "_" + parseInt(j + 1) + ".txt",   txt + "@~-~@" + txt1  );
+                                    zip.file(labelName + "_" + parseInt(j + 1) + ".txt", txt + "@~-~@" + txt1);
                                 }
                             }
                             if (i == myResult.length - 1) {
@@ -276,7 +276,7 @@ export default class ExportProgram extends Component {
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
-                            <div ><h4> <strong>Loading...</strong></h4></div>
+                            <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
 
                             <div class="spinner-border blue ml-4" role="status">
 

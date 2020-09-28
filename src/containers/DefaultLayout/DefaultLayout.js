@@ -1265,12 +1265,6 @@ class DefaultLayout extends Component {
                                 attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_GLOBAL_VIEW_REPORT') ? false : true) }
                               },
                               {
-                                name: i18n.t('static.dashboard.shipmentGlobalViewheader'),
-                                url: '/report/shipmentGlobalView',
-                                icon: 'fa fa-wpforms',
-                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_GLOBAL_DEMAND_REPORT') ? false : true) }
-                              },
-                              {
                                 name: i18n.t('static.report.forecasterrorovertime'),
                                 url: '/report/forecastOverTheTime',
                                 icon: 'fa fa-line-chart',
@@ -1342,6 +1336,12 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-list',
                             attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_ANNUAL_SHIPMENT_COST_REPORT')) ? false : true) },
                             children: [
+                              {
+                                name: i18n.t('static.dashboard.shipmentGlobalViewheader'),
+                                url: '/report/shipmentGlobalView',
+                                icon: 'fa fa-wpforms',
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_GLOBAL_DEMAND_REPORT') ? false : true) }
+                              },
                               {
                                 name: i18n.t('static.report.shipmentDetailReport'),
                                 url: '/report/shipmentSummery',
