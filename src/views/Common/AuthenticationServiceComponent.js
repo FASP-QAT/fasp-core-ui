@@ -64,13 +64,13 @@ export default class AuthenticationServiceComponent extends Component {
                                 return response;
                             } else {
                                 this.props.message("Network Error")
-                                this.props.loading(false)
+                                // this.props.loading(false)
                                 return "";
                             }
                         }, (error) => {
                             if (error.message === "Network Error") {
                                 this.props.message("Network Error")
-                                this.props.loading(false)
+                                // this.props.loading(false)
                             } else {
                                 switch (error.response ? error.response.status : "") {
                                     case 403:
@@ -87,20 +87,20 @@ export default class AuthenticationServiceComponent extends Component {
                                         console.log("common component 404,406,500--->", error);
                                         console.log("error.response.data.messageCode-------------", error.response.data.messageCode);
                                         this.props.message(error.response.data.messageCode);
-                                        this.props.loading(false)
+                                        // this.props.loading(false)
                                         break;
                                     case 412:
                                         console.log("common component 412--->", error);
                                         console.log("error.response.data.messageCode-------------", error.response.data.messageCode);
                                         this.props.message(error.response.data.messageCode);
                                         console.log("Common component called---------");
-                                        this.props.loading(false)
+                                        // this.props.loading(false)
                                         console.log("Common component loading---------");
                                         break;
                                     default:
                                         console.log("common component default--->", error);
                                         this.props.message('static.unkownError');
-                                        this.props.loading(false)
+                                        // this.props.loading(false)
                                         break;
                                 }
                                 return Promise.reject(error);

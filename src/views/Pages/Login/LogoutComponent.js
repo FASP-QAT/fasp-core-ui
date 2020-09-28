@@ -17,6 +17,7 @@ class LogoutComponent extends Component {
 
 
     componentDidMount() {
+        console.log("########### Logout component did mount start ####################")
         let keysToRemove = ["token-" + AuthenticationService.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken"];
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
         if (navigator.onLine && localStorage.getItem('token-' + decryptedCurUser) != null && localStorage.getItem('token-' + decryptedCurUser) != "") {
@@ -33,6 +34,7 @@ class LogoutComponent extends Component {
                 );
         }
         keysToRemove.forEach(k => localStorage.removeItem(k));
+        console.log("########### Logout component did mount end ####################")
         this.props.history.push(`/login/${this.props.match.params.message}`)
     }
     render() {

@@ -98,7 +98,7 @@ class Login extends Component {
   }
 
   componentDidMount() {
-    console.log("------componentDidMount------------");
+    console.log("############## Login component did mount #####################");
     // AuthenticationService.clearLocalStorage();
     this.logoutMessagehide();
     LoginService.getApiVersion()
