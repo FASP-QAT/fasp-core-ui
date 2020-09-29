@@ -1525,7 +1525,7 @@ class SupplierLeadTimes extends Component {
             ele => A.push(this.addDoubleQuoteToRowContent([
               //  (getLabelText(ele.country.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
                 (getLabelText(ele.program.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
-                (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
+                getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(' ', '%20'),
                 (ele.procurementAgent.code== null ? '' : ele.procurementAgent.code.replaceAll(',', ' ')).replaceAll(' ', '%20'),
                 ele.plannedSubmittedLeadTime,
                 // ele.draftToSubmittedLeadTime,
@@ -1666,7 +1666,7 @@ class SupplierLeadTimes extends Component {
           //  getLabelText(ele.country.label, this.state.lang),
             getLabelText(ele.program.label, this.state.lang),
             getLabelText(ele.planningUnit.label, this.state.lang),
-            getLabelText(ele.procurementAgent.label, this.state.lang),
+           ele.procurementAgent.code,
             ele.plannedSubmittedLeadTime,
             // ele.draftToSubmittedLeadTime,
             ele.submittedToApprovedLeadTime,
@@ -1685,11 +1685,11 @@ class SupplierLeadTimes extends Component {
             startY: startYtable,
             head: [headers],
             body: data,
-            styles: { lineWidth: 1, fontSize: 8, cellWidth: 55, halign: 'center' },
+            styles: { lineWidth: 1, fontSize: 8, cellWidth: 57, halign: 'center' },
             columnStyles: {
                 // 0: { cellWidth: 170 },
                 // 1: { cellWidth: 171.89 },
-                3: { cellWidth: 110 }
+                1: { cellWidth: 134.89 }
             }
         };
         doc.autoTable(content);
