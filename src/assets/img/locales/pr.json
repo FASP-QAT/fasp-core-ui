@@ -876,5 +876,11 @@
     "static.supplyPlan.plannedDate": "Data planejada",
     "static.supplyPlan.shipped": "Enviado (Enviado, Chegou)",
     "static.supplyPlan.shippedDate": "Data de envio",
-    "static.report.minmonth": "Min MOS"
+    "static.report.minmonth": "Min MOS",
+    "static.ticket.help": "Socorro",
+    "static.ticket.header": "QAT Central de Ajuda",
+    "static.ticket.subheader": "ESTAMOS AQUI PARA AJUDÁ-LO COM SUA PERGUNTA",
+    "static.ticket.requestTo": "Solicite uma nova / atualização para...",
+    "static.ticket.uploadScreenshot": "Faça upload de uma captura de tela",
+    "static.ticket.drodownvaluenotfound": "Nota: Se você não vir o XYZ desejado que deseja, envie um tíquete para este item"
 }

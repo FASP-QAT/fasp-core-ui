@@ -2233,8 +2233,8 @@ class ShipmentGlobalView extends Component {
             // let realmId = AuthenticationService.getRealmId();
             var inputjson = {
                 realmId: realmId,
-                startDate: new moment(startDate),
-                stopDate: new moment(endDate),
+                startDate:startDate,
+                stopDate: endDate,
                 realmCountryIds: CountryIds,
                 planningUnitId: planningUnitId,
                 reportView: viewby,

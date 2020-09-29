@@ -2721,8 +2721,8 @@ export default class QatProblemActions extends Component {
 
                                                             dt: moment(Date.now()).format('YYYY-MM-DD'),
                                                             region: {
-                                                                id: regionList[r].regionId,
-                                                                label: regionList[r].label
+                                                                id: 0,
+                                                                // label: regionList[r].label
                                                             },
                                                             planningUnit: {
                                                                 id: planningUnitList[p].planningUnit.id,

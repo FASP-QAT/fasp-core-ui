@@ -1144,5 +1144,18 @@
     "static.common.productFreight":"Costo del producto + flete",
     "static.common.grandTotal":"Gran total",
     "static.budget.allocatedShipmentOrdered":"Presupuesto asignado al envío (pedido)",
-    "static.budget.allocatedShipmentPlanned":"Presupuesto asignado al envío (planificado)"
+    "static.budget.allocatedShipmentPlanned":"Presupuesto asignado al envío (planificado)",
+    "static.ticket.help": "Ayuda",
+    "static.ticket.header": "QAT Mesa de ayuda",
+    "static.ticket.subheader": "ESTAMOS AQUÍ PARA AYUDARLE CON SU CONSULTA",
+    "static.ticket.addUpdateMasterData": "Agregar / actualizar datos maestros",
+    "static.common.bugreport": "Reportar un error",
+    "static.ticket.requestTo": "Solicite una nueva / actualización de...",
+    "static.ticket.uploadScreenshot": "Sube una captura de pantalla",
+    "static.common.description": "la descripción",
+    "static.common.notes": "Notas",
+    "static.common.summary": "Resumen",
+    "static.ticket.ticketcreated": "El ticket ha sido creado.",
+    "static.ticket.ticketcode": "Boleto Código",
+    "static.ticket.drodownvaluenotfound": "Nota: Si no ve el XYZ deseado que desea, envíe un ticket para este artículo"
 }

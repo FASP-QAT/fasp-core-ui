@@ -327,9 +327,10 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                 shippedDate: shipmentList[i].shippedDate,
                                                 arrivedDate: shipmentList[i].arrivedDate,
                                                 expectedDeliveryDate: shipmentList[i].expectedDeliveryDate,
-                                                receivedDate: shipmentList[i].receivedDate
+                                                receivedDate: shipmentList[i].receivedDate == "Invalid date" ? "" : shipmentList[i].receivedDate
                                             }
                                             console.log("shipmentList[i].expectedDeliveryDate", shipmentList[i].expectedDeliveryDate);
+                                            console.log("show Shipment dates", shipmentDatesJson);
 
                                             data = [];
                                             data[0] = shipmentList[i].shipmentStatus.id; //A
@@ -418,7 +419,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                 { type: 'hidden', title: i18n.t('static.supplyPlan.index'), width: 0 },
                                                 { type: 'hidden', title: i18n.t('static.supplyPlan.batchInfo'), width: 200 },
                                                 { type: 'hidden', title: i18n.t('static.supplyPlan.totalQtyBatchInfo'), width: 0 },
-                                                { type: 'hidden', title: i18n.t('static.supplyPlan.emergencyOrder'), width: 0 },
+                                                { type: 'checkbox', title: i18n.t('static.supplyPlan.emergencyOrder'), width: 80 },
                                                 { type: 'checkbox', title: i18n.t('static.common.accountFlag'), width: 80 },
                                                 { type: 'hidden', title: i18n.t('static.supplyPlan.shipmentDatesJson'), width: 0 },
                                                 { type: 'hidden' },
@@ -473,12 +474,14 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             }.bind(this),
                                             contextMenu: function (obj, x, y, e) {
                                                 var items = [];
-                                                items.push({
-                                                    title: i18n.t('static.supplyPlan.addNewShipment'),
-                                                    onclick: function () {
-                                                        this.addRowInJexcel();
-                                                    }.bind(this)
-                                                });
+                                                if (shipmentEditable) {
+                                                    items.push({
+                                                        title: i18n.t('static.supplyPlan.addNewShipment'),
+                                                        onclick: function () {
+                                                            this.addRowInJexcel();
+                                                        }.bind(this)
+                                                    });
+                                                }
 
                                                 // Add shipment batch info
                                                 var rowData = obj.getRowData(y);
@@ -595,7 +598,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                     if (y == null) {
                                                                     } else {
                                                                         // Insert new row
-                                                                        if (obj.options.allowInsertRow == true) {
+                                                                        if (shipmentEditable && obj.options.allowInsertRow == true) {
                                                                             items.push({
                                                                                 title: i18n.t('static.supplyPlan.addNewBatchInfo'),
                                                                                 onclick: function () {
@@ -603,7 +606,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                                 }.bind(this)
                                                                             });
                                                                         }
-                                                                        if (obj.options.allowDeleteRow == true && obj.getJson().length > 1) {
+                                                                        if (shipmentEditable && obj.options.allowDeleteRow == true && obj.getJson().length > 1) {
                                                                             // region id
                                                                             if (obj.getRowData(y)[5] == -1) {
                                                                                 items.push({
@@ -625,32 +628,15 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                         }.bind(this)
                                                     });
                                                 }
-                                                console.log("RowData-------->", rowData);
-                                                if (rowData[19].toString() == "true" && rowData[14].toString() == "false") {
+                                                if (shipmentEditable && rowData[0].toString() == PLANNED_SHIPMENT_STATUS && rowData[16] != -1) {
                                                     items.push({
-                                                        title: i18n.t('static.supplyPlan.doNotConsideAsEmergencyOrder'),
+                                                        title: i18n.t('static.common.deleterow'),
                                                         onclick: function () {
-                                                            obj.setValueFromCoords(19, y, false, true);
+                                                            obj.setValueFromCoords(24, y, false, true);
                                                         }.bind(this)
                                                     });
                                                 }
-                                                if (rowData[19].toString() == "false" && rowData[14].toString() == "false") {
-                                                    items.push({
-                                                        title: i18n.t('static.supplyPlan.consideAsEmergencyOrder'),
-                                                        onclick: function () {
-                                                            obj.setValueFromCoords(19, y, true, true);
-                                                        }.bind(this)
-                                                    });
-                                                }
-                                                // if (rowData[0].toString() == PLANNED_SHIPMENT_STATUS && rowData[16] != -1) {
-                                                //     items.push({
-                                                //         title: i18n.t('static.common.deleterow'),
-                                                //         onclick: function () {
-                                                //             obj.setValueFromCoords(24, y, false, true);
-                                                //         }.bind(this)
-                                                //     });
-                                                // }
-                                                if (obj.options.allowDeleteRow == true && obj.getJson().length > 1) {
+                                                if (shipmentEditable && obj.options.allowDeleteRow == true && obj.getJson().length > 1) {
                                                     // region id
                                                     if (obj.getRowData(y)[16] == -1) {
                                                         items.push({
@@ -798,7 +784,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             var rowData = shipmentInstance.getRowData(i);
             var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y']
             for (var j = 0; j < colArr.length; j++) {
-                var col = (colArr[j]).concat(parseInt(y) + 1);
+                var col = (colArr[j]).concat(parseInt(i) + 1);
                 if (rowData[20].toString() == "false") {
                     shipmentInstance.setStyle(col, "background-color", "transparent");
                     shipmentInstance.setStyle(col, "background-color", "#D3D3D3");
@@ -851,7 +837,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         this.props.updateState("shipmentError", "");
         this.props.updateState("noFundsBudgetError", "");
         console.log("X-------->", x, "Y---------->", y);
-        if (x == 19 || x == 20) {
+        if (x == 19 || x == 20 || x == 24) {
             var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y']
             for (var j = 0; j < colArr.length; j++) {
                 var col = (colArr[j]).concat(parseInt(y) + 1);
@@ -868,6 +854,16 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     elInstance.setStyle(col, "color", "red");
                 } else {
                     console.log("In else")
+                    elInstance.setStyle(col, "color", "#000");
+                }
+
+                if (rowData[24].toString() == "false") {
+                    elInstance.setStyle(col, "color", "#000");
+                    elInstance.setStyle(col, "color", "#808080");
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "#808080");
+                } else {
+                    elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setStyle(col, "color", "#000");
                 }
             }
@@ -1741,8 +1737,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             if (y == 1) {
                 var valid = checkValidtion("date", "B", y, rowDataForDates[1], elInstance);
             }
-        }
-        if (x == 2) {
             if (y == 1 && shipmentStatus != PLANNED_SHIPMENT_STATUS) {
                 var valid = checkValidtion("date", "C", y, rowDataForDates[2], elInstance);
                 if (valid == true) {
@@ -1752,8 +1746,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     }
                 }
             }
-        }
-        if (x == 3) {
             if (y == 1 && shipmentStatus != PLANNED_SHIPMENT_STATUS && shipmentStatus != SUBMITTED_SHIPMENT_STATUS) {
                 var valid = checkValidtion("date", "D", y, rowDataForDates[3], elInstance);
                 if (valid == true) {
@@ -1763,8 +1755,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     }
                 }
             }
-        }
-        if (x == 4) {
             if (y == 1 && shipmentStatus != PLANNED_SHIPMENT_STATUS && shipmentStatus != SUBMITTED_SHIPMENT_STATUS && shipmentStatus != APPROVED_SHIPMENT_STATUS) {
                 var valid = checkValidtion("date", "E", y, rowDataForDates[4], elInstance);
                 if (valid == true) {
@@ -1774,8 +1764,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     }
                 }
             }
-        }
-        if (x == 5) {
             if (shipmentStatus != PLANNED_SHIPMENT_STATUS && shipmentStatus != SUBMITTED_SHIPMENT_STATUS && shipmentStatus != APPROVED_SHIPMENT_STATUS && shipmentStatus != SHIPPED_SHIPMENT_STATUS) {
                 var valid = checkValidtion("date", "F", y, rowDataForDates[5], elInstance);
                 if (valid == true) {
@@ -1785,13 +1773,283 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     }
                 }
             }
+            if (y == 0) {
+                valid = checkValidtion("date", "G", y, rowDataForDates[6], elInstance);
+            } else if (y == 1 && shipmentStatus != PLANNED_SHIPMENT_STATUS && shipmentStatus != SUBMITTED_SHIPMENT_STATUS && shipmentStatus != APPROVED_SHIPMENT_STATUS && shipmentStatus != SHIPPED_SHIPMENT_STATUS && shipmentStatus != ARRIVED_SHIPMENT_STATUS) {
+                valid = checkValidtion("date", "G", y, rowDataForDates[6], elInstance);
+                if (valid == true) {
+                    if (moment(rowDataForDates[5]).format("YYYY-MM-DD") > moment(value).format("YYYY-MM-DD")) {
+                        inValid("G", y, i18n.t('static.message.invaliddate'), elInstance);
+                        valid = false;
+                    } else {
+                    }
+                }
+            }
+        }
+        if (x == 2) {
+            if (y == 1) {
+                var valid = checkValidtion("date", "B", y, rowDataForDates[1], elInstance);
+            }
+            if (y == 1 && shipmentStatus != PLANNED_SHIPMENT_STATUS) {
+                var valid = checkValidtion("date", "C", y, rowDataForDates[2], elInstance);
+                if (valid == true) {
+                    if (moment(rowDataForDates[1]).format("YYYY-MM-DD") > moment(value).format("YYYY-MM-DD") && y != 0) {
+                        inValid("C", y, i18n.t('static.message.invaliddate'), elInstance);
+                    } else {
+                    }
+                }
+            }
+            if (y == 1 && shipmentStatus != PLANNED_SHIPMENT_STATUS && shipmentStatus != SUBMITTED_SHIPMENT_STATUS) {
+                var valid = checkValidtion("date", "D", y, rowDataForDates[3], elInstance);
+                if (valid == true) {
+                    if (moment(rowDataForDates[2]).format("YYYY-MM-DD") > moment(value).format("YYYY-MM-DD")) {
+                        inValid("D", y, i18n.t('static.message.invaliddate'), elInstance);
+                    } else {
+                    }
+                }
+            }
+            if (y == 1 && shipmentStatus != PLANNED_SHIPMENT_STATUS && shipmentStatus != SUBMITTED_SHIPMENT_STATUS && shipmentStatus != APPROVED_SHIPMENT_STATUS) {
+                var valid = checkValidtion("date", "E", y, rowDataForDates[4], elInstance);
+                if (valid == true) {
+                    if (moment(rowDataForDates[3]).format("YYYY-MM-DD") > moment(value).format("YYYY-MM-DD")) {
+                        inValid("E", y, i18n.t('static.message.invaliddate'), elInstance);
+                    } else {
+                    }
+                }
+            }
+            if (shipmentStatus != PLANNED_SHIPMENT_STATUS && shipmentStatus != SUBMITTED_SHIPMENT_STATUS && shipmentStatus != APPROVED_SHIPMENT_STATUS && shipmentStatus != SHIPPED_SHIPMENT_STATUS) {
+                var valid = checkValidtion("date", "F", y, rowDataForDates[5], elInstance);
+                if (valid == true) {
+                    if (moment(rowDataForDates[4]).format("YYYY-MM-DD") > moment(value).format("YYYY-MM-DD")) {
+                        inValid("F", y, i18n.t('static.message.invaliddate'), elInstance);
+                    } else {
+                    }
+                }
+            }
+            if (y == 0) {
+                valid = checkValidtion("date", "G", y, rowDataForDates[6], elInstance);
+            } else if (y == 1 && shipmentStatus != PLANNED_SHIPMENT_STATUS && shipmentStatus != SUBMITTED_SHIPMENT_STATUS && shipmentStatus != APPROVED_SHIPMENT_STATUS && shipmentStatus != SHIPPED_SHIPMENT_STATUS && shipmentStatus != ARRIVED_SHIPMENT_STATUS) {
+                valid = checkValidtion("date", "G", y, rowDataForDates[6], elInstance);
+                if (valid == true) {
+                    if (moment(rowDataForDates[5]).format("YYYY-MM-DD") > moment(value).format("YYYY-MM-DD")) {
+                        inValid("G", y, i18n.t('static.message.invaliddate'), elInstance);
+                        valid = false;
+                    } else {
+                    }
+                }
+            }
+        }
+        if (x == 3) {
+            if (y == 1) {
+                var valid = checkValidtion("date", "B", y, rowDataForDates[1], elInstance);
+            }
+            if (y == 1 && shipmentStatus != PLANNED_SHIPMENT_STATUS) {
+                var valid = checkValidtion("date", "C", y, rowDataForDates[2], elInstance);
+                if (valid == true) {
+                    if (moment(rowDataForDates[1]).format("YYYY-MM-DD") > moment(value).format("YYYY-MM-DD") && y != 0) {
+                        inValid("C", y, i18n.t('static.message.invaliddate'), elInstance);
+                    } else {
+                    }
+                }
+            }
+            if (y == 1 && shipmentStatus != PLANNED_SHIPMENT_STATUS && shipmentStatus != SUBMITTED_SHIPMENT_STATUS) {
+                var valid = checkValidtion("date", "D", y, rowDataForDates[3], elInstance);
+                if (valid == true) {
+                    if (moment(rowDataForDates[2]).format("YYYY-MM-DD") > moment(value).format("YYYY-MM-DD")) {
+                        inValid("D", y, i18n.t('static.message.invaliddate'), elInstance);
+                    } else {
+                    }
+                }
+            }
+            if (y == 1 && shipmentStatus != PLANNED_SHIPMENT_STATUS && shipmentStatus != SUBMITTED_SHIPMENT_STATUS && shipmentStatus != APPROVED_SHIPMENT_STATUS) {
+                var valid = checkValidtion("date", "E", y, rowDataForDates[4], elInstance);
+                if (valid == true) {
+                    if (moment(rowDataForDates[3]).format("YYYY-MM-DD") > moment(value).format("YYYY-MM-DD")) {
+                        inValid("E", y, i18n.t('static.message.invaliddate'), elInstance);
+                    } else {
+                    }
+                }
+            }
+            if (shipmentStatus != PLANNED_SHIPMENT_STATUS && shipmentStatus != SUBMITTED_SHIPMENT_STATUS && shipmentStatus != APPROVED_SHIPMENT_STATUS && shipmentStatus != SHIPPED_SHIPMENT_STATUS) {
+                var valid = checkValidtion("date", "F", y, rowDataForDates[5], elInstance);
+                if (valid == true) {
+                    if (moment(rowDataForDates[4]).format("YYYY-MM-DD") > moment(value).format("YYYY-MM-DD")) {
+                        inValid("F", y, i18n.t('static.message.invaliddate'), elInstance);
+                    } else {
+                    }
+                }
+            }
+            if (y == 0) {
+                valid = checkValidtion("date", "G", y, rowDataForDates[6], elInstance);
+            } else if (y == 1 && shipmentStatus != PLANNED_SHIPMENT_STATUS && shipmentStatus != SUBMITTED_SHIPMENT_STATUS && shipmentStatus != APPROVED_SHIPMENT_STATUS && shipmentStatus != SHIPPED_SHIPMENT_STATUS && shipmentStatus != ARRIVED_SHIPMENT_STATUS) {
+                valid = checkValidtion("date", "G", y, rowDataForDates[6], elInstance);
+                if (valid == true) {
+                    if (moment(rowDataForDates[5]).format("YYYY-MM-DD") > moment(value).format("YYYY-MM-DD")) {
+                        inValid("G", y, i18n.t('static.message.invaliddate'), elInstance);
+                        valid = false;
+                    } else {
+                    }
+                }
+            }
+        }
+        if (x == 4) {
+            if (y == 1) {
+                var valid = checkValidtion("date", "B", y, rowDataForDates[1], elInstance);
+            }
+            if (y == 1 && shipmentStatus != PLANNED_SHIPMENT_STATUS) {
+                var valid = checkValidtion("date", "C", y, rowDataForDates[2], elInstance);
+                if (valid == true) {
+                    if (moment(rowDataForDates[1]).format("YYYY-MM-DD") > moment(value).format("YYYY-MM-DD") && y != 0) {
+                        inValid("C", y, i18n.t('static.message.invaliddate'), elInstance);
+                    } else {
+                    }
+                }
+            }
+            if (y == 1 && shipmentStatus != PLANNED_SHIPMENT_STATUS && shipmentStatus != SUBMITTED_SHIPMENT_STATUS) {
+                var valid = checkValidtion("date", "D", y, rowDataForDates[3], elInstance);
+                if (valid == true) {
+                    if (moment(rowDataForDates[2]).format("YYYY-MM-DD") > moment(value).format("YYYY-MM-DD")) {
+                        inValid("D", y, i18n.t('static.message.invaliddate'), elInstance);
+                    } else {
+                    }
+                }
+            }
+            if (y == 1 && shipmentStatus != PLANNED_SHIPMENT_STATUS && shipmentStatus != SUBMITTED_SHIPMENT_STATUS && shipmentStatus != APPROVED_SHIPMENT_STATUS) {
+                var valid = checkValidtion("date", "E", y, rowDataForDates[4], elInstance);
+                if (valid == true) {
+                    if (moment(rowDataForDates[3]).format("YYYY-MM-DD") > moment(value).format("YYYY-MM-DD")) {
+                        inValid("E", y, i18n.t('static.message.invaliddate'), elInstance);
+                    } else {
+                    }
+                }
+            }
+            if (shipmentStatus != PLANNED_SHIPMENT_STATUS && shipmentStatus != SUBMITTED_SHIPMENT_STATUS && shipmentStatus != APPROVED_SHIPMENT_STATUS && shipmentStatus != SHIPPED_SHIPMENT_STATUS) {
+                var valid = checkValidtion("date", "F", y, rowDataForDates[5], elInstance);
+                if (valid == true) {
+                    if (moment(rowDataForDates[4]).format("YYYY-MM-DD") > moment(value).format("YYYY-MM-DD")) {
+                        inValid("F", y, i18n.t('static.message.invaliddate'), elInstance);
+                    } else {
+                    }
+                }
+            }
+            if (y == 0) {
+                valid = checkValidtion("date", "G", y, rowDataForDates[6], elInstance);
+            } else if (y == 1 && shipmentStatus != PLANNED_SHIPMENT_STATUS && shipmentStatus != SUBMITTED_SHIPMENT_STATUS && shipmentStatus != APPROVED_SHIPMENT_STATUS && shipmentStatus != SHIPPED_SHIPMENT_STATUS && shipmentStatus != ARRIVED_SHIPMENT_STATUS) {
+                valid = checkValidtion("date", "G", y, rowDataForDates[6], elInstance);
+                if (valid == true) {
+                    if (moment(rowDataForDates[5]).format("YYYY-MM-DD") > moment(value).format("YYYY-MM-DD")) {
+                        inValid("G", y, i18n.t('static.message.invaliddate'), elInstance);
+                        valid = false;
+                    } else {
+                    }
+                }
+            }
+        }
+        if (x == 5) {
+            if (y == 1) {
+                var valid = checkValidtion("date", "B", y, rowDataForDates[1], elInstance);
+            }
+            if (y == 1 && shipmentStatus != PLANNED_SHIPMENT_STATUS) {
+                var valid = checkValidtion("date", "C", y, rowDataForDates[2], elInstance);
+                if (valid == true) {
+                    if (moment(rowDataForDates[1]).format("YYYY-MM-DD") > moment(value).format("YYYY-MM-DD") && y != 0) {
+                        inValid("C", y, i18n.t('static.message.invaliddate'), elInstance);
+                    } else {
+                    }
+                }
+            }
+            if (y == 1 && shipmentStatus != PLANNED_SHIPMENT_STATUS && shipmentStatus != SUBMITTED_SHIPMENT_STATUS) {
+                var valid = checkValidtion("date", "D", y, rowDataForDates[3], elInstance);
+                if (valid == true) {
+                    if (moment(rowDataForDates[2]).format("YYYY-MM-DD") > moment(value).format("YYYY-MM-DD")) {
+                        inValid("D", y, i18n.t('static.message.invaliddate'), elInstance);
+                    } else {
+                    }
+                }
+            }
+            if (y == 1 && shipmentStatus != PLANNED_SHIPMENT_STATUS && shipmentStatus != SUBMITTED_SHIPMENT_STATUS && shipmentStatus != APPROVED_SHIPMENT_STATUS) {
+                var valid = checkValidtion("date", "E", y, rowDataForDates[4], elInstance);
+                if (valid == true) {
+                    if (moment(rowDataForDates[3]).format("YYYY-MM-DD") > moment(value).format("YYYY-MM-DD")) {
+                        inValid("E", y, i18n.t('static.message.invaliddate'), elInstance);
+                    } else {
+                    }
+                }
+            }
+            if (shipmentStatus != PLANNED_SHIPMENT_STATUS && shipmentStatus != SUBMITTED_SHIPMENT_STATUS && shipmentStatus != APPROVED_SHIPMENT_STATUS && shipmentStatus != SHIPPED_SHIPMENT_STATUS) {
+                var valid = checkValidtion("date", "F", y, rowDataForDates[5], elInstance);
+                if (valid == true) {
+                    if (moment(rowDataForDates[4]).format("YYYY-MM-DD") > moment(value).format("YYYY-MM-DD")) {
+                        inValid("F", y, i18n.t('static.message.invaliddate'), elInstance);
+                    } else {
+                    }
+                }
+            }
+            if (y == 0) {
+                valid = checkValidtion("date", "G", y, rowDataForDates[6], elInstance);
+            } else if (y == 1 && shipmentStatus != PLANNED_SHIPMENT_STATUS && shipmentStatus != SUBMITTED_SHIPMENT_STATUS && shipmentStatus != APPROVED_SHIPMENT_STATUS && shipmentStatus != SHIPPED_SHIPMENT_STATUS && shipmentStatus != ARRIVED_SHIPMENT_STATUS) {
+                valid = checkValidtion("date", "G", y, rowDataForDates[6], elInstance);
+                if (valid == true) {
+                    if (moment(rowDataForDates[5]).format("YYYY-MM-DD") > moment(value).format("YYYY-MM-DD")) {
+                        inValid("G", y, i18n.t('static.message.invaliddate'), elInstance);
+                        valid = false;
+                    } else {
+                    }
+                }
+            }
         }
         if (x == 6) {
-            console.log(" in x 6")
+            if (y == 1) {
+                var valid = checkValidtion("date", "B", y, rowDataForDates[1], elInstance);
+            }
+            if (y == 1 && shipmentStatus != PLANNED_SHIPMENT_STATUS) {
+                var valid = checkValidtion("date", "C", y, rowDataForDates[2], elInstance);
+                if (valid == true) {
+                    if (moment(rowDataForDates[1]).format("YYYY-MM-DD") > moment(value).format("YYYY-MM-DD") && y != 0) {
+                        inValid("C", y, i18n.t('static.message.invaliddate'), elInstance);
+                    } else {
+                    }
+                }
+            }
+            if (y == 1 && shipmentStatus != PLANNED_SHIPMENT_STATUS && shipmentStatus != SUBMITTED_SHIPMENT_STATUS) {
+                var valid = checkValidtion("date", "D", y, rowDataForDates[3], elInstance);
+                if (valid == true) {
+                    if (moment(rowDataForDates[2]).format("YYYY-MM-DD") > moment(value).format("YYYY-MM-DD")) {
+                        inValid("D", y, i18n.t('static.message.invaliddate'), elInstance);
+                    } else {
+                    }
+                }
+            }
+            if (y == 1 && shipmentStatus != PLANNED_SHIPMENT_STATUS && shipmentStatus != SUBMITTED_SHIPMENT_STATUS && shipmentStatus != APPROVED_SHIPMENT_STATUS) {
+                var valid = checkValidtion("date", "E", y, rowDataForDates[4], elInstance);
+                if (valid == true) {
+                    if (moment(rowDataForDates[3]).format("YYYY-MM-DD") > moment(value).format("YYYY-MM-DD")) {
+                        inValid("E", y, i18n.t('static.message.invaliddate'), elInstance);
+                    } else {
+                    }
+                }
+            }
+            if (shipmentStatus != PLANNED_SHIPMENT_STATUS && shipmentStatus != SUBMITTED_SHIPMENT_STATUS && shipmentStatus != APPROVED_SHIPMENT_STATUS && shipmentStatus != SHIPPED_SHIPMENT_STATUS) {
+                var valid = checkValidtion("date", "F", y, rowDataForDates[5], elInstance);
+                if (valid == true) {
+                    if (moment(rowDataForDates[4]).format("YYYY-MM-DD") > moment(value).format("YYYY-MM-DD")) {
+                        inValid("F", y, i18n.t('static.message.invaliddate'), elInstance);
+                    } else {
+                    }
+                }
+            }
+            var valid = true;
             if (y == 0) {
-                var valid = checkValidtion("date", "G", y, rowDataForDates[6], elInstance);
-            } else if (shipmentStatus != PLANNED_SHIPMENT_STATUS && shipmentStatus != SUBMITTED_SHIPMENT_STATUS && shipmentStatus != APPROVED_SHIPMENT_STATUS && shipmentStatus != SHIPPED_SHIPMENT_STATUS && shipmentStatus != ARRIVED_SHIPMENT_STATUS) {
-                var valid = checkValidtion("date", "G", y, rowDataForDates[6], elInstance);
+                valid = checkValidtion("date", "G", y, rowDataForDates[6], elInstance);
+            } else if (y == 1 && shipmentStatus != PLANNED_SHIPMENT_STATUS && shipmentStatus != SUBMITTED_SHIPMENT_STATUS && shipmentStatus != APPROVED_SHIPMENT_STATUS && shipmentStatus != SHIPPED_SHIPMENT_STATUS && shipmentStatus != ARRIVED_SHIPMENT_STATUS) {
+                valid = checkValidtion("date", "G", y, rowDataForDates[6], elInstance);
+                if (valid == true) {
+                    if (moment(rowDataForDates[5]).format("YYYY-MM-DD") > moment(value).format("YYYY-MM-DD")) {
+                        inValid("G", y, i18n.t('static.message.invaliddate'), elInstance);
+                        valid = false;
+                    } else {
+                    }
+                }
             }
 
             if (valid == true) {
@@ -1800,6 +2058,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     console.log("In y==0")
                     var shipmentInstance = this.state.shipmentsEl;
                     var procurementAgent = rowData[2];
+                    var shipmentStatus = rowData[0];
                     var db1;
                     var storeOS;
                     getDatabase();
@@ -1833,10 +2092,18 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             if (papuResult.localProcurementAgent) {
                                 addLeadTimes = this.state.programPlanningUnitList.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
                                 var leadTimesPerStatus = addLeadTimes / 5;
-                                expectedArrivedDate = moment(expectedDeliveryDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                                expectedShippedDate = moment(expectedArrivedDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                                expectedApprovedDate = moment(expectedShippedDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                                expectedSubmittedDate = moment(expectedApprovedDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                if (shipmentStatus == PLANNED_SHIPMENT_STATUS || shipmentStatus == SUBMITTED_SHIPMENT_STATUS || shipmentStatus == APPROVED_SHIPMENT_STATUS || shipmentStatus == SHIPPED_SHIPMENT_STATUS) {
+                                    expectedArrivedDate = moment(expectedDeliveryDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                }
+                                if (shipmentStatus == PLANNED_SHIPMENT_STATUS || shipmentStatus == SUBMITTED_SHIPMENT_STATUS || shipmentStatus == APPROVED_SHIPMENT_STATUS) {
+                                    expectedShippedDate = moment(expectedArrivedDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                }
+                                if (shipmentStatus == PLANNED_SHIPMENT_STATUS || shipmentStatus == SUBMITTED_SHIPMENT_STATUS) {
+                                    expectedApprovedDate = moment(expectedShippedDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                }
+                                if (shipmentStatus == PLANNED_SHIPMENT_STATUS) {
+                                    expectedSubmittedDate = moment(expectedApprovedDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                }
                                 expectedPlannedDate = moment(expectedSubmittedDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
                             } else {
                                 var shipmentMode = rowData[7];
@@ -1857,10 +2124,18 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                 } else {
                                     shippedToArrivedLeadTime = parseFloat(programJson.shippedToArrivedBySeaLeadTime);
                                 }
-                                expectedArrivedDate = moment(expectedDeliveryDate).subtract(parseInt(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
-                                expectedShippedDate = moment(expectedArrivedDate).subtract(parseInt(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                                expectedApprovedDate = moment(expectedShippedDate).subtract(parseInt(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                                expectedSubmittedDate = moment(expectedApprovedDate).subtract(parseInt(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                if (shipmentStatus == PLANNED_SHIPMENT_STATUS || shipmentStatus == SUBMITTED_SHIPMENT_STATUS || shipmentStatus == APPROVED_SHIPMENT_STATUS || shipmentStatus == SHIPPED_SHIPMENT_STATUS) {
+                                    expectedArrivedDate = moment(expectedDeliveryDate).subtract(parseInt(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                }
+                                if (shipmentStatus == PLANNED_SHIPMENT_STATUS || shipmentStatus == SUBMITTED_SHIPMENT_STATUS || shipmentStatus == APPROVED_SHIPMENT_STATUS) {
+                                    expectedShippedDate = moment(expectedArrivedDate).subtract(parseInt(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                }
+                                if (shipmentStatus == PLANNED_SHIPMENT_STATUS || shipmentStatus == SUBMITTED_SHIPMENT_STATUS) {
+                                    expectedApprovedDate = moment(expectedShippedDate).subtract(parseInt(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                }
+                                if (shipmentStatus == PLANNED_SHIPMENT_STATUS) {
+                                    expectedSubmittedDate = moment(expectedApprovedDate).subtract(parseInt(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                }
                                 expectedPlannedDate = moment(expectedSubmittedDate).subtract(parseInt(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
                             }
 
@@ -1868,11 +2143,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             elInstance.setValueFromCoords(3, 0, expectedApprovedDate, true);
                             elInstance.setValueFromCoords(4, 0, expectedShippedDate, true);
                             elInstance.setValueFromCoords(5, 0, expectedArrivedDate, true);
-                            if (moment(expectedArrivedDate).format("YYYY-MM-DD") > moment(value).format("YYYY-MM-DD")) {
-                                inValid("G", y, i18n.t('static.message.invaliddate'), elInstance);
-                            } else {
-
-                            }
                         }.bind(this)
                     }.bind(this)
                 }
@@ -2040,95 +2310,105 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
     checkValidationForShipmentDates() {
         var valid = true;
         var elInstance = this.state.shipmentDatesTableEl;
-        var y = 1;
-        var rowData = elInstance.getRowData(y);
-
-
-        var validation = checkValidtion("date", "G", y, rowData[6], elInstance);
-        if (validation == false) {
-            valid = false;
-        } else {
-            if (moment(rowData[5]).format("YYYY-MM-DD") > moment(rowData[6]).format("YYYY-MM-DD")) {
-                inValid("G", y, i18n.t('static.message.invaliddate'), elInstance);
-                valid = false;
-            }
-        }
-        var shipmentInstance = this.state.shipmentsEl;
-        var rowDataForShipments = shipmentInstance.getRowData(rowData[7]);
-        var shipmentStatus = rowDataForShipments[0];
-        y = 0;
-        rowData = elInstance.getRowData(y);
-        if (shipmentStatus == PLANNED_SHIPMENT_STATUS || shipmentStatus == SUBMITTED_SHIPMENT_STATUS || shipmentStatus == APPROVED_SHIPMENT_STATUS || shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS || shipmentStatus == DELIVERED_SHIPMENT_STATUS || shipmentStatus == ON_HOLD_SHIPMENT_STATUS) {
-            var validation = checkValidtion("date", "B", y, rowData[1], elInstance);
-            if (validation == false) {
-                valid = false;
-            }
-        }
-        if (shipmentStatus == SUBMITTED_SHIPMENT_STATUS || shipmentStatus == APPROVED_SHIPMENT_STATUS || shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS || shipmentStatus == DELIVERED_SHIPMENT_STATUS) {
-            var validation = checkValidtion("date", "C", y, rowData[2], elInstance);
-            if (validation == false) {
-                valid = false;
-            } else {
-                if (moment(rowData[1]).format("YYYY-MM-DD") > moment(rowData[2]).format("YYYY-MM-DD")) {
-                    inValid("C", y, i18n.t('static.message.invaliddate'), elInstance);
+        var shipmentInstance = "";
+        var rowDataForDates = elInstance.getRowData(0);
+        shipmentInstance = this.state.shipmentsEl;
+        var rowData = shipmentInstance.getRowData(rowDataForDates[7]);
+        var shipmentStatus = rowData[0];
+        for (var y = 0; y < 2; y++) {
+            var rowDataForDates = elInstance.getRowData(y);
+            if (y == 1) {
+                var validation = checkValidtion("date", "B", y, rowDataForDates[1], elInstance);
+                if (validation == false) {
+                    console.log("In 1 false")
                     valid = false;
                 }
             }
-        }
-
-        if (shipmentStatus == APPROVED_SHIPMENT_STATUS || shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS || shipmentStatus == DELIVERED_SHIPMENT_STATUS) {
-            var validation = checkValidtion("date", "D", y, rowData[3], elInstance);
-            if (validation == false) {
-                valid = false;
-            } else {
-                if (moment(rowData[2]).format("YYYY-MM-DD") > moment(rowData[3]).format("YYYY-MM-DD")) {
-                    inValid("D", y, i18n.t('static.message.invaliddate'), elInstance);
+            if (y == 1 && shipmentStatus != PLANNED_SHIPMENT_STATUS) {
+                var validation = checkValidtion("date", "C", y, rowDataForDates[2], elInstance);
+                if (validation == true) {
+                    if (moment(rowDataForDates[1]).format("YYYY-MM-DD") > moment(rowDataForDates[2]).format("YYYY-MM-DD") && y != 0) {
+                        inValid("C", y, i18n.t('static.message.invaliddate'), elInstance);
+                        valid = false;
+                        console.log("In 2 false")
+                    } else {
+                    }
+                } else {
                     valid = false;
+                    console.log("In 3 false")
+                }
+            }
+            if (y == 1 && shipmentStatus != PLANNED_SHIPMENT_STATUS && shipmentStatus != SUBMITTED_SHIPMENT_STATUS) {
+                var validation = checkValidtion("date", "D", y, rowDataForDates[3], elInstance);
+                if (validation == true) {
+                    if (moment(rowDataForDates[2]).format("YYYY-MM-DD") > moment(rowDataForDates[3]).format("YYYY-MM-DD")) {
+                        inValid("D", y, i18n.t('static.message.invaliddate'), elInstance);
+                        valid = false
+                        console.log("In 4 false")
+                    } else {
+                    }
+                } else {
+                    valid = false;
+                    console.log("In 5 false")
+                }
+            }
+            if (y == 1 && shipmentStatus != PLANNED_SHIPMENT_STATUS && shipmentStatus != SUBMITTED_SHIPMENT_STATUS && shipmentStatus != APPROVED_SHIPMENT_STATUS) {
+                var validation = checkValidtion("date", "E", y, rowDataForDates[4], elInstance);
+                if (validation == true) {
+                    if (moment(rowDataForDates[3]).format("YYYY-MM-DD") > moment(rowDataForDates[4]).format("YYYY-MM-DD")) {
+                        inValid("E", y, i18n.t('static.message.invaliddate'), elInstance);
+                        valid = false;
+                        console.log("In 6 false")
+                    } else {
+                    }
+                } else {
+                    valid = false;
+                    console.log("In 7 false")
+                }
+            }
+            if (shipmentStatus != PLANNED_SHIPMENT_STATUS && shipmentStatus != SUBMITTED_SHIPMENT_STATUS && shipmentStatus != APPROVED_SHIPMENT_STATUS && shipmentStatus != SHIPPED_SHIPMENT_STATUS) {
+                var validation = checkValidtion("date", "F", y, rowDataForDates[5], elInstance);
+                if (validation == true) {
+                    if (moment(rowDataForDates[4]).format("YYYY-MM-DD") > moment(rowDataForDates[5]).format("YYYY-MM-DD")) {
+                        inValid("F", y, i18n.t('static.message.invaliddate'), elInstance);
+                        valid = false;
+                        console.log("In 8 false")
+                    } else {
+                    }
+                } else {
+                    valid = false;
+                    console.log("In 9 false")
+                }
+            }
+            if (y == 0) {
+                var validation = checkValidtion("date", "G", y, rowDataForDates[6], elInstance);
+                if (validation == false) {
+                    console.log("In 10 false")
+                    valid = false;
+                }
+            } else if (y == 1 && shipmentStatus != PLANNED_SHIPMENT_STATUS && shipmentStatus != SUBMITTED_SHIPMENT_STATUS && shipmentStatus != APPROVED_SHIPMENT_STATUS && shipmentStatus != SHIPPED_SHIPMENT_STATUS && shipmentStatus != ARRIVED_SHIPMENT_STATUS) {
+                var validation = checkValidtion("date", "G", y, rowDataForDates[6], elInstance);
+                if (validation == true) {
+                    if (moment(rowDataForDates[5]).format("YYYY-MM-DD") > moment(rowDataForDates[6]).format("YYYY-MM-DD")) {
+                        inValid("G", y, i18n.t('static.message.invaliddate'), elInstance);
+                        valid = false;
+                        console.log("In 11 false")
+                    } else {
+                    }
+                } else {
+                    valid = false;
+                    console.log("In 12 false")
                 }
             }
         }
-
-        if (shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS || shipmentStatus == DELIVERED_SHIPMENT_STATUS) {
-            var validation = checkValidtion("date", "E", y, rowData[4], elInstance);
-            if (validation == false) {
-                valid = false;
-            } else {
-                if (moment(rowData[3]).format("YYYY-MM-DD") > moment(rowData[4]).format("YYYY-MM-DD")) {
-                    inValid("E", y, i18n.t('static.message.invaliddate'), elInstance);
-                    valid = false;
-                }
-            }
-        }
-        if (shipmentStatus == ARRIVED_SHIPMENT_STATUS || shipmentStatus == DELIVERED_SHIPMENT_STATUS) {
-            var validation = checkValidtion("date", "F", y, rowData[5], elInstance);
-            if (validation == false) {
-                valid = false;
-            } else {
-                if (moment(rowData[4]).format("YYYY-MM-DD") > moment(rowData[5]).format("YYYY-MM-DD")) {
-                    inValid("F", y, i18n.t('static.message.invaliddate'), elInstance);
-                    valid = false;
-                }
-            }
-        }
-
-        if (shipmentStatus == DELIVERED_SHIPMENT_STATUS) {
-            var validation = checkValidtion("date", "G", y, rowData[6], elInstance);
-            if (validation == false) {
-                valid = false;
-            } else {
-                if (moment(rowData[5]).format("YYYY-MM-DD") > moment(rowData[6]).format("YYYY-MM-DD")) {
-                    inValid("G", y, i18n.t('static.message.invaliddate'), elInstance);
-                    valid = false;
-                }
-            }
-        }
-
+        console.log("In valuid", valid);
         return valid;
     }
 
     saveShipmentsDate() {
         this.props.updateState("loading", true);
-        var validation = true;
+        var validation = this.checkValidationForShipmentDates();
+        console.log("Validation====>", validation);
         if (validation == true) {
             var elInstance = this.state.shipmentDatesTableEl;
             var json = elInstance.getJson();
@@ -2488,7 +2768,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                 receivedDate = moment(Date.now()).format("YYYY-MM-DD");
                             }
                         }
-
+                        console.log("expected received dare", moment(map.get("1")).format("YYYY-MM-DD"));
                         if (map.get("16") != -1) {
                             shipmentDataList[parseInt(map.get("16"))].plannedDate = plannedDate;
                             shipmentDataList[parseInt(map.get("16"))].submittedDate = submittedDate;
@@ -2629,7 +2909,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                 approvedDate: moment(approvedDate).format("YYYY-MM-DD"),
                                 shippedDate: moment(shippedDate).format("YYYY-MM-DD"),
                                 arrivedDate: moment(arrivedDate).format("YYYY-MM-DD"),
-                                expectedDeliveryDate: moment(expectedDeliveryDate).format("YYYY-MM-DD"),
+                                expectedDeliveryDate: moment(map.get("1")).format("YYYY-MM-DD"),
                                 receivedDate: moment(receivedDate).format("YYYY-MM-DD"),
                                 index: shipmentDataList.length,
                                 batchInfoList: []
@@ -2992,6 +3272,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     var json = [];
                     var shipmentDates = rowData[21];
                     var shipmentStatus = rowData[0];
+                    var emergencyOrder = rowData[19];
                     var expectedDeliveryDate = shipmentDates.expectedDeliveryDate;
                     var expectedPlannedDate = "";
                     var expectedSubmittedDate = "";
@@ -3050,6 +3331,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         if (submittedDate == "" || submittedDate == null || submittedDate == undefined) {
                             submittedDate = moment(Date.now()).format("YYYY-MM-DD");
                         }
+                        expectedSubmittedDate = "";
                     } else if (shipmentStatus == APPROVED_SHIPMENT_STATUS) {
                         if (plannedDate == "" || plannedDate == null || plannedDate == undefined) {
                             plannedDate = moment(Date.now()).format("YYYY-MM-DD");
@@ -3060,6 +3342,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         if (approvedDate == "" || approvedDate == null || approvedDate == undefined) {
                             approvedDate = moment(Date.now()).format("YYYY-MM-DD");
                         }
+                        expectedSubmittedDate = "";
+                        expectedApprovedDate = "";
                     } else if (shipmentStatus == SHIPPED_SHIPMENT_STATUS) {
                         if (plannedDate == "" || plannedDate == null || plannedDate == undefined) {
                             plannedDate = moment(Date.now()).format("YYYY-MM-DD");
@@ -3073,6 +3357,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         if (shippedDate == "" || shippedDate == null || shippedDate == undefined) {
                             shippedDate = moment(Date.now()).format("YYYY-MM-DD");
                         }
+                        expectedSubmittedDate = "";
+                        expectedApprovedDate = "";
+                        expectedShippedDate = "";
                     } else if (shipmentStatus == ARRIVED_SHIPMENT_STATUS) {
                         if (plannedDate == "" || plannedDate == null || plannedDate == undefined) {
                             plannedDate = moment(Date.now()).format("YYYY-MM-DD");
@@ -3089,6 +3376,10 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         if (arrivedDate == "" || arrivedDate == undefined || arrivedDate == null) {
                             arrivedDate = moment(Date.now()).format("YYYY-MM-DD");
                         }
+                        expectedSubmittedDate = "";
+                        expectedApprovedDate = "";
+                        expectedShippedDate = "";
+                        expectedArrivedDate = "";
                     } else if (shipmentStatus == DELIVERED_SHIPMENT_STATUS) {
                         if (plannedDate == "" || plannedDate == null || plannedDate == undefined) {
                             plannedDate = moment(Date.now()).format("YYYY-MM-DD");
@@ -3105,9 +3396,14 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         if (arrivedDate == "" || arrivedDate == undefined || arrivedDate == null) {
                             arrivedDate = moment(Date.now()).format("YYYY-MM-DD");
                         }
-                        if (receivedDate == "" || receivedDate == undefined || receivedDate == null) {
+                        if (receivedDate == "" || receivedDate == undefined || receivedDate == null || receivedDate == "Invalid date") {
                             receivedDate = moment(Date.now()).format("YYYY-MM-DD");
                         }
+                        expectedSubmittedDate = "";
+                        expectedApprovedDate = "";
+                        expectedShippedDate = "";
+                        expectedArrivedDate = "";
+                        // expectedDeliveryDate = "";
                     }
 
                     var tableEditable = true;

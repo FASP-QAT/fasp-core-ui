@@ -142,7 +142,7 @@ class MasterSyncService {
     }
 
     getProblemListForSync(lastSyncDate) {
-        return axios.get(`${API_URL}/api/sync/problem/realm/1/lastSyncDate/${lastSyncDate}`, {
+        return axios.get(`${API_URL}/api/sync/problem/lastSyncDate/${lastSyncDate}`, {
         });
     }
 

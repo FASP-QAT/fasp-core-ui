@@ -9,6 +9,7 @@ import * as Yup from 'yup';
 import JiraTikcetService from '../../api/JiraTikcetService';
 import RealmService from '../../api/RealmService';
 import getLabelText from '../../CommonComponent/getLabelText';
+import { SPACE_REGEX } from '../../Constants';
 
 const initialValues = {
     summary: "Add / Update Product Category",
@@ -20,6 +21,7 @@ const initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({        
         summary: Yup.string()
+            .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.common.summarytext')),
         realmName: Yup.string()
             .required(i18n.t('static.common.realmtext')),
@@ -148,7 +150,7 @@ export default class ProductCategoryTicketComponent extends Component {
 
     resetClicked() {        
         let { productCategory } = this.state;
-        productCategory.summary = '';
+        // productCategory.summary = '';
         productCategory.realmName = '';
         productCategory.productCategoryName = '';        
         productCategory.notes = '';   
@@ -172,7 +174,7 @@ export default class ProductCategoryTicketComponent extends Component {
 
         return (
             <div className="col-md-12">
-                <h5 style={{ color: "green" }} id="div2">{i18n.t(this.state.message)}</h5>                
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>                
                 <h4>{i18n.t('static.product.productcategory')}</h4>
                 <br></br>
                 <div style={{ display: this.state.loading ? "none" : "block" }}>
@@ -195,36 +197,26 @@ export default class ProductCategoryTicketComponent extends Component {
                                         this.hideSecondComponent();
                                     })                                
                             } else {
-                                this.setState({
-                                    // message: response.data.messageCode
-                                    message: 'Error while creating query', loading: false
+                                this.setState({                                    
+                                    message: i18n.t('static.unkownError'), loading: false
                                 },
-                                    () => {
-                                        this.resetClicked();
+                                    () => {                                        
                                         this.hideSecondComponent();
                                     })                                
                             }                            
                             this.props.togglehelp();
                             this.props.toggleSmall(this.state.message);
                         })
-                        // .catch(
-                        //     error => {
-                        //         switch (error.message) {
-                        //             case "Network Error":
-                        //                 this.setState({
-                        //                     message: 'Network Error'
-                        //                 })
-                        //                 break
-                        //             default:
-                        //                 this.setState({
-                        //                     message: 'Error'
-                        //                 })
-                        //                 break
-                        //         }
-                        //         alert(this.state.message);
-                        //         this.props.togglehelp();
-                        //     }
-                        // );      
+                        .catch(
+                            error => {
+                                this.setState({                                        
+                                    message: i18n.t('static.unkownError'), loading: false
+                                },
+                                () => {                                        
+                                    this.hideSecondComponent();                                     
+                                });                                    
+                            }
+                        );   
                     }}
                     render={
                         ({
@@ -239,10 +231,10 @@ export default class ProductCategoryTicketComponent extends Component {
                             setTouched,
                             handleReset
                         }) => (
-                                <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm'>
+                                <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm' autocomplete="off">
                                     < FormGroup >
                                         <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
-                                        <Input type="text" name="summary" id="summary"
+                                        <Input type="text" name="summary" id="summary" readOnly = {true}
                                         bsSize="sm"
                                         valid={!errors.summary && this.state.productCategory.summary != ''}
                                         invalid={touched.summary && !!errors.summary}
@@ -297,6 +289,10 @@ export default class ProductCategoryTicketComponent extends Component {
                                         <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>                                        
                                         <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                     </ModalFooter>
+                                    <br></br><br></br>
+                                    <div className={this.props.className}>
+                                        <p>{i18n.t('static.ticket.drodownvaluenotfound')}</p>
+                                    </div>
                                 </Form>
                             )} />
                             </div>

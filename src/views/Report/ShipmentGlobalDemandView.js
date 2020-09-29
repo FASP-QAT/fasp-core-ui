@@ -3198,7 +3198,7 @@ class ShipmentGlobalDemandView extends Component {
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.report.planningUnit')}</Label>
                                             <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                             <div className="controls">
-                                                {/* <MultiSelect
+                                                <MultiSelect
                                                     name="planningUnitId"
                                                     id="planningUnitId"
                                                     bsSize="md"
@@ -3206,9 +3206,9 @@ class ShipmentGlobalDemandView extends Component {
                                                     onChange={(e) => { this.handlePlanningUnitChange(e) }}
                                                     options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
                                                 // options={fundingSourceList && fundingSourceList.length > 0 ? fundingSourceList : []}
-                                                /> */}
+                                                />
 
-                                                <Multiselect
+                                                {/* <Multiselect
                                                     name="planningUnitId"
                                                     id="planningUnitId"
                                                     bsSize="md"
@@ -3219,8 +3219,8 @@ class ShipmentGlobalDemandView extends Component {
                                                     onRemove={(e) => { this.handlePlanningUnitChange(e) }}
                                                     // onSelect={this.onSelect} // Function will trigger on select event
                                                     // onRemove={this.onRemove} // Function will trigger on remove event
-                                                    displayValue="label" // Property name to display in the dropdown options
-                                                />
+                                                    // displayValue="label" // Property name to display in the dropdown options
+                                                /> */}
 
                                             </div>
                                         </FormGroup>

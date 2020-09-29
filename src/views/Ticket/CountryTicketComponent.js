@@ -9,7 +9,7 @@ import * as Yup from 'yup';
 import JiraTikcetService from '../../api/JiraTikcetService';
 import getLabelText from '../../CommonComponent/getLabelText';
 import CurrencyService from '../../api/CurrencyService';
-import { LABEL_REGEX, ALPHABETS_REGEX } from '../../Constants';
+import { LABEL_REGEX, ALPHABETS_REGEX, SPACE_REGEX } from '../../Constants';
 
 const initialValues = {
     summary: "Add / Update Country",
@@ -23,6 +23,7 @@ const initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({        
         summary: Yup.string()
+            .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.common.summarytext')),
         countryName: Yup.string()
             .required(i18n.t('static.country.countrytext'))
@@ -168,7 +169,7 @@ export default class CountryTicketComponent extends Component {
 
     resetClicked() {        
         let { country } = this.state;
-        country.summary = '';
+        // country.summary = '';
         country.countryName = '';
         country.countryCode = '';
         country.countryCode2 = '';
@@ -192,7 +193,7 @@ export default class CountryTicketComponent extends Component {
 
         return (
             <div className="col-md-12">
-                <h5 style={{ color: "green" }} id="div2">{i18n.t(this.state.message)}</h5>                
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>                
                 <h4>{i18n.t('static.country.countryMaster')}</h4>
                 <br></br>
                 <div style={{ display: this.state.loading ? "none" : "block" }}>
@@ -215,36 +216,26 @@ export default class CountryTicketComponent extends Component {
                                         this.hideSecondComponent();
                                     })                                
                             } else {
-                                this.setState({
-                                    // message: response.data.messageCode
-                                    message: 'Error while creating query', loading: false
+                                this.setState({                                    
+                                    message: i18n.t('static.unkownError'), loading: false
                                 },
-                                    () => {
-                                        this.resetClicked();
+                                    () => {                                        
                                         this.hideSecondComponent();
                                     })                                
                             }                            
                             this.props.togglehelp();
                             this.props.toggleSmall(this.state.message);
                         })
-                        // .catch(
-                        //     error => {
-                        //         switch (error.message) {
-                        //             case "Network Error":
-                        //                 this.setState({
-                        //                     message: 'Network Error'
-                        //                 })
-                        //                 break
-                        //             default:
-                        //                 this.setState({
-                        //                     message: 'Error'
-                        //                 })
-                        //                 break
-                        //         }
-                        //         alert(this.state.message);
-                        //         this.props.togglehelp();
-                        //     }
-                        // );        
+                        .catch(
+                            error => {
+                                this.setState({                                        
+                                    message: i18n.t('static.unkownError'), loading: false
+                                },
+                                () => {                                        
+                                    this.hideSecondComponent();                                     
+                                });                                    
+                            }
+                        );  
                     }}
                     render={
                         ({
@@ -259,10 +250,10 @@ export default class CountryTicketComponent extends Component {
                             setTouched,
                             handleReset
                         }) => (
-                                <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm'>
+                                <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm' autocomplete="off">
                                     < FormGroup >
                                         <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
-                                        <Input type="text" name="summary" id="summary"
+                                        <Input type="text" name="summary" id="summary" readOnly = {true}
                                         bsSize="sm"
                                         valid={!errors.summary && this.state.country.summary != ''}
                                         invalid={touched.summary && !!errors.summary}
