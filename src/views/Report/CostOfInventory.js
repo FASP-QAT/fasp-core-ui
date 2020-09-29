@@ -1310,7 +1310,7 @@ export default class CostOfInventory extends Component {
                 doc.setPage(i)
                 doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
                 doc.setTextColor("#002f6c");
-                doc.text("Cost Of Inventory ", doc.internal.pageSize.width / 2, 60, {
+                doc.text(i18n.t('static.dashboard.costOfInventory'), doc.internal.pageSize.width / 2, 60, {
                     align: 'center'
                 })
                 if (i == 1) {

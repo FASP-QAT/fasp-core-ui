@@ -656,11 +656,11 @@ class AnnualShipmentCost extends Component {
                     var splittext = doc.splitTextToSize(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8);
 
                     doc.text(doc.internal.pageSize.width / 8, 80, splittext)
-                    splittext = doc.splitTextToSize('Run Date:' + moment(new Date()).format(`${DATE_FORMAT_CAP}`) + '\n Run Time:' + moment(new Date()).format('hh:mm A'), doc.internal.pageSize.width / 8);
+                    splittext = doc.splitTextToSize(i18n.t('static.common.runDate')+':' + moment(new Date()).format(`${DATE_FORMAT_CAP}`) + '\n'+i18n.t('static.common.runDate') +':' + moment(new Date()).format('hh:mm A'), doc.internal.pageSize.width / 8);
 
                     doc.text(doc.internal.pageSize.width * 3 / 4, 80, splittext)
                     doc.setFontSize(8)
-                    doc.text('Cost of product + Freight', doc.internal.pageSize.width / 2, 90, {
+                    doc.text(i18n.t('static.common.productFreight'), doc.internal.pageSize.width / 2, 90, {
                         align: 'center'
                     })
                     doc.text(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 2, 100, {
@@ -849,7 +849,7 @@ class AnnualShipmentCost extends Component {
         doc.line(doc.internal.pageSize.width / 8, yindex, doc.internal.pageSize.width - 50, yindex);
         yindex += 20
         doc.setFontSize(9);
-        doc.text("Grand Total", doc.internal.pageSize.width / 8, yindex, {
+        doc.text(i18n.t('static.common.grandTotal'), doc.internal.pageSize.width / 8, yindex, {
             align: 'left'
         });
         var Gtotal = 0
@@ -883,7 +883,7 @@ class AnnualShipmentCost extends Component {
     }
     exportPDF = () => {
         var doc = this.initalisedoc()
-        doc.save("AnnualShipmentCost.pdf")
+        doc.save(i18n.t('static.report.annualshipmentcost').concat('.pdf'));
 
     }
     previewPDF = () => {
@@ -1645,7 +1645,7 @@ class AnnualShipmentCost extends Component {
                                             {this.state.outPutList.length > 0 &&
                                                 // {true &&
                                                 <div className="col-md-12">
-                                                    <button className="mr-1 float-right btn btn-info btn-md showdatabtn mt-1 mb-3" onClick={this.previewPDF}>Preview</button>
+                                                    <button className="mr-1 float-right btn btn-info btn-md showdatabtn mt-1 mb-3" onClick={this.previewPDF}>{i18n.t('static.common.preview')}</button>
 
                                                     <p style={{ width: '100%', height: '700px', overflow: 'hidden' }} id='pdf'></p>   </div>}
 

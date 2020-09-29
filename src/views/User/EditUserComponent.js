@@ -517,6 +517,7 @@ class EditUserComponent extends Component {
                                                             invalid={touched.username && !!errors.username || this.state.user.username == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
+                                                            maxLength={25}
                                                             required
                                                             value={this.state.user.username}
                                                         /> <FormFeedback className="red">{errors.username}</FormFeedback>
@@ -531,6 +532,7 @@ class EditUserComponent extends Component {
                                                             invalid={touched.emailId && !!errors.emailId || this.state.user.emailId == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
+                                                            maxLength={50}
                                                             required
                                                             value={this.state.user.emailId}
                                                         />

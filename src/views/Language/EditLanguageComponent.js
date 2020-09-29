@@ -220,6 +220,7 @@ export default class EditLanguageComponent extends Component {
                                                             invalid={touched.languageName && !!errors.languageName || this.state.language.languageName == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
+                                                            maxLength={100}
                                                             value={this.state.language.languageName}
                                                             required />
                                                         <FormFeedback className="red">{errors.languageName}</FormFeedback>
