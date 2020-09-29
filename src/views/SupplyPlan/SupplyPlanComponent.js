@@ -746,8 +746,8 @@ export default class SupplyPlanComponent extends React.Component {
                             <span className="supplyplan-rarrow" onClick={this.rightClicked}> {i18n.t('static.supplyPlan.scrollToRight')} <i className="cui-arrow-right icons" ></i> </span>
                         </div>
                         {/* </Row> */}
-
-                        <Table className="table-bordered text-center mt-2 overflowhide" bordered responsive size="sm" options={this.options}>
+                        <div className="table-responsive">
+                        <Table className="table-bordered text-center mt-2 overflowhide" bordered  size="sm" options={this.options}>
                             <thead>
                                 <tr>
                                     <th className="BorderNoneSupplyPlan"></th>
@@ -1026,9 +1026,25 @@ export default class SupplyPlanComponent extends React.Component {
                                     }
                                 </tr>
                             </tbody>
+                            
                         </Table>
+                        <div className="" >
+                        {
+                            this.state.jsonArrForGraph.length > 0
+                            &&
+                            <div className="" >
+
+                                <div className="float-right" style={{width:'978px',marginRight:'-172px'}}>
+                                    <div className="chart-wrapper chart-graph-report">
+                                        <Bar id="cool-canvas" data={bar} options={chartOptions} />
+                                    </div>
+                                </div>  
+                                 </div>}
+
                     </div>
-                    <div className="row" >
+                        </div>
+                    </div>
+                    {/* <div className="row" >
                         {
                             this.state.jsonArrForGraph.length > 0
                             &&
@@ -1040,7 +1056,20 @@ export default class SupplyPlanComponent extends React.Component {
                                     </div>
                                 </div>   </div>}
 
-                    </div>
+                    </div> */}
+                     {/* <div className="" >
+                        {
+                            this.state.jsonArrForGraph.length > 0
+                            &&
+                            <div className="table-responsive" >
+
+                                <div className="float-right" style={{width:'978px',marginRight:'-172px'}}>
+                                    <div className="chart-wrapper chart-graph-report">
+                                        <Bar id="cool-canvas" data={bar} options={chartOptions} />
+                                    </div>
+                                </div>   </div>}
+
+                    </div> */}
                     {/* </div> */}
 
                     {/* Consumption modal */}
