@@ -2259,7 +2259,7 @@ class StockStatusAcrossPlanningUnits extends Component {
 
             {
                 dataField: 'planningUnit.label',
-                text: 'Planning Unit',
+                text: i18n.t('static.dashboard.product'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -2439,7 +2439,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                                             </FormGroup>
 
                                             <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">Program</Label>
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                                 <div className="controls ">
                                                     <InputGroup>
                                                         <Input
@@ -2457,7 +2457,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                                                 </div>
                                             </FormGroup>
                                             <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">Version</Label>
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
                                                 <div className="controls ">
                                                     <InputGroup>
                                                         <Input

@@ -990,7 +990,7 @@ addDoubleQuoteToRowContent=(arr)=>{
 
         doc.setFontSize(8);
 
-        const title = "Consumption Report";
+        const title = i18n.t('static.report.stockstatusovertimeReport');
         var canvas = document.getElementById("cool-canvas");
         //creates image
 
@@ -1037,7 +1037,7 @@ addDoubleQuoteToRowContent=(arr)=>{
         doc.autoTable(content);
         addHeaders(doc)
         addFooters(doc)
-        doc.save("StockStatusOverTime.pdf")
+        doc.save(i18n.t('static.report.stockstatusovertimeReport').concat('.pdf'));
         //creates PDF from img
         /* var doc = new jsPDF('landscape');
         doc.setFontSize(20);
@@ -1243,7 +1243,7 @@ addDoubleQuoteToRowContent=(arr)=>{
                                         </FormGroup>
 
                                         <FormGroup className="col-md-3">
-                                            <Label htmlFor="appendedInputButton">Version</Label>
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
                                             <div className="controls">
                                                 <InputGroup>
                                                     <Input
@@ -1364,7 +1364,7 @@ addDoubleQuoteToRowContent=(arr)=>{
                                 </div>
                                 <div className="col-md-12">
                                     <button className="mr-1 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
-                                        {this.state.show ? 'Hide Data' : 'Show Data'}
+                                        {this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
                                     </button>
 
                                 </div>

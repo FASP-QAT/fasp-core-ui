@@ -1210,6 +1210,18 @@
     "static.report.submitted": "Submitted",
     "static.report.hold": "On-hold",
     "static.report.planned": "Planned",
-    "static.report.arrived": "Arrived"
+    "static.report.arrived": "Arrived",
+    "static.common.runDate":"Run Date:",
+    "static.common.productFreight":"Cost of product + Freight",
+    "static.common.grandTotal":"Grand Total",
+    "static.budget.allocatedShipmentOrdered":"Budget Allocated To Shipment (Ordered)",
+    "static.budget.allocatedShipmentPlanned":"Budget Allocated To Shipment (Planned)",
+    "static.shipment.orderedShipment":"Ordered Shipment",
+    "static.shipment.plannedShipment":"Planned Shipment",
+    "static.shipment.amount":"Amount (USD)",
+    "static.shipment.shipmentProcurementAgent":"Shipment/Orders Procurement Agent",
+    "static.common.preview":"Preview",
+    "static.report.problemTransDetails": "Problem Trans Details",
+    "static.report.updateStatus": "Update Details"
     
 }
