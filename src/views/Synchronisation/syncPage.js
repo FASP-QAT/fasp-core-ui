@@ -1077,7 +1077,7 @@ export default class syncPage extends Component {
                                     data: mergedConsumptionJexcel,
                                     columnDrag: true,
                                     columns: [
-                                      { title: i18n.t('static.commit.consumptionId'), type: 'hidden', width: 100 },
+                                      { title: i18n.t('static.commit.consumptionId'), type: 'text', width: 100 },
                                       { title: i18n.t('static.planningunit.planningunit'), type: 'dropdown', source: planningUnitList, width: 200 },
                                       { title: i18n.t('static.pipeline.consumptionDate'), type: 'text', width: 85 },
                                       { title: i18n.t('static.region.region'), type: 'dropdown', source: regionList, width: 100 },
@@ -1237,7 +1237,7 @@ export default class syncPage extends Component {
                                     data: mergedInventoryJexcel,
                                     columnDrag: true,
                                     columns: [
-                                      { title: i18n.t('static.commit.inventoryId'), type: 'hidden', width: 100 },
+                                      { title: i18n.t('static.commit.inventoryId'), type: 'text', width: 100 },
                                       { title: i18n.t('static.planningunit.planningunit'), type: 'dropdown', source: planningUnitList, width: 200 },
                                       { title: i18n.t('static.inventory.inventoryDate'), type: 'text', width: 85 },
                                       { title: i18n.t('static.region.region'), type: 'dropdown', source: regionList, width: 100 },
@@ -1387,7 +1387,7 @@ export default class syncPage extends Component {
                                     data: mergedShipmentJexcel,
                                     columnDrag: true,
                                     columns: [
-                                      { title: i18n.t('static.commit.shipmentId'), type: 'hidden', width: 100 },
+                                      { title: i18n.t('static.commit.shipmentId'), type: 'text', width: 100 },
                                       { title: i18n.t('static.planningunit.planningunit'), type: 'dropdown', source: planningUnitList, width: 200 },
                                       { type: 'dropdown', title: i18n.t('static.supplyPlan.shipmentStatus'), source: shipmentStatusList, width: 100 },
                                       { type: 'text', title: i18n.t('static.supplyPlan.expectedDeliveryDate'), width: 100, },
