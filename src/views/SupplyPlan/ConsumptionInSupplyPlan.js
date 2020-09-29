@@ -70,6 +70,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
     }
 
     componentDidMount() {
+        console.log("In cvompionent")
     }
 
     showConsumptionData() {
@@ -77,6 +78,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         var consumptionListUnFiltered = this.props.items.consumptionListUnFiltered;
         var consumptionList = this.props.items.consumptionList;
         var programJson = this.props.items.programJson;
+        console.log("Program Json", this.props.items);
         var db1;
         var dataSourceList = [];
         var realmCountryPlanningUnitList = [];
@@ -405,7 +407,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                                                             }.bind(this)
                                                         });
                                                     }
-                                                    if (obj.options.allowDeleteRow == true && obj.getJson().length > 1) {
+                                                    if (consumptionEditable && obj.options.allowDeleteRow == true && obj.getJson().length > 1) {
                                                         // region id
                                                         if (obj.getRowData(y)[3] == 0) {
                                                             items.push({
@@ -435,7 +437,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                             if (y == null) {
                             } else {
                                 // Insert new row
-                                if (obj.options.allowInsertRow == true) {
+                                if (consumptionEditable && obj.options.allowInsertRow == true) {
                                     var json = obj.getJson();
                                     if (consumptionEditable) {
                                         items.push({
@@ -447,7 +449,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                                     }
                                 }
 
-                                if (obj.options.allowDeleteRow == true && obj.getJson().length > 1) {
+                                if (consumptionEditable && obj.options.allowDeleteRow == true && obj.getJson().length > 1) {
                                     // region id
                                     if (obj.getRowData(y)[12] == -1) {
                                         items.push({
