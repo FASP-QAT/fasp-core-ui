@@ -366,6 +366,7 @@ export default class AddHealthAreaComponent extends Component {
                               invalid={touched.healthAreaCode && !!errors.healthAreaCode}
                               onChange={(e) => { handleChange(e); this.dataChange(e); }}
                               onBlur={handleBlur}
+                              maxLength={6}
                               value={this.state.healthArea.healthAreaCode}
                               id="healthAreaCode" />
                             <FormFeedback className="red">{errors.healthAreaCode}</FormFeedback>

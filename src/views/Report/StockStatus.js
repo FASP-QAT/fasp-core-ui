@@ -2858,7 +2858,7 @@ class StockStatus extends Component {
         , {
           type: "line",
           yAxisID: 'B',
-          label: "MOS",
+          label: i18n.t('static.report.mos'),
           borderColor: '#205493',
           backgroundColor: 'transparent',
           ticks: {
@@ -3019,7 +3019,7 @@ class StockStatus extends Component {
                   <div className=" pl-0">
                     <div className="row">
                       <FormGroup className="col-md-3">
-                        <Label htmlFor="appendedInputButton">Select Period</Label>
+                        <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}</Label>
                         <div className="controls  edit">
 
                           <Picker
@@ -3058,7 +3058,7 @@ class StockStatus extends Component {
                       </FormGroup>
 
                       <FormGroup className="col-md-3">
-                        <Label htmlFor="appendedInputButton">Version</Label>
+                        <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
                         <div className="controls">
                           <InputGroup>
                             <Input
@@ -3113,7 +3113,7 @@ class StockStatus extends Component {
                         </div>
                         <div className="col-md-12">
                           <button className="mr-1 mb-2 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
-                            {this.state.show ? 'Hide Data' : 'Show Data'}
+                            {this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
                           </button>
 
                         </div>

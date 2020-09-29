@@ -393,6 +393,7 @@ class EditRoleComponent extends Component {
                                                             invalid={touched.roleName && !!errors.roleName}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
+                                                            maxLength={30}
                                                             required
                                                             value={this.Capitalize(this.state.role.label.label_en)}
                                                         />
