@@ -2063,8 +2063,10 @@ class SupplierLeadTimes extends Component {
             ProcurementAgentService.getProcurementAgentListAll()
                 .then(response => {
                     // console.log(JSON.stringify(response.data))
+                    var procurementAgent=response.data
+                  //  procurementAgent.push({ procurementAgentCode: 'No Procurement Agent', procurementAgentId: 0 })
                     this.setState({
-                        procurementAgents: response.data, loading: false
+                        procurementAgents: procurementAgent, loading: false
                     }, () => { this.consolidatedProcurementAgentList() })
                 }).catch(
                     error => {

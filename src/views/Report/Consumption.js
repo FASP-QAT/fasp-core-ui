@@ -1768,10 +1768,11 @@ if(value!=null){
     }
   }
   round = num => {
-    if (num != '' || num != null) {
-    return parseFloat(Math.round(num * Math.pow(10, 0)) / Math.pow(10, 0)).toFixed(0);
+    if (num == '' || num == null) {
+      return null
   } else {
-    return ''
+    return parseFloat(Math.round(num * Math.pow(10, 0)) / Math.pow(10, 0)).toFixed(0);
+    
   }
 }
 
@@ -2050,22 +2051,21 @@ if(value!=null){
               let actualValue = null;
               let forecastValue = null;
               let transDate = '';
-
               if (objActual.length > 0) {
-                actualValue = objActual[0].consumptionQty;
+                actualValue = this.round(objActual[0].consumptionQty);
                 transDate = objActual[0].consumptionDate;
               }
               if (objForecast.length > 0) {
-                forecastValue = objForecast[0].consumptionQty;
-                transDate = objForecast[0].consumptionDate;
+                forecastValue = this.round(objForecast[0].consumptionQty);
+                transDate =objForecast[0].consumptionDate;
               }
 
               if (viewById == 2) {
               //  this.toggleView();
               let json = {
                 "transDate": transDate,
-                "actualConsumption": this.round(actualValue* this.state.multiplier),
-                "forecastedConsumption": this.round(forecastValue*this.state.multiplier)
+                "actualConsumption": actualValue* this.state.multiplier,
+                "forecastedConsumption": forecastValue*this.state.multiplier
               }
                 finalOfflineConsumption.push(json);
               }else{

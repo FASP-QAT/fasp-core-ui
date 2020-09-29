@@ -393,7 +393,7 @@ class GlobalConsumption extends Component {
     }
     let startYtable = startY - ((height - h1) * (pages - 1))
     doc.setTextColor("#fff");
-    if (startYtable > height - 500) {
+    if (startYtable > (height - 400)) {
       doc.addPage()
       startYtable = 80
   }
