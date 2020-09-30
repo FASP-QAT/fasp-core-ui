@@ -9,6 +9,7 @@ import * as Yup from 'yup';
 import JiraTikcetService from '../../api/JiraTikcetService';
 import UnitService from '../../api/UnitService';
 import ForecastingUnitService from '../../api/ForecastingUnitService';
+import { SPACE_REGEX } from '../../Constants';
 
 const initialValues = {
     summary: "Add / Update Planning Unit",
@@ -22,14 +23,17 @@ const initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({        
         summary: Yup.string()
+            .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.common.summarytext')),
         planningUnitDesc: Yup.string()
-            .required(i18n.t('static.planningunit.planningunittext')),
+            .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
+            .required(i18n.t('static.product.productnametext')),
         forecastingUnitDesc: Yup.string()
             .required(i18n.t('static.planningunit.forcastingunittext')),
         unit: Yup.string()
             .required(i18n.t('static.procurementUnit.validUnitIdText')),
-        multiplier: Yup.string()
+        multiplier: Yup.number()
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
             .required(i18n.t('static.planningunit.multipliertext')),
         // notes: Yup.string()
         //     .required(i18n.t('static.common.notestext'))
@@ -75,7 +79,8 @@ export default class PlanningUnitTicketComponent extends Component {
             units: [],
             forecastingUnits: [],
             unitId: '',
-            forecastingUnitId: ''
+            forecastingUnitId: '',
+            loading: false
         }        
         this.dataChange = this.dataChange.bind(this);        
         this.resetClicked = this.resetClicked.bind(this);
@@ -179,7 +184,7 @@ export default class PlanningUnitTicketComponent extends Component {
 
     resetClicked() {        
         let { planningUnit } = this.state;
-        planningUnit.summary = '';
+        // planningUnit.summary = '';
         planningUnit.planningUnitDesc = '';
         planningUnit.forecastingUnitDesc = '';
         planningUnit.unit = '';
@@ -214,55 +219,49 @@ export default class PlanningUnitTicketComponent extends Component {
 
         return (
             <div className="col-md-12">
-                <h5 style={{ color: "green" }} id="div2">{i18n.t(this.state.message)}</h5>                
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>                
                 <h4>{i18n.t('static.planningunit.planningunit')}</h4>
                 <br></br>
+                <div style={{ display: this.state.loading ? "none" : "block" }}>
                 <Formik
                     initialValues={initialValues}
                     validate={validate(validationSchema)}
                     onSubmit={(values, { setSubmitting, setErrors }) => {   
+                        this.setState({
+                            loading: true
+                        })
                         JiraTikcetService.addEmailRequestIssue(this.state.planningUnit).then(response => {                                         
                             console.log("Response :",response.status, ":" ,JSON.stringify(response.data));
                             if (response.status == 200 || response.status == 201) {
                                 var msg = response.data.key;
                                 this.setState({
-                                    message: msg
+                                    message: msg, loading: false
                                 },
                                     () => {
                                         this.resetClicked();
                                         this.hideSecondComponent();
                                     })                                
                             } else {
-                                this.setState({
-                                    // message: response.data.messageCode
-                                    message: 'Error while creating query'
+                                this.setState({                                    
+                                    message: i18n.t('static.unkownError'), loading: false
                                 },
-                                    () => {
-                                        this.resetClicked();
+                                    () => {                                        
                                         this.hideSecondComponent();
                                     })                                
                             }                            
                             this.props.togglehelp();
                             this.props.toggleSmall(this.state.message);
                         })
-                        // .catch(
-                        //     error => {
-                        //         switch (error.message) {
-                        //             case "Network Error":
-                        //                 this.setState({
-                        //                     message: 'Network Error'
-                        //                 })
-                        //                 break
-                        //             default:
-                        //                 this.setState({
-                        //                     message: 'Error'
-                        //                 })
-                        //                 break
-                        //         }
-                        //         alert(this.state.message);
-                        //         this.props.togglehelp();
-                        //     }
-                        // );        
+                        .catch(
+                            error => {
+                                this.setState({                                        
+                                    message: i18n.t('static.unkownError'), loading: false
+                                },
+                                () => {                                        
+                                    this.hideSecondComponent();                                     
+                                });                                    
+                            }
+                        );       
                     }}
                     render={
                         ({
@@ -277,10 +276,10 @@ export default class PlanningUnitTicketComponent extends Component {
                             setTouched,
                             handleReset
                         }) => (
-                                <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm'>
+                                <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm' autocomplete="off">
                                     < FormGroup >
                                         <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
-                                        <Input type="text" name="summary" id="summary"
+                                        <Input type="text" name="summary" id="summary" readOnly = {true}
                                         bsSize="sm"
                                         valid={!errors.summary && this.state.planningUnit.summary != ''}
                                         invalid={touched.summary && !!errors.summary}
@@ -289,18 +288,6 @@ export default class PlanningUnitTicketComponent extends Component {
                                         value={this.state.planningUnit.summary}
                                         required />
                                         <FormFeedback className="red">{errors.summary}</FormFeedback>
-                                    </FormGroup>
-                                    <FormGroup>
-                                        <Label for="planningUnitDesc">{i18n.t('static.planningUnit.planningUnitName')}<span class="red Reqasterisk">*</span></Label>
-                                        <Input type="text" name="planningUnitDesc" id="planningUnitDesc"
-                                        bsSize="sm"
-                                        valid={!errors.planningUnitDesc && this.state.planningUnit.planningUnitDesc != ''}
-                                        invalid={touched.planningUnitDesc && !!errors.planningUnitDesc}
-                                        onChange={(e) => { handleChange(e); this.dataChange(e);}}
-                                        onBlur={handleBlur}
-                                        value={this.state.planningUnit.planningUnitDesc}
-                                        required />
-                                        <FormFeedback className="red">{errors.planningUnitDesc}</FormFeedback>
                                     </FormGroup>
                                     < FormGroup >
                                         <Label for="forecastingUnitDesc">{i18n.t('static.forecastingUnit.forecastingUnitName')}<span class="red Reqasterisk">*</span></Label>
@@ -318,6 +305,30 @@ export default class PlanningUnitTicketComponent extends Component {
                                         <FormFeedback className="red">{errors.forecastingUnitDesc}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup>
+                                        <Label for="multiplier">{i18n.t('static.unit.multiplier')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="number" name="multiplier" id="multiplier"
+                                        bsSize="sm"
+                                        valid={!errors.multiplier && this.state.planningUnit.multiplier != ''}
+                                        invalid={touched.multiplier && !!errors.multiplier}
+                                        onChange={(e) => { handleChange(e); this.dataChange(e);}}
+                                        onBlur={handleBlur}
+                                        value={this.state.planningUnit.multiplier}
+                                        required />
+                                        <FormFeedback className="red">{errors.multiplier}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label for="planningUnitDesc">{i18n.t('static.planningUnit.planningUnitName')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="text" name="planningUnitDesc" id="planningUnitDesc"
+                                        bsSize="sm"
+                                        valid={!errors.planningUnitDesc && this.state.planningUnit.planningUnitDesc != ''}
+                                        invalid={touched.planningUnitDesc && !!errors.planningUnitDesc}
+                                        onChange={(e) => { handleChange(e); this.dataChange(e);}}
+                                        onBlur={handleBlur}
+                                        value={this.state.planningUnit.planningUnitDesc}
+                                        required />
+                                        <FormFeedback className="red">{errors.planningUnitDesc}</FormFeedback>
+                                    </FormGroup>                                    
+                                    <FormGroup>
                                         <Label for="unit">{i18n.t('static.unit.unit')}<span class="red Reqasterisk">*</span></Label>
                                         <Input type="select" name="unit" id="unit"
                                         bsSize="sm"
@@ -331,19 +342,7 @@ export default class PlanningUnitTicketComponent extends Component {
                                             {unitList}
                                         </Input>
                                         <FormFeedback className="red">{errors.unit}</FormFeedback>
-                                    </FormGroup>                                    
-                                    <FormGroup>
-                                        <Label for="multiplier">{i18n.t('static.unit.multiplier')}<span class="red Reqasterisk">*</span></Label>
-                                        <Input type="number" name="multiplier" id="multiplier"
-                                        bsSize="sm"
-                                        valid={!errors.multiplier && this.state.planningUnit.multiplier != ''}
-                                        invalid={touched.multiplier && !!errors.multiplier}
-                                        onChange={(e) => { handleChange(e); this.dataChange(e);}}
-                                        onBlur={handleBlur}
-                                        value={this.state.planningUnit.multiplier}
-                                        required />
-                                        <FormFeedback className="red">{errors.multiplier}</FormFeedback>
-                                    </FormGroup>
+                                    </FormGroup>                                                                        
                                     <FormGroup>
                                         <Label for="notes">{i18n.t('static.common.notes')}</Label>
                                         <Input type="textarea" name="notes" id="notes"
@@ -362,8 +361,21 @@ export default class PlanningUnitTicketComponent extends Component {
                                         <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>                                        
                                         <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                     </ModalFooter>
+                                    <br></br><br></br>
+                                    <div className={this.props.className}>
+                                        <p>{i18n.t('static.ticket.drodownvaluenotfound')}</p>
+                                    </div>
                                 </Form>
                             )} />
+                            </div>
+                            <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                    <div class="align-items-center">
+                                        <div ><h4> <strong>Loading...</strong></h4></div>
+                                        <div class="spinner-border blue ml-4" role="status"></div>
+                                    </div>
+                                </div> 
+                            </div>
             </div>
         );
     }

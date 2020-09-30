@@ -170,8 +170,8 @@ class GlobalConsumption extends Component {
       realmList: [],
       message: '',
       rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-      minDate:{year:  new Date().getFullYear()-3, month: new Date().getMonth()},
-      maxDate:{year:  new Date().getFullYear()+3, month: new Date().getMonth()+1},
+      minDate:{year:  new Date().getFullYear()-3, month: new Date().getMonth()+2},
+      maxDate:{year:  new Date().getFullYear()+3, month: new Date().getMonth()},
       loading: true
 
 
@@ -198,6 +198,10 @@ class GlobalConsumption extends Component {
     return '?'
   }
 
+  addDoubleQuoteToRowContent=(arr)=>{
+    return arr.map(ele=>'"'+ele+'"')
+ }
+
   exportCSV() {
 
     var csvRow = [];
@@ -216,12 +220,12 @@ class GlobalConsumption extends Component {
     csvRow.push('')
     var re;
 
-    var A = [[(i18n.t('static.dashboard.country')).replaceAll(' ', '%20'), (i18n.t('static.report.month')).replaceAll(' ', '%20'), (i18n.t('static.consumption.consumptionqty')+' '+i18n.t('static.report.inmillions')).replaceAll(' ', '%20')]]
+    var A = [this.addDoubleQuoteToRowContent([(i18n.t('static.dashboard.country')).replaceAll(' ', '%20'), (i18n.t('static.report.month')).replaceAll(' ', '%20'), (i18n.t('static.consumption.consumptionqty')+' '+i18n.t('static.report.inmillions')).replaceAll(' ', '%20')])]
 
     re = this.state.consumptions
 
     for (var item = 0; item < re.length; item++) {
-      A.push([[getLabelText(re[item].realmCountry.label), re[item].consumptionDateString, re[item].planningUnitQty]])
+      A.push([this.addDoubleQuoteToRowContent([getLabelText(re[item].realmCountry.label), re[item].consumptionDateString, re[item].planningUnitQty])])
     }
     for (var i = 0; i < A.length; i++) {
       csvRow.push(A[i].join(","))
@@ -372,7 +376,7 @@ class GlobalConsumption extends Component {
 
 
 
-    const title = "Consumption Report";
+    const title = i18n.t('static.dashboard.globalconsumption');
     var canvas = document.getElementById("cool-canvas");
     //creates image
 
@@ -389,7 +393,7 @@ class GlobalConsumption extends Component {
     }
     let startYtable = startY - ((height - h1) * (pages - 1))
     doc.setTextColor("#fff");
-    if (startYtable > height - 500) {
+    if (startYtable > (height - 400)) {
       doc.addPage()
       startYtable = 80
   }
@@ -413,7 +417,7 @@ class GlobalConsumption extends Component {
     doc.autoTable(content);
     addHeaders(doc)
     addFooters(doc)
-    doc.save("Consumption (Realm View).pdf")
+    doc.save(i18n.t('static.dashboard.globalconsumption').concat('.pdf'));
     //creates PDF from img
     /*  var doc = new jsPDF('landscape');
       doc.setFontSize(20);
@@ -1167,7 +1171,7 @@ class GlobalConsumption extends Component {
                         </div>
                         <div className="col-md-12">
                           <button className="mr-1 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
-                            {this.state.show ? 'Hide Data' : 'Show Data'}
+                            {this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
                           </button>
 
                         </div>

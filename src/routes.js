@@ -236,7 +236,8 @@ const routes = [
   { path: '/consumptionDetails/:programId/:versionId/:planningUnitId', name: i18n.t('static.dashboard.consumptiondetails'), component: ConsumptionDetails },
   { path: '/shipment/shipmentDetails/:programId/:versionId/:planningUnitId', name: i18n.t('static.dashboard.shipmentdetails'), component: ShipmentList },
   { path: '/report/addProblem/:color/:message', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.report.problem') }), component: AddProblem },
-  { path: '/report/problemList/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.qatProblem') }), component: ProblemList },
+  { path: '/report/problemList/:color/:message',exact:true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.qatProblem') }), component: ProblemList },
+  { path: '/report/problemList/:programId/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.qatProblem') }), component: ProblemList },
   // { path: '/report/problemList', name: 'Qat Problem List', component: ProblemList },
 
   { path: '/problem/editProblem', name: ' Edit Problem', component: EditProblem },
@@ -490,7 +491,7 @@ const routes = [
 
   { path: '/report/supplyPlanVersionAndReview', exact: true, name: i18n.t('static.report.supplyplanversionandreviewReport'), component: SupplyPlanVersionAndReview },
   { path: '/report/editStatus/:programId/:versionId', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.report.supplyplanversionandreviewReport'), component: EditSupplyPlanStatus },
-  { path: '/report/supplyPlanVersionAndReview/:message', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.report.supplyplanversionandreviewReport'), component: SupplyPlanVersionAndReview },
+  { path: '/report/supplyPlanVersionAndReview/:color/:message', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.report.supplyplanversionandreviewReport'), component: SupplyPlanVersionAndReview },
 
   { path: '/report/shipmentSummery', exact: true, name: i18n.t('static.report.shipmentDetailReport'), component: ShipmentSummery },
   { path: '/report/shipmentSummery/:message', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.report.shipmentSummeryReport'), component: ShipmentSummery },

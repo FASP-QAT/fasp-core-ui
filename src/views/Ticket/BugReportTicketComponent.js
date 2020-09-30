@@ -7,6 +7,7 @@ import { Formik } from 'formik';
 import i18n from '../../i18n';
 import * as Yup from 'yup';
 import JiraTikcetService from '../../api/JiraTikcetService';
+import { SPACE_REGEX } from '../../Constants';
 
 const initialValues = {
     summary: "Report a bug",
@@ -16,6 +17,7 @@ const entityname = i18n.t('static.program.realmcountry');
 const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()
+            .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.common.summarytext')),
         description: Yup.string()
             .required(i18n.t('static.common.descriptiontext')),
@@ -57,7 +59,8 @@ export default class BugReportTicketComponent extends Component {
                 file: '',
                 attachFile: ''
             },
-            message: ''
+            message: '',
+            loading: false
         }
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
@@ -120,7 +123,7 @@ export default class BugReportTicketComponent extends Component {
 
     resetClicked() {
         let { bugReport } = this.state;
-        bugReport.summary = '';
+        // bugReport.summary = '';
         bugReport.description = '';
         bugReport.file= '';
         bugReport.attachFile= '';
@@ -133,15 +136,19 @@ export default class BugReportTicketComponent extends Component {
     render() {
 
         return (
-            <div className="col-md-12">
-                <h5 style={{ color: "green" }} id="div2">{i18n.t(this.state.message)}</h5>
+            <div className="col-md-12">                
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
                 <h4>{i18n.t('static.common.bugreport')}</h4>
                 <br></br>
+                <div style={{ display: this.state.loading ? "none" : "block" }}>
                 <Formik
                     initialValues={initialValues}
                     validate={validate(validationSchema)}
                     onSubmit={(values, { setSubmitting, setErrors }) => {
-                        JiraTikcetService.addBugReportIssue(this.state.bugReport).then(response => { 
+                        this.setState({
+                            loading: true
+                        })
+                        JiraTikcetService.addBugReportIssue(this.state.bugReport).then(response => {                             
                             console.log("Response :",response.status, ":" ,JSON.stringify(response.data));
                             if (response.status == 200 || response.status == 201) {
                                 var msg = response.data.key;
@@ -150,43 +157,33 @@ export default class BugReportTicketComponent extends Component {
                                 });
 
                                 this.setState({
-                                    message: msg
+                                    message: msg, loading: false
                                 },
                                     () => {
                                         this.resetClicked();
                                         this.hideSecondComponent();
                                     })                                
                             } else {
-                                this.setState({
-                                    // message: response.data.messageCode
-                                    message: 'Error while creating query'
+                                this.setState({                                    
+                                    message: i18n.t('static.unkownError'), loading: false
                                 },
-                                    () => {
-                                        this.resetClicked();
+                                    () => {                                        
                                         this.hideSecondComponent();
                                     })                                
                             }
                             this.props.togglehelp();
                             this.props.toggleSmall(this.state.message);
                         })
-                        // .catch(
-                        //         error => {
-                        //             switch (error.message) {
-                        //                 case "Network Error":
-                        //                     this.setState({
-                        //                         message: 'Network Error'
-                        //                     })
-                        //                     break
-                        //                 default:
-                        //                     this.setState({
-                        //                         message: 'Error'
-                        //                     })
-                        //                     break
-                        //             }
-                        //             alert(this.state.message);
-                        //             this.props.togglehelp();
-                        //         }
-                        //     );
+                        .catch(
+                                error => {
+                                    this.setState({                                        
+                                        message: i18n.t('static.unkownError'), loading: false
+                                    },
+                                    () => {                                        
+                                        this.hideSecondComponent();                                     
+                                    });                                    
+                                }
+                            );
                     }}
                     render={
                         ({
@@ -204,7 +201,7 @@ export default class BugReportTicketComponent extends Component {
                                 <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm'>
                                     < FormGroup >
                                         <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
-                                        <Input type="text" name="summary" id="summary"
+                                        <Input type="text" name="summary" id="summary" readOnly = {true}
                                             bsSize="sm"
                                             valid={!errors.summary && this.state.bugReport.summary != ''}
                                             invalid={touched.summary && !!errors.summary}
@@ -228,10 +225,10 @@ export default class BugReportTicketComponent extends Component {
                                     </FormGroup>
                                     <FormGroup >
                                         <Col>
-                                            <Label className="uploadfilelable" htmlFor="attachFile">Upload Screenshot<span class="red Reqasterisk">*</span></Label>
+                                            <Label className="uploadfilelable" htmlFor="attachFile">{i18n.t('static.ticket.uploadScreenshot')}<span class="red Reqasterisk">*</span></Label>
                                         </Col>
                                         <div className="custom-file">                                            
-                                            <Input type="file" className="custom-file-input" id="attachFile" name="attachFile" accept=".zip,.png"
+                                            <Input type="file" className="custom-file-input" id="attachFile" name="attachFile" accept=".zip,.png,.jpg,.jpeg"
                                                 valid={!errors.attachFile && this.state.bugReport.attachFile != ''}
                                                 invalid={touched.attachFile && !!errors.attachFile}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e); }}
@@ -250,6 +247,15 @@ export default class BugReportTicketComponent extends Component {
                                     </ModalFooter>
                                 </Form>
                             )} />
+                            </div>
+                            <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                    <div class="align-items-center">
+                                        <div ><h4> <strong>Loading...</strong></h4></div>
+                                        <div class="spinner-border blue ml-4" role="status"></div>
+                                    </div>
+                                </div> 
+                            </div>
             </div>
         );
     }

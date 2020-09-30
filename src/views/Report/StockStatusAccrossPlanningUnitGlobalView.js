@@ -987,8 +987,8 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
       data: [],
       tracerCategories: [],
       singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
-      minDate:{year:  new Date().getFullYear()-3, month: new Date().getMonth()},
-      maxDate:{year:  new Date().getFullYear()+3, month: new Date().getMonth()+1},
+      minDate:{year:  new Date().getFullYear()-3, month: new Date().getMonth()+2},
+      maxDate:{year:  new Date().getFullYear()+3, month: new Date().getMonth()},
       loading: true
 
 
@@ -1057,6 +1057,9 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
   round = num => {
     return parseFloat(Math.round(num * Math.pow(10, 0)) / Math.pow(10, 0)).toFixed(0);
   }
+  addDoubleQuoteToRowContent=(arr)=>{
+    return arr.map(ele=>'"'+ele+'"')
+ }
 
   exportCSV() {
 
@@ -1072,13 +1075,13 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
     csvRow.push('')
     var re;
 
-    var A = [[i18n.t('static.planningunit.planningunit'), i18n.t('static.program.programMaster'), i18n.t('static.supplyPlan.amc'), i18n.t('static.supplyPlan.endingBalance').replaceAll(',', '%20'), i18n.t('static.supplyPlan.monthsOfStock').replaceAll(',', '%20'), i18n.t('static.supplyPlan.minStock').replaceAll(',', '%20'), i18n.t('static.supplyPlan.maxStock').replaceAll(',', '%20')]]
+    var A = [this.addDoubleQuoteToRowContent([i18n.t('static.planningunit.planningunit'), i18n.t('static.program.programMaster'), i18n.t('static.supplyPlan.amc'), i18n.t('static.supplyPlan.endingBalance').replaceAll(',', '%20'), i18n.t('static.supplyPlan.monthsOfStock').replaceAll(',', '%20'), i18n.t('static.supplyPlan.minStock').replaceAll(',', '%20'), i18n.t('static.supplyPlan.maxStock').replaceAll(',', '%20')])]
 
     re = this.state.data
 
     for (var item = 0; item < re.length; item++) {
       re[item].programData.map(p =>
-        A.push([[(getLabelText(re[item].planningUnit.label, this.state.lang).replaceAll(',', '%20')).replaceAll(' ', '%20'), (getLabelText(p.program.label, this.state.lang).replaceAll(',', '%20')).replaceAll(' ', '%20'), this.round(p.amc), this.round(p.finalClosingBalance), this.roundN(p.mos), p.minMos, p.maxMos]])
+        A.push([this.addDoubleQuoteToRowContent([(getLabelText(re[item].planningUnit.label, this.state.lang).replaceAll(',', '%20')).replaceAll(' ', '%20'), (getLabelText(p.program.label, this.state.lang).replaceAll(',', '%20')).replaceAll(' ', '%20'), this.round(p.amc), this.round(p.finalClosingBalance), this.roundN(p.mos), p.minMos, p.maxMos])])
       )
     }
     for (var i = 0; i < A.length; i++) {
@@ -1170,7 +1173,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
           var planningText = doc.splitTextToSize(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.join(' , '), doc.internal.pageSize.width * 3 / 4);
           doc.text(doc.internal.pageSize.width / 8, 130, planningText)
 
-          doc.text(i18n.t('static.tracercategory.tracercategory') + ' : ' + document.getElementById("tracerCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130+(this.state.countryValues.length ), {
+          doc.text(i18n.t('static.tracercategory.tracercategory') + ' : ' + document.getElementById("tracerCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150+(this.state.countryValues.length ), {
             align: 'left'
           })
         }
@@ -1192,7 +1195,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
     var data = [];
     this.state.data.map(elt => elt.programData.map(p => data.push([getLabelText(elt.planningUnit.label, this.state.lang), getLabelText(p.program.label, this.state.lang), this.formatter(this.round(p.amc)), this.formatter(this.round(p.finalClosingBalance)), this.formatter(this.roundN(p.mos)), p.minMos, p.maxMos])));
     var height = doc.internal.pageSize.height;
-    var startY = 130 + (this.state.countryValues.length * 2)+20
+    var startY = 150 + (this.state.countryValues.length * 2)+20
     let content = {
       margin: { top: 80, bottom: 50 },
       startY: startY,

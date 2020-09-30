@@ -433,6 +433,7 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import { LABEL_REGEX } from '../../Constants.js';
+import { ALPHABET_NUMBER_REGEX, SPACE_REGEX } from '../../Constants.js';
 import classNames from 'classnames';
 
 const initialValues = {
@@ -443,9 +444,12 @@ const initialValues = {
 const entityname = i18n.t('static.role.role');
 const validationSchema = function (values) {
     return Yup.object().shape({
+        // roleName: Yup.string()
+        //     .required(i18n.t('static.role.roletext'))
+        //     .matches(LABEL_REGEX, i18n.t('static.message.rolenamevalidtext')),
         roleName: Yup.string()
-            .required(i18n.t('static.role.roletext'))
-            .matches(LABEL_REGEX, i18n.t('static.message.rolenamevalidtext')),
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
+            .required(i18n.t('static.role.roletext')),
         businessFunctions: Yup.string()
             .required(i18n.t('static.role.businessfunctiontext')),
         canCreateRoles: Yup.string()
@@ -781,6 +785,7 @@ class AddRoleComponent extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             required
+                                                            maxLength={30}
                                                             value={this.Capitalize(this.state.role.label.label_en)}
                                                         /><FormFeedback className="red">{errors.roleName}</FormFeedback>
                                                     </FormGroup>
@@ -810,7 +815,7 @@ class AddRoleComponent extends Component {
                                                     </FormGroup>
                                                     <FormGroup className="Selectcontrol-bdrNone">
                                                         <Label htmlFor="canCreateRoles">{i18n.t('static.role.cancreaterole')}<span className="red Reqasterisk">*</span> </Label>
-                                            
+
                                                         <Select
                                                             className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
                                                                 { 'is-valid': !errors.canCreateRoles && this.state.role.canCreateRoles.length != 0 },
@@ -852,7 +857,7 @@ class AddRoleComponent extends Component {
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
-                            <div ><h4> <strong>Loading...</strong></h4></div>
+                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
                             <div class="spinner-border blue ml-4" role="status">
 

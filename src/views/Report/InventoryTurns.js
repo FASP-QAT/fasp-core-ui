@@ -976,8 +976,8 @@ export default class InventoryTurns extends Component {
             versions: [],
             message: '',
             singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
-            minDate:{year:  new Date().getFullYear()-3, month: new Date().getMonth()},
-            maxDate:{year:  new Date().getFullYear()+3, month: new Date().getMonth()+1},
+            minDate:{year:  new Date().getFullYear()-3, month: new Date().getMonth()+2},
+            maxDate:{year:  new Date().getFullYear()+3, month: new Date().getMonth()},
            loading: true
 
         }
@@ -1223,6 +1223,9 @@ export default class InventoryTurns extends Component {
         }
         return x1 + x2;
     }
+    addDoubleQuoteToRowContent=(arr)=>{
+        return arr.map(ele=>'"'+ele+'"')
+     }
     exportCSV = (columns) => {
 
         var csvRow = [];
@@ -1239,8 +1242,8 @@ export default class InventoryTurns extends Component {
         const headers = [];
         columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ', '%20') });
 
-        var A = [headers]
-        this.state.costOfInventory.map(ele => A.push([(getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.totalConsumption, this.round(ele.avergeStock), ele.noOfMonths, this.roundN(ele.inventoryTurns)]));
+        var A = [this.addDoubleQuoteToRowContent(headers)]
+        this.state.costOfInventory.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.totalConsumption, this.round(ele.avergeStock), ele.noOfMonths, this.roundN(ele.inventoryTurns)])));
 
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
@@ -1506,7 +1509,8 @@ export default class InventoryTurns extends Component {
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                 openRequest.onerror = function (event) {
                     this.setState({
-                        message: i18n.t('static.program.errortext')
+                        message: i18n.t('static.program.errortext'),
+                        loading:false
                     })
                 }.bind(this);
                 openRequest.onsuccess = function (e) {
@@ -1521,11 +1525,12 @@ export default class InventoryTurns extends Component {
                     var programRequest = programDataOs.get(program);
                     programRequest.onerror = function (event) {
                         this.setState({
-                            message: i18n.t('static.program.errortext')
+                            message: i18n.t('static.program.errortext'),
+                            loading:false
                         })
                     }.bind(this);
                     programRequest.onsuccess = function (e) {
-                        // this.setState({ loading: true })
+                        this.setState({ loading: true })
                         console.log(programRequest)
                         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
@@ -1536,6 +1541,9 @@ export default class InventoryTurns extends Component {
                         var planningunitRequest = planningunitOs.getAll();
                         planningunitRequest.onerror = function (event) {
                             // Handle errors!
+                            this.setState({
+                                loading:false
+                            })
                         };
                         planningunitRequest.onsuccess = function (e) {
                             var myResult = [];
@@ -1557,28 +1565,34 @@ export default class InventoryTurns extends Component {
                             var monthcnt = 0;
                             var totalConsumption = 0;
                             var totalClosingBalance = 0;
+                            var reportList=[]
                             for (var n = 0; n < 12; n++) {
                                var dtstr = m[n].startDate
                                 var enddtStr = m[n].endDate
                                
                                 var dt = dtstr
                                 var list = programJson.supplyPlan.filter(c => c.planningUnitId ==planningUnit.planningUnit.id && c.transDate == dt)
-                                console.log(dtstr, ' ', enddtStr,' list',list)
+                                //console.log(dtstr, ' ', enddtStr,' list',list)
+                                reportList=[...reportList,...list]
                             if(list.length>0){
                                 if(document.getElementById("includePlanningShipments").value.toString() == 'true'){
                                 endingBalanceArray[n] = list[0].closingBalance
-                                totalConsumption = totalConsumption + list[0].consumptionQty
-                                if(list[0].consumptionQty>0){
-                                    monthcnt++
-                                    totalClosingBalance=totalClosingBalance+list[0].closingBalance
-                                }
+                                totalConsumption = totalConsumption + parseInt(list[0].consumptionQty==null?0:list[0].consumptionQty)
+                                totalClosingBalance=totalClosingBalance+parseInt(list[0].closingBalance)
+                                monthcnt++
+                                // if(list[0].consumptionQty>0|| list[0].closingBalance>0){
+                                //     monthcnt++
+                                    
+                                // }
                             }else{
                                 endingBalanceArray[n] = list[0].closingBalanceWps
-                                totalConsumption = totalConsumption + list[0].consumptionQty
-                                if(list[0].consumptionQty>0){
-                                    monthcnt++
-                                    totalClosingBalance=totalClosingBalance+list[0].closingBalanceWps
-                                }
+                                totalConsumption = totalConsumption + parseInt(list[0].consumptionQty==null?0:list[0].consumptionQty)
+                                monthcnt++
+                                // totalClosingBalance=totalClosingBalance+list[0].closingBalanceWps
+                                // if(list[0].consumptionQty>0|| list[0].closingBalanceWps>0){
+                                //     monthcnt++
+                                   
+                                // }
                             }}else{
                                 endingBalanceArray[n] = ''
                             }  
@@ -1600,7 +1614,7 @@ export default class InventoryTurns extends Component {
                             //     }
                             // }
 
-
+console.log(reportList)
                             var avergeStock =monthcnt>0? totalClosingBalance / (monthcnt):0
 
                           
@@ -1632,7 +1646,7 @@ var inputJson={
     "programId":this.state.CostOfInventoryInput.programId,
     "versionId":this.state.CostOfInventoryInput.versionId,
     "dt":moment(this.state.CostOfInventoryInput.dt).startOf('month').format('YYYY-MM-DD'),
-    "includePlanningShipments":this.state.CostOfInventoryInput.includePlanningShipments.toString()=="true"?1:0
+    "includePlannedShipments":this.state.CostOfInventoryInput.includePlanningShipments.toString()=="true"?1:0
 }
                 AuthenticationService.setupAxiosInterceptors();
                 ReportService.inventoryTurns(inputJson).then(response => {
@@ -1803,7 +1817,7 @@ var inputJson={
                                 <Form >
                                     <div className="pl-0">
                                         <div className="row">
-                                        <FormGroup className="col-md-3">
+                                        <FormGroup className="col-md-3 pl-0">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.report.month')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                                                 <div className="controls edit">
                                                     <Picker
@@ -1829,7 +1843,7 @@ var inputJson={
                                                             name="programId"
                                                             id="programId"
                                                             bsSize="sm"
-                                                            onChange={(e) => { this.dataChange(e); this.filterVersion(); this.formSubmit() }}
+                                                            onChange={(e) => { this.dataChange(e); this.filterVersion(); }}
                                                         >
                                                             <option value="0">{i18n.t('static.common.select')}</option>
                                                             {programList}
@@ -1847,7 +1861,7 @@ var inputJson={
                                                             name="versionId"
                                                             id="versionId"
                                                             bsSize="sm"
-                                                            onChange={(e) => { this.dataChange(e); this.formSubmit() }}
+                                                            onChange={(e) => { this.dataChange(e)}}
                                                         >
                                                             <option value="0">{i18n.t('static.common.select')}</option>
                                                             {versionList}
@@ -1867,7 +1881,7 @@ var inputJson={
                                                             name="includePlanningShipments"
                                                             id="includePlanningShipments"
                                                             bsSize="sm"
-                                                            onChange={(e) => { this.dataChange(e); this.formSubmit() }}
+                                                            onChange={(e) => { this.dataChange(e);  }}
                                                         >
                                                             <option value="true">{i18n.t('static.program.yes')}</option>
                                                             <option value="false">{i18n.t('static.program.no')}</option>

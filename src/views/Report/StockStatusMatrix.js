@@ -146,10 +146,17 @@ export default class StockStatusMatrix extends React.Component {
     if (this.state.planningUnitValues.length > 0 && programId > 0 && versionId != 0) {
 
       if (versionId.includes('Local')) {
+        this.setState({ loading: true })
         var data = [];
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onerror = function (event) {
+          this.setState({
+            message: i18n.t('static.program.errortext'),
+            loading: false
+          })
+        }.bind(this);
         openRequest.onsuccess = function (e) {
           db1 = e.target.result;
           var planningUnitTransaction = db1.transaction(['planningUnit'], 'readwrite');
@@ -157,6 +164,9 @@ export default class StockStatusMatrix extends React.Component {
           var planningunitRequest = planningUnitObjectStore.getAll();
           planningunitRequest.onerror = function (event) {
             // Handle errors!
+            this.setState({
+              loading: false
+            })
           };
           var plunit = []
           planningunitRequest.onsuccess = function (e) {
@@ -179,11 +189,16 @@ export default class StockStatusMatrix extends React.Component {
 
           var programRequest = programTransaction.get(program);
 
+          programRequest.onerror = function (event) {
+            this.setState({
+              loading: false
+            })
+          }.bind(this);
           programRequest.onsuccess = function (event) {
             var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
             var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
             var programJson = JSON.parse(programData);
-
+            
             planningUnitIds.map(planningUnitId => {
 
               var pu = (this.state.planningUnits.filter(c => c.planningUnit.id == planningUnitId))[0]
@@ -736,7 +751,9 @@ export default class StockStatusMatrix extends React.Component {
       return ''
     }
   }
-
+  addDoubleQuoteToRowContent=(arr)=>{
+    return arr.map(ele=>'"'+ele+'"')
+ }
   exportCSV(columns) {
 
     var csvRow = [];
@@ -754,9 +771,9 @@ export default class StockStatusMatrix extends React.Component {
 
     const headers = [];
     columns.map((item, idx) => { headers[idx] = ((item.text).replaceAll(' ', '%20')) });
-    var A = [headers]
+    var A = [this.addDoubleQuoteToRowContent(headers)]
     var re = this.state.data
-    this.state.data.map(ele => A.push([(getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.unit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.minMonthsOfStock, ele.reorderFrequency, ele.year, this.roundN(ele.jan), this.roundN(ele.feb), this.roundN(ele.mar), this.roundN(ele.apr), this.roundN(ele.may), this.roundN(ele.jun), this.roundN(ele.jul), this.roundN(ele.aug), this.roundN(ele.sep), this.roundN(ele.oct), this.roundN(ele.nov), this.roundN(ele.dec)]));
+    this.state.data.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.unit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.minMonthsOfStock, ele.reorderFrequency, ele.year, this.roundN(ele.jan), this.roundN(ele.feb), this.roundN(ele.mar), this.roundN(ele.apr), this.roundN(ele.may), this.roundN(ele.jun), this.roundN(ele.jul), this.roundN(ele.aug), this.roundN(ele.sep), this.roundN(ele.oct), this.roundN(ele.nov), this.roundN(ele.dec)])));
     for (var i = 0; i < A.length; i++) {
       console.log(A[i])
       csvRow.push(A[i].join(","))
@@ -842,7 +859,7 @@ export default class StockStatusMatrix extends React.Component {
     let header = []
 
     header = [[{ content: i18n.t('static.planningunit.planningunit'), rowSpan: 2, styles: { halign: 'center' } },
-    { content: i18n.t('static.dashboard.unit'), rowSpan: 2, styles: { halign: 'center'} },
+    { content: i18n.t('static.dashboard.unit'), rowSpan: 2, styles: { halign: 'center' } },
     { content: i18n.t('static.common.min'), rowSpan: 2, styles: { halign: 'center' } },
     { content: i18n.t('static.program.reorderFrequencyInMonths'), rowSpan: 2, styles: { halign: 'center' } },
     { content: i18n.t('static.common.year'), rowSpan: 2, styles: { halign: 'center' } },
@@ -866,7 +883,7 @@ export default class StockStatusMatrix extends React.Component {
 
     var startY = 150 + (this.state.planningUnitValues.length * 3)
     let content = {
-      margin: { top: 80, bottom: 50 },
+      margin: { top: 80, bottom: 90 },
       startY: startY,
       head: header,
       body: data,
@@ -1211,7 +1228,7 @@ export default class StockStatusMatrix extends React.Component {
                   </div>
                 </FormGroup>
                 <FormGroup className="col-md-3">
-                  <Label htmlFor="appendedInputButton">Version</Label>
+                  <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
                   <div className="controls ">
                     <InputGroup>
                       <Input

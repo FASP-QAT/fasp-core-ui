@@ -13,6 +13,7 @@ import UnitService from "../../api/UnitService";
 import { stringify } from 'querystring';
 import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
+import { SPACE_REGEX } from '../../Constants.js';
 
 const initialValues = {
     realmId: [],
@@ -31,9 +32,14 @@ const validationSchema = function (values) {
         productCategoryId: Yup.string()
             .required(i18n.t('static.productcategory.productcategorytext')),
         label: Yup.string()
+            // .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.forecastingunit.forecastingunittext')),
         unitId: Yup.string()
             .required(i18n.t('static.product.productunittext')),
+        genericLabel: Yup.string()
+            // .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
     })
 }
 

@@ -680,7 +680,7 @@ export default class ConsumptionDetails extends React.Component {
         this.getProblemListAfterCalculation = this.getProblemListAfterCalculation.bind(this);
 
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
-        
+
 
     }
 
@@ -761,6 +761,11 @@ export default class ConsumptionDetails extends React.Component {
                         problemStatusList: proList
                     })
 
+                    var programIdd = this.props.match.params.programId;
+                    if (programIdd != '' && programIdd != undefined) {
+                        document.getElementById("programId").value = programIdd;
+                        this.getProblemListAfterCalculation();
+                    }
 
                 }.bind(this);
             }.bind(this);
@@ -940,9 +945,11 @@ export default class ConsumptionDetails extends React.Component {
                                 var versionId = this.el.getValueFromCoords(3, y)
 
                                 // if (this.el.getValueFromCoords(14, y) != 2) {
-                                this.props.history.push({
-                                    pathname: `${this.el.getValueFromCoords(15, y)}/${programId}/${versionId}/${planningunitId}`,
-                                });
+
+                                // this.props.history.push({
+                                //     pathname: `${this.el.getValueFromCoords(15, y)}/${programId}/${versionId}/${planningunitId}`,
+                                // });
+                                window.open(window.location.origin + `/#${this.el.getValueFromCoords(15, y)}/${programId}/${versionId}/${planningunitId}`);
                                 // } else {
                                 //     this.props.history.push({
                                 //         pathname: `${this.el.getValueFromCoords(15, y)}`,
@@ -975,10 +982,17 @@ export default class ConsumptionDetails extends React.Component {
                 if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROBLEM')) {
                     let problemStatusId = document.getElementById('problemStatusId').value;
                     let problemTypeId = document.getElementById('problemTypeId').value;
+                    var index = 0;
+                    if (this.el.getValueFromCoords(1, x) == "") {
+                        var index = 0;
+                    } else {
+                        index = this.el.getValueFromCoords(1, x);
+                    }
                     // console.log("problemReportId--------------------------", this.el.getValueFromCoords(0, x));
                     // console.log("problemActionIndex--------------------------", this.el.getValueFromCoords(1, x));
+                    console.log("URL", `/report/editProblem/${this.el.getValueFromCoords(0, x)}/${this.state.programId}/${index}/${problemStatusId}/${problemTypeId}`);
                     this.props.history.push({
-                        pathname: `/report/editProblem/${this.el.getValueFromCoords(0, x)}/ ${this.state.programId}/${this.el.getValueFromCoords(1, x)}/${problemStatusId}/${problemTypeId}`,
+                        pathname: `/report/editProblem/${this.el.getValueFromCoords(0, x)}/${this.state.programId}/${index}/${problemStatusId}/${problemTypeId}`,
                     });
                 }
             }
@@ -1035,8 +1049,11 @@ export default class ConsumptionDetails extends React.Component {
 
         let programId = document.getElementById('programId').value;
         this.setState({ programId: programId });
-        this.refs.problemListChild.qatProblemActions(programId);
-
+        if (programId != 0) {
+            this.refs.problemListChild.qatProblemActions(programId);
+        } else {
+            this.setState({ message: i18n.t('static.common.selectProgram'), data: [], loading: false });
+        }
 
     }
     fetchData() {
@@ -1113,15 +1130,22 @@ export default class ConsumptionDetails extends React.Component {
                 }.bind(this)
             }.bind(this)
         }
+        else if (programId == 0) {
+            this.setState({ message: i18n.t('static.common.selectProgram'), data: [], loading: false },
+                () => {
+                    this.el = jexcel(document.getElementById("tableDiv"), '');
+                    this.el.destroy();
+                });
+        }
         else if (problemStatusId == 0) {
-            this.setState({ message: i18n.t('static.report.selectProblemStatus'), data: [] },
+            this.setState({ message: i18n.t('static.report.selectProblemStatus'), data: [], loading: false },
                 () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
                     this.el.destroy();
                 });
         }
         else if (problemTypeId == 0) {
-            this.setState({ message: i18n.t('static.report.selectProblemType'), data: [] },
+            this.setState({ message: i18n.t('static.report.selectProblemType'), data: [], loading: false },
                 () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
                     this.el.destroy();
@@ -1385,8 +1409,10 @@ export default class ConsumptionDetails extends React.Component {
                     <div className="Card-header-addicon">
                         <div className="card-header-actions">
                             <div className="card-header-action">
-
+                                {this.state.programId != 0 && <a href="javascript:void();" title="Recalculate" onClick={this.getProblemListAfterCalculation}><i className="fa fa-refresh"></i></a>}
+                                &nbsp;&nbsp;
                                 {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_PROBLEM') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addMannualProblem}><i className="fa fa-plus-square"></i></a>}
+
                             </div>
                         </div>
                     </div>

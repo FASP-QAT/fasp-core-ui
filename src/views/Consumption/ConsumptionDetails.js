@@ -16,6 +16,9 @@ import ConsumptionInSupplyPlanComponent from "../SupplyPlan/ConsumptionInSupplyP
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import AuthenticationService from "../Common/AuthenticationService.js";
+import Picker from 'react-month-picker'
+import MonthBox from '../../CommonComponent/MonthBox.js'
+import moment from "moment"
 
 const entityname = i18n.t('static.dashboard.consumptiondetails');
 
@@ -34,6 +37,9 @@ export default class ConsumptionDetails extends React.Component {
             timeout: 0,
             showConsumption: 0,
             consumptionChangedFlag: 0,
+            rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
+            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() },
         }
 
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
@@ -44,8 +50,21 @@ export default class ConsumptionDetails extends React.Component {
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this)
         this.updateState = this.updateState.bind(this);
         this.toggleLarge = this.toggleLarge.bind(this);
+        this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
+        this.handleRangeChange = this.handleRangeChange.bind(this);
+        this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
+        this.pickRange = React.createRef();
     }
 
+    show() {
+    }
+    handleRangeChange(value, text, listIndex) {
+        //
+    }
+    handleRangeDissmis(value) {
+        this.setState({ rangeValue: value })
+        this.formSubmit(this.state.planningUnit, value);
+    }
 
     hideFirstComponent() {
         document.getElementById('div1').style.display = 'block';
@@ -233,7 +252,7 @@ export default class ConsumptionDetails extends React.Component {
                                 planningUnit: planningUnit,
                                 planningUnitId: planningUnitIdProp
                             })
-                            this.formSubmit(planningUnit);
+                            this.formSubmit(planningUnit, this.state.rangeValue);
                         }
                     }.bind(this);
                 }.bind(this)
@@ -246,8 +265,12 @@ export default class ConsumptionDetails extends React.Component {
         }
     }
 
-    formSubmit(value) {
+    formSubmit(value, rangeValue) {
         this.setState({ loading: true })
+        let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
+        let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
+        console.log("startDate", startDate);
+        console.log("Stop Date", stopDate);
         var programId = document.getElementById('programId').value;
         this.setState({ programId: programId, planningUnitId: value != "" && value != undefined ? value.value : 0, planningUnit: value });
         var planningUnitId = value != "" && value != undefined ? value.value : 0;
@@ -284,7 +307,8 @@ export default class ConsumptionDetails extends React.Component {
                     var consumptionListUnFiltered = (programJson.consumptionList);
                     var consumptionList = (programJson.consumptionList).filter(c =>
                         c.planningUnit.id == planningUnitId &&
-                        c.region != null && c.region.id != 0);
+                        c.region != null && c.region.id != 0 &&
+                        moment(c.consumptionDate).format("YYYY-MM-DD") >= moment(startDate).format("YYYY-MM-DD") && moment(c.consumptionDate).format("YYYY-MM-DD") <= moment(stopDate).format("YYYY-MM-DD"));
                     this.setState({
                         batchInfoList: batchInfoList,
                         programJson: programJson,
@@ -293,7 +317,9 @@ export default class ConsumptionDetails extends React.Component {
                         showConsumption: 1,
                         consumptionMonth: "",
                         consumptionStartDate: "",
-                        consumptionRegion: ""
+                        consumptionRegion: "",
+                        startDate: startDate,
+                        stopDate: stopDate
                     })
                     this.refs.consumptionChild.showConsumptionData();
                 }.bind(this)
@@ -326,6 +352,16 @@ export default class ConsumptionDetails extends React.Component {
     }
 
     render() {
+        const pickerLang = {
+            months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            from: 'From', to: 'To',
+        }
+        const { rangeValue } = this.state
+
+        const makeText = m => {
+            if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
+            return '?'
+        }
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
@@ -344,6 +380,23 @@ export default class ConsumptionDetails extends React.Component {
                                         <Form name='simpleForm'>
                                             <div className=" pl-0">
                                                 <div className="row">
+                                                    <FormGroup className="col-md-3">
+                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                                                        <div className="controls edit">
+
+                                                            <Picker
+                                                                years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                                                ref={this.pickRange}
+                                                                value={rangeValue}
+                                                                lang={pickerLang}
+                                                                //theme="light"
+                                                                onChange={this.handleRangeChange}
+                                                                onDismiss={this.handleRangeDissmis}
+                                                            >
+                                                                <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
+                                                            </Picker>
+                                                        </div>
+                                                    </FormGroup>
                                                     <FormGroup className="col-md-3">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                                         <div className="controls ">
@@ -366,10 +419,14 @@ export default class ConsumptionDetails extends React.Component {
                                                                 bsSize="sm"
                                                                 options={this.state.planningUnitList}
                                                                 value={this.state.planningUnit}
-                                                                onChange={(e) => { this.formSubmit(e); }}
+                                                                onChange={(e) => { this.formSubmit(e, this.state.rangeValue); }}
                                                             />
                                                         </div>
                                                     </FormGroup>
+                                                    {/* {this.state.consumptionChangedFlag == 1 && <FormGroup check inline>
+                                                        <Input className="form-check-input removeMarginLeftCheckbox" type="checkbox" id="showErrors" name="showErrors" value="true" onClick={this.refs.consumptionChild.showOnlyErrors} />
+                                                        <Label className="form-check-label" check htmlFor="inline-checkbox1">{i18n.t("static.dataEntry.showOnlyErrors")}</Label>
+                                                    </FormGroup>} */}
                                                     <input type="hidden" id="planningUnitId" name="planningUnitId" value={this.state.planningUnitId} />
                                                     <input type="hidden" id="programId" name="programId" value={this.state.programId} />
                                                 </div>
@@ -390,6 +447,7 @@ export default class ConsumptionDetails extends React.Component {
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 {this.state.consumptionChangedFlag == 1 && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.refs.consumptionChild.saveConsumption}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>}
                                 &nbsp;
+                                {this.refs.consumptionChild != undefined && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.refs.consumptionChild.addRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}&nbsp;
                         </FormGroup>
                         </FormGroup>
                     </CardFooter>
@@ -408,7 +466,8 @@ export default class ConsumptionDetails extends React.Component {
                     </ModalBody>
                     <ModalFooter>
                         <div id="showConsumptionBatchInfoButtonsDiv" style={{ display: 'none' }}>
-                            {this.state.consumptionBatchInfoChangedFlag == 1 && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.refs.consumptionChild.saveConsumptionBatchInfo}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>}{' '}
+                            {this.state.consumptionBatchInfoChangedFlag == 1 && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.refs.consumptionChild.saveConsumptionBatchInfo}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>}
+                            {this.refs.consumptionChild != undefined && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.refs.consumptionChild.addBatchRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
                         </div>
                         <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceled()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                     </ModalFooter>
@@ -417,7 +476,7 @@ export default class ConsumptionDetails extends React.Component {
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
-                            <div ><h4> <strong>Loading...</strong></h4></div>
+                            <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
 
                             <div class="spinner-border blue ml-4" role="status">
 
@@ -428,5 +487,10 @@ export default class ConsumptionDetails extends React.Component {
 
             </div>
         );
+    }
+
+    _handleClickRangeBox(e) {
+        console.log("Thuis.refs", this);
+        this.pickRange.current.show()
     }
 }

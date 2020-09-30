@@ -806,7 +806,7 @@ class ListRealmCountryComponent extends Component {
 
                         </div>
                     </CardHeader> */}
-                    <CardBody className="pb-lg-0 mt-3">
+                    <CardBody className="pb-lg-0 mt-1">
                         {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') &&
                             <Col md="3 pl-0">
                                 <FormGroup className="Selectdiv mt-md-1 mb-md-0">
@@ -842,7 +842,7 @@ class ListRealmCountryComponent extends Component {
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
-                            <div ><h4> <strong>Loading...</strong></h4></div>
+                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
                             <div class="spinner-border blue ml-4" role="status">
 

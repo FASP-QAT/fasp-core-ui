@@ -745,8 +745,18 @@ export default class ForecastingUnitListComponent extends Component {
         //     });
         // } else 
         if (productCategoryId != 0 && tracerCategoryId != 0) {
+            // productCategories
+            var pc = this.state.productCategories.filter(c => c.payload.productCategoryId == productCategoryId)[0]
+            console.log("Pc---------->", pc);
+            var pcList = this.state.productCategories.filter(c => c.payload.productCategoryId == pc.payload.productCategoryId || c.parentId == pc.id);
+            console.log("PcList", pcList);
+            var pcIdArray = [];
+            for (var pcu = 0; pcu < pcList.length; pcu++) {
+                pcIdArray.push(pcList[pcu].payload.productCategoryId);
+            }
+            console.log("pcIdArray", pcIdArray);
             this.setState({ loading: true })
-            const selSource = this.state.forecastingUnitList.filter(c => c.tracerCategory.id == tracerCategoryId && c.productCategory.id == productCategoryId)
+            const selSource = this.state.forecastingUnitList.filter(c => c.tracerCategory.id == tracerCategoryId && pcIdArray.includes(c.productCategory.id))
             this.setState({
                 selSource,
                 loading: false
@@ -762,8 +772,17 @@ export default class ForecastingUnitListComponent extends Component {
         //     });
         // } 
         else if (productCategoryId != 0) {
+            var pc = this.state.productCategories.filter(c => c.payload.productCategoryId == productCategoryId)[0]
+            console.log("Pc---------->", pc);
+            var pcList = this.state.productCategories.filter(c => c.payload.productCategoryId == pc.payload.productCategoryId || c.parentId == pc.id);
+            console.log("PcList", pcList);
+            var pcIdArray = [];
+            for (var pcu = 0; pcu < pcList.length; pcu++) {
+                pcIdArray.push(pcList[pcu].payload.productCategoryId);
+            }
+            console.log("pcIdArray", pcIdArray);
             console.log("productCategoryId---" + productCategoryId);
-            const selSource = this.state.forecastingUnitList.filter(c => c.productCategory.id == productCategoryId)
+            const selSource = this.state.forecastingUnitList.filter(c => pcIdArray.includes(c.productCategory.id));
             console.log("selSource---", selSource);
             this.setState({
                 selSource

@@ -13,6 +13,7 @@ import HealthAreaService from '../../api/HealthAreaService';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import classNames from 'classnames';
+import { SPACE_REGEX, ALPHABET_NUMBER_REGEX } from '../../Constants';
 
 const initialValues = {
     summary: 'Add / Update Organization',
@@ -26,15 +27,19 @@ const initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({        
         summary: Yup.string()
+            .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.common.summarytext')),
         realmId: Yup.string()
             .required(i18n.t('static.common.realmtext')),
         realmCountryId: Yup.string()
             .required(i18n.t('static.program.validcountrytext')),
         organisationName: Yup.string()            
+            .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.organisation.organisationtext')),
-        organisationCode: Yup.string()
-            .required(i18n.t('static.organisation.organisationcodetext')),
+        // organisationCode: Yup.string()
+        //     .matches(ALPHABET_NUMBER_REGEX, i18n.t('static.message.alphabetnumerallowed'))
+        //     .max(4, i18n.t('static.organisation.organisationcodemax4digittext'))
+        //     .required(i18n.t('static.organisation.organisationcodetext')),
         // notes: Yup.string()
         //     .required(i18n.t('static.common.notestext'))
     })
@@ -81,7 +86,8 @@ export default class OrganisationTicketComponent extends Component {
             realm: '',
             countryId: '',
             countries: [],
-            realmCountryList: []
+            realmCountryList: [],
+            loading: false
         }        
         this.dataChange = this.dataChange.bind(this);        
         this.resetClicked = this.resetClicked.bind(this);
@@ -220,7 +226,7 @@ export default class OrganisationTicketComponent extends Component {
 
     resetClicked() {        
         let { organisation } = this.state;
-        organisation.summary = '';
+        // organisation.summary = '';
         organisation.realmId = '';
         organisation.realmCountryId = '';
         organisation.organisationName = '';        
@@ -246,55 +252,49 @@ export default class OrganisationTicketComponent extends Component {
 
         return (
             <div className="col-md-12">
-                <h5 style={{ color: "green" }} id="div2">{i18n.t(this.state.message)}</h5>                
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>                
                 <h4>{i18n.t('static.organisation.organisation')}</h4>
                 <br></br>
+                <div style={{ display: this.state.loading ? "none" : "block" }}>
                 <Formik
                     initialValues={initialValues}
                     validate={validate(validationSchema)}
                     onSubmit={(values, { setSubmitting, setErrors }) => {   
+                        this.setState({
+                            loading: true
+                        })
                         JiraTikcetService.addEmailRequestIssue(this.state.organisation).then(response => {                                         
                             console.log("Response :",response.status, ":" ,JSON.stringify(response.data));
                             if (response.status == 200 || response.status == 201) {
                                 var msg = response.data.key;
                                 this.setState({
-                                    message: msg
+                                    message: msg, loading: false
                                 },
                                     () => {
                                         this.resetClicked();
                                         this.hideSecondComponent();
                                     })                                
                             } else {
-                                this.setState({
-                                    // message: response.data.messageCode
-                                    message: 'Error while creating query'
+                                this.setState({                                    
+                                    message: i18n.t('static.unkownError'), loading: false
                                 },
-                                    () => {
-                                        this.resetClicked();
+                                    () => {                                        
                                         this.hideSecondComponent();
                                     })                                
                             }                            
                             this.props.togglehelp();
                             this.props.toggleSmall(this.state.message);
                         })
-                        // .catch(
-                        //     error => {
-                        //         switch (error.message) {
-                        //             case "Network Error":
-                        //                 this.setState({
-                        //                     message: 'Network Error'
-                        //                 })
-                        //                 break
-                        //             default:
-                        //                 this.setState({
-                        //                     message: 'Error'
-                        //                 })
-                        //                 break
-                        //         }
-                        //         alert(this.state.message);
-                        //         this.props.togglehelp();
-                        //     }
-                        // );    
+                        .catch(
+                            error => {
+                                this.setState({                                        
+                                    message: i18n.t('static.unkownError'), loading: false
+                                },
+                                () => {                                        
+                                    this.hideSecondComponent();                                     
+                                });                                    
+                            }
+                        ); 
                     }}
                     render={
                         ({
@@ -311,10 +311,10 @@ export default class OrganisationTicketComponent extends Component {
                             setFieldValue,
                             setFieldTouched
                         }) => (
-                                <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm'>
+                                <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm' autocomplete="off">
                                     < FormGroup >
                                         <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
-                                        <Input type="text" name="summary" id="summary"
+                                        <Input type="text" name="summary" id="summary" readOnly = {true}
                                         bsSize="sm"
                                         valid={!errors.summary && this.state.organisation.summary != ''}
                                         invalid={touched.summary && !!errors.summary}
@@ -369,15 +369,16 @@ export default class OrganisationTicketComponent extends Component {
                                         <FormFeedback className="red">{errors.organisationName}</FormFeedback>
                                     </FormGroup>
                                     < FormGroup >
-                                        <Label for="organisationCode">{i18n.t('static.organisation.organisationcode')}<span class="red Reqasterisk">*</span></Label>
+                                        <Label for="organisationCode">{i18n.t('static.organisation.organisationcode')}</Label>
                                         <Input type="text" name="organisationCode" id="organisationCode"
                                         bsSize="sm"
-                                        valid={!errors.organisationCode && this.state.organisation.organisationCode != ''}
-                                        invalid={touched.organisationCode && !!errors.organisationCode}
+                                        // valid={!errors.organisationCode && this.state.organisation.organisationCode != ''}
+                                        // invalid={touched.organisationCode && !!errors.organisationCode}
                                         onChange={(e) => { handleChange(e); this.dataChange(e);}}
                                         onBlur={handleBlur}
                                         value={this.state.organisation.organisationCode}
-                                        required />
+                                        // required 
+                                        />
                                         <FormFeedback className="red">{errors.organisationCode}</FormFeedback>
                                     </FormGroup>                                                                                                                                                                           
                                     <FormGroup>
@@ -398,8 +399,21 @@ export default class OrganisationTicketComponent extends Component {
                                         <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>                                        
                                         <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                     </ModalFooter>
+                                    <br></br><br></br>
+                                    <div className={this.props.className}>
+                                        <p>{i18n.t('static.ticket.drodownvaluenotfound')}</p>
+                                    </div>
                                 </Form>
                             )} />
+                            </div>
+                            <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                    <div class="align-items-center">
+                                        <div ><h4> <strong>Loading...</strong></h4></div>
+                                        <div class="spinner-border blue ml-4" role="status"></div>
+                                    </div>
+                                </div> 
+                            </div>
             </div>
         );
     }

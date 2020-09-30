@@ -13,7 +13,7 @@ export function jExcelLoadedFunction(instance, number) {
     var searchContainer = document.getElementsByClassName('jexcel_filter')[number];
     var searchDiv = (document.getElementsByClassName('jexcel_filter')[number]).childNodes[1];
     searchDiv.removeChild(((document.getElementsByClassName('jexcel_filter')[number]).childNodes[1]).childNodes[0]);
-    document.getElementsByClassName("jexcel_search")[number].placeholder = "Search";
+    document.getElementsByClassName("jexcel_search")[number].placeholder = i18n.t('static.jexcel.search');
     // searchContainer.classList.add('TableCust');
     var clearBtn = document.createElement('button');
     clearBtn.type = "button";
@@ -21,7 +21,7 @@ export function jExcelLoadedFunction(instance, number) {
     clearBtn.classList.add('btn');
     clearBtn.classList.add('jexcel_clear_btn');
 
-    var clarText = document.createTextNode('Clear');
+    var clarText = document.createTextNode(i18n.t('static.jexcel.clear'));
     clearBtn.setAttribute("id", "clearBtnID");
     clearBtn.onclick = function () {
         document.getElementsByClassName("jexcel_search")[number].value = "";
@@ -81,14 +81,14 @@ export function jExcelLoadedFunctionPipeline(instance, number) {
     var searchContainer = document.getElementsByClassName('jexcel_filter')[number];
     var searchDiv = (document.getElementsByClassName('jexcel_filter')[number]).childNodes[1];
     searchDiv.removeChild(((document.getElementsByClassName('jexcel_filter')[number]).childNodes[1]).childNodes[0]);
-    document.getElementsByClassName("jexcel_search")[number].placeholder = "Search";
+    document.getElementsByClassName("jexcel_search")[number].placeholder = i18n.t('static.jexcel.search');
     var clearBtn = document.createElement('button');
     clearBtn.type = "button";
     clearBtn.classList.add('btn-default');
     clearBtn.classList.add('btn');
     clearBtn.classList.add('jexcel_clear_btn');
 
-    var clarText = document.createTextNode('Clear');
+    var clarText = document.createTextNode(i18n.t('static.jexcel.clear'));
     clearBtn.setAttribute("id", "clearBtnID");
     clearBtn.onclick = function () {
         document.getElementsByClassName("jexcel_search")[number].value = "";
@@ -127,7 +127,7 @@ export function jExcelLoadedFunctionWithoutPagination(instance, number) {
     var searchContainer = document.getElementsByClassName('jexcel_filter')[number];
     var searchDiv = (document.getElementsByClassName('jexcel_filter')[number]).childNodes[1];
     searchDiv.removeChild(((document.getElementsByClassName('jexcel_filter')[number]).childNodes[1]).childNodes[0]);
-    document.getElementsByClassName("jexcel_search")[number].placeholder = "Search";
+    document.getElementsByClassName("jexcel_search")[number].placeholder = i18n.t('static.jexcel.search');
     // searchContainer.classList.add('TableCust');
     var clearBtn = document.createElement('button');
     clearBtn.type = "button";
@@ -139,7 +139,7 @@ export function jExcelLoadedFunctionWithoutPagination(instance, number) {
     clearBtn.classList.add('btn');
     clearBtn.classList.add('jexcel_clear_btn');
 
-    var clarText = document.createTextNode('Clear');
+    var clarText = document.createTextNode(i18n.t('static.jexcel.clear'));
     clearBtn.setAttribute("id", "clearBtnID");
     clearBtn.appendChild(clarText);
     searchContainer.appendChild(clearBtn);

@@ -7,6 +7,7 @@ import { Formik } from 'formik';
 import i18n from '../../i18n';
 import * as Yup from 'yup';
 import JiraTikcetService from '../../api/JiraTikcetService';
+import { SPACE_REGEX } from '../../Constants';
 
 const initialValues = {
     summary: "Add / Update Realm",
@@ -21,16 +22,26 @@ const initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({        
         summary: Yup.string()
+            .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.common.summarytext')),
         realmName: Yup.string()
             .required(i18n.t('static.realm.realmNameText')),
-        realmCode: Yup.string()
-            .required(i18n.t('static.realm.realmCodeText')),
-        minMosMinGaurdrail: Yup.string()
+        // realmCode: Yup.string()
+        //     .required(i18n.t('static.realm.realmCodeText')),
+        minMosMinGaurdrail: Yup.number()
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))            
+            .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
+            .integer(i18n.t('static.realm.decimalNotAllow'))
             .required(i18n.t('static.realm.minMosMinGaurdrail')),
-        minMosMaxGaurdrail: Yup.string()
+        minMosMaxGaurdrail: Yup.number()
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
+            .integer(i18n.t('static.realm.decimalNotAllow'))
             .required(i18n.t('static.realm.minMosMaxGaurdrail')),        
-        maxMosMaxGaurdrail: Yup.string()
+        maxMosMaxGaurdrail: Yup.number()
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
+            .integer(i18n.t('static.realm.decimalNotAllow'))
             .required(i18n.t('static.realm.maxMosMaxGaurdrail')),        
         // notes: Yup.string()
         //     .required(i18n.t('static.common.notestext'))
@@ -73,7 +84,8 @@ export default class RealmTicketComponent extends Component {
                 maxMosMaxGaurdrail: "",
                 notes: ""
             },
-            message : ''
+            message : '',
+            loading: false
         }        
         this.dataChange = this.dataChange.bind(this);        
         this.resetClicked = this.resetClicked.bind(this);
@@ -152,7 +164,7 @@ export default class RealmTicketComponent extends Component {
 
     resetClicked() {        
         let { realm } = this.state;
-        realm.summary = '';
+        // realm.summary = '';
         realm.realmName = '';
         realm.realmCode = '';
         realm.minMosMinGaurdrail = '';
@@ -169,55 +181,49 @@ export default class RealmTicketComponent extends Component {
 
         return (
             <div className="col-md-12">
-                <h5 style={{ color: "green" }} id="div2">{i18n.t(this.state.message)}</h5>                
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>                
                 <h4>{i18n.t('static.realm.realm')}</h4>
                 <br></br>
+                <div style={{ display: this.state.loading ? "none" : "block" }}>
                 <Formik
                     initialValues={initialValues}
                     validate={validate(validationSchema)}
-                    onSubmit={(values, { setSubmitting, setErrors }) => {   
+                    onSubmit={(values, { setSubmitting, setErrors }) => {  
+                        this.setState({
+                            loading: true
+                        }) 
                         JiraTikcetService.addEmailRequestIssue(values).then(response => {                                         
                             console.log("Response :",response.status, ":" ,JSON.stringify(response.data));
                             if (response.status == 200 || response.status == 201) {
                                 var msg = response.data.key;
                                 this.setState({
-                                    message: msg
+                                    message: msg, loading: false
                                 },
                                     () => {
                                         this.resetClicked();
                                         this.hideSecondComponent();
                                     })                                
                             } else {
-                                this.setState({
-                                    // message: response.data.messageCode
-                                    message: 'Error while creating query'
+                                this.setState({                                    
+                                    message: i18n.t('static.unkownError'), loading: false
                                 },
-                                    () => {
-                                        this.resetClicked();
+                                    () => {                                        
                                         this.hideSecondComponent();
                                     })                                
                             }                            
                             this.props.togglehelp();
                             this.props.toggleSmall(this.state.message);
                         })
-                        // .catch(
-                        //     error => {
-                        //         switch (error.message) {
-                        //             case "Network Error":
-                        //                 this.setState({
-                        //                     message: 'Network Error'
-                        //                 })
-                        //                 break
-                        //             default:
-                        //                 this.setState({
-                        //                     message: 'Error'
-                        //                 })
-                        //                 break
-                        //         }
-                        //         alert(this.state.message);
-                        //         this.props.togglehelp();
-                        //     }
-                        // );       
+                        .catch(
+                            error => {
+                                this.setState({                                        
+                                    message: i18n.t('static.unkownError'), loading: false
+                                },
+                                () => {                                        
+                                    this.hideSecondComponent();                                     
+                                });                                    
+                            }
+                        );       
                     }}
                     render={
                         ({
@@ -232,10 +238,10 @@ export default class RealmTicketComponent extends Component {
                             setTouched,
                             handleReset
                         }) => (
-                                <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm'>
+                                <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm' autocomplete="off">
                                     < FormGroup >
                                         <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
-                                        <Input type="text" name="summary" id="summary"
+                                        <Input type="text" name="summary" id="summary" readOnly = {true}
                                         bsSize="sm"
                                         valid={!errors.summary && this.state.realm.summary != ''}
                                         invalid={touched.summary && !!errors.summary}
@@ -258,15 +264,16 @@ export default class RealmTicketComponent extends Component {
                                         <FormFeedback className="red">{errors.realmName}</FormFeedback>
                                     </FormGroup>
                                     < FormGroup >
-                                        <Label for="realmCode">{i18n.t('static.realm.realmCode')}<span class="red Reqasterisk">*</span></Label>
+                                        <Label for="realmCode">{i18n.t('static.realm.realmCode')}</Label>
                                         <Input type="text" name="realmCode" id="realmCode"
                                         bsSize="sm"
-                                        valid={!errors.realmCode && this.state.realm.realmCode != ''}
-                                        invalid={touched.realmCode && !!errors.realmCode}
+                                        // valid={!errors.realmCode && this.state.realm.realmCode != ''}
+                                        // invalid={touched.realmCode && !!errors.realmCode}
                                         onChange={(e) => { handleChange(e); this.dataChange(e);}}
                                         onBlur={handleBlur}
                                         value={this.state.realm.realmCode}
-                                        required />
+                                        // required 
+                                        />
                                         <FormFeedback className="red">{errors.realmCode}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup>
@@ -325,6 +332,15 @@ export default class RealmTicketComponent extends Component {
                                     </ModalFooter>
                                 </Form>
                             )} />
+                            </div>
+                            <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                    <div class="align-items-center">
+                                        <div ><h4> <strong>Loading...</strong></h4></div>
+                                        <div class="spinner-border blue ml-4" role="status"></div>
+                                    </div>
+                                </div> 
+                            </div>
             </div>
         );
     }

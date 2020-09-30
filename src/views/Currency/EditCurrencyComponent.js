@@ -23,7 +23,8 @@ let initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         currencyCode: Yup.string()
-            .matches(ALPHABETS_REGEX, i18n.t('static.common.alphabetsOnly'))
+            // .matches(ALPHABETS_REGEX, i18n.t('static.common.alphabetsOnly'))
+            .matches(/^\S*$/, i18n.t('static.validNoSpace.string'))
             .required(i18n.t('static.currency.currencycodetext')),
         // .max(4, i18n.t('static.currency.currencycodemax4digittext')),
         // currencySymbol: Yup.string()
@@ -32,10 +33,11 @@ const validationSchema = function (values) {
         //     // matches(/^[A-Z@~`!@#$%^&*()_=+\\\\';:\"\\/?>.<,-]*$/i, i18n.t('static.currency.numbernotallowedtext')),
         //     matches(/^([^0-9]*)$/, i18n.t('static.currency.numbernotallowedtext')),
         label: Yup.string()
-            .matches(SPACE_REGEX, i18n.t('static.message.rolenamevalidtext'))
+            // .matches(SPACE_REGEX, i18n.t('static.message.rolenamevalidtext'))
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.currency.currencytext')),
         conversionRate: Yup.string()
-            .matches(DECIMAL_NO_REGEX, i18n.t('static.currency.conversionrateNumberDecimalPlaces'))
+            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.currency.conversionrateNumberTwoDecimalPlaces'))
             .required(i18n.t('static.currency.conversionrateNumber')).min(0, i18n.t('static.currency.conversionrateMin'))
     })
 }
@@ -259,7 +261,8 @@ export default class UpdateCurrencyComponent extends Component {
                                                             id="label"
                                                             bsSize="sm"
                                                             valid={!errors.label}
-                                                            invalid={touched.label && !!errors.label || this.state.currency.label.label_en == ''}
+                                                            // invalid={touched.label && !!errors.label || this.state.currency.label.label_en == ''}
+                                                            invalid={touched.label && !!errors.label || !!errors.label}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.currency.label.label_en}
@@ -276,7 +279,8 @@ export default class UpdateCurrencyComponent extends Component {
                                                             id="currencyCode"
                                                             bsSize="sm"
                                                             valid={!errors.currencyCode}
-                                                            invalid={touched.currencyCode && !!errors.currencyCode || this.state.currency.currencyCode == ''}
+                                                            // invalid={touched.currencyCode && !!errors.currencyCode || this.state.currency.currencyCode == ''}
+                                                            invalid={touched.currencyCode && !!errors.currencyCode || !!errors.currencyCode}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.currency.currencyCode}
@@ -309,7 +313,8 @@ export default class UpdateCurrencyComponent extends Component {
                                                             id="conversionRate"
                                                             bsSize="sm"
                                                             valid={!errors.conversionRate}
-                                                            invalid={touched.conversionRate && !!errors.conversionRate || this.state.currency.conversionRateToUsd == ''}
+                                                            // invalid={touched.conversionRate && !!errors.conversionRate || this.state.currency.conversionRateToUsd == ''}
+                                                            invalid={touched.conversionRate && !!errors.conversionRate || !!errors.conversionRate}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.currency.conversionRateToUsd}
@@ -373,7 +378,7 @@ export default class UpdateCurrencyComponent extends Component {
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
-                            <div ><h4> <strong>Loading...</strong></h4></div>
+                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
                             <div class="spinner-border blue ml-4" role="status">
 

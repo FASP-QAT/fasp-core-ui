@@ -16,6 +16,7 @@ import getLabelText from "../../CommonComponent/getLabelText";
 import SupplierService from "../../api/SupplierService";
 import UnitService from "../../api/UnitService";
 import PlanningUnitService from "../../api/PlanningUnitService";
+import { SPACE_REGEX } from "../../Constants";
 
 const initialValues = {
     summary: 'Add / Update Procurement Unit',
@@ -42,12 +43,14 @@ const initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()
+            .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.common.summarytext')),
         procurementUnitName: Yup.string()
             .required(i18n.t('static.procurementUnit.validProcurementUnitText')),
         planningUnitId: Yup.string()
             .required(i18n.t('static.procurementUnit.validPlanningUnitText')),
-        multiplier: Yup.string()
+        multiplier: Yup.number()
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
             .required(i18n.t('static.procurementUnit.validMultiplierText')).min(0, i18n.t('static.procurementUnit.validValueText')),
         unitId: Yup.string()
             .required(i18n.t('static.procurementUnit.validUnitIdText')),
@@ -136,7 +139,8 @@ export default class ProcurementUnitTicketComponent extends Component {
             heightUnitId: '',                
             lengthUnitId: '',                
             widthUnitId: '',                
-            weightUnitId: ''
+            weightUnitId: '',
+            loading: false
 
         }
         this.dataChange = this.dataChange.bind(this);        
@@ -365,55 +369,49 @@ export default class ProcurementUnitTicketComponent extends Component {
         return (
 
             <div className="col-md-12">
-                <h5 style={{ color: "green" }} id="div2">{i18n.t(this.state.message)}</h5>
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
                 <h4>{i18n.t('static.procurementUnit.procurementUnit')}</h4>
                 <br></br>
+                <div style={{ display: this.state.loading ? "none" : "block" }}>
                 <Formik
                     initialValues={initialValues}
                     validate={validate(validationSchema)}
                     onSubmit={(values, { setSubmitting, setErrors }) => {
+                        this.setState({
+                            loading: true
+                        })
                         JiraTikcetService.addEmailRequestIssue(this.state.procurementUnit).then(response => {                                         
                             console.log("Response :",response.status, ":" ,JSON.stringify(response.data));
                             if (response.status == 200 || response.status == 201) {
                                 var msg = response.data.key;
                                 this.setState({
-                                    message: msg
+                                    message: msg, loading: false
                                 },
                                     () => {
                                         this.resetClicked();
                                         this.hideSecondComponent();
                                     })                                
                             } else {
-                                this.setState({
-                                    // message: response.data.messageCode
-                                    message: 'Error while creating query'
+                                this.setState({                                    
+                                    message: i18n.t('static.unkownError'), loading: false
                                 },
-                                    () => {
-                                        this.resetClicked();
+                                    () => {                                        
                                         this.hideSecondComponent();
                                     })                                
                             }                            
                             this.props.togglehelp();
                             this.props.toggleSmall(this.state.message);
                         })
-                        // .catch(
-                        //     error => {
-                        //         switch (error.message) {
-                        //             case "Network Error":
-                        //                 this.setState({
-                        //                     message: 'Network Error'
-                        //                 })
-                        //                 break
-                        //             default:
-                        //                 this.setState({
-                        //                     message: 'Error'
-                        //                 })
-                        //                 break
-                        //         }
-                        //         alert(this.state.message);
-                        //         this.props.togglehelp();
-                        //     }
-                        // );  
+                        .catch(
+                            error => {
+                                this.setState({                                        
+                                    message: i18n.t('static.unkownError'), loading: false
+                                },
+                                () => {                                        
+                                    this.hideSecondComponent();                                     
+                                });                                    
+                            }
+                        );  
                     }}
                     render={
                         ({
@@ -432,7 +430,7 @@ export default class ProcurementUnitTicketComponent extends Component {
                                 <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='procurementUnitForm'>                                    
                                     < FormGroup >
                                         <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
-                                        <Input type="text" name="summary" id="summary"
+                                        <Input type="text" name="summary" id="summary" readOnly = {true}
                                             bsSize="sm"
                                             valid={!errors.summary && this.state.procurementUnit.summary != ''}
                                             invalid={touched.summary && !!errors.summary}
@@ -688,6 +686,15 @@ export default class ProcurementUnitTicketComponent extends Component {
                                     </ModalFooter>
                                 </Form>
                             )} />
+                            </div>
+                            <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                    <div class="align-items-center">
+                                        <div ><h4> <strong>Loading...</strong></h4></div>
+                                        <div class="spinner-border blue ml-4" role="status"></div>
+                                    </div>
+                                </div> 
+                            </div>
             </div>
 
         );
@@ -695,7 +702,7 @@ export default class ProcurementUnitTicketComponent extends Component {
 
     resetClicked() {
         let { procurementUnit } = this.state;
-        procurementUnit.summary = ''
+        // procurementUnit.summary = ''
         procurementUnit.procurementUnitName = ''
         procurementUnit.planningUnitId = ''
         procurementUnit.multiplier = ''

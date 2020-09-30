@@ -910,9 +910,9 @@ class SupplyPlanVersionAndReview extends Component {
             message: '',
             programLst: [],
             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate:{year:  new Date().getFullYear()-3, month: new Date().getMonth()},
-            maxDate:{year:  new Date().getFullYear()+3, month: new Date().getMonth()+1},
-            
+            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth()+2 },
+            maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
+
 
 
         };
@@ -930,7 +930,25 @@ class SupplyPlanVersionAndReview extends Component {
         this.checkValue = this.checkValue.bind(this);
         this.editprogramStatus = this.editprogramStatus.bind(this)
         this.buildJexcel = this.buildJexcel.bind(this);
+        this.hideFirstComponent = this.hideFirstComponent.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
+
+    hideFirstComponent() {
+        this.timeout = setTimeout(function () {
+            document.getElementById('div1').style.display = 'none';
+        }, 8000);
+    }
+    hideSecondComponent() {
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
+    }
+
+    componentWillUnmount() {
+        clearTimeout(this.timeout);
+      }
+
 
     buildJexcel() {
 
@@ -1062,7 +1080,7 @@ class SupplyPlanVersionAndReview extends Component {
             // let versionStatusId = this.el.getValueFromCoords(5, x);
             // let versionTypeId =this.el.getValueFromCoords(2, x);
 
-            console.log("instance----->",instance.jexcel,"----------->",x);
+            console.log("instance----->", instance.jexcel, "----------->", x);
             var elInstance = instance.jexcel;
             var rowData = elInstance.getRowData(x);
             console.log("rowData==>", rowData);
@@ -1088,6 +1106,8 @@ class SupplyPlanVersionAndReview extends Component {
     }
 
     componentDidMount() {
+        this.hideFirstComponent();
+        // clearTimeout(this.timeout);
         AuthenticationService.setupAxiosInterceptors();
         this.getCountrylist();
         this.getPrograms()
@@ -1188,6 +1208,9 @@ class SupplyPlanVersionAndReview extends Component {
                 error => {
                     this.setState({
                         programs: [], loading: false
+                    },
+                    () => {
+                      this.hideSecondComponent();
                     })
                     if (error.message === "Network Error") {
                         this.setState({ loading: false, message: error.message });
@@ -1315,7 +1338,9 @@ class SupplyPlanVersionAndReview extends Component {
 
     }
 
-
+    addDoubleQuoteToRowContent=(arr)=>{
+        return arr.map(ele=>'"'+ele+'"')
+     }
     exportCSV(columns) {
 
         var csvRow = [];
@@ -1333,10 +1358,10 @@ class SupplyPlanVersionAndReview extends Component {
         columns.map((item, idx) => { headers[idx] = item.text.replaceAll(' ', '%20') });
 
 
-        var A = [headers]
+        var A = [this.addDoubleQuoteToRowContent(headers)]
 
-        this.state.matricsList.map(elt => A.push([(elt.program.label.label_en.replaceAll(',', '%20')).replaceAll(' ', '%20'), elt.versionId, (elt.versionType.label.label_en.replaceAll(',', '%20')).replaceAll(' ', '%20'), (moment(elt.createdDate).format(`${DATE_FORMAT_CAP}`)).replaceAll(' ', '%20'), elt.createdBy.username, elt.versionStatus.label.label_en.replaceAll(' ', '%20'), elt.versionStatus.id == 2 ? elt.lastModifiedBy.username : '', elt.versionStatus.id == 2 ? moment(elt.lastModifiedDate).format(`${DATE_FORMAT_CAP} hh:mm A`).replaceAll(' ', '%20') : '', elt.notes != null ? (elt.notes.replaceAll(',', '%20')).replaceAll(' ', '%20') : ''
-        ]));
+        this.state.matricsList.map(elt => A.push(this.addDoubleQuoteToRowContent([(elt.program.label.label_en.replaceAll(',', '%20')).replaceAll(' ', '%20'), elt.versionId, (elt.versionType.label.label_en.replaceAll(',', '%20')).replaceAll(' ', '%20'), (moment(elt.createdDate).format(`${DATE_FORMAT_CAP}`)).replaceAll(' ', '%20'), elt.createdBy.username, elt.versionStatus.label.label_en.replaceAll(' ', '%20'), elt.versionStatus.id == 2 ? elt.lastModifiedBy.username : '', elt.versionStatus.id == 2 ? moment(elt.lastModifiedDate).format(`${DATE_FORMAT_CAP} hh:mm A`).replaceAll(' ', '%20') : '', elt.notes != null ? (elt.notes.replaceAll(',', '%20')).replaceAll(' ', '%20') : ''
+        ])));
 
 
         for (var i = 0; i < A.length; i++) {
@@ -1711,7 +1736,7 @@ class SupplyPlanVersionAndReview extends Component {
 
                                                 <Picker
                                                     ref="pickRange"
-                                                    years={{min: this.state.minDate, max: this.state.maxDate}}
+                                                    years={{ min: this.state.minDate, max: this.state.maxDate }}
                                                     value={rangeValue}
                                                     lang={pickerLang}
                                                     //theme="light"

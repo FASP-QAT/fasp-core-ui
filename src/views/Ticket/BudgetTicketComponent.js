@@ -7,7 +7,7 @@ import InitialTicketPageComponent from './InitialTicketPageComponent';
 import { Formik } from 'formik';
 import i18n from '../../i18n';
 import * as Yup from 'yup';
-import { DATE_FORMAT_SM, DATE_PLACEHOLDER_TEXT } from '../../Constants.js';
+import { DATE_FORMAT_SM, DATE_PLACEHOLDER_TEXT, SPACE_REGEX } from '../../Constants.js';
 import { Date } from 'core-js';
 import moment from 'moment';
 import '../../../node_modules/react-datepicker/dist/react-datepicker.css';
@@ -31,18 +31,21 @@ const initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()
+            .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.common.summarytext')),
         programName: Yup.string()
             .required(i18n.t('static.budget.programtext')),
         fundingSourceName: Yup.string()
             .required(i18n.t('static.fundingSource.selectFundingSource')),
         budgetName: Yup.string()
-            .required(i18n.t('static.budget.budgetdesctext')),
-        budgetCode: Yup.string()
-            .required(i18n.t('static.budget.budgetCodeText')),
+            .required(i18n.t('static.budget.budgetamountdesc')),
+        // budgetCode: Yup.string()
+        //     .max(10, i18n.t('static.common.max10digittext'))
+        //     .required(i18n.t('static.budget.budgetCodeText')),
         currency: Yup.string()
             .required(i18n.t('static.country.currencytext')),
         budgetAmount: Yup.string()
+            .matches(/^[0-9]+([,\.][0-9]+)?/, i18n.t('static.program.validBudgetAmount'))
             .required(i18n.t('static.budget.budgetamounttext')),
         // notes: Yup.string()
         //     .required(i18n.t('static.common.notestext'))
@@ -94,7 +97,8 @@ export default class BudgetTicketComponent extends Component {
             currencies: [],
             programId: '',
             fundingSourceId: '',
-            currencyId: ''
+            currencyId: '',
+            loading: false
         }
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
@@ -225,7 +229,7 @@ export default class BudgetTicketComponent extends Component {
 
     resetClicked() {
         let { budget } = this.state;
-        budget.summary = '';
+        // budget.summary = '';
         budget.programName = '';
         budget.fundingSourceName = '';
         budget.budgetName = '';
@@ -303,55 +307,49 @@ export default class BudgetTicketComponent extends Component {
 
         return (
             <div className="col-md-12">
-                {/* <h5 style={{ color: "green" }} id="div2">{i18n.t(this.state.message)}</h5> */}
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
                 <h4>{i18n.t('static.dashboard.budget')}</h4>
                 <br></br>
+                <div style={{ display: this.state.loading ? "none" : "block" }}>
                 <Formik
                     initialValues={initialValues}
                     validate={validate(validationSchema)}
                     onSubmit={(values, { setSubmitting, setErrors }) => {
+                        this.setState({
+                            loading: true
+                        })
                         JiraTikcetService.addEmailRequestIssue(this.state.budget).then(response => {                                         
                             console.log("Response :",response.status, ":" ,JSON.stringify(response.data));
                             if (response.status == 200 || response.status == 201) {
                                 var msg = response.data.key;
                                 this.setState({
-                                    message: msg
+                                    message: msg, loading: false
                                 },
                                     () => {
                                         this.resetClicked();
                                         this.hideSecondComponent();
                                     })                                
                             } else {
-                                this.setState({
-                                    // message: response.data.messageCode
-                                    message: 'Error while creating query'
+                                this.setState({                                    
+                                    message: i18n.t('static.unkownError'), loading: false
                                 },
-                                    () => {
-                                        this.resetClicked();
+                                    () => {                                        
                                         this.hideSecondComponent();
                                     })                                
                             }                            
                             this.props.togglehelp();
                             this.props.toggleSmall(this.state.message);
                         })
-                        // .catch(
-                        //     error => {
-                        //         switch (error.message) {
-                        //             case "Network Error":
-                        //                 this.setState({
-                        //                     message: 'Network Error'
-                        //                 })
-                        //                 break
-                        //             default:
-                        //                 this.setState({
-                        //                     message: 'Error'
-                        //                 })
-                        //                 break
-                        //         }
-                        //         alert(this.state.message);
-                        //         this.props.togglehelp();
-                        //     }
-                        // );  
+                        .catch(
+                            error => {
+                                this.setState({                                        
+                                    message: i18n.t('static.unkownError'), loading: false
+                                },
+                                () => {                                        
+                                    this.hideSecondComponent();                                     
+                                });                                    
+                            }
+                        );
                     }}
                     render={
                         ({
@@ -366,10 +364,10 @@ export default class BudgetTicketComponent extends Component {
                             setTouched,
                             handleReset
                         }) => (
-                                <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm'>
+                                <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm' autocomplete="off">
                                     < FormGroup >
                                         <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
-                                        <Input type="text" name="summary" id="summary"
+                                        <Input type="text" name="summary" id="summary" readOnly = {true}
                                             bsSize="sm"
                                             valid={!errors.summary && this.state.budget.summary != ''}
                                             invalid={touched.summary && !!errors.summary}
@@ -433,17 +431,18 @@ export default class BudgetTicketComponent extends Component {
                                         <FormFeedback className="red">{errors.budgetName}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup>
-                                        <Label for="budget">{i18n.t('static.budget.budgetCode')}<span className="red Reqasterisk">*</span></Label>
+                                        <Label for="budget">{i18n.t('static.budget.budgetCode')}</Label>
                                         <Input type="text"
                                             name="budgetCode"
                                             id="budgetCode"
                                             bsSize="sm"
-                                            valid={!errors.budgetCode && this.state.budget.budgetCode != ''}
-                                            invalid={touched.budgetCode && !!errors.budgetCode}
+                                            // valid={!errors.budgetCode && this.state.budget.budgetCode != ''}
+                                            // invalid={touched.budgetCode && !!errors.budgetCode}
                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                             onBlur={handleBlur}
                                             value={this.state.budget.budgetCode}
-                                            required />
+                                            // required 
+                                            />
                                         <FormFeedback className="red">{errors.budgetCode}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup>
@@ -533,8 +532,21 @@ export default class BudgetTicketComponent extends Component {
                                         <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>
                                     
                                     </ModalFooter>
+                                    <br></br><br></br>
+                                    <div className={this.props.className}>
+                                        <p>{i18n.t('static.ticket.drodownvaluenotfound')}</p>
+                                    </div>
                                 </Form>
                             )} />
+                            </div>
+                            <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                    <div class="align-items-center">
+                                        <div ><h4> <strong>Loading...</strong></h4></div>
+                                        <div class="spinner-border blue ml-4" role="status"></div>
+                                    </div>
+                                </div> 
+                            </div>
             </div>
         );
     }

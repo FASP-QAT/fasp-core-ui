@@ -43,6 +43,7 @@ let initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         programName: Yup.string()
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.program.validprogramtext')),
         realmId: Yup.string()
             .required(i18n.t('static.common.realmtext')),
@@ -239,6 +240,7 @@ export default class EditProgram extends Component {
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
         ProgramService.getProgramById(this.props.match.params.programId).then(response => {
+            console.log("program obj===>", response.data);
             this.setState({
                 program: response.data, loading: false
             })
@@ -484,7 +486,8 @@ export default class EditProgram extends Component {
                                                         <Input
                                                             type="text" name="programName" valid={!errors.programName}
                                                             bsSize="sm"
-                                                            invalid={touched.programName && !!errors.programName || this.state.program.label.label_en == ''}
+                                                            // invalid={touched.programName && !!errors.programName || this.state.program.label.label_en == ''}
+                                                            invalid={touched.programName && !!errors.programName || !!errors.programName}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.program.label.label_en}
@@ -785,7 +788,7 @@ export default class EditProgram extends Component {
                                                     <FormGroup>
                                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
                                                         <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>Update</Button>
+                                                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                                         &nbsp;
                                             </FormGroup>
                                                 </CardFooter>
@@ -797,7 +800,7 @@ export default class EditProgram extends Component {
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
-                            <div ><h4> <strong>Loading...</strong></h4></div>
+                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
                             <div class="spinner-border blue ml-4" role="status">
 

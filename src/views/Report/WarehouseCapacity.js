@@ -588,6 +588,9 @@ class warehouseCapacity extends Component {
     formatLabel(cell, row) {
         return getLabelText(cell, this.state.lang);
     }
+    addDoubleQuoteToRowContent=(arr)=>{
+        return arr.map(ele=>'"'+ele+'"')
+     }
 
     exportCSV() {
 
@@ -608,16 +611,16 @@ class warehouseCapacity extends Component {
         csvRow.push('')
 
         var re;
-        var A = [[(i18n.t('static.region.country')).replaceAll(' ', '%20'), (i18n.t('static.region.region')).replaceAll(' ', '%20'), (i18n.t('static.program.program')).replaceAll(' ', '%20'), (i18n.t('static.region.gln')).replaceAll(' ', '%20'), (i18n.t('static.region.capacitycbm')).replaceAll(' ', '%20')]]
+        var A = [this.addDoubleQuoteToRowContent([(i18n.t('static.region.country')).replaceAll(' ', '%20'), (i18n.t('static.region.region')).replaceAll(' ', '%20'), (i18n.t('static.program.program')).replaceAll(' ', '%20'), (i18n.t('static.region.gln')).replaceAll(' ', '%20'), (i18n.t('static.region.capacitycbm')).replaceAll(' ', '%20')])]
 
         re = this.state.data;
         // console.log("DATA--------",re);
 
         for (var item = 0; item < re.length; item++) {
             // A.push([(getLabelText(re[item].realmCountry.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),(getLabelText(re[item].region.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),(getLabelText(re[item].programList.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),re[item].gln, re[item].capacityCbm])
-            A.push([(getLabelText(re[item].realmCountry.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(re[item].region.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(re[item].programList[0].label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), re[item].gln, re[item].capacityCbm])
+            A.push(this.addDoubleQuoteToRowContent([(getLabelText(re[item].realmCountry.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(re[item].region.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(re[item].programList[0].label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), re[item].gln, re[item].capacityCbm]))
             for (var item1 = 1; item1 < re[item].programList.length; item1++) {
-                A.push(['', '', (getLabelText(re[item].programList[item1].label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), '', ''])
+                A.push(this.addDoubleQuoteToRowContent(['', '', (getLabelText(re[item].programList[item1].label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), '', '']))
             }
         }
 
@@ -736,11 +739,11 @@ class warehouseCapacity extends Component {
             // body: data,
             styles: { lineWidth: 1, fontSize: 8, cellWidth: 80, halign: 'center' },
             columnStyles: {
-                0: { cellWidth: 100 },
-                1: { cellWidth: 100 },
-                2: { cellWidth: 200 },
-                3: { cellWidth: 100 },
-                4: { cellWidth: 100 },
+                0: { cellWidth: 113 },
+                1: { cellWidth: 113 },
+                2: { cellWidth: 249.89 },
+                3: { cellWidth: 113 },
+                4: { cellWidth: 113 },
             },
             html: '#mytable',
             // bodyStyles: { minCellHeight: 15 },
@@ -983,9 +986,16 @@ class warehouseCapacity extends Component {
             console.log("offline ProgramId---", programId);
 
             if (programId != 0) {
+                this.setState({ loading: true })
                 var db1;
                 getDatabase();
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+
+                openRequest.onerror = function (event) {
+                    this.setState({
+                        loading:false
+                    })
+                }.bind(this);
                 openRequest.onsuccess = function (e) {
                     db1 = e.target.result;
 
@@ -993,6 +1003,11 @@ class warehouseCapacity extends Component {
                     var programTransaction = transaction.objectStore('programData');
                     var programRequest = programTransaction.get(programId);
 
+                    programRequest.onerror = function (event) {
+                        this.setState({
+                            loading:false
+                        })
+                    }.bind(this);
                     programRequest.onsuccess = function (event) {
                         // this.setState({ loading: true })
                         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);

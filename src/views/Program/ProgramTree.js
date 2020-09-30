@@ -19,13 +19,14 @@ import HealthAreaService from "../../api/HealthAreaService"
 import ProgramService from "../../api/ProgramService"
 import getLabelText from '../../CommonComponent/getLabelText'
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, DATE_FORMAT_CAP } from '../../Constants.js'
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import i18n from '../../i18n';
 import { getDatabase } from '../../CommonComponent/IndexedDbFunctions';
 import RealmService from '../../api/RealmService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import moment from "moment";
 
 const entityname = i18n.t('static.dashboard.downloadprogram')
 class Program extends Component {
@@ -82,14 +83,14 @@ class Program extends Component {
                         })
                     } else {
                         this.setState({
-                            message: response.data.messageCode, loading: false,color:"red"
+                            message: response.data.messageCode, loading: false, color: "red"
                         })
                         this.hideFirstComponent()
                     }
                 }).catch(
                     error => {
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message, loading: false,color:"red" });
+                            this.setState({ message: error.message, loading: false, color: "red" });
                             this.hideFirstComponent()
                         } else {
                             switch (error.response.status) {
@@ -98,11 +99,11 @@ class Program extends Component {
                                 case 404:
                                 case 406:
                                 case 412:
-                                    this.setState({ message: error.response.data.messageCode, loading: false,color:"red" });
+                                    this.setState({ message: error.response.data.messageCode, loading: false, color: "red" });
                                     this.hideFirstComponent()
                                     break;
                                 default:
-                                    this.setState({ message: 'static.unkownError', loading: false,color:"red" });
+                                    this.setState({ message: 'static.unkownError', loading: false, color: "red" });
                                     this.hideFirstComponent()
                                     console.log("Error code unkown");
                                     break;
@@ -137,64 +138,34 @@ class Program extends Component {
                         this.setState({
                             countryList: response.data
                         })
-                        HealthAreaService.getHealthAreaListForProgram(this.state.realmId)
+                        // HealthAreaService.getHealthAreaListForProgram(this.state.realmId)
+                        //     .then(response => {
+                        //         if (response.status == 200) {
+                        //             console.log("Response.data", response.data);
+                        //             this.setState({
+                        //                 healthAreaList: response.data
+                        //             })
+                        ProgramService.getProgramList()
                             .then(response => {
                                 if (response.status == 200) {
+                                    console.log("Program List", response.data);
                                     this.setState({
-                                        healthAreaList: response.data
+                                        prgList: response.data,
+                                        loading: false
                                     })
-                                    ProgramService.getProgramList()
-                                        .then(response => {
-                                            if (response.status == 200) {
-                                                this.setState({
-                                                    prgList: response.data,
-                                                    loading: false
-                                                })
-                                            } else {
-                                                this.setState({
-                                                    message: response.data.messageCode,
-                                                    loading: false,
-                                                    color:"red"
-                                                })
-                                                this.hideFirstComponent()
-                                            }
-                                        }).catch(
-                                            error => {
-
-                                                if (error.message === "Network Error") {
-                                                    this.setState({ message: error.message });
-                                                    this.hideFirstComponent()
-                                                } else {
-                                                    switch (error.response ? error.response.status : "") {
-                                                        case 500:
-                                                        case 401:
-                                                        case 404:
-                                                        case 406:
-                                                        case 412:
-                                                            this.setState({ message: error.response.data.messageCode });
-                                                            this.hideFirstComponent()
-                                                            break;
-                                                        default:
-                                                            this.setState({ message: 'static.unkownError' });
-                                                            this.hideFirstComponent()
-                                                            console.log("Error code unkown");
-                                                            break;
-                                                    }
-                                                }
-                                                this.setState({ loading: false,color:"red" })
-                                            }
-                                        );
                                 } else {
                                     this.setState({
                                         message: response.data.messageCode,
-                                        loading: false,color:"red"
+                                        loading: false,
+                                        color: "red"
                                     })
                                     this.hideFirstComponent()
                                 }
                             }).catch(
                                 error => {
+
                                     if (error.message === "Network Error") {
-                                        this.setState({ message: error.message, loading: false,color:"red" });
+                                        this.setState({ message: error.message });
                                         this.hideFirstComponent()
                                     } else {
                                         switch (error.response ? error.response.status : "") {
@@ -203,30 +174,62 @@ class Program extends Component {
                                             case 404:
                                             case 406:
                                             case 412:
-                                                this.setState({ message: error.response.data.messageCode,color:"red" });
+                                                this.setState({ message: error.response.data.messageCode });
                                                 this.hideFirstComponent()
                                                 break;
                                             default:
-                                                this.setState({ message: 'static.unkownError',color:"red" });
+                                                this.setState({ message: 'static.unkownError' });
                                                 this.hideFirstComponent()
                                                 console.log("Error code unkown");
                                                 break;
                                         }
-                                        this.setState({ loading: false })
                                     }
+                                    this.setState({ loading: false, color: "red" })
                                 }
                             );
+                        //     } else {
+                        //         this.setState({
+                        //             message: response.data.messageCode,
+                        //             loading: false, color: "red"
+                        //         })
+                        //         this.hideFirstComponent()
+                        //     }
+                        // }).catch(
+                        //     error => {
+                        //         if (error.message === "Network Error") {
+                        //             this.setState({ message: error.message, loading: false, color: "red" });
+                        //             this.hideFirstComponent()
+                        //         } else {
+                        //             switch (error.response ? error.response.status : "") {
+                        //                 case 500:
+                        //                 case 401:
+                        //                 case 404:
+                        //                 case 406:
+                        //                 case 412:
+                        //                     this.setState({ message: error.response.data.messageCode, color: "red" });
+                        //                     this.hideFirstComponent()
+                        //                     break;
+                        //                 default:
+                        //                     this.setState({ message: 'static.unkownError', color: "red" });
+                        //                     this.hideFirstComponent()
+                        //                     console.log("Error code unkown");
+                        //                     break;
+                        //             }
+                        //             this.setState({ loading: false })
+                        //         }
+                        //     }
+                        // );
                     } else {
                         this.setState({
                             message: response.data.messageCode,
-                            loading: false,color:"red"
+                            loading: false, color: "red"
                         })
                         this.hideFirstComponent()
                     }
                 }).catch(
                     error => {
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message, loading: false,color:"red" });
+                            this.setState({ message: error.message, loading: false, color: "red" });
                             this.hideFirstComponent()
                         } else {
                             this.setState({ loading: false })
@@ -236,11 +239,11 @@ class Program extends Component {
                                 case 404:
                                 case 406:
                                 case 412:
-                                    this.setState({ message: error.response.data.messageCode,color:"red" });
+                                    this.setState({ message: error.response.data.messageCode, color: "red" });
                                     this.hideFirstComponent()
                                     break;
                                 default:
-                                    this.setState({ message: 'static.unkownError',color:"red" });
+                                    this.setState({ message: 'static.unkownError', color: "red" });
                                     this.hideFirstComponent()
                                     console.log("Error code unkown");
                                     break;
@@ -345,28 +348,28 @@ class Program extends Component {
                                                 {
                                                     this.state.countryList.map(item => (
                                                         <li>
-                                                            <input type="checkbox" defaultChecked id={"c1-".concat(item.country.countryId)} />
-                                                            <label htmlFor={"c1-".concat(item.country.countryId)} className="tree_label">{getLabelText(item.country.label, this.state.lang)}</label>
+                                                            <input type="checkbox" defaultChecked id={"c1-".concat(item.realmCountry.id)} />
+                                                            <label htmlFor={"c1-".concat(item.realmCountry.id)} className="tree_label">{getLabelText(item.realmCountry.label, this.state.lang)}</label>
                                                             <ul>
                                                                 {
-                                                                    this.state.healthAreaList.map(item1 => (
+                                                                    item.healthAreaList.map(item1 => (
                                                                         <li>
-                                                                            <input type="checkbox" defaultChecked id={"c1-".concat(item.country.countryId).concat(item1.healthAreaId)} />
-                                                                            <label htmlFor={"c1-".concat(item.country.countryId).concat(item1.healthAreaId)} className="tree_label">{getLabelText(item1.label, this.state.lang)}</label>
+                                                                            <input type="checkbox" defaultChecked id={"c1-".concat(item.realmCountry.id).concat(item1.id)} />
+                                                                            <label htmlFor={"c1-".concat(item.realmCountry.id).concat(item1.id)} className="tree_label">{getLabelText(item1.label, this.state.lang)}</label>
                                                                             <ul>
                                                                                 {
-                                                                                    this.state.prgList.filter(c => c.realmCountry.country.countryId == item.country.countryId).filter(c => c.healthArea.id == item1.healthAreaId).map(item2 => (
+                                                                                    this.state.prgList.filter(c => c.realmCountry.realmCountryId == item.realmCountry.id).filter(c => c.healthArea.id == item1.id).map(item2 => (
                                                                                         <li>
                                                                                             <span className="tree_label">
                                                                                                 <span className="">
                                                                                                     <div className="checkbox m-0">
-                                                                                                        <input type="checkbox" name="programCheckBox" value={item2.programId} id={"checkbox_".concat(item.country.countryId).concat(item1.healthAreaId).concat(item2.programId).concat(".0")} />
-                                                                                                        <label htmlFor={"checkbox_".concat(item.country.countryId).concat(item1.healthAreaId).concat(item2.programId).concat(".0")}>{getLabelText(item2.label, this.state.lang)}<i className="ml-1 fa fa-eye"></i></label>
+                                                                                                        <input type="checkbox" name="programCheckBox" value={item2.programId} id={"checkbox_".concat(item.realmCountry.id).concat(item1.id).concat(item2.programId).concat(".0")} />
+                                                                                                        <label htmlFor={"checkbox_".concat(item.realmCountry.id).concat(item1.id).concat(item2.programId).concat(".0")}>{getLabelText(item2.label, this.state.lang)}<i className="ml-1 fa fa-eye"></i></label>
                                                                                                     </div>
                                                                                                 </span>
                                                                                             </span>
-                                                                                            <input type="checkbox" defaultChecked id={"fpm".concat(item.country.countryId).concat(item1.healthAreaId).concat(item2.programId)} />
-                                                                                            <label className="arrow_label" htmlFor={"fpm".concat(item.country.countryId).concat(item1.healthAreaId).concat(item2.programId)}></label>
+                                                                                            <input type="checkbox" defaultChecked id={"fpm".concat(item.realmCountry.id).concat(item1.id).concat(item2.programId)} />
+                                                                                            <label className="arrow_label" htmlFor={"fpm".concat(item.realmCountry.id).concat(item1.id).concat(item2.programId)}></label>
                                                                                             <ul>
                                                                                                 {
                                                                                                     this.state.prgList.filter(c => c.programId == item2.programId).map(item3 => (
@@ -375,8 +378,8 @@ class Program extends Component {
                                                                                                             <li><span className="tree_label">
                                                                                                                 <span className="">
                                                                                                                     <div className="checkbox m-0">
-                                                                                                                        <input type="checkbox" value={item4.versionId} name={"versionCheckBox".concat(item2.programId)} id={"kf-v".concat(item.country.countryId).concat(item1.healthAreaId).concat(item2.programId).concat(item4.versionId)} />
-                                                                                                                        <label htmlFor={"kf-v".concat(item.country.countryId).concat(item1.healthAreaId).concat(item2.programId).concat(item4.versionId)}>{i18n.t('static.program.version').concat(item4.versionId)}</label>
+                                                                                                                        <input type="checkbox" value={item4.versionId} name={"versionCheckBox".concat(item2.programId)} id={"kf-v".concat(item.realmCountry.id).concat(item1.id).concat(item2.programId).concat(item4.versionId)} />
+                                                                                                                        <label htmlFor={"kf-v".concat(item.realmCountry.id).concat(item1.id).concat(item2.programId).concat(item4.versionId)}>{i18n.t('static.program.version').concat(" ")}<b>{(item4.versionId)}</b>{(" ").concat(i18n.t('static.program.savedOn')).concat(" ")}<b>{(moment(item4.createdDate).format(DATE_FORMAT_CAP))}</b>{(" ").concat(i18n.t("static.program.savedBy")).concat(" ")}<b>{(item4.createdBy.username)}</b>{(" ").concat(i18n.t("static.program.as")).concat(" ")}<b>{getLabelText(item4.versionType.label)}</b></label>
                                                                                                                     </div>
                                                                                                                 </span>
                                                                                                             </span>
@@ -412,7 +415,7 @@ class Program extends Component {
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
-                            <div ><h4> <strong>Loading...</strong></h4></div>
+                            <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
 
                             <div class="spinner-border blue ml-4" role="status">
 
@@ -485,7 +488,7 @@ class Program extends Component {
         if (programCheckedCount == 0) {
             this.setState({
                 message: i18n.t('static.program.errorSelectAtleastOneProgram'),
-                loading: false,color:"red"
+                loading: false, color: "red"
             },
                 () => {
                     this.hideSecondComponent();
@@ -677,9 +680,9 @@ class Program extends Component {
                                                     label: i18n.t('static.program.no'),
                                                     onClick: () => {
                                                         this.setState({
-                                                            message: i18n.t('static.program.actioncancelled'), loading: false,color:"red"
+                                                            message: i18n.t('static.program.actioncancelled'), loading: false, color: "red"
                                                         })
-                                                        this.setState({ loading: false,color:"red" })
+                                                        this.setState({ loading: false, color: "red" })
                                                         this.hideFirstComponent()
                                                         this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.actioncancelled'))
                                                     }
@@ -694,7 +697,7 @@ class Program extends Component {
                             error => {
                                 this.setState({ loading: false })
                                 if (error.message === "Network Error") {
-                                    this.setState({ message: error.message, loading: false,color:"red" });
+                                    this.setState({ message: error.message, loading: false, color: "red" });
                                     this.hideFirstComponent()
                                 } else {
                                     switch (error.response ? error.response.status : "") {
@@ -703,11 +706,11 @@ class Program extends Component {
                                         case 404:
                                         case 406:
                                         case 412:
-                                            this.setState({ message: error.response.data.messageCode, loading: false,color:"red" });
+                                            this.setState({ message: error.response.data.messageCode, loading: false, color: "red" });
                                             this.hideFirstComponent()
                                             break;
                                         default:
-                                            this.setState({ message: 'static.unkownError', loading: false,color:"red" });
+                                            this.setState({ message: 'static.unkownError', loading: false, color: "red" });
                                             this.hideFirstComponent()
                                             console.log("Error code unkown");
                                             break;
@@ -730,7 +733,7 @@ class Program extends Component {
                         )
 
                 } else {
-                    this.setState({ loading: false,color:"red" })
+                    this.setState({ loading: false, color: "red" })
                     alert(i18n.t('static.common.online'))
                 }
             }

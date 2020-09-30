@@ -22,8 +22,11 @@ let initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         realmCode: Yup.string()
-            .required(i18n.t('static.realm.realmCodeText')).max(6, i18n.t('static.realm.realmCodeLength')),
+            .matches(/^\S*$/, i18n.t('static.validNoSpace.string'))
+            .required(i18n.t('static.realm.realmCodeText'))
+            .max(6, i18n.t('static.realm.realmCodeLength')),
         label: Yup.string()
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.realm.realmNameText')),
         minMosMinGaurdrail: Yup.number()
             .typeError(i18n.t('static.procurementUnit.validNumberText'))
@@ -286,7 +289,8 @@ export default class UpdateDataSourceComponent extends Component {
                                                             id="label"
                                                             bsSize="sm"
                                                             valid={!errors.label}
-                                                            invalid={touched.label && !!errors.label || this.state.realm.label.label_en == ''}
+                                                            // invalid={touched.label && !!errors.label || this.state.realm.label.label_en == ''}
+                                                            invalid={(touched.label && !!errors.label) || !!errors.label}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.realm.label.label_en}
@@ -300,7 +304,8 @@ export default class UpdateDataSourceComponent extends Component {
                                                             id="realmCode"
                                                             bsSize="sm"
                                                             valid={!errors.realmCode}
-                                                            invalid={touched.realmCode && !!errors.realmCode || this.state.realm.realmCode == ''}
+                                                            // invalid={touched.realmCode && !!errors.realmCode || this.state.realm.realmCode == ''}
+                                                            invalid={(touched.realmCode && !!errors.realmCode) || !!errors.realmCode}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.realm.realmCode}
@@ -315,7 +320,8 @@ export default class UpdateDataSourceComponent extends Component {
                                                             id="minMosMinGaurdrail"
                                                             bsSize="sm"
                                                             valid={!errors.minMosMinGaurdrail && (this.state.realm.minMosMinGaurdrail >= 0)}
-                                                            invalid={(touched.minMosMinGaurdrail && !!errors.minMosMinGaurdrail) || (this.state.realm.minMosMinGaurdrail < 0 || (this.state.realm.minMosMinGaurdrail).toString() == '')}
+                                                            // invalid={(touched.minMosMinGaurdrail && !!errors.minMosMinGaurdrail) || (this.state.realm.minMosMinGaurdrail < 0 || (this.state.realm.minMosMinGaurdrail).toString() == '')}
+                                                            invalid={(touched.minMosMinGaurdrail && !!errors.minMosMinGaurdrail) || (this.state.realm.minMosMinGaurdrail < 0 || !!errors.minMosMinGaurdrail)}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.realm.minMosMinGaurdrail}
@@ -330,7 +336,8 @@ export default class UpdateDataSourceComponent extends Component {
                                                             id="minMosMaxGaurdrail"
                                                             bsSize="sm"
                                                             valid={!errors.minMosMaxGaurdrail && (this.state.realm.minMosMaxGaurdrail >= 0)}
-                                                            invalid={(touched.minMosMaxGaurdrail && !!errors.minMosMaxGaurdrail) || (this.state.realm.minMosMaxGaurdrail < 0 || (this.state.realm.minMosMaxGaurdrail).toString() == '')}
+                                                            // invalid={(touched.minMosMaxGaurdrail && !!errors.minMosMaxGaurdrail) || (this.state.realm.minMosMaxGaurdrail < 0 || (this.state.realm.minMosMaxGaurdrail).toString() == '')}
+                                                            invalid={(touched.minMosMaxGaurdrail && !!errors.minMosMaxGaurdrail) || (this.state.realm.minMosMaxGaurdrail < 0 || !!errors.minMosMaxGaurdrail)}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.realm.minMosMaxGaurdrail}
@@ -345,7 +352,8 @@ export default class UpdateDataSourceComponent extends Component {
                                                             id="maxMosMaxGaurdrail"
                                                             bsSize="sm"
                                                             valid={!errors.maxMosMaxGaurdrail && (this.state.realm.maxMosMaxGaurdrail >= 0)}
-                                                            invalid={(touched.maxMosMaxGaurdrail && !!errors.maxMosMaxGaurdrail) || (this.state.realm.maxMosMaxGaurdrail < 0 || (this.state.realm.maxMosMaxGaurdrail).toString() == '')}
+                                                            // invalid={(touched.maxMosMaxGaurdrail && !!errors.maxMosMaxGaurdrail) || (this.state.realm.maxMosMaxGaurdrail < 0 || (this.state.realm.maxMosMaxGaurdrail).toString() == '')}
+                                                            invalid={(touched.maxMosMaxGaurdrail && !!errors.maxMosMaxGaurdrail) || (this.state.realm.maxMosMaxGaurdrail < 0 || !!errors.maxMosMaxGaurdrail)}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.realm.maxMosMaxGaurdrail}
@@ -484,7 +492,7 @@ export default class UpdateDataSourceComponent extends Component {
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
-                            <div ><h4> <strong>Loading...</strong></h4></div>
+                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
                             <div class="spinner-border blue ml-4" role="status">
 

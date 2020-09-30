@@ -9,6 +9,7 @@ import ForecastingUnitService from '../../api/ForecastingUnitService';
 import i18n from '../../i18n';
 import UnitService from '../../api/UnitService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
+import { SPACE_REGEX } from '../../Constants.js';
 
 const initialValues = {
     unitId: [],
@@ -23,10 +24,13 @@ const validationSchema = function (values) {
         unitId: Yup.string()
             .required(i18n.t('static.planningunit.unittext')),
         label: Yup.string()
+            // .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.planningunit.planningunittext')),
         forecastingUnitId: Yup.string()
             .required(i18n.t('static.planningunit.forcastingunittext')),
         multiplier: Yup.string()
+            .matches(/^\s*(?=.*[1-9])\d*(?:\.\d{1,2})?\s*$/, i18n.t('static.currency.conversionrateNumberTwoDecimalPlaces'))
             .required(i18n.t('static.planningunit.multipliertext'))
             .min(0, i18n.t('static.program.validvaluetext'))
     })

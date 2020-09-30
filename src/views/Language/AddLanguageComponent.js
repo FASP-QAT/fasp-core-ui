@@ -13,6 +13,7 @@ import LanguageService from '../../api/LanguageService.js'
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import { LABEL_REGEX, ALPHABETS_REGEX } from '../../Constants.js';
+import { ALPHABET_NUMBER_REGEX, SPACE_REGEX } from '../../Constants.js';
 
 const initialValues = {
     languageName: "",
@@ -22,8 +23,11 @@ const entityname = i18n.t('static.language.language');
 const validationSchema = function (values) {
     return Yup.object().shape({
 
+        // languageName: Yup.string()
+        //     .matches(LABEL_REGEX, i18n.t('static.message.rolenamevalidtext'))
+        //     .required(i18n.t('static.language.languagetext')),
         languageName: Yup.string()
-            .matches(LABEL_REGEX, i18n.t('static.message.rolenamevalidtext'))
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.language.languagetext')),
         languageCode: Yup.string()
             .matches(ALPHABETS_REGEX, i18n.t('static.common.alphabetsOnly'))
@@ -201,6 +205,7 @@ class AddLanguageComponent extends Component {
                                                                 invalid={touched.languageName && !!errors.languageName}
                                                                 onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                                 onBlur={handleBlur}
+                                                                maxLength={100}
                                                                 value={this.state.language.languageName}
                                                                 required />
                                                             <FormFeedback className="red">{errors.languageName}</FormFeedback>
@@ -240,7 +245,7 @@ class AddLanguageComponent extends Component {
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
-                            <div ><h4> <strong>Loading...</strong></h4></div>
+                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
                             <div class="spinner-border blue ml-4" role="status">
 

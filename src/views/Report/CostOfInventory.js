@@ -1244,6 +1244,10 @@ export default class CostOfInventory extends Component {
         }
         return x1 + x2;
     }
+
+    addDoubleQuoteToRowContent=(arr)=>{
+        return arr.map(ele=>'"'+ele+'"')
+     }
     exportCSV = (columns) => {
 
         var csvRow = [];
@@ -1261,8 +1265,8 @@ export default class CostOfInventory extends Component {
         const headers = [];
         columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ', '%20') });
 
-        var A = [headers]
-        this.state.costOfInventory.map(ele => A.push([(getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.stock, ele.catalogPrice, ele.cost]));
+        var A = [this.addDoubleQuoteToRowContent(headers)]
+        this.state.costOfInventory.map(ele => A.push(this.addDoubleQuoteToRowContent[(getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.stock, ele.catalogPrice, ele.cost]));
 
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
@@ -1306,7 +1310,7 @@ export default class CostOfInventory extends Component {
                 doc.setPage(i)
                 doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
                 doc.setTextColor("#002f6c");
-                doc.text("Cost Of Inventory ", doc.internal.pageSize.width / 2, 60, {
+                doc.text(i18n.t('static.dashboard.costOfInventory'), doc.internal.pageSize.width / 2, 60, {
                     align: 'center'
                 })
                 if (i == 1) {
@@ -1504,13 +1508,15 @@ export default class CostOfInventory extends Component {
                 let startDate = (this.state.singleValue2.year) + '-' + this.state.singleValue2.month + '-01';
                 let endDate = this.state.singleValue2.year + '-' + this.state.singleValue2.month + '-' + new Date(this.state.singleValue2.year, this.state.singleValue2.month + 1, 0).getDate();
 
+                this.setState({ loading: true })
                 var db1;
                 var storeOS;
                 getDatabase();
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                 openRequest.onerror = function (event) {
                     this.setState({
-                        message: i18n.t('static.program.errortext')
+                        message: i18n.t('static.program.errortext'),
+                        loading:false
                     })
                 }.bind(this);
                 openRequest.onsuccess = function (e) {
@@ -1525,7 +1531,8 @@ export default class CostOfInventory extends Component {
                     var programRequest = programDataOs.get(program);
                     programRequest.onerror = function (event) {
                         this.setState({
-                            message: i18n.t('static.program.errortext')
+                            message: i18n.t('static.program.errortext'),
+                            loading:false
                         })
                     }.bind(this);
                     programRequest.onsuccess = function (e) {
@@ -1540,6 +1547,9 @@ export default class CostOfInventory extends Component {
                         var planningunitRequest = planningunitOs.getAll();
                         planningunitRequest.onerror = function (event) {
                             // Handle errors!
+                            this.setState({
+                                loading:false
+                            })
                         };
                         planningunitRequest.onsuccess = function (e) {
                             var myResult = [];
@@ -1745,7 +1755,7 @@ export default class CostOfInventory extends Component {
                                 <Form >
                                     <div className=" pl-0">
                                         <div className="row ">
-                                        <FormGroup className="col-md-3">
+                                        <FormGroup className="col-md-3 pl-0">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.report.month')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                                                 <div className="controls edit">
                                                     <Picker

@@ -329,15 +329,16 @@ class AuthenticationService {
             var lastActionTaken = moment(lastActionTakenStorage);
             // console.log("lastActionTakenStorage---", lastActionTakenStorage);
             var curDate = moment(new Date());
+            console.log("curdate:", curDate);
             const diff = curDate.diff(lastActionTaken);
             const diffDuration = moment.duration(diff);
-            // console.log("Total Duration in millis:", diffDuration.asMilliseconds());
-            // console.log("Days:", diffDuration.days());
-            // console.log("Hours:", diffDuration.hours());
-            // console.log("Minutes:", diffDuration.minutes());
-            // console.log("Seconds:", diffDuration.seconds());
+            console.log("Total Duration in millis:", diffDuration.asMilliseconds());
+            console.log("Days:", diffDuration.days());
+            console.log("Hours:", diffDuration.hours());
+            console.log("Minutes:", diffDuration.minutes());
+            console.log("Seconds:", diffDuration.seconds());
             if (diffDuration.minutes() < 30) {
-                // if (diffDuration.minutes() < 10) {
+                console.log("last action taken less than 30 minutes");
                 return true;
             }
             return false;
@@ -1050,7 +1051,7 @@ class AuthenticationService {
                     break;
                 case "/report/supplyPlanVersionAndReview":
                 case "/report/editStatus/:programId/:versionId":
-                case "/report/supplyPlanVersionAndReview/:message":
+                case "/report/supplyPlanVersionAndReview/:color/:message":
                     if (bfunction.includes("ROLE_BF_SUPPLY_PLAN_VERSION_AND_REVIEW")) {
                         return true;
                     }
@@ -1114,6 +1115,7 @@ class AuthenticationService {
                     break;
                 case "/consumptionDetails/:programId/:versionId/:planningUnitId": return true
                     break;
+                case "/report/problemList/:programId/:color/:message":
                 case "/report/problemList/:color/:message":
                     if (bfunction.includes("ROLE_BF_PROBLEM_AND_ACTION_REPORT")) {
                         return true;
@@ -1150,6 +1152,13 @@ class AuthenticationService {
             return 'rgba(' + [(c >> 16) & 255, (c >> 8) & 255, c & 255].join(',') + ',1)';
         }
         throw new Error('Bad Hex');
+    }
+
+    clearLocalStorage() {
+        console.log("################ Clear local storage started ################");
+        let keysToRemove = ["token-" + AuthenticationService.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken"];
+        keysToRemove.forEach(k => localStorage.removeItem(k));
+        console.log("################ Clear local storage completed ################");
     }
 
 }

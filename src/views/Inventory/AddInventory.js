@@ -4,7 +4,7 @@ import { Formik } from 'formik';
 import React, { Component } from 'react';
 import {
     Button, Card, CardBody, CardFooter, Col, Form, FormGroup,
-    Label, Modal, ModalBody, ModalFooter, ModalHeader
+    Label, Modal, ModalBody, ModalFooter, ModalHeader, Input
 } from 'reactstrap';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
@@ -15,6 +15,9 @@ import InventoryInSupplyPlanComponent from "../SupplyPlan/InventoryInSupplyPlan"
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import AuthenticationService from '../Common/AuthenticationService';
+import Picker from 'react-month-picker'
+import MonthBox from '../../CommonComponent/MonthBox.js'
+import moment from "moment"
 
 const entityname = i18n.t('static.inventory.inventorydetils')
 export default class AddInventory extends Component {
@@ -31,8 +34,10 @@ export default class AddInventory extends Component {
             inventoryType: 1,
             showInventory: 0,
             inventoryChangedFlag: 0,
-            inventoryDataType: { value: 1, label: i18n.t('static.inventory.inventory') }
-
+            inventoryDataType: { value: 1, label: i18n.t('static.inventory.inventory') },
+            rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth()+2 },
+            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() },
         }
         this.options = props.options;
         this.formSubmit = this.formSubmit.bind(this);
@@ -43,6 +48,20 @@ export default class AddInventory extends Component {
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.hideThirdComponent = this.hideThirdComponent.bind(this);
+        this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
+        this.handleRangeChange = this.handleRangeChange.bind(this);
+        this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
+        this.pickRange = React.createRef();
+    }
+
+    show() {
+    }
+    handleRangeChange(value, text, listIndex) {
+        //
+    }
+    handleRangeDissmis(value) {
+        this.setState({ rangeValue: value })
+        this.formSubmit(this.state.planningUnit, value);
     }
 
     hideFirstComponent() {
@@ -238,7 +257,7 @@ export default class AddInventory extends Component {
                                 planningUnit: planningUnit,
                                 planningUnitId: planningUnitIdProp
                             })
-                            this.formSubmit(planningUnit);
+                            this.formSubmit(planningUnit, this.state.rangeValue);
                         }
                     }.bind(this);
                 }.bind(this)
@@ -251,7 +270,9 @@ export default class AddInventory extends Component {
         }
     }
 
-    formSubmit(value) {
+    formSubmit(value, rangeValue) {
+        let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
+        let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
         console.log("In form submit");
         this.setState({ loading: true })
         var programId = document.getElementById('programId').value;
@@ -294,10 +315,11 @@ export default class AddInventory extends Component {
                         c.planningUnit.id == planningUnitId &&
                         c.region != null && c.region.id != 0);
                     if (this.state.inventoryType == 1) {
-                        inventoryList = inventoryList.filter(c => c.actualQty != "" && c.actualQty != 0 && c.actualQty != null);
+                        inventoryList = inventoryList.filter(c => c.actualQty != "" && c.actualQty != undefined && c.actualQty != null);
                     } else {
-                        inventoryList = inventoryList.filter(c => c.adjustmentQty != "" && c.adjustmentQty != 0 && c.adjustmentQty != null);
+                        inventoryList = inventoryList.filter(c => c.adjustmentQty != "" && c.adjustmentQty != undefined && c.adjustmentQty != null);
                     }
+                    inventoryList = inventoryList.filter(c => moment(c.inventoryDate).format("YYYY-MM-DD") >= moment(startDate).format("YYYY-MM-DD") && moment(c.inventoryDate).format("YYYY-MM-DD") <= moment(stopDate).format("YYYY-MM-DD"))
                     this.setState({
                         batchInfoList: batchInfoList,
                         programJson: programJson,
@@ -333,11 +355,21 @@ export default class AddInventory extends Component {
         })
         document.getElementById("adjustmentsTableDiv").style.display = "none";
         if (this.state.planningUnit != 0 && (value != "" && value != undefined ? value.value : 0) != 0) {
-            this.formSubmit(this.state.planningUnit);
+            this.formSubmit(this.state.planningUnit, this.state.rangeValue);
         }
     }
 
     render() {
+        const pickerLang = {
+            months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            from: 'From', to: 'To',
+        }
+        const { rangeValue } = this.state
+
+        const makeText = m => {
+            if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
+            return '?'
+        }
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
@@ -348,7 +380,7 @@ export default class AddInventory extends Component {
                 <h5 className={this.state.color} id="div1">{i18n.t(this.state.message, { entityname }) || this.state.supplyPlanError}</h5>
                 <h5 className="red" id="div2">{this.state.inventoryDuplicateError || this.state.inventoryNoStockError || this.state.inventoryError}</h5>
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
-                    <CardBody className="pb-lg-5 pt-lg-2" >
+                    <CardBody className="pb-lg-2 pt-lg-2" >
                         <Formik
                             render={
                                 ({
@@ -356,6 +388,24 @@ export default class AddInventory extends Component {
                                         <Form name='simpleForm'>
                                             <div className="pl-0">
                                                 <div className="row">
+                                                    <FormGroup className="col-md-3">
+                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                                                        <div className="controls edit">
+
+                                                            <Picker
+                                                                years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                                                ref={this.pickRange}
+                                                                value={rangeValue}
+                                                                lang={pickerLang}
+                                                                //theme="light"
+                                                                onChange={this.handleRangeChange}
+                                                                onDismiss={this.handleRangeDissmis}
+                                                            >
+                                                                <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
+                                                            </Picker>
+                                                        </div>
+
+                                                    </FormGroup>
                                                     <FormGroup className="col-md-3">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                                         <div className="controls ">
@@ -378,7 +428,7 @@ export default class AddInventory extends Component {
                                                                 bsSize="sm"
                                                                 options={this.state.planningUnitList}
                                                                 value={this.state.planningUnit}
-                                                                onChange={(e) => { this.formSubmit(e); }}
+                                                                onChange={(e) => { this.formSubmit(e, this.state.rangeValue); }}
                                                             />
                                                         </div>
                                                     </FormGroup>
@@ -395,6 +445,10 @@ export default class AddInventory extends Component {
                                                             />
                                                         </div>
                                                     </FormGroup>
+                                                    {/* {this.state.inventoryChangedFlag == 1 && <FormGroup check inline>
+                                                        <Input className="form-check-input removeMarginLeftCheckbox" type="checkbox" id="showErrors" name="showErrors" value="true" onClick={this.refs.inventoryChild.showOnlyErrors} />
+                                                        <Label className="form-check-label" check htmlFor="inline-checkbox1">{i18n.t("static.dataEntry.showOnlyErrors")}</Label>
+                                                    </FormGroup>} */}
                                                     <input type="hidden" id="planningUnitId" name="planningUnitId" value={this.state.planningUnitId} />
                                                     <input type="hidden" id="programId" name="programId" value={this.state.programId} />
                                                 </div>
@@ -402,7 +456,7 @@ export default class AddInventory extends Component {
                                         </Form>
                                     )} />
 
-                        <div className="shipmentconsumptionSearchMarginTop">
+                        <div>
                             {this.state.showInventory == 1 && <InventoryInSupplyPlanComponent ref="inventoryChild" items={this.state} toggleLarge={this.toggleLarge} updateState={this.updateState} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} inventoryPage="inventoryDataEntry" />}
                             <div className="table-responsive" id="adjustmentsTableDiv">
                                 <div id="adjustmentsTable" />
@@ -413,7 +467,8 @@ export default class AddInventory extends Component {
                         <FormGroup>
                             <FormGroup>
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                {this.state.inventoryChangedFlag == 1 && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.refs.inventoryChild.saveInventory}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>}
+                                {this.state.inventoryChangedFlag == 1 && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.refs.inventoryChild.saveInventory}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>}&nbsp;
+                                {this.refs.inventoryChild != undefined && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.refs.inventoryChild.addRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
                                 &nbsp;
                         </FormGroup>
                         </FormGroup>
@@ -434,6 +489,7 @@ export default class AddInventory extends Component {
                     <ModalFooter>
                         <div id="showInventoryBatchInfoButtonsDiv" style={{ display: 'none' }}>
                             {this.state.inventoryBatchInfoChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.inventoryChild.saveInventoryBatchInfo()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBatchInfo')}</Button>}
+                            {this.refs.inventoryChild != undefined && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.refs.inventoryChild.addBatchRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
                         </div>
                         <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceled()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                     </ModalFooter>
@@ -465,6 +521,11 @@ export default class AddInventory extends Component {
         })
         this.hideFirstComponent();
         this.toggleLarge();
+    }
+
+    _handleClickRangeBox(e) {
+        console.log("Thuis.refs", this);
+        this.pickRange.current.show()
     }
 }
 

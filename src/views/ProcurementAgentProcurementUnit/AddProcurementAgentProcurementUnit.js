@@ -116,7 +116,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
         console.log('hasDuplicate', hasDuplicate);
         if (hasDuplicate) {
             this.setState({
-                message: 'Duplicate Procurement Unit Details Found',
+                message: i18n.t('static.procurementUnit.duplicateProcurementUnit'),
                 changedFlag: 0,
 
             },
@@ -663,9 +663,9 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                                     // region id
                                                     if (obj.getRowData(y)[6] == 0) {
                                                         items.push({
-                                                            title: obj.options.text.deleteSelectedRows,
+                                                            title: i18n.t("static.common.deleterow"),
                                                             onclick: function () {
-                                                                obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y));
+                                                                obj.deleteRow(parseInt(y));
                                                             }
                                                         });
                                                     }
@@ -700,15 +700,15 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                             items.push({ type: 'line' });
 
                                             // Save
-                                            if (obj.options.allowExport) {
-                                                items.push({
-                                                    title: i18n.t('static.supplyPlan.exportAsCsv'),
-                                                    shortcut: 'Ctrl + S',
-                                                    onclick: function () {
-                                                        obj.download(true);
-                                                    }
-                                                });
-                                            }
+                                            // if (obj.options.allowExport) {
+                                            //     items.push({
+                                            //         title: i18n.t('static.supplyPlan.exportAsCsv'),
+                                            //         shortcut: 'Ctrl + S',
+                                            //         onclick: function () {
+                                            //             obj.download(true);
+                                            //         }
+                                            //     });
+                                            // }
 
                                             return items;
                                         }.bind(this)
@@ -854,7 +854,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
 
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 <Button type="submit" size="md" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRowInJexcel()}> <i className="fa fa-plus"></i> Add Row</Button>
+                                <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRowInJexcel()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>
                             </FormGroup>
 
                         </CardFooter>

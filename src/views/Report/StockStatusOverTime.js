@@ -109,8 +109,8 @@ class StockStatusOverTime extends Component {
                 date: []
             },
             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() },
-            maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() + 1 },
+            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth()+2 },
+            maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth()  },
             loading: true
 
 
@@ -866,7 +866,9 @@ class StockStatusOverTime extends Component {
 
 
     }
-
+addDoubleQuoteToRowContent=(arr)=>{
+    return arr.map(ele=>'"'+ele+'"')
+ }
 
     exportCSV() {
 
@@ -882,10 +884,10 @@ class StockStatusOverTime extends Component {
         csvRow.push('')
         var re;
 
-        var A = [[i18n.t('static.report.month'), i18n.t('static.program.program'), ((i18n.t('static.planningunit.planningunit')).replaceAll(',', '%20')).replaceAll(' ', '%20'), i18n.t('static.report.stock'), ((i18n.t('static.report.consupmtionqty')).replaceAll(',', '%20')).replaceAll(' ', '%20'), i18n.t('static.report.amc'), ((i18n.t('static.report.noofmonth')).replaceAll(',', '%20')).replaceAll(' ', '%20'), i18n.t('static.report.mos')]]
+        var A = [this.addDoubleQuoteToRowContent([i18n.t('static.report.month'), i18n.t('static.program.program'), ((i18n.t('static.planningunit.planningunit')).replaceAll(',', '%20')).replaceAll(' ', '%20'), i18n.t('static.report.stock'), ((i18n.t('static.report.consupmtionqty')).replaceAll(',', '%20')).replaceAll(' ', '%20'), i18n.t('static.report.amc'), ((i18n.t('static.report.noofmonth')).replaceAll(',', '%20')).replaceAll(' ', '%20'), i18n.t('static.report.mos')])]
 
 
-        this.state.matricsList.map(elt => A.push([this.dateFormatter(elt.dt).replaceAll(' ', '%20'), ((getLabelText(elt.program.label, this.state.lang)).replaceAll(',', '%20')).replaceAll(' ', '%20'), ((getLabelText(elt.planningUnit.label, this.state.lang)).replaceAll(',', '%20')).replaceAll(' ', '%20'), elt.stock, elt.consumptionQty, this.formatAmc(elt.amc), elt.amcMonthCount, this.roundN(elt.mos)]));
+        this.state.matricsList.map(elt => A.push(this.addDoubleQuoteToRowContent([this.dateFormatter(elt.dt).replaceAll(' ', '%20'), ((getLabelText(elt.program.label, this.state.lang)).replaceAll(',', '%20')).replaceAll(' ', '%20'), ((getLabelText(elt.planningUnit.label, this.state.lang)).replaceAll(',', '%20')).replaceAll(' ', '%20'), elt.stock, elt.consumptionQty, this.formatAmc(elt.amc), elt.amcMonthCount, this.roundN(elt.mos)])));
 
 
         for (var i = 0; i < A.length; i++) {
@@ -988,7 +990,7 @@ class StockStatusOverTime extends Component {
 
         doc.setFontSize(8);
 
-        const title = "Consumption Report";
+        const title = i18n.t('static.report.stockstatusovertimeReport');
         var canvas = document.getElementById("cool-canvas");
         //creates image
 
@@ -1035,7 +1037,7 @@ class StockStatusOverTime extends Component {
         doc.autoTable(content);
         addHeaders(doc)
         addFooters(doc)
-        doc.save("StockStatusOverTime.pdf")
+        doc.save(i18n.t('static.report.stockstatusovertimeReport').concat('.pdf'));
         //creates PDF from img
         /* var doc = new jsPDF('landscape');
         doc.setFontSize(20);
@@ -1241,7 +1243,7 @@ class StockStatusOverTime extends Component {
                                         </FormGroup>
 
                                         <FormGroup className="col-md-3">
-                                            <Label htmlFor="appendedInputButton">Version</Label>
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
                                             <div className="controls">
                                                 <InputGroup>
                                                     <Input
@@ -1362,7 +1364,7 @@ class StockStatusOverTime extends Component {
                                 </div>
                                 <div className="col-md-12">
                                     <button className="mr-1 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
-                                        {this.state.show ? 'Hide Data' : 'Show Data'}
+                                        {this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
                                     </button>
 
                                 </div>

@@ -120,6 +120,9 @@ class Budgets extends Component {
         }
         return x1 + x2;
     }
+    addDoubleQuoteToRowContent=(arr)=>{
+        return arr.map(ele=>'"'+ele+'"')
+     }
     exportCSV = (columns) => {
 
         var csvRow = [];
@@ -134,8 +137,8 @@ class Budgets extends Component {
         const headers = [];
         columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ', '%20') });
 
-        var A = [headers]
-        this.state.selBudget.map(ele => A.push([(getLabelText(ele.budget.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), "\""+(ele.budget.code.replaceAll(',', ' ')).replaceAll(' ', '%20')+"\"",  (ele.fundingSource.code.replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.currency.label).replaceAll(',', ' ')).replaceAll(' ', '%20'),this.roundN(ele.budgetAmt), this.roundN(ele.plannedBudgetAmt), this.roundN(ele.orderedBudgetAmt), this.roundN((ele.budgetAmt - (ele.plannedBudgetAmt + ele.orderedBudgetAmt))), this.formatDate(ele.startDate), this.formatDate(ele.stopDate)]));
+        var A = [this.addDoubleQuoteToRowContent(headers)]
+        this.state.selBudget.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.budget.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), "\"" + (ele.budget.code.replaceAll(',', ' ')).replaceAll(' ', '%20') + "\"", (ele.fundingSource.code.replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.currency.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), this.roundN(ele.budgetAmt), this.roundN(ele.plannedBudgetAmt), this.roundN(ele.orderedBudgetAmt), this.roundN((ele.budgetAmt - (ele.plannedBudgetAmt + ele.orderedBudgetAmt))), this.formatDate(ele.startDate), this.formatDate(ele.stopDate)])));
 
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
@@ -207,20 +210,20 @@ class Budgets extends Component {
 
         var canvas = document.getElementById("cool-canvas");
         //creates image
-    
+
         var canvasImg = canvas.toDataURL("image/png", 1.0);
         var width = doc.internal.pageSize.width;
         var height = doc.internal.pageSize.height;
         var h1 = 50;
         var aspectwidth1 = (width - h1);
-    
+
         doc.addImage(canvasImg, 'png', 50, 200, 750, 260, 'CANVAS');
-    
+
         const headers = columns.map((item, idx) => (item.text));
         const data = this.state.selBudget.map(ele => [getLabelText(ele.budget.label), ele.budget.code, ele.fundingSource.code, getLabelText(ele.currency.label), this.formatter(this.roundN(ele.budgetAmt)), this.formatter(this.roundN(ele.plannedBudgetAmt)), this.formatter(this.roundN(ele.orderedBudgetAmt)), this.formatter(this.roundN(ele.budgetAmt - (ele.plannedBudgetAmt + ele.orderedBudgetAmt))), this.formatDate(ele.startDate), this.formatDate(ele.stopDate)]);
 
         let content = {
-            margin: { top: 80,bottom:50 },
+            margin: { top: 80, bottom: 50 },
             startY: height,
             head: [headers],
             body: data,
@@ -252,7 +255,7 @@ class Budgets extends Component {
 
                 var db1;
                 getDatabase();
-                var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
+                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
 
                 var procurementAgentList = [];
                 var fundingSourceList = [];
@@ -288,16 +291,19 @@ class Budgets extends Component {
                             for (var l = 0; l < budgetList.length; l++) {
                                 var shipmentList = programJson.shipmentList.filter(s => s.budget.id == budgetList[l].budgetId);
                                 var plannedShipmentbudget = 0;
-                                (shipmentList.filter(s => (s.shipmentStatus.id == 1 || s.shipmentStatus.id == 2 || s.shipmentStatus.id == 3 || s.shipmentStatus.id == 9))).map(ele => plannedShipmentbudget = plannedShipmentbudget + (ele.productCost + ele.freightCost) * ele.currency.conversionRateToUsd);
-
+                                (shipmentList.filter(s => (s.shipmentStatus.id == 1 || s.shipmentStatus.id == 2 || s.shipmentStatus.id == 3 || s.shipmentStatus.id == 9))).map(ele =>{
+                                    console.log(ele) 
+                                    plannedShipmentbudget = plannedShipmentbudget + (parseFloat(ele.productCost) + parseFloat(ele.freightCost)) * parseFloat(ele.currency.conversionRateToUsd)});
+console.log(plannedShipmentbudget)
                                 var OrderedShipmentbudget = 0;
                                 var shiplist = (shipmentList.filter(s => (s.shipmentStatus.id == 4 || s.shipmentStatus.id == 5 || s.shipmentStatus.id == 6 || s.shipmentStatus.id == 7)))
                                 console.log(shiplist)
                                 shiplist.map(ele => {
                                     console.log(OrderedShipmentbudget, '+', ele.productCost + ele.freightCost)
-                                    OrderedShipmentbudget = OrderedShipmentbudget + (ele.productCost + ele.freightCost) * ele.currency.conversionRateToUsd
+                                    OrderedShipmentbudget = OrderedShipmentbudget +  (parseFloat(ele.productCost) + parseFloat(ele.freightCost)) * parseFloat(ele.currency.conversionRateToUsd)
                                 });
-                                console.log("budget list==>",budgetList[l]);
+                                console.log(OrderedShipmentbudget)
+                                console.log("budget list==>", budgetList[l]);
                                 var json = {
                                     budget: { id: budgetList[l].budgetId, label: budgetList[l].label, code: budgetList[l].budgetCode },
                                     program: { id: budgetList[l].program.id, label: budgetList[l].program.label, code: programJson.programCode },
@@ -312,10 +318,9 @@ class Budgets extends Component {
                                 }
                                 data.push(json)
                             }
-                            console.log("ofline data===>",data);
                             this.setState({
                                 selBudget: data,
-                                message:''
+                                message: ''
                             })
 
 
@@ -351,10 +356,10 @@ class Budgets extends Component {
                                     case 404:
                                     case 406:
                                     case 412:
-                                        this.setState({loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                        this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
                                         break;
                                     default:
-                                        this.setState({loading: false, message: 'static.unkownError' });
+                                        this.setState({ loading: false, message: 'static.unkownError' });
                                         break;
                                 }
                             }
@@ -401,10 +406,10 @@ class Budgets extends Component {
                                 case 404:
                                 case 406:
                                 case 412:
-                                    this.setState({loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                    this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
                                     break;
                                 default:
-                                    this.setState({loading: false, message: 'static.unkownError' });
+                                    this.setState({ loading: false, message: 'static.unkownError' });
                                     break;
                             }
                         }
@@ -425,7 +430,7 @@ class Budgets extends Component {
 
         var db1;
         getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
             var transaction = db1.transaction(['programData'], 'readwrite');
@@ -477,11 +482,11 @@ class Budgets extends Component {
 
     roundN = num => {
         return parseFloat(Math.round(num * Math.pow(10, 4)) / Math.pow(10, 4)).toFixed(4);
-    
-      }
+
+    }
     filterVersion = () => {
         let programId = document.getElementById("programId").value;
-        document.getElementById("versionId").value=0
+        document.getElementById("versionId").value = 0
         if (programId != 0) {
 
             const program = this.state.programs.filter(c => c.programId == programId)
@@ -524,7 +529,7 @@ class Budgets extends Component {
 
         var db1;
         getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
             var transaction = db1.transaction(['programData'], 'readwrite');
@@ -674,7 +679,7 @@ class Budgets extends Component {
             labels: budgets.map(ele => getLabelText(ele.label, this.state.lang)),
             datasets: [
                 {
-                    label: 'Budget Allocated To Shipment (Ordered)',
+                    label: i18n.t('static.budget.allocatedShipmentOrdered'),
                     type: 'horizontalBar',
                     stack: 1,
                     backgroundColor: '#042e6a',
@@ -686,7 +691,7 @@ class Budgets extends Component {
                     data: data1
                 },
                 {
-                    label: 'Budget Allocated To Shipment (Planned)',
+                    label: i18n.t('static.budget.allocatedShipmentPlanned'),
                     type: 'horizontalBar',
                     stack: 1,
                     backgroundColor: '#6a82a8',
@@ -699,7 +704,7 @@ class Budgets extends Component {
                 },
 
                 {
-                    label: 'Budget Remaining',
+                    label: i18n.t('static.report.remainingBudgetAmt'),
                     type: 'horizontalBar',
                     stack: 1,
                     backgroundColor: '#8aa9e6',
@@ -771,7 +776,7 @@ class Budgets extends Component {
                 align: 'center',
                 headerAlign: 'center',
                 style: { align: 'center', width: '100px' }
-               // formatter: this.formatLabel
+                // formatter: this.formatLabel
 
             },
             {
@@ -872,7 +877,7 @@ class Budgets extends Component {
         }
         return (
             <div className="animated">
-                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
                 }} loading={(loading) => {
                     this.setState({ loading: loading })
@@ -886,8 +891,8 @@ class Budgets extends Component {
                             <div className="card-header-action">
                                 <a className="card-header-action">
                                     {this.state.selBudget.length > 0 && <div className="card-header-actions">
-                                        <img style={{ height: '25px', width: '25px',cursor:'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF(columns)} />
-                                        <img style={{ height: '25px', width: '25px',cursor:'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
+                                        <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF(columns)} />
+                                        <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
                                     </div>}
                                 </a>
                             </div>
@@ -898,7 +903,7 @@ class Budgets extends Component {
                         <Col md="11 pl-0">
                             <div className="row">
                                 <FormGroup className="col-md-3">
-                                    <Label htmlFor="appendedInputButton">Program</Label>
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                     <div className="controls ">
                                         <InputGroup>
                                             <Input
@@ -916,7 +921,7 @@ class Budgets extends Component {
                                     </div>
                                 </FormGroup>
                                 <FormGroup className="col-md-3">
-                                    <Label htmlFor="appendedInputButton">Version</Label>
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
                                     <div className="controls ">
                                         <InputGroup>
                                             <Input
@@ -950,7 +955,7 @@ class Budgets extends Component {
                                         </div>
                                         <div className="col-md-12">
                                             <button className="mr-1 mb-2 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
-                                                {this.state.show ? 'Hide Data' : 'Show Data'}
+                                                {this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
                                             </button>
 
                                         </div>

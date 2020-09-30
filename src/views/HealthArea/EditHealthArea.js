@@ -14,6 +14,8 @@ import i18n from '../../i18n'
 import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import classNames from 'classnames';
+import { ALPHABET_NUMBER_REGEX, SPACE_REGEX } from '../../Constants.js';
+
 
 
 let initialValues = {
@@ -28,11 +30,13 @@ const validationSchema = function (values) {
         realmId: Yup.string()
             .required(i18n.t('static.common.realmtext')),
         healthAreaName: Yup.string()
-            .matches(/^([a-zA-Z]+\s)*[a-zA-Z]+$/, i18n.t('static.message.rolenamevalidtext'))
+            // .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.healtharea.healthareatext')),
         healthAreaCode: Yup.string()
-            .max(3, 'Technical Area Code Is 3 Digit')
-            .required(i18n.t('static.country.countrycodetext')),
+            .matches(ALPHABET_NUMBER_REGEX, i18n.t('static.message.alphabetnumerallowed'))
+            .max(6, 'Display name length should be 6')
+            .required(i18n.t('static.common.displayName')),
         realmCountryId: Yup.string()
             .required(i18n.t('static.program.validcountrytext'))
     })
@@ -343,9 +347,13 @@ export default class EditHealthAreaComponent extends Component {
                                                     <FormGroup className="Selectcontrol-bdrNone">
                                                         <Label htmlFor="select">{i18n.t('static.healtharea.realmcountry')}<span class="red Reqasterisk">*</span></Label>
                                                         <Select
+                                                            // className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                            //     { 'is-valid': !errors.realmCountryId },
+                                                            //     { 'is-invalid': (touched.realmCountryId && !!errors.realmCountryId || this.state.healthArea.realmCountryArray.length == 0) }
+                                                            // )}
                                                             className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
                                                                 { 'is-valid': !errors.realmCountryId },
-                                                                { 'is-invalid': (touched.realmCountryId && !!errors.realmCountryId || this.state.healthArea.realmCountryArray.length == 0) }
+                                                                { 'is-invalid': (touched.realmCountryId && !!errors.realmCountryId || !!errors.realmCountryId) }
                                                             )}
                                                             bsSize="sm"
                                                             name="realmCountryId"
@@ -367,10 +375,12 @@ export default class EditHealthAreaComponent extends Component {
                                                         <Label htmlFor="company">{i18n.t('static.technicalArea.technicalAreaDisplayName')}<span class="red Reqasterisk">*</span> </Label>
                                                         <Input
                                                             bsSize="sm"
-                                                            type="text" name="healthAreaCode" valid={!errors.healthAreaCode && this.state.healthArea.healthAreaCode != ''}
-                                                            invalid={touched.healthAreaCode && !!errors.healthAreaCode || this.state.healthArea.healthAreaCode == ''}
+                                                            type="text" name="healthAreaCode"
+                                                            valid={!errors.healthAreaCode}
+                                                            invalid={touched.healthAreaCode && !!errors.healthAreaCode || !!errors.healthAreaCode}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
+                                                            maxLength={6}
                                                             value={this.state.healthArea.healthAreaCode}
                                                             id="healthAreaCode" />
                                                         <FormFeedback className="red">{errors.healthAreaCode}</FormFeedback>
@@ -380,8 +390,10 @@ export default class EditHealthAreaComponent extends Component {
                                                         <Label htmlFor="company">{i18n.t('static.healthArea.healthAreaName')}<span class="red Reqasterisk">*</span> </Label>
                                                         <Input
                                                             bsSize="sm"
-                                                            type="text" name="healthAreaName" valid={!errors.healthAreaName}
-                                                            invalid={touched.healthAreaName && !!errors.healthAreaName || this.state.healthArea.label.label_en == ''}
+                                                            type="text" name="healthAreaName"
+                                                            valid={!errors.healthAreaName}
+                                                            invalid={touched.healthAreaName && !!errors.healthAreaName || !!errors.healthAreaName}
+                                                            type="text" name="healthAreaName"
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.healthArea.label.label_en}

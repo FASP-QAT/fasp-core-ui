@@ -1387,33 +1387,33 @@ class AccessControlComponent extends Component {
             columns: [
 
                 {
-                    title: "Username",
+                    title: i18n.t('static.username.username'),
                     type: 'text',
                     readOnly: true
                 },
                 {
-                    title: "Country",
+                    title: i18n.t('static.program.realmcountry'),
                     type: 'autocomplete',
                     source: countryList,
                     // filter: this.filterCountry
 
                 },
                 {
-                    title: "Technical Area",
+                    title: i18n.t('static.dashboard.healthareaheader'),
                     type: 'autocomplete',
                     source: healthAreaList,
                     // filter: this.filterHealthArea
 
                 },
                 {
-                    title: "Organization",
+                    title: i18n.t('static.organisation.organisation'),
                     type: 'autocomplete',
                     source: organisationList,
                     // filter: this.filterOrganisation
 
                 },
                 {
-                    title: "Program",
+                    title: i18n.t('static.dataSource.program'),
                     type: 'autocomplete',
                     source: programList,
                     // filter: this.filterProgram
@@ -1540,9 +1540,9 @@ class AccessControlComponent extends Component {
                         // region id
                         // if (obj.getRowData(y)[8] == 0) {
                         items.push({
-                            title: obj.options.text.deleteSelectedRows,
+                            title: i18n.t("static.common.deleterow"),
                             onclick: function () {
-                                obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y));
+                                obj.deleteRow(parseInt(y));
                             }
                         });
                         // }
@@ -1577,15 +1577,15 @@ class AccessControlComponent extends Component {
                 items.push({ type: 'line' });
 
                 // Save
-                if (obj.options.allowExport) {
-                    items.push({
-                        title: i18n.t('static.supplyPlan.exportAsCsv'),
-                        shortcut: 'Ctrl + S',
-                        onclick: function () {
-                            obj.download(true);
-                        }
-                    });
-                }
+                // if (obj.options.allowExport) {
+                //     items.push({
+                //         title: i18n.t('static.supplyPlan.exportAsCsv'),
+                //         shortcut: 'Ctrl + S',
+                //         onclick: function () {
+                //             obj.download(true);
+                //         }
+                //     });
+                // }
 
                 return items;
             }.bind(this)
@@ -2002,7 +2002,7 @@ class AccessControlComponent extends Component {
                         <FormGroup>
                             <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                             <Button type="submit" size="md" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                            <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> Add Row</Button>
+                            <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>
                             &nbsp;
                 </FormGroup>
                     </CardFooter>

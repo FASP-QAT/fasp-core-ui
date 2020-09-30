@@ -12,6 +12,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import { LABEL_REGEX } from '../../Constants.js';
+import { ALPHABET_NUMBER_REGEX, SPACE_REGEX } from '../../Constants.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import classNames from 'classnames';
 
@@ -27,9 +28,12 @@ const entityname = i18n.t('static.user.user')
 const validationSchema = function (values) {
     return Yup.object().shape({
 
+        // username: Yup.string()
+        //     .required(i18n.t('static.user.validusername'))
+        //     .matches(LABEL_REGEX, i18n.t('static.message.rolenamevalidtext')),
         username: Yup.string()
-            .required(i18n.t('static.user.validusername'))
-            .matches(LABEL_REGEX, i18n.t('static.message.rolenamevalidtext')),
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
+            .required(i18n.t('static.user.validusername')),
         showRealm: Yup.boolean(),
         realmId: Yup.string()
             .when("showRealm", {
@@ -537,6 +541,7 @@ class AddUserComponent extends Component {
                                                             invalid={touched.username && !!errors.username}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
+                                                            maxLength={25}
                                                             required
                                                             value={this.state.user.username}
                                                         /><FormFeedback className="red">{errors.username}</FormFeedback>
@@ -551,6 +556,7 @@ class AddUserComponent extends Component {
                                                             invalid={touched.emailId && !!errors.emailId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
+                                                            maxLength={50}
                                                             required
                                                             value={this.state.user.emailId}
                                                         />
@@ -631,7 +637,7 @@ class AddUserComponent extends Component {
                 <Row style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
-                            <div ><h4> <strong>Loading...</strong></h4></div>
+                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
                             <div class="spinner-border blue ml-4" role="status">
 

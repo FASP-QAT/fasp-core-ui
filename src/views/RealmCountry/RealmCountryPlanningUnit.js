@@ -238,7 +238,7 @@ class PlanningUnitCountry extends Component {
                                                     },
 
                                                     {
-                                                        title: "Is Active",
+                                                        title: i18n.t('static.checkbox.active'),
                                                         type: 'checkbox'
                                                     },
                                                     {
@@ -259,14 +259,14 @@ class PlanningUnitCountry extends Component {
                                                     var elInstance = el.jexcel;
                                                     var rowData = elInstance.getRowData(y);
                                                     var realmCountryPlanningUnitId = rowData[8];
-                                                    if(realmCountryPlanningUnitId==0){
+                                                    if (realmCountryPlanningUnitId == 0) {
                                                         var cell = elInstance.getCell(`B${parseInt(y) + 1}`)
                                                         cell.classList.remove('readonly');
-                                                    }else{
+                                                    } else {
                                                         var cell = elInstance.getCell(`B${parseInt(y) + 1}`)
                                                         cell.classList.add('readonly');
                                                     }
-                                                    
+
                                                 },
                                                 pagination: 10,
                                                 search: true,
@@ -400,7 +400,7 @@ class PlanningUnitCountry extends Component {
                                                             // region id
                                                             if (obj.getRowData(y)[8] == 0) {
                                                                 items.push({
-                                                                    title: obj.options.text.deleteSelectedRows,
+                                                                    title: i18n.t("static.common.deleterow"),
                                                                     onclick: function () {
                                                                         obj.deleteRow(parseInt(y));
                                                                     }
@@ -436,16 +436,16 @@ class PlanningUnitCountry extends Component {
                                                     // Line
                                                     items.push({ type: 'line' });
 
-                                                    // Save
-                                                    if (obj.options.allowExport) {
-                                                        items.push({
-                                                            title: i18n.t('static.supplyPlan.exportAsCsv'),
-                                                            shortcut: 'Ctrl + S',
-                                                            onclick: function () {
-                                                                obj.download(true);
-                                                            }
-                                                        });
-                                                    }
+                                                    // // Save
+                                                    // if (obj.options.allowExport) {
+                                                    //     items.push({
+                                                    //         title: i18n.t('static.supplyPlan.exportAsCsv'),
+                                                    //         shortcut: 'Ctrl + S',
+                                                    //         onclick: function () {
+                                                    //             obj.download(true);
+                                                    //         }
+                                                    //     });
+                                                    // }
 
                                                     return items;
                                                 }.bind(this)
@@ -678,19 +678,40 @@ class PlanningUnitCountry extends Component {
         }
 
         //Multiplier
+        // if (x == 5) {
+        //     var col = ("F").concat(parseInt(y) + 1);
+        //     var reg = /^[0-9\b]+$/;
+        //     if (value == "" || isNaN(parseInt(value)) || !(reg.test(value))) {
+        //         this.el.setStyle(col, "background-color", "transparent");
+        //         this.el.setStyle(col, "background-color", "yellow");
+        //         this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+        //     }
+        //     else {
+        //         this.el.setStyle(col, "background-color", "transparent");
+        //         this.el.setComments(col, "");
+        //     }
+        // }
+
         if (x == 5) {
             var col = ("F").concat(parseInt(y) + 1);
             var reg = /^[0-9\b]+$/;
-            if (value == "" || isNaN(parseInt(value)) || !(reg.test(value))) {
+            if (value == "" || isNaN(Number.parseInt(value)) || value < 0) {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                if (isNaN(Number.parseInt(value)) || value < 0) {
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                }
+                else {
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                }
             }
             else {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
             }
         }
+
+
         //Active
         if (x == 6) {
             this.el.setValueFromCoords(9, y, 1, true);
@@ -756,8 +777,8 @@ class PlanningUnitCountry extends Component {
                     //     this.el.setStyle(col, "background-color", "yellow");
                     //     this.el.setComments(col, i18n.t('static.message.skucodevalid'));
                     // } else {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setComments(col, "");
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
                     // }
                 }
 
@@ -825,7 +846,7 @@ class PlanningUnitCountry extends Component {
                             <FormGroup>
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> Add Row</Button>
+                                <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>
                                 &nbsp;
 </FormGroup>
                         </CardFooter>
@@ -834,7 +855,7 @@ class PlanningUnitCountry extends Component {
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
-                            <div ><h4> <strong>Loading...</strong></h4></div>
+                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
                             <div class="spinner-border blue ml-4" role="status">
 

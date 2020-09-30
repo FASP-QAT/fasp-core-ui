@@ -20,6 +20,7 @@ import CryptoJS from 'crypto-js'
 import UserService from '../../api/UserService';
 import { qatProblemActions } from '../../CommonComponent/QatProblemActions'
 import { calculateSupplyPlan } from '../SupplyPlan/SupplyPlanCalculations';
+import QatProblemActions from '../../CommonComponent/QatProblemActions'
 
 export default class SyncMasterData extends Component {
 
@@ -86,6 +87,7 @@ export default class SyncMasterData extends Component {
     render() {
         return (
             <div className="animated fadeIn">
+                <QatProblemActions ref="problemListChild" updateState={undefined} fetchData={undefined}></QatProblemActions>
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5 className="pl-md-5" style={{ color: "red" }} id="div2">{this.state.message != "" && i18n.t('static.masterDataSync.masterDataSyncFailed')}</h5>
                 <div className="col-md-12" style={{ display: this.state.loading ? "none" : "block" }}>
@@ -144,122 +146,124 @@ export default class SyncMasterData extends Component {
         var valid = true;
         for (var i = 0; i < programList.length; i++) {
             AuthenticationService.setupAxiosInterceptors();
+            this.refs.problemListChild.qatProblemActions(programList[i].id);
             if (navigator.onLine) {
                 //Code to Sync Country list
-                MasterSyncService.syncProgram(programList[i].programId, programList[i].version, date)
-                    .then(response => {
-                        console.log("Response", response);
-                        if (response.status == 200) {
-                            console.log("Response=========================>", response.data);
-                            console.log("i", i);
-                            var prog = programList.filter(c => c.programId == response.data.programId)[0];
-                            console.log("Prog=====================>", prog)
-                            var programDataBytes = CryptoJS.AES.decrypt((prog).programData, SECRET_KEY);
-                            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                            var programJson = JSON.parse(programData);
-                            var shipmentDataList = (programJson.shipmentList);
-                            var batchInfoList = (programJson.batchInfoList);
-                            console.log("Shipment data list", shipmentDataList);
-                            console.log("Batch Info list", batchInfoList);
-                            var shipArray = response.data.shipmentList;
-                            console.log("Min Date shiparray", shipArray);
-                            var minDate = moment.min(shipArray.map(d => moment(d.expectedDeliveryDate)))
-                            console.log("Min Date in sync", minDate);
-                            var batchArray = response.data.batchInfoList;
-                            var planningUnitList = [];
-                            for (var j = 0; j < shipArray.length; j++) {
-                                console.log("In planning unit list", shipArray[j].planningUnit.id);
-                                if (!planningUnitList.includes(shipArray[j].planningUnit.id)) {
-                                    planningUnitList.push(shipArray[j].planningUnit.id);
-                                }
-                                var index = shipmentDataList.findIndex(c => c.shipmentId == shipArray[j].shipmentId)
-                                if (index == -1) {
-                                    shipmentDataList.push(shipArray[j]);
-                                } else {
-                                    shipmentDataList[index] = shipArray[j];
-                                }
-                            }
-                            console.log("Shipment data updated", shipmentDataList);
+                // MasterSyncService.syncProgram(programList[i].programId, programList[i].version, date)
+                //     .then(response => {
+                //         console.log("Response", response);
+                //         if (response.status == 200) {
+                //             console.log("Response=========================>", response.data);
+                //             console.log("i", i);
+                //             var prog = programList.filter(c => c.programId == response.data.programId)[0];
+                //             console.log("Prog=====================>", prog)
+                //             var programDataBytes = CryptoJS.AES.decrypt((prog).programData, SECRET_KEY);
+                //             var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                //             var programJson = JSON.parse(programData);
+                //             var shipmentDataList = (programJson.shipmentList);
+                //             var batchInfoList = (programJson.batchInfoList);
+                //             console.log("Shipment data list", shipmentDataList);
+                //             console.log("Batch Info list", batchInfoList);
+                //             var shipArray = response.data.shipmentList;
+                //             console.log("Min Date shiparray", shipArray);
+                //             var minDate = moment.min(shipArray.map(d => moment(d.expectedDeliveryDate)))
+                //             console.log("Min Date in sync", minDate);
+                //             var batchArray = response.data.batchInfoList;
+                //             var planningUnitList = [];
+                //             for (var j = 0; j < shipArray.length; j++) {
+                //                 console.log("In planning unit list", shipArray[j].planningUnit.id);
+                //                 if (!planningUnitList.includes(shipArray[j].planningUnit.id)) {
+                //                     planningUnitList.push(shipArray[j].planningUnit.id);
+                //                 }
+                //                 var index = shipmentDataList.findIndex(c => c.shipmentId == shipArray[j].shipmentId)
+                //                 if (index == -1) {
+                //                     shipmentDataList.push(shipArray[j]);
+                //                 } else {
+                //                     shipmentDataList[index] = shipArray[j];
+                //                 }
+                //             }
+                //             console.log("Shipment data updated", shipmentDataList);
 
-                            for (var j = 0; j < batchArray.length; j++) {
-                                var index = batchInfoList.findIndex(c => c.batchNo == batchArray[j].batchNo)
-                                if (index == -1) {
-                                    batchInfoList.push(batchArray[j]);
-                                } else {
-                                    batchInfoList[index] = batchArray[j];
-                                }
-                            }
-                            console.log("Batch Info updated", batchInfoList);
-                            programJson.shipmentList = shipmentDataList;
-                            programJson.batchInfoList = batchInfoList;
-                            prog.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
-                            var db1;
-                            var storeOS;
-                            getDatabase();
-                            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                            openRequest.onerror = function (event) {
-                                this.setState({
-                                    message: i18n.t('static.program.errortext')
-                                },
-                                () => {
-                                    this.hideSecondComponent();
-                                })
-                            }.bind(this);
-                            openRequest.onsuccess = function (e) {
-                                db1 = e.target.result;
-                                var transaction = db1.transaction(['programData'], 'readwrite');
-                                var programTransaction = transaction.objectStore('programData');
-                                var putRequest = programTransaction.put(prog);
+                //             for (var j = 0; j < batchArray.length; j++) {
+                //                 var index = batchInfoList.findIndex(c => c.batchNo == batchArray[j].batchNo)
+                //                 if (index == -1) {
+                //                     batchInfoList.push(batchArray[j]);
+                //                 } else {
+                //                     batchInfoList[index] = batchArray[j];
+                //                 }
+                //             }
+                //             console.log("Batch Info updated", batchInfoList);
+                //             programJson.shipmentList = shipmentDataList;
+                //             programJson.batchInfoList = batchInfoList;
+                //             prog.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                //             var db1;
+                //             var storeOS;
+                //             getDatabase();
+                //             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                //             openRequest.onerror = function (event) {
+                //                 this.setState({
+                //                     message: i18n.t('static.program.errortext')
+                //                 },
+                //                 () => {
+                //                     this.hideSecondComponent();
+                //                 })
+                //             }.bind(this);
+                //             openRequest.onsuccess = function (e) {
+                //                 db1 = e.target.result;
+                //                 var transaction = db1.transaction(['programData'], 'readwrite');
+                //                 var programTransaction = transaction.objectStore('programData');
+                //                 var putRequest = programTransaction.put(prog);
 
-                                putRequest.onerror = function (event) {
-                                    this.setState({
-                                        supplyPlanError: i18n.t('static.program.errortext')
-                                    })
-                                }.bind(this);
-                                putRequest.onsuccess = function (event) {
-                                    console.log("Planning unit list", planningUnitList);
-                                    calculateSupplyPlan(prog.id, 0, 'programData', 'masterDataSync', '', planningUnitList, minDate);
-                                }
-                            }
-                        } else {
-                            this.setState({
-                                message: response.data.messageCode
-                            },
-                                () => {
-                                    this.hideSecondComponent();
-                                })
-                            document.getElementById("retryButtonDiv").style.display = "block";
-                            valid = false;
-                        }
-                    }).catch(error => {
-                        if (error.message === "Network Error") {
-                            this.setState({ message: error.message },
-                                () => {
-                                    this.hideSecondComponent();
-                                });
-                        } else {
-                            switch (error.response ? error.response.status : "") {
-                                case 500:
-                                case 401:
-                                case 404:
-                                case 406:
-                                case 412:
-                                    this.setState({ message: error.response.data.messageCode },
-                                        () => {
-                                            this.hideSecondComponent();
-                                        });
-                                    break;
-                                default:
-                                    this.setState({ message: 'static.unkownError' },
-                                        () => {
-                                            this.hideSecondComponent();
-                                        });
-                                    break;
-                            }
-                        }
-                        document.getElementById("retryButtonDiv").style.display = "block";
-                        valid = false;
-                    });
+                //                 putRequest.onerror = function (event) {
+                //                     this.setState({
+                //                         supplyPlanError: i18n.t('static.program.errortext')
+                //                     })
+                //                 }.bind(this);
+                //                 putRequest.onsuccess = function (event) {
+                //                     console.log("Planning unit list", planningUnitList);
+                                  
+                //                     calculateSupplyPlan(prog.id, 0, 'programData', 'masterDataSync', '', planningUnitList, minDate);
+                //                 }
+                //             }
+                //         } else {
+                //             this.setState({
+                //                 message: response.data.messageCode
+                //             },
+                //                 () => {
+                //                     this.hideSecondComponent();
+                //                 })
+                //             document.getElementById("retryButtonDiv").style.display = "block";
+                //             valid = false;
+                //         }
+                //     }).catch(error => {
+                //         if (error.message === "Network Error") {
+                //             this.setState({ message: error.message },
+                //                 () => {
+                //                     this.hideSecondComponent();
+                //                 });
+                //         } else {
+                //             switch (error.response ? error.response.status : "") {
+                //                 case 500:
+                //                 case 401:
+                //                 case 404:
+                //                 case 406:
+                //                 case 412:
+                //                     this.setState({ message: error.response.data.messageCode },
+                //                         () => {
+                //                             this.hideSecondComponent();
+                //                         });
+                //                     break;
+                //                 default:
+                //                     this.setState({ message: 'static.unkownError' },
+                //                         () => {
+                //                             this.hideSecondComponent();
+                //                         });
+                //                     break;
+                //             }
+                //         }
+                //         document.getElementById("retryButtonDiv").style.display = "block";
+                //         valid = false;
+                //     });
             } else {
                 document.getElementById("retryButtonDiv").style.display = "block";
                 this.setState({

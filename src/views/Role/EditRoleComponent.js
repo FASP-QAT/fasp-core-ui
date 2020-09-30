@@ -11,6 +11,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import { LABEL_REGEX } from '../../Constants.js';
+import { ALPHABET_NUMBER_REGEX, SPACE_REGEX } from '../../Constants.js';
 import classNames from 'classnames';
 const initialValues = {
     roleName: "",
@@ -22,12 +23,13 @@ const entityname = i18n.t('static.role.role');
 const validationSchema = function (values) {
     return Yup.object().shape({
         roleName: Yup.string()
-            .required(i18n.t('static.role.roletext'))
-            .matches(LABEL_REGEX, i18n.t('static.message.rolenamevalidtext')),
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
+            .required(i18n.t('static.role.roletext')),
+        // .matches(LABEL_REGEX, i18n.t('static.message.rolenamevalidtext')),
         businessFunctions: Yup.string()
-            .required('Please select business functions'),
+            .required(i18n.t('static.role.businessfunctiontext')),
         canCreateRoles: Yup.string()
-            .required('Please select can create role')
+            .required(i18n.t('static.role.cancreateroletext'))
 
         // businessFunctions: Yup.array()
         //     .min(1, i18n.t('static.role.businessfunctiontext'))
@@ -388,9 +390,10 @@ class EditRoleComponent extends Component {
                                                             id="roleName"
                                                             bsSize="sm"
                                                             valid={!errors.roleName}
-                                                            invalid={touched.roleName && !!errors.roleName}
+                                                            invalid={(touched.roleName && !!errors.roleName || !!errors.roleName)}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
+                                                            maxLength={30}
                                                             required
                                                             value={this.Capitalize(this.state.role.label.label_en)}
                                                         />
@@ -399,9 +402,13 @@ class EditRoleComponent extends Component {
                                                     <FormGroup className="Selectcontrol-bdrNone">
                                                         <Label htmlFor="businessFunctions">{i18n.t('static.role.businessfunction')}<span className="red Reqasterisk">*</span> </Label>
                                                         <Select
+                                                            // className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                            //     { 'is-valid': !errors.businessFunctions },
+                                                            //     { 'is-invalid': (touched.businessFunctions && !!errors.businessFunctions || this.state.role.businessFunctions.length == 0) }
+                                                            // )}
                                                             className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
                                                                 { 'is-valid': !errors.businessFunctions },
-                                                                { 'is-invalid': (touched.businessFunctions && !!errors.businessFunctions || this.state.role.businessFunctions.length == 0) }
+                                                                { 'is-invalid': (touched.businessFunctions && !!errors.businessFunctions || !!errors.businessFunctions) }
                                                             )}
                                                             bsSize="sm"
                                                             onChange={(e) => {
@@ -423,9 +430,13 @@ class EditRoleComponent extends Component {
                                                     <FormGroup className="Selectcontrol-bdrNone">
                                                         <Label htmlFor="canCreateRoles">{i18n.t('static.role.cancreaterole')}<span className="red Reqasterisk">*</span> </Label>
                                                         <Select
+                                                            // className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                            //     { 'is-valid': !errors.canCreateRoles },
+                                                            //     { 'is-invalid': (touched.canCreateRoles && !!errors.canCreateRoles || this.state.role.canCreateRoles.length == 0) }
+                                                            // )}
                                                             className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
                                                                 { 'is-valid': !errors.canCreateRoles },
-                                                                { 'is-invalid': (touched.canCreateRoles && !!errors.canCreateRoles || this.state.role.canCreateRoles.length == 0) }
+                                                                { 'is-invalid': (touched.canCreateRoles && !!errors.canCreateRoles || !!errors.canCreateRoles) }
                                                             )}
                                                             bsSize="sm"
                                                             onChange={(e) => {
@@ -468,7 +479,7 @@ class EditRoleComponent extends Component {
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
-                            <div ><h4> <strong>Loading...</strong></h4></div>
+                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
                             <div class="spinner-border blue ml-4" role="status">
 

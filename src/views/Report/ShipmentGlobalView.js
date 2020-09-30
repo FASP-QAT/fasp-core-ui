@@ -1327,7 +1327,7 @@ const colors = ['#004876', '#0063a0', '#007ecc', '#0093ee', '#82caf8', '#c8e6f4'
 const options = {
     title: {
         display: true,
-        text: "Global Demand",
+        text: i18n.t('static.dashboard.shipmentGlobalViewheader'),
         fontColor: 'black'
     },
     scales: {
@@ -1340,7 +1340,7 @@ const options = {
         }],
         yAxes: [{
             stacked: true,
-            labelString: "Amount (USD)",
+            labelString: i18n.t('static.shipment.amount'),
         }],
     },
     tooltips: {
@@ -1362,7 +1362,7 @@ const options = {
 const options1 = {
     title: {
         display: true,
-        text: "Shipment/Orders Procurement Agent",
+        text: i18n.t('static.shipment.shipmentProcurementAgent'),
         fontColor: 'black'
     },
     scales: {
@@ -1375,7 +1375,7 @@ const options1 = {
         }],
         yAxes: [{
             stacked: true,
-            labelString: "Amount (USD)",
+            labelString: i18n.t('static.shipment.amount'),
         }],
     },
     tooltips: {
@@ -1397,13 +1397,13 @@ const options1 = {
 const chartData = {
     labels: ["Malawi", "Kenya", "Zimbabwe"],
     datasets: [{
-        label: 'Ordered Shipments',
+        label: i18n.t('static.shipment.orderedShipment'),
         data: [20000, 10000, 2000],
         backgroundColor: '#6a82a8',
         borderWidth: 0
     },
     {
-        label: 'Planned Shipments',
+        label: i18n.t('static.shipment.plannedShipment'),
         data: [20000, 20000, 2000],
         backgroundColor: '#dee7f8',
         borderWidth: 0,
@@ -1516,8 +1516,8 @@ class ShipmentGlobalView extends Component {
             table1Headers: [],
             viewby: 1,
             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate:{year:  new Date().getFullYear()-3, month: new Date().getMonth()},
-            maxDate:{year:  new Date().getFullYear()+3, month: new Date().getMonth()+1},
+            minDate:{year:  new Date().getFullYear()-3, month: new Date().getMonth()+2},
+            maxDate:{year:  new Date().getFullYear()+3, month: new Date().getMonth()},
             loading: true
 
 
@@ -1539,7 +1539,9 @@ class ShipmentGlobalView extends Component {
         if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
         return '?'
     }
-
+    addDoubleQuoteToRowContent=(arr)=>{
+        return arr.map(ele=>'"'+ele+'"')
+     }
     exportCSV() {
 
         var csvRow = [];
@@ -1576,10 +1578,10 @@ class ShipmentGlobalView extends Component {
             for (var i = 0; i < tableHead.length; i++) {
                 tableHeadTemp.push((tableHead[i].replaceAll(',', ' ')).replaceAll(' ', '%20'));
             }
-            A[0] = tableHeadTemp;
+            A[0] = this.addDoubleQuoteToRowContent(tableHeadTemp);
             re = this.state.table1Body
             for (var item = 0; item < re.length; item++) {
-                A.push([[(getLabelText(re[item].country.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), re[item].amount]])
+                A.push([this.addDoubleQuoteToRowContent([(getLabelText(re[item].country.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), re[item].amount])])
             }
             for (var i = 0; i < A.length; i++) {
                 csvRow.push(A[i].join(","))
@@ -1596,10 +1598,10 @@ class ShipmentGlobalView extends Component {
             } else {
                 tempLabel = i18n.t('static.procurementagent.procurementagent');
             }
-            var B = [[(i18n.t('static.dashboard.months').replaceAll(',', ' ')).replaceAll(' ', '%20'), (i18n.t('static.program.realmcountry').replaceAll(',', ' ')).replaceAll(' ', '%20'), (i18n.t('static.supplyPlan.amountInUSD').replaceAll(',', ' ')).replaceAll(' ', '%20'), (tempLabel.replaceAll(',', ' ')).replaceAll(' ', '%20'), (i18n.t('static.common.status').replaceAll(',', ' ')).replaceAll(' ', '%20')]];
+            var B = [this.addDoubleQuoteToRowContent([(i18n.t('static.dashboard.months').replaceAll(',', ' ')).replaceAll(' ', '%20'), (i18n.t('static.program.realmcountry').replaceAll(',', ' ')).replaceAll(' ', '%20'), (i18n.t('static.supplyPlan.amountInUSD').replaceAll(',', ' ')).replaceAll(' ', '%20'), (tempLabel.replaceAll(',', ' ')).replaceAll(' ', '%20'), (i18n.t('static.common.status').replaceAll(',', ' ')).replaceAll(' ', '%20')])];
             re = this.state.shipmentList;
             for (var item = 0; item < re.length; item++) {
-                B.push([[(moment(re[item].transDate, 'YYYY-MM-dd').format('MMM YYYY').replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(re[item].country.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), re[item].amount, (getLabelText(re[item].fundingSourceProcurementAgent.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(re[item].shipmentStatus.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20')]])
+                B.push([this.addDoubleQuoteToRowContent([(moment(re[item].transDate, 'YYYY-MM-dd').format('MMM YYYY').replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(re[item].country.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), re[item].amount, (getLabelText(re[item].fundingSourceProcurementAgent.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(re[item].shipmentStatus.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20')])])
             }
             for (var i = 0; i < B.length; i++) {
                 csvRow.push(B[i].join(","))
@@ -1715,7 +1717,7 @@ class ShipmentGlobalView extends Component {
         doc.setFontSize(10);
 
         //creates image1
-        const title = "Global Demand - Single Product";
+        const title = i18n.t('static.dashboard.shipmentGlobalViewheader');
         var canvas = document.getElementById("cool-canvas1");
 
         var canvasImg = canvas.toDataURL("image/png", 1.0);
@@ -1764,7 +1766,7 @@ class ShipmentGlobalView extends Component {
         doc.autoTable(content1);
 
         let content2 = {
-            margin: { top: 80, left: 100, bottom: 50 },
+            margin: { top: 80, bottom: 50 },
             startY: doc.autoTableEndPosY() + 50,
             pageBreak: 'auto',
             styles: { lineWidth: 1, fontSize: 8, cellWidth: 120, halign: 'center' },
@@ -1793,7 +1795,7 @@ class ShipmentGlobalView extends Component {
         doc.autoTable(content2);
         addHeaders(doc)
         addFooters(doc)
-        doc.save("GlobalDemandSingleProduct.pdf")
+        doc.save(i18n.t('static.dashboard.shipmentGlobalViewheader').concat('.pdf'));
         //creates PDF from img
         /*  var doc = new jsPDF('landscape');
           doc.setFontSize(20);
@@ -2231,8 +2233,8 @@ class ShipmentGlobalView extends Component {
             // let realmId = AuthenticationService.getRealmId();
             var inputjson = {
                 realmId: realmId,
-                startDate: new moment(startDate),
-                stopDate: new moment(endDate),
+                startDate:startDate,
+                stopDate: endDate,
                 realmCountryIds: CountryIds,
                 planningUnitId: planningUnitId,
                 reportView: viewby,
@@ -2545,13 +2547,13 @@ class ShipmentGlobalView extends Component {
 
             labels: this.state.countryShipmentSplitList.map(ele => (ele.country.label.label_en)),
             datasets: [{
-                label: 'Ordered Shipments',
+                label: i18n.t('static.shipment.orderedShipment'),
                 data: this.state.countryShipmentSplitList.map(ele => (ele.orderedShipmentAmt)),
                 backgroundColor: '#6a82a8',
                 borderWidth: 0
             },
             {
-                label: 'Planned Shipments',
+                label: i18n.t('static.shipment.plannedShipment'),
                 data: this.state.countryShipmentSplitList.map(ele => (ele.plannedShipmentAmt)),
                 backgroundColor: '#dee7f8',
                 borderWidth: 0,

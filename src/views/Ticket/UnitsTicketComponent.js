@@ -9,6 +9,7 @@ import * as Yup from 'yup';
 import JiraTikcetService from '../../api/JiraTikcetService';
 import DimensionService from '../../api/DimensionService';
 import getLabelText from '../../CommonComponent/getLabelText';
+import { UNIT_LABEL_REGEX, SPACE_REGEX } from '../../Constants';
 
 const initialValues = {
     summary: "Add / Update Units",
@@ -21,13 +22,16 @@ const initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({        
         summary: Yup.string()
+            .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.common.summarytext')),
         dimension: Yup.string()
             .required(i18n.t('static.unit.dimensiontext')),
         unit: Yup.string()
-            .required(i18n.t('static.unit.unittext')),
-        unitCode: Yup.string()
-            .required(i18n.t('static.unit.unitcodetext')),        
+            .required(i18n.t('static.unit.unittext'))
+            .matches(UNIT_LABEL_REGEX, i18n.t('static.message.alphaspespacenumtext')),
+        // unitCode: Yup.string()
+        //     .required(i18n.t('static.unit.unitcodetext'))
+        //     .matches(UNIT_LABEL_REGEX, i18n.t('static.message.alphaspespacenumtext')),        
         // notes: Yup.string()
         //     .required(i18n.t('static.common.notestext'))
     })
@@ -69,7 +73,8 @@ export default class UnitsTicketComponent extends Component {
             },
             message : '',
             dimensions: [],
-            dimensionId : ''
+            dimensionId : '',
+            loading: false
         }        
         this.dataChange = this.dataChange.bind(this);        
         this.resetClicked = this.resetClicked.bind(this);
@@ -159,7 +164,7 @@ export default class UnitsTicketComponent extends Component {
 
     resetClicked() {        
         let { units } = this.state;
-        units.summary = '';
+        // units.summary = '';
         units.dimension = '';
         units.unit = '';
         units.unitCode = '';              
@@ -184,55 +189,49 @@ export default class UnitsTicketComponent extends Component {
             
         return (
             <div className="col-md-12">
-                <h5 style={{ color: "green" }} id="div2">{i18n.t(this.state.message)}</h5>                
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>                
                 <h4>{i18n.t('static.unit.unit')}</h4>
                 <br></br>
+                <div style={{ display: this.state.loading ? "none" : "block" }}>
                 <Formik
                     initialValues={initialValues}
                     validate={validate(validationSchema)}
                     onSubmit={(values, { setSubmitting, setErrors }) => {   
+                        this.setState({
+                            loading: true
+                        })
                         JiraTikcetService.addEmailRequestIssue(this.state.units).then(response => {                                         
                             console.log("Response :",response.status, ":" ,JSON.stringify(response.data));
                             if (response.status == 200 || response.status == 201) {
                                 var msg = response.data.key;
                                 this.setState({
-                                    message: msg
+                                    message: msg, loading: false
                                 },
                                     () => {
                                         this.resetClicked();
                                         this.hideSecondComponent();
                                     })                                
                             } else {
-                                this.setState({
-                                    // message: response.data.messageCode
-                                    message: 'Error while creating query'
+                                this.setState({                                    
+                                    message: i18n.t('static.unkownError'), loading: false
                                 },
-                                    () => {
-                                        this.resetClicked();
+                                    () => {                                        
                                         this.hideSecondComponent();
                                     })                                
                             }                            
                             this.props.togglehelp();
                             this.props.toggleSmall(this.state.message);
                         })
-                        // .catch(
-                        //     error => {
-                        //         switch (error.message) {
-                        //             case "Network Error":
-                        //                 this.setState({
-                        //                     message: 'Network Error'
-                        //                 })
-                        //                 break
-                        //             default:
-                        //                 this.setState({
-                        //                     message: 'Error'
-                        //                 })
-                        //                 break
-                        //         }
-                        //         alert(this.state.message);
-                        //         this.props.togglehelp();
-                        //     }
-                        // );        
+                        .catch(
+                            error => {
+                                this.setState({                                        
+                                    message: i18n.t('static.unkownError'), loading: false
+                                },
+                                () => {                                        
+                                    this.hideSecondComponent();                                     
+                                });                                    
+                            }
+                        );      
                     }}
                     render={
                         ({
@@ -247,10 +246,10 @@ export default class UnitsTicketComponent extends Component {
                             setTouched,
                             handleReset
                         }) => (
-                                <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm'>
+                                <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm' autocomplete="off">
                                     < FormGroup >
                                         <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
-                                        <Input type="text" name="summary" id="summary"
+                                        <Input type="text" name="summary" id="summary" readOnly = {true}
                                         bsSize="sm"
                                         valid={!errors.summary && this.state.units.summary != ''}
                                         invalid={touched.summary && !!errors.summary}
@@ -288,11 +287,11 @@ export default class UnitsTicketComponent extends Component {
                                         <FormFeedback className="red">{errors.unit}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup>
-                                        <Label for="unitCode">{i18n.t('static.unit.unitCode')}<span class="red Reqasterisk">*</span></Label>
+                                        <Label for="unitCode">{i18n.t('static.unit.unitCode')}</Label>
                                         <Input type="text" name="unitCode" id="unitCode"
                                         bsSize="sm"
-                                        valid={!errors.unitCode && this.state.units.unitCode != ''}
-                                        invalid={touched.unitCode && !!errors.unitCode}
+                                        // valid={!errors.unitCode && this.state.units.unitCode != ''}
+                                        // invalid={touched.unitCode && !!errors.unitCode}
                                         onChange={(e) => { handleChange(e); this.dataChange(e);}}
                                         onBlur={handleBlur}
                                         value={this.state.units.unitCode}
@@ -317,8 +316,21 @@ export default class UnitsTicketComponent extends Component {
                                         <Button type="reset" size="md" color="warning" className=" mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>                                        
                                         <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                     </ModalFooter>
+                                    <br></br><br></br>
+                                    <div className={this.props.className}>
+                                    <p>{i18n.t('static.ticket.drodownvaluenotfound')}</p>
+                                    </div>
                                 </Form>
                             )} />
+                            </div>
+                            <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                    <div class="align-items-center">
+                                        <div ><h4> <strong>Loading...</strong></h4></div>
+                                        <div class="spinner-border blue ml-4" role="status"></div>
+                                    </div>
+                                </div> 
+                            </div>
             </div>
         );
     }

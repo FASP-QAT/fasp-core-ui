@@ -15,6 +15,7 @@ const entityname = i18n.t('static.supplier.supplier');
 const validationSchema = function (values) {
     return Yup.object().shape({
         supplier: Yup.string()
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.supplier.suppliertext'))
     })
 }
@@ -284,10 +285,10 @@ class EditSupplierComponent extends Component {
                         </div>
                     </div>
                 </div>
-                <div>
+                {/* <div>
                     <h6>{i18n.t(this.state.message)}</h6>
                     <h6>{i18n.t(this.props.match.params.message)}</h6>
-                </div>
+                </div> */}
             </div>
         );
     }
@@ -299,7 +300,7 @@ class EditSupplierComponent extends Component {
         AuthenticationService.setupAxiosInterceptors();
         SupplierService.getSupplierById(this.props.match.params.supplierId).then(response => {
             this.setState({
-                supplier: response.data,loading:false
+                supplier: response.data, loading: false
             });
 
         })

@@ -29,31 +29,48 @@ const initialValuesSix = {
 const validationSchemaSix = function (values) {
     return Yup.object().shape({
         programName: Yup.string()
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.program.validprogramtext')),
         userId: Yup.string()
             .required(i18n.t('static.program.validmanagertext')),
-        airFreightPerc: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .required(i18n.t('static.program.validairfreighttext')).min(0, i18n.t('static.program.validvaluetext')),
-        seaFreightPerc: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .required(i18n.t('static.program.validseafreighttext')).min(0, i18n.t('static.program.validvaluetext')),
+        airFreightPerc: Yup.string()
+            .required(i18n.t('static.program.validairfreighttext'))
+            .min(0, i18n.t('static.program.validvaluetext'))
+            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
+        seaFreightPerc: Yup.string()
+            .required(i18n.t('static.program.validseafreighttext'))
+            .min(0, i18n.t('static.program.validvaluetext'))
+            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
         // deliveredToReceivedLeadTime: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
         // .required(i18n.t('static.program.validdelivertoreceivetext')).min(0, i18n.t('static.program.validvaluetext')),
-        plannedToSubmittedLeadTime: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .required(i18n.t('static.program.validplantosubmittext')).min(0, i18n.t('static.program.validvaluetext')),
-        submittedToApprovedLeadTime: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .required(i18n.t('static.program.validsubmittoapprovetext')).min(0, i18n.t('static.program.validvaluetext')),
-        approvedToShippedLeadTime: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .required(i18n.t('static.program.validapprovetoshiptext')).min(0, i18n.t('static.program.validvaluetext')),
+        plannedToSubmittedLeadTime: Yup.string()
+            .required(i18n.t('static.program.validplantosubmittext'))
+            .min(0, i18n.t('static.program.validvaluetext'))
+            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
+        submittedToApprovedLeadTime: Yup.string()
+            .required(i18n.t('static.program.validsubmittoapprovetext'))
+            .min(0, i18n.t('static.program.validvaluetext'))
+            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
+        approvedToShippedLeadTime: Yup.string()
+            .required(i18n.t('static.program.validapprovetoshiptext'))
+            .min(0, i18n.t('static.program.validvaluetext'))
+            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
         // healthAreaId: Yup.string()
         //     .required(i18n.t('static.program.validhealthareatext')),
         // programNotes: Yup.string()
         //     .required(i18n.t('static.program.validnotestext')),
-        shippedToArrivedByAirLeadTime: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .required(i18n.t('static.program.shippedToArrivedByAirLeadTime')).min(0, i18n.t('static.program.validvaluetext')),
-        shippedToArrivedBySeaLeadTime: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .required(i18n.t('static.program.shippedToArrivedBySeaLeadTime')).min(0, i18n.t('static.program.validvaluetext')),
-        arrivedToDeliveredLeadTime: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .required(i18n.t('static.program.arrivedToDeliveredLeadTime')).min(0, i18n.t('static.program.validvaluetext')),
+        shippedToArrivedByAirLeadTime: Yup.string()
+            .required(i18n.t('static.program.validapprovetoshiptext'))
+            .min(0, i18n.t('static.program.validvaluetext'))
+            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
+        shippedToArrivedBySeaLeadTime: Yup.string()
+            .required(i18n.t('static.program.validapprovetoshiptext'))
+            .min(0, i18n.t('static.program.validvaluetext'))
+            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
+        arrivedToDeliveredLeadTime: Yup.string()
+            .required(i18n.t('static.program.validapprovetoshiptext'))
+            .min(0, i18n.t('static.program.validvaluetext'))
+            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
 
     })
 }
@@ -188,7 +205,7 @@ export default class StepSix extends Component {
                                             bsSize="sm"
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e); this.props.Capitalize(e.target.value) }}
                                             // value={this.state.program.label.label_en}
-                                            id="programName"  />
+                                            id="programName" />
                                         <FormFeedback className="red">{errors.programName}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup className="col-md-6">
@@ -205,7 +222,7 @@ export default class StepSix extends Component {
                                         </Input>
                                         <FormFeedback className="red">{errors.userId}</FormFeedback>
                                     </FormGroup>
-                                   
+
                                     <FormGroup className="col-md-6">
                                         <Label htmlFor="company">{i18n.t('static.program.airfreightperc')} (%)<span class="red ">*</span></Label>
                                         <Input
@@ -216,7 +233,7 @@ export default class StepSix extends Component {
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
                                             type="number"
                                             min="0"
-                                            name="airFreightPerc" id="airFreightPerc"  />
+                                            name="airFreightPerc" id="airFreightPerc" />
                                         <FormFeedback className="red">{errors.airFreightPerc}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup className="col-md-6">
@@ -229,7 +246,7 @@ export default class StepSix extends Component {
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
                                             type="number"
                                             min="0"
-                                            name="seaFreightPerc" id="seaFreightPerc"  />
+                                            name="seaFreightPerc" id="seaFreightPerc" />
                                         <FormFeedback className="red">{errors.seaFreightPerc}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup className="col-md-6">
@@ -255,7 +272,7 @@ export default class StepSix extends Component {
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
                                             type="number"
                                             min="0"
-                                            name="submittedToApprovedLeadTime" id="submittedToApprovedLeadTime"  />
+                                            name="submittedToApprovedLeadTime" id="submittedToApprovedLeadTime" />
                                         <FormFeedback className="red">{errors.submittedToApprovedLeadTime}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup className="col-md-6">
@@ -268,7 +285,7 @@ export default class StepSix extends Component {
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
                                             type="number"
                                             min="0"
-                                            name="approvedToShippedLeadTime" id="approvedToShippedLeadTime"  />
+                                            name="approvedToShippedLeadTime" id="approvedToShippedLeadTime" />
                                         <FormFeedback className="red">{errors.approvedToShippedLeadTime}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup className="col-md-6">
@@ -281,12 +298,12 @@ export default class StepSix extends Component {
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
                                             type="number"
                                             min="0"
-                                            name="shippedToArrivedByAirLeadTime" id="shippedToArrivedByAirLeadTime"  />
+                                            name="shippedToArrivedByAirLeadTime" id="shippedToArrivedByAirLeadTime" />
                                         <FormFeedback className="red">{errors.shippedToArrivedByAirLeadTime}</FormFeedback>
                                     </FormGroup>
 
-            
-            
+
+
                                     <FormGroup className="col-md-6">
                                         <Label htmlFor="company">{i18n.t('static.realmcountry.shippedToArrivedSeaLeadTime')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
@@ -297,7 +314,7 @@ export default class StepSix extends Component {
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
                                             type="number"
                                             min="0"
-                                            name="shippedToArrivedBySeaLeadTime" id="shippedToArrivedBySeaLeadTime"  />
+                                            name="shippedToArrivedBySeaLeadTime" id="shippedToArrivedBySeaLeadTime" />
                                         <FormFeedback className="red">{errors.shippedToArrivedBySeaLeadTime}</FormFeedback>
                                     </FormGroup>
 
@@ -312,11 +329,11 @@ export default class StepSix extends Component {
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
                                             type="number"
                                             min="0"
-                                            name="arrivedToDeliveredLeadTime" id="arrivedToDeliveredLeadTime"  />
+                                            name="arrivedToDeliveredLeadTime" id="arrivedToDeliveredLeadTime" />
                                         <FormFeedback className="red">{errors.arrivedToDeliveredLeadTime}</FormFeedback>
                                     </FormGroup>
 
-                                   
+
                                     <FormGroup className="col-md-6">
                                         <Label htmlFor="select">{i18n.t('static.program.notes')}</Label>
                                         <Input
@@ -328,11 +345,11 @@ export default class StepSix extends Component {
                                             type="textarea" name="programNotes" id="programNotes" />
                                         <FormFeedback className="red">{errors.programNotes}</FormFeedback>
                                     </FormGroup>
-                                    
+
                                     <FormGroup className="col-md-12">
-                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.props.previousToStepFive} > <i className="fa fa-angle-double-left"></i> Back</Button>
+                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.props.previousToStepFive} > <i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
                                         &nbsp;
-                                         <Button color="info" size="md" className="float-left mr-1" type="submit" name="regionSub" id="regionSub" onClick={() => this.touchAllSix(setTouched, errors)} disabled={!isValid}>Next <i className="fa fa-angle-double-right"></i></Button>
+                                         <Button color="info" size="md" className="float-left mr-1" type="submit" name="regionSub" id="regionSub" onClick={() => this.touchAllSix(setTouched, errors)} disabled={!isValid}>{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
 
                                     </FormGroup>
                                 </Row>

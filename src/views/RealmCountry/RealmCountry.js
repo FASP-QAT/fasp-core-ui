@@ -222,7 +222,7 @@ class RealmCountry extends Component {
                                                     },
 
                                                     {
-                                                        title: "Is Active",
+                                                        title: i18n.t('static.checkbox.active'),
                                                         type: 'checkbox'
                                                     },
                                                     {
@@ -239,6 +239,29 @@ class RealmCountry extends Component {
                                                     }
 
                                                 ],
+                                                updateTable: function (el, cell, x, y, source, value, id) {
+                                                    var elInstance = el.jexcel;
+                                                    var rowData = elInstance.getRowData(y);
+                                                    // var productCategoryId = rowData[0];
+                                                    var realmCountryId = rowData[5];
+                                                    if (realmCountryId == 0) {
+                                                        var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
+                                                        cell1.classList.remove('readonly');
+
+                                                        // var cell2 = elInstance.getCell(`C${parseInt(y) + 1}`)
+                                                        // cell2.classList.remove('readonly');
+
+
+                                                    } else {
+                                                        var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
+                                                        cell1.classList.add('readonly');
+
+                                                        // var cell2 = elInstance.getCell(`C${parseInt(y) + 1}`)
+                                                        // cell2.classList.add('readonly');
+
+
+                                                    }
+                                                },
                                                 pagination: 10,
                                                 search: true,
                                                 columnSorting: true,
@@ -254,6 +277,7 @@ class RealmCountry extends Component {
                                                 onfocus: this.focus,
                                                 oneditionend: this.onedit,
                                                 copyCompatibility: true,
+                                                allowManualInsertRow: false,
                                                 text: {
                                                     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
                                                     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
@@ -364,9 +388,9 @@ class RealmCountry extends Component {
                                                             // region id
                                                             if (obj.getRowData(y)[5] == 0) {
                                                                 items.push({
-                                                                    title: obj.options.text.deleteSelectedRows,
+                                                                    title: i18n.t("static.common.deleterow"),
                                                                     onclick: function () {
-                                                                        obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y));
+                                                                        obj.deleteRow(parseInt(y));
                                                                     }
                                                                 });
                                                             }
@@ -400,16 +424,16 @@ class RealmCountry extends Component {
                                                     // Line
                                                     items.push({ type: 'line' });
 
-                                                    // Save
-                                                    if (obj.options.allowExport) {
-                                                        items.push({
-                                                            title: i18n.t('static.supplyPlan.exportAsCsv'),
-                                                            shortcut: 'Ctrl + S',
-                                                            onclick: function () {
-                                                                obj.download(true);
-                                                            }
-                                                        });
-                                                    }
+                                                    // // Save
+                                                    // if (obj.options.allowExport) {
+                                                    //     items.push({
+                                                    //         title: i18n.t('static.supplyPlan.exportAsCsv'),
+                                                    //         shortcut: 'Ctrl + S',
+                                                    //         onclick: function () {
+                                                    //             obj.download(true);
+                                                    //         }
+                                                    //     });
+                                                    // }
 
                                                     return items;
                                                 }.bind(this)
@@ -669,7 +693,7 @@ class RealmCountry extends Component {
                             <FormGroup>
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> Add Row</Button>
+                                <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>
                                 &nbsp;
 </FormGroup>
                         </CardFooter>
@@ -678,7 +702,7 @@ class RealmCountry extends Component {
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
-                            <div ><h4> <strong>Loading...</strong></h4></div>
+                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
                             <div class="spinner-border blue ml-4" role="status">
 

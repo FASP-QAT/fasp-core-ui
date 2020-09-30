@@ -21,8 +21,11 @@ const validationSchema = function (values) {
   return Yup.object().shape({
     realmId: Yup.string()
       .required(i18n.t('static.common.realmtext')),
+    // fundingSource: Yup.string()
+    //   .matches(LABEL_REGEX, i18n.t('static.message.rolenamevalidtext'))
+    //   .required(i18n.t('static.fundingsource.fundingsourcetext')),
     fundingSource: Yup.string()
-      .matches(LABEL_REGEX, i18n.t('static.message.rolenamevalidtext'))
+      .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
       .required(i18n.t('static.fundingsource.fundingsourcetext')),
     fundingSourceCode: Yup.string()
       // .max(6, i18n.t('static.common.max6digittext'))

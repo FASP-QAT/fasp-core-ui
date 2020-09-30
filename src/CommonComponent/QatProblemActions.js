@@ -59,7 +59,10 @@ export default class QatProblemActions extends Component {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext')
                 });
-                this.props.updateState(false);
+                if (this.props.updateState != undefined) {
+                    this.props.updateState(false);
+                }
+
             };
             getRequest.onsuccess = function (event) {
                 // console.log("get request===>",getRequest.result);
@@ -109,7 +112,10 @@ export default class QatProblemActions extends Component {
                     this.setState({
                         supplyPlanError: i18n.t('static.program.errortext')
                     })
-                    this.props.updateState(false);
+                    // this.props.updateState(false);
+                    if (this.props.updateState != undefined) {
+                        this.props.updateState(false);
+                    }
                 }.bind(this);
                 planningunitRequest.onsuccess = function (e) {
 
@@ -121,7 +127,10 @@ export default class QatProblemActions extends Component {
                         this.setState({
                             supplyPlanError: i18n.t('static.program.errortext')
                         })
-                        this.props.updateState(false);
+                        // this.props.updateState(false);
+                        if (this.props.updateState != undefined) {
+                            this.props.updateState(false);
+                        }
                     }.bind(this);
                     problemRequest.onsuccess = function (e) {
 
@@ -145,13 +154,20 @@ export default class QatProblemActions extends Component {
                             this.setState({
                                 supplyPlanError: i18n.t('static.program.errortext')
                             })
-                            this.props.updateState(false);
+                            // this.props.updateState(false);
+                            if (this.props.updateState != undefined) {
+                                this.props.updateState(false);
+                            }
                         }.bind(this);
                         puRequest.onsuccess = function (e) {
                             console.log("+++++++++++++", puRequest.result);
                             var planningUnitListAll = puRequest.result;
                             if (programList.length == 0) {
-                                this.props.updateState(false);
+
+                                // this.props.updateState(false);
+                                if (this.props.updateState != undefined) {
+                                    this.props.updateState(false);
+                                }
                             }
                             for (var pp = 0; pp < programList.length; pp++) {
                                 console.log("=====>in for====>", programList[pp]);
@@ -161,6 +177,7 @@ export default class QatProblemActions extends Component {
                                 problemActionIndex = programList[pp].problemReportList.length;
                                 var regionList = programList[pp].regionList;
                                 problemList = problemRequest.result.filter(c => c.realm.id == programList[pp].realmCountry.realm.realmId);
+                                console.log("test=====>problem List===>", problemList);
                                 planningUnitList = planningUnitResult.filter(c => c.program.id == programList[pp].programId);
                                 // for (var r = 0; r < regionList.length; r++) {
                                 for (var p = 0; p < planningUnitList.length; p++) {
@@ -183,7 +200,8 @@ export default class QatProblemActions extends Component {
                                                         && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                         && c.program.id == programList[pp].programId
                                                         && c.realmProblem.problem.problemId == 1
-                                                        && c.versionId == versionID);
+                                                        // && c.versionId == versionID
+                                                        );
                                                 if (filteredConsumptionList.length == 0) {
                                                     // console.log("index====>", index);
                                                     if (index == -1) {
@@ -328,7 +346,8 @@ export default class QatProblemActions extends Component {
                                                         && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                         && c.program.id == programList[pp].programId
                                                         && c.realmProblem.problem.problemId == 2
-                                                        && c.versionId == versionID);
+                                                        // && c.versionId == versionID
+                                                        );
 
                                                 if (filterInventoryList.length == 0) {
                                                     if (index == -1) {
@@ -480,13 +499,15 @@ export default class QatProblemActions extends Component {
                                                             c => c.program.id == programList[pp].programId
                                                                 && c.shipmentId == filteredShipmentList[s].shipmentId
                                                                 && c.realmProblem.problem.problemId == 3
-                                                                && c.versionId == versionID);
+                                                                // && c.versionId == versionID
+                                                                );
                                                     } else {
                                                         indexShipment = problemActionList.findIndex(
                                                             c => c.program.id == programList[pp].programId
                                                                 && c.index == filteredShipmentList[s].index
                                                                 && c.realmProblem.problem.problemId == 3
-                                                                && c.versionId == versionID);
+                                                                // && c.versionId == versionID
+                                                                );
                                                         newAddShipment = true;
                                                     }
 
@@ -688,7 +709,8 @@ export default class QatProblemActions extends Component {
                                                         && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                         && c.program.id == programList[pp].programId
                                                         && c.realmProblem.problem.problemId == 8
-                                                        && c.versionId == versionID);
+                                                        // && c.versionId == versionID
+                                                        );
 
                                                 if (filteredConsumptionListTwo.length != 18) {
                                                     if (index == -1) {
@@ -838,13 +860,15 @@ export default class QatProblemActions extends Component {
                                                             c => c.program.id == programList[pp].programId
                                                                 && c.shipmentId == filteredShipmentList[s].shipmentId
                                                                 && c.realmProblem.problem.problemId == 4
-                                                                && c.versionId == versionID);
+                                                                // && c.versionId == versionID
+                                                                );
                                                     } else {
                                                         indexShipment = problemActionList.findIndex(
                                                             c => c.program.id == programList[pp].programId
                                                                 && c.index == filteredShipmentList[s].index
                                                                 && c.realmProblem.problem.problemId == 4
-                                                                && c.versionId == versionID);
+                                                                // && c.versionId == versionID
+                                                                );
                                                         newAddShipment = true;
                                                     }
 
@@ -1052,13 +1076,15 @@ export default class QatProblemActions extends Component {
                                                             c => c.program.id == programList[pp].programId
                                                                 && c.shipmentId == filteredShipmentList[s].shipmentId
                                                                 && c.realmProblem.problem.problemId == 5
-                                                                && c.versionId == versionID);
+                                                                // && c.versionId == versionID
+                                                                );
                                                     } else {
                                                         indexShipment = problemActionList.findIndex(
                                                             c => c.program.id == programList[pp].programId
                                                                 && c.index == filteredShipmentList[s].index
                                                                 && c.realmProblem.problem.problemId == 5
-                                                                && c.versionId == versionID);
+                                                                // && c.versionId == versionID
+                                                                );
                                                         newAddShipment = true;
                                                     }
 
@@ -1088,7 +1114,7 @@ export default class QatProblemActions extends Component {
                                                             },
                                                             shipmentId: filteredShipmentList[s].shipmentId,
                                                             data5: '',
-                                                            newAdded:newAddShipment,
+                                                            newAdded: newAddShipment,
 
                                                             problemActionIndex: problemActionIndex,
 
@@ -1267,14 +1293,16 @@ export default class QatProblemActions extends Component {
                                                             c => c.program.id == programList[pp].programId
                                                                 && c.shipmentId == filteredShipmentList[s].shipmentId
                                                                 && c.realmProblem.problem.problemId == 6
-                                                                && c.versionId == versionID);
+                                                                // && c.versionId == versionID
+                                                                );
                                                     } else {
                                                         indexShipment = problemActionList.findIndex(
                                                             c => c.program.id == programList[pp].programId
                                                                 && c.index == filteredShipmentList[s].index
                                                                 && c.realmProblem.problem.problemId == 6
-                                                                && c.versionId == versionID);
-                                                                newAddShipment=true;
+                                                                // && c.versionId == versionID
+                                                                );
+                                                        newAddShipment = true;
                                                     }
 
                                                     if (indexShipment == -1) {
@@ -1303,7 +1331,7 @@ export default class QatProblemActions extends Component {
                                                             },
                                                             shipmentId: filteredShipmentList[s].shipmentId,
                                                             data5: '',
-                                                            newAdded:newAddShipment,
+                                                            newAdded: newAddShipment,
 
                                                             problemActionIndex: problemActionIndex,
 
@@ -1482,14 +1510,16 @@ export default class QatProblemActions extends Component {
                                                             c => c.program.id == programList[pp].programId
                                                                 && c.shipmentId == filteredShipmentList[s].shipmentId
                                                                 && c.realmProblem.problem.problemId == 7
-                                                                && c.versionId == versionID);
+                                                                // && c.versionId == versionID
+                                                                );
                                                     } else {
                                                         indexShipment = problemActionList.findIndex(
                                                             c => c.program.id == programList[pp].programId
                                                                 && c.index == filteredShipmentList[s].index
                                                                 && c.realmProblem.problem.problemId == 7
-                                                                && c.versionId == versionID);
-                                                                newAddShipment=true;
+                                                                // && c.versionId == versionID
+                                                                );
+                                                        newAddShipment = true;
                                                     }
 
                                                     if (indexShipment == -1) {
@@ -1518,7 +1548,7 @@ export default class QatProblemActions extends Component {
                                                             },
                                                             shipmentId: filteredShipmentList[s].shipmentId,
                                                             data5: '',
-                                                            newAdded:newAddShipment,
+                                                            newAdded: newAddShipment,
 
                                                             problemActionIndex: problemActionIndex,
 
@@ -1689,7 +1719,8 @@ export default class QatProblemActions extends Component {
                                                             && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                             && c.program.id == programList[pp].programId
                                                             && c.realmProblem.problem.problemId == 10
-                                                            && c.versionId == versionID);
+                                                            // && c.versionId == versionID
+                                                            );
 
                                                     if (consumptionList.length > problemList[prob].data2) {
                                                         var conQtyArray = [];
@@ -1882,7 +1913,8 @@ export default class QatProblemActions extends Component {
                                                             && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                             && c.program.id == programList[pp].programId
                                                             && c.realmProblem.problem.problemId == 10
-                                                            && c.versionId == versionID);
+                                                            // && c.versionId == versionID
+                                                            );
 
                                                     if (consumptionList.length > problemList[prob].data2) {
                                                         var conQtyArray = [];
@@ -2058,7 +2090,8 @@ export default class QatProblemActions extends Component {
                                                             && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                             && c.program.id == programList[pp].programId
                                                             && c.realmProblem.problem.problemId == 10
-                                                            && c.versionId == versionID);
+                                                            // && c.versionId == versionID
+                                                            );
 
                                                     if (consumptionList.length > problemList[prob].data2) {
                                                         var conQtyArray = [];
@@ -2261,7 +2294,7 @@ export default class QatProblemActions extends Component {
 
                                             }
                                             // console.log("planningUnitId====>", planningUnitId);
-                                            // console.log("mosArray============>$@##", mosArray);
+                                            console.log("mosArray============>$@##", mosArray);
                                             // for loop on array mosArray
                                             var monthWithMosLessThenMin = '';
                                             for (var element = 0; element < mosArray.length; element++) {
@@ -2272,13 +2305,15 @@ export default class QatProblemActions extends Component {
                                                 } else {
                                                 }
                                             }
+                                            console.log("monthWithMosLessThenMin======>", monthWithMosLessThenMin);
                                             var index = problemActionList.findIndex(
                                                 c => moment(c.dt).format("YYYY-MM") == moment(Date.now()).format("YYYY-MM")
                                                     // && c.region.id == regionList[r].regionId
                                                     && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                     && c.program.id == programList[pp].programId
                                                     && c.realmProblem.problem.problemId == 11
-                                                    && c.versionId == versionID);
+                                                    // && c.versionId == versionID
+                                                    );
 
                                             if (monthWithMosLessThenMin != '') {
                                                 // console.log("min mos month from array ======>", monthWithMosLessThenMin);
@@ -2368,9 +2403,12 @@ export default class QatProblemActions extends Component {
                                                     console.log("dont falg problem mos is not less then min ");
                                                 }
                                             } else {
-                                                // console.log("no months with MOS less then min ===#########");
-                                                if (index != -1 && problemActionList[index].problemStatus.id == 1 && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].version == versionID) {
-                                                    // console.log("//////at this point resolve the problem.");
+                                                console.log("no months with MOS less then min ===#########");
+                                                // console.log("index*************>", index);
+                                                // console.log("versionId************", versionID);
+
+                                                if (index != -1 && problemActionList[index].problemStatus.id == 1 && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
+                                                    console.log("//////at this point resolve the problem.");
                                                     var filterObj = problemActionList[index];
                                                     var transList = filterObj.problemTransList;
                                                     let tempProblemTransObj = {
@@ -2477,7 +2515,8 @@ export default class QatProblemActions extends Component {
                                                     && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                     && c.program.id == programList[pp].programId
                                                     && c.realmProblem.problem.problemId == 16
-                                                    && c.versionId == versionID);
+                                                    // && c.versionId == versionID
+                                                    );
 
                                             if (monthWithMosGreaterThenMax != '') {
                                                 // console.log("min mos month from array ======>", monthWithMosGreaterThenMax);
@@ -2565,7 +2604,7 @@ export default class QatProblemActions extends Component {
                                                 }
                                             } else {
                                                 // console.log("no months with MOS greater then max ===#########");
-                                                if (index != -1 && problemActionList[index].problemStatus.id == 1 && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].version == versionID) {
+                                                if (index != -1 && problemActionList[index].problemStatus.id == 1 && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
                                                     // console.log("//////at this point resolve the problem. ###########");
                                                     var filterObj = problemActionList[index];
                                                     var transList = filterObj.problemTransList;
@@ -2676,7 +2715,8 @@ export default class QatProblemActions extends Component {
                                                     && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                     && c.program.id == programList[pp].programId
                                                     && c.realmProblem.problem.problemId == 17
-                                                    && c.versionId == versionID);
+                                                    // && c.versionId == versionID
+                                                    );
 
                                             if (monthWithMosLessThenMin != '') {
                                                 // console.log("min mos month from array ======>", monthWithMosLessThenMin);
@@ -2704,8 +2744,8 @@ export default class QatProblemActions extends Component {
 
                                                             dt: moment(Date.now()).format('YYYY-MM-DD'),
                                                             region: {
-                                                                id: regionList[r].regionId,
-                                                                label: regionList[r].label
+                                                                id: 0,
+                                                                // label: regionList[r].label
                                                             },
                                                             planningUnit: {
                                                                 id: planningUnitList[p].planningUnit.id,
@@ -2768,7 +2808,7 @@ export default class QatProblemActions extends Component {
                                                 }
                                             } else {
                                                 console.log("no months with MOS less then min or have shipmnet coming withing lead time===#########");
-                                                if (index != -1 && problemActionList[index].problemStatus.id == 1 && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].version == versionID) {
+                                                if (index != -1 && problemActionList[index].problemStatus.id == 1 && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
                                                     // console.log("//////at this point resolve the problem.");
                                                     var filterObj = problemActionList[index];
                                                     var transList = filterObj.problemTransList;
@@ -2877,7 +2917,8 @@ export default class QatProblemActions extends Component {
                                                     && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                     && c.program.id == programList[pp].programId
                                                     && c.realmProblem.problem.problemId == 18
-                                                    && c.versionId == versionID);
+                                                    // && c.versionId == versionID
+                                                    );
 
                                             if (monthWithMosLessThenMin != '') {
                                                 // console.log("min mos month from array ======>", monthWithMosLessThenMin);
@@ -2968,7 +3009,7 @@ export default class QatProblemActions extends Component {
                                                 }
                                             } else {
                                                 // console.log("no months with MOS less then min ===#########");
-                                                if (index != -1 && problemActionList[index].problemStatus.id == 1 && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].version == versionID) {
+                                                if (index != -1 && problemActionList[index].problemStatus.id == 1 && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
                                                     // console.log("//////at this point resolve the problem.");
                                                     var filterObj = problemActionList[index];
                                                     var transList = filterObj.problemTransList;
@@ -3077,7 +3118,8 @@ export default class QatProblemActions extends Component {
                                                     && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                     && c.program.id == programList[pp].programId
                                                     && c.realmProblem.problem.problemId == 19
-                                                    && c.versionId == versionID);
+                                                    // && c.versionId == versionID
+                                                    );
 
                                             if (monthWithMosGreaterThenMax != '') {
                                                 // console.log("min mos month from array ======>", monthWithMosGreaterThenMax);
@@ -3165,7 +3207,7 @@ export default class QatProblemActions extends Component {
                                                 }
                                             } else {
                                                 // console.log("no months with MOS greater then max ===#########");
-                                                if (index != -1 && problemActionList[index].problemStatus.id == 1 && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].version == versionID) {
+                                                if (index != -1 && problemActionList[index].problemStatus.id == 1 && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
                                                     // console.log("//////at this point resolve the problem. ###########");
                                                     var filterObj = problemActionList[index];
                                                     var transList = filterObj.problemTransList;
@@ -3275,7 +3317,8 @@ export default class QatProblemActions extends Component {
                                                     && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                     && c.program.id == programList[pp].programId
                                                     && c.realmProblem.problem.problemId == 20
-                                                    && c.versionId == versionID);
+                                                    // && c.versionId == versionID
+                                                    );
 
                                             if (monthWithMosLessThenMin != '') {
                                                 // console.log("min mos month from array ======>", monthWithMosLessThenMin);
@@ -3303,8 +3346,8 @@ export default class QatProblemActions extends Component {
 
                                                             dt: moment(Date.now()).format('YYYY-MM-DD'),
                                                             region: {
-                                                                id: regionList[r].regionId,
-                                                                label: regionList[r].label
+                                                                id: 0,
+                                                                // label: regionList[r].label
                                                             },
                                                             planningUnit: {
                                                                 id: planningUnitList[p].planningUnit.id,
@@ -3367,7 +3410,7 @@ export default class QatProblemActions extends Component {
                                                 }
                                             } else {
                                                 // console.log("no months with MOS less then min or have shipmnet coming withing lead time===#########");
-                                                if (index != -1 && problemActionList[index].problemStatus.id == 1 && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].version == versionID) {
+                                                if (index != -1 && problemActionList[index].problemStatus.id == 1 && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
                                                     // console.log("//////at this point resolve the problem.");
                                                     var filterObj = problemActionList[index];
                                                     var transList = filterObj.problemTransList;
@@ -3436,7 +3479,8 @@ export default class QatProblemActions extends Component {
                                                         && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                         && c.program.id == programList[pp].programId
                                                         && c.realmProblem.problem.problemId == 21
-                                                        && c.versionId == versionID);
+                                                        // && c.versionId == versionID
+                                                        );
 
                                                 if (consumptionListFortMinusOneDate.length > 0 && consumptionListFortMinusThreeDate.length > 0 && consumptionListFortMinusTwoDate.length == 0) {
                                                     // console.log("rais prob--------");
@@ -3577,14 +3621,22 @@ export default class QatProblemActions extends Component {
                                         message: i18n.t('static.program.errortext'),
                                         color: 'red'
                                     })
-                                    this.props.updateState(false);
+                                    // this.props.updateState(false);
+                                    if (this.props.updateState != undefined) {
+                                        this.props.updateState(false);
+                                    }
                                 }.bind(this);
                                 putRequest.onsuccess = function (event) {
                                     // this.setState({executionStatus:1});
                                     // return executionStatus;
                                     console.log("time taken in sec===>", performance.now());
-                                    this.props.updateState(false);
-                                    this.props.fetchData(false);
+
+                                    // this.props.updateState(false);
+                                    // this.props.fetchData(false);
+                                    if (this.props.updateState != undefined) {
+                                        this.props.updateState(false);
+                                        this.props.fetchData(false);
+                                    }
 
                                 }.bind(this);
 
