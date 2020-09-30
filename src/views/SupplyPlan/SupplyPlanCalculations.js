@@ -185,8 +185,10 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                         // Shipments part
                         // Getting shipments list for planning unit
                         var shipmentList = (programJsonForStoringTheResult.shipmentList).filter(c => c.active == true && c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag == true);
+                        console.log("Shipment list----------------->", shipmentList);
                         // Getting shipment list for a month
                         var shipmentArr = shipmentList.filter(c => (c.shipmentStatus.id != DELIVERED_SHIPMENT_STATUS) ? (c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate) : (c.receivedDate >= startDate && c.receivedDate <= endDate))
+                        console.log("Shipment Arr----------------->", shipmentArr);
                         var shipmentTotalQty = 0;
                         var shipmentTotalQtyWps = 0;
                         var manualTotalQty = 0;
@@ -214,6 +216,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                         for (var j = 0; j < shipmentArr.length; j++) {
                             // Adding total shipment qty
                             shipmentTotalQty += parseInt((shipmentArr[j].shipmentQty));
+                            console.log("(shipmentArr[j].shipmentQty)", (shipmentArr[j].shipmentQty));
                             // Adding total shipment qty wps
                             if (shipmentArr[j].shipmentStatus.id != PLANNED_SHIPMENT_STATUS && shipmentArr[j].shipmentStatus.id != ON_HOLD_SHIPMENT_STATUS && shipmentArr[j].shipmentStatus.id != SUBMITTED_SHIPMENT_STATUS) {
                                 shipmentTotalQtyWps += parseInt((shipmentArr[j].shipmentQty));

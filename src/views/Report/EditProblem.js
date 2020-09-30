@@ -759,7 +759,7 @@ export default class EditLanguageComponent extends Component {
                                             <Form onSubmit={handleSubmit} noValidate name='languageForm'>
                                                 <CardBody className="pb-0">
                                                     <div className="col-md-12 bg-white pb-1  mb-2">
-                                                        <ul class="navbar-nav"><li class="nav-item pl-0"><a aria-current="page" class="nav-link active" ><b >Problem Details</b></a></li></ul>
+                                                        <ul class="navbar-nav"><li class="nav-item pl-0"><a aria-current="page" class="nav-link active" ><b >{i18n.t('static.report.problemDescription')}</b></a></li></ul>
                                                         <div className="row">
                                                             <FormGroup className="col-md-6 ">
                                                                 <Label for="program">{i18n.t('static.program.program')}</Label>
@@ -938,7 +938,7 @@ export default class EditLanguageComponent extends Component {
                                                         {
                                                             props => (
                                                                 <div className="col-md-12 bg-white pb-1 mb-2">
-                                                                    <ul class="navbar-nav"><li class="nav-item pl-0"><a aria-current="page" class="nav-link active" ><b>Problem Trans Details</b></a></li></ul>
+                                                                    <ul class="navbar-nav"><li class="nav-item pl-0"><a aria-current="page" class="nav-link active" ><b>{i18n.t('static.report.problemTransDetails')}</b></a></li></ul>
                                                                     <div className="TableCust">
                                                                         <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
 
@@ -964,7 +964,7 @@ export default class EditLanguageComponent extends Component {
 
 
                                                     <div className="col-md-12 bg-white pb-1">
-                                                        <ul class="navbar-nav"><li class="nav-item pl-0"><a aria-current="page" class="nav-link active"><b>Update Status</b></a></li></ul>
+                                                        <ul class="navbar-nav"><li class="nav-item pl-0"><a aria-current="page" class="nav-link active"><b>{i18n.t('static.report.updateStatus')}</b></a></li></ul>
 
                                                         <div className="row">
                                                             <FormGroup className="col-md-3 ">
