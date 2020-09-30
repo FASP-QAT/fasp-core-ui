@@ -759,7 +759,7 @@ const validationSchema = function (values) {
             .matches(/^\s*(?=.*[1-9])\d*(?:\.\d{1,2})?\s*$/, i18n.t('static.currency.conversionrateNumberTwoDecimalPlaces'))
             .required(i18n.t('static.procurementUnit.validMultiplierText'))
             .min(0, i18n.t('static.procurementUnit.validValueText')),
-            // .max(12, i18n.t("Eneter valid number with digits less then 10.")),
+        // .max(12, i18n.t("Eneter valid number with digits less then 10.")),
         unitId: Yup.string()
             .required(i18n.t('static.procurementUnit.validUnitIdText')),
         supplierId: Yup.string()
@@ -1136,7 +1136,8 @@ export default class EditProcurementUnit extends Component {
                                                             type="text" name="procurementUnitName"
                                                             valid={!errors.procurementUnitName}
                                                             bsSize="sm"
-                                                            invalid={touched.procurementUnitName && !!errors.procurementUnitName || this.state.procurementUnit.label.label_en == ''}
+                                                            // invalid={touched.procurementUnitName && !!errors.procurementUnitName || this.state.procurementUnit.label.label_en == ''}
+                                                            invalid={touched.procurementUnitName && !!errors.procurementUnitName || !!errors.procurementUnitName}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.procurementUnit.label.label_en}
@@ -1237,7 +1238,7 @@ export default class EditProcurementUnit extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.procurementUnit.lengthUnit.id}
-                                                            
+
                                                             type="select" name="lengthUnitId" id="lengthUnitId">
                                                             <option value="">{i18n.t('static.common.select')}</option>
                                                             {units}
@@ -1419,7 +1420,7 @@ export default class EditProcurementUnit extends Component {
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
-                            <div ><h4> <strong>Loading...</strong></h4></div>
+                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
                             <div class="spinner-border blue ml-4" role="status">
 

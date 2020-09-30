@@ -949,56 +949,56 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                         columns: [
 
                                                             {
-                                                                title: "Procurement Agent",
+                                                                title: i18n.t('static.procurementagent.procurementagent'),
                                                                 type: 'dropdown',
                                                                 source: programs,
                                                                 readOnly: true
                                                             },
                                                             {
-                                                                title: "Planing Unit",
+                                                                title: i18n.t('static.dashboard.product'),
                                                                 type: 'autocomplete',
                                                                 source: products,
                                                                 filter: this.filterProduct
 
                                                             },
                                                             {
-                                                                title: "SKU Code",
+                                                                title: i18n.t('static.procurementAgentProcurementUnit.skuCode'),
                                                                 type: 'text',
 
                                                             },
                                                             {
-                                                                title: "Catalog Price (USD)",
+                                                                title: i18n.t('static.procurementAgentPlanningUnit.catalogPrice'),
                                                                 type: 'numeric',
                                                                 // mask: '$ #.##,00',
                                                                 // decimal: ',',
                                                             },
                                                             {
-                                                                title: "MOQ",
+                                                                title: i18n.t('static.procurementAgent.MOQ'),
                                                                 type: 'number',
                                                             },
                                                             {
-                                                                title: "Unit Per Pallet (EURO1)",
+                                                                title: i18n.t('static.procurementAgent.UnitPerPalletEuro1'),
                                                                 type: 'numeric',
                                                             },
                                                             {
-                                                                title: "Unit Per Pallet (EURO2)",
+                                                                title: i18n.t('static.procurementAgent.UnitPerPalletEuro2'),
                                                                 type: 'numeric',
                                                             },
                                                             {
-                                                                title: "Unit Per Container",
+                                                                title: i18n.t('static.procurementAgent.UnitPerContainer'),
                                                                 type: 'numeric',
                                                             },
                                                             {
-                                                                title: "Volume",
+                                                                title: i18n.t('static.procurementAgentPlanningUnit.volume'),
                                                                 type: 'numeric',
 
                                                             },
                                                             {
-                                                                title: "Weight",
+                                                                title: i18n.t('static.procurementAgentPlanningUnit.weight'),
                                                                 type: 'numeric',
                                                             },
                                                             {
-                                                                title: "Is Active",
+                                                                title: i18n.t('static.checkbox.active'),
                                                                 type: 'checkbox'
                                                             },
                                                             {
@@ -1413,7 +1413,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
         console.log('hasDuplicate', hasDuplicate);
         if (hasDuplicate) {
             this.setState({
-                message: 'Duplicate Planning Unit Details Found',
+                message: i18n.t('static.planningUnit.duplicatePlanningUnit'),
                 changedFlag: 0,
 
             },
@@ -1864,7 +1864,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                             <FormGroup>
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> Add Row</Button>
+                                <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>
                                 &nbsp;
     </FormGroup>
                         </CardFooter>

@@ -29,7 +29,7 @@ const validationSchema = function (values) {
             .required(i18n.t('static.common.realmtext')),
         organisationName: Yup.string()
             // .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
-            .matches(/^\S+(?: \S+)*$/,i18n.t('static.validSpace.string'))
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.organisation.organisationtext')),
         organisationCode: Yup.string()
             .matches(ALPHABET_NUMBER_REGEX, i18n.t('static.message.alphabetnumerallowed'))
@@ -346,9 +346,13 @@ export default class EditOrganisationComponent extends Component {
                                                         <Label htmlFor="realmCountryId">{i18n.t('static.organisation.realmcountry')}<span class="red Reqasterisk">*</span></Label>
                                                         <Select
                                                             bsSize="sm"
+                                                            // className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                            //     { 'is-valid': !errors.realmCountryId },
+                                                            //     { 'is-invalid': (touched.realmCountryId && !!errors.realmCountryId || this.state.organisation.realmCountryArray.length == 0) }
+                                                            // )}
                                                             className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
                                                                 { 'is-valid': !errors.realmCountryId },
-                                                                { 'is-invalid': (touched.realmCountryId && !!errors.realmCountryId || this.state.organisation.realmCountryArray.length == 0) }
+                                                                { 'is-invalid': (touched.realmCountryId && !!errors.realmCountryId || !!errors.realmCountryId) }
                                                             )}
                                                             name="realmCountryId"
                                                             id="realmCountryId"
@@ -384,7 +388,8 @@ export default class EditOrganisationComponent extends Component {
                                                         <Input
                                                             bsSize="sm"
                                                             type="text" name="organisationName" valid={!errors.organisationName}
-                                                            invalid={touched.organisationName && !!errors.organisationName || this.state.organisation.label.label_en == ''}
+                                                            // invalid={touched.organisationName && !!errors.organisationName || this.state.organisation.label.label_en == ''}
+                                                            invalid={(touched.organisationName && !!errors.organisationName) || !!errors.organisationName}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.organisation.label.label_en}
@@ -450,7 +455,7 @@ export default class EditOrganisationComponent extends Component {
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
-                            <div ><h4> <strong>Loading...</strong></h4></div>
+                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
                             <div class="spinner-border blue ml-4" role="status">
 

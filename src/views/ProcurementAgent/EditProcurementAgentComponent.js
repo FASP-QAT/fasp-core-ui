@@ -338,7 +338,8 @@ class EditProcurementAgentComponent extends Component {
                                                             name="procurementAgentName"
                                                             id="procurementAgentName"
                                                             valid={!errors.procurementAgentName}
-                                                            invalid={touched.procurementAgentName && !!errors.procurementAgentName || this.state.procurementAgent.label.label_en == ''}
+                                                            // invalid={touched.procurementAgentName && !!errors.procurementAgentName || this.state.procurementAgent.label.label_en == ''}
+                                                            invalid={(touched.procurementAgentName && !!errors.procurementAgentName) || !!errors.procurementAgentName}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             required
@@ -396,7 +397,7 @@ class EditProcurementAgentComponent extends Component {
                                                             name="submittedToApprovedLeadTime"
                                                             id="submittedToApprovedLeadTime"
                                                             valid={!errors.submittedToApprovedLeadTime}
-                                                            invalid={touched.submittedToApprovedLeadTime && !!errors.submittedToApprovedLeadTime || this.state.procurementAgent.submittedToApprovedLeadTime == ''}
+                                                            invalid={(touched.submittedToApprovedLeadTime && !!errors.submittedToApprovedLeadTime) || !!errors.submittedToApprovedLeadTime}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             required
@@ -415,7 +416,8 @@ class EditProcurementAgentComponent extends Component {
                                                             name="approvedToShippedLeadTime"
                                                             id="approvedToShippedLeadTime"
                                                             valid={!errors.approvedToShippedLeadTime && this.state.procurementAgent.approvedToShippedLeadTime != ''}
-                                                            invalid={touched.approvedToShippedLeadTime && !!errors.approvedToShippedLeadTime || this.state.procurementAgent.approvedToShippedLeadTime == ''}
+                                                            // invalid={touched.approvedToShippedLeadTime && !!errors.approvedToShippedLeadTime || this.state.procurementAgent.approvedToShippedLeadTime == ''}
+                                                            invalid={(touched.approvedToShippedLeadTime && !!errors.approvedToShippedLeadTime) || !!errors.approvedToShippedLeadTime}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             required
@@ -479,7 +481,7 @@ class EditProcurementAgentComponent extends Component {
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
-                            <div ><h4> <strong>Loading...</strong></h4></div>
+                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
                             <div class="spinner-border blue ml-4" role="status">
 

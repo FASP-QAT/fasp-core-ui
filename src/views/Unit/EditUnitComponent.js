@@ -231,7 +231,8 @@ export default class EditUnitComponent extends Component {
                                                             name="dimensionId"
                                                             id="dimensionId"
                                                             valid={!errors.dimensionId}
-                                                            invalid={touched.dimensionId && !!errors.dimensionId || this.state.unit.dimension.dimensionId == ''}
+                                                            // invalid={touched.dimensionId && !!errors.dimensionId || this.state.unit.dimension.dimensionId == ''}
+                                                            invalid={(touched.dimensionId && !!errors.dimensionId) || !!errors.dimensionId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             readOnly={true}
@@ -250,7 +251,8 @@ export default class EditUnitComponent extends Component {
                                                             id="unitName"
                                                             bsSize="sm"
                                                             valid={!errors.unitName}
-                                                            invalid={touched.unitName && !!errors.unitName || this.state.unit.label.label_en == ''}
+                                                            // invalid={touched.unitName && !!errors.unitName || this.state.unit.label.label_en == ''}
+                                                            invalid={(touched.unitName && !!errors.unitName) || !!errors.unitName}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.unit.label.label_en}
@@ -264,7 +266,8 @@ export default class EditUnitComponent extends Component {
                                                             id="unitCode"
                                                             bsSize="sm"
                                                             valid={!errors.unitCode}
-                                                            invalid={touched.unitCode && !!errors.unitCode || this.state.unit.unitCode == ''}
+                                                            // invalid={touched.unitCode && !!errors.unitCode || this.state.unit.unitCode == ''}
+                                                            invalid={(touched.unitCode && !!errors.unitCode) || !!errors.unitCode}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             required
@@ -325,7 +328,7 @@ export default class EditUnitComponent extends Component {
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
-                            <div ><h4> <strong>Loading...</strong></h4></div>
+                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
                             <div class="spinner-border blue ml-4" role="status">
 

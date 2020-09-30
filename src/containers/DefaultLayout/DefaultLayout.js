@@ -1691,19 +1691,19 @@ class DefaultLayout extends Component {
                         icon: 'fa fa-list',
                         attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_REPORT') ? false : true) },
                         children: [
-                          {
-                            name: i18n.t('static.dashboard.productcatalog'),
-                            url: '/report/productCatalog',
-                            icon: 'fa fa-th',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PRODUCT_CATALOG_REPORT') ? false : true) }
+                          // {
+                          //   name: i18n.t('static.dashboard.productcatalog'),
+                          //   url: '/report/productCatalog',
+                          //   icon: 'fa fa-th',
+                          //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PRODUCT_CATALOG_REPORT') ? false : true) }
 
-                          },
-                          {
-                            name: i18n.t('static.dashboard.supplierLeadTimes'),
-                            url: '/report/supplierLeadTimes',
-                            icon: 'fa fa-wpforms',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
-                          },
+                          // },
+                          // {
+                          //   name: i18n.t('static.dashboard.supplierLeadTimes'),
+                          //   url: '/report/supplierLeadTimes',
+                          //   icon: 'fa fa-wpforms',
+                          //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
+                          // },
 
 
                           //1) Consumption Reports
