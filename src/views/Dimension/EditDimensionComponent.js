@@ -117,7 +117,7 @@ export default class UpdateDimensionComponent extends Component {
     }
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         DimensionService.getDiamensionById(this.props.match.params.dimensionId).then(response => {
             if (response.status == 200) {
                 this.setState({
@@ -242,7 +242,7 @@ export default class UpdateDimensionComponent extends Component {
     }
 
     resetClicked() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         DimensionService.getDiamensionById(this.props.match.params.dimensionId).then(response => {
             this.setState({
                 dimension: response.data

@@ -1629,7 +1629,7 @@ class AccessControlComponent extends Component {
                 userAcls: changedpapuList
             }
 
-            AuthenticationService.setupAxiosInterceptors();
+            // AuthenticationService.setupAxiosInterceptors();
             UserService.accessControls(user)
                 .then(response => {
                     if (response.status == 200) {
@@ -1670,7 +1670,7 @@ class AccessControlComponent extends Component {
 
     }
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         RealmCountryService.getRealmCountryListAll()
             .then(response => {
                 if (response.status == 200) {

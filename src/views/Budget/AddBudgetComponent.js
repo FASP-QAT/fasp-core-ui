@@ -275,7 +275,6 @@ class AddBudgetComponent extends Component {
 
     componentDidMount() {
         console.log("new date--->", new Date());
-        AuthenticationService.setupAxiosInterceptors();
         ProgramService.getProgramList()
             .then(response => {
                 if (response.status == 200) {

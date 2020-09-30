@@ -663,7 +663,7 @@ class RegionListComponent extends Component {
     }
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         RegionService.getRegionList()
             .then(response => {
                 console.log(response.data);

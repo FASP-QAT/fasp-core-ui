@@ -169,7 +169,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
 
             }
             console.log("procurementUnitArray----->", procurementUnitArray);
-            AuthenticationService.setupAxiosInterceptors();
+            // AuthenticationService.setupAxiosInterceptors();
             ProcurementAgentService.addprocurementAgentProcurementUnitMapping(procurementUnitArray)
                 .then(response => {
                     if (response.status == "200") {
@@ -422,7 +422,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
         var procurmentAgentListJexcel = [];
         var procurmentUnitListJexcel = [];
 
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         ProcurementAgentService.getProcurementAgentProcurementUnitList(this.state.procurementAgentId)
             .then(response => {
                 if (response.status == 200) {
@@ -431,7 +431,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                     if (myResponse.length > 0) {
                         this.setState({ rows: myResponse });
                     }
-                    AuthenticationService.setupAxiosInterceptors();
+                    // AuthenticationService.setupAxiosInterceptors();
                     ProcurementAgentService.getProcurementAgentListAll().then(response => {
                         if (response.status == "200") {
                             // console.log("second--->", response.data);
@@ -445,7 +445,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                 }
                                 procurmentAgentListJexcel.push(procurementAgentJson);
                             }
-                            AuthenticationService.setupAxiosInterceptors();
+                            // AuthenticationService.setupAxiosInterceptors();
                             ProcurementUnitService.getProcurementUnitList().then(response => {
                                 if (response.status == 200) {
                                     // console.log("third ffff---->", response.data);

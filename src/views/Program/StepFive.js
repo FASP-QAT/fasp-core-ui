@@ -85,7 +85,7 @@ export default class StepFive extends Component {
 
     getRegionList() {
 
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         ProgramService.getRegionList(document.getElementById('realmCountryId').value)
             .then(response => {
                 if (response.status == 200) {

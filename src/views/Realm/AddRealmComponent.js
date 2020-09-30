@@ -172,7 +172,7 @@ export default class AddRealmComponent extends Component {
         }
     }
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         this.setState({ loading: false })
     }
     hideSecondComponent() {
@@ -209,7 +209,7 @@ export default class AddRealmComponent extends Component {
                                     this.setState({
                                         loading: true
                                     })
-                                    AuthenticationService.setupAxiosInterceptors();
+                                    // AuthenticationService.setupAxiosInterceptors();
                                     RealmService.addRealm(this.state.realm)
                                         .then(response => {
                                             if (response.status == 200) {

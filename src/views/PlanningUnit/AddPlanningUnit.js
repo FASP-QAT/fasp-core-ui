@@ -146,14 +146,14 @@ export default class AddPlanningUnit extends Component {
     }
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         UnitService.getUnitListAll()
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
                         units: response.data, loading: false
                     })
-                    AuthenticationService.setupAxiosInterceptors();
+                    // AuthenticationService.setupAxiosInterceptors();
                     ForecastingUnitService.getForecastingUnitList().then(response => {
                         console.log(response.data)
                         this.setState({

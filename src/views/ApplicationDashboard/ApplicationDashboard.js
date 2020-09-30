@@ -1131,38 +1131,38 @@ class ApplicationDashboard extends Component {
             </Row>
           }
           <Row>
-          {this.state.programList.length > 0 &&
-            <Col xs="12" sm="6" lg="3">
-              <Card className=" CardHeight">
+            {this.state.programList.length > 0 &&
+              <Col xs="12" sm="6" lg="3">
+                <Card className=" CardHeight">
 
-                <CardBody className="p-0">
-                  <div class="h1 text-muted text-left mb-0 m-3">
-                    <i class="fa fa-list-alt icon-color"></i>
-                    <ButtonGroup className="float-right BtnZindex">
-                      <Dropdown id='card9' isOpen={this.state.card9} toggle={() => { this.setState({ card9: !this.state.card9 }); }}>
-                        <DropdownToggle caret className="p-0" color="transparent">
-                          {/* <i className="icon-settings"></i> */}
-                        </DropdownToggle>
-                        <DropdownMenu right>
-                          <DropdownItem onClick={() => this.redirectToCrud("/report/problemList")}>QAT Problem Action Report</DropdownItem>
-                          {/* <DropdownItem onClick={() => this.redirectToCrud("/user/addUser")}>Add User</DropdownItem> */}
+                  <CardBody className="p-0">
+                    <div class="h1 text-muted text-left mb-0 m-3">
+                      <i class="fa fa-list-alt icon-color"></i>
+                      <ButtonGroup className="float-right BtnZindex">
+                        <Dropdown id='card9' isOpen={this.state.card9} toggle={() => { this.setState({ card9: !this.state.card9 }); }}>
+                          <DropdownToggle caret className="p-0" color="transparent">
+                            {/* <i className="icon-settings"></i> */}
+                          </DropdownToggle>
+                          <DropdownMenu right>
+                            <DropdownItem onClick={() => this.redirectToCrud("/report/problemList")}>QAT Problem Action Report</DropdownItem>
+                            {/* <DropdownItem onClick={() => this.redirectToCrud("/user/addUser")}>Add User</DropdownItem> */}
 
-                        </DropdownMenu>
-                      </Dropdown>
-                    </ButtonGroup>
-                    <Carousel className='trustedMechCarousel' defaultWait={1000} activeIndex={activeIndexProgram} next={this.nextProgramSlide} previous={this.previousProgramSlide} ride="carousel">
-                      <CarouselIndicators items={this.state.programList} activeIndex={activeIndexProgram} onClickHandler={this.goToIndexProgram} />
-                      {programSlides}
-                    </Carousel>
-                    <div className="chart-wrapper " >
+                          </DropdownMenu>
+                        </Dropdown>
+                      </ButtonGroup>
+                      <Carousel className='trustedMechCarousel' defaultWait={1000} activeIndex={activeIndexProgram} next={this.nextProgramSlide} previous={this.previousProgramSlide} ride="carousel">
+                        <CarouselIndicators items={this.state.programList} activeIndex={activeIndexProgram} onClickHandler={this.goToIndexProgram} />
+                        {programSlides}
+                      </Carousel>
+                      <div className="chart-wrapper " >
+                      </div>
                     </div>
-                  </div>
 
-                </CardBody>
+                  </CardBody>
 
-              </Card>
-            </Col>
-          }
+                </Card>
+              </Col>
+            }
           </Row>
         </Online>
         {/* <Row className="mt-2">

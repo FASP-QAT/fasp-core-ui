@@ -114,7 +114,7 @@ export default class AddDimensionComponent extends Component {
 
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         this.setState({ loading: false })
 
     }

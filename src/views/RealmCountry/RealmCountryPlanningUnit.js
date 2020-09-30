@@ -106,7 +106,7 @@ class PlanningUnitCountry extends Component {
         }, 8000);
     }
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         RealmCountryService.getPlanningUnitCountryForId(this.props.match.params.realmCountryId).then(response => {
             if (response.status == 200) {
                 let myResponse = response.data;

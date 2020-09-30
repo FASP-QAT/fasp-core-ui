@@ -339,7 +339,7 @@ export default class LanguageListComponent extends Component {
 
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         this.hideFirstComponent();
         LanguageService.getLanguageList()
             .then(response => {

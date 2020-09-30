@@ -600,7 +600,7 @@ export default class PipelineProgramShipment extends Component {
 
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         PlanningUnitService.getAllPlanningUnitList()
             .then(response => {
                 if (response.status == 200) {

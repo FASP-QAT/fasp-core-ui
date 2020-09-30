@@ -157,7 +157,7 @@ export default class PipelineProgramDataStepSix extends Component {
 
     // }
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         ProgramService.getProgramManagerList(1)
             .then(response => {
                 if (response.status == 200) {

@@ -20,6 +20,7 @@ import { SECRET_KEY, APP_VERSION_REACT } from '../../../Constants.js';
 import AuthenticationService from '../../Common/AuthenticationService.js';
 import '../../Forms/ValidationForms/ValidationForms.css';
 import axios from 'axios';
+import { Online, Offline } from 'react-detect-offline';
 
 
 
@@ -100,10 +101,10 @@ class Login extends Component {
 
   componentDidMount() {
     console.log("############## Login component did mount #####################");
-    // delete axios.defaults.headers.common["Authorization"];
+    delete axios.defaults.headers.common["Authorization"];
     this.logoutMessagehide();
     console.log("--------Going to call version api-----------")
-    // AuthenticationService.setupAxiosInterceptors()
+    AuthenticationService.clearUserDetails()
     if (navigator.onLine) {
       LoginService.getApiVersion()
         .then(response => {
@@ -377,7 +378,7 @@ class Login extends Component {
                   </div>
 
                 </CardGroup>
-                <h5 className="text-right versionColor">{i18n.t('static.common.version')}{APP_VERSION_REACT} | {this.state.apiVersion}</h5>
+                <h5 className="text-right versionColor">{i18n.t('static.common.version')}{APP_VERSION_REACT} | <Online>{this.state.apiVersion}</Online><Offline>Offline</Offline></h5>
                 {/* <h5 className="text-right versionColor">{i18n.t('static.common.version')}{APP_VERSION_REACT}</h5> */}
               </Col>
 

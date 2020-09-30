@@ -119,7 +119,7 @@ class AddSupplierComponent extends Component {
   }
 
   componentDidMount() {
-    AuthenticationService.setupAxiosInterceptors();
+    // AuthenticationService.setupAxiosInterceptors();
     RealmService.getRealmListAll()
       .then(response => {
         this.setState({

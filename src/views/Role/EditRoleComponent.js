@@ -188,7 +188,7 @@ class EditRoleComponent extends Component {
 
         // console.log("----**************---", this.props.match.params.roleId);
         // alert("hi");
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         UserService.getBusinessFunctionList()
             .then(response => {
                 if (response.status == 200) {

@@ -77,7 +77,7 @@ export default class Steptwo extends Component {
     }
 
     getRealmCountryList() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         console.log("in get realmCOuntry list----->",this.props.items.program.realm.realmId);
         ProgramService.getRealmCountryList(this.props.items.program.realm.realmId)
             .then(response => {

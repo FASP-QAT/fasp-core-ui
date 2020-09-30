@@ -144,7 +144,7 @@ export default class StepSix extends Component {
 
     getProgramManagerList() {
 
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         ProgramService.getProgramManagerList(this.props.items.program.realm.realmId)
             .then(response => {
                 if (response.status == 200) {

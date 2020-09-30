@@ -128,7 +128,7 @@ class AddFundingSourceComponent extends Component {
     }
   }
   componentDidMount() {
-    AuthenticationService.setupAxiosInterceptors();
+    // AuthenticationService.setupAxiosInterceptors();
     RealmService.getRealmListAll()
       .then(response => {
         if (response.status == 200) {

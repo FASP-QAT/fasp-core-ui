@@ -123,7 +123,7 @@ class EditRegionComponent extends Component {
         }
     }
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         RegionService.getRegionById(this.props.match.params.regionId).then(response => {
             this.setState({
                 region: response.data
@@ -148,7 +148,7 @@ class EditRegionComponent extends Component {
                                 initialValues={{ region: getLabelText(this.state.region.label, this.state.lang) }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
-                                    AuthenticationService.setupAxiosInterceptors();
+                                    // AuthenticationService.setupAxiosInterceptors();
                                     RegionService.updateRegion(this.state.region)
                                         .then(response => {
                                             console.log("---------->", response);
@@ -260,7 +260,7 @@ class EditRegionComponent extends Component {
     }
 
     resetClicked() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         RegionService.getRegionById(this.props.match.params.regionId).then(response => {
             this.setState({
                 region: response.data

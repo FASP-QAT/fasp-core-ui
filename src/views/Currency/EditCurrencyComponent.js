@@ -161,7 +161,6 @@ export default class UpdateCurrencyComponent extends Component {
     }
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
         CurrencyService.getCurrencyById(this.props.match.params.currencyId).then(response => {
             console.log(JSON.stringify(response.data))
             if (response.status == 200) {
@@ -391,7 +390,6 @@ export default class UpdateCurrencyComponent extends Component {
     }
 
     resetClicked() {
-        AuthenticationService.setupAxiosInterceptors();
         CurrencyService.getCurrencyById(this.props.match.params.currencyId).then(response => {
             this.setState({
                 currency: response.data

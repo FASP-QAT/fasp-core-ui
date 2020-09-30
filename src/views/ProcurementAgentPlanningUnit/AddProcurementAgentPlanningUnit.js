@@ -801,7 +801,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
     }.bind(this);
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
 
         ProcurementAgentService.getProcurementAgentPlaningUnitList(this.state.procurementAgentId)
             .then(response => {

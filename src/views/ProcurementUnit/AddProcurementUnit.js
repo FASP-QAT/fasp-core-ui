@@ -846,7 +846,7 @@ export default class AddProcurementUnit extends Component {
     }
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         PlanningUnitService.getActivePlanningUnitList()
             .then(response => {
                 if (response.status == 200) {
@@ -863,7 +863,7 @@ export default class AddProcurementUnit extends Component {
                 }
             })
 
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         UnitService.getUnitListAll()
             .then(response => {
                 if (response.status == 200) {
@@ -880,7 +880,7 @@ export default class AddProcurementUnit extends Component {
                 }
             })
 
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         SupplierService.getSupplierListAll()
             .then(response => {
                 if (response.status == 200) {
@@ -1041,7 +1041,7 @@ export default class AddProcurementUnit extends Component {
                                     this.setState({
                                         loading: true
                                     })
-                                    AuthenticationService.setupAxiosInterceptors();
+                                    // AuthenticationService.setupAxiosInterceptors();
                                     ProcurementUnitService.addProcurementUnit(this.state.procurementUnit).then(response => {
                                         if (response.status == "200") {
                                             this.props.history.push(`/procurementUnit/listProcurementUnit/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))

@@ -135,7 +135,7 @@ class AddUnitComponent extends Component {
     }
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         DimensionService.getDimensionListAll()
             .then(response => {
                 if (response.status == 200) {

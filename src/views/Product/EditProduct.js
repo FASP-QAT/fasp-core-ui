@@ -102,7 +102,7 @@ export default class EditProduct extends Component {
         this.getDependentLists = this.getDependentLists.bind(this);
     }
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         ProductService.getProductDataById(this.props.match.params.productId)
             .then(response => {
                 // console.log("------>", response.data);
@@ -238,7 +238,7 @@ export default class EditProduct extends Component {
 
     }
     getDependentLists(event) {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         ProductService.getProdcutCategoryListByRealmId(event.target.value)
             .then(response => {
                 if (response.status == 200) {

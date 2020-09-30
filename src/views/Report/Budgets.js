@@ -334,7 +334,7 @@ console.log(plannedShipmentbudget)
             } else {
                 this.setState({ loading: true })
                 var inputjson = { "programId": programId, "versionId": versionId }
-                AuthenticationService.setupAxiosInterceptors();
+                // AuthenticationService.setupAxiosInterceptors();
                 ReportService.budgetReport(inputjson)
                     .then(response => {
                         console.log(JSON.stringify(response.data));
@@ -385,7 +385,7 @@ console.log(plannedShipmentbudget)
 
     getPrograms = () => {
         if (navigator.onLine) {
-            AuthenticationService.setupAxiosInterceptors();
+            // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramList()
                 .then(response => {
                     console.log(JSON.stringify(response.data))

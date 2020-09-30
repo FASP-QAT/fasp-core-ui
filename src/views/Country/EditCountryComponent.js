@@ -168,7 +168,6 @@
 //     }
 
 //     componentDidMount() {
-//         AuthenticationService.setupAxiosInterceptors();
 //         CountryService.getCountryById(this.props.match.params.countryId).then(response => {
 //             if (response.status == 200) {
 //                 this.setState({
@@ -520,7 +519,6 @@
 //     }
 
 //     resetClicked() {
-//         AuthenticationService.setupAxiosInterceptors();
 //         CountryService.getCountryById(this.props.match.params.countryId).then(response => {
 //             this.setState({
 //                 country: response.data
@@ -797,7 +795,6 @@ export default class UpdateCountryComponent extends Component {
     }
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
         CountryService.getCountryById(this.props.match.params.countryId).then(response => {
             if (response.status == 200) {
                 this.setState({
@@ -1168,7 +1165,6 @@ export default class UpdateCountryComponent extends Component {
     }
 
     resetClicked() {
-        AuthenticationService.setupAxiosInterceptors();
         CountryService.getCountryById(this.props.match.params.countryId).then(response => {
             this.setState({
                 country: response.data

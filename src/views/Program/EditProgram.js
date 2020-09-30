@@ -238,7 +238,7 @@ export default class EditProgram extends Component {
         program.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
     }
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         ProgramService.getProgramById(this.props.match.params.programId).then(response => {
             console.log("program obj===>", response.data);
             this.setState({
@@ -263,7 +263,7 @@ export default class EditProgram extends Component {
             //     programNotes: this.state.program.programNotes,
             //     regionArray: this.state.program.regionArray
             // }
-            AuthenticationService.setupAxiosInterceptors();
+            // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramManagerList(response.data.realmCountry.realm.realmId)
                 .then(response => {
                     console.log("realm list---", response.data);
@@ -442,7 +442,7 @@ export default class EditProgram extends Component {
                                     this.setState({
                                         loading: true
                                     })
-                                    AuthenticationService.setupAxiosInterceptors();
+                                    // AuthenticationService.setupAxiosInterceptors();
                                     ProgramService.editProgram(this.state.program).then(response => {
                                         if (response.status == 200) {
                                             this.props.history.push(`/program/listProgram/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
@@ -817,7 +817,7 @@ export default class EditProgram extends Component {
     }
 
     resetClicked() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         ProgramService.getProgramById(this.props.match.params.programId).then(response => {
             this.setState({
                 program: response.data
@@ -841,7 +841,7 @@ export default class EditProgram extends Component {
                 programNotes: this.state.program.programNotes,
                 regionArray: this.state.program.regionArray
             }
-            AuthenticationService.setupAxiosInterceptors();
+            // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramManagerList(response.data.realmCountry.realm.realmId)
                 .then(response => {
                     console.log("realm list---", response.data);

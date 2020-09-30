@@ -174,7 +174,7 @@ export default class PipelineProgramInventory extends Component {
 
         // alert(document.getElementById("realmCountryId").value);
         var realmCounryId = document.getElementById("realmCountryId").value;
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         RealmCountryService.getRealmCountryPlanningUnitAllByrealmCountryId(realmCounryId).then(response => {
             var realmCountryPlanningUnitList = [];
 
@@ -191,7 +191,7 @@ export default class PipelineProgramInventory extends Component {
 
 
 
-            AuthenticationService.setupAxiosInterceptors();
+            // AuthenticationService.setupAxiosInterceptors();
             PipelineService.getQatTempProgramregion(this.props.pipelineId).then(response => {
                 // console.log("inventory region List +++++++++++++++ ----->", response.data);
                 var regionList = [];
@@ -203,7 +203,7 @@ export default class PipelineProgramInventory extends Component {
                     regionList.push(regionJson);
                 }
 
-                AuthenticationService.setupAxiosInterceptors();
+                // AuthenticationService.setupAxiosInterceptors();
                 DataSourceService.getActiveDataSourceList().then(response => {
                     var dataSourceList = [];
                     // console.log("inventory data source List ++++++++++++++++++----->", response.data);
@@ -214,7 +214,7 @@ export default class PipelineProgramInventory extends Component {
                         }
                         dataSourceList.push(dataSourceJson);
                     }
-                    AuthenticationService.setupAxiosInterceptors();
+                    // AuthenticationService.setupAxiosInterceptors();
                     PlanningUnitService.getActivePlanningUnitList()
                         .then(response => {
                             var planningUnitListQat = []
@@ -226,7 +226,7 @@ export default class PipelineProgramInventory extends Component {
                                 planningUnitListQat.push(planningUnitJson);
                             }
 
-                            AuthenticationService.setupAxiosInterceptors();
+                            // AuthenticationService.setupAxiosInterceptors();
                             PipelineService.getPipelineProgramInventory(this.props.pipelineId).then(response => {
                                 // console.log("inventory List iiiiiiiiiiii----->", response.data);
 

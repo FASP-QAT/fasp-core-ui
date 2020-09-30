@@ -160,7 +160,6 @@
 //     }
 
 //     componentDidMount() {
-//         AuthenticationService.setupAxiosInterceptors();
 //         // LanguageService.getLanguageListActive().then(response => {
 //         //     if (response.status == 200) {
 //         //         this.setState({
@@ -638,7 +637,6 @@ export default class AddCountryComponent extends Component {
     }
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
         // LanguageService.getLanguageListActive().then(response => {
         //     if (response.status == 200) {
         //         this.setState({

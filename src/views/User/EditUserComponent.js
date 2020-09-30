@@ -240,7 +240,7 @@ class EditUserComponent extends Component {
             () => { });
     }
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         document.getElementById("roleValid").value = false;
         // console.log("USERID --> ", this.props.match.params.userId);
         UserService.getUserByUserId(this.props.match.params.userId).then(response => {

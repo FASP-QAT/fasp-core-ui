@@ -15,7 +15,7 @@ export default class UserAgreementComponent extends Component {
         this.decline = this.decline.bind(this);
     }
     accept() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         UserService.acceptUserAgreement().then(response => {
             this.props.history.push(`/masterDataSync`)
         }).catch(

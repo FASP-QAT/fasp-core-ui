@@ -549,7 +549,7 @@ export default class PipelineProgramPlanningUnits extends Component {
     componentDidMount() {
         var productCategoryList = [];
         // var realmId = document.getElementById("realmId").value;
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         ProductCategoryServcie.getProductCategoryListByRealmId(1)
             .then(response => {
                 // productCategoryList = response.data;
@@ -591,7 +591,7 @@ export default class PipelineProgramPlanningUnits extends Component {
 
                 var planningUnitListQat = [];
                 // var activePlanningUnitList=[];
-                AuthenticationService.setupAxiosInterceptors();
+                // AuthenticationService.setupAxiosInterceptors();
                 PlanningUnitService.getActivePlanningUnitList()
                     .then(response => {
                         if (response.status == 200) {
@@ -606,7 +606,7 @@ export default class PipelineProgramPlanningUnits extends Component {
                             }
                             this.setState({ planningUnitListQat: planningUnitListQat });
 
-                            AuthenticationService.setupAxiosInterceptors();
+                            // AuthenticationService.setupAxiosInterceptors();
                             PipelineService.getQatTempPlanningUnitList(this.props.pipelineId)
                                 .then(response => {
                                     if (response.status == 200) {

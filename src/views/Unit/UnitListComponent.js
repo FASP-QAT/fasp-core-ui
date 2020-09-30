@@ -555,7 +555,7 @@ export default class UnitListComponent extends Component {
     }
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         this.hideFirstComponent();
         DimensionService.getDimensionListAll().then(response => {
             if (response.status == 200) {

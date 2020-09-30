@@ -531,7 +531,7 @@ class AggregateShipmentByProduct extends Component {
 
     getPrograms() {
         if (navigator.onLine) {
-            AuthenticationService.setupAxiosInterceptors();
+            // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramList()
                 .then(response => {
                     console.log(JSON.stringify(response.data))
@@ -746,7 +746,7 @@ class AggregateShipmentByProduct extends Component {
 
             }
             else {
-                AuthenticationService.setupAxiosInterceptors();
+                // AuthenticationService.setupAxiosInterceptors();
 
                 //let productCategoryId = document.getElementById("productCategoryId").value;
                 ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
@@ -901,7 +901,7 @@ class AggregateShipmentByProduct extends Component {
                     stopDate: new moment(endDate),
                     planningUnitIds: planningUnitIds
                 }
-                AuthenticationService.setupAxiosInterceptors();
+                // AuthenticationService.setupAxiosInterceptors();
 
                 ReportService.AggregateShipmentByProduct(inputjson)
                     .then(response => {

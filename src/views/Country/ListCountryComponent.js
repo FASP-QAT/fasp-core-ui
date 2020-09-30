@@ -91,7 +91,6 @@
 //     }
 
 //     componentDidMount() {
-//         AuthenticationService.setupAxiosInterceptors();
 //         this.hideFirstComponent();
 //         CountryService.getCountryListAll().then(response => {
 //             if (response.status == 200) {
@@ -512,7 +511,6 @@ export default class CountryListComponent extends Component {
     }
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
         this.hideFirstComponent();
         CountryService.getCountryListAll().then(response => {
             if (response.status == 200) {

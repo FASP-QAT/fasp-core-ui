@@ -1111,6 +1111,7 @@ class AuthenticationService {
                     break;
                 case "/logout/:message":
                 case "/logout":
+                case "/accessDenied":
                     return true;
                     break;
                 case "/problem/editProblem":
@@ -1135,7 +1136,10 @@ class AuthenticationService {
                     return false;
             }
             // localStorage.removeItem("token-" + decryptedCurUser);
+        } else {
+            return true;
         }
+        console.log("route access denied------------------------");
         // let keysToRemove = ["curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken"];
         // keysToRemove.forEach(k => localStorage.removeItem(k))
         return false;
@@ -1198,6 +1202,15 @@ class AuthenticationService {
                 return "/logout/static.message.sessionChange";
             }
         }
+    }
+    clearUserDetails() {
+        let keysToRemove;
+        if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != "") {
+            keysToRemove = ["token-" + this.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken"];
+        } else {
+            keysToRemove = ["curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken"];
+        }
+        keysToRemove.forEach(k => localStorage.removeItem(k));
     }
 
 }

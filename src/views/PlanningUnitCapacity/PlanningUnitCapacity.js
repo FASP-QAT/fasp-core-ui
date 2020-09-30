@@ -804,7 +804,7 @@ class PlanningUnitCapacity extends Component {
                 }
             }
             console.log("changedpapuList----->", changedpapuList);
-            AuthenticationService.setupAxiosInterceptors();
+            // AuthenticationService.setupAxiosInterceptors();
             PlanningUnitService.editPlanningUnitCapacity(changedpapuList)
                 .then(response => {
                     if (response.status == 200) {
@@ -1151,7 +1151,7 @@ class PlanningUnitCapacity extends Component {
 
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         PlanningUnitService.getPlanningUnitById(this.props.match.params.planningUnitId).then(response => {
             if (response.status == 200) {
                 console.log(response.data);

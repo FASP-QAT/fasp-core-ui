@@ -472,7 +472,7 @@ class EditTracerCategoryComponent extends Component {
         }
     }
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         TracerCategoryService.getTracerCategoryById(this.props.match.params.tracerCategoryId).then(response => {
             if (response.status == 200) {
                 this.setState({
@@ -518,7 +518,7 @@ class EditTracerCategoryComponent extends Component {
                                         loading: true
                                     })
                                     console.log("this.state.tracerCategory---", this.state.tracerCategory);
-                                    AuthenticationService.setupAxiosInterceptors();
+                                    // AuthenticationService.setupAxiosInterceptors();
                                     TracerCategoryService.updateTracerCategory(this.state.tracerCategory)
                                         .then(response => {
                                             if (response.status == 200) {
@@ -652,7 +652,7 @@ class EditTracerCategoryComponent extends Component {
     }
 
     resetClicked() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         TracerCategoryService.getTracerCategoryById(this.props.match.params.tracerCategoryId).then(response => {
             this.setState({
                 tracerCategory: response.data

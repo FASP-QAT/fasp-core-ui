@@ -736,7 +736,7 @@ export default class DataSourceListComponent extends Component {
     }
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         this.hideFirstComponent();
         ProgramService.getProgramList()
             .then(response => {

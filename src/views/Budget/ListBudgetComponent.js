@@ -116,7 +116,6 @@
 
 
 //   componentDidMount() {
-//     AuthenticationService.setupAxiosInterceptors();
 //     this.hideFirstComponent();
 //     BudgetServcie.getBudgetList()
 //       .then(response => {
@@ -816,7 +815,6 @@ class ListBudgetComponent extends Component {
 
 
   componentDidMount() {
-    AuthenticationService.setupAxiosInterceptors();
     this.hideFirstComponent();
     BudgetServcie.getBudgetList()
       .then(response => {

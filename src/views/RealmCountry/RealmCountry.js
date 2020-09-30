@@ -103,7 +103,7 @@ class RealmCountry extends Component {
     }.bind(this);
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         RealmCountryService.getRealmCountryrealmIdById(this.props.match.params.realmId).then(response => {
             if (response.status == 200) {
                 console.log("getRealmCountryrealmIdById---", response.data);

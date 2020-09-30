@@ -2188,7 +2188,7 @@ if(value!=null){
 
   getPrograms() {
     if (navigator.onLine) {
-      AuthenticationService.setupAxiosInterceptors();
+      // AuthenticationService.setupAxiosInterceptors();
       ProgramService.getProgramList()
         .then(response => {
           console.log(JSON.stringify(response.data))
@@ -2334,7 +2334,7 @@ if(value!=null){
 
         }
         else {
-          AuthenticationService.setupAxiosInterceptors();
+          // AuthenticationService.setupAxiosInterceptors();
 
           ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
             console.log('**' + JSON.stringify(response.data))
@@ -2659,7 +2659,7 @@ if(value!=null){
             data: this.state.consumptions.map((item, index) => (item.forecastedConsumption))
           }, {
             label: i18n.t('static.report.actualConsumption'),
-            backgroundColor: '#86CD99',
+            backgroundColor: '#118b70',
             borderColor: 'rgba(179,181,198,1)',
             pointBackgroundColor: 'rgba(179,181,198,1)',
             pointBorderColor: '#fff',
@@ -2697,7 +2697,7 @@ if(value!=null){
             data: this.state.offlineConsumptionList.map((item, index) => (item.forecastedConsumption))
           }, {
             label: i18n.t('static.report.actualConsumption'),
-            backgroundColor: '#86CD99',
+            backgroundColor: '#118b70',
             borderColor: 'rgba(179,181,198,1)',
             pointBackgroundColor: 'rgba(179,181,198,1)',
             pointBorderColor: '#fff',
@@ -3035,7 +3035,7 @@ if(value!=null){
 
                             <tbody>
                               <>
-                                <tr>
+                                <tr style={{fontWeight:'bold'}}>
                                   <th style={{ width: '140px' }}></th>
                                   {
                                     this.state.consumptions.length > 0
@@ -3084,7 +3084,7 @@ if(value!=null){
 
                             <tbody>
                               <>
-                                <tr>
+                                <tr style={{fontWeight:'bold'}}>
                                   <th style={{ width: '140px' }}></th>
                                   {
                                     this.state.offlineConsumptionList.length > 0
@@ -3097,7 +3097,7 @@ if(value!=null){
                                   }
                                 </tr>
 
-                                <tr>
+                                <tr >
                                   <th style={{ width: '140px' }}>{i18n.t('static.report.forecasted')}</th>
                                   {
                                     this.state.offlineConsumptionList.length > 0

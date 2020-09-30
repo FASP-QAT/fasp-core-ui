@@ -363,7 +363,7 @@ export default class DimensionListComponent extends Component {
     }
     componentDidMount() {
         this.hideFirstComponent();
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         DimensionService.getDimensionListAll().then(response => {
             if (response.status == 200) {
                 console.log(response.data)

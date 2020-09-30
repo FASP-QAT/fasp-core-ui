@@ -368,7 +368,7 @@ class ListRoleComponent extends Component {
     }.bind(this);
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         this.hideFirstComponent();
         UserService.getRoleList()
             .then(response => {

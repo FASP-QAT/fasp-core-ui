@@ -1512,7 +1512,7 @@ class StockStatusAcrossPlanningUnits extends Component {
 
     getPrograms = () => {
         if (navigator.onLine) {
-            AuthenticationService.setupAxiosInterceptors();
+            // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramList()
                 .then(response => {
                     console.log(JSON.stringify(response.data))
@@ -2166,7 +2166,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                           amc: 23957
                       }]
                   })*/
-                AuthenticationService.setupAxiosInterceptors();
+                // AuthenticationService.setupAxiosInterceptors();
                 ReportService.stockStatusForProgram(inputjson)
                     .then(response => {
                         console.log(JSON.stringify(response.data));
