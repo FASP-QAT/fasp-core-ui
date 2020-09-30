@@ -217,7 +217,8 @@ export default class EditLanguageComponent extends Component {
                                                             id="languageName"
                                                             bsSize="sm"
                                                             valid={!errors.languageName}
-                                                            invalid={touched.languageName && !!errors.languageName || this.state.language.languageName == ''}
+                                                            // invalid={touched.languageName && !!errors.languageName || this.state.language.languageName == ''}
+                                                            invalid={(touched.languageName && !!errors.languageName) || !!errors.languageName}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             maxLength={100}
@@ -232,7 +233,8 @@ export default class EditLanguageComponent extends Component {
                                                             id="languageCode"
                                                             bsSize="sm"
                                                             valid={!errors.languageCode}
-                                                            invalid={touched.languageCode && !!errors.languageCode || this.state.language.languageCode == ''}
+                                                            // invalid={touched.languageCode && !!errors.languageCode || this.state.language.languageCode == ''}
+                                                            invalid={(touched.languageCode && !!errors.languageCode) || !!errors.languageCode}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.language.languageCode}
@@ -294,7 +296,7 @@ export default class EditLanguageComponent extends Component {
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
-                            <div ><h4> <strong>Loading...</strong></h4></div>
+                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
                             <div class="spinner-border blue ml-4" role="status">
 

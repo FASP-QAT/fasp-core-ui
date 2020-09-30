@@ -250,7 +250,10 @@ class EditUserComponent extends Component {
                     loading: false
                 }, (
                 ) => {
-                    // console.log("state after update---", this.state.user);
+                    // console.log("state after update--- 1", response.data);
+                    // if(response.data.phoneNumber == null){
+                    //     console.log("state after update--- 2");
+                    // }
                     // console.log("Role list---", this.state.user.roleList);
                 });
             } else {
@@ -406,7 +409,7 @@ class EditUserComponent extends Component {
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} loading={this.changeLoading} />
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-                <Row>
+                <Row style={{ display: this.state.loading ? "none" : "block" }}>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             {/* <CardHeader>
@@ -418,7 +421,7 @@ class EditUserComponent extends Component {
                                     username: this.state.user.username,
                                     realmId: this.state.user.realm.realmId,
                                     emailId: this.state.user.emailId,
-                                    phoneNumber: this.state.user.phoneNumber,
+                                    phoneNumber: (this.state.user.phoneNumber == null ? '' : this.state.user.phoneNumber),
                                     roles: this.state.user.roleList,
                                     languageId: this.state.user.language.languageId,
                                     roleId: this.state.user.roleList
@@ -494,7 +497,7 @@ class EditUserComponent extends Component {
                                                         type="hidden"
                                                         name="needPhoneValidation"
                                                         id="needPhoneValidation"
-                                                        value={(this.state.user.phoneNumber === '' ? false : true)}
+                                                        value={((this.state.user.phoneNumber === '' || this.state.user.phoneNumber == null) ? false : true)}
                                                     />
                                                     <FormGroup>
                                                         <Label htmlFor="realmId">{i18n.t('static.realm.realm')}<span class="red Reqasterisk">*</span></Label><Input
@@ -514,7 +517,8 @@ class EditUserComponent extends Component {
                                                             id="username"
                                                             bsSize="sm"
                                                             valid={!errors.username}
-                                                            invalid={touched.username && !!errors.username || this.state.user.username == ''}
+                                                            // invalid={touched.username && !!errors.username || this.state.user.username == ''}
+                                                            invalid={(touched.username && !!errors.username) || !!errors.username}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             maxLength={25}
@@ -529,7 +533,8 @@ class EditUserComponent extends Component {
                                                             id="emailId"
                                                             bsSize="sm"
                                                             valid={!errors.emailId}
-                                                            invalid={touched.emailId && !!errors.emailId || this.state.user.emailId == ''}
+                                                            // invalid={touched.emailId && !!errors.emailId || this.state.user.emailId == ''}
+                                                            invalid={(touched.emailId && !!errors.emailId) || !!errors.emailId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             maxLength={50}
@@ -545,7 +550,8 @@ class EditUserComponent extends Component {
                                                             id="phoneNumber"
                                                             bsSize="sm"
                                                             valid={!errors.phoneNumber}
-                                                            invalid={touched.phoneNumber && !!errors.phoneNumber}
+                                                            // invalid={touched.phoneNumber && !!errors.phoneNumber}
+                                                            invalid={(touched.phoneNumber && !!errors.phoneNumber) || !!errors.phoneNumber}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             required
@@ -599,7 +605,8 @@ class EditUserComponent extends Component {
                                                             id="languageId"
                                                             bsSize="sm"
                                                             valid={!errors.languageId}
-                                                            invalid={touched.languageId && !!errors.languageId || this.state.user.language.languageId == ''}
+                                                            // invalid={touched.languageId && !!errors.languageId || this.state.user.language.languageId == ''}
+                                                            invalid={touched.languageId && !!errors.languageId || !!errors.languageId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             required
@@ -658,6 +665,17 @@ class EditUserComponent extends Component {
                                         )} />
                         </Card>
                     </Col>
+                </Row>
+                <Row style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
                 </Row>
             </div>
         );

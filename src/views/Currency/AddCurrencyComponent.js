@@ -370,7 +370,7 @@ const validationSchema = function (values) {
     return Yup.object().shape({
         currencyCode: Yup.string()
             // .matches(ALPHABETS_REGEX, i18n.t('static.common.alphabetsOnly'))
-            .matches(/^\S*$/,i18n.t('static.validNoSpace.string'))
+            .matches(/^\S*$/, i18n.t('static.validNoSpace.string'))
             .required(i18n.t('static.currency.currencycodetext')),
         // max(4, i18n.t('static.currency.currencycodemax4digittext')),
         // currencySymbol: Yup.string()
@@ -380,7 +380,7 @@ const validationSchema = function (values) {
         //     matches(/^([^0-9]*)$/, i18n.t('static.currency.numbernotallowedtext')),
         label: Yup.string()
             // .matches(SPACE_REGEX, i18n.t('static.message.rolenamevalidtext'))
-            .matches(/^\S+(?: \S+)*$/,i18n.t('static.validSpace.string'))
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.currency.currencytext')),
         conversionRate: Yup.string()
             .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.currency.conversionrateNumberTwoDecimalPlaces'))
@@ -437,7 +437,7 @@ export default class AddCurrencyComponent extends Component {
             document.getElementById('div2').style.display = 'none';
         }, 8000);
     }
- 
+
 
     dataChange(event) {
         console.log(event.target.name)
@@ -679,7 +679,7 @@ export default class AddCurrencyComponent extends Component {
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
-                            <div ><h4> <strong>Loading...</strong></h4></div>
+                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
                             <div class="spinner-border blue ml-4" role="status">
 

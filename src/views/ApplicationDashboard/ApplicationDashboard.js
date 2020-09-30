@@ -68,13 +68,13 @@ const options = {
     yAxes: [{
       scaleLabel: {
         display: true,
-        labelString: 'Program Count'
+        labelString: i18n.t('static.dashboard.programCount')
       }
     }],
     xAxes: [{
       scaleLabel: {
         display: true,
-        labelString: 'Realm'
+        labelString: i18n.t('static.supplier.realm')
       }
     }],
   },
@@ -217,7 +217,8 @@ class ApplicationDashboard extends Component {
 
       message: '',
       dashboard: '',
-      users: []
+      users: [],
+      lang: localStorage.getItem('lang')
     };
     // this.state = {
 
@@ -499,7 +500,7 @@ class ApplicationDashboard extends Component {
     this.setState({ activeIndex: newIndex });
   }
 
-  loading = () => <div className="animated fadeIn pt-1 text-center">Loading...</div>
+  loading = () => <div className="animated fadeIn pt-1 text-center">{i18n.t('static.common.loading')}</div>
 
   render() {
     const { activeIndex } = this.state;
@@ -601,7 +602,7 @@ class ApplicationDashboard extends Component {
       // },
       {
         dataField: 'realmProblem.problem.actionLabel',
-        text: 'Suggestion',
+        text: i18n.t('static.report.suggession'),
         sort: true,
         align: 'center',
         headerAlign: 'center',
@@ -726,6 +727,7 @@ class ApplicationDashboard extends Component {
             </div>
             <div className='TextCont'>
               <CarouselCaption captionHeader={item.LABEL_EN} captionText={item.COUNT} />
+              {/* <CarouselCaption captionHeader={getLabelText(item, this.state.lang)} captionText={item.COUNT} /> */}
             </div>
           </div>
         </CarouselItem>
@@ -776,8 +778,8 @@ class ApplicationDashboard extends Component {
                             {/* <i className="icon-settings"></i> */}
                           </DropdownToggle>
                           <DropdownMenu right>
-                            <DropdownItem onClick={() => this.redirectToCrud("/user/listUser")}>List Users</DropdownItem>
-                            <DropdownItem onClick={() => this.redirectToCrud("/user/addUser")}>Add User</DropdownItem>
+                            <DropdownItem onClick={() => this.redirectToCrud("/user/listUser")}>{i18n.t('static.list.listUser')}</DropdownItem>
+                            <DropdownItem onClick={() => this.redirectToCrud("/user/addUser")}>{i18n.t('static.add.addUser')}</DropdownItem>
 
                           </DropdownMenu>
                         </Dropdown>
@@ -810,15 +812,15 @@ class ApplicationDashboard extends Component {
                             {/* <i className="icon-settings"></i> */}
                           </DropdownToggle>
                           <DropdownMenu right>
-                            <DropdownItem onClick={() => this.redirectToCrud("/realm/listRealm")}>List Realms</DropdownItem>
-                            <DropdownItem onClick={() => this.redirectToCrud("/realm/addrealm")}>Add Realm</DropdownItem>
+                            <DropdownItem onClick={() => this.redirectToCrud("/realm/listRealm")}>{i18n.t('static.list.listRealm')}</DropdownItem>
+                            <DropdownItem onClick={() => this.redirectToCrud("/realm/addrealm")}>{i18n.t('static.add.addRealm')}</DropdownItem>
 
                           </DropdownMenu>
                         </Dropdown>
                       </ButtonGroup>
                     </div>
 
-                    <div className="TextTittle ">TOTAL REALMS </div>
+                    <div className="TextTittle ">{i18n.t('static.dashboard.totalRealm')} </div>
                     <div className="text-count">{this.state.dashboard.REALM_COUNT}</div>
                     <div className="chart-wrapper mt-4 pb-2" >
                       {/* <Line data={cardChartData3} options={cardChartOpts3} height={70} /> */}
@@ -838,14 +840,14 @@ class ApplicationDashboard extends Component {
                           <DropdownToggle caret className="p-0" color="transparent">
                           </DropdownToggle>
                           <DropdownMenu right>
-                            <DropdownItem onClick={() => this.redirectToCrud("/language/listLanguage")}>List Languages</DropdownItem>
-                            <DropdownItem onClick={() => this.redirectToCrud("/language/addLanguage")}>Add Language</DropdownItem>
+                            <DropdownItem onClick={() => this.redirectToCrud("/language/listLanguage")}>{i18n.t('static.list.listLanguage')}</DropdownItem>
+                            <DropdownItem onClick={() => this.redirectToCrud("/language/addLanguage")}>{i18n.t('static.add.addLanguage')}</DropdownItem>
                           </DropdownMenu>
                         </Dropdown>
                       </ButtonGroup>
                     </div>
 
-                    <div className="TextTittle ">Languages </div>
+                    <div className="TextTittle ">{i18n.t('static.dashboard.language')}</div>
                     <div className="text-count">{this.state.dashboard.LANGUAGE_COUNT}</div>
                     <div className="chart-wrapper mt-4 pb-2" >
                     </div>
@@ -863,14 +865,14 @@ class ApplicationDashboard extends Component {
                           <DropdownToggle caret className="p-0" color="transparent">
                           </DropdownToggle>
                           <DropdownMenu right>
-                            <DropdownItem onClick={() => this.redirectToCrud("/report/supplyPlanVersionAndReview")}>View Supply Plans Waiting for Approval</DropdownItem>
+                            <DropdownItem onClick={() => this.redirectToCrud("/report/supplyPlanVersionAndReview")}>{i18n.t('static.dashboard.viewSupplyPlan')}</DropdownItem>
 
                           </DropdownMenu>
                         </Dropdown>
                       </ButtonGroup>
                     </div>
 
-                    <div className="TextTittle ">Supply Plans Waiting for Approval </div>
+                    <div className="TextTittle ">{i18n.t('static.dashboard.supplyPlanWaiting')} </div>
                     <div className="text-count">{this.state.dashboard.SUPPLY_PLAN_COUNT}</div>
                     <div className="chart-wrapper mt-4 pb-2" >
                     </div>
@@ -893,8 +895,8 @@ class ApplicationDashboard extends Component {
                             {/* <i className="icon-settings"></i> */}
                           </DropdownToggle>
                           <DropdownMenu right>
-                            <DropdownItem onClick={() => this.redirectToCrud("/user/listUser")}>List Users</DropdownItem>
-                            <DropdownItem onClick={() => this.redirectToCrud("/user/addUser")}>Add User</DropdownItem>
+                            <DropdownItem onClick={() => this.redirectToCrud("/user/listUser")}>{i18n.t('static.list.listUser')}</DropdownItem>
+                            <DropdownItem onClick={() => this.redirectToCrud("/user/addUser")}>{i18n.t('static.add.addUser')}</DropdownItem>
 
                           </DropdownMenu>
                         </Dropdown>
@@ -923,15 +925,15 @@ class ApplicationDashboard extends Component {
                             {/* <i className="icon-settings"></i> */}
                           </DropdownToggle>
                           <DropdownMenu right>
-                            <DropdownItem onClick={() => this.redirectToCrud("/country/listCountry")}>List Countries</DropdownItem>
-                            <DropdownItem onClick={() => this.redirectToCrud("/country/addCountry")}>Add Country</DropdownItem>
+                            <DropdownItem onClick={() => this.redirectToCrud("/country/listCountry")}>{i18n.t('static.list.listCountry')}</DropdownItem>
+                            <DropdownItem onClick={() => this.redirectToCrud("/country/addCountry")}>{i18n.t('static.add.addCountry')}</DropdownItem>
 
                           </DropdownMenu>
                         </Dropdown>
                       </ButtonGroup>
                     </div>
 
-                    <div className="TextTittle ">Country </div>
+                    <div className="TextTittle ">{i18n.t('static.program.realmcountry')}</div>
                     <div className="text-count">{this.state.dashboard.REALM_COUNTRY_COUNT}</div>
                     <div className="chart-wrapper mt-4 pb-2" >
                       {/* <Line data={cardChartData3} options={cardChartOpts3} height={70} /> */}
@@ -951,15 +953,15 @@ class ApplicationDashboard extends Component {
                             {/* <i className="icon-settings"></i> */}
                           </DropdownToggle>
                           <DropdownMenu right>
-                            <DropdownItem onClick={() => this.redirectToCrud("/healthArea/listHealthArea")}>List Technical Areas</DropdownItem>
-                            <DropdownItem onClick={() => this.redirectToCrud("/healthArea/addHealthArea")}>Add Technical Area</DropdownItem>
+                            <DropdownItem onClick={() => this.redirectToCrud("/healthArea/listHealthArea")}>{i18n.t('static.list.listTechnicalArea')}</DropdownItem>
+                            <DropdownItem onClick={() => this.redirectToCrud("/healthArea/addHealthArea")}>{i18n.t('static.add.addTechnicalArea')}</DropdownItem>
 
                           </DropdownMenu>
                         </Dropdown>
                       </ButtonGroup>
                     </div>
 
-                    <div className="TextTittle ">Technical Area </div>
+                    <div className="TextTittle ">{i18n.t('static.program.healtharea')} </div>
                     <div className="text-count">{this.state.dashboard.TECHNICAL_AREA_COUNT}</div>
                     <div className="chart-wrapper mt-4 pb-2" >
                       {/* <Line data={cardChartData3} options={cardChartOpts3} height={70} /> */}
@@ -979,15 +981,15 @@ class ApplicationDashboard extends Component {
                             {/* <i className="icon-settings"></i> */}
                           </DropdownToggle>
                           <DropdownMenu right>
-                            <DropdownItem onClick={() => this.redirectToCrud("/realmCountry/listRealmCountry")}>List Regions</DropdownItem>
-                            <DropdownItem onClick={() => this.redirectToCrud("/realmCountry/listRealmCountry")}>Add Region</DropdownItem>
+                            <DropdownItem onClick={() => this.redirectToCrud("/realmCountry/listRealmCountry")}>{i18n.t('static.list.listRegion')}</DropdownItem>
+                            <DropdownItem onClick={() => this.redirectToCrud("/realmCountry/listRealmCountry")}>{i18n.t('static.add.addRegion')}</DropdownItem>
 
                           </DropdownMenu>
                         </Dropdown>
                       </ButtonGroup>
                     </div>
 
-                    <div className="TextTittle ">Region </div>
+                    <div className="TextTittle ">{i18n.t('static.region.region')} </div>
                     <div className="text-count">{this.state.dashboard.REGION_COUNT}</div>
                     <div className="chart-wrapper mt-4 pb-2" >
                       {/* <Line data={cardChartData3} options={cardChartOpts3} height={70} /> */}
@@ -1005,15 +1007,15 @@ class ApplicationDashboard extends Component {
                           <DropdownToggle caret className="p-0" color="transparent">
                           </DropdownToggle>
                           <DropdownMenu right>
-                            <DropdownItem onClick={() => this.redirectToCrud("/organisation/listOrganisation")}>List Organisations</DropdownItem>
-                            <DropdownItem onClick={() => this.redirectToCrud("/organisation/addOrganisation")}>Add Organisation</DropdownItem>
+                            <DropdownItem onClick={() => this.redirectToCrud("/organisation/listOrganisation")}>{i18n.t('static.list.listOrganisation')}</DropdownItem>
+                            <DropdownItem onClick={() => this.redirectToCrud("/organisation/addOrganisation")}>{i18n.t('static.add.addOrganisation')}</DropdownItem>
 
                           </DropdownMenu>
                         </Dropdown>
                       </ButtonGroup>
                     </div>
 
-                    <div className="TextTittle ">Organisation </div>
+                    <div className="TextTittle ">{i18n.t('static.program.organisation')} </div>
                     <div className="text-count">{this.state.dashboard.ORGANIZATION_COUNT}</div>
                     <div className="chart-wrapper mt-4 pb-2" >
 
@@ -1034,7 +1036,7 @@ class ApplicationDashboard extends Component {
 
                           </DropdownToggle>
                           <DropdownMenu right>
-                            <DropdownItem onClick={() => this.redirectToCrud("/program/listProgram")}>List Programs</DropdownItem>
+                            <DropdownItem onClick={() => this.redirectToCrud("/program/listProgram")}>{i18n.t('static.list.listProgram')}</DropdownItem>
 
 
                           </DropdownMenu>
@@ -1042,7 +1044,7 @@ class ApplicationDashboard extends Component {
                       </ButtonGroup>
                     </div>
 
-                    <div className="TextTittle ">Total Programs </div>
+                    <div className="TextTittle ">{i18n.t('static.add.totalProgram')} </div>
                     <div className="text-count">{this.state.dashboard.PROGRAM_COUNT}</div>
                     <div className="chart-wrapper mt-4 pb-2" >
 
@@ -1060,13 +1062,13 @@ class ApplicationDashboard extends Component {
                           <DropdownToggle caret className="p-0" color="transparent">
                           </DropdownToggle>
                           <DropdownMenu right>
-                            <DropdownItem onClick={() => this.redirectToCrud("/program/programOnboarding")}>Setup Program</DropdownItem>
+                            <DropdownItem onClick={() => this.redirectToCrud("/program/programOnboarding")}>{i18n.t('static.dashboard.setupprogram')}</DropdownItem>
                           </DropdownMenu>
                         </Dropdown>
                       </ButtonGroup>
                     </div>
 
-                    <div className="TextTittle ">Setup Program </div>
+                    <div className="TextTittle ">{i18n.t('static.dashboard.setupprogram')} </div>
                     <div className="chart-wrapper mt-4 pb-2" >
                     </div>
                   </CardBody>
@@ -1082,13 +1084,13 @@ class ApplicationDashboard extends Component {
                           <DropdownToggle caret className="p-0" color="transparent">
                           </DropdownToggle>
                           <DropdownMenu right>
-                            <DropdownItem onClick={() => this.redirectToCrud("/report/supplyPlanVersionAndReview")}>View Supply Plans Waiting for Approval</DropdownItem>
+                            <DropdownItem onClick={() => this.redirectToCrud("/report/supplyPlanVersionAndReview")}>{i18n.t('static.dashboard.viewSupplyPlan')}</DropdownItem>
                           </DropdownMenu>
                         </Dropdown>
                       </ButtonGroup>
                     </div>
 
-                    <div className="TextTittle ">Supply Plans waiting for Approval </div>
+                    <div className="TextTittle ">{i18n.t('static.dashboard.supplyPlanWaiting')} </div>
                     <div className="text-count">{this.state.dashboard.SUPPLY_PLAN_COUNT}</div>
                     <div className="chart-wrapper mt-4 pb-2" >
                     </div>
