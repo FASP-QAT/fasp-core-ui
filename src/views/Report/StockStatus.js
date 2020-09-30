@@ -2070,7 +2070,7 @@ class StockStatus extends Component {
 
   roundN = num => {
     if (num != '') {
-      return parseFloat(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
+      return parseFloat(Math.round(num * Math.pow(10, 1)) / Math.pow(10, 1)).toFixed(1);
     } else {
       return ''
     }
@@ -2130,7 +2130,7 @@ class StockStatus extends Component {
     this.state.stockStatusList.map(ele => A.push(this.addDoubleQuoteToRowContent([this.dateFormatter(ele.dt).replaceAll(' ', '%20'), ele.consumptionQty, ele.actualConsumption ? 'Yes' : '', ele.shipmentQty,
     ((ele.shipmentInfo.map(item => {
       return (
-        " [ " + getLabelText(item.fundingSource.label, this.state.lang) + " : " + getLabelText(item.shipmentStatus.label, this.state.lang) + " ] "
+        " [ " +item.fundingSource.code + " : " + getLabelText(item.shipmentStatus.label, this.state.lang) + " ] "
       )
     }).toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')
       , ele.adjustment, ele.closingBalance, this.roundN(ele.mos), ele.minMos, ele.maxMos])));
@@ -2238,7 +2238,7 @@ class StockStatus extends Component {
       this.state.stockStatusList.map(ele => [this.dateFormatter(ele.dt), this.formatter(ele.consumptionQty), ele.actualConsumption ? 'Yes' : '', this.formatter(ele.shipmentQty),
       ele.shipmentInfo.map(item => {
         return (
-          " [ " + getLabelText(item.fundingSource.label, this.state.lang) + " : " + getLabelText(item.shipmentStatus.label, this.state.lang) + " ] "
+          " [ " + item.fundingSource.code + " : " + getLabelText(item.shipmentStatus.label, this.state.lang) + " ] "
         )
       })
         , this.formatter(ele.adjustment), this.formatter(ele.closingBalance), this.formatter(this.roundN(ele.mos)), this.formatter(ele.minMos), this.formatter(ele.maxMos)]);
@@ -3162,7 +3162,7 @@ class StockStatus extends Component {
                             </td>
                             <td align="center">
                               {this.state.stockStatusList[idx].shipmentInfo.map((item, index) => {
-                                return (`[ ${item.fundingSource.label.label_en} : ${item.shipmentStatus.label.label_en} ]  `)
+                                return (`[ ${item.fundingSource.code} : ${item.shipmentStatus.label.label_en} ]  `)
                                 //return (<tr><td>{item.shipmentQty}</td><td>{item.fundingSource.label.label_en}</td><td>{item.shipmentStatus.label.label_en}</td></tr>)
                               })}
                             </td>

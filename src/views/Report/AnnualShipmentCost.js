@@ -205,8 +205,8 @@ class AnnualShipmentCost extends Component {
                                                 var json = {
                                                     'FUNDING_SOURCE_ID': fundingSource.fundingSourceId,
                                                     'PROCUREMENT_AGENT_ID': procurementAgent.procurementAgentId,
-                                                    'fundingsource': fundingSource.label.label_en,
-                                                    'procurementAgent': procurementAgent.label.label_en,
+                                                    'fundingsource': fundingSource.fundingSourceCode,
+                                                    'procurementAgent': procurementAgent.procurementAgentCode,
                                                     'PLANNING_UNIT_ID': document.getElementById('planningUnitId').value,
                                                     'planningUnit': list[0].planningUnit.label.label_en
 
@@ -435,8 +435,8 @@ class AnnualShipmentCost extends Component {
                                 var json = {
                                     'FUNDING_SOURCE_ID': responseData[i].fundingSource.id,
                                     'PROCUREMENT_AGENT_ID': responseData[i].procurementAgent.id,
-                                    'fundingsource': getLabelText(responseData[i].fundingSource.label, this.state.lang),
-                                    'procurementAgent': getLabelText(responseData[i].procurementAgent.label, this.state.lang),
+                                    'fundingsource': responseData[i].fundingSource.code,
+                                    'procurementAgent':responseData[i].procurementAgent.code,
                                     'PLANNING_UNIT_ID': responseData[i].planningUnit.id,
                                     'planningUnit': getLabelText(responseData[i].planningUnit.label, this.state.lang)
                                 }
