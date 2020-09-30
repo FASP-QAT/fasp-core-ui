@@ -443,7 +443,7 @@ export default class ReactListComponent extends Component {
                                 if (y != null) {
                                     if (obj.options.allowInsertRow == true) {
                                         items.push({
-                                            title: 'Map Realm Country',
+                                            title: i18n.t('static.realm.mapRealmCountry'),
                                             onclick: function () {
                                                 // console.log("onclick------>", this.el.getValueFromCoords(0, y));
                                                 if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_REALM_COUNTRY')) {
@@ -573,7 +573,7 @@ export default class ReactListComponent extends Component {
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
-                            <div ><h4> <strong>Loading...</strong></h4></div>
+                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
                             <div class="spinner-border blue ml-4" role="status">
 

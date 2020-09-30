@@ -329,7 +329,8 @@ const validationSchema = function (values) {
         realmId: Yup.string()
             .required(i18n.t('static.common.realmtext')),
         tracerCategoryName: Yup.string()
-            .matches(BUDGET_NAME_REGEX, i18n.t('static.message.budgetNameRegex'))
+            // .matches(BUDGET_NAME_REGEX, i18n.t('static.message.budgetNameRegex'))
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.tracerCategory.tracercategorytext'))
     })
 }

@@ -346,7 +346,8 @@ const initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         tracerCategoryName: Yup.string()
-            .matches(BUDGET_NAME_REGEX, i18n.t('static.message.budgetNameRegex'))
+            // .matches(BUDGET_NAME_REGEX, i18n.t('static.message.budgetNameRegex'))
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.tracerCategory.tracercategorytext')),
     })
 }
