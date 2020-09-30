@@ -200,7 +200,8 @@ export default class QatProblemActions extends Component {
                                                         && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                         && c.program.id == programList[pp].programId
                                                         && c.realmProblem.problem.problemId == 1
-                                                        && c.versionId == versionID);
+                                                        // && c.versionId == versionID
+                                                        );
                                                 if (filteredConsumptionList.length == 0) {
                                                     // console.log("index====>", index);
                                                     if (index == -1) {
@@ -345,7 +346,8 @@ export default class QatProblemActions extends Component {
                                                         && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                         && c.program.id == programList[pp].programId
                                                         && c.realmProblem.problem.problemId == 2
-                                                        && c.versionId == versionID);
+                                                        // && c.versionId == versionID
+                                                        );
 
                                                 if (filterInventoryList.length == 0) {
                                                     if (index == -1) {
@@ -497,13 +499,15 @@ export default class QatProblemActions extends Component {
                                                             c => c.program.id == programList[pp].programId
                                                                 && c.shipmentId == filteredShipmentList[s].shipmentId
                                                                 && c.realmProblem.problem.problemId == 3
-                                                                && c.versionId == versionID);
+                                                                // && c.versionId == versionID
+                                                                );
                                                     } else {
                                                         indexShipment = problemActionList.findIndex(
                                                             c => c.program.id == programList[pp].programId
                                                                 && c.index == filteredShipmentList[s].index
                                                                 && c.realmProblem.problem.problemId == 3
-                                                                && c.versionId == versionID);
+                                                                // && c.versionId == versionID
+                                                                );
                                                         newAddShipment = true;
                                                     }
 
@@ -705,7 +709,8 @@ export default class QatProblemActions extends Component {
                                                         && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                         && c.program.id == programList[pp].programId
                                                         && c.realmProblem.problem.problemId == 8
-                                                        && c.versionId == versionID);
+                                                        // && c.versionId == versionID
+                                                        );
 
                                                 if (filteredConsumptionListTwo.length != 18) {
                                                     if (index == -1) {
@@ -855,13 +860,15 @@ export default class QatProblemActions extends Component {
                                                             c => c.program.id == programList[pp].programId
                                                                 && c.shipmentId == filteredShipmentList[s].shipmentId
                                                                 && c.realmProblem.problem.problemId == 4
-                                                                && c.versionId == versionID);
+                                                                // && c.versionId == versionID
+                                                                );
                                                     } else {
                                                         indexShipment = problemActionList.findIndex(
                                                             c => c.program.id == programList[pp].programId
                                                                 && c.index == filteredShipmentList[s].index
                                                                 && c.realmProblem.problem.problemId == 4
-                                                                && c.versionId == versionID);
+                                                                // && c.versionId == versionID
+                                                                );
                                                         newAddShipment = true;
                                                     }
 
@@ -1069,13 +1076,15 @@ export default class QatProblemActions extends Component {
                                                             c => c.program.id == programList[pp].programId
                                                                 && c.shipmentId == filteredShipmentList[s].shipmentId
                                                                 && c.realmProblem.problem.problemId == 5
-                                                                && c.versionId == versionID);
+                                                                // && c.versionId == versionID
+                                                                );
                                                     } else {
                                                         indexShipment = problemActionList.findIndex(
                                                             c => c.program.id == programList[pp].programId
                                                                 && c.index == filteredShipmentList[s].index
                                                                 && c.realmProblem.problem.problemId == 5
-                                                                && c.versionId == versionID);
+                                                                // && c.versionId == versionID
+                                                                );
                                                         newAddShipment = true;
                                                     }
 
@@ -1284,13 +1293,15 @@ export default class QatProblemActions extends Component {
                                                             c => c.program.id == programList[pp].programId
                                                                 && c.shipmentId == filteredShipmentList[s].shipmentId
                                                                 && c.realmProblem.problem.problemId == 6
-                                                                && c.versionId == versionID);
+                                                                // && c.versionId == versionID
+                                                                );
                                                     } else {
                                                         indexShipment = problemActionList.findIndex(
                                                             c => c.program.id == programList[pp].programId
                                                                 && c.index == filteredShipmentList[s].index
                                                                 && c.realmProblem.problem.problemId == 6
-                                                                && c.versionId == versionID);
+                                                                // && c.versionId == versionID
+                                                                );
                                                         newAddShipment = true;
                                                     }
 
@@ -1499,13 +1510,15 @@ export default class QatProblemActions extends Component {
                                                             c => c.program.id == programList[pp].programId
                                                                 && c.shipmentId == filteredShipmentList[s].shipmentId
                                                                 && c.realmProblem.problem.problemId == 7
-                                                                && c.versionId == versionID);
+                                                                // && c.versionId == versionID
+                                                                );
                                                     } else {
                                                         indexShipment = problemActionList.findIndex(
                                                             c => c.program.id == programList[pp].programId
                                                                 && c.index == filteredShipmentList[s].index
                                                                 && c.realmProblem.problem.problemId == 7
-                                                                && c.versionId == versionID);
+                                                                // && c.versionId == versionID
+                                                                );
                                                         newAddShipment = true;
                                                     }
 
@@ -1706,7 +1719,8 @@ export default class QatProblemActions extends Component {
                                                             && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                             && c.program.id == programList[pp].programId
                                                             && c.realmProblem.problem.problemId == 10
-                                                            && c.versionId == versionID);
+                                                            // && c.versionId == versionID
+                                                            );
 
                                                     if (consumptionList.length > problemList[prob].data2) {
                                                         var conQtyArray = [];
@@ -1899,7 +1913,8 @@ export default class QatProblemActions extends Component {
                                                             && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                             && c.program.id == programList[pp].programId
                                                             && c.realmProblem.problem.problemId == 10
-                                                            && c.versionId == versionID);
+                                                            // && c.versionId == versionID
+                                                            );
 
                                                     if (consumptionList.length > problemList[prob].data2) {
                                                         var conQtyArray = [];
@@ -2075,7 +2090,8 @@ export default class QatProblemActions extends Component {
                                                             && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                             && c.program.id == programList[pp].programId
                                                             && c.realmProblem.problem.problemId == 10
-                                                            && c.versionId == versionID);
+                                                            // && c.versionId == versionID
+                                                            );
 
                                                     if (consumptionList.length > problemList[prob].data2) {
                                                         var conQtyArray = [];
@@ -2296,7 +2312,8 @@ export default class QatProblemActions extends Component {
                                                     && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                     && c.program.id == programList[pp].programId
                                                     && c.realmProblem.problem.problemId == 11
-                                                    && c.versionId == versionID);
+                                                    // && c.versionId == versionID
+                                                    );
 
                                             if (monthWithMosLessThenMin != '') {
                                                 // console.log("min mos month from array ======>", monthWithMosLessThenMin);
@@ -2498,7 +2515,8 @@ export default class QatProblemActions extends Component {
                                                     && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                     && c.program.id == programList[pp].programId
                                                     && c.realmProblem.problem.problemId == 16
-                                                    && c.versionId == versionID);
+                                                    // && c.versionId == versionID
+                                                    );
 
                                             if (monthWithMosGreaterThenMax != '') {
                                                 // console.log("min mos month from array ======>", monthWithMosGreaterThenMax);
@@ -2697,7 +2715,8 @@ export default class QatProblemActions extends Component {
                                                     && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                     && c.program.id == programList[pp].programId
                                                     && c.realmProblem.problem.problemId == 17
-                                                    && c.versionId == versionID);
+                                                    // && c.versionId == versionID
+                                                    );
 
                                             if (monthWithMosLessThenMin != '') {
                                                 // console.log("min mos month from array ======>", monthWithMosLessThenMin);
@@ -2898,7 +2917,8 @@ export default class QatProblemActions extends Component {
                                                     && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                     && c.program.id == programList[pp].programId
                                                     && c.realmProblem.problem.problemId == 18
-                                                    && c.versionId == versionID);
+                                                    // && c.versionId == versionID
+                                                    );
 
                                             if (monthWithMosLessThenMin != '') {
                                                 // console.log("min mos month from array ======>", monthWithMosLessThenMin);
@@ -3098,7 +3118,8 @@ export default class QatProblemActions extends Component {
                                                     && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                     && c.program.id == programList[pp].programId
                                                     && c.realmProblem.problem.problemId == 19
-                                                    && c.versionId == versionID);
+                                                    // && c.versionId == versionID
+                                                    );
 
                                             if (monthWithMosGreaterThenMax != '') {
                                                 // console.log("min mos month from array ======>", monthWithMosGreaterThenMax);
@@ -3296,7 +3317,8 @@ export default class QatProblemActions extends Component {
                                                     && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                     && c.program.id == programList[pp].programId
                                                     && c.realmProblem.problem.problemId == 20
-                                                    && c.versionId == versionID);
+                                                    // && c.versionId == versionID
+                                                    );
 
                                             if (monthWithMosLessThenMin != '') {
                                                 // console.log("min mos month from array ======>", monthWithMosLessThenMin);
@@ -3457,7 +3479,8 @@ export default class QatProblemActions extends Component {
                                                         && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                         && c.program.id == programList[pp].programId
                                                         && c.realmProblem.problem.problemId == 21
-                                                        && c.versionId == versionID);
+                                                        // && c.versionId == versionID
+                                                        );
 
                                                 if (consumptionListFortMinusOneDate.length > 0 && consumptionListFortMinusThreeDate.length > 0 && consumptionListFortMinusTwoDate.length == 0) {
                                                     // console.log("rais prob--------");

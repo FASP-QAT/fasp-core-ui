@@ -116,7 +116,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
         console.log('hasDuplicate', hasDuplicate);
         if (hasDuplicate) {
             this.setState({
-                message: 'Duplicate Procurement Unit Details Found',
+                message: i18n.t('static.procurementUnit.duplicateProcurementUnit'),
                 changedFlag: 0,
 
             },
@@ -854,7 +854,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
 
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 <Button type="submit" size="md" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRowInJexcel()}> <i className="fa fa-plus"></i> Add Row</Button>
+                                <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRowInJexcel()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>
                             </FormGroup>
 
                         </CardFooter>

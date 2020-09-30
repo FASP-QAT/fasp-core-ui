@@ -347,9 +347,13 @@ export default class EditHealthAreaComponent extends Component {
                                                     <FormGroup className="Selectcontrol-bdrNone">
                                                         <Label htmlFor="select">{i18n.t('static.healtharea.realmcountry')}<span class="red Reqasterisk">*</span></Label>
                                                         <Select
+                                                            // className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                            //     { 'is-valid': !errors.realmCountryId },
+                                                            //     { 'is-invalid': (touched.realmCountryId && !!errors.realmCountryId || this.state.healthArea.realmCountryArray.length == 0) }
+                                                            // )}
                                                             className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
                                                                 { 'is-valid': !errors.realmCountryId },
-                                                                { 'is-invalid': (touched.realmCountryId && !!errors.realmCountryId || this.state.healthArea.realmCountryArray.length == 0) }
+                                                                { 'is-invalid': (touched.realmCountryId && !!errors.realmCountryId || !!errors.realmCountryId) }
                                                             )}
                                                             bsSize="sm"
                                                             name="realmCountryId"
@@ -371,8 +375,9 @@ export default class EditHealthAreaComponent extends Component {
                                                         <Label htmlFor="company">{i18n.t('static.technicalArea.technicalAreaDisplayName')}<span class="red Reqasterisk">*</span> </Label>
                                                         <Input
                                                             bsSize="sm"
-                                                            type="text" name="healthAreaCode" valid={!errors.healthAreaCode && this.state.healthArea.healthAreaCode != ''}
-                                                            invalid={touched.healthAreaCode && !!errors.healthAreaCode || this.state.healthArea.healthAreaCode == ''}
+                                                            type="text" name="healthAreaCode"
+                                                            valid={!errors.healthAreaCode}
+                                                            invalid={touched.healthAreaCode && !!errors.healthAreaCode || !!errors.healthAreaCode}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             maxLength={6}
@@ -385,8 +390,10 @@ export default class EditHealthAreaComponent extends Component {
                                                         <Label htmlFor="company">{i18n.t('static.healthArea.healthAreaName')}<span class="red Reqasterisk">*</span> </Label>
                                                         <Input
                                                             bsSize="sm"
-                                                            type="text" name="healthAreaName" valid={!errors.healthAreaName}
-                                                            invalid={touched.healthAreaName && !!errors.healthAreaName || this.state.healthArea.label.label_en == ''}
+                                                            type="text" name="healthAreaName"
+                                                            valid={!errors.healthAreaName}
+                                                            invalid={touched.healthAreaName && !!errors.healthAreaName || !!errors.healthAreaName}
+                                                            type="text" name="healthAreaName"
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.healthArea.label.label_en}
