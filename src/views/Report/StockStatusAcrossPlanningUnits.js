@@ -1412,7 +1412,7 @@ class StockStatusAcrossPlanningUnits extends Component {
         columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ', '%20') });
 
         var A = [this.addDoubleQuoteToRowContent(headers)]
-        this.state.data.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), (ele.mos < ele.minMos ? i18n.t('static.report.low') : (ele.mos > ele.maxMos ? i18n.t('static.report.excess') : i18n.t('static.report.ok'))).replaceAll(' ', '%20'), this.roundN(ele.mos), ele.minMos, ele.maxMos, ele.stock, this.round(ele.amc), ele.lastStockCount != null ? (new moment(ele.lastStockCount).format(`${DATE_FORMAT_CAP}`)).replaceAll(' ', '%20') : ''])));
+        this.state.data.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), (ele.mos < ele.minMos ? i18n.t('static.report.low') : (ele.mos > ele.maxMos ? i18n.t('static.report.excess') : i18n.t('static.report.ok'))).replaceAll(' ', '%20'), this.roundN(ele.mos), ele.minMos, ele.maxMos, ele.stock, this.round(ele.amc), ele.lastStockCount != null && ele.lastStockCount!='' ? (new moment(ele.lastStockCount).format(`${DATE_FORMAT_CAP}`)).replaceAll(' ', '%20') : ''])));
 
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
@@ -1491,7 +1491,7 @@ class StockStatusAcrossPlanningUnits extends Component {
         var height = doc.internal.pageSize.height;
         var h1 = 50;
         const headers = columns.map((item, idx) => (item.text));
-        const data = this.state.data.map(ele => [getLabelText(ele.planningUnit.label), (ele.mos < ele.minMos ? i18n.t('static.report.low') : (ele.mos > ele.maxMos ? i18n.t('static.report.excess') : i18n.t('static.report.ok'))), this.formatterDouble(ele.mos), this.formatterDouble(ele.minMos), this.formatterDouble(ele.maxMos), this.formatter(ele.stock), this.formatter(ele.amc), ele.lastStockCount != null ? new moment(ele.lastStockCount).format(`${DATE_FORMAT_CAP}`) : '']);
+        const data = this.state.data.map(ele => [getLabelText(ele.planningUnit.label), (ele.mos < ele.minMos ? i18n.t('static.report.low') : (ele.mos > ele.maxMos ? i18n.t('static.report.excess') : i18n.t('static.report.ok'))), this.formatterDouble(ele.mos), this.formatterDouble(ele.minMos), this.formatterDouble(ele.maxMos), this.formatter(ele.stock), this.formatter(ele.amc), ele.lastStockCount != null && ele.lastStockCount!=''  ? new moment(ele.lastStockCount).format(`${DATE_FORMAT_CAP}`) : '']);
 
         let content = {
             margin: { top: 80, bottom: 50 },
@@ -2084,6 +2084,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                                 var maxDate = moments.length > 0 ? moment.max(moments) : ''
                                 var dtstr = startDate.startOf('month').format('YYYY-MM-DD')
                                 var list = programJson.supplyPlan.filter(c => c.planningUnitId == planningUnit.planningUnit.id && c.transDate == dtstr)
+                                console.log( planningUnit)
                                 if (list.length > 0) {
                                     var json = {
                                         planningUnit: planningUnit.planningUnit,
@@ -2101,8 +2102,8 @@ class StockStatusAcrossPlanningUnits extends Component {
                                         planningUnit: planningUnit.planningUnit,
                                         lastStockCount: maxDate == '' ? '' : maxDate.format('MMM-DD-YYYY'),
                                         mos: '',
-                                        minMos: '',
-                                        maxMos: '',
+                                        minMos: planningUnit.minMonthsOfStock,
+                                        maxMos: planningUnit.minMonthsOfStock+planningUnit.reorderFrequencyInMonths,
                                         stock: 0,
                                         amc: 0
                                     }
@@ -2259,7 +2260,7 @@ class StockStatusAcrossPlanningUnits extends Component {
 
             {
                 dataField: 'planningUnit.label',
-                text: 'Planning Unit',
+                text: i18n.t('static.dashboard.product'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -2439,7 +2440,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                                             </FormGroup>
 
                                             <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">Program</Label>
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                                 <div className="controls ">
                                                     <InputGroup>
                                                         <Input
@@ -2457,7 +2458,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                                                 </div>
                                             </FormGroup>
                                             <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">Version</Label>
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
                                                 <div className="controls ">
                                                     <InputGroup>
                                                         <Input

@@ -16,16 +16,16 @@ const initialValues = {
     minMosMinGaurdrail: '',
     minMosMaxGaurdrail: '',
     maxMosMaxGaurdrail: ''
-} 
+}
 
 const validationSchema = function (values) {
     return Yup.object().shape({
         realmCode: Yup.string()
-        .matches(/^\S*$/,i18n.t('static.validNoSpace.string'))
-        .required(i18n.t('static.realm.realmCodeText'))
-        .max(6, i18n.t('static.realm.realmCodeLength')),
-        label: Yup.string() 
-            .matches(/^\S+(?: \S+)*$/,i18n.t('static.validSpace.string'))
+            .matches(/^\S*$/, i18n.t('static.validNoSpace.string'))
+            .required(i18n.t('static.realm.realmCodeText'))
+            .max(6, i18n.t('static.realm.realmCodeLength')),
+        label: Yup.string()
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.realm.realmNameText')),
         minMosMinGaurdrail: Yup.number()
             .typeError(i18n.t('static.procurementUnit.validNumberText'))
@@ -431,7 +431,7 @@ export default class AddRealmComponent extends Component {
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
-                            <div ><h4> <strong>Loading...</strong></h4></div>
+                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
                             <div class="spinner-border blue ml-4" role="status">
 

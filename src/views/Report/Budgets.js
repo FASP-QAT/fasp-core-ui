@@ -679,7 +679,7 @@ console.log(plannedShipmentbudget)
             labels: budgets.map(ele => getLabelText(ele.label, this.state.lang)),
             datasets: [
                 {
-                    label: 'Budget Allocated To Shipment (Ordered)',
+                    label: i18n.t('static.budget.allocatedShipmentOrdered'),
                     type: 'horizontalBar',
                     stack: 1,
                     backgroundColor: '#042e6a',
@@ -691,7 +691,7 @@ console.log(plannedShipmentbudget)
                     data: data1
                 },
                 {
-                    label: 'Budget Allocated To Shipment (Planned)',
+                    label: i18n.t('static.budget.allocatedShipmentPlanned'),
                     type: 'horizontalBar',
                     stack: 1,
                     backgroundColor: '#6a82a8',
@@ -704,7 +704,7 @@ console.log(plannedShipmentbudget)
                 },
 
                 {
-                    label: 'Budget Remaining',
+                    label: i18n.t('static.report.remainingBudgetAmt'),
                     type: 'horizontalBar',
                     stack: 1,
                     backgroundColor: '#8aa9e6',
@@ -903,7 +903,7 @@ console.log(plannedShipmentbudget)
                         <Col md="11 pl-0">
                             <div className="row">
                                 <FormGroup className="col-md-3">
-                                    <Label htmlFor="appendedInputButton">Program</Label>
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                     <div className="controls ">
                                         <InputGroup>
                                             <Input
@@ -921,7 +921,7 @@ console.log(plannedShipmentbudget)
                                     </div>
                                 </FormGroup>
                                 <FormGroup className="col-md-3">
-                                    <Label htmlFor="appendedInputButton">Version</Label>
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
                                     <div className="controls ">
                                         <InputGroup>
                                             <Input
@@ -955,7 +955,7 @@ console.log(plannedShipmentbudget)
                                         </div>
                                         <div className="col-md-12">
                                             <button className="mr-1 mb-2 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
-                                                {this.state.show ? 'Hide Data' : 'Show Data'}
+                                                {this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
                                             </button>
 
                                         </div>

@@ -1423,8 +1423,8 @@ class Consumption extends Component {
     for (let i = 0; i < tempConsumptionList.length; i++) {
       let json = {
         "transDate": tempConsumptionList[i].transDate,
-        "actualConsumption": tempConsumptionList[i].actualConsumption * multiplier,
-        "forecastedConsumption": tempConsumptionList[i].forecastedConsumption * multiplier
+        "actualConsumption": this.round(tempConsumptionList[i].actualConsumption * multiplier),
+        "forecastedConsumption": this.round(tempConsumptionList[i].forecastedConsumption * multiplier)
       }
       tempConsumptionList1.push(json);
     }
@@ -1512,7 +1512,7 @@ class Consumption extends Component {
 
   toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
   formatter = value => {
-
+if(value!=null){
     var cell1 = value
     cell1 += '';
     var x = cell1.split('.');
@@ -1523,6 +1523,9 @@ class Consumption extends Component {
       x1 = x1.replace(rgx, '$1' + ',' + '$2');
     }
     return x1 + x2;
+  }else{
+    return ''
+  }
   }
   addDoubleQuoteToRowContent=(arr)=>{
     return arr.map(ele=>'"'+ele+'"')
@@ -1764,6 +1767,14 @@ class Consumption extends Component {
       return ''
     }
   }
+  round = num => {
+    if (num == '' || num == null) {
+      return null
+  } else {
+    return parseFloat(Math.round(num * Math.pow(10, 0)) / Math.pow(10, 0)).toFixed(0);
+    
+  }
+}
 
 
   // filterData() {
@@ -2037,17 +2048,16 @@ class Consumption extends Component {
               let objActual = sorted.filter(c => (moment(dateArray[j], 'MM-YYYY').isSame(moment(moment(c.consumptionDate, 'YYYY-MM-dd').format('MM-YYYY'), 'MM-YYYY'))) != 0 && c.actualFlag == true);
               let objForecast = sorted.filter(c => (moment(dateArray[j], 'MM-YYYY').isSame(moment(moment(c.consumptionDate, 'YYYY-MM-dd').format('MM-YYYY'), 'MM-YYYY'))) != 0 && c.actualFlag == false);
 
-              let actualValue = 0;
-              let forecastValue = 0;
+              let actualValue = null;
+              let forecastValue = null;
               let transDate = '';
-
               if (objActual.length > 0) {
-                actualValue = objActual[0].consumptionQty;
+                actualValue = this.round(objActual[0].consumptionQty);
                 transDate = objActual[0].consumptionDate;
               }
               if (objForecast.length > 0) {
-                forecastValue = objForecast[0].consumptionQty;
-                transDate = objForecast[0].consumptionDate;
+                forecastValue = this.round(objForecast[0].consumptionQty);
+                transDate =objForecast[0].consumptionDate;
               }
 
               if (viewById == 2) {
@@ -2061,8 +2071,8 @@ class Consumption extends Component {
               }else{
               let json = {
                 "transDate": transDate,
-                "actualConsumption": actualValue,
-                "forecastedConsumption": forecastValue
+                "actualConsumption":this.round( actualValue),
+                "forecastedConsumption":this.round( forecastValue)
               }
               finalOfflineConsumption.push(json);
             }

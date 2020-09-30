@@ -70,6 +70,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
     }
 
     componentDidMount() {
+        console.log("In cvompionent")
     }
 
     showConsumptionData() {
@@ -77,6 +78,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         var consumptionListUnFiltered = this.props.items.consumptionListUnFiltered;
         var consumptionList = this.props.items.consumptionList;
         var programJson = this.props.items.programJson;
+        console.log("Program Json", this.props.items);
         var db1;
         var dataSourceList = [];
         var realmCountryPlanningUnitList = [];
@@ -405,7 +407,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                                                             }.bind(this)
                                                         });
                                                     }
-                                                    if (obj.options.allowDeleteRow == true && obj.getJson().length > 1) {
+                                                    if (consumptionEditable && obj.options.allowDeleteRow == true && obj.getJson().length > 1) {
                                                         // region id
                                                         if (obj.getRowData(y)[3] == 0) {
                                                             items.push({
@@ -435,7 +437,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                             if (y == null) {
                             } else {
                                 // Insert new row
-                                if (obj.options.allowInsertRow == true) {
+                                if (consumptionEditable && obj.options.allowInsertRow == true) {
                                     var json = obj.getJson();
                                     if (consumptionEditable) {
                                         items.push({
@@ -447,7 +449,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                                     }
                                 }
 
-                                if (obj.options.allowDeleteRow == true && obj.getJson().length > 1) {
+                                if (consumptionEditable && obj.options.allowDeleteRow == true && obj.getJson().length > 1) {
                                     // region id
                                     if (obj.getRowData(y)[12] == -1) {
                                         items.push({
@@ -862,13 +864,43 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             var map = new Map(Object.entries(json[y]));
             mapArray.push(map);
 
+            var consumptionListUnFiltered = this.props.items.consumptionListUnFiltered;
+            var checkDuplicateOverAll = consumptionListUnFiltered.filter(c =>
+                c.realmCountryPlanningUnit.id == map.get("4") &&
+                moment(c.consumptionDate).format("YYYY-MM") == moment(map.get("0")).format("YYYY-MM") &&
+                c.region.id == map.get("1") &&
+                (c.actualFlag.toString() == "true" ? ACTUAL_CONSUMPTION_TYPE : FORCASTED_CONSUMPTION_TYPE) == map.get("2"));
+            console.log("Check Duplicate overall", checkDuplicateOverAll);
+            var index = 0;
+            if (checkDuplicateOverAll.length > 0) {
+                console.log("In if");
+                if (checkDuplicateOverAll[0].consumptionId > 0) {
+                    console.log("In if consumption id is greater than 0");
+                    index = consumptionListUnFiltered.findIndex(c => c.consumptionId == checkDuplicateOverAll[0].consumptionId);
+                    console.log("Index", index);
+                } else {
+                    console.log("In ekse where consumption id is 0");
+                    index = consumptionListUnFiltered.findIndex(c =>
+                        c.realmCountryPlanningUnit.id == checkDuplicateOverAll[0].realmCountryPlanningUnit.id &&
+                        moment(c.consumptionDate).format("YYYY-MM") == moment(checkDuplicateOverAll[0].consumptionDate).format("YYYY-MM") &&
+                        c.region.id == checkDuplicateOverAll[0].region.id &&
+                        (c.actualFlag.toString() == "true" ? ACTUAL_CONSUMPTION_TYPE : FORCASTED_CONSUMPTION_TYPE) == (checkDuplicateOverAll[0].actualFlag.toString() == "true" ? ACTUAL_CONSUMPTION_TYPE : FORCASTED_CONSUMPTION_TYPE));
+                    console.log("Index", index);
+                }
+            }
+            console.log("Map.get(12)", map.get("12"));
+
             var checkDuplicateInMap = mapArray.filter(c =>
                 c.get("4") == map.get("4") &&
                 moment(c.get("0")).format("YYYY-MM") == moment(map.get("0")).format("YYYY-MM") &&
                 c.get("1") == map.get("1") &&
                 c.get("2") == map.get("2")
             )
-            if (checkDuplicateInMap.length > 1) {
+            console.log("Check duplicate in map", checkDuplicateInMap);
+            console.log("Condition", checkDuplicateInMap.length > 1 || (checkDuplicateOverAll > 0 && index != map.get("12")));
+            console.log("checkDuplicateInMap.length > 1", checkDuplicateInMap.length > 1);
+            if (checkDuplicateInMap.length > 1 || (checkDuplicateOverAll.length > 0 && index != map.get("12"))) {
+                console.log("in if for is duplicate");
                 var colArr = ['E'];
                 for (var c = 0; c < colArr.length; c++) {
                     inValid(colArr[c], y, i18n.t('static.supplyPlan.duplicateConsumption'), elInstance);

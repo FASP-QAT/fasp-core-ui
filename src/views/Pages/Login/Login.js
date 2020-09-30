@@ -393,8 +393,8 @@ class Login extends Component {
                   and delivers health commodities, offers comprehensive technical assistance to strengthen
                   national supply chain systems, and provides global supply chain leadership. For more
                   information, visit <a href="https://www.ghsupplychain.org/" target="_blank">ghsupplychain.org</a>. The information provided in this tool is not
-                                                                                  official U.S. government information and does not represent the views or positions of the
-                                                                                  Agency for International Development or the U.S. government.
+                                                                                    official U.S. government information and does not represent the views or positions of the
+                                                                                    Agency for International Development or the U.S. government.
               </p>
                 </CardBody>
                 <Row className="text-center Login-bttom-logo">

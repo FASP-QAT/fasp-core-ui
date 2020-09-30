@@ -222,7 +222,7 @@ class RealmCountry extends Component {
                                                     },
 
                                                     {
-                                                        title: "Is Active",
+                                                        title: i18n.t('static.checkbox.active'),
                                                         type: 'checkbox'
                                                     },
                                                     {
@@ -244,22 +244,22 @@ class RealmCountry extends Component {
                                                     var rowData = elInstance.getRowData(y);
                                                     // var productCategoryId = rowData[0];
                                                     var realmCountryId = rowData[5];
-                                                    if(realmCountryId==0){
+                                                    if (realmCountryId == 0) {
                                                         var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
                                                         cell1.classList.remove('readonly');
 
                                                         // var cell2 = elInstance.getCell(`C${parseInt(y) + 1}`)
                                                         // cell2.classList.remove('readonly');
 
-                                                        
-                                                    }else{
+
+                                                    } else {
                                                         var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
                                                         cell1.classList.add('readonly');
 
                                                         // var cell2 = elInstance.getCell(`C${parseInt(y) + 1}`)
                                                         // cell2.classList.add('readonly');
 
-                                                       
+
                                                     }
                                                 },
                                                 pagination: 10,
@@ -693,7 +693,7 @@ class RealmCountry extends Component {
                             <FormGroup>
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> Add Row</Button>
+                                <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>
                                 &nbsp;
 </FormGroup>
                         </CardFooter>
@@ -702,7 +702,7 @@ class RealmCountry extends Component {
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
-                            <div ><h4> <strong>Loading...</strong></h4></div>
+                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
                             <div class="spinner-border blue ml-4" role="status">
 

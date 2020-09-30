@@ -234,7 +234,8 @@ class EditFundingSourceComponent extends Component {
                                                             id="fundingSource"
                                                             bsSize="sm"
                                                             valid={!errors.fundingSource}
-                                                            invalid={touched.fundingSource && !!errors.fundingSource || this.state.fundingSource.label.label_en == ''}
+                                                            // invalid={touched.fundingSource && !!errors.fundingSource || this.state.fundingSource.label.label_en == ''}
+                                                            invalid={(touched.fundingSource && !!errors.fundingSource) || !!errors.fundingSource}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.fundingSource.label.label_en}
@@ -248,7 +249,8 @@ class EditFundingSourceComponent extends Component {
                                                             id="fundingSourceCode"
                                                             bsSize="sm"
                                                             valid={!errors.fundingSourceCode && this.state.fundingSource.fundingSourceCode != ''}
-                                                            invalid={touched.fundingSourceCode && !!errors.fundingSourceCode || this.state.fundingSource.fundingSourceCode == ''}
+                                                            // invalid={touched.fundingSourceCode && !!errors.fundingSourceCode || this.state.fundingSource.fundingSourceCode == ''}
+                                                            invalid={(touched.fundingSourceCode && !!errors.fundingSourceCode) || !!errors.fundingSourceCode}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.fundingSource.fundingSourceCode}
@@ -313,7 +315,7 @@ class EditFundingSourceComponent extends Component {
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
-                            <div ><h4> <strong>Loading...</strong></h4></div>
+                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
                             <div class="spinner-border blue ml-4" role="status">
 

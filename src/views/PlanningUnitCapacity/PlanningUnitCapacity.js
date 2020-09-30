@@ -924,19 +924,19 @@ class PlanningUnitCapacity extends Component {
             columns: [
 
                 {
-                    title: "Planning Unit",
+                    title: i18n.t('static.dashboard.planningunit'),
                     type: 'text',
                     readOnly: true
                 },
                 {
-                    title: "Supplier",
+                    title: i18n.t('static.dashboard.supplier'),
                     type: 'autocomplete',
                     source: supplierList,
                     filter: this.filterSupplier
 
                 },
                 {
-                    title: "Start Date",
+                    title: i18n.t('static.common.startdate'),
                     type: 'calendar',
                     options: {
                         format: JEXCEL_DATE_FORMAT
@@ -944,18 +944,18 @@ class PlanningUnitCapacity extends Component {
 
                 },
                 {
-                    title: "End Date",
+                    title: i18n.t('static.common.stopdate'),
                     type: 'calendar',
                     options: {
                         format: JEXCEL_DATE_FORMAT
                     }
                 },
                 {
-                    title: "Capacity",
+                    title: i18n.t('static.planningunit.capacity'),
                     type: 'number',
                 },
                 {
-                    title: "Is Active",
+                    title: i18n.t('static.common.status'),
                     type: 'checkbox'
                 },
                 {
@@ -1556,7 +1556,7 @@ class PlanningUnitCapacity extends Component {
                         <FormGroup>
                             <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                             <Button type="submit" size="md" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                            <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> Add Row</Button>
+                            <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>
                             &nbsp;
                 </FormGroup>
                     </CardFooter>

@@ -89,7 +89,9 @@ class AuthenticationService {
                 return 1;
             if (roleList.includes("ROLE_REALM_ADMIN"))
                 return 2;
-            return 3;
+            if (roleList.includes("ROLE_PROGRAM_ADMIN"))
+                return 3;
+            return 4;
         }
     }
 
@@ -443,7 +445,7 @@ class AuthenticationService {
                     }
                     break;
                 case "/user/editUser/:userId":
-                    if (bfunction.includes("ROLE_BF_MANAGE_USER")) {
+                    if (bfunction.includes("ROLE_BF_MANAGE_USER1")) {
                         return true;
                     }
                     break;
@@ -1118,6 +1120,7 @@ class AuthenticationService {
                     break;
                 case "/consumptionDetails/:programId/:versionId/:planningUnitId": return true
                     break;
+                case "/report/problemList/:programId/:color/:message":
                 case "/report/problemList/:color/:message":
                     if (bfunction.includes("ROLE_BF_PROBLEM_AND_ACTION_REPORT")) {
                         return true;
@@ -1131,10 +1134,10 @@ class AuthenticationService {
                 default:
                     return false;
             }
-            localStorage.removeItem("token-" + decryptedCurUser);
+            // localStorage.removeItem("token-" + decryptedCurUser);
         }
-        let keysToRemove = ["curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken"];
-        keysToRemove.forEach(k => localStorage.removeItem(k))
+        // let keysToRemove = ["curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken"];
+        // keysToRemove.forEach(k => localStorage.removeItem(k))
         return false;
 
     }

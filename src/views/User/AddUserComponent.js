@@ -541,6 +541,7 @@ class AddUserComponent extends Component {
                                                             invalid={touched.username && !!errors.username}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
+                                                            maxLength={25}
                                                             required
                                                             value={this.state.user.username}
                                                         /><FormFeedback className="red">{errors.username}</FormFeedback>
@@ -555,6 +556,7 @@ class AddUserComponent extends Component {
                                                             invalid={touched.emailId && !!errors.emailId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
+                                                            maxLength={50}
                                                             required
                                                             value={this.state.user.emailId}
                                                         />
@@ -635,7 +637,7 @@ class AddUserComponent extends Component {
                 <Row style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
-                            <div ><h4> <strong>Loading...</strong></h4></div>
+                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
                             <div class="spinner-border blue ml-4" role="status">
 
