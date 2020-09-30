@@ -3402,6 +3402,9 @@ margin-left: -45px;
   text-align: left;
   display: flex;
 }
+.sidebar .nav-dropdown.open{
+  background: none!important;
+}
 .sidebar .nav-dropdown-toggle {
   position: relative;
   text-align: left;
