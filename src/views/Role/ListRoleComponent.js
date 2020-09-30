@@ -390,24 +390,46 @@ class ListRoleComponent extends Component {
                 }
 
             })
+            .catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
 
-        // .catch(
-        //     error => {
-        //         switch (error.response ? error.response.status : "") {
-
-        //             case 500:
-        //             case 401:
-        //             case 404:
-        //             case 406:
-        //             case 412:
-        //                 this.setState({ message: error.response.data.messageCode });
-        //                 break;
-        //             default:
-        //                 this.setState({ message: 'static.unkownError' });
-        //                 break;
-        //         }
-        //     }
-        // );
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
     }
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
@@ -447,11 +469,11 @@ class ListRoleComponent extends Component {
 
         return (
             <div className="animated">
-                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                {/* <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
                 }} loading={(loading) => {
                     this.setState({ loading: loading })
-                }} />
+                }} /> */}
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
