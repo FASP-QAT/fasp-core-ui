@@ -185,8 +185,10 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                         // Shipments part
                         // Getting shipments list for planning unit
                         var shipmentList = (programJsonForStoringTheResult.shipmentList).filter(c => c.active == true && c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag == true);
+                        console.log("Shipment list----------------->", shipmentList);
                         // Getting shipment list for a month
                         var shipmentArr = shipmentList.filter(c => (c.shipmentStatus.id != DELIVERED_SHIPMENT_STATUS) ? (c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate) : (c.receivedDate >= startDate && c.receivedDate <= endDate))
+                        console.log("Shipment Arr----------------->", shipmentArr);
                         var shipmentTotalQty = 0;
                         var shipmentTotalQtyWps = 0;
                         var manualTotalQty = 0;
@@ -214,6 +216,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                         for (var j = 0; j < shipmentArr.length; j++) {
                             // Adding total shipment qty
                             shipmentTotalQty += parseInt((shipmentArr[j].shipmentQty));
+                            console.log("(shipmentArr[j].shipmentQty)", (shipmentArr[j].shipmentQty));
                             // Adding total shipment qty wps
                             if (shipmentArr[j].shipmentStatus.id != PLANNED_SHIPMENT_STATUS && shipmentArr[j].shipmentStatus.id != ON_HOLD_SHIPMENT_STATUS && shipmentArr[j].shipmentStatus.id != SUBMITTED_SHIPMENT_STATUS) {
                                 shipmentTotalQtyWps += parseInt((shipmentArr[j].shipmentQty));
@@ -478,16 +481,22 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
 
                         // Calculations of national adjustments
                         var nationalAdjustment = 0;
+                        console.log("National adjustment");
                         // Check if all the regions have reported actual inventory and expected stock is not equal to actual stock make an national adjustment
+                        console.log("regionsReportingActualInventory", regionsReportingActualInventory, "totalNoOfRegions", totalNoOfRegions, "expectedStock", expectedStock, "actualStockCount", actualStockCount, "Adjutsment qty", adjustmentQty);
                         if (regionsReportingActualInventory == totalNoOfRegions && expectedStock != actualStockCount) {
+                            console.log("In first if");
                             nationalAdjustment = actualStockCount - expectedStock;
                         } else if (inventoryList.length != 0 && actualStockCount > (expectedStock + adjustmentQty)) {
+                            console.log("In second if");
                             // If actual stock count is greater than expected + adjustment qty that consider that stock as national adjustment
                             nationalAdjustment = actualStockCount - expectedStock;
                         } else if (regionsReportingActualInventory > 0 && expectedStock < 0) {
+                            console.log("In 3rd if");
                             // If expected is less than 0 than make an national adjustment
                             nationalAdjustment = actualStockCount - expectedStock;
                         }
+                        console.log("National adjutsment", nationalAdjustment);
                         // Calculations of national adjustments wps
                         var nationalAdjustmentWps = 0;
                         // Check if all the regions have reported actual inventory and expected stock is not equal to actual stock make an national adjustment wps

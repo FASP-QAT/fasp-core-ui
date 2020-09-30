@@ -2603,7 +2603,7 @@ export default class WhatIfReportComponent extends React.Component {
             };
         return (
             <>
-                <TabPane tabId="1">
+                {/* <TabPane tabId="1"> */}
                     <div id="supplyPlanTableId" style={{ display: this.state.display }}>
                         <Formik
                             enableReinitialize={true}
@@ -3110,7 +3110,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         </tr>
                                     </tfoot>
                                 </Table>
-                                {this.state.showConsumption == 1 && <ConsumptionInSupplyPlanComponent ref="consumptionChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} consumptionPage="supplyPlan" />}
+                                {this.state.showConsumption == 1 && <ConsumptionInSupplyPlanComponent ref="consumptionChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} consumptionPage="whatIf" />}
                                 <div className="table-responsive mt-3">
                                     <div id="consumptionTable" />
                                 </div>
@@ -3283,7 +3283,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         </tr>
                                     </tbody>
                                 </Table>
-                                {this.state.showInventory == 1 && <InventoryInSupplyPlanComponent ref="inventoryChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} inventoryPage="supplyPlan" hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} adjustmentsDetailsClicked={this.adjustmentsDetailsClicked} />}
+                                {this.state.showInventory == 1 && <InventoryInSupplyPlanComponent ref="inventoryChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} inventoryPage="whatIf" hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} adjustmentsDetailsClicked={this.adjustmentsDetailsClicked} />}
                                 <div className="table-responsive mt-3">
                                     <div id="adjustmentsTable" className="table-responsive " />
                                 </div>
@@ -3329,7 +3329,7 @@ export default class WhatIfReportComponent extends React.Component {
                         </ModalHeader>
                         <div style={{ display: this.state.loading ? "none" : "block" }}>
                             <ModalBody>
-                                {this.state.showShipments && <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} hideFourthComponent={this.hideFourthComponent} hideFifthComponent={this.hideFifthComponent} shipmentPage="supplyPlan" />}
+                                {this.state.showShipments && <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} hideFourthComponent={this.hideFourthComponent} hideFifthComponent={this.hideFifthComponent} shipmentPage="whatIf" />}
                                 <h6 className="red" id="div2">{this.state.noFundsBudgetError || this.state.shipmentBatchError || this.state.shipmentError}</h6>
                                 <div className="table-responsive">
                                     <div id="shipmentsDetailsTable" />
@@ -3442,8 +3442,8 @@ export default class WhatIfReportComponent extends React.Component {
                         </div>
                     </Modal>
                     {/* Expired stock modal */}
-                </TabPane>
-                <TabPane tabId="2">
+                {/* </TabPane> */}
+                {/* <TabPane tabId="2"> */}
                     <Row>
                         <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                             <Col md="12 pl-0" id="realmDiv">
@@ -3473,7 +3473,7 @@ export default class WhatIfReportComponent extends React.Component {
                             </Col>
                         </Col>
                     </Row>
-                </TabPane>
+                {/* </TabPane> */}
             </>
         );
     }
@@ -3557,7 +3557,7 @@ export default class WhatIfReportComponent extends React.Component {
                             </FormGroup>
                         </div>
                         <div className="animated fadeIn" style={{ display: this.state.display }}>
-                            <Row>
+                            {/* <Row>
                                 <Col xs="12" md="12" className="mb-4">
                                     <Nav tabs>
                                         <NavItem>
@@ -3575,11 +3575,11 @@ export default class WhatIfReportComponent extends React.Component {
 
                                         </NavItem>
                                     </Nav>
-                                    <TabContent activeTab={this.state.activeTab[0]}>
+                                    <TabContent activeTab={this.state.activeTab[0]}> */}
                                         {this.tabPane()}
-                                    </TabContent>
+                                    {/* </TabContent>
                                 </Col>
-                            </Row>
+                            </Row> */}
                         </div>
                     </CardBody>
                     <CardFooter className="pb-5">
