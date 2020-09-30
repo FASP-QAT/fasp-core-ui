@@ -1111,7 +1111,7 @@ class ApplicationDashboard extends Component {
                               {/* <i className="icon-settings"></i> */}
                             </DropdownToggle>
                             <DropdownMenu right>
-                              <DropdownItem onClick={() => this.redirectToCrud("/report/problemList")}>QAT Probelm Action Report</DropdownItem>
+                              <DropdownItem onClick={() => this.redirectToCrud("/report/problemList")}>QAT Problem Action Report</DropdownItem>
                               {/* <DropdownItem onClick={() => this.redirectToCrud("/user/addUser")}>Add User</DropdownItem> */}
 
                             </DropdownMenu>
