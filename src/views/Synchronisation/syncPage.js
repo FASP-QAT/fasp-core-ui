@@ -1364,7 +1364,7 @@ export default class syncPage extends Component {
                                     var oldDataList = oldProgramDataShipment.filter(c => c.shipmentId == mergedShipmentData[cd].shipmentId);
                                     var oldData = ""
                                     if (oldDataList.length > 0) {
-                                      oldData = [oldDataList[0].shipmentId, oldDataList[0].planningUnit.id, oldDataList[0].shipmentStatus.id, moment(oldDataList[0].expectedDeliveryDate).format(DATE_FORMAT_CAP), oldDataList[0].procurementAgent.id, oldDataList[0].fundingSource.id, oldDataList[0].budget.id, oldDataList[0].orderNo != "" && oldDataList[0].orderNo != null ? oldDataList[0].orderNo.concat("~").concat(oldDataList[0].primeLineNo) : "", oldDataList[0].dataSource.id, oldDataList[0].shipmentMode == "Air" ? 2 : 1, oldDataList[0].suggestedQty, oldDataList[0].shipmentQty, oldDataList[0].currency.currencyId, oldDataList[0].rate, oldDataList[0].rate * oldDataList[0].shipmentQty, oldDataList[0].freightCost, oldDataList[0].plannedDate != "" && oldDataList[0].plannedDate != null ? moment(oldDataList[0].plannedDate).format(DATE_FORMAT_CAP) : "", oldDataList[0].submittedDate != "" && oldDataList[0].submittedDate != null ? moment(oldDataList[0].submittedDate).format(DATE_FORMAT_CAP) : "", oldDataList[0].approvedDate != "" && oldDataList[0].approvedDate != null ? moment(oldDataList[0].approvedDate).format(DATE_FORMAT_CAP) : "", oldDataList[0].shippedDate != "" && oldDataList[0].shippedDate!=null ? moment(oldDataList[0].shippedDate).format(DATE_FORMAT_CAP) : "", oldDataList[0].arrivedDate != "" && oldDataList[0].arrivedDate != null ? moment(oldDataList[0].arrivedDate).format(DATE_FORMAT_CAP) : "", oldDataList[0].receivedDate != "" && oldDataList[0].receivedDate != null ? moment(oldDataList[0].receivedDate).format(DATE_FORMAT_CAP) : "", oldDataList[0].notes, oldDataList[0].erpFlag, oldDataList[0].emergencyOrder, oldDataList[0].accountFlag, JSON.stringify(oldDataList[0].batchInfoList != "" ? ((oldDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.shipmentQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
+                                      oldData = [oldDataList[0].shipmentId, oldDataList[0].planningUnit.id, oldDataList[0].shipmentStatus.id, moment(oldDataList[0].expectedDeliveryDate).format(DATE_FORMAT_CAP), oldDataList[0].procurementAgent.id, oldDataList[0].fundingSource.id, oldDataList[0].budget.id, oldDataList[0].orderNo != "" && oldDataList[0].orderNo != null ? oldDataList[0].orderNo.concat("~").concat(oldDataList[0].primeLineNo) : "", oldDataList[0].dataSource.id, oldDataList[0].shipmentMode == "Air" ? 2 : 1, oldDataList[0].suggestedQty, oldDataList[0].shipmentQty, oldDataList[0].currency.currencyId, oldDataList[0].rate, oldDataList[0].rate * oldDataList[0].shipmentQty, oldDataList[0].freightCost, oldDataList[0].plannedDate != "" && oldDataList[0].plannedDate != null ? moment(oldDataList[0].plannedDate).format(DATE_FORMAT_CAP) : "", oldDataList[0].submittedDate != "" && oldDataList[0].submittedDate != null ? moment(oldDataList[0].submittedDate).format(DATE_FORMAT_CAP) : "", oldDataList[0].approvedDate != "" && oldDataList[0].approvedDate != null ? moment(oldDataList[0].approvedDate).format(DATE_FORMAT_CAP) : "", oldDataList[0].shippedDate != "" && oldDataList[0].shippedDate != null ? moment(oldDataList[0].shippedDate).format(DATE_FORMAT_CAP) : "", oldDataList[0].arrivedDate != "" && oldDataList[0].arrivedDate != null ? moment(oldDataList[0].arrivedDate).format(DATE_FORMAT_CAP) : "", oldDataList[0].receivedDate != "" && oldDataList[0].receivedDate != null ? moment(oldDataList[0].receivedDate).format(DATE_FORMAT_CAP) : "", oldDataList[0].notes, oldDataList[0].erpFlag, oldDataList[0].emergencyOrder, oldDataList[0].accountFlag, JSON.stringify(oldDataList[0].batchInfoList != "" ? ((oldDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.shipmentQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
                                     }
                                     data[28] = oldData;//Old data
                                     var latestDataList = latestProgramDataShipment.filter(c => c.shipmentId == mergedShipmentData[cd].shipmentId);
@@ -2533,7 +2533,50 @@ export default class syncPage extends Component {
           console.log("Program json", programJson);
           ProgramService.saveProgramData(programJson).then(response => {
             if (response.status == 200) {
-              this.redirectToDashbaord();
+              var programDataTransaction1 = db1.transaction(['programData'], 'readwrite');
+              var programDataOs1 = programDataTransaction1.objectStore('programData');
+              var programRequest1 = programDataOs1.delete((this.state.programId).value);
+
+              var programDataTransaction2 = db1.transaction(['downloadedProgramData'], 'readwrite');
+              var programDataOs2 = programDataTransaction2.objectStore('downloadedProgramData');
+              var programRequest2 = programDataOs2.delete((this.state.programId).value);
+
+              programRequest1.onerror = function (event) {
+                this.setState({
+                  supplyPlanError: i18n.t('static.program.errortext')
+                })
+              }.bind(this);
+              programRequest2.onsuccess = function (e) {
+
+                var json = response.data;
+                var version = json.requestedProgramVersion;
+                if (version == -1) {
+                  version = json.currentVersion.versionId
+                }
+
+                var transactionForSavingData = db1.transaction(['programData'], 'readwrite');
+                var programSaveData = transactionForSavingData.objectStore('programData');
+
+                var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedProgramData'], 'readwrite');
+                var downloadedProgramSaveData = transactionForSavingDownloadedProgramData.objectStore('downloadedProgramData');
+                // for (var i = 0; i < json.length; i++) {
+                var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json), SECRET_KEY);
+                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                var item = {
+                  id: json.programId + "_v" + version + "_uId_" + userId,
+                  programId: json.programId,
+                  version: version,
+                  programName: (CryptoJS.AES.encrypt(JSON.stringify((json.label)), SECRET_KEY)).toString(),
+                  programData: encryptedText.toString(),
+                  userId: userId
+                };
+                console.log("Item------------>", item);
+                var putRequest = programSaveData.put(item);
+                var putRequest1 = downloadedProgramSaveData.put(item);
+
+                this.redirectToDashbaord();
+              }.bind(this)
             } else {
               this.setState({
                 message: response.data.messageCode,

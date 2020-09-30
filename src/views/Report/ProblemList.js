@@ -975,10 +975,17 @@ export default class ConsumptionDetails extends React.Component {
                 if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROBLEM')) {
                     let problemStatusId = document.getElementById('problemStatusId').value;
                     let problemTypeId = document.getElementById('problemTypeId').value;
+                    var index = 0;
+                    if (this.el.getValueFromCoords(1, x) == "") {
+                        var index = 0;
+                    } else {
+                        index = this.el.getValueFromCoords(1, x);
+                    }
                     // console.log("problemReportId--------------------------", this.el.getValueFromCoords(0, x));
                     // console.log("problemActionIndex--------------------------", this.el.getValueFromCoords(1, x));
+                    console.log("URL", `/report/editProblem/${this.el.getValueFromCoords(0, x)}/${this.state.programId}/${index}/${problemStatusId}/${problemTypeId}`);
                     this.props.history.push({
-                        pathname: `/report/editProblem/${this.el.getValueFromCoords(0, x)}/ ${this.state.programId}/${this.el.getValueFromCoords(1, x)}/${problemStatusId}/${problemTypeId}`,
+                        pathname: `/report/editProblem/${this.el.getValueFromCoords(0, x)}/${this.state.programId}/${index}/${problemStatusId}/${problemTypeId}`,
                     });
                 }
             }
@@ -1114,21 +1121,21 @@ export default class ConsumptionDetails extends React.Component {
             }.bind(this)
         }
         else if (programId == 0) {
-            this.setState({ message: i18n.t('static.common.selectProgram'), data: [],loading:false },
+            this.setState({ message: i18n.t('static.common.selectProgram'), data: [], loading: false },
                 () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
                     this.el.destroy();
                 });
         }
         else if (problemStatusId == 0) {
-            this.setState({ message: i18n.t('static.report.selectProblemStatus'), data: [],loading:false },
+            this.setState({ message: i18n.t('static.report.selectProblemStatus'), data: [], loading: false },
                 () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
                     this.el.destroy();
                 });
         }
         else if (problemTypeId == 0) {
-            this.setState({ message: i18n.t('static.report.selectProblemType'), data: [] ,loading:false},
+            this.setState({ message: i18n.t('static.report.selectProblemType'), data: [], loading: false },
                 () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
                     this.el.destroy();

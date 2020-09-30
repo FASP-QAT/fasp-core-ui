@@ -2603,7 +2603,7 @@ export default class WhatIfReportComponent extends React.Component {
             };
         return (
             <>
-                <TabPane tabId="1">
+                {/* <TabPane tabId="1"> */}
                     <div id="supplyPlanTableId" style={{ display: this.state.display }}>
                         <Formik
                             enableReinitialize={true}
@@ -3442,8 +3442,8 @@ export default class WhatIfReportComponent extends React.Component {
                         </div>
                     </Modal>
                     {/* Expired stock modal */}
-                </TabPane>
-                <TabPane tabId="2">
+                {/* </TabPane> */}
+                {/* <TabPane tabId="2"> */}
                     <Row>
                         <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                             <Col md="12 pl-0" id="realmDiv">
@@ -3473,7 +3473,7 @@ export default class WhatIfReportComponent extends React.Component {
                             </Col>
                         </Col>
                     </Row>
-                </TabPane>
+                {/* </TabPane> */}
             </>
         );
     }
@@ -3557,7 +3557,7 @@ export default class WhatIfReportComponent extends React.Component {
                             </FormGroup>
                         </div>
                         <div className="animated fadeIn" style={{ display: this.state.display }}>
-                            <Row>
+                            {/* <Row>
                                 <Col xs="12" md="12" className="mb-4">
                                     <Nav tabs>
                                         <NavItem>
@@ -3575,11 +3575,11 @@ export default class WhatIfReportComponent extends React.Component {
 
                                         </NavItem>
                                     </Nav>
-                                    <TabContent activeTab={this.state.activeTab[0]}>
+                                    <TabContent activeTab={this.state.activeTab[0]}> */}
                                         {this.tabPane()}
-                                    </TabContent>
+                                    {/* </TabContent>
                                 </Col>
-                            </Row>
+                            </Row> */}
                         </div>
                     </CardBody>
                     <CardFooter className="pb-5">
