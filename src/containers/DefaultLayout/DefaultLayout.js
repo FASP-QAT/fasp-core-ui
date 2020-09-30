@@ -250,7 +250,8 @@ const routes = [
   { path: '/consumptionDetails/:programId/:versionId/:planningUnitId', name: 'static.consumptionDetailHead.consumptionDetail', component: ConsumptionDetails },
   { path: '/shipment/shipmentDetails/:programId/:versionId/:planningUnitId', name: 'static.shipmentDetailHead.shipmentDetail', component: ShipmentList },
   { path: '/report/addProblem/:color/:message', name: 'static.breadcrum.add', entityname: 'static.report.problem', component: AddProblem },
-  { path: '/report/problemList/:color/:message', name: 'static.breadcrum.list', entityname: 'static.dashboard.qatProblem', component: ProblemList },
+  { path: '/report/problemList/:color/:message', exact:true,name: 'static.breadcrum.list', entityname: 'static.dashboard.qatProblem', component: ProblemList },
+  { path: '/report/problemList/:programId/:color/:message', name: 'static.breadcrum.list', entityname: 'static.dashboard.qatProblem', component: ProblemList },
   // { path: '/report/problemList', name: 'Qat Problem List', component: ProblemList },
 
   { path: '/problem/editProblem', name: ' Edit Problem', component: EditProblem },
@@ -1691,19 +1692,19 @@ class DefaultLayout extends Component {
                         icon: 'fa fa-list',
                         attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_REPORT') ? false : true) },
                         children: [
-                          {
-                            name: i18n.t('static.dashboard.productcatalog'),
-                            url: '/report/productCatalog',
-                            icon: 'fa fa-th',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PRODUCT_CATALOG_REPORT') ? false : true) }
+                          // {
+                          //   name: i18n.t('static.dashboard.productcatalog'),
+                          //   url: '/report/productCatalog',
+                          //   icon: 'fa fa-th',
+                          //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PRODUCT_CATALOG_REPORT') ? false : true) }
 
-                          },
-                          {
-                            name: i18n.t('static.dashboard.supplierLeadTimes'),
-                            url: '/report/supplierLeadTimes',
-                            icon: 'fa fa-wpforms',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
-                          },
+                          // },
+                          // {
+                          //   name: i18n.t('static.dashboard.supplierLeadTimes'),
+                          //   url: '/report/supplierLeadTimes',
+                          //   icon: 'fa fa-wpforms',
+                          //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
+                          // },
 
 
                           //1) Consumption Reports
@@ -1717,6 +1718,11 @@ class DefaultLayout extends Component {
                                 url: '/report/consumption',
                                 icon: 'fa fa-exchange',
                                 attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_REPORT') ? false : true) }
+                              }, {
+                                name: i18n.t('static.report.forecasterrorovertime'),
+                                url: '/report/forecastOverTheTime',
+                                icon: 'fa fa-line-chart',
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT') ? false : true) }
                               },
 
                             ]

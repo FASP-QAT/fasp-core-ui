@@ -2860,7 +2860,7 @@ input::placeholder {
   position: absolute;
   right: 0;
   // bottom: 17px!important;
-  bottom: 17px!important;
+  bottom: 20px!important;
   z-index: 1!important;
 }
 .btn-transparent {
@@ -3402,6 +3402,9 @@ margin-left: -45px;
   text-align: left;
   display: flex;
 }
+.sidebar .nav-dropdown.open{
+  background: none!important;
+}
 .sidebar .nav-dropdown-toggle {
   position: relative;
   text-align: left;
@@ -3421,3 +3424,29 @@ margin-left: -45px;
 .sidebar .nav-link.active .nav-icon {
   color: #20a8d8 ;
 }
+//supply plan graph align with table 
+.graphwidth{
+  width: 1407px!important;
+  // margin-right: -597px;
+  margin-left: 211px;
+
+}
+@media (min-width: 992px){
+  .graphwidth{
+    width: 1413px!important;
+    // margin-right: -597px;
+    margin-left: 217px;
+  
+  }
+}
+
+.emergencyComment{
+    background-image:url('/src/assets/img/emergencyComment.png');
+    background-repeat: no-repeat;
+    background-position: top right;
+}
+
+.supplyplan-Thead {
+  background-color: #e4e5e6!important;
+  color: #20a8d8;
+  }

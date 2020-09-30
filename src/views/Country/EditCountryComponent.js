@@ -994,7 +994,8 @@ export default class UpdateCountryComponent extends Component {
                                                             id="label"
                                                             valid={!errors.label}
                                                             bsSize="sm"
-                                                            invalid={touched.label && !!errors.label || this.state.country.label.label_en == ''}
+                                                            // invalid={touched.label && !!errors.label || this.state.country.label.label_en == ''}
+                                                            invalid={(touched.label && !!errors.label) || !!errors.label}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.country.label.label_en}
@@ -1011,7 +1012,8 @@ export default class UpdateCountryComponent extends Component {
                                                             id="countryCode"
                                                             bsSize="sm"
                                                             valid={!errors.countryCode}
-                                                            invalid={touched.countryCode && !!errors.countryCode || this.state.country.countryCode == ''}
+                                                            // invalid={touched.countryCode && !!errors.countryCode || this.state.country.countryCode == ''}
+                                                            invalid={(touched.countryCode && !!errors.countryCode) || !!errors.countryCode}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.country.countryCode}
@@ -1030,7 +1032,8 @@ export default class UpdateCountryComponent extends Component {
                                                             id="countryCode2"
                                                             bsSize="sm"
                                                             valid={!errors.countryCode2}
-                                                            invalid={touched.countryCode2 && !!errors.countryCode2 || this.state.country.countryCode2 == ''}
+                                                            // invalid={touched.countryCode2 && !!errors.countryCode2 || this.state.country.countryCode2 == ''}
+                                                            invalid={(touched.countryCode2 && !!errors.countryCode2) || !!errors.countryCode2}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.country.countryCode2}
@@ -1082,7 +1085,8 @@ export default class UpdateCountryComponent extends Component {
                                                             id="currencyId"
                                                             bsSize="sm"
                                                             valid={!errors.currencyId}
-                                                            invalid={touched.currencyId && !!errors.currencyId || this.state.country.currency.id == ''}
+                                                            // invalid={touched.currencyId && !!errors.currencyId || this.state.country.currency.id == ''}
+                                                            invalid={(touched.currencyId && !!errors.currencyId) || !!errors.currencyId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             required
@@ -1148,7 +1152,7 @@ export default class UpdateCountryComponent extends Component {
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
-                            <div ><h4> <strong>Loading...</strong></h4></div>
+                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
                             <div class="spinner-border blue ml-4" role="status">
 

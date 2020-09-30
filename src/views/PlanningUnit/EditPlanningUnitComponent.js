@@ -277,7 +277,8 @@ export default class EditPlanningUnitComponent extends Component {
                                                             id="label"
                                                             bsSize="sm"
                                                             valid={!errors.label}
-                                                            invalid={touched.label && !!errors.label || this.state.planningUnit.label.label_en == ''}
+                                                            // invalid={touched.label && !!errors.label || this.state.planningUnit.label.label_en == ''}
+                                                            invalid={(touched.label && !!errors.label) || !!errors.label}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.planningUnit.label.label_en}
@@ -293,7 +294,8 @@ export default class EditPlanningUnitComponent extends Component {
                                                             id="multiplier"
                                                             bsSize="sm"
                                                             valid={!errors.multiplier}
-                                                            invalid={touched.multiplier && !!errors.multiplier || this.state.planningUnit.multiplier == ''}
+                                                            // invalid={touched.multiplier && !!errors.multiplier || this.state.planningUnit.multiplier == ''}
+                                                            invalid={(touched.multiplier && !!errors.multiplier) || !!errors.multiplier}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.planningUnit.multiplier}
@@ -354,7 +356,7 @@ export default class EditPlanningUnitComponent extends Component {
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
-                            <div ><h4> <strong>Loading...</strong></h4></div>
+                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
                             <div class="spinner-border blue ml-4" role="status">
 

@@ -556,7 +556,7 @@ class ListUserComponent extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [50, 50, 50,50,120],
+            colWidths: [50, 50, 50, 50, 120],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
@@ -854,7 +854,7 @@ class ListUserComponent extends Component {
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
-                            <div ><h4> <strong>Loading...</strong></h4></div>
+                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
                             <div class="spinner-border blue ml-4" role="status">
 

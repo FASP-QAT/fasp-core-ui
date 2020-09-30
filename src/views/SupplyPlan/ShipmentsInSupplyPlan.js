@@ -171,6 +171,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             var fsResult = [];
                             fsResult = fsRequest.result;
                             for (var k = 0; k < fsResult.length; k++) {
+                                console.log(programJson)
                                 if (fsResult[k].realm.id == programJson.realmCountry.realm.realmId) {
                                     var fsJson = {
                                         name: fsResult[k].fundingSourceCode,
@@ -2029,7 +2030,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     }
                 }
             }
-            if (shipmentStatus != PLANNED_SHIPMENT_STATUS && shipmentStatus != SUBMITTED_SHIPMENT_STATUS && shipmentStatus != APPROVED_SHIPMENT_STATUS && shipmentStatus != SHIPPED_SHIPMENT_STATUS) {
+            if (y == 1 && shipmentStatus != PLANNED_SHIPMENT_STATUS && shipmentStatus != SUBMITTED_SHIPMENT_STATUS && shipmentStatus != APPROVED_SHIPMENT_STATUS && shipmentStatus != SHIPPED_SHIPMENT_STATUS) {
                 var valid = checkValidtion("date", "F", y, rowDataForDates[5], elInstance);
                 if (valid == true) {
                     if (moment(rowDataForDates[4]).format("YYYY-MM-DD") > moment(value).format("YYYY-MM-DD")) {
@@ -2044,6 +2045,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             } else if (y == 1 && shipmentStatus != PLANNED_SHIPMENT_STATUS && shipmentStatus != SUBMITTED_SHIPMENT_STATUS && shipmentStatus != APPROVED_SHIPMENT_STATUS && shipmentStatus != SHIPPED_SHIPMENT_STATUS && shipmentStatus != ARRIVED_SHIPMENT_STATUS) {
                 valid = checkValidtion("date", "G", y, rowDataForDates[6], elInstance);
                 if (valid == true) {
+                    console.log("Row data 5", moment(rowDataForDates[5]).format("YYYY-MM-DD"));
+                    console.log("Value", moment(value).format("YYYY-MM-DD"));
+                    console.log("Condition",moment(rowDataForDates[5]).format("YYYY-MM-DD") > moment(value).format("YYYY-MM-DD"))
                     if (moment(rowDataForDates[5]).format("YYYY-MM-DD") > moment(value).format("YYYY-MM-DD")) {
                         inValid("G", y, i18n.t('static.message.invaliddate'), elInstance);
                         valid = false;
@@ -2366,7 +2370,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     console.log("In 7 false")
                 }
             }
-            if (shipmentStatus != PLANNED_SHIPMENT_STATUS && shipmentStatus != SUBMITTED_SHIPMENT_STATUS && shipmentStatus != APPROVED_SHIPMENT_STATUS && shipmentStatus != SHIPPED_SHIPMENT_STATUS) {
+            if (y == 1 && shipmentStatus != PLANNED_SHIPMENT_STATUS && shipmentStatus != SUBMITTED_SHIPMENT_STATUS && shipmentStatus != APPROVED_SHIPMENT_STATUS && shipmentStatus != SHIPPED_SHIPMENT_STATUS) {
                 var validation = checkValidtion("date", "F", y, rowDataForDates[5], elInstance);
                 if (validation == true) {
                     if (moment(rowDataForDates[4]).format("YYYY-MM-DD") > moment(rowDataForDates[5]).format("YYYY-MM-DD")) {

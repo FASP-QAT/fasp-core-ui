@@ -481,16 +481,22 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
 
                         // Calculations of national adjustments
                         var nationalAdjustment = 0;
+                        console.log("National adjustment");
                         // Check if all the regions have reported actual inventory and expected stock is not equal to actual stock make an national adjustment
+                        console.log("regionsReportingActualInventory", regionsReportingActualInventory, "totalNoOfRegions", totalNoOfRegions, "expectedStock", expectedStock, "actualStockCount", actualStockCount, "Adjutsment qty", adjustmentQty);
                         if (regionsReportingActualInventory == totalNoOfRegions && expectedStock != actualStockCount) {
+                            console.log("In first if");
                             nationalAdjustment = actualStockCount - expectedStock;
                         } else if (inventoryList.length != 0 && actualStockCount > (expectedStock + adjustmentQty)) {
+                            console.log("In second if");
                             // If actual stock count is greater than expected + adjustment qty that consider that stock as national adjustment
                             nationalAdjustment = actualStockCount - expectedStock;
                         } else if (regionsReportingActualInventory > 0 && expectedStock < 0) {
+                            console.log("In 3rd if");
                             // If expected is less than 0 than make an national adjustment
                             nationalAdjustment = actualStockCount - expectedStock;
                         }
+                        console.log("National adjutsment", nationalAdjustment);
                         // Calculations of national adjustments wps
                         var nationalAdjustmentWps = 0;
                         // Check if all the regions have reported actual inventory and expected stock is not equal to actual stock make an national adjustment wps
