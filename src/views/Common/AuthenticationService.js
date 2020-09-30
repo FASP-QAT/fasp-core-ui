@@ -1115,6 +1115,7 @@ class AuthenticationService {
                     break;
                 case "/consumptionDetails/:programId/:versionId/:planningUnitId": return true
                     break;
+                case "/report/problemList/:programId/:color/:message":
                 case "/report/problemList/:color/:message":
                     if (bfunction.includes("ROLE_BF_PROBLEM_AND_ACTION_REPORT")) {
                         return true;
@@ -1153,7 +1154,7 @@ class AuthenticationService {
         throw new Error('Bad Hex');
     }
 
-    clearLocalStorage(){
+    clearLocalStorage() {
         console.log("################ Clear local storage started ################");
         let keysToRemove = ["token-" + AuthenticationService.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken"];
         keysToRemove.forEach(k => localStorage.removeItem(k));

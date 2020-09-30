@@ -108,7 +108,7 @@ class AddRoleComponent extends Component {
   componentDidMount() {
     var db1;
     getDatabase();
-    var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
+    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
     openRequest.onerror = function (event) {
       this.setState({
         message: i18n.t('static.program.errortext'),
@@ -165,7 +165,7 @@ class AddRoleComponent extends Component {
         getRequestP.onsuccess = function (event) {
           var probList = [];
           probList = getRequestP.result;
-          var filteredList=probList.filter(c=>c.problemType.id !=1)
+          var filteredList = probList.filter(c => c.problemType.id != 1)
           console.log("problemList====>", filteredList);
           this.setState({ problemList: filteredList });
 
@@ -181,7 +181,7 @@ class AddRoleComponent extends Component {
     var db1;
     var storeOS;
     getDatabase();
-    var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
+    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
     openRequest.onerror = function (event) {
       this.setState({
         message: i18n.t('static.program.errortext'),
@@ -228,7 +228,7 @@ class AddRoleComponent extends Component {
         this.setState({ programId: programId });
         var db1;
         getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         var regionList = []
         openRequest.onerror = function (event) {
           this.setState({
@@ -284,7 +284,7 @@ class AddRoleComponent extends Component {
 
     var db1;
     getDatabase();
-    var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
+    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
     var regionList = []
     openRequest.onerror = function (event) {
       this.setState({
@@ -461,8 +461,8 @@ class AddRoleComponent extends Component {
                   })
                 }.bind(this);
                 putRequest.onsuccess = function (event) {
-
-                  this.props.history.push(`/report/problemList/` + 'green/' + i18n.t('static.problem.addedSuccessfully'));
+                  var programId = document.getElementById("programId").value;
+                  this.props.history.push(`/report/problemList/` + programId + '/green/' + i18n.t('static.problem.addedSuccessfully'));
 
                 }.bind(this);
 

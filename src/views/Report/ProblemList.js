@@ -761,6 +761,11 @@ export default class ConsumptionDetails extends React.Component {
                         problemStatusList: proList
                     })
 
+                    var programIdd = this.props.match.params.programId;
+                    if (programIdd != '' && programIdd != undefined) {
+                        document.getElementById("programId").value = programIdd;
+                        this.getProblemListAfterCalculation();
+                    }
 
                 }.bind(this);
             }.bind(this);
@@ -944,7 +949,7 @@ export default class ConsumptionDetails extends React.Component {
                                 // this.props.history.push({
                                 //     pathname: `${this.el.getValueFromCoords(15, y)}/${programId}/${versionId}/${planningunitId}`,
                                 // });
-                                window.open(window.location.origin+`/#${this.el.getValueFromCoords(15, y)}/${programId}/${versionId}/${planningunitId}`);
+                                window.open(window.location.origin + `/#${this.el.getValueFromCoords(15, y)}/${programId}/${versionId}/${planningunitId}`);
                                 // } else {
                                 //     this.props.history.push({
                                 //         pathname: `${this.el.getValueFromCoords(15, y)}`,
