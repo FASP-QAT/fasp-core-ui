@@ -1327,7 +1327,7 @@ const colors = ['#004876', '#0063a0', '#007ecc', '#0093ee', '#82caf8', '#c8e6f4'
 const options = {
     title: {
         display: true,
-        text: "Global Demand",
+        text: i18n.t('static.dashboard.shipmentGlobalViewheader'),
         fontColor: 'black'
     },
     scales: {
@@ -1340,7 +1340,7 @@ const options = {
         }],
         yAxes: [{
             stacked: true,
-            labelString: "Amount (USD)",
+            labelString: i18n.t('static.shipment.amount'),
         }],
     },
     tooltips: {
@@ -1362,7 +1362,7 @@ const options = {
 const options1 = {
     title: {
         display: true,
-        text: "Shipment/Orders Procurement Agent",
+        text: i18n.t('static.shipment.shipmentProcurementAgent'),
         fontColor: 'black'
     },
     scales: {
@@ -1375,7 +1375,7 @@ const options1 = {
         }],
         yAxes: [{
             stacked: true,
-            labelString: "Amount (USD)",
+            labelString: i18n.t('static.shipment.amount'),
         }],
     },
     tooltips: {
@@ -1397,13 +1397,13 @@ const options1 = {
 const chartData = {
     labels: ["Malawi", "Kenya", "Zimbabwe"],
     datasets: [{
-        label: 'Ordered Shipments',
+        label: i18n.t('static.shipment.orderedShipment'),
         data: [20000, 10000, 2000],
         backgroundColor: '#6a82a8',
         borderWidth: 0
     },
     {
-        label: 'Planned Shipments',
+        label: i18n.t('static.shipment.plannedShipment'),
         data: [20000, 20000, 2000],
         backgroundColor: '#dee7f8',
         borderWidth: 0,
@@ -1717,7 +1717,7 @@ class ShipmentGlobalView extends Component {
         doc.setFontSize(10);
 
         //creates image1
-        const title = "Global Demand - Single Product";
+        const title = i18n.t('static.dashboard.shipmentGlobalViewheader');
         var canvas = document.getElementById("cool-canvas1");
 
         var canvasImg = canvas.toDataURL("image/png", 1.0);
@@ -1795,7 +1795,7 @@ class ShipmentGlobalView extends Component {
         doc.autoTable(content2);
         addHeaders(doc)
         addFooters(doc)
-        doc.save("GlobalDemandSingleProduct.pdf")
+        doc.save(i18n.t('static.dashboard.shipmentGlobalViewheader').concat('.pdf'));
         //creates PDF from img
         /*  var doc = new jsPDF('landscape');
           doc.setFontSize(20);
@@ -2233,8 +2233,8 @@ class ShipmentGlobalView extends Component {
             // let realmId = AuthenticationService.getRealmId();
             var inputjson = {
                 realmId: realmId,
-                startDate: new moment(startDate),
-                stopDate: new moment(endDate),
+                startDate:startDate,
+                stopDate: endDate,
                 realmCountryIds: CountryIds,
                 planningUnitId: planningUnitId,
                 reportView: viewby,
@@ -2547,13 +2547,13 @@ class ShipmentGlobalView extends Component {
 
             labels: this.state.countryShipmentSplitList.map(ele => (ele.country.label.label_en)),
             datasets: [{
-                label: 'Ordered Shipments',
+                label: i18n.t('static.shipment.orderedShipment'),
                 data: this.state.countryShipmentSplitList.map(ele => (ele.orderedShipmentAmt)),
                 backgroundColor: '#6a82a8',
                 borderWidth: 0
             },
             {
-                label: 'Planned Shipments',
+                label: i18n.t('static.shipment.plannedShipment'),
                 data: this.state.countryShipmentSplitList.map(ele => (ele.plannedShipmentAmt)),
                 backgroundColor: '#dee7f8',
                 borderWidth: 0,

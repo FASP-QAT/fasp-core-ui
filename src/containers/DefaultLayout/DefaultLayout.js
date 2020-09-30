@@ -250,7 +250,8 @@ const routes = [
   { path: '/consumptionDetails/:programId/:versionId/:planningUnitId', name: 'static.consumptionDetailHead.consumptionDetail', component: ConsumptionDetails },
   { path: '/shipment/shipmentDetails/:programId/:versionId/:planningUnitId', name: 'static.shipmentDetailHead.shipmentDetail', component: ShipmentList },
   { path: '/report/addProblem/:color/:message', name: 'static.breadcrum.add', entityname: 'static.report.problem', component: AddProblem },
-  { path: '/report/problemList/:color/:message', name: 'static.breadcrum.list', entityname: 'static.dashboard.qatProblem', component: ProblemList },
+  { path: '/report/problemList/:color/:message', exact:true,name: 'static.breadcrum.list', entityname: 'static.dashboard.qatProblem', component: ProblemList },
+  { path: '/report/problemList/:programId/:color/:message', name: 'static.breadcrum.list', entityname: 'static.dashboard.qatProblem', component: ProblemList },
   // { path: '/report/problemList', name: 'Qat Problem List', component: ProblemList },
 
   { path: '/problem/editProblem', name: ' Edit Problem', component: EditProblem },
@@ -1020,15 +1021,45 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-truck',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }
                           },
+                        ]
+                      },
+                      // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
+
+
+                      //5) Supply Plan
+                      {
+                        name: i18n.t('static.dashboard.supplyPlan'),
+                        icon: 'fa fa-list',
+                        attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN')) || (this.state.businessFunctions.includes('ROLE_BF_COMMIT_VERSION')) || (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_VERSION_AND_REVIEW')) ? false : true) },
+                        children: [
+                          {
+                            name: i18n.t('static.dashboard.supplyPlan'),
+                            url: '/supplyPlan',
+                            icon: 'fa fa-calculator',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }
+                          },
+                          {
+                            name: i18n.t('static.dashboard.whatIf'),
+                            url: '/report/whatIf',
+                            icon: 'fa fa-calculator',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }
+                          },
                           {
                             name: i18n.t('static.dashboard.commitVersion'),
                             url: '/program/syncPage',
                             icon: 'fa fa-code-fork',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_COMMIT_VERSION') ? false : true) }
                           },
+                          {
+                            name: i18n.t('static.report.supplyplanversionandreviewReport'),
+                            url: '/report/supplyPlanVersionAndReview',
+                            icon: 'fa fa-exchange',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_VERSION_AND_REVIEW') ? false : true) }
+                          },
+
                         ]
                       },
-                      // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
+
 
 
                       // {
@@ -1250,7 +1281,7 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.report.consumptionReports'),
                             icon: 'fa fa-list',
-                            attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_GLOBAL_VIEW_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_GLOBAL_DEMAND_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_FORECAST_MATRIX_REPORT')) ? false : true) },
+                            attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_GLOBAL_VIEW_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_FORECAST_MATRIX_REPORT')) ? false : true) },
                             children: [
                               {
                                 name: i18n.t('static.dashboard.consumption'),
@@ -1334,7 +1365,7 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.report.shipmentReports'),
                             icon: 'fa fa-list',
-                            attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_ANNUAL_SHIPMENT_COST_REPORT')) ? false : true) },
+                            attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_GLOBAL_DEMAND_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_ANNUAL_SHIPMENT_COST_REPORT')) ? false : true) },
                             children: [
                               {
                                 name: i18n.t('static.dashboard.shipmentGlobalViewheader'),
@@ -1417,35 +1448,6 @@ class DefaultLayout extends Component {
 
                             ]
                           },
-
-                          //5) Supply Plan
-                          {
-                            name: i18n.t('static.dashboard.supplyPlan'),
-                            icon: 'fa fa-list',
-                            attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN')) || (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_VERSION_AND_REVIEW')) ? false : true) },
-                            children: [
-                              {
-                                name: i18n.t('static.dashboard.supplyPlan'),
-                                url: '/supplyPlan',
-                                icon: 'fa fa-calculator',
-                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }
-                              },
-                              {
-                                name: i18n.t('static.report.supplyplanversionandreviewReport'),
-                                url: '/report/supplyPlanVersionAndReview',
-                                icon: 'fa fa-exchange',
-                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_VERSION_AND_REVIEW') ? false : true) }
-                              },
-                              {
-                                name: i18n.t('static.dashboard.whatIf'),
-                                url: '/report/whatIf',
-                                icon: 'fa fa-calculator',
-                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }
-                              },
-
-                            ]
-                          },
-
 
                           {
                             name: i18n.t('static.dashboard.qatProblemList'),
@@ -1536,6 +1538,28 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-list',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }
                           }
+                        ]
+                      },
+
+                      //5) Supply Plan
+                      {
+                        name: i18n.t('static.dashboard.supplyPlan'),
+                        icon: 'fa fa-list',
+                        attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN')) ? false : true) },
+                        children: [
+                          {
+                            name: i18n.t('static.dashboard.supplyPlan'),
+                            url: '/supplyPlan',
+                            icon: 'fa fa-calculator',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }
+                          },
+                          {
+                            name: i18n.t('static.dashboard.whatIf'),
+                            url: '/report/whatIf',
+                            icon: 'fa fa-calculator',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }
+                          },
+
                         ]
                       },
 
@@ -1806,27 +1830,7 @@ class DefaultLayout extends Component {
                           },
 
 
-                          //5) Supply Plan
-                          {
-                            name: i18n.t('static.dashboard.supplyPlan'),
-                            icon: 'fa fa-list',
-                            attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN')) ? false : true) },
-                            children: [
-                              {
-                                name: i18n.t('static.dashboard.supplyPlan'),
-                                url: '/supplyPlan',
-                                icon: 'fa fa-calculator',
-                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }
-                              },
-                              {
-                                name: i18n.t('static.dashboard.whatIf'),
-                                url: '/report/whatIf',
-                                icon: 'fa fa-calculator',
-                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }
-                              },
 
-                            ]
-                          },
 
                           // {
                           //   name: i18n.t('static.dashboard.aggregateShipmentByProduct'),

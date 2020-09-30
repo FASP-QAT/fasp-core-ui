@@ -1471,7 +1471,7 @@ const colors = ['#004876', '#0063a0', '#007ecc', '#0093ee', '#82caf8', '#c8e6f4'
 const options = {
     title: {
         display: true,
-        text: "Global Demand (Units)",
+        text: i18n.t('static.dashboard.shipmentGlobalViewheader'),
         fontColor: 'black'
     },
     scales: {
@@ -1485,7 +1485,7 @@ const options = {
         }],
         yAxes: [{
             stacked: true,
-            labelString: "Planning Unit"
+            labelString: i18n.t('static.common.product')
         }],
     },
     tooltips: {
@@ -1506,7 +1506,7 @@ const options = {
 const optionsPie = {
     title: {
         display: true,
-        text: "Funding Source (USD)",
+        text: i18n.t('static.fundingSourceHead.fundingSource'),
         fontColor: 'black'
     },
     legend: {
@@ -1656,11 +1656,11 @@ class ShipmentGlobalDemandView extends Component {
 
             let tableHead = this.state.table1Headers;
             let tableHeadTemp = [];
-            tableHeadTemp.push("Planning Unit");
+            tableHeadTemp.push(i18n.t('static.dashboard.product'));
             for (var i = 0; i < tableHead.length; i++) {
                 tableHeadTemp.push((tableHead[i].replaceAll(',', ' ')).replaceAll(' ', '%20'));
             }
-            tableHeadTemp.push("Total");
+            tableHeadTemp.push(i18n.t('static.supplyPlan.total'));
 
             A[0] = this.addDoubleQuoteToRowContent(tableHeadTemp);
             re = this.state.procurementAgentSplit;
@@ -1870,7 +1870,7 @@ class ShipmentGlobalDemandView extends Component {
 
 
         doc.setTextColor("#fff");
-        const title = "Shipment Global Demand";
+        const title = i18n.t('static.dashboard.shipmentGlobalDemandViewheader');
         var canvas = document.getElementById("cool-canvas1");
 
         var canvasImg = canvas.toDataURL("image/png", 1.0);
@@ -3009,14 +3009,14 @@ class ShipmentGlobalDemandView extends Component {
 
             labels: [...new Set(this.state.planningUnitSplit.map(ele => (getLabelText(ele.planningUnit.label, this.state.lang))))],
             datasets: [{
-                label: 'Ordered Shipments',
+                label: i18n.t('static.shipment.orderedShipment'),
                 data: this.state.planningUnitSplit.map(ele => (ele.orderedShipmentQty)),
                 backgroundColor: '#6a82a8',
                 borderWidth: 0
 
             },
             {
-                label: 'Planned Shipments',
+                label: i18n.t('static.shipment.plannedShipment'),
                 data: this.state.planningUnitSplit.map(ele => (ele.plannedShipmentQty)),
                 backgroundColor: '#dee7f8',
                 borderWidth: 0,
@@ -3198,7 +3198,7 @@ class ShipmentGlobalDemandView extends Component {
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.report.planningUnit')}</Label>
                                             <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                             <div className="controls">
-                                                {/* <MultiSelect
+                                                <MultiSelect
                                                     name="planningUnitId"
                                                     id="planningUnitId"
                                                     bsSize="md"
@@ -3206,9 +3206,9 @@ class ShipmentGlobalDemandView extends Component {
                                                     onChange={(e) => { this.handlePlanningUnitChange(e) }}
                                                     options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
                                                 // options={fundingSourceList && fundingSourceList.length > 0 ? fundingSourceList : []}
-                                                /> */}
+                                                />
 
-                                                <Multiselect
+                                                {/* <Multiselect
                                                     name="planningUnitId"
                                                     id="planningUnitId"
                                                     bsSize="md"
@@ -3219,8 +3219,8 @@ class ShipmentGlobalDemandView extends Component {
                                                     onRemove={(e) => { this.handlePlanningUnitChange(e) }}
                                                     // onSelect={this.onSelect} // Function will trigger on select event
                                                     // onRemove={this.onRemove} // Function will trigger on remove event
-                                                    displayValue="label" // Property name to display in the dropdown options
-                                                />
+                                                    // displayValue="label" // Property name to display in the dropdown options
+                                                /> */}
 
                                             </div>
                                         </FormGroup>

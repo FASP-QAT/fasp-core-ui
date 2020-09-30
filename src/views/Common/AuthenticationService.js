@@ -89,7 +89,9 @@ class AuthenticationService {
                 return 1;
             if (roleList.includes("ROLE_REALM_ADMIN"))
                 return 2;
-            return 3;
+            if (roleList.includes("ROLE_PROGRAM_ADMIN"))
+                return 3;
+            return 4;
         }
     }
 
@@ -1115,6 +1117,7 @@ class AuthenticationService {
                     break;
                 case "/consumptionDetails/:programId/:versionId/:planningUnitId": return true
                     break;
+                case "/report/problemList/:programId/:color/:message":
                 case "/report/problemList/:color/:message":
                     if (bfunction.includes("ROLE_BF_PROBLEM_AND_ACTION_REPORT")) {
                         return true;
@@ -1151,6 +1154,13 @@ class AuthenticationService {
             return 'rgba(' + [(c >> 16) & 255, (c >> 8) & 255, c & 255].join(',') + ',1)';
         }
         throw new Error('Bad Hex');
+    }
+
+    clearLocalStorage() {
+        console.log("################ Clear local storage started ################");
+        let keysToRemove = ["token-" + AuthenticationService.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken"];
+        keysToRemove.forEach(k => localStorage.removeItem(k));
+        console.log("################ Clear local storage completed ################");
     }
 
 }

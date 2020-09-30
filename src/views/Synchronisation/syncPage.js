@@ -67,7 +67,7 @@ export default class syncPage extends Component {
     this.hideFirstComponent = this.hideFirstComponent.bind(this);
     this.hideSecondComponent = this.hideSecondComponent.bind(this);
 
-    this.checkValidations = this.checkValidations.bind(this);
+    // this.checkValidations = this.checkValidations.bind(this);
   }
 
   hideFirstComponent() {
@@ -871,8 +871,8 @@ export default class syncPage extends Component {
                             }
                             shipmentStatusList.push(shipmentStatusJson);
                           }
-                          var papuTransaction = db1.transaction(['procurementAgentPlanningUnit'], 'readwrite');
-                          var papuOs = papuTransaction.objectStore('procurementAgentPlanningUnit');
+                          var papuTransaction = db1.transaction(['procurementAgent'], 'readwrite');
+                          var papuOs = papuTransaction.objectStore('procurementAgent');
                           var papuRequest = papuOs.getAll();
                           papuRequest.onerror = function (event) {
                             this.setState({
@@ -886,8 +886,8 @@ export default class syncPage extends Component {
                             papuResult = papuRequest.result;
                             for (var k = 0; k < papuResult.length; k++) {
                               var papuJson = {
-                                name: papuResult[k].procurementAgent.code,
-                                id: papuResult[k].procurementAgent.id
+                                name: papuResult[k].procurementAgentCode,
+                                id: papuResult[k].procurementAgentId
                               }
                               procurementAgentList.push(papuJson);
                             }
@@ -1066,7 +1066,7 @@ export default class syncPage extends Component {
                                     var downloadedDataList = downloadedProgramDataConsumption.filter(c => c.consumptionId == mergedConsumptionData[cd].consumptionId);
                                     var downloadedData = "";
                                     if (downloadedDataList.length > 0) {
-                                      downloadedData = [downloadedDataList[0].consumptionId, downloadedDataList[0].planningUnit.id, moment(downloadedDataList[0].consumptionDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), downloadedDataList[0].region.id, downloadedDataList[0].dataSource.id, downloadedDataList[0].realmCountryPlanningUnit.id, Math.round(downloadedDataList[0].consumptionRcpuQty), downloadedDataList[0].multiplier,Math.round(downloadedDataList[0].consumptionRcpuQty) * downloadedDataList[0].multiplier, downloadedDataList[0].dayOfStockOut, downloadedDataList[0].notes, (downloadedDataList[0].actualFlag.toString() == "true" ? 1 : 0), downloadedDataList[0].active, JSON.stringify(downloadedDataList[0].batchInfoList != "" ? ((downloadedDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.consumptionQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
+                                      downloadedData = [downloadedDataList[0].consumptionId, downloadedDataList[0].planningUnit.id, moment(downloadedDataList[0].consumptionDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), downloadedDataList[0].region.id, downloadedDataList[0].dataSource.id, downloadedDataList[0].realmCountryPlanningUnit.id, Math.round(downloadedDataList[0].consumptionRcpuQty), downloadedDataList[0].multiplier, Math.round(downloadedDataList[0].consumptionRcpuQty) * downloadedDataList[0].multiplier, downloadedDataList[0].dayOfStockOut, downloadedDataList[0].notes, (downloadedDataList[0].actualFlag.toString() == "true" ? 1 : 0), downloadedDataList[0].active, JSON.stringify(downloadedDataList[0].batchInfoList != "" ? ((downloadedDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.consumptionQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
                                     }
                                     data[17] = downloadedData;//Downloaded data
                                     data[18] = 4;
@@ -1077,7 +1077,7 @@ export default class syncPage extends Component {
                                     data: mergedConsumptionJexcel,
                                     columnDrag: true,
                                     columns: [
-                                      { title: i18n.t('static.commit.consumptionId'), type: 'text',width: 100 },
+                                      { title: i18n.t('static.commit.consumptionId'), type: 'text', width: 100 },
                                       { title: i18n.t('static.planningunit.planningunit'), type: 'dropdown', source: planningUnitList, width: 200 },
                                       { title: i18n.t('static.pipeline.consumptionDate'), type: 'text', width: 85 },
                                       { title: i18n.t('static.region.region'), type: 'dropdown', source: regionList, width: 100 },
@@ -1098,7 +1098,7 @@ export default class syncPage extends Component {
                                       { type: 'hidden', title: 'result of compare' },
                                     ],
                                     pagination: 10,
-                                    paginationOptions:[10, 25, 50],
+                                    paginationOptions: [10, 25, 50],
                                     search: true,
                                     columnSorting: true,
                                     tableOverflow: true,
@@ -1166,13 +1166,16 @@ export default class syncPage extends Component {
                                       existingInventoryId.push(oldProgramDataInventory[c].inventoryId);
                                     } else {
                                       // If 0 check whether that exists in latest version or not
+                                      console.log("oldProgramDataInventory[c].actualQty", oldProgramDataInventory[c].actualQty);
+                                      console.log("Katest program data inventory", latestProgramDataInventory);
                                       var index = latestProgramDataInventory.findIndex(f =>
                                         f.planningUnit.id == oldProgramDataInventory[c].planningUnit.id &&
                                         moment(f.inventoryDate).format("YYYY-MM") == moment(oldProgramDataInventory[c].inventoryDate).format("YYYY-MM") &&
                                         f.region != null && f.region.id != 0 && oldProgramDataInventory[c].region != null && oldProgramDataInventory[c].region.id != 0 && f.region.id == oldProgramDataInventory[c].region.id &&
-                                        (c.actualQty != null && c.actualQty != "" && c.actualQty != 0) == (oldProgramDataInventory[c].actualQty != null && oldProgramDataInventory[c].actualQty != "" && oldProgramDataInventory[c].actualQty != 0) &&
+                                        (f.actualQty != null && f.actualQty.toString() != "" && f.actualQty != undefined) == (oldProgramDataInventory[c].actualQty != null && oldProgramDataInventory[c].actualQty != "" && oldProgramDataInventory[c].actualQty != undefined) &&
                                         f.realmCountryPlanningUnit.id == oldProgramDataInventory[c].realmCountryPlanningUnit.id
                                       );
+                                      console.log("Inventory date", oldProgramDataInventory[c].inventoryDate, "index------>", index);
                                       if (index == -1) { // Does not exists
                                         mergedInventoryData.push(oldProgramDataInventory[c]);
                                       } else { // Exists
@@ -1197,7 +1200,7 @@ export default class syncPage extends Component {
                                       data[3] = mergedInventoryData[cd].region.id;
                                       data[4] = mergedInventoryData[cd].dataSource.id;
                                       data[5] = mergedInventoryData[cd].realmCountryPlanningUnit.id;
-                                      data[6] = mergedInventoryData[cd].adjustmentQty != "" && mergedInventoryData[cd].adjustmentQty != null && mergedInventoryData[cd].adjustmentQty != 0 ? 2 : 1;
+                                      data[6] = mergedInventoryData[cd].adjustmentQty != "" && mergedInventoryData[cd].adjustmentQty != null && mergedInventoryData[cd].adjustmentQty != undefined ? 2 : 1;
                                       data[7] = Math.round(mergedInventoryData[cd].adjustmentQty);
                                       data[8] = Math.round(mergedInventoryData[cd].actualQty);
                                       data[9] = mergedInventoryData[cd].multiplier;
@@ -1210,19 +1213,19 @@ export default class syncPage extends Component {
                                       var oldDataList = oldProgramDataInventory.filter(c => c.inventoryId == mergedInventoryData[cd].inventoryId && c.region != null && c.region.id != 0);
                                       var oldData = ""
                                       if (oldDataList.length > 0) {
-                                        oldData = [oldDataList[0].inventoryId, oldDataList[0].planningUnit.id, moment(oldDataList[0].inventoryDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), oldDataList[0].region.id, oldDataList[0].dataSource.id, oldDataList[0].realmCountryPlanningUnit.id, oldDataList[0].adjustmentQty != "" && oldDataList[0].adjustmentQty != null && oldDataList[0].adjustmentQty != 0 ? 2 : 1, Math.round(oldDataList[0].adjustmentQty), Math.round(oldDataList[0].actualQty), oldDataList[0].multiplier, Math.round(oldDataList[0].adjustmentQty) * oldDataList[0].multiplier, Math.round(oldDataList[0].actualQty) * oldDataList[0].multiplier, oldDataList[0].notes, oldDataList[0].active, JSON.stringify(oldDataList[0].batchInfoList != "" ? ((oldDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty1": parseInt(a.adjustmentQty), "qty2": parseInt(a.actualQty) } })).sort(function (a, b) { return a.qty1 - b.qty1; }) : ""), "", "", "", "", 4];
+                                        oldData = [oldDataList[0].inventoryId, oldDataList[0].planningUnit.id, moment(oldDataList[0].inventoryDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), oldDataList[0].region.id, oldDataList[0].dataSource.id, oldDataList[0].realmCountryPlanningUnit.id, oldDataList[0].adjustmentQty != "" && oldDataList[0].adjustmentQty != null && oldDataList[0].adjustmentQty != undefined ? 2 : 1, Math.round(oldDataList[0].adjustmentQty), Math.round(oldDataList[0].actualQty), oldDataList[0].multiplier, Math.round(oldDataList[0].adjustmentQty) * oldDataList[0].multiplier, Math.round(oldDataList[0].actualQty) * oldDataList[0].multiplier, oldDataList[0].notes, oldDataList[0].active, JSON.stringify(oldDataList[0].batchInfoList != "" ? ((oldDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty1": parseInt(a.adjustmentQty), "qty2": parseInt(a.actualQty) } })).sort(function (a, b) { return a.qty1 - b.qty1; }) : ""), "", "", "", "", 4];
                                       }
                                       data[16] = oldData;//Old data
                                       var latestDataList = latestProgramDataInventory.filter(c => c.inventoryId == mergedInventoryData[cd].inventoryId && c.region != null && c.region.id != 0);
                                       var latestData = ""
                                       if (latestDataList.length > 0) {
-                                        latestData = [latestDataList[0].inventoryId, latestDataList[0].planningUnit.id, moment(latestDataList[0].inventoryDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), latestDataList[0].region.id, latestDataList[0].dataSource.id, latestDataList[0].realmCountryPlanningUnit.id, latestDataList[0].adjustmentQty != "" && latestDataList[0].adjustmentQty != null && latestDataList[0].adjustmentQty != 0 ? 2 : 1, Math.round(latestDataList[0].adjustmentQty), Math.round(latestDataList[0].actualQty), latestDataList[0].multiplier, Math.round(latestDataList[0].adjustmentQty) * latestDataList[0].multiplier, Math.round(latestDataList[0].actualQty) * latestDataList[0].multiplier, latestDataList[0].notes, latestDataList[0].active, JSON.stringify(latestDataList[0].batchInfoList != "" ? ((latestDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty1": parseInt(a.adjustmentQty), "qty2": parseInt(a.actualQty) } })).sort(function (a, b) { return a.qty1 - b.qty1; }) : ""), "", "", "", "", 4];
+                                        latestData = [latestDataList[0].inventoryId, latestDataList[0].planningUnit.id, moment(latestDataList[0].inventoryDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), latestDataList[0].region.id, latestDataList[0].dataSource.id, latestDataList[0].realmCountryPlanningUnit.id, latestDataList[0].adjustmentQty != "" && latestDataList[0].adjustmentQty != null && latestDataList[0].adjustmentQty != undefined ? 2 : 1, Math.round(latestDataList[0].adjustmentQty), Math.round(latestDataList[0].actualQty), latestDataList[0].multiplier, Math.round(latestDataList[0].adjustmentQty) * latestDataList[0].multiplier, Math.round(latestDataList[0].actualQty) * latestDataList[0].multiplier, latestDataList[0].notes, latestDataList[0].active, JSON.stringify(latestDataList[0].batchInfoList != "" ? ((latestDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty1": parseInt(a.adjustmentQty), "qty2": parseInt(a.actualQty) } })).sort(function (a, b) { return a.qty1 - b.qty1; }) : ""), "", "", "", "", 4];
                                       }
                                       data[17] = latestData;//Latest data
                                       var downloadedDataList = downloadedProgramDataInventory.filter(c => c.inventoryId == mergedInventoryData[cd].inventoryId && c.region != null && c.region.id != 0);
                                       var downloadedData = "";
                                       if (downloadedDataList.length > 0) {
-                                        downloadedData = [downloadedDataList[0].inventoryId, downloadedDataList[0].planningUnit.id, moment(downloadedDataList[0].inventoryDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), downloadedDataList[0].region.id, downloadedDataList[0].dataSource.id, downloadedDataList[0].realmCountryPlanningUnit.id, downloadedDataList[0].adjustmentQty != "" && downloadedDataList[0].adjustmentQty != null && downloadedDataList[0].adjustmentQty != 0 ? 2 : 1, Math.round(downloadedDataList[0].adjustmentQty), Math.round(downloadedDataList[0].actualQty), downloadedDataList[0].multiplier, Math.round(downloadedDataList[0].adjustmentQty) * downloadedDataList[0].multiplier, Math.round(downloadedDataList[0].actualQty) * downloadedDataList[0].multiplier, downloadedDataList[0].notes, downloadedDataList[0].active, JSON.stringify(downloadedDataList[0].batchInfoList != "" ? ((downloadedDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty1": parseInt(a.adjustmentQty), "qty2": parseInt(a.actualQty) } })).sort(function (a, b) { return a.qty1 - b.qty1; }) : ""), "", "", "", "", 4];
+                                        downloadedData = [downloadedDataList[0].inventoryId, downloadedDataList[0].planningUnit.id, moment(downloadedDataList[0].inventoryDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), downloadedDataList[0].region.id, downloadedDataList[0].dataSource.id, downloadedDataList[0].realmCountryPlanningUnit.id, downloadedDataList[0].adjustmentQty != "" && downloadedDataList[0].adjustmentQty != null && downloadedDataList[0].adjustmentQty != undefined ? 2 : 1, Math.round(downloadedDataList[0].adjustmentQty), Math.round(downloadedDataList[0].actualQty), downloadedDataList[0].multiplier, Math.round(downloadedDataList[0].adjustmentQty) * downloadedDataList[0].multiplier, Math.round(downloadedDataList[0].actualQty) * downloadedDataList[0].multiplier, downloadedDataList[0].notes, downloadedDataList[0].active, JSON.stringify(downloadedDataList[0].batchInfoList != "" ? ((downloadedDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty1": parseInt(a.adjustmentQty), "qty2": parseInt(a.actualQty) } })).sort(function (a, b) { return a.qty1 - b.qty1; }) : ""), "", "", "", "", 4];
                                       }
                                       data[18] = downloadedData;//Downloaded data
                                       data[19] = 4;
@@ -1234,7 +1237,7 @@ export default class syncPage extends Component {
                                     data: mergedInventoryJexcel,
                                     columnDrag: true,
                                     columns: [
-                                      { title: i18n.t('static.commit.inventoryId'), type: 'text',width: 100 },
+                                      { title: i18n.t('static.commit.inventoryId'), type: 'text', width: 100 },
                                       { title: i18n.t('static.planningunit.planningunit'), type: 'dropdown', source: planningUnitList, width: 200 },
                                       { title: i18n.t('static.inventory.inventoryDate'), type: 'text', width: 85 },
                                       { title: i18n.t('static.region.region'), type: 'dropdown', source: regionList, width: 100 },
@@ -1256,7 +1259,7 @@ export default class syncPage extends Component {
                                       { type: 'hidden', title: 'result of compare' },
                                     ],
                                     pagination: 10,
-                                    paginationOptions:[10, 25, 50],
+                                    paginationOptions: [10, 25, 50],
                                     search: true,
                                     columnSorting: true,
                                     tableOverflow: true,
@@ -1327,6 +1330,7 @@ export default class syncPage extends Component {
                                   mergedShipmentData = mergedShipmentData.concat(latestOtherShipmentEntries);
                                   var data = [];
                                   var mergedShipmentJexcel = [];
+                                  console.log("mergedShipmentData", mergedShipmentData)
                                   for (var cd = 0; cd < mergedShipmentData.length; cd++) {
                                     data = [];
                                     data[0] = mergedShipmentData[cd].shipmentId;
@@ -1345,12 +1349,12 @@ export default class syncPage extends Component {
                                     data[13] = mergedShipmentData[cd].rate;
                                     data[14] = mergedShipmentData[cd].rate * mergedShipmentData[cd].shipmentQty;
                                     data[15] = mergedShipmentData[cd].freightCost;
-                                    data[16] = moment(mergedShipmentData[cd].plannedDate).format(DATE_FORMAT_CAP);
-                                    data[17] = moment(mergedShipmentData[cd].submittedDate).format(DATE_FORMAT_CAP);
-                                    data[18] = moment(mergedShipmentData[cd].approvedDate).format(DATE_FORMAT_CAP);
-                                    data[19] = moment(mergedShipmentData[cd].shippedDate).format(DATE_FORMAT_CAP);
-                                    data[20] = moment(mergedShipmentData[cd].arrivedDate).format(DATE_FORMAT_CAP);
-                                    data[21] = moment(mergedShipmentData[cd].deliveredDate).format(DATE_FORMAT_CAP);
+                                    data[16] = mergedShipmentData[cd].plannedDate != "" && mergedShipmentData[cd].plannedDate != null ? moment(mergedShipmentData[cd].plannedDate).format(DATE_FORMAT_CAP) : "";
+                                    data[17] = mergedShipmentData[cd].submittedDate != "" && mergedShipmentData[cd].submittedDate != null ? moment(mergedShipmentData[cd].submittedDate).format(DATE_FORMAT_CAP) : "";
+                                    data[18] = mergedShipmentData[cd].approvedDate != "" && mergedShipmentData[cd].approvedDate != null ? moment(mergedShipmentData[cd].approvedDate).format(DATE_FORMAT_CAP) : "";
+                                    data[19] = mergedShipmentData[cd].shippedDate != "" && mergedShipmentData[cd].shippedDate != null ? moment(mergedShipmentData[cd].shippedDate).format(DATE_FORMAT_CAP) : "";
+                                    data[20] = mergedShipmentData[cd].arrivedDate != "" && mergedShipmentData[cd].arrivedDate != null ? moment(mergedShipmentData[cd].arrivedDate).format(DATE_FORMAT_CAP) : "";
+                                    data[21] = mergedShipmentData[cd].receivedDate != "" && mergedShipmentData[cd].receivedDate != null ? moment(mergedShipmentData[cd].receivedDate).format(DATE_FORMAT_CAP) : "";
                                     data[22] = mergedShipmentData[cd].notes;
                                     data[23] = mergedShipmentData[cd].erpFlag;
                                     data[24] = mergedShipmentData[cd].emergencyOrder;
@@ -1360,19 +1364,19 @@ export default class syncPage extends Component {
                                     var oldDataList = oldProgramDataShipment.filter(c => c.shipmentId == mergedShipmentData[cd].shipmentId);
                                     var oldData = ""
                                     if (oldDataList.length > 0) {
-                                      oldData = [oldDataList[0].shipmentId, oldDataList[0].planningUnit.id, oldDataList[0].shipmentStatus.id, moment(oldDataList[0].expectedDeliveryDate).format(DATE_FORMAT_CAP), oldDataList[0].procurementAgent.id, oldDataList[0].fundingSource.id, oldDataList[0].budget.id, oldDataList[0].orderNo != "" && oldDataList[0].orderNo != null ? oldDataList[0].orderNo.concat("~").concat(oldDataList[0].primeLineNo) : "", oldDataList[0].dataSource.id, oldDataList[0].shipmentMode == "Air" ? 2 : 1, oldDataList[0].suggestedQty, oldDataList[0].shipmentQty, oldDataList[0].currency.currencyId, oldDataList[0].rate, oldDataList[0].rate * oldDataList[0].shipmentQty, oldDataList[0].freightCost, moment(oldDataList[0].plannedDate).format(DATE_FORMAT_CAP), moment(oldDataList[0].submittedDate).format(DATE_FORMAT_CAP), moment(oldDataList[0].approvedDate).format(DATE_FORMAT_CAP), moment(oldDataList[0].shippedDate).format(DATE_FORMAT_CAP), moment(oldDataList[0].arrivedDate).format(DATE_FORMAT_CAP), moment(oldDataList[0].deliveredDate).format(DATE_FORMAT_CAP), oldDataList[0].notes, oldDataList[0].erpFlag, oldDataList[0].emergencyOrder, oldDataList[0].accountFlag, JSON.stringify(oldDataList[0].batchInfoList != "" ? ((oldDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.shipmentQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
+                                      oldData = [oldDataList[0].shipmentId, oldDataList[0].planningUnit.id, oldDataList[0].shipmentStatus.id, moment(oldDataList[0].expectedDeliveryDate).format(DATE_FORMAT_CAP), oldDataList[0].procurementAgent.id, oldDataList[0].fundingSource.id, oldDataList[0].budget.id, oldDataList[0].orderNo != "" && oldDataList[0].orderNo != null ? oldDataList[0].orderNo.concat("~").concat(oldDataList[0].primeLineNo) : "", oldDataList[0].dataSource.id, oldDataList[0].shipmentMode == "Air" ? 2 : 1, oldDataList[0].suggestedQty, oldDataList[0].shipmentQty, oldDataList[0].currency.currencyId, oldDataList[0].rate, oldDataList[0].rate * oldDataList[0].shipmentQty, oldDataList[0].freightCost, oldDataList[0].plannedDate != "" && oldDataList[0].plannedDate != null ? moment(oldDataList[0].plannedDate).format(DATE_FORMAT_CAP) : "", oldDataList[0].submittedDate != "" && oldDataList[0].submittedDate != null ? moment(oldDataList[0].submittedDate).format(DATE_FORMAT_CAP) : "", oldDataList[0].approvedDate != "" && oldDataList[0].approvedDate != null ? moment(oldDataList[0].approvedDate).format(DATE_FORMAT_CAP) : "", oldDataList[0].shippedDate != "" && oldDataList[0].shippedDate != null ? moment(oldDataList[0].shippedDate).format(DATE_FORMAT_CAP) : "", oldDataList[0].arrivedDate != "" && oldDataList[0].arrivedDate != null ? moment(oldDataList[0].arrivedDate).format(DATE_FORMAT_CAP) : "", oldDataList[0].receivedDate != "" && oldDataList[0].receivedDate != null ? moment(oldDataList[0].receivedDate).format(DATE_FORMAT_CAP) : "", oldDataList[0].notes, oldDataList[0].erpFlag, oldDataList[0].emergencyOrder, oldDataList[0].accountFlag, JSON.stringify(oldDataList[0].batchInfoList != "" ? ((oldDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.shipmentQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
                                     }
                                     data[28] = oldData;//Old data
                                     var latestDataList = latestProgramDataShipment.filter(c => c.shipmentId == mergedShipmentData[cd].shipmentId);
                                     var latestData = ""
                                     if (latestDataList.length > 0) {
-                                      latestData = [latestDataList[0].shipmentId, latestDataList[0].planningUnit.id, latestDataList[0].shipmentStatus.id, moment(latestDataList[0].expectedDeliveryDate).format(DATE_FORMAT_CAP), latestDataList[0].procurementAgent.id, latestDataList[0].fundingSource.id, latestDataList[0].budget.id, latestDataList[0].orderNo != "" && latestDataList[0].orderNo != null ? latestDataList[0].orderNo.concat("~").concat(latestDataList[0].primeLineNo) : "", latestDataList[0].dataSource.id, latestDataList[0].shipmentMode == "Air" ? 2 : 1, latestDataList[0].suggestedQty, latestDataList[0].shipmentQty, latestDataList[0].currency.currencyId, latestDataList[0].rate, latestDataList[0].rate * latestDataList[0].shipmentQty, latestDataList[0].freightCost, moment(latestDataList[0].plannedDate).format(DATE_FORMAT_CAP), moment(latestDataList[0].submittedDate).format(DATE_FORMAT_CAP), moment(latestDataList[0].approvedDate).format(DATE_FORMAT_CAP), moment(latestDataList[0].shippedDate).format(DATE_FORMAT_CAP), moment(latestDataList[0].arrivedDate).format(DATE_FORMAT_CAP), moment(latestDataList[0].deliveredDate).format(DATE_FORMAT_CAP), latestDataList[0].notes, latestDataList[0].erpFlag, latestDataList[0].emergencyOrder, latestDataList[0].accountFlag, JSON.stringify(latestDataList[0].batchInfoList != "" ? ((latestDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.shipmentQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
+                                      latestData = [latestDataList[0].shipmentId, latestDataList[0].planningUnit.id, latestDataList[0].shipmentStatus.id, moment(latestDataList[0].expectedDeliveryDate).format(DATE_FORMAT_CAP), latestDataList[0].procurementAgent.id, latestDataList[0].fundingSource.id, latestDataList[0].budget.id, latestDataList[0].orderNo != "" && latestDataList[0].orderNo != null ? latestDataList[0].orderNo.concat("~").concat(latestDataList[0].primeLineNo) : "", latestDataList[0].dataSource.id, latestDataList[0].shipmentMode == "Air" ? 2 : 1, latestDataList[0].suggestedQty, latestDataList[0].shipmentQty, latestDataList[0].currency.currencyId, latestDataList[0].rate, latestDataList[0].rate * latestDataList[0].shipmentQty, latestDataList[0].freightCost, latestDataList[0].plannedDate != "" && latestDataList[0].plannedDate != null ? moment(latestDataList[0].plannedDate).format(DATE_FORMAT_CAP) : "", latestDataList[0].submittedDate != "" && latestDataList[0].submittedDate != null ? moment(latestDataList[0].submittedDate).format(DATE_FORMAT_CAP) : "", latestDataList[0].approvedDate != "" && latestDataList[0].approvedDate != null ? moment(latestDataList[0].approvedDate).format(DATE_FORMAT_CAP) : "", latestDataList[0].shippedDate != "" && latestDataList[0].shippedDate != null ? moment(latestDataList[0].shippedDate).format(DATE_FORMAT_CAP) : "", latestDataList[0].arrivedDate != "" && latestDataList[0].arrivedDate != null ? moment(latestDataList[0].arrivedDate).format(DATE_FORMAT_CAP) : "", latestDataList[0].receivedDate != "" && latestDataList[0].receivedDate != null ? moment(latestDataList[0].receivedDate).format(DATE_FORMAT_CAP) : "", latestDataList[0].notes, latestDataList[0].erpFlag, latestDataList[0].emergencyOrder, latestDataList[0].accountFlag, JSON.stringify(latestDataList[0].batchInfoList != "" ? ((latestDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.shipmentQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
                                     }
                                     data[29] = latestData;//Latest data
                                     var downloadedDataList = downloadedProgramDataShipment.filter(c => c.shipmentId == mergedShipmentData[cd].shipmentId);
                                     var downloadedData = "";
                                     if (downloadedDataList.length > 0) {
-                                      downloadedData = [downloadedDataList[0].shipmentId, downloadedDataList[0].planningUnit.id, downloadedDataList[0].shipmentStatus.id, moment(downloadedDataList[0].expectedDeliveryDate).format(DATE_FORMAT_CAP), downloadedDataList[0].procurementAgent.id, downloadedDataList[0].fundingSource.id, downloadedDataList[0].budget.id, downloadedDataList[0].orderNo != "" && downloadedDataList[0].orderNo != null ? downloadedDataList[0].orderNo.concat("~").concat(downloadedDataList[0].primeLineNo) : "", downloadedDataList[0].dataSource.id, downloadedDataList[0].shipmentMode == "Air" ? 2 : 1, downloadedDataList[0].suggestedQty, downloadedDataList[0].shipmentQty, downloadedDataList[0].currency.currencyId, downloadedDataList[0].rate, downloadedDataList[0].rate * downloadedDataList[0].shipmentQty, downloadedDataList[0].freightCost, moment(downloadedDataList[0].plannedDate).format(DATE_FORMAT_CAP), moment(downloadedDataList[0].submittedDate).format(DATE_FORMAT_CAP), moment(downloadedDataList[0].approvedDate).format(DATE_FORMAT_CAP), moment(downloadedDataList[0].shippedDate).format(DATE_FORMAT_CAP), moment(downloadedDataList[0].arrivedDate).format(DATE_FORMAT_CAP), moment(downloadedDataList[0].deliveredDate).format(DATE_FORMAT_CAP), downloadedDataList[0].notes, downloadedDataList[0].erpFlag, downloadedDataList[0].emergencyOrder, downloadedDataList[0].accountFlag, JSON.stringify(downloadedDataList[0].batchInfoList != "" ? ((downloadedDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.shipmentQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
+                                      downloadedData = [downloadedDataList[0].shipmentId, downloadedDataList[0].planningUnit.id, downloadedDataList[0].shipmentStatus.id, moment(downloadedDataList[0].expectedDeliveryDate).format(DATE_FORMAT_CAP), downloadedDataList[0].procurementAgent.id, downloadedDataList[0].fundingSource.id, downloadedDataList[0].budget.id, downloadedDataList[0].orderNo != "" && downloadedDataList[0].orderNo != null ? downloadedDataList[0].orderNo.concat("~").concat(downloadedDataList[0].primeLineNo) : "", downloadedDataList[0].dataSource.id, downloadedDataList[0].shipmentMode == "Air" ? 2 : 1, downloadedDataList[0].suggestedQty, downloadedDataList[0].shipmentQty, downloadedDataList[0].currency.currencyId, downloadedDataList[0].rate, downloadedDataList[0].rate * downloadedDataList[0].shipmentQty, downloadedDataList[0].freightCost, downloadedDataList[0].plannedDate != "" && downloadedDataList[0].plannedDate != null ? moment(downloadedDataList[0].plannedDate).format(DATE_FORMAT_CAP) : "", downloadedDataList[0].submittedDate != "" && downloadedDataList[0].submittedDate != null ? moment(downloadedDataList[0].submittedDate).format(DATE_FORMAT_CAP) : "", downloadedDataList[0].approvedDate != "" && downloadedDataList[0].approvedDate != null ? moment(downloadedDataList[0].approvedDate).format(DATE_FORMAT_CAP) : "", downloadedDataList[0].shippedDate != "" && downloadedDataList[0].shippedDate != null ? moment(downloadedDataList[0].shippedDate).format(DATE_FORMAT_CAP) : "", downloadedDataList[0].arrivedDate != "" && downloadedDataList[0].arrivedDate != null ? moment(downloadedDataList[0].arrivedDate).format(DATE_FORMAT_CAP) : "", downloadedDataList[0].receivedDate != "" && downloadedDataList[0].receivedDate != null ? moment(downloadedDataList[0].receivedDate).format(DATE_FORMAT_CAP) : "", downloadedDataList[0].notes, downloadedDataList[0].erpFlag, downloadedDataList[0].emergencyOrder, downloadedDataList[0].accountFlag, JSON.stringify(downloadedDataList[0].batchInfoList != "" ? ((downloadedDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.shipmentQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
                                     }
                                     data[30] = downloadedData;//Downloaded data
                                     data[31] = 4;
@@ -1383,7 +1387,7 @@ export default class syncPage extends Component {
                                     data: mergedShipmentJexcel,
                                     columnDrag: true,
                                     columns: [
-                                      { title: i18n.t('static.commit.shipmentId'), type: 'text',width: 100  },
+                                      { title: i18n.t('static.commit.shipmentId'), type: 'text', width: 100 },
                                       { title: i18n.t('static.planningunit.planningunit'), type: 'dropdown', source: planningUnitList, width: 200 },
                                       { type: 'dropdown', title: i18n.t('static.supplyPlan.shipmentStatus'), source: shipmentStatusList, width: 100 },
                                       { type: 'text', title: i18n.t('static.supplyPlan.expectedDeliveryDate'), width: 100, },
@@ -1417,7 +1421,7 @@ export default class syncPage extends Component {
                                       { type: 'hidden', title: 'result of compare' },
                                     ],
                                     pagination: 10,
-                                    paginationOptions:[10, 25, 50],
+                                    paginationOptions: [10, 25, 50],
                                     search: true,
                                     columnSorting: true,
                                     tableOverflow: true,
@@ -1563,7 +1567,7 @@ export default class syncPage extends Component {
                                     columns: [
                                       {
                                         title: 'problemReportId',
-                                        type: 'text',
+                                        type: 'hidden',
                                       },
                                       {
                                         title: 'problemActionIndex',
@@ -1635,7 +1639,7 @@ export default class syncPage extends Component {
                                       { type: 'hidden', title: 'result of compare' },
                                     ],
                                     pagination: 10,
-                                    paginationOptions:[10, 25, 50],
+                                    paginationOptions: [10, 25, 50],
                                     search: true,
                                     columnSorting: true,
                                     tableOverflow: true,
@@ -1747,8 +1751,8 @@ export default class syncPage extends Component {
       } else if ((jsonData[c])[15] == "") {
         for (var i = 0; i < colArr.length; i++) {
           var col = (colArr[i]).concat(parseInt(c) + 1);
-          elInstance.setStyle(col[i], "background-color", "transparent");
-          elInstance.setStyle(col[i], "background-color", LATEST_VERSION_COLOUR);
+          elInstance.setStyle(col, "background-color", "transparent");
+          elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
           elInstance.setValueFromCoords(18, c, 3, true);
         }
         this.setState({
@@ -1837,6 +1841,9 @@ export default class syncPage extends Component {
     jExcelLoadedFunction(instance, 1);
     var elInstance = instance.jexcel;
     var jsonData = elInstance.getJson();
+    console.log("json data", jsonData);
+    console.log("El instanmce", elInstance);
+
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S']
     for (var c = 0; c < jsonData.length; c++) {
       if ((jsonData[c])[17] == "") {
@@ -1850,10 +1857,13 @@ export default class syncPage extends Component {
           isChanged: true
         })
       } else if ((jsonData[c])[16] == "") {
+        console.log("in else if", colArr.length);
+
         for (var i = 0; i < colArr.length; i++) {
           var col = (colArr[i]).concat(parseInt(c) + 1);
-          elInstance.setStyle(col[i], "background-color", "transparent");
-          elInstance.setStyle(col[i], "background-color", LATEST_VERSION_COLOUR);
+
+          elInstance.setStyle(col, "background-color", "transparent");
+          elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
           elInstance.setValueFromCoords(19, c, 3, true);
         }
         this.setState({
@@ -1956,8 +1966,8 @@ export default class syncPage extends Component {
       } else if ((jsonData[c])[28] == "") {
         for (var i = 0; i < colArr.length; i++) {
           var col = (colArr[i]).concat(parseInt(c) + 1);
-          elInstance.setStyle(col[i], "background-color", "transparent");
-          elInstance.setStyle(col[i], "background-color", LATEST_VERSION_COLOUR);
+          elInstance.setStyle(col, "background-color", "transparent");
+          elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
           elInstance.setValueFromCoords(31, c, 3, true);
         }
         this.setState({
@@ -2215,7 +2225,7 @@ export default class syncPage extends Component {
                           <li><span className="lightpinklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.commitVersion.conflicts')}</span></li>
                           <li><span className=" greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.commitVersion.changedInCurrentVersion')} </span></li>
                           <li><span className="notawesome legendcolor"></span > <span className="legendcommitversionText">{i18n.t('static.commitVersion.changedInLatestVersion')}</span></li>
-                          <li><span className=" redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.label.noFundsAvailable')} </span></li>
+                          {/* <li><span className=" redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.label.noFundsAvailable')} </span></li> */}
                         </ul>
                       </div>
 
@@ -2391,55 +2401,55 @@ export default class syncPage extends Component {
     );
   };
 
-  checkValidations() {
-    var valid = true;
-    var elInstance = this.state.mergedShipmentJexcel;
-    var json = elInstance.getJson();
-    var shipmentData = [];
-    var shipmentJson = (this.state.mergedShipmentJexcel).getJson();
-    var oldProgramDataShipment = this.state.oldProgramDataShipment;
-    var latestProgramDataShipment = this.state.latestProgramDataShipment;
-    for (var c = 0; c < shipmentJson.length; c++) {
-      if (((shipmentJson[c])[31] == 2 || (shipmentJson[c])[31] == 4) && (shipmentJson[c])[0] != 0) {
-        shipmentData.push(oldProgramDataShipment.filter(a => a.shipmentId == (shipmentJson[c])[0])[0]);
-      } else if ((shipmentJson[c])[31] == 3 && (shipmentJson[c])[0] != 0) {
-        shipmentData.push(latestProgramDataShipment.filter(a => a.shipmentId == (shipmentJson[c])[0])[0]);
-      }
-    }
-    shipmentData = shipmentData.concat(oldProgramDataShipment.filter(c => c.shipmentId == 0));
-    for (var y = 0; y < json.length; y++) {
-      var map = new Map(Object.entries(json[y]));
-      var rowData = elInstance.getRowData(y);
-      if (map.get("6") != "" && map.get("12") != "") {
-        var budget = this.state.budgetListAll.filter(c => c.id == map.get("6"))[0]
-        var totalBudget = budget.budgetAmt * budget.currency.conversionRateToUsd;
-        var shipmentList = shipmentData.filter(c => c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.active == true && c.budget.id == map.get("6"))
-        var usedBudgetTotalAmount = 0;
-        for (var s = 0; s < shipmentList.length; s++) {
-          usedBudgetTotalAmount += parseFloat((parseFloat(shipmentList[s].productCost) + parseFloat(shipmentList[s].freightCost)) * parseFloat(shipmentList[s].currency.conversionRateToUsd));
-        }
-        var totalCost = parseFloat(((elInstance.getCell(`O${parseInt(y) + 1}`)).innerHTML).toString().replaceAll("\,", "")) + parseFloat(((elInstance.getCell(`P${parseInt(y) + 1}`)).innerHTML).toString().replaceAll("\,", ""));
-        var enteredBudgetAmt = (totalCost * (parseFloat((this.state.currencyListAll.filter(c => c.currencyId == rowData[12])[0]).conversionRateToUsd)));
-        usedBudgetTotalAmount = usedBudgetTotalAmount.toFixed(2);
-        enteredBudgetAmt = enteredBudgetAmt.toFixed(2);
+  // checkValidations() {
+  //   var valid = true;
+  //   var elInstance = this.state.mergedShipmentJexcel;
+  //   var json = elInstance.getJson();
+  //   var shipmentData = [];
+  //   var shipmentJson = (this.state.mergedShipmentJexcel).getJson();
+  //   var oldProgramDataShipment = this.state.oldProgramDataShipment;
+  //   var latestProgramDataShipment = this.state.latestProgramDataShipment;
+  //   for (var c = 0; c < shipmentJson.length; c++) {
+  //     if (((shipmentJson[c])[31] == 2 || (shipmentJson[c])[31] == 4) && (shipmentJson[c])[0] != 0) {
+  //       shipmentData.push(oldProgramDataShipment.filter(a => a.shipmentId == (shipmentJson[c])[0])[0]);
+  //     } else if ((shipmentJson[c])[31] == 3 && (shipmentJson[c])[0] != 0) {
+  //       shipmentData.push(latestProgramDataShipment.filter(a => a.shipmentId == (shipmentJson[c])[0])[0]);
+  //     }
+  //   }
+  //   shipmentData = shipmentData.concat(oldProgramDataShipment.filter(c => c.shipmentId == 0));
+  //   for (var y = 0; y < json.length; y++) {
+  //     var map = new Map(Object.entries(json[y]));
+  //     var rowData = elInstance.getRowData(y);
+  //     if (map.get("6") != "" && map.get("12") != "") {
+  //       var budget = this.state.budgetListAll.filter(c => c.id == map.get("6"))[0]
+  //       var totalBudget = budget.budgetAmt * budget.currency.conversionRateToUsd;
+  //       var shipmentList = shipmentData.filter(c => c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.active == true && c.budget.id == map.get("6"))
+  //       var usedBudgetTotalAmount = 0;
+  //       for (var s = 0; s < shipmentList.length; s++) {
+  //         usedBudgetTotalAmount += parseFloat((parseFloat(shipmentList[s].productCost) + parseFloat(shipmentList[s].freightCost)) * parseFloat(shipmentList[s].currency.conversionRateToUsd));
+  //       }
+  //       var totalCost = parseFloat(((elInstance.getCell(`O${parseInt(y) + 1}`)).innerHTML).toString().replaceAll("\,", "")) + parseFloat(((elInstance.getCell(`P${parseInt(y) + 1}`)).innerHTML).toString().replaceAll("\,", ""));
+  //       var enteredBudgetAmt = (totalCost * (parseFloat((this.state.currencyListAll.filter(c => c.currencyId == rowData[12])[0]).conversionRateToUsd)));
+  //       usedBudgetTotalAmount = usedBudgetTotalAmount.toFixed(2);
+  //       enteredBudgetAmt = enteredBudgetAmt.toFixed(2);
 
-        var availableBudgetAmount = totalBudget - usedBudgetTotalAmount;
-        console.log("BudgetId", map.get("6"), "Entered amount", enteredBudgetAmt, "total budget", totalBudget, "Available budget", availableBudgetAmount, "Condition", enteredBudgetAmt > availableBudgetAmount || availableBudgetAmount < 0);
-        if (enteredBudgetAmt > availableBudgetAmount || availableBudgetAmount < 0) {
-          valid = false;
-          inValidWithColor("G", y, i18n.t('static.label.noFundsAvailable'), elInstance, "red");
-          inValidWithColor("O", y, i18n.t('static.label.noFundsAvailable'), elInstance, "red");
-        } else {
-        }
-      } else {
-      }
-    }
-    return valid;
-  }
+  //       var availableBudgetAmount = totalBudget - usedBudgetTotalAmount;
+  //       console.log("BudgetId", map.get("6"), "Entered amount", enteredBudgetAmt, "total budget", totalBudget, "Available budget", availableBudgetAmount, "Condition", enteredBudgetAmt > availableBudgetAmount || availableBudgetAmount < 0);
+  //       if (enteredBudgetAmt > availableBudgetAmount || availableBudgetAmount < 0) {
+  //         valid = false;
+  //         inValidWithColor("G", y, i18n.t('static.label.noFundsAvailable'), elInstance, "red");
+  //         inValidWithColor("O", y, i18n.t('static.label.noFundsAvailable'), elInstance, "red");
+  //       } else {
+  //       }
+  //     } else {
+  //     }
+  //   }
+  //   return valid;
+  // }
 
   synchronize() {
     this.setState({ loading: true });
-    var checkValidations = this.checkValidations();
+    var checkValidations = true;
     if (checkValidations) {
       var db1;
       var storeOS;
@@ -2523,7 +2533,50 @@ export default class syncPage extends Component {
           console.log("Program json", programJson);
           ProgramService.saveProgramData(programJson).then(response => {
             if (response.status == 200) {
-              this.redirectToDashbaord();
+              var programDataTransaction1 = db1.transaction(['programData'], 'readwrite');
+              var programDataOs1 = programDataTransaction1.objectStore('programData');
+              var programRequest1 = programDataOs1.delete((this.state.programId).value);
+
+              var programDataTransaction2 = db1.transaction(['downloadedProgramData'], 'readwrite');
+              var programDataOs2 = programDataTransaction2.objectStore('downloadedProgramData');
+              var programRequest2 = programDataOs2.delete((this.state.programId).value);
+
+              programRequest1.onerror = function (event) {
+                this.setState({
+                  supplyPlanError: i18n.t('static.program.errortext')
+                })
+              }.bind(this);
+              programRequest2.onsuccess = function (e) {
+
+                var json = response.data;
+                var version = json.requestedProgramVersion;
+                if (version == -1) {
+                  version = json.currentVersion.versionId
+                }
+
+                var transactionForSavingData = db1.transaction(['programData'], 'readwrite');
+                var programSaveData = transactionForSavingData.objectStore('programData');
+
+                var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedProgramData'], 'readwrite');
+                var downloadedProgramSaveData = transactionForSavingDownloadedProgramData.objectStore('downloadedProgramData');
+                // for (var i = 0; i < json.length; i++) {
+                var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json), SECRET_KEY);
+                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                var item = {
+                  id: json.programId + "_v" + version + "_uId_" + userId,
+                  programId: json.programId,
+                  version: version,
+                  programName: (CryptoJS.AES.encrypt(JSON.stringify((json.label)), SECRET_KEY)).toString(),
+                  programData: encryptedText.toString(),
+                  userId: userId
+                };
+                console.log("Item------------>", item);
+                var putRequest = programSaveData.put(item);
+                var putRequest1 = downloadedProgramSaveData.put(item);
+
+                this.redirectToDashbaord();
+              }.bind(this)
             } else {
               this.setState({
                 message: response.data.messageCode,

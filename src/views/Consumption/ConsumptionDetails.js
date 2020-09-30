@@ -317,7 +317,9 @@ export default class ConsumptionDetails extends React.Component {
                         showConsumption: 1,
                         consumptionMonth: "",
                         consumptionStartDate: "",
-                        consumptionRegion: ""
+                        consumptionRegion: "",
+                        startDate: startDate,
+                        stopDate: stopDate
                     })
                     this.refs.consumptionChild.showConsumptionData();
                 }.bind(this)

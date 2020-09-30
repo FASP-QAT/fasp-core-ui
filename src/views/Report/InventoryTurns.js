@@ -1646,7 +1646,7 @@ var inputJson={
     "programId":this.state.CostOfInventoryInput.programId,
     "versionId":this.state.CostOfInventoryInput.versionId,
     "dt":moment(this.state.CostOfInventoryInput.dt).startOf('month').format('YYYY-MM-DD'),
-    "includePlanningShipments":this.state.CostOfInventoryInput.includePlanningShipments.toString()=="true"?1:0
+    "includePlannedShipments":this.state.CostOfInventoryInput.includePlanningShipments.toString()=="true"?1:0
 }
                 AuthenticationService.setupAxiosInterceptors();
                 ReportService.inventoryTurns(inputJson).then(response => {
