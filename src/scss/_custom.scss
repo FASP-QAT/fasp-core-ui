@@ -3424,3 +3424,18 @@ margin-left: -45px;
 .sidebar .nav-link.active .nav-icon {
   color: #20a8d8 ;
 }
+//supply plan graph align with table 
+.graphwidth{
+  width: 1407px!important;
+  // margin-right: -597px;
+  margin-left: 211px;
+
+}
+@media (min-width: 992px){
+  .graphwidth{
+    width: 1413px!important;
+    // margin-right: -597px;
+    margin-left: 217px;
+  
+  }
+}
