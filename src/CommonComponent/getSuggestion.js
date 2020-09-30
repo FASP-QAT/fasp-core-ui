@@ -69,6 +69,9 @@ export default function getSuggestion(row, lang) {
     }
     if (row.realmProblem.problem.problemId == 3) {
         // Please update the Shipment status for Shipment Id <%SHIPMENT_ID%>, it should have been Received by now
+        // Please check to make sure shipment id <%SHIPMENT_ID%>  for product <%PLANNING_UNIT%> was received, and update either the receive date or the shipment status.
+
+
         var desc_en = row.realmProblem.problem.actionLabel.label_en;
         var desc_fr = row.realmProblem.problem.actionLabel.label_fr;
         var desc_sp = row.realmProblem.problem.actionLabel.label_sp;
@@ -77,16 +80,16 @@ export default function getSuggestion(row, lang) {
         var label = row.realmProblem.problem.actionLabel;
 
         if (desc_en != null && desc_en != '') {
-            const result_en = desc_en.split('<%SHIPMENT_ID%>').join(row.shipmentId);
+            const result_en = desc_en.split('<%SHIPMENT_ID%>').join(row.shipmentId).split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang));
             label.label_en = result_en;
         } if (desc_fr != null && desc_fr != '') {
-            const result_fr = desc_fr.split('<%SHIPMENT_ID%>').join(row.shipmentId);
+            const result_fr = desc_fr.split('<%SHIPMENT_ID%>').join(row.shipmentId).split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang));
             label.label_fr = result_fr;
         } if (desc_sp != null && desc_sp != '') {
-            const result_sp = desc_sp.split('<%SHIPMENT_ID%>').join(row.shipmentId);
+            const result_sp = desc_sp.split('<%SHIPMENT_ID%>').join(row.shipmentId).split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang));
             label.label_sp = result_sp;
         } if (desc_pr != null && desc_pr != '') {
-            const result_pr = desc_pr.split('<%SHIPMENT_ID%>').join(row.shipmentId);
+            const result_pr = desc_pr.split('<%SHIPMENT_ID%>').join(row.shipmentId).split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang));
             label.label_pr = result_pr;
         }
 
@@ -94,6 +97,8 @@ export default function getSuggestion(row, lang) {
     }
     if (row.realmProblem.problem.problemId == 4) {
         // Please update the Shipment status for Shipment Id <%SHIPMENT_ID%>, it should have been Submitted by now
+        // Please check to make sure shipment id <%SHIPMENT_ID%>   for product <%PLANNING_UNIT%> was submitted, and update either the receive date or the shipment status.
+
         var desc_en = row.realmProblem.problem.actionLabel.label_en;
         var desc_fr = row.realmProblem.problem.actionLabel.label_fr;
         var desc_sp = row.realmProblem.problem.actionLabel.label_sp;
@@ -102,22 +107,24 @@ export default function getSuggestion(row, lang) {
         var label = row.realmProblem.problem.actionLabel;
 
         if (desc_en != null && desc_en != '') {
-            const result_en = desc_en.split('<%SHIPMENT_ID%>').join(row.shipmentId);
+            const result_en = desc_en.split('<%SHIPMENT_ID%>').join(row.shipmentId).split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang));
             label.label_en = result_en;
         } if (desc_fr != null && desc_fr != '') {
-            const result_fr = desc_fr.split('<%SHIPMENT_ID%>').join(row.shipmentId);
+            const result_fr = desc_fr.split('<%SHIPMENT_ID%>').join(row.shipmentId).split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang));
             label.label_fr = result_fr;
         } if (desc_sp != null && desc_sp != '') {
-            const result_sp = desc_sp.split('<%SHIPMENT_ID%>').join(row.shipmentId);
+            const result_sp = desc_sp.split('<%SHIPMENT_ID%>').join(row.shipmentId).split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang));
             label.label_sp = result_sp;
         } if (desc_pr != null && desc_pr != '') {
-            const result_pr = desc_pr.split('<%SHIPMENT_ID%>').join(row.shipmentId);
+            const result_pr = desc_pr.split('<%SHIPMENT_ID%>').join(row.shipmentId).split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang));
             label.label_pr = result_pr;
         }
         return getLabelText(label, lang);
     }
     if (row.realmProblem.problem.problemId == 5) {
         // Please update the Shipment status for Shipment Id <%SHIPMENT_ID%>, it should have been Approved by now
+        // Please check to make sure shipment id <%SHIPMENT_ID%> for product <%PLANNING_UNIT%> was approved, and update either the  date or the  status.
+
         var desc_en = row.realmProblem.problem.actionLabel.label_en;
         var desc_fr = row.realmProblem.problem.actionLabel.label_fr;
         var desc_sp = row.realmProblem.problem.actionLabel.label_sp;
@@ -126,22 +133,24 @@ export default function getSuggestion(row, lang) {
         var label = row.realmProblem.problem.actionLabel;
 
         if (desc_en != null && desc_en != '') {
-            const result_en = desc_en.split('<%SHIPMENT_ID%>').join(row.shipmentId);
+            const result_en = desc_en.split('<%SHIPMENT_ID%>').join(row.shipmentId).split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang));
             label.label_en = result_en;
         } if (desc_fr != null && desc_fr != '') {
-            const result_fr = desc_fr.split('<%SHIPMENT_ID%>').join(row.shipmentId);
+            const result_fr = desc_fr.split('<%SHIPMENT_ID%>').join(row.shipmentId).split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang));
             label.label_fr = result_fr;
         } if (desc_sp != null && desc_sp != '') {
-            const result_sp = desc_sp.split('<%SHIPMENT_ID%>').join(row.shipmentId);
+            const result_sp = desc_sp.split('<%SHIPMENT_ID%>').join(row.shipmentId).split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang));
             label.label_sp = result_sp;
         } if (desc_pr != null && desc_pr != '') {
-            const result_pr = desc_pr.split('<%SHIPMENT_ID%>').join(row.shipmentId);
+            const result_pr = desc_pr.split('<%SHIPMENT_ID%>').join(row.shipmentId).split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang));
             label.label_pr = result_pr;
         }
         return getLabelText(label, lang);
     }
     if (row.realmProblem.problem.problemId == 6) {
         // Please update the Shipment status for Shipment Id <%SHIPMENT_ID%>, it should have been Shipped by now
+        // Please check to make sure shipment id <%SHIPMENT_ID%>  for product <%PLANNING_UNIT%> was shipped, and update either the  date or the  status.
+
         var desc_en = row.realmProblem.problem.actionLabel.label_en;
         var desc_fr = row.realmProblem.problem.actionLabel.label_fr;
         var desc_sp = row.realmProblem.problem.actionLabel.label_sp;
@@ -150,22 +159,24 @@ export default function getSuggestion(row, lang) {
         var label = row.realmProblem.problem.actionLabel;
 
         if (desc_en != null && desc_en != '') {
-            const result_en = desc_en.split('<%SHIPMENT_ID%>').join(row.shipmentId);
+            const result_en = desc_en.split('<%SHIPMENT_ID%>').join(row.shipmentId).split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang));
             label.label_en = result_en;
         } if (desc_fr != null && desc_fr != '') {
-            const result_fr = desc_fr.split('<%SHIPMENT_ID%>').join(row.shipmentId);
+            const result_fr = desc_fr.split('<%SHIPMENT_ID%>').join(row.shipmentId).split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang));
             label.label_fr = result_fr;
         } if (desc_sp != null && desc_sp != '') {
-            const result_sp = desc_sp.split('<%SHIPMENT_ID%>').join(row.shipmentId);
+            const result_sp = desc_sp.split('<%SHIPMENT_ID%>').join(row.shipmentId).split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang));
             label.label_sp = result_sp;
         } if (desc_pr != null && desc_pr != '') {
-            const result_pr = desc_pr.split('<%SHIPMENT_ID%>').join(row.shipmentId);
+            const result_pr = desc_pr.split('<%SHIPMENT_ID%>').join(row.shipmentId).split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang));
             label.label_pr = result_pr;
         }
         return getLabelText(label, lang);
     }
     if (row.realmProblem.problem.problemId == 7) {
         // Please update the Shipment status for Shipment Id <%SHIPMENT_ID%>, it should have Arrived by now
+        // Please check to make sure shipment id <%SHIPMENT_ID%> for product <%PLANNING_UNIT%> was Arrived, and update either the  date or the  status.
+
         var desc_en = row.realmProblem.problem.actionLabel.label_en;
         var desc_fr = row.realmProblem.problem.actionLabel.label_fr;
         var desc_sp = row.realmProblem.problem.actionLabel.label_sp;
@@ -174,16 +185,16 @@ export default function getSuggestion(row, lang) {
         var label = row.realmProblem.problem.actionLabel;
 
         if (desc_en != null && desc_en != '') {
-            const result_en = desc_en.split('<%SHIPMENT_ID%>').join(row.shipmentId);
+            const result_en = desc_en.split('<%SHIPMENT_ID%>').join(row.shipmentId).split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang));
             label.label_en = result_en;
         } if (desc_fr != null && desc_fr != '') {
-            const result_fr = desc_fr.split('<%SHIPMENT_ID%>').join(row.shipmentId);
+            const result_fr = desc_fr.split('<%SHIPMENT_ID%>').join(row.shipmentId).split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang));
             label.label_fr = result_fr;
         } if (desc_sp != null && desc_sp != '') {
-            const result_sp = desc_sp.split('<%SHIPMENT_ID%>').join(row.shipmentId);
+            const result_sp = desc_sp.split('<%SHIPMENT_ID%>').join(row.shipmentId).split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang));
             label.label_sp = result_sp;
         } if (desc_pr != null && desc_pr != '') {
-            const result_pr = desc_pr.split('<%SHIPMENT_ID%>').join(row.shipmentId);
+            const result_pr = desc_pr.split('<%SHIPMENT_ID%>').join(row.shipmentId).split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang));
             label.label_pr = result_pr;
         }
         return getLabelText(label, lang);
