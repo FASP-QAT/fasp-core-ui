@@ -19,6 +19,7 @@ import image2 from '../../../assets/img/wordmark.png';
 import { SECRET_KEY, APP_VERSION_REACT } from '../../../Constants.js';
 import AuthenticationService from '../../Common/AuthenticationService.js';
 import '../../Forms/ValidationForms/ValidationForms.css';
+import axios from 'axios';
 
 
 
@@ -67,7 +68,7 @@ class Login extends Component {
     this.state = {
       message: '',
       loading: false,
-      apiVersion:''
+      apiVersion: ''
     }
     this.forgotPassword = this.forgotPassword.bind(this);
     this.incorrectPassmessageHide = this.incorrectPassmessageHide.bind(this);
@@ -99,16 +100,27 @@ class Login extends Component {
 
   componentDidMount() {
     console.log("############## Login component did mount #####################");
-    // AuthenticationService.clearLocalStorage();
+    // delete axios.defaults.headers.common["Authorization"];
     this.logoutMessagehide();
-    LoginService.getApiVersion()
-      .then(response => {
-        this.setState({
-          apiVersion : response.data.app.version
-          
+    console.log("--------Going to call version api-----------")
+    // AuthenticationService.setupAxiosInterceptors()
+    if (navigator.onLine) {
+      LoginService.getApiVersion()
+        .then(response => {
+          console.log("--------version api success----------->", response)
+          if (response != null && response != "") {
+            this.setState({
+              apiVersion: response.data.app.version
+
+            })
+            console.log("response---", response.data.app.version)
+          }
+        }).catch(error => {
+          console.log("--------version api error----------->", error)
         })
-        console.log("response---", response.data.app.version)
-      })
+    } else {
+      console.log("############## Offline so can't fetch version #####################");
+    }
   }
 
   forgotPassword() {
@@ -203,6 +215,7 @@ class Login extends Component {
                                 let keysToRemove = ["token-" + decoded.userId, "user-" + decoded.userId, "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken"];
                                 keysToRemove.forEach(k => localStorage.removeItem(k))
                                 decoded.user.syncExpiresOn = moment().format("YYYY-MM-DD HH:mm:ss");
+                                decoded.user.apiVersion = this.state.apiVersion;
                                 // decoded.user.syncExpiresOn = moment("2020-04-29 13:13:19").format("YYYY-MM-DD HH:mm:ss");
                                 localStorage.setItem('token-' + decoded.userId, CryptoJS.AES.encrypt((response.data.token).toString(), `${SECRET_KEY}`));
                                 // localStorage.setItem('user-' + decoded.userId, CryptoJS.AES.encrypt(JSON.stringify(decoded.user), `${SECRET_KEY}`));
@@ -364,8 +377,8 @@ class Login extends Component {
                   </div>
 
                 </CardGroup>
-                          <h5 className="text-right versionColor">{i18n.t('static.common.version')}{APP_VERSION_REACT} | {this.state.apiVersion}</h5>
-                          {/* <h5 className="text-right versionColor">{i18n.t('static.common.version')}{APP_VERSION_REACT}</h5> */}
+                <h5 className="text-right versionColor">{i18n.t('static.common.version')}{APP_VERSION_REACT} | {this.state.apiVersion}</h5>
+                {/* <h5 className="text-right versionColor">{i18n.t('static.common.version')}{APP_VERSION_REACT}</h5> */}
               </Col>
 
 
@@ -380,8 +393,8 @@ class Login extends Component {
                   and delivers health commodities, offers comprehensive technical assistance to strengthen
                   national supply chain systems, and provides global supply chain leadership. For more
                   information, visit <a href="https://www.ghsupplychain.org/" target="_blank">ghsupplychain.org</a>. The information provided in this tool is not
-                                                                            official U.S. government information and does not represent the views or positions of the
-                                                                            Agency for International Development or the U.S. government.
+                                                                                  official U.S. government information and does not represent the views or positions of the
+                                                                                  Agency for International Development or the U.S. government.
               </p>
                 </CardBody>
                 <Row className="text-center Login-bttom-logo">
