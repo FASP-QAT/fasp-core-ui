@@ -129,7 +129,7 @@ class StockStatusOverTime extends Component {
     }
 
     roundN = num => {
-        return parseFloat(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
+        return parseFloat(Math.round(num * Math.pow(10, 1)) / Math.pow(10, 1)).toFixed(1);
     }
     formatAmc = value => {
         return Math.ceil(value)

@@ -1565,9 +1565,9 @@ if(value!=null){
       row1.push(i18n.t('static.report.forecasted'));
       row2.push(i18n.t('static.report.actual'));
       for (let i = 0; i < consumptionArray.length; i++) {
-        head.push((moment(consumptionArray[i].transDate, 'yyyy-MM-dd').format('MMM YYYY')));
-        row1.push(consumptionArray[i].forecastedConsumption);
-        row2.push(consumptionArray[i].actualConsumption);
+        head.push((moment(consumptionArray[i].transDate, 'yyyy-MM-dd').format('MMM YYYY')).replaceAll(' ','%20'));
+        row1.push(consumptionArray[i].forecastedConsumption==null?'':consumptionArray[i].forecastedConsumption);
+        row2.push(consumptionArray[i].actualConsumption==null?'':consumptionArray[i].actualConsumption,consumptionArray[i].actualConsumption);
       }
     } else {
       let consumptionArray = this.state.offlineConsumptionList;
@@ -1575,9 +1575,9 @@ if(value!=null){
       row1.push(i18n.t('static.report.forecasted'));
       row2.push(i18n.t('static.report.actual'));
       for (let i = 0; i < consumptionArray.length; i++) {
-        head.push((moment(consumptionArray[i].transDate, 'yyyy-MM-dd').format('MMM YYYY')));
-        row1.push(consumptionArray[i].forecastedConsumption);
-        row2.push(consumptionArray[i].actualConsumption);
+        head.push(((moment(consumptionArray[i].transDate, 'yyyy-MM-dd').format('MMM YYYY'))).replaceAll(' ','%20'));
+        row1.push(consumptionArray[i].forecastedConsumption==null?'':consumptionArray[i].forecastedConsumption);
+        row2.push(consumptionArray[i].actualConsumption==null?'':consumptionArray[i].actualConsumption);
       }
     }
     var A = [];
@@ -1751,7 +1751,6 @@ if(value!=null){
     doc.autoTable(content);
     addHeaders(doc)
     addFooters(doc)
-    doc.save("Consumption.pdf")
     doc.save(i18n.t('static.dashboard.consumption').concat('.pdf'));
     //creates PDF from img
     /* var doc = new jsPDF('landscape');
@@ -2659,7 +2658,7 @@ if(value!=null){
             data: this.state.consumptions.map((item, index) => (item.forecastedConsumption))
           }, {
             label: i18n.t('static.report.actualConsumption'),
-            backgroundColor: '#86CD99',
+            backgroundColor: '#118b70',
             borderColor: 'rgba(179,181,198,1)',
             pointBackgroundColor: 'rgba(179,181,198,1)',
             pointBorderColor: '#fff',
@@ -2697,7 +2696,7 @@ if(value!=null){
             data: this.state.offlineConsumptionList.map((item, index) => (item.forecastedConsumption))
           }, {
             label: i18n.t('static.report.actualConsumption'),
-            backgroundColor: '#86CD99',
+            backgroundColor: '#118b70',
             borderColor: 'rgba(179,181,198,1)',
             pointBackgroundColor: 'rgba(179,181,198,1)',
             pointBorderColor: '#fff',
@@ -3035,7 +3034,7 @@ if(value!=null){
 
                             <tbody>
                               <>
-                                <tr>
+                                <tr style={{fontWeight:'bold'}}>
                                   <th style={{ width: '140px' }}></th>
                                   {
                                     this.state.consumptions.length > 0
@@ -3084,7 +3083,7 @@ if(value!=null){
 
                             <tbody>
                               <>
-                                <tr>
+                                <tr style={{fontWeight:'bold'}}>
                                   <th style={{ width: '140px' }}></th>
                                   {
                                     this.state.offlineConsumptionList.length > 0
@@ -3097,7 +3096,7 @@ if(value!=null){
                                   }
                                 </tr>
 
-                                <tr>
+                                <tr >
                                   <th style={{ width: '140px' }}>{i18n.t('static.report.forecasted')}</th>
                                   {
                                     this.state.offlineConsumptionList.length > 0
