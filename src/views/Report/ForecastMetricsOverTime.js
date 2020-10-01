@@ -1484,7 +1484,7 @@ if(value!=null){
 
 
     for (var item = 0; item < re.length; item++) {
-      A.push(this.addDoubleQuoteToRowContent([this.dateFormatter(re[item].month).replaceAll(' ', '%20'), re[item].forecastedConsumption, re[item].actualConsumption, this.PercentageFormatter(re[item].forecastError)]))
+      A.push(this.addDoubleQuoteToRowContent([this.dateFormatter(re[item].month).replaceAll(' ', '%20'), re[item].forecastedConsumption==null?'': re[item].forecastedConsumption, re[item].actualConsumption==null?'':re[item].actualConsumption, this.PercentageFormatter(re[item].forecastError)]))
     }
     for (var i = 0; i < A.length; i++) {
       csvRow.push(A[i].join(","))

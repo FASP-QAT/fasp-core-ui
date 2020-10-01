@@ -171,6 +171,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             var fsResult = [];
                             fsResult = fsRequest.result;
                             for (var k = 0; k < fsResult.length; k++) {
+                                console.log(programJson)
                                 if (fsResult[k].realm.id == programJson.realmCountry.realm.realmId) {
                                     var fsJson = {
                                         name: fsResult[k].fundingSourceCode,

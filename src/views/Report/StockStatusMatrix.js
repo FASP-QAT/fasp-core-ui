@@ -728,13 +728,7 @@ export default class StockStatusMatrix extends React.Component {
     this.getPrograms();
 
   }
-  roundN = num => {
-    if (num != '') {
-      return parseFloat(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
-    } else {
-      return ''
-    }
-  }
+
   formatter = value => {
     if (value != '') {
       var cell1 = this.roundN(value)
@@ -747,7 +741,7 @@ export default class StockStatusMatrix extends React.Component {
         x1 = x1.replace(rgx, '$1' + ',' + '$2');
       }
       return x1 + x2;
-    } else {
+    } else {  
       return ''
     }
   }
@@ -908,7 +902,7 @@ export default class StockStatusMatrix extends React.Component {
     if (num == '') {
       return ''
     } else {
-      return parseFloat(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
+      return parseFloat(Math.round(num * Math.pow(10, 1)) / Math.pow(10, 1)).toFixed(1);
     }
   }
   cellStyle = (min, value) => {
@@ -958,19 +952,7 @@ export default class StockStatusMatrix extends React.Component {
       if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
       return '?'
     }
-    const formatter = value => {
-
-      var cell1 = value
-      cell1 += '';
-      var x = cell1.split('.');
-      var x1 = x[0];
-      var x2 = x.length > 1 ? '.' + x[1] : '';
-      var rgx = /(\d+)(\d{3})/;
-      while (rgx.test(x1)) {
-        x1 = x1.replace(rgx, '$1' + ',' + '$2');
-      }
-      return x1 + x2;
-    }
+    
 
     const { SearchBar, ClearSearchButton } = Search;
     const customTotal = (from, to, size) => (

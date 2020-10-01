@@ -618,7 +618,7 @@ class warehouseCapacity extends Component {
 
         for (var item = 0; item < re.length; item++) {
             // A.push([(getLabelText(re[item].realmCountry.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),(getLabelText(re[item].region.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),(getLabelText(re[item].programList.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),re[item].gln, re[item].capacityCbm])
-            A.push(this.addDoubleQuoteToRowContent([(getLabelText(re[item].realmCountry.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(re[item].region.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(re[item].programList[0].label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), re[item].gln, re[item].capacityCbm]))
+            A.push(this.addDoubleQuoteToRowContent([(getLabelText(re[item].realmCountry.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(re[item].region.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(re[item].programList[0].label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), re[item].gln==null?'':re[item].gln, re[item].capacityCbm]))
             for (var item1 = 1; item1 < re[item].programList.length; item1++) {
                 A.push(this.addDoubleQuoteToRowContent(['', '', (getLabelText(re[item].programList[item1].label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), '', '']))
             }
@@ -1106,18 +1106,8 @@ class warehouseCapacity extends Component {
                     <div className="Card-header-reporticon">
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.report.warehouseCapacity')}</strong> */}
 
-                        <Online>
-                            {
-                                this.state.data.length > 0 &&
-                                <div className="card-header-actions">
-                                    <a className="card-header-action">
-                                        <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF()} />
-                                    </a>
-                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
-                                </div>
-                            }
-                        </Online>
-                        <Offline>
+                            
+                              
                             {
                                 this.state.data.length > 0 &&
                                 <div className="card-header-actions">
@@ -1127,7 +1117,7 @@ class warehouseCapacity extends Component {
                                     <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
                                 </div>
                             }
-                        </Offline>
+                      
                     </div>
                     <CardBody className="pb-lg-2 pt-lg-0 ">
                         <div className="" >

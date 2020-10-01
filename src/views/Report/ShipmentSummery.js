@@ -1745,8 +1745,8 @@ console.log(dateFilter)
                               var quantity=0;
                               console.log('fundingSourceList',fundingSourceList)
                               fundingSourceList.map(c=>{
-                                cost=cost+(c.productCost) + (c.freightCost)
-                                quantity=quantity+(viewById==1?c.shipmentQty:(c.shipmentQty*c.multiplier))
+                                cost=cost+ parseFloat(c.productCost) + parseFloat(c.freightCost)
+                                quantity=quantity+(viewById==1?parseInt(c.shipmentQty):(parseInt(c.shipmentQty)*c.multiplier))
                               })
                                 var json={
                                     "fundingSource":fundingSourceList[0].fundingSource,
@@ -2372,8 +2372,7 @@ console.log(dateFilter)
 
                                 <Col md="12 pl-0">
                                     <div className="row">
-                                        <Online>
-                                            {
+    {
                                                 this.state.shipmentDetailsMonthList.length > 0
                                                 &&
                                                 <div className="col-md-12 p-0">
@@ -2394,26 +2393,7 @@ console.log(dateFilter)
 
 
 
-                                        </Online>
-                                        <Offline>
-                                            {
-                                                this.state.data.length > 0
-                                                &&
-                                                <div className="col-md-12 p-0">
-                                                    <div className="col-md-12">
-                                                        <div className="chart-wrapper chart-graph-report">
-                                                            <Bar id="cool-canvas" data={bar} options={options} />
-
-                                                        </div>
-                                                    </div><br />
-                                                    {/* <div className="col-md-12">
-                                                        <button className="mr-1 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
-                                                            {this.state.show ? 'Hide Data' : 'Show Data'}
-                                                        </button>
-                                                    </div> */}
-                                                </div>}
-
-                                        </Offline>
+                                        
                                     </div>
 
 

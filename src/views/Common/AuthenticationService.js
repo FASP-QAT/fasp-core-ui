@@ -445,7 +445,7 @@ class AuthenticationService {
                     }
                     break;
                 case "/user/editUser/:userId":
-                    if (bfunction.includes("ROLE_BF_MANAGE_USER1")) {
+                    if (bfunction.includes("ROLE_BF_MANAGE_USER")) {
                         return true;
                     }
                     break;

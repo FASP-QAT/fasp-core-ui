@@ -1769,6 +1769,11 @@ class DefaultLayout extends Component {
                                 url: '/report/consumption',
                                 icon: 'fa fa-exchange',
                                 attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_REPORT') ? false : true) }
+                              }, {
+                                name: i18n.t('static.report.forecasterrorovertime'),
+                                url: '/report/forecastOverTheTime',
+                                icon: 'fa fa-line-chart',
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT') ? false : true) }
                               },
 
                             ]
