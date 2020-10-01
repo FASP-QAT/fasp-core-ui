@@ -2869,7 +2869,7 @@ class StockStatus extends Component {
           showInLegend: true,
           pointStyle: 'line',
           yValueFormatString: "$#,##0",
-          data: this.state.stockStatusList.map((item, index) => (item.mos))
+          data: this.state.stockStatusList.map((item, index) => (this.roundN(item.mos)))
         }
         , /*{
           type: "line",
