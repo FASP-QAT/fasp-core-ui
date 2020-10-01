@@ -126,7 +126,7 @@ class SupplyPlanFormulas extends Component {
               <CardBody>
               <Button onClick={this.toggle} className="mr-1">Launch demo modal</Button> */}
              {/*Supply plan formuale */} 
-                <Modal isOpen={this.state.modal}  className={'modal-lg ' + this.props.className} >
+                <Modal isOpen={this.state.modal}  className={'modal-xl ' + this.props.className} >
                   <ModalHeader toggle={this.toggle} className="ModalHead modal-info-Headher"><strong className="TextWhite" >Formulae</strong></ModalHeader>
                   <ModalBody >
                   <ListGroup style={{height:'490px',overflowY:'scroll'}}>
@@ -335,7 +335,7 @@ Months Of Stock = 3.54</p>
                   </ModalBody>
                   </Modal>
  {/*Forcast Matrix formuale */} 
- <Modal isOpen={this.state.forecastmatrix}  className={'modal-lg ' + this.props.className} >
+ <Modal isOpen={this.state.forecastmatrix}  className={'modal-xl ' + this.props.className} >
                   <ModalHeader toggle={this.toggleForecastMatrix} className="ModalHead modal-info-Headher"><strong className="TextWhite">Formulae</strong></ModalHeader>
                   <ModalBody >
                       <ListGroup>
@@ -351,7 +351,7 @@ Months Of Stock = 3.54</p>
                   </ModalBody>
                   </Modal>
  {/*Stock Status Over Time formuale */} 
- <Modal isOpen={this.state.stockstatusovertime}  className={'modal-lg ' + this.props.className} >
+ <Modal isOpen={this.state.stockstatusovertime}  className={'modal-xl ' + this.props.className} >
                   <ModalHeader toggle={this.toggleStockStatusOverTime} className="ModalHead modal-info-Headher"><strong className="TextWhite">Formulae</strong></ModalHeader>
                   <ModalBody >
                       <ListGroup style={{height:'300px',overflowY:'scroll'}}>
@@ -397,7 +397,7 @@ Months Of Stock = 3.54</p>
                   </ModalBody>
                   </Modal>
 {/*Stock Status formuale */} 
-<Modal isOpen={this.state.stockstatus}  className={'modal-lg ' + this.props.className} >
+<Modal isOpen={this.state.stockstatus}  className={'modal-xl ' + this.props.className} >
                   <ModalHeader toggle={this.toggleStockStatus} className="ModalHead modal-info-Headher"><strong className="TextWhite">Formulae</strong></ModalHeader>
                   <ModalBody >
                       <ListGroup style={{height:'300px',overflowY:'scroll'}}>
@@ -465,7 +465,7 @@ Max = 44,744</p>
 
 
                   {/*Stock Status Across Planning Units formuale */} 
-<Modal isOpen={this.state.stockstatusacrossplaningunit}  className={'modal-lg ' + this.props.className} >
+<Modal isOpen={this.state.stockstatusacrossplaningunit}  className={'modal-xl ' + this.props.className} >
                   <ModalHeader toggle={this.toggleStockStatusAcrossPlaningUnit} className="ModalHead modal-info-Headher"><strong className="TextWhite">Formulae</strong></ModalHeader>
                   <ModalBody >
                       <ListGroup style={{height:'300px',overflowY:'scroll'}}>
