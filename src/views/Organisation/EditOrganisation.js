@@ -172,7 +172,7 @@ export default class EditOrganisationComponent extends Component {
 
     componentDidMount() {
 
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         OrganisationService.getOrganisationById(this.props.match.params.organisationId).then(response => {
             if (response.status == 200) {
                 this.setState({
@@ -472,7 +472,7 @@ export default class EditOrganisationComponent extends Component {
     }
 
     resetClicked() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         OrganisationService.getOrganisationById(this.props.match.params.organisationId).then(response => {
             this.setState({
                 organisation: response.data

@@ -192,7 +192,7 @@ export default class AddProgram extends Component {
         program.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
     }
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         HealthAreaService.getRealmList()
             .then(response => {
                 if (response.status == 200) {
@@ -279,7 +279,7 @@ export default class AddProgram extends Component {
     }
 
     getRegionList(e) {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         ProgramService.getRegionList(e.target.value)
             .then(response => {
                 console.log("health area list---", response.data);
@@ -462,7 +462,7 @@ export default class AddProgram extends Component {
                                     this.setState({
                                         loading: true
                                     })
-                                    AuthenticationService.setupAxiosInterceptors();
+                                    // AuthenticationService.setupAxiosInterceptors();
                                     ProgramService.addProgram(this.state.program).then(response => {
                                         if (response.status == "200") {
                                             this.props.history.push(`/program/listProgram/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))

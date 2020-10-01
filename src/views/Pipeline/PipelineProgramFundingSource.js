@@ -133,7 +133,7 @@ export default class PipelineProgramFundingSource extends Component {
     componentDidMount() {
         var FundingSourceListQat = [];
         // var activeDataSourceList=[];
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         FundingSourceService.getFundingSourceListAll()
             .then(response => {
                 if (response.status == 200) {
@@ -149,7 +149,7 @@ export default class PipelineProgramFundingSource extends Component {
                     this.setState({ FundingSourceListQat: FundingSourceListQat });
 
    
-                        AuthenticationService.setupAxiosInterceptors();
+                        // AuthenticationService.setupAxiosInterceptors();
                             PipelineService.getQatTempFundingSourceList(this.props.pipelineId)
                                 .then(response => {
                                     if (response.status == 200) {

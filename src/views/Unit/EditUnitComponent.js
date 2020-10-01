@@ -138,7 +138,7 @@ export default class EditUnitComponent extends Component {
         }
     }
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         UnitService.getUnitById(this.props.match.params.unitId).then(response => {
             if (response.status == 200) {
                 this.setState({
@@ -189,7 +189,7 @@ export default class EditUnitComponent extends Component {
                                     this.setState({
                                         loading: true
                                     })
-                                    AuthenticationService.setupAxiosInterceptors();
+                                    // AuthenticationService.setupAxiosInterceptors();
                                     UnitService.updateUnit(this.state.unit).then(response => {
                                         console.log(response)
                                         if (response.status == 200) {
@@ -348,7 +348,7 @@ export default class EditUnitComponent extends Component {
     }
 
     resetClicked() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         UnitService.getUnitById(this.props.match.params.unitId).then(response => {
             this.setState({
                 unit: response.data

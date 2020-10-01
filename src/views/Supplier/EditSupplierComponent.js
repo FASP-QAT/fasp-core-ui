@@ -129,7 +129,7 @@ class EditSupplierComponent extends Component {
         }
     }
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         SupplierService.getSupplierById(this.props.match.params.supplierId).then(response => {
             if (response.status == 200) {
                 this.setState({
@@ -167,7 +167,7 @@ class EditSupplierComponent extends Component {
                                     this.setState({
                                         loading: true
                                     })
-                                    AuthenticationService.setupAxiosInterceptors();
+                                    // AuthenticationService.setupAxiosInterceptors();
                                     SupplierService.updateSupplier(this.state.supplier)
                                         .then(response => {
                                             if (response.status == 200) {
@@ -297,7 +297,7 @@ class EditSupplierComponent extends Component {
     }
 
     resetClicked() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         SupplierService.getSupplierById(this.props.match.params.supplierId).then(response => {
             this.setState({
                 supplier: response.data, loading: false

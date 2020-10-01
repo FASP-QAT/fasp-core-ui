@@ -572,7 +572,7 @@ class ListTracerCategoryComponent extends Component {
 
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         this.hideFirstComponent();
         RealmService.getRealmListAll()
             .then(response => {

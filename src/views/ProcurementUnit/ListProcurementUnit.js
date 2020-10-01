@@ -526,7 +526,7 @@ export default class ListProcurementUnit extends Component {
   }
 
   componentDidMount() {
-    AuthenticationService.setupAxiosInterceptors();
+    // AuthenticationService.setupAxiosInterceptors();
     this.hideFirstComponent();
     ProcurementUnitService.getProcurementUnitList().then(response => {
       if (response.status == 200) {

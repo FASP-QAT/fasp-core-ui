@@ -163,7 +163,7 @@ export default class PipelineProgramSetup extends Component {
     }
     endProgramInfoStepFive() {
         console.log("program Data=======>", this.state.program);
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         PipelineService.addProgramToQatTempTable(this.state.program, this.props.match.params.pipelineId).then(response => {
             if (response.status == "200") {
                 this.setState({
@@ -209,7 +209,7 @@ export default class PipelineProgramSetup extends Component {
         // console.log("planning unit data---->",this.refs.child.savePlanningUnits());
         var planningUnits = this.refs.child.savePlanningUnits();
         var checkValidation = this.refs.child.checkValidation();
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         PipelineService.addProgramToQatTempPlanningUnits(planningUnits, this.props.match.params.pipelineId).
             then(response => {
                 if (response.status == "200") {
@@ -260,7 +260,7 @@ export default class PipelineProgramSetup extends Component {
         var datasources = this.refs.datasourcechild.saveDataSource();
         var checkValidation = this.refs.datasourcechild.checkValidation();
         // console.log("consumption save------>",consumption);
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         PipelineService.addProgramToQatTempDataSource(datasources, this.props.match.params.pipelineId).
             then(response => {
                 // console.log("consumption add response--->", response);
@@ -297,7 +297,7 @@ export default class PipelineProgramSetup extends Component {
         var consumption = this.refs.fundingSourceChild.saveFundingSource();
         var checkValidation = this.refs.fundingSourceChild.checkValidation();
         // console.log("consumption save------>",consumption);
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         PipelineService.addQatTempFundingSource(consumption, this.props.match.params.pipelineId).
             then(response => {
                 // console.log("consumption add response--->", response);
@@ -342,7 +342,7 @@ export default class PipelineProgramSetup extends Component {
         var inventory = this.refs.procurementAgentChild.saveProcurementAgent();
         var checkValidation = this.refs.procurementAgentChild.checkValidation();
         console.log("inventory-----data---", inventory);
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         PipelineService.addQatTempProcurementAgent(inventory, this.props.match.params.pipelineId).
             then(response => {
                 if (response.status == "200") {
@@ -379,7 +379,7 @@ export default class PipelineProgramSetup extends Component {
         var consumption = this.refs.consumptionChild.saveConsumption();
         var checkValidation = this.refs.consumptionChild.checkValidation();
         console.log("inventory-----data---", consumption);
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         PipelineService.addQatTempConsumption(consumption, this.props.match.params.pipelineId).
             then(response => {
                 if (response.status == "200") {
@@ -416,7 +416,7 @@ export default class PipelineProgramSetup extends Component {
         var inventory = this.refs.inventoryChild.saveInventory();
         var checkValidation = this.refs.inventoryChild.checkValidation();
         console.log("inventory-----data---", inventory);
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         PipelineService.addQatTempInventory(inventory, this.props.match.params.pipelineId).
             then(response => {
                 if (response.status == "200") {
@@ -704,7 +704,7 @@ export default class PipelineProgramSetup extends Component {
 
     getRegionList(e) {
 
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         ProgramService.getRegionList(e.target.value)
             .then(response => {
                 if (response.status == 200) {
@@ -729,7 +729,7 @@ export default class PipelineProgramSetup extends Component {
 
     componentDidMount() {
         // console.log("pipelineProgramId----->", this.props.match.params.pipelineId);
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         PipelineService.getQatTempPorgramByPipelineId(this.props.match.params.pipelineId)
             .then(response => {
                 console.log("my resp---", response);

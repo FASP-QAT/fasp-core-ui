@@ -1096,7 +1096,7 @@ export default class EditProcurementUnit extends Component {
                                     this.setState({
                                         loading: true
                                     })
-                                    AuthenticationService.setupAxiosInterceptors();
+                                    // AuthenticationService.setupAxiosInterceptors();
                                     ProcurementUnitService.editProcurementUnit(this.state.procurementUnit).then(response => {
                                         if (response.status == 200) {
                                             this.props.history.push(`/procurementUnit/listProcurementUnit/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))

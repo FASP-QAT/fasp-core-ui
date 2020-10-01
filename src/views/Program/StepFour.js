@@ -76,7 +76,7 @@ export default class StepFour extends Component {
     }
 
     getOrganisationList() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         ProgramService.getOrganisationList(this.props.items.program.realm.realmId)
             .then(response => {
                 if (response.status == 200) {

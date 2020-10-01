@@ -139,7 +139,7 @@ export default class UpdateDataSourceTypeComponent extends Component {
     }
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         DataSourceTypeService.getDataSourceTypeById(this.props.match.params.dataSourceTypeId).then(response => {
             if (response.status == 200) {
                 this.setState({
@@ -323,7 +323,7 @@ export default class UpdateDataSourceTypeComponent extends Component {
     }
 
     resetClicked() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         DataSourceTypeService.getDataSourceTypeById(this.props.match.params.dataSourceTypeId).then(response => {
             this.setState({
                 dataSourceType: response.data

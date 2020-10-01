@@ -580,7 +580,7 @@ export default class ProgramList extends Component {
 
   componentDidMount() {
     console.log("props--------------------", this.props);
-    AuthenticationService.setupAxiosInterceptors();
+    // AuthenticationService.setupAxiosInterceptors();
     this.hideFirstComponent();
     ProgramService.getProgramList().then(response => {
       if (response.status == 200) {

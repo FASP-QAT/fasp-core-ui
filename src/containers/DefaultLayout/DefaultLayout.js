@@ -6,6 +6,7 @@ import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import { Offline, Online } from "react-detect-offline";
 import { Redirect, Route, Switch } from 'react-router-dom';
 import { Container } from 'reactstrap';
+import IdleTimer from 'react-idle-timer';
 
 // routes config
 //import routes from '../../routes';
@@ -589,8 +590,47 @@ class DefaultLayout extends Component {
     super(props);
     this.state = {
       businessFunctions: [],
-      name: ""
+      name: "",
+      //Timer
+      timeout: 1000 * 3600 * 1,
+      showModal: false,
+      userLoggedIn: false,
+      isTimedOut: false
     }
+    this.idleTimer = null
+    this.onAction = this._onAction.bind(this)
+    this.onActive = this._onActive.bind(this)
+    this.onIdle = this._onIdle.bind(this)
+  }
+  checkEvent = (e) => {
+    console.log("checkEvent called---", e);
+    if (e.type != "mousemove") {
+      this._onAction(e);
+    }
+  }
+  _onAction(e) {
+    console.log('user did something', e)
+    console.log('user event type', e.type)
+    this.setState({ isTimedOut: false })
+  }
+
+  _onActive(e) {
+    console.log('user is active', e)
+    this.setState({ isTimedOut: false })
+  }
+
+  _onIdle(e) {
+    console.log('user is idle', e)
+    const isTimedOut = this.state.isTimedOut
+    if (isTimedOut) {
+      console.log("user timed out")
+      this.props.history.push('/logout/static.message.sessionExpired')
+    } else {
+      this.setState({ showModal: true })
+      this.idleTimer.reset();
+      this.setState({ isTimedOut: true })
+    }
+
   }
 
   displayHeaderTitle = (name) => {
@@ -615,7 +655,7 @@ class DefaultLayout extends Component {
   loading = () => <div className="animated fadeIn pt-1 text-center"><div className="sk-spinner sk-spinner-pulse"></div></div>;
   changePassword(e) {
     e.preventDefault();
-    AuthenticationService.setupAxiosInterceptors();
+    // AuthenticationService.setupAxiosInterceptors();
     this.props.history.push(`/changePassword`);
   }
   signOut(e) {
@@ -646,8 +686,19 @@ class DefaultLayout extends Component {
 
   render() {
     console.log('in I18n defaultlayout')
+    let events = ["keydown","mousedown"];
     return (
       <div className="app">
+        <IdleTimer
+          ref={ref => { this.idleTimer = ref }}
+          element={document}
+          onActive={this.onActive}
+          onIdle={this.onIdle}
+          onAction={this.checkEvent}
+          debounce={250}
+          timeout={this.state.timeout}
+          events={events}
+           />
         <AppHeader fixed>
           <Suspense fallback={this.loading()}>
             <DefaultHeader onLogout={e => this.signOut(e)} onChangePassword={e => this.changePassword(e)} onChangeDashboard={e => this.showDashboard(e)} title={this.state.name} />
@@ -1875,7 +1926,7 @@ class DefaultLayout extends Component {
                             (
                               <route.component {...props} onClick={this.displayHeaderTitle(i18n.t(route.name, { entityname: i18n.t(route.entityname) }))} />
                             ) : (
-                              <Redirect to={{ pathname: "/login/static.accessDenied" }} />
+                              <Redirect to={{ pathname: "/accessDenied" }} />
                             )
                         }
                       />

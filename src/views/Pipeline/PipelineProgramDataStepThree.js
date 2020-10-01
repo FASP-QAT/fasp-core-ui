@@ -91,7 +91,7 @@ export default class PipelineProgramDataStepThree extends Component {
     // }
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         ProgramService.getHealthAreaList(1)
             .then(response => {
                 if (response.status == 200) {

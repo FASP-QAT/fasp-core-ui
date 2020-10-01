@@ -113,7 +113,7 @@ class AddprogramPlanningUnit extends Component {
         var programObj;
         // var realmId = document.getElementById("realmId").value;
 
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
 
         ProgramService.getProgramById(this.props.match.params.programId).then(response => {
             if (response.status == 200) {
@@ -175,7 +175,7 @@ class AddprogramPlanningUnit extends Component {
                                         }
 
 
-                                        AuthenticationService.setupAxiosInterceptors();
+                                        // AuthenticationService.setupAxiosInterceptors();
                                         ProgramService.getProgramPlaningUnitListByProgramId(this.state.programId)
                                             .then(response => {
                                                 if (response.status == 200) {
@@ -1091,7 +1091,7 @@ class AddprogramPlanningUnit extends Component {
                 }
 
             }
-            AuthenticationService.setupAxiosInterceptors();
+            // AuthenticationService.setupAxiosInterceptors();
             console.log("SUBMIT----", planningUnitArray);
             ProgramService.addprogramPlanningUnitMapping(planningUnitArray)
                 .then(response => {

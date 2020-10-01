@@ -434,7 +434,7 @@ export default class RealmCountryPlanningUnitList extends Component {
     filterData() {
         this.setState({ loading: true })
         let realmCountryId = document.getElementById("realmCountryId").value;
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         RealmCountryService.getRealmCountryPlanningUnitAllByrealmCountryId(realmCountryId).then(response => {
             console.log(response.data)
             this.setState({
@@ -471,7 +471,7 @@ export default class RealmCountryPlanningUnitList extends Component {
 
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         // RealmCountryService.getRealmCountryListAll().then(response => {
         //     console.log(response.data)
 

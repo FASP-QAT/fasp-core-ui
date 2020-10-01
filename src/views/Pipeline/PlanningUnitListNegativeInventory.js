@@ -14,7 +14,7 @@ export default class PlanningUnitListNegativeInventory extends Component {
         this.cancelClicked = this.cancelClicked.bind(this);
     }
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         PipelineService.getPlanningUnitListWithFinalInventry(this.props.match.params.pipelineId)
             .then(response => {
                 var planningUnitListFinalInventory = response.data;

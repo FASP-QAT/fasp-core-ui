@@ -488,7 +488,7 @@ export default class OrganisationListComponent extends Component {
     }
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         this.hideFirstComponent();
         RealmService.getRealmListAll()
             .then(response => {

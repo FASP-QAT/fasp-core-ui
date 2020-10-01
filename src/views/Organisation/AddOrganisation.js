@@ -145,7 +145,7 @@ export default class AddOrganisationComponent extends Component {
 
     componentDidMount() {
         console.log("IN componentDidMount------------------");
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         CountryService.getCountryListAll()
             .then(response => {
                 console.log("country list---", response.data);
@@ -182,7 +182,7 @@ export default class AddOrganisationComponent extends Component {
     }
 
     getRealmCountryList(e) {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         OrganisationService.getRealmCountryList(e.target.value)
             .then(response => {
                 console.log("Realm Country List list---", response.data);

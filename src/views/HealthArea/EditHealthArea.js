@@ -178,7 +178,7 @@ export default class EditHealthAreaComponent extends Component {
 
     componentDidMount() {
 
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         HealthAreaService.getHealthAreaById(this.props.match.params.healthAreaId).then(response => {
             if (response.status == 200) {
                 this.setState({
@@ -467,7 +467,7 @@ export default class EditHealthAreaComponent extends Component {
     }
 
     resetClicked() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         HealthAreaService.getHealthAreaById(this.props.match.params.healthAreaId).then(response => {
             this.setState({
                 healthArea: response.data

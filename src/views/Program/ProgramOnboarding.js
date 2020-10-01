@@ -145,7 +145,7 @@ export default class ProgramOnboarding extends Component {
         document.getElementById('stepSix').style.display = 'none';
         document.getElementById('stepSeven').style.display = 'none';
 
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         HealthAreaService.getRealmList()
             .then(response => {
                 if (response.status == 200) {
@@ -238,7 +238,7 @@ export default class ProgramOnboarding extends Component {
 
         if (validation == true) {
             this.setState({ loading: true });
-            AuthenticationService.setupAxiosInterceptors();
+            // AuthenticationService.setupAxiosInterceptors();
             ProgramService.programInitialize(this.state.program).then(response => {
                 if (response.status == "200") {
                     console.log("in success--------");
@@ -444,7 +444,7 @@ export default class ProgramOnboarding extends Component {
     }
 
     getRegionList(e) {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         ProgramService.getRegionList(e.target.value)
             .then(response => {
                 if (response.status == 200) {

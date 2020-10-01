@@ -89,7 +89,9 @@ class AuthenticationService {
                 return 1;
             if (roleList.includes("ROLE_REALM_ADMIN"))
                 return 2;
-            return 3;
+            if (roleList.includes("ROLE_PROGRAM_ADMIN"))
+                return 3;
+            return 4;
         }
     }
 
@@ -182,24 +184,28 @@ class AuthenticationService {
     setupAxiosInterceptors() {
         // axios.defaults.headers.common['Authorization'] = '';
         // delete axios.defaults.headers.common['Authorization'];
-        let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-        let decryptedToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-        let basicAuthHeader = 'Bearer ' + decryptedToken
-        axios.defaults.headers.common['Authorization'] = basicAuthHeader;
-        // axios.interceptors.request.use(
-        //     (config) => {
-        //         config.headers.authorization = decryptedToken ? basicAuthHeader : '';
-        //         return config;
-        //     }
-        // )
+        console.log("############## Going to call axios interceptos################", localStorage.getItem('curUser'));
+        if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != "") {
+            console.log("Inside set up axios");
+            let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+            let decryptedToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+            let basicAuthHeader = 'Bearer ' + decryptedToken
+            axios.defaults.headers.common['Authorization'] = basicAuthHeader;
+            // axios.interceptors.request.use(
+            //     (config) => {
+            //         config.headers.authorization = decryptedToken ? basicAuthHeader : '';
+            //         return config;
+            //     }
+            // )
 
 
-        // // Add a response interceptor
-        // axios.interceptors.response.use(function (response) {
-        //     return response;
-        // }, function (error) {
-        //     return Promise.reject(error);
-        // });
+            // // Add a response interceptor
+            // axios.interceptors.response.use(function (response) {
+            //     return response;
+            // }, function (error) {
+            //     return Promise.reject(error);
+            // });
+        }
 
     }
 
@@ -427,7 +433,7 @@ class AuthenticationService {
             let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
             if (navigator.onLine && (localStorage.getItem('token-' + decryptedCurUser) == null || localStorage.getItem('token-' + decryptedCurUser) == "")) {
                 console.log("token not available");
-                return false;
+                return true;
             }
             console.log("going to check bf functions");
             var bfunction = this.getLoggedInUserRoleBusinessFunctionArray();
@@ -439,7 +445,7 @@ class AuthenticationService {
                     }
                     break;
                 case "/user/editUser/:userId":
-                    if (bfunction.includes("ROLE_BF_MANAGE_USER")) {
+                    if (bfunction.includes("ROLE_BF_MANAGE_USER1")) {
                         return true;
                     }
                     break;
@@ -1105,13 +1111,13 @@ class AuthenticationService {
                     break;
                 case "/logout/:message":
                 case "/logout":
+                case "/accessDenied":
                     return true;
                     break;
                 case "/problem/editProblem":
                     if (bfunction.includes("ROLE_BF_EDIT_PROBLEM")) {
                         return true;
                     }
-                    // return true
                     break;
                 case "/consumptionDetails/:programId/:versionId/:planningUnitId": return true
                     break;
@@ -1120,19 +1126,22 @@ class AuthenticationService {
                     if (bfunction.includes("ROLE_BF_PROBLEM_AND_ACTION_REPORT")) {
                         return true;
                     }
-                    // return true
                     break;
                 case "/report/addProblem/:color/:message":
                     if (bfunction.includes("ROLE_BF_ADD_PROBLEM")) {
                         return true;
                     }
-                    //  return true
                     break;
                 default:
-                    console.log("Inside default-");
                     return false;
             }
+            // localStorage.removeItem("token-" + decryptedCurUser);
+        } else {
+            return true;
         }
+        console.log("route access denied------------------------");
+        // let keysToRemove = ["curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken"];
+        // keysToRemove.forEach(k => localStorage.removeItem(k))
         return false;
 
     }
@@ -1154,11 +1163,54 @@ class AuthenticationService {
         throw new Error('Bad Hex');
     }
 
-    clearLocalStorage() {
-        console.log("################ Clear local storage started ################");
-        let keysToRemove = ["token-" + AuthenticationService.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken"];
+    validateRequest() {
+        if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != "") {
+            let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+            if (this.checkTypeOfSession()) {
+                if (navigator.onLine) {
+                    if (localStorage.getItem('token-' + decryptedCurUser) != null && localStorage.getItem('token-' + decryptedCurUser) != "") {
+                        // if (this.checkLastActionTaken()) {
+                        //     var lastActionTakenStorage = CryptoJS.AES.decrypt(localStorage.getItem('lastActionTaken').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+                        //     var lastActionTaken = moment(lastActionTakenStorage);
+                        //     console.log("last action taken common component inside if---", lastActionTaken);
+                        //     localStorage.removeItem('lastActionTaken');
+                        //     localStorage.setItem('lastActionTaken', CryptoJS.AES.encrypt((moment(new Date()).format("YYYY-MM-DD HH:mm:ss")).toString(), `${SECRET_KEY}`));
+                        return "";
+                        // } else {
+                        //     var lastActionTakenStorage = CryptoJS.AES.decrypt(localStorage.getItem('lastActionTaken').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+                        //     var lastActionTaken = moment(lastActionTakenStorage);
+                        //     console.log("last action taken common component session expired---", lastActionTaken);
+                        //     localStorage.removeItem('lastActionTaken');
+                        //     return "/logout/static.message.sessionExpired";
+                        // }
+                    } else {
+                        console.log("common component token error");
+                        return "/logout/static.message.tokenError";
+                    }
+                }
+                // else {
+                //     console.log("common component user is offline");
+                //     if (this.checkLastActionTaken()) {
+                //         localStorage.removeItem('lastActionTaken');
+                //         localStorage.setItem('lastActionTaken', CryptoJS.AES.encrypt((moment(new Date()).format("YYYY-MM-DD HH:mm:ss")).toString(), `${SECRET_KEY}`));
+                //     } else {
+                //         console.log("common component offline session expired");
+                //         return "/logout/static.message.sessionExpired";
+                //     }
+                // }
+            } else {
+                return "/logout/static.message.sessionChange";
+            }
+        }
+    }
+    clearUserDetails() {
+        let keysToRemove;
+        if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != "") {
+            keysToRemove = ["token-" + this.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken"];
+        } else {
+            keysToRemove = ["curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken"];
+        }
         keysToRemove.forEach(k => localStorage.removeItem(k));
-        console.log("################ Clear local storage completed ################");
     }
 
 }

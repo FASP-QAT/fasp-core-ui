@@ -86,7 +86,7 @@ class RealmCountryRegion extends Component {
         }, 8000);
     }
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         RegionService.getRegionForCountryId(this.props.match.params.realmCountryId).then(response => {
             if (response.status == 200) {
                 console.log(response.data);

@@ -81,7 +81,7 @@ export default class commitVersion extends Component {
           programList: proList
         })
 
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         ProgramService.getVersionTypeList().then(response => {
           console.log('**' + JSON.stringify(response.data))
           this.setState({

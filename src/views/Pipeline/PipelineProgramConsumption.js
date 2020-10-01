@@ -208,7 +208,7 @@ export default class PipelineProgramConsumption extends Component {
         return consumptionArray;
     }
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         PipelineService.getQatTempProgramregion(this.props.pipelineId).then(response => {
             // console.log("my region List ----->", response.data);
             var regionList = [];
@@ -223,7 +223,7 @@ export default class PipelineProgramConsumption extends Component {
                 regionList.push(regionJson);
             }
             var realmCounryId = document.getElementById("realmCountryId").value;
-            AuthenticationService.setupAxiosInterceptors();
+            // AuthenticationService.setupAxiosInterceptors();
             RealmCountryService.getRealmCountryPlanningUnitAllByrealmCountryId(realmCounryId).then(response => {
                 var realmCountryPlanningUnitList = [];
     
@@ -238,7 +238,7 @@ export default class PipelineProgramConsumption extends Component {
                     realmCountryPlanningUnitList.push(rcpJson);
                 }
     
-            AuthenticationService.setupAxiosInterceptors();
+            // AuthenticationService.setupAxiosInterceptors();
             DataSourceService.getActiveDataSourceList().then(response => {
                 // console.log("data source List ----->", response.data);
                 for (var j = 0; j < response.data.length; j++) {
@@ -251,7 +251,7 @@ export default class PipelineProgramConsumption extends Component {
                 }
 
 
-                AuthenticationService.setupAxiosInterceptors();
+                // AuthenticationService.setupAxiosInterceptors();
                 PlanningUnitService.getActivePlanningUnitList()
                     .then(response => {
                         // console.log("planning units list in consumption--->", response.data);
@@ -264,7 +264,7 @@ export default class PipelineProgramConsumption extends Component {
                             planningUnitListQat.push(planningUnitJson);
                         }
 
-                        AuthenticationService.setupAxiosInterceptors();
+                        // AuthenticationService.setupAxiosInterceptors();
                         PipelineService.getQatTempConsumptionById(this.props.pipelineId).then(response => {
                             console.log("temp consumpton list--->", response.data.length);
                             if (response.status == 200) {

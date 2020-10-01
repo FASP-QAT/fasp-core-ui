@@ -73,7 +73,7 @@ class Program extends Component {
     componentDidMount() {
         if (AuthenticationService.getRealmId() == -1) {
             document.getElementById("realmDiv").style.display = "block"
-            AuthenticationService.setupAxiosInterceptors();
+            // AuthenticationService.setupAxiosInterceptors();
             RealmService.getRealmListAll()
                 .then(response => {
                     if (response.status == 200) {
@@ -125,7 +125,7 @@ class Program extends Component {
         this.setState({ loading: true })
         console.log(this.state.realmId)
         document.getElementById("treeDiv").style.display = "block";
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         console.log("This.state.realmId", this.state.realmId)
         if (this.state.realmId != "" && this.state.realmId > 0) {
             this.setState({
@@ -503,7 +503,7 @@ class Program extends Component {
             for (var i = 0; i < checkboxesChecked.length; i++) {
                 // var version = (checkboxesChecked[i]).versionId;
                 if (navigator.onLine) {
-                    AuthenticationService.setupAxiosInterceptors();
+                    // AuthenticationService.setupAxiosInterceptors();
                     ProgramService.getProgramData(checkboxesChecked[i])
                         .then(response => {
                             console.log("ProgramThenCount", programThenCount)

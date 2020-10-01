@@ -110,7 +110,7 @@ class AddRegionComponent extends Component {
   }
 
   componentDidMount() {
-    AuthenticationService.setupAxiosInterceptors();
+    // AuthenticationService.setupAxiosInterceptors();
     RealmCountryService.getRealmCountryListAll()
       .then(response => {
         if (response.status == 200) {

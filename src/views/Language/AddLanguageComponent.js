@@ -127,7 +127,7 @@ class AddLanguageComponent extends Component {
     }
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         this.setState({ loading: false })
     }
 

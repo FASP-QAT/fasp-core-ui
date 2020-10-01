@@ -106,7 +106,7 @@ export default class ProductCategoryTree extends Component {
         // setTimeout(function () { //Start the timer
         //     this.setState({ loading: false })
         // }.bind(this), 500)
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         RealmService.getRealmListAll()
             .then(response => {
                 if (response.status == 200) {
@@ -172,7 +172,7 @@ export default class ProductCategoryTree extends Component {
                 message: '',
                 loading: true
             });
-            AuthenticationService.setupAxiosInterceptors();
+            // AuthenticationService.setupAxiosInterceptors();
 
             ProductCategoryService.getProductCategoryListByRealmId(this.state.realmId)
 

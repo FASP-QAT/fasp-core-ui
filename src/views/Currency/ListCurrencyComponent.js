@@ -63,7 +63,6 @@
 
 //     componentDidMount() {
 //         this.hideFirstComponent();
-//         AuthenticationService.setupAxiosInterceptors();
 //         CurrencyService.getCurrencyList().then(response => {
 //             if (response.status == 200) {
 //                 this.setState({
@@ -360,7 +359,6 @@ export default class CurrencyListComponent extends Component {
 
     componentDidMount() {
         this.hideFirstComponent();
-        AuthenticationService.setupAxiosInterceptors();
         CurrencyService.getCurrencyList().then(response => {
             if (response.status == 200) {
                 // this.setState({

@@ -178,7 +178,6 @@ class EditBudgetComponent extends Component {
     }
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
         BudgetService.getBudgetDataById(this.props.match.params.budgetId)
             .then(response => {
                 if (response.status == 200) {
@@ -318,8 +317,6 @@ class EditBudgetComponent extends Component {
 
                                     var stopDate = moment(this.state.budget.stopDate).format("YYYY-MM-DD");
                                     budget.stopDate = stopDate;
-
-                                    AuthenticationService.setupAxiosInterceptors();
                                     console.log("this.state.budget----->", budget);
                                     BudgetService.editBudget(budget)
                                         .then(response => {
@@ -641,7 +638,6 @@ class EditBudgetComponent extends Component {
     }
 
     resetClicked() {
-        AuthenticationService.setupAxiosInterceptors();
         BudgetService.getBudgetDataById(this.props.match.params.budgetId)
             .then(response => {
                 if (response.data.startDate != null && response.data.startDate != "") {

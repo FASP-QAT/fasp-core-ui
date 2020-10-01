@@ -293,7 +293,7 @@ export default class StockStatusMatrix extends React.Component {
         }
 
 
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         ProductService.getStockStatusMatrixData(inputjson)
           .then(response => {
             console.log("data---", response.data)
@@ -406,7 +406,7 @@ export default class StockStatusMatrix extends React.Component {
         }.bind(this)
       } else {
         let realmId = AuthenticationService.getRealmId();
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         let programId = document.getElementById("programId").value;
         ProductService.getProductCategoryListByProgram(realmId, programId)
           .then(response => {
@@ -446,7 +446,7 @@ export default class StockStatusMatrix extends React.Component {
 
   getPrograms = () => {
     if (navigator.onLine) {
-      AuthenticationService.setupAxiosInterceptors();
+      // AuthenticationService.setupAxiosInterceptors();
       ProgramService.getProgramList()
         .then(response => {
           console.log(JSON.stringify(response.data))
@@ -684,7 +684,7 @@ export default class StockStatusMatrix extends React.Component {
 
         }
         else {
-          AuthenticationService.setupAxiosInterceptors();
+          // AuthenticationService.setupAxiosInterceptors();
 
           //let productCategoryId = document.getElementById("productCategoryId").value;
           ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {

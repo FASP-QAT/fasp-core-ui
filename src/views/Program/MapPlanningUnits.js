@@ -456,7 +456,7 @@ export default class MapPlanningUnits extends Component {
         var realmId = this.props.items.program.realm.realmId;
         console.log("in mapping page---->", realmId);
         console.log("in mapping page---->", this.props.items);
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         ProductCategoryServcie.getProductCategoryListByRealmId(this.props.items.program.realm.realmId)
             .then(response => {
                 if (response.status == 200) {

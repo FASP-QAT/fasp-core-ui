@@ -138,7 +138,6 @@
 
 
 //     componentDidMount() {
-//         AuthenticationService.setupAxiosInterceptors();
 //     }
 
 //     Capitalize(str) {
@@ -491,7 +490,6 @@ export default class AddCurrencyComponent extends Component {
 
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
         this.setState({ loading: false })
     }
 

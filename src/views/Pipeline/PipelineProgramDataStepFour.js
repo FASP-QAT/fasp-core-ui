@@ -94,7 +94,7 @@ export default class PipelineProgramDataStepFour extends Component {
     // }
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         ProgramService.getOrganisationList(1)
             .then(response => {
                 if (response.status == 200) {

@@ -161,7 +161,7 @@ export default class PipelineProgramDataSource extends Component {
 
     componentDidMount() {
         var dataSourceTypeList = [];
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         DataSourceTypeService.getDataSourceTypeListActive(AuthenticationService.getRealmId())
             .then(response => {
                 // productCategoryList = response.data;
@@ -188,7 +188,7 @@ export default class PipelineProgramDataSource extends Component {
         // var realmId = document.getElementById("realmId").value;
                 var DataSourceListQat = [];
                 // var activeDataSourceList=[];
-                AuthenticationService.setupAxiosInterceptors();
+                // AuthenticationService.setupAxiosInterceptors();
                 DataSourceService.getActiveDataSourceList()
                     .then(response => {
                         if (response.status == 200) {
@@ -203,7 +203,7 @@ export default class PipelineProgramDataSource extends Component {
                             }
                             this.setState({ DataSourceListQat: DataSourceListQat });
 
-                            AuthenticationService.setupAxiosInterceptors();
+                            // AuthenticationService.setupAxiosInterceptors();
                             PipelineService.getQatTempDataSourceList(this.props.pipelineId)
                                 .then(response => {
                                     if (response.status == 200) {

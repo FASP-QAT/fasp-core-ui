@@ -35,7 +35,7 @@ export default class DatabaseTranslations extends React.Component {
     }
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         LabelsService.getDatabaseLabelsList().then(response => {
             if (response.status == 200) {
                 var json = response.data;
@@ -145,7 +145,7 @@ export default class DatabaseTranslations extends React.Component {
             labelList: labelList
         })
         if (JSON.stringify(this.el.getComments()).length == 2) {
-            AuthenticationService.setupAxiosInterceptors();
+            // AuthenticationService.setupAxiosInterceptors();
             var json = this.state.labelList;
             LabelsService.saveDatabaseLabels(json).then(response => {
                 if (response.status == 200) {

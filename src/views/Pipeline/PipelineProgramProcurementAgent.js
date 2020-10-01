@@ -133,7 +133,7 @@ export default class PipelineProgramProcurementAgent extends Component {
     componentDidMount() {
         var ProcurementAgentListQat = [];
         // var activeDataSourceList=[];
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         ProcurementAgentService.getProcurementAgentListAll()
             .then(response => {
                 if (response.status == 200) {
@@ -149,7 +149,7 @@ export default class PipelineProgramProcurementAgent extends Component {
                     this.setState({ ProcurementAgentListQat: ProcurementAgentListQat });
 
 
-                    AuthenticationService.setupAxiosInterceptors();
+                    // AuthenticationService.setupAxiosInterceptors();
                     PipelineService.getQatTempProcurementAgentList(this.props.pipelineId)
                         .then(response => {
                             if (response.status == 200) {

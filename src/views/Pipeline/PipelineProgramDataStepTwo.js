@@ -94,7 +94,7 @@ export default class PipelineProgramDataStepTwo extends Component {
     //         })
     // }
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         ProgramService.getRealmCountryList(1)
             .then(response => {
                 if (response.status == 200) {

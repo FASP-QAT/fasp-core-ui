@@ -1693,7 +1693,7 @@ class ProductCatalog extends Component {
 
             if (navigator.onLine) {
 
-                AuthenticationService.setupAxiosInterceptors();
+                // AuthenticationService.setupAxiosInterceptors();
                 ProgramService.getProgramById(programId).then(response => {
                     var programJson;
                     var realmId = 0;
@@ -1701,7 +1701,7 @@ class ProductCatalog extends Component {
                         programJson = response.data;
                         realmId = programJson.realmCountry.realm.realmId;
 
-                        AuthenticationService.setupAxiosInterceptors();
+                        // AuthenticationService.setupAxiosInterceptors();
                         TracerCategoryService.getTracerCategoryByRealmId(realmId).then(response => {
 
                             if (response.status == 200) {
@@ -1811,7 +1811,7 @@ class ProductCatalog extends Component {
 
     getPrograms() {
         if (navigator.onLine) {
-            AuthenticationService.setupAxiosInterceptors();
+            // AuthenticationService.setupAxiosInterceptors();
             let realmId = AuthenticationService.getRealmId();
             // ProgramService.getProgramByRealmId(realmId)
             ProgramService.getProgramList()
@@ -1909,7 +1909,7 @@ class ProductCatalog extends Component {
         // alert(navigator.onLine);
 
         if (navigator.onLine) {
-            AuthenticationService.setupAxiosInterceptors();
+            // AuthenticationService.setupAxiosInterceptors();
             let realmId = AuthenticationService.getRealmId();
             ProductService.getProductCategoryList(realmId)
                 .then(response => {
@@ -2143,7 +2143,7 @@ class ProductCatalog extends Component {
 
                 this.setState({ loading: true })
                 console.log("json---", json);
-                AuthenticationService.setupAxiosInterceptors();
+                // AuthenticationService.setupAxiosInterceptors();
                 ReportService.programProductCatalog(json)
                     .then(response => {
                         console.log("-----response", JSON.stringify(response.data));

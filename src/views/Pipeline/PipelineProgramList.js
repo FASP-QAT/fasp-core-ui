@@ -388,7 +388,7 @@ export default class PipelineProgramList extends Component {
 
     componentDidMount() {
         this.hideFirstComponent();
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         PipelineService.getPipelineProgramList().then(response => {
             if (response.status == 200) {
                 this.setState({

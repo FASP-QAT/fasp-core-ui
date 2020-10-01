@@ -147,7 +147,7 @@ export default class AddDataSource extends Component {
     }
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
 
         RealmService.getRealmListAll()
             .then(response => {
@@ -165,7 +165,7 @@ export default class AddDataSource extends Component {
 
     getDataSourceTypeByRealmId(e) {
 
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         if (e.target.value != 0) {
             DataSourceTypeService.getDataSourceTypeByRealmId(e.target.value)
                 .then(response => {
@@ -183,7 +183,7 @@ export default class AddDataSource extends Component {
     }
 
     getProgramByRealmId(e) {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         console.log("e.target.value---", e.target.value);
         if (e.target.value != 0) {
             ProgramService.getProgramList(e.target.value)

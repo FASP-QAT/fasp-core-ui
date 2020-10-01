@@ -711,7 +711,7 @@ export default class PlanningUnitListComponent extends Component {
         this.hideFirstComponent();
         if (AuthenticationService.getRealmId() == -1) {
             document.getElementById("realmDiv").style.display = "block"
-            AuthenticationService.setupAxiosInterceptors();
+            // AuthenticationService.setupAxiosInterceptors();
             RealmService.getRealmListAll()
                 .then(response => {
                     if (response.status == 200) {

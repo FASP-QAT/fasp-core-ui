@@ -129,7 +129,7 @@ export default class EditLanguageComponent extends Component {
         }
     }
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         LanguageService.getLanguageById(this.props.match.params.languageId).then(response => {
             if (response.status == 200) {
                 this.setState({
@@ -178,7 +178,7 @@ export default class EditLanguageComponent extends Component {
                                     this.setState({
                                         loading: true
                                     })
-                                    AuthenticationService.setupAxiosInterceptors();
+                                    // AuthenticationService.setupAxiosInterceptors();
                                     LanguageService.editLanguage(this.state.language).then(response => {
                                         console.log(response)
                                         if (response.status == 200) {

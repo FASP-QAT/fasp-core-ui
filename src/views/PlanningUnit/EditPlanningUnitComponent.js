@@ -167,7 +167,7 @@ export default class EditPlanningUnitComponent extends Component {
         this.props.history.push(`/planningUnit/listPlanningUnit/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
     componentWillMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         console.log(this.props.match.params.planningUnitId)
         PlanningUnitService.getPlanningUnitById(this.props.match.params.planningUnitId).then(response => {
             if (response.status == 200) {
@@ -213,7 +213,7 @@ export default class EditPlanningUnitComponent extends Component {
                                         loading: true
                                     })
                                     console.log(JSON.stringify(this.state.planningUnit))
-                                    AuthenticationService.setupAxiosInterceptors();
+                                    // AuthenticationService.setupAxiosInterceptors();
                                     PlanningUnitService.editPlanningUnit(this.state.planningUnit)
                                         .then(response => {
                                             if (response.status == 200) {
@@ -373,7 +373,7 @@ export default class EditPlanningUnitComponent extends Component {
     }
 
     resetClicked() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         console.log(this.props.match.params.planningUnitId)
         PlanningUnitService.getPlanningUnitById(this.props.match.params.planningUnitId).then(response => {
             this.setState({

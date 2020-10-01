@@ -333,7 +333,7 @@ export default class ReactListComponent extends Component {
         }, 8000);
     }
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         this.hideFirstComponent();
         RealmService.getRealmListAll().then(response => {
             if (response.status == 200) {

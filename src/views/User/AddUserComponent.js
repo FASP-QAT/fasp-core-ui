@@ -295,7 +295,7 @@ class AddUserComponent extends Component {
     }
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         LanguageService.getLanguageList()
             .then(response => {
                 if (response.status == 200) {

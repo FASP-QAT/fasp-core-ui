@@ -1862,7 +1862,7 @@ class ShipmentGlobalView extends Component {
                 "realmCountryIds": CountryIds, "programIds": programIds, "planningUnitIds": planningUnitIds, "startDate": startDate, "stopDate": stopDate
             }
             // console.log('***' + inputjson)
-            AuthenticationService.setupAxiosInterceptors();
+            // AuthenticationService.setupAxiosInterceptors();
 
             ReportService.getGlobalConsumptiondata(inputjson)
                 .then(response => {
@@ -1912,7 +1912,7 @@ class ShipmentGlobalView extends Component {
 
     getCountrys() {
 
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         let realmId = AuthenticationService.getRealmId();
         RealmCountryService.getRealmCountryrealmIdById(realmId)
             .then(response => {
@@ -1947,7 +1947,7 @@ class ShipmentGlobalView extends Component {
     getPlanningUnit() {
 
         let productCategoryId = document.getElementById("productCategoryId").value;
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         if (productCategoryId != -1) {
             PlanningUnitService.getPlanningUnitByProductCategoryId(productCategoryId).then(response => {
                 this.setState({
@@ -2022,7 +2022,7 @@ class ShipmentGlobalView extends Component {
     }
 
     getRelamList = () => {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         RealmService.getRealmListAll()
             .then(response => {
                 if (response.status == 200) {
@@ -2059,7 +2059,7 @@ class ShipmentGlobalView extends Component {
 
     getProcurementAgent = () => {
 
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         ProcurementAgentService.getProcurementAgentListAll()
             .then(response => {
                 // console.log(JSON.stringify(response.data))
@@ -2093,7 +2093,7 @@ class ShipmentGlobalView extends Component {
 
     getFundingSource = () => {
 
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         FundingSourceService.getFundingSourceListAll()
             .then(response => {
                 // console.log(JSON.stringify(response.data))
@@ -2126,7 +2126,7 @@ class ShipmentGlobalView extends Component {
     }
 
     getProductCategories() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         let realmId = AuthenticationService.getRealmId();
         ProductService.getProductCategoryList(realmId)
             .then(response => {
@@ -2241,7 +2241,7 @@ class ShipmentGlobalView extends Component {
                 fundingSourceProcurementAgentIds: fundingSourceProcurementAgentIds
             }
             console.log("INPUTJSON--------->", inputjson);
-            AuthenticationService.setupAxiosInterceptors();
+            // AuthenticationService.setupAxiosInterceptors();
             ReportService.ShipmentGlobalView(inputjson)
                 .then(response => {
                     console.log("RESP------", response.data);

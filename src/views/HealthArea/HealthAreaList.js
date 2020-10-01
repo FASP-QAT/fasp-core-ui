@@ -498,7 +498,7 @@ export default class HealthAreaListComponent extends Component {
     }
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         this.hideFirstComponent();
         RealmService.getRealmListAll()
             .then(response => {

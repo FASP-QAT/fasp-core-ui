@@ -45,7 +45,7 @@ export default class PipelineProgramImport extends Component {
                         var fileName = this.state.fileName;
                         // alert(myJson);
                         // alert(fileName);
-                        AuthenticationService.setupAxiosInterceptors();
+                        // AuthenticationService.setupAxiosInterceptors();
                         PipelineService.savePipelineJson(myJson, fileName)
                             .then(response => {
                                 console.log("response--------->", response)
