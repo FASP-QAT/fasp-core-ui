@@ -2681,6 +2681,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         var arrivedDate = shipmentDatesJson.arrivedDate;
                         var receivedDate = shipmentDatesJson.receivedDate;
                         var expectedDeliveryDate = shipmentDatesJson.expectedDeliveryDate;
+                        console.log("shipmentDatesJson", shipmentDatesJson);
+                        console.log("Received date", receivedDate);
+                        console.log("Shipment Received date", shipmentDatesJson.receivedDate);
 
                         var expiryDate = moment(expectedDeliveryDate).add(this.props.items.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
                         console.log("expected received dare", expectedDeliveryDate);
@@ -2824,7 +2827,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             programJson.batchInfoList = batchInfoList;
                             // }
                         } else {
-                            console.log("In else")
+                            console.log("In else---------->", expectedDeliveryDate);
+                            console.log("In else---------->", receivedDate);
                             var shipmentJson = {
                                 accountFlag: true,
                                 active: map.get("24"),
@@ -2860,16 +2864,17 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                 fundingSource: {
                                     id: map.get("3")
                                 },
-                                plannedDate: moment(plannedDate).format("YYYY-MM-DD"),
-                                submittedDate: moment(submittedDate).format("YYYY-MM-DD"),
-                                approvedDate: moment(approvedDate).format("YYYY-MM-DD"),
-                                shippedDate: moment(shippedDate).format("YYYY-MM-DD"),
-                                arrivedDate: moment(arrivedDate).format("YYYY-MM-DD"),
-                                expectedDeliveryDate: moment(expectedDeliveryDate).format("YYYY-MM-DD"),
-                                receivedDate: moment(receivedDate).format("YYYY-MM-DD"),
+                                plannedDate: plannedDate,
+                                submittedDate: submittedDate,
+                                approvedDate: approvedDate,
+                                shippedDate: shippedDate,
+                                arrivedDate: arrivedDate,
+                                expectedDeliveryDate: expectedDeliveryDate,
+                                receivedDate: receivedDate,
                                 index: shipmentDataList.length,
                                 batchInfoList: []
                             }
+                            console.log("Shipment json", shipmentJson);
                             if (map.get("17") != "" && map.get("17").length != 0) {
                                 var totalShipmentQty = (map.get("18"));
                                 var adjustedOrderQty = ((elInstance.getCell(`I${parseInt(j) + 1}`)).innerHTML).replaceAll(",", "");
