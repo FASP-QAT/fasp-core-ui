@@ -1840,8 +1840,8 @@ export default class SupplyPlanComponent extends React.Component {
                             <span className="supplyplan-rarrow" onClick={this.rightClicked}> {i18n.t('static.supplyPlan.scrollToRight')} <i className="cui-arrow-right icons" ></i> </span>
                         </div>
                         {/* </Row> */}
-
-                        <Table className="table-bordered text-center mt-2 overflowhide" bordered responsive size="sm" options={this.options}>
+                        <div className="table-responsive">
+                        <Table className="table-bordered text-center mt-2 overflowhide" bordered  size="sm" options={this.options}>
                             <thead>
                                 <tr>
                                     <th className="BorderNoneSupplyPlan"></th>
@@ -2126,11 +2126,23 @@ export default class SupplyPlanComponent extends React.Component {
                                 </tr>
                             </tbody>
                         </Table>
+                        {
+                        this.state.jsonArrForGraph.length > 0
+                        &&
+                        <div className="" >
+
+                            <div className="graphwidth">
+                                <div className="chart-wrapper chart-graph-report">
+                                    <Bar id="cool-canvas1" data={bar1} options={chartOptions1} />
+                                </div>
+                            </div>  
+                             </div>}
+                        </div>
                     </div>
 
 
 
-                    {
+                    {/* {
                         this.state.jsonArrForGraph.length > 0
                         &&
                         <div className="col-md-12 " >
@@ -2139,7 +2151,8 @@ export default class SupplyPlanComponent extends React.Component {
                                 <div className="chart-wrapper chart-graph-report">
                                     <Bar id="cool-canvas1" data={bar1} options={chartOptions1} />
                                 </div>
-                            </div>   </div>}
+                            </div>  
+                             </div>} */}
                 </div>
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
