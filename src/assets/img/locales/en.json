@@ -442,7 +442,7 @@
     "static.organisation.organisationcodemax4digittext": "Display name length should be 4",
     "static.dashboard.forecastingunit": "Forecasting Unit",
     "static.forecastingunit.forecastingunit": "Forecasting Unit",
-    "static.tracercategory.tracercategoryText": "Enter Tracer Category",
+    "static.tracercategory.tracercategoryText": "Select Tracer Category",
     "static.productcategory.productcategorytext": "Select Planning Unit Category",
     "static.forecastingunit.forecastingunittext": "Enter Forecasting Unit",
     "static.planningunit.planningunit": "Planning Unit",
