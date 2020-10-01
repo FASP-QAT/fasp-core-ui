@@ -1075,7 +1075,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
     csvRow.push('')
     var re;
 
-    var A = [this.addDoubleQuoteToRowContent([i18n.t('static.planningunit.planningunit'), i18n.t('static.program.programMaster'), i18n.t('static.supplyPlan.amc'), i18n.t('static.supplyPlan.endingBalance').replaceAll(',', '%20'), i18n.t('static.supplyPlan.monthsOfStock').replaceAll(',', '%20'), i18n.t('static.supplyPlan.minStock').replaceAll(',', '%20'), i18n.t('static.supplyPlan.maxStock').replaceAll(',', '%20')])]
+    var A = [this.addDoubleQuoteToRowContent([i18n.t('static.planningunit.planningunit').replaceAll(' ', '%20'), i18n.t('static.program.programMaster'), i18n.t('static.supplyPlan.amc'), i18n.t('static.supplyPlan.endingBalance').replaceAll(' ', '%20'), i18n.t('static.supplyPlan.monthsOfStock').replaceAll(' ', '%20'), i18n.t('static.supplyPlan.minStock').replaceAll(' ', '%20'), i18n.t('static.supplyPlan.maxStock').replaceAll(' ', '%20')])]
 
     re = this.state.data
 
