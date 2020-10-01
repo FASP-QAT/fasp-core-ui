@@ -6,7 +6,7 @@ import '../Forms/ValidationForms/ValidationForms.css'
 import i18n from '../../i18n'
 import UserService from "../../api/UserService";
 import AuthenticationService from '../Common/AuthenticationService.js';
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+// import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import getLabelText from '../../CommonComponent/getLabelText';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
@@ -371,7 +371,7 @@ class EditRoleComponent extends Component {
     render() {
         return (
             <div className="animated fadeIn">
-                <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} loading={this.changeLoading} />
+                {/* <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} loading={this.changeLoading} /> */}
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row style={{ display: this.state.loading ? "none" : "block" }}>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
