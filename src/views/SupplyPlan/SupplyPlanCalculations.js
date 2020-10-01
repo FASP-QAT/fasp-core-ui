@@ -187,7 +187,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                         var shipmentList = (programJsonForStoringTheResult.shipmentList).filter(c => c.active == true && c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag == true);
                         console.log("Shipment list----------------->", shipmentList);
                         // Getting shipment list for a month
-                        var shipmentArr = shipmentList.filter(c => (c.shipmentStatus.id != DELIVERED_SHIPMENT_STATUS) ? (c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate) : (c.receivedDate >= startDate && c.receivedDate <= endDate))
+                        var shipmentArr = shipmentList.filter(c => (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date") ? (c.receivedDate >= startDate && c.receivedDate <= endDate) : (c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate))
                         console.log("Shipment Arr----------------->", shipmentArr);
                         var shipmentTotalQty = 0;
                         var shipmentTotalQtyWps = 0;
