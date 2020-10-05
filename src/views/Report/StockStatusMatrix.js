@@ -875,7 +875,7 @@ export default class StockStatusMatrix extends React.Component {
     let data;
     data = this.state.data.map(ele => [getLabelText(ele.planningUnit.label, this.state.lang), getLabelText(ele.unit.label, this.state.lang), ele.minMonthsOfStock, ele.reorderFrequency, ele.year, this.formatter(ele.jan), this.formatter(ele.feb), this.formatter(ele.mar), this.formatter(ele.apr), this.formatter(ele.may), this.formatter(ele.jun), this.formatter(ele.jul), this.formatter(ele.aug), this.formatter(ele.sep), this.formatter(ele.oct), this.formatter(ele.nov), this.formatter(ele.dec)]);
 
-    var startY = 150 + (this.state.planningUnitValues.length * 3)
+    var startY = 170 + (this.state.planningUnitValues.length * 3)
     let content = {
       margin: { top: 80, bottom: 90 },
       startY: startY,

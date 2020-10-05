@@ -1776,9 +1776,9 @@ class StockStatusAcrossPlanningUnits extends Component {
 
         for (var j = 0; j < dataStockStatus.length; j++) {
             let data1 = '';
-            if (dataStockStatus[j].mos < dataStockStatus[j].minMos) {
+            if (this.roundN(dataStockStatus[j].mos) < dataStockStatus[j].minMos) {
                 data1 = i18n.t('static.report.low')
-            } else if (dataStockStatus[j].mos > dataStockStatus[j].maxMos) {
+            } else if (this.roundN(dataStockStatus[j].mos) > dataStockStatus[j].maxMos) {
                 data1 = i18n.t('static.report.excess')
             } else {
                 data1 = i18n.t('static.report.ok')
@@ -2448,7 +2448,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                                                             name="programId"
                                                             id="programId"
                                                             bsSize="sm"
-                                                            onChange={(e) => { this.filterVersion(); this.fetchData() }}
+                                                            onChange={(e) => { this.filterVersion();  }}
                                                         >
                                                             <option value="0">{i18n.t('static.common.select')}</option>
                                                             {programList}

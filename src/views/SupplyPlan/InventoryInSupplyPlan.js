@@ -333,9 +333,10 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                             if (batchInfoList[k].planningUnitId == planningUnitId) {
                                                 var batchJson = {
                                                     name: batchInfoList[k].batchNo,
-                                                    id: batchInfoList[k].batchId.toString(),
+                                                    id: batchInfoList[k].batchNo,
                                                     createdDate: batchInfoList[k].createdDate,
-                                                    expiryDate: batchInfoList[k].expiryDate
+                                                    expiryDate: batchInfoList[k].expiryDate,
+                                                    batchId: batchInfoList[k].batchId
                                                 }
                                                 batchList.push(batchJson);
                                             }
@@ -368,7 +369,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                         var inventoryBatchInfoQty = 0;
                                         for (var sb = 0; sb < batchInfo.length; sb++) {
                                             var data = [];
-                                            data[0] = batchInfo[sb].batch.batchId; //A
+                                            data[0] = batchInfo[sb].batch.batchNo; //A
                                             data[1] = moment(batchInfo[sb].batch.expiryDate).format(DATE_FORMAT_CAP);
                                             data[2] = adjustmentType; //B
                                             data[3] = parseInt(batchInfo[sb].adjustmentQty); //C
@@ -688,10 +689,13 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         var json = instance.jexcel.getJson();
         var value = (json[r])[5];
         var date = json[0][7];
+        console.log("Date---------->", date);
+        console.log("this.state.batchInfoList", this.state.batchInfoList);
+        console.log("Value",value);
         if (value != 0) {
             mylist = this.state.batchInfoList.filter(c => c.id != -1 && (moment(c.expiryDate).format("YYYY-MM-DD") > moment(date).format("YYYY-MM-DD") && moment(c.createdDate).format("YYYY-MM-DD") <= moment(date).format("YYYY-MM-DD")));
         } else {
-            mylist = this.state.batchInfoList.filter(c => (c.id == -1) || ((moment(c.createdDate).format("YYYY-MM-DD") <= moment(date).format("YYYY-MM-DD"))));
+            mylist = this.state.batchInfoList.filter(c => (c.id == -1) || (moment(c.expiryDate).format("YYYY-MM-DD") > moment(date).format("YYYY-MM-DD") && moment(c.createdDate).format("YYYY-MM-DD") <= moment(date).format("YYYY-MM-DD")));
         }
         return mylist;
     }.bind(this)
@@ -901,7 +905,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     var batchInfoJson = {
                         inventoryTransBatchInfoId: map.get("5"),
                         batch: {
-                            batchId: map.get("0"),
+                            batchId: this.state.batchInfoList.filter(c => c.name == elInstance.getCell(`A${parseInt(i) + 1}`).innerText)[0].batchId,
                             batchNo: elInstance.getCell(`A${parseInt(i) + 1}`).innerText,
                             expiryDate: moment(map.get("1")).format("YYYY-MM-DD")
                         },
@@ -955,9 +959,15 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 if (map.get("2") == 1) {
                     inventoryInstance.setValueFromCoords(5, rowNumber, "", true);
                     inventoryInstance.setValueFromCoords(6, rowNumber, totalActualStock, true);
+                    if (batchInfoArray.length > 0) {
+                        var cell = inventoryInstance.getCell(`G${parseInt(rowNumber) + 1}`)
+                        cell.classList.add('readonly');
+                    }
                 } else {
                     inventoryInstance.setValueFromCoords(5, rowNumber, totalAdjustments, true);
                     inventoryInstance.setValueFromCoords(6, rowNumber, "", true);
+                    var cell = inventoryInstance.getCell(`F${parseInt(rowNumber) + 1}`)
+                    cell.classList.add('readonly');
                 }
                 // rowData[15] = batchInfoArray;
                 inventoryInstance.setValueFromCoords(13, rowNumber, batchInfoArray, "");

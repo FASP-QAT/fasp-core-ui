@@ -2077,7 +2077,7 @@ class StockStatus extends Component {
   }
 
   formatter = value => {
-
+if(value!=null){
     var cell1 = value
     cell1 += '';
     var x = cell1.split('.');
@@ -2087,7 +2087,10 @@ class StockStatus extends Component {
     while (rgx.test(x1)) {
       x1 = x1.replace(rgx, '$1' + ',' + '$2');
     }
-    return x1 + x2;
+    return x1 + x2;}
+    else{
+      return ''
+    }
   }
   makeText = m => {
     if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
@@ -2319,7 +2322,7 @@ class StockStatus extends Component {
                 console.log(dtstr, ' ', enddtStr)
                 var dt = dtstr
                 var list = programJson.supplyPlan.filter(c => c.planningUnitId == planningUnitId && c.transDate == dt)
-
+console.log(list)
                 if (list.length > 0) {
                   var shiplist = shipmentList.filter(c => c.receivedDate==null ||c.receivedDate==""?(c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr):(c.receivedDate >= dt && c.receivedDate <= enddtStr))
 
