@@ -251,7 +251,7 @@ const routes = [
   { path: '/consumptionDetails/:programId/:versionId/:planningUnitId', name: 'static.consumptionDetailHead.consumptionDetail', component: ConsumptionDetails },
   { path: '/shipment/shipmentDetails/:programId/:versionId/:planningUnitId', name: 'static.shipmentDetailHead.shipmentDetail', component: ShipmentList },
   { path: '/report/addProblem/:color/:message', name: 'static.breadcrum.add', entityname: 'static.report.problem', component: AddProblem },
-  { path: '/report/problemList/:color/:message', exact:true,name: 'static.breadcrum.list', entityname: 'static.dashboard.qatProblem', component: ProblemList },
+  { path: '/report/problemList/:color/:message', exact: true, name: 'static.breadcrum.list', entityname: 'static.dashboard.qatProblem', component: ProblemList },
   { path: '/report/problemList/:programId/:color/:message', name: 'static.breadcrum.list', entityname: 'static.dashboard.qatProblem', component: ProblemList },
   // { path: '/report/problemList', name: 'Qat Problem List', component: ProblemList },
 
@@ -649,7 +649,7 @@ class DefaultLayout extends Component {
       }
       this.setState({ businessFunctions: bfunction });
     }
-    console.log("has business function---",this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_GLOBAL_VIEW_REPORT'));
+    console.log("has business function---", this.state.businessFunctions.includes('ROLE_BF_DELETE_LOCAL_PROGARM'));
 
   }
 
@@ -687,7 +687,7 @@ class DefaultLayout extends Component {
 
   render() {
     console.log('in I18n defaultlayout')
-    let events = ["keydown","mousedown"];
+    let events = ["keydown", "mousedown"];
     return (
       <div className="app">
         <IdleTimer
@@ -699,7 +699,7 @@ class DefaultLayout extends Component {
           debounce={250}
           timeout={this.state.timeout}
           events={events}
-           />
+        />
         <AppHeader fixed>
           <Suspense fallback={this.loading()}>
             <DefaultHeader onLogout={e => this.signOut(e)} onChangePassword={e => this.changePassword(e)} onChangeDashboard={e => this.showDashboard(e)} title={this.state.name} />
@@ -1039,6 +1039,13 @@ class DefaultLayout extends Component {
                                 url: '/program/downloadProgram',
                                 icon: 'fa fa-download',
                                 attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DOWNLOAD_PROGARM') ? false : true) }
+                              },
+                              {
+                                name: i18n.t('static.program.deleteLocalProgram'),
+                                url: '/program/deleteLocalProgram',
+                                icon: 'fa fa-download',
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DELETE_LOCAL_PROGARM') ? false : true) }
+                                // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DOWNLOAD_PROGARM') ? false : true) }
                               },
                               {
                                 name: i18n.t('static.dashboard.importprogram'),
@@ -1557,6 +1564,12 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-list',
                             // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DOWNLOAD_PROGRAM') ? false : true) },
                             children: [
+                              {
+                                name: i18n.t('static.program.deleteLocalProgram'),
+                                url: '/program/deleteLocalProgram',
+                                icon: 'fa fa-download',
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DELETE_LOCAL_PROGARM') ? false : true) }
+                              },
                               {
                                 name: i18n.t('static.dashboard.importprogram'),
                                 url: '/program/importProgram',

@@ -437,7 +437,8 @@ class AuthenticationService {
             }
             console.log("going to check bf functions");
             var bfunction = this.getLoggedInUserRoleBusinessFunctionArray();
-            console.log("includes---" + bfunction.includes("ROLE_BF_MANAGE_UNIT"))
+            console.log("route bfunction--->",bfunction);
+            console.log("includes---" + bfunction.includes("ROLE_BF_DELETE_LOCAL_PROGARM"))
             switch (route) {
                 case "/user/addUser":
                     if (bfunction.includes("ROLE_BF_MANAGE_USER")) {
@@ -1030,6 +1031,13 @@ class AuthenticationService {
                         return true;
                     }
                     break;
+                case "/program/deleteLocalProgram":
+                    console.log("Going to check if condition")
+                    if (bfunction.includes("ROLE_BF_DELETE_LOCAL_PROGARM")) {
+                        console.log("Going to check if condition")
+                        return true;
+                    }
+                    break;
                 case "/program/importProgram":
                     if (bfunction.includes("ROLE_BF_IMPORT_EXPORT_PROGARM")) {
                         return true;
@@ -1133,10 +1141,12 @@ class AuthenticationService {
                     }
                     break;
                 default:
+                    console.log("default case");
                     return false;
             }
             // localStorage.removeItem("token-" + decryptedCurUser);
         } else {
+            console.log("else in route");
             return true;
         }
         console.log("route access denied------------------------");
@@ -1164,6 +1174,7 @@ class AuthenticationService {
     }
 
     validateRequest() {
+        console.log("inside validate request")
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != "") {
             let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
             if (this.checkTypeOfSession()) {
