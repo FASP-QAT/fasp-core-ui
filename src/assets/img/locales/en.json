@@ -676,6 +676,7 @@
     "static.graph.inactiveProgram": "Inactive Programs",
     "static.graph.totalRealmCount": "Total Realms count:",
     "static.logout.confirmLogout": "Are you sure you want to log out?",
+    "static.program.confirmDelete": "Are you sure you want to delete local program(s)?",
     "static.home": "Home",
     "static.report.consumptionDate": "Consumption Month",
     "static.report.forecastConsumption": "Forecasted Consumption",

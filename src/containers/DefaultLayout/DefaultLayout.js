@@ -138,6 +138,7 @@ const AddProduct = React.lazy(() => import('../../views/Product/AddProduct'));
 const ListProdct = React.lazy(() => import('../../views/Product/ProductList'));
 const EditProdct = React.lazy(() => import('../../views/Product/EditProduct'));
 const ProgramTree = React.lazy(() => import('../../views/Program/ProgramTree'));
+const DeleteLocalPrograms = React.lazy(() => import('../../views/Program/DeleteLocalProgramComponent'));
 const ExportProgram = React.lazy(() => import('../../views/Program/ExportProgram'));
 const ImportProgram = React.lazy(() => import('../../views/Program/ImportProgram'));
 // const MasterDataSync = React.lazy(() => import('../../views/SyncMasterData/SyncMasterData'));
@@ -273,6 +274,7 @@ const routes = [
 
   { path: '/', exact: true, name: 'static.home' },
   { path: '/programTree', name: 'static.dashboard.program', component: ProgramTree },
+  { path: '/program/deleteLocalProgram', name: 'static.program.deleteLocalProgram', component: DeleteLocalPrograms },
   { path: '/diamension/AddDiamension', name: 'static.breadcrum.add', entityname: 'static.dashboard.dimensionheader', component: AddDimension },
   { path: '/dimension/listDimension', exact: true, name: 'static.breadcrum.list', entityname: 'static.dashboard.dimension', component: DimensionList },
   // { path: '/dimension/listDimension/:message', component: DimensionList },
