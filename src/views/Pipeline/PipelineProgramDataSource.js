@@ -16,7 +16,7 @@ export default class PipelineProgramDataSource extends Component {
         this.state = {
             dataSourceList: [],
             mapDataSourceEl: '',
-            loading:false
+            loading: false
         }
         this.loaded = this.loaded.bind(this);
         this.changed = this.changed.bind(this);
@@ -24,10 +24,10 @@ export default class PipelineProgramDataSource extends Component {
         this.saveDataSource = this.saveDataSource.bind(this);
         this.dropdownFilter = this.dropdownFilter.bind(this);
     }
-    
-  
+
+
     dropdownFilter = function (instance, cell, c, r, source) {
-        console.log('activeDataSourceList',this.state.activeDataSourceList)
+        console.log('activeDataSourceList', this.state.activeDataSourceList)
         var mylist = [];
         var value = (instance.jexcel.getJson()[r])[c - 1];
         var puList = (this.state.activeDataSourceList).filter(c => c.dataSourceType.id == value);
@@ -62,7 +62,7 @@ export default class PipelineProgramDataSource extends Component {
     }
 
     changed = function (instance, cell, x, y, value) {
-      
+
 
         //Planning Unit
         if (x == 3) {
@@ -73,15 +73,15 @@ export default class PipelineProgramDataSource extends Component {
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-              
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setComments(col, "");
-                
-                }
+
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+
             }
-           
-        
-       
+        }
+
+
+
     }
 
     checkValidation() {
@@ -122,8 +122,8 @@ export default class PipelineProgramDataSource extends Component {
                     }
                 }
             }
-       }
-        return valid;   
+        }
+        return valid;
     }
 
     saveDataSource() {
@@ -146,10 +146,10 @@ export default class PipelineProgramDataSource extends Component {
                 //     id: this.props.pipelineId
                 // },
                 // active: true,
-                
+
                 dataSourceId: dataSourceId,
-               pipelineDataSourceId:map.get("4")
-               
+                pipelineDataSourceId: map.get("4")
+
 
             }
             dataSourceArray.push(dataSourceJson);
@@ -167,7 +167,7 @@ export default class PipelineProgramDataSource extends Component {
                 // productCategoryList = response.data;
                 for (var k = 0; k < (response.data).length; k++) {
                     //var spaceCount = response.data[k].sortOrder.split(".").length;
-                   // console.log("spaceCOunt--->", spaceCount);
+                    // console.log("spaceCOunt--->", spaceCount);
                     // var indendent = "";
                     // for (var p = 1; p <= spaceCount - 1; p++) {
                     //     if (p == 1) {
@@ -176,7 +176,7 @@ export default class PipelineProgramDataSource extends Component {
                     //         indendent = indendent.concat("_");
                     //     }
                     // }
-                   // console.log("ind", indendent);
+                    // console.log("ind", indendent);
                     var dataSourceTypeJson = {
                         name: (response.data[k].label.label_en),
                         id: response.data[k].dataSourceTypeId
@@ -185,7 +185,7 @@ export default class PipelineProgramDataSource extends Component {
 
                 }
 
-        // var realmId = document.getElementById("realmId").value;
+                // var realmId = document.getElementById("realmId").value;
                 var DataSourceListQat = [];
                 // var activeDataSourceList=[];
                 // AuthenticationService.setupAxiosInterceptors();
@@ -247,23 +247,23 @@ export default class PipelineProgramDataSource extends Component {
                                                         type: 'text',
                                                         readonly: true
                                                     }, {
-                                                        title:  i18n.t('static.pipeline.pplndatasource'),
+                                                        title: i18n.t('static.pipeline.pplndatasource'),
                                                         type: 'text',
                                                         readonly: true
                                                     },
                                                     {
-                                                        title:  i18n.t('static.datasource.datasourcetype'),
+                                                        title: i18n.t('static.datasource.datasourcetype'),
                                                         type: 'dropdown',
                                                         source: dataSourceTypeList,
                                                         // filter: this.dropdownFilter
                                                     },
                                                     {
-                                                        title:  i18n.t('static.dashboard.datasourcehaeder'),
+                                                        title: i18n.t('static.dashboard.datasourcehaeder'),
                                                         type: 'autocomplete',
                                                         source: DataSourceListQat,
                                                         filter: this.dropdownFilter
                                                     }, {
-                                                        title:  i18n.t('static.inventory.dataSource'),
+                                                        title: i18n.t('static.inventory.dataSource'),
                                                         type: 'hidden',
                                                         readonly: true
                                                     }
@@ -282,8 +282,8 @@ export default class PipelineProgramDataSource extends Component {
                                                 oneditionend: this.onedit,
                                                 copyCompatibility: true,
                                                 // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                                                
-                                                    text: {
+
+                                                text: {
                                                     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
                                                     show: '',
                                                     entries: '',
@@ -303,7 +303,46 @@ export default class PipelineProgramDataSource extends Component {
                                     } else {
                                         this.setState({ message: response.data.messageCode, loading: false })
                                     }
-                                });
+                                }).catch(
+                                    error => {
+                                        if (error.message === "Network Error") {
+                                            this.setState({
+                                                message: 'static.unkownError',
+                                                loading: false
+                                            });
+                                        } else {
+                                            switch (error.response ? error.response.status : "") {
+
+                                                case 401:
+                                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                                    break;
+                                                case 403:
+                                                    this.props.history.push(`/accessDenied`)
+                                                    break;
+                                                case 500:
+                                                case 404:
+                                                case 406:
+                                                    this.setState({
+                                                        message: error.response.data.messageCode,
+                                                        loading: false
+                                                    });
+                                                    break;
+                                                case 412:
+                                                    this.setState({
+                                                        message: error.response.data.messageCode,
+                                                        loading: false
+                                                    });
+                                                    break;
+                                                default:
+                                                    this.setState({
+                                                        message: 'static.unkownError',
+                                                        loading: false
+                                                    });
+                                                    break;
+                                            }
+                                        }
+                                    }
+                                );
 
                         } else {
                             this.setState({ message: response.data.messageCode, loading: false })
@@ -312,42 +351,97 @@ export default class PipelineProgramDataSource extends Component {
                     }).catch(
                         error => {
                             if (error.message === "Network Error") {
-                                this.setState({ message: error.message, loading: false });
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
                             } else {
                                 switch (error.response ? error.response.status : "") {
-                                    case 500:
+
                                     case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
                                     case 404:
                                     case 406:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
                                     case 412:
-                                        this.setState({ message: error.response.data.messageCode, loading: false });
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
                                         break;
                                     default:
-                                        this.setState({ loading: false, message: 'static.unkownError' });
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
                                         break;
                                 }
                             }
                         }
                     );
 
+            })
+            .catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
 
-            });
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
 
 
     }
 
     loadedJexcelCommonFunction = function (instance, cell, x, y, value) {
-        jExcelLoadedFunctionPipeline(instance,0);
+        jExcelLoadedFunctionPipeline(instance, 0);
     }
 
     render() {
         return (
             <>
-             <AuthenticationServiceComponent history={this.props.history} message={(message) => {
-                    this.setState({ message: message })
-                }} loading={(loading) => {
-                    this.setState({ loading: loading })
-                }} />
+                <AuthenticationServiceComponent history={this.props.history} />
                 <h4 className="red">{this.props.message}</h4>
                 <div className="table-responsive" style={{ display: this.state.loading ? "none" : "block" }}>
 
@@ -357,7 +451,7 @@ export default class PipelineProgramDataSource extends Component {
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
-                            <div ><h4> <strong>Loading...</strong></h4></div>
+                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
                             <div class="spinner-border blue ml-4" role="status">
 

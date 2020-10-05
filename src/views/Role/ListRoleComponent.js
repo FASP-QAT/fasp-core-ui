@@ -227,7 +227,7 @@ import i18n from '../../i18n'
 import getLabelText from '../../CommonComponent/getLabelText'
 import UserService from "../../api/UserService";
 import AuthenticationService from '../Common/AuthenticationService.js';
-// import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
@@ -469,11 +469,7 @@ class ListRoleComponent extends Component {
 
         return (
             <div className="animated">
-                {/* <AuthenticationServiceComponent history={this.props.history} message={(message) => {
-                    this.setState({ message: message })
-                }} loading={(loading) => {
-                    this.setState({ loading: loading })
-                }} /> */}
+                <AuthenticationServiceComponent history={this.props.history} />
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>

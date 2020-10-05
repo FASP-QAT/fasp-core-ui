@@ -90,28 +90,48 @@ export default class commitVersion extends Component {
         })
           .catch(
             error => {
-              this.setState({
-                statuses: [],
-              })
               if (error.message === "Network Error") {
-                this.setState({ message: error.message });
+                this.setState({
+                  message: 'static.unkownError',
+                  loading: false,
+                  statuses: []
+                });
               } else {
                 switch (error.response ? error.response.status : "") {
-                  case 500:
+
                   case 401:
+                    this.props.history.push(`/login/static.message.sessionExpired`)
+                    break;
+                  case 403:
+                    this.props.history.push(`/accessDenied`)
+                    break;
+                  case 500:
                   case 404:
                   case 406:
+                    this.setState({
+                      message: error.response.data.messageCode,
+                      loading: false,
+                      statuses: []
+                    });
+                    break;
                   case 412:
-                    this.setState({ message: error.response.data.messageCode });
+                    this.setState({
+                      message: error.response.data.messageCode,
+                      loading: false,
+                      statuses: []
+                    });
                     break;
                   default:
-                    this.setState({ message: 'static.unkownError' });
+                    this.setState({
+                      message: 'static.unkownError',
+                      loading: false,
+                      statuses: []
+                    });
                     break;
                 }
               }
             }
           );
-
 
       }.bind(this);
     }.bind(this);
@@ -120,7 +140,7 @@ export default class commitVersion extends Component {
 
   getDataForCompare() {
     document.getElementById("detailsDiv").style.display = "block";
-    
+
   }
 
   tabPane() {
@@ -182,9 +202,7 @@ export default class commitVersion extends Component {
 
     return (
       <div className="animated fadeIn">
-        <AuthenticationServiceComponent history={this.props.history} message={(message) => {
-          this.setState({ message: message })
-        }} />
+        <AuthenticationServiceComponent history={this.props.history} />
         <h5>{i18n.t(this.state.message, { entityname })}</h5>
         <Row>
           <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>

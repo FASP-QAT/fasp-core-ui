@@ -1041,9 +1041,9 @@ export default class SupplyPlanComponent extends React.Component {
                                     }
                                 </tr>
                             </tbody>
-                            
+
                         </Table>
-                    
+
                         {/* </div> */}
                     </div>
                     <div className="row" >
@@ -1056,12 +1056,12 @@ export default class SupplyPlanComponent extends React.Component {
                                     <div className="chart-wrapper chart-graph-report">
                                         <Bar id="cool-canvas" data={bar} options={chartOptions} />
                                     </div>
-                                </div>  
-                                
-                                 </div>}
+                                </div>
+
+                            </div>}
 
                     </div>
-                     {/* <div className="" >
+                    {/* <div className="" >
                         {
                             this.state.jsonArrForGraph.length > 0
                             &&
@@ -2879,11 +2879,7 @@ export default class SupplyPlanComponent extends React.Component {
         const { programList } = this.state;
         return (
             <div className="animated fadeIn">
-                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
-                    this.setState({ message: message })
-                }} loading={(loading) => {
-                    this.setState({ loading: loading })
-                }} />
+                <AuthenticationServiceComponent history={this.props.history} />
                 <h5 className={this.state.color} id="div1">{i18n.t(this.state.message, { entityname }) || this.state.supplyPlanError}</h5>
                 <SupplyPlanFormulas ref="formulaeChild" />
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
@@ -3002,7 +2998,7 @@ export default class SupplyPlanComponent extends React.Component {
                 <div style={{ display: this.state.loading ? "block" : "none" }} className="modalBackgroundSupplyPlan">
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
-                            <div ><h4> <strong>Loading...</strong></h4></div>
+                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
                             <div class="spinner-border blue ml-4" role="status">
 
