@@ -1292,7 +1292,16 @@ const options = {
           beginAtZero: true,
           Max: 900,
           callback: function (value) {
-            return value + "%";
+            var cell1 = value
+            cell1 += '';
+            var x = cell1.split('.');
+            var x1 = x[0];
+            var x2 = x.length > 1 ? '.' + x[1] : '';
+            var rgx = /(\d+)(\d{3})/;
+            while (rgx.test(x1)) {
+              x1 = x1.replace(rgx, '$1' + ',' + '$2');
+            }
+            return x1 + x2+"%";
           }
         }
       }
@@ -1326,7 +1335,7 @@ const options = {
       this.data.datasets.forEach(function (dataset, i) {
         const meta = chartInstance.controller.getDatasetMeta(i);
         meta.data.forEach(function (bar, index) {
-          const data = dataset.data[index] + "%";
+          const data = dataset.data[index];
           ctx.fillStyle = "#000";
           ctx.fillText(data, bar._model.x, bar._model.y - 2);
         });
@@ -1336,9 +1345,21 @@ const options = {
   tooltips: {
     mode: 'index',
     callbacks: {
-      label: function (tooltipItems, data) {
+      label: function (tooltipItem, data) {
 
-        return tooltipItems.yLabel + "%";
+        let label = data.labels[tooltipItem.index];
+        let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+
+var cell1 = value
+cell1 += '';
+var x = cell1.split('.');
+var x1 = x[0];
+var x2 = x.length > 1 ? '.' + x[1] : '';
+var rgx = /(\d+)(\d{3})/;
+while (rgx.test(x1)) {
+x1 = x1.replace(rgx, '$1' + ',' + '$2');
+}
+return data.datasets[tooltipItem.datasetIndex].label+' : ' +  x1 + x2;
       }
     },
     enabled: true,
@@ -1449,6 +1470,13 @@ if(value!=null){
   roundN = num => {
     if (num != '' && num != null) {
       return parseFloat(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
+    } else {
+      return NaN
+    }
+  }
+  round = num => {
+    if (num != '' && num != null) {
+      return parseFloat(Math.round(num * Math.pow(10, 0)) / Math.pow(10, 0)).toFixed(0);
     } else {
       return NaN
     }
@@ -1890,7 +1918,9 @@ if(value!=null){
 
 
   }
-
+  rowtextFormatClassName(row) {
+        return (row.forecastError > 50) ? 'textcolor-red' : '';
+      }
 
   fetchData() {
     let programId = document.getElementById("programId").value;
@@ -1985,7 +2015,7 @@ if(value!=null){
                   month: new Date(from, month - 1),
                   actualConsumption: currentActualconsumption,
                   forecastedConsumption: currentForcastConsumption,
-                  forecastError: actualconsumption > 0 ? (((absvalue * 100) / actualconsumption)) : ''
+                  forecastError: currentActualconsumption>0 && actualconsumption > 0 ? (((absvalue * 100) / actualconsumption)) : ''
 
                 }
                 data.push(json)
@@ -2152,7 +2182,7 @@ if(value!=null){
           pointStyle: 'line',
           yValueFormatString: "$#####%",
 
-          data: this.state.matricsList.map((item, index) => (this.roundN(item.forecastError)))
+          data: this.state.matricsList.map((item, index) => (this.round(item.forecastError)))
         }
       ],
 
@@ -2395,10 +2425,10 @@ if(value!=null){
                                   &&
                                   this.state.matricsList.map((item, idx) =>
 
-                                    <tr id="addr0" key={idx} >
+                                    <tr id="addr0" key={idx} className={this.rowtextFormatClassName(item)} >
 
                                       <td>{this.dateFormatter(this.state.matricsList[idx].month)}</td>
-                                      <td>
+                                      <td className="textcolor-purple">
 
                                         {this.formatter(this.state.matricsList[idx].forecastedConsumption)}
                                       </td>

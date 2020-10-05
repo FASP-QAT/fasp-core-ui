@@ -1320,7 +1320,20 @@ const options = {
       },
       ticks: {
         beginAtZero: true,
-        fontColor: 'black'
+        fontColor: 'black',
+        callback: function (value) {
+          var cell1 = value
+          cell1 += '';
+          var x = cell1.split('.');
+          var x1 = x[0];
+          var x2 = x.length > 1 ? '.' + x[1] : '';
+          var rgx = /(\d+)(\d{3})/;
+          while (rgx.test(x1)) {
+            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+          }
+          return x1 + x2;
+
+        }
       }
     }],
     xAxes: [{
@@ -1332,7 +1345,26 @@ const options = {
 
   tooltips: {
     enabled: false,
-    custom: CustomTooltips
+    custom: CustomTooltips,
+    callbacks:{
+      label:function (tooltipItem, data) {
+       
+        let label = data.labels[tooltipItem.index];
+                    let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+           
+      var cell1 = value
+      cell1 += '';
+      var x = cell1.split('.');
+      var x1 = x[0];
+      var x2 = x.length > 1 ? '.' + x[1] : '';
+      var rgx = /(\d+)(\d{3})/;
+      while (rgx.test(x1)) {
+        x1 = x1.replace(rgx, '$1' + ',' + '$2');
+      }
+      return data.datasets[tooltipItem.datasetIndex].label+' : ' +  x1 + x2;
+    }
+    }
+
   },
   maintainAspectRatio: false,
   legend: {
@@ -1442,66 +1474,66 @@ class Consumption extends Component {
     let productId = document.getElementById("planningUnitId").value;
     // let productFilter = this.state.productList.filter(c => (c.planningUnit.id == productId));
     // console.log("EEEEEEEEE--------", productId);
-    if(productId!=0){
-    if (navigator.onLine) {
-      RealmService.getRealmListAll()
-        .then(response => {
-          if (response.status == 200) {
-            this.setState({
-              realmId: response.data[0].realmId,
-            })
-
-            PlanningUnitService.getPlanningUnitById(productId).then(response => {
-               console.log("RESP-----", response.data)
-              //let productFilter = response.data.filter(c => (c.planningUnitId == productId));
+    if (productId != 0) {
+      if (navigator.onLine) {
+        RealmService.getRealmListAll()
+          .then(response => {
+            if (response.status == 200) {
               this.setState({
-                multiplier: response.data.multiplier,
+                realmId: response.data[0].realmId,
+              })
+
+              PlanningUnitService.getPlanningUnitById(productId).then(response => {
+                console.log("RESP-----", response.data)
+                //let productFilter = response.data.filter(c => (c.planningUnitId == productId));
+                this.setState({
+                  multiplier: response.data.multiplier,
+                },
+                  () => {
+                    this.filterData()
+                    console.log("MULTIPLIER----", this.state.multiplier);
+                  })
+              })
+
+            } else {
+              this.setState({
+                message: response.data.messageCode
               },
                 () => {
-                  this.filterData()
-                  console.log("MULTIPLIER----", this.state.multiplier);
+                  // this.hideSecondComponent();
                 })
-            })
-
-          } else {
+            }
+          })
+      } else {
+        const lan = 'en';
+        var db1;
+        var storeOS;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onsuccess = function (e) {
+          db1 = e.target.result;
+          var planningunitTransaction = db1.transaction(['planningUnit'], 'readwrite');
+          var planningunitOs = planningunitTransaction.objectStore('planningUnit');
+          var planningunitRequest = planningunitOs.getAll();
+          var planningList = []
+          planningunitRequest.onerror = function (event) {
+            // Handle errors!
+          };
+          planningunitRequest.onsuccess = function (e) {
+            var myResult = [];
+            myResult = planningunitRequest.result;
+            let productFilter = myResult.filter(c => (c.planningUnitId == productId));
             this.setState({
-              message: response.data.messageCode
+              multiplier: productFilter[0].multiplier,
             },
               () => {
-                // this.hideSecondComponent();
+                this.filterData()
+                console.log("MULTIPLIER----", this.state.multiplier);
               })
-          }
-        })
-    } else {
-      const lan = 'en';
-      var db1;
-      var storeOS;
-      getDatabase();
-      var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-      openRequest.onsuccess = function (e) {
-        db1 = e.target.result;
-        var planningunitTransaction = db1.transaction(['planningUnit'], 'readwrite');
-        var planningunitOs = planningunitTransaction.objectStore('planningUnit');
-        var planningunitRequest = planningunitOs.getAll();
-        var planningList = []
-        planningunitRequest.onerror = function (event) {
-          // Handle errors!
-        };
-        planningunitRequest.onsuccess = function (e) {
-          var myResult = [];
-          myResult = planningunitRequest.result;
-          let productFilter = myResult.filter(c => (c.planningUnitId == productId));
-          this.setState({
-            multiplier: productFilter[0].multiplier,
-          },
-            () => {
-              this.filterData()
-              console.log("MULTIPLIER----", this.state.multiplier);
-            })
-        }.bind(this);
-      }.bind(this)
+          }.bind(this);
+        }.bind(this)
+      }
     }
-  }
   }
 
 
@@ -1512,24 +1544,24 @@ class Consumption extends Component {
 
   toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
   formatter = value => {
-if(value!=null){
-    var cell1 = value
-    cell1 += '';
-    var x = cell1.split('.');
-    var x1 = x[0];
-    var x2 = x.length > 1 ? '.' + x[1] : '';
-    var rgx = /(\d+)(\d{3})/;
-    while (rgx.test(x1)) {
-      x1 = x1.replace(rgx, '$1' + ',' + '$2');
+    if (value != null) {
+      var cell1 = value
+      cell1 += '';
+      var x = cell1.split('.');
+      var x1 = x[0];
+      var x2 = x.length > 1 ? '.' + x[1] : '';
+      var rgx = /(\d+)(\d{3})/;
+      while (rgx.test(x1)) {
+        x1 = x1.replace(rgx, '$1' + ',' + '$2');
+      }
+      return x1 + x2;
+    } else {
+      return ''
     }
-    return x1 + x2;
-  }else{
-    return ''
   }
+  addDoubleQuoteToRowContent = (arr) => {
+    return arr.map(ele => '"' + ele + '"')
   }
-  addDoubleQuoteToRowContent=(arr)=>{
-    return arr.map(ele=>'"'+ele+'"')
- }
 
   exportCSV() {
 
@@ -1565,9 +1597,9 @@ if(value!=null){
       row1.push(i18n.t('static.report.forecasted'));
       row2.push(i18n.t('static.report.actual'));
       for (let i = 0; i < consumptionArray.length; i++) {
-        head.push((moment(consumptionArray[i].transDate, 'yyyy-MM-dd').format('MMM YYYY')).replaceAll(' ','%20'));
-        row1.push(consumptionArray[i].forecastedConsumption==null?'':consumptionArray[i].forecastedConsumption);
-        row2.push(consumptionArray[i].actualConsumption==null?'':consumptionArray[i].actualConsumption,consumptionArray[i].actualConsumption);
+        head.push((moment(consumptionArray[i].transDate, 'yyyy-MM-dd').format('MMM YYYY')).replaceAll(' ', '%20'));
+        row1.push(consumptionArray[i].forecastedConsumption == null ? '' : consumptionArray[i].forecastedConsumption);
+        row2.push(consumptionArray[i].actualConsumption == null ? '' : consumptionArray[i].actualConsumption, consumptionArray[i].actualConsumption);
       }
     } else {
       let consumptionArray = this.state.offlineConsumptionList;
@@ -1575,13 +1607,13 @@ if(value!=null){
       row1.push(i18n.t('static.report.forecasted'));
       row2.push(i18n.t('static.report.actual'));
       for (let i = 0; i < consumptionArray.length; i++) {
-        head.push(((moment(consumptionArray[i].transDate, 'yyyy-MM-dd').format('MMM YYYY'))).replaceAll(' ','%20'));
-        row1.push(consumptionArray[i].forecastedConsumption==null?'':consumptionArray[i].forecastedConsumption);
-        row2.push(consumptionArray[i].actualConsumption==null?'':consumptionArray[i].actualConsumption);
+        head.push(((moment(consumptionArray[i].transDate, 'yyyy-MM-dd').format('MMM YYYY'))).replaceAll(' ', '%20'));
+        row1.push(consumptionArray[i].forecastedConsumption == null ? '' : consumptionArray[i].forecastedConsumption);
+        row2.push(consumptionArray[i].actualConsumption == null ? '' : consumptionArray[i].actualConsumption);
       }
     }
     var A = [];
-    A[0] =this.addDoubleQuoteToRowContent( head);
+    A[0] = this.addDoubleQuoteToRowContent(head);
     A[1] = this.addDoubleQuoteToRowContent(row1);
     A[2] = this.addDoubleQuoteToRowContent(row2);
 
@@ -1769,11 +1801,11 @@ if(value!=null){
   round = num => {
     if (num == '' || num == null) {
       return null
-  } else {
-    return parseFloat(Math.round(num * Math.pow(10, 0)) / Math.pow(10, 0)).toFixed(0);
-    
+    } else {
+      return parseFloat(Math.round(num * Math.pow(10, 0)) / Math.pow(10, 0)).toFixed(0);
+
+    }
   }
-}
 
 
   // filterData() {
@@ -1939,8 +1971,8 @@ if(value!=null){
     // let productCategoryId = document.getElementById("productCategoryId").value;
     let planningUnitId = document.getElementById("planningUnitId").value;
     let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
-    let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month , 0).getDate();
-    console.log('values =>',planningUnitId, programId ,versionId );
+    let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
+    console.log('values =>', planningUnitId, programId, versionId);
     if (planningUnitId > 0 && programId > 0 && versionId != 0) {
       if (versionId.includes('Local')) {
         this.setState({ loading: true })
@@ -2056,25 +2088,25 @@ if(value!=null){
               }
               if (objForecast.length > 0) {
                 forecastValue = this.round(objForecast[0].consumptionQty);
-                transDate =objForecast[0].consumptionDate;
+                transDate = objForecast[0].consumptionDate;
               }
 
               if (viewById == 2) {
-              //  this.toggleView();
-              let json = {
-                "transDate": transDate,
-                "actualConsumption": actualValue* this.state.multiplier,
-                "forecastedConsumption": forecastValue*this.state.multiplier
-              }
+                //  this.toggleView();
+                let json = {
+                  "transDate": transDate,
+                  "actualConsumption": actualValue * this.state.multiplier,
+                  "forecastedConsumption": forecastValue * this.state.multiplier
+                }
                 finalOfflineConsumption.push(json);
-              }else{
-              let json = {
-                "transDate": transDate,
-                "actualConsumption":this.round( actualValue),
-                "forecastedConsumption":this.round( forecastValue)
+              } else {
+                let json = {
+                  "transDate": transDate,
+                  "actualConsumption": this.round(actualValue),
+                  "forecastedConsumption": this.round(forecastValue)
+                }
+                finalOfflineConsumption.push(json);
               }
-              finalOfflineConsumption.push(json);
-            }
             }
 
 
@@ -2128,12 +2160,12 @@ if(value!=null){
               message: '',
               loading: false
             })
-              // () => {
-              //   this.storeProduct(planningUnitId);
-              //   if (viewById == 2) {
-              //     this.toggleView();
-              //   }
-              // });
+            // () => {
+            //   this.storeProduct(planningUnitId);
+            //   if (viewById == 2) {
+            //     this.toggleView();
+            //   }
+            // });
 
           }.bind(this)
         }.bind(this)
@@ -2164,7 +2196,7 @@ if(value!=null){
               loading: false
             },
               () => {
-              //  this.storeProduct(planningUnitId);
+                //  this.storeProduct(planningUnitId);
                 // if (viewById == 2) {
                 //   this.toggleView();
                 // }
@@ -2173,13 +2205,13 @@ if(value!=null){
       }
 
     } else if (programId == -1) {
-      this.setState({ message: i18n.t('static.common.selectProgram'), consumptions: [],offlineConsumptionList:[] });
+      this.setState({ message: i18n.t('static.common.selectProgram'), consumptions: [], offlineConsumptionList: [] });
 
     } else if (versionId == 0) {
-      this.setState({ message: i18n.t('static.program.validversion'), consumptions: [] ,offlineConsumptionList:[]});
+      this.setState({ message: i18n.t('static.program.validversion'), consumptions: [], offlineConsumptionList: [] });
 
     } else {
-      this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), consumptions: [] ,offlineConsumptionList:[]});
+      this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), consumptions: [], offlineConsumptionList: [] });
 
     }
   }
@@ -2506,7 +2538,7 @@ if(value!=null){
         planningUnitLabels: []
       })
     }
-   
+
   }
   consolidatedVersionList = (programId) => {
     const lan = 'en';
@@ -2549,7 +2581,7 @@ if(value!=null){
           versions: verList.filter(function (x, i, a) {
             return a.indexOf(x) === i;
           })
-        },()=>{this.filterData()})
+        }, () => { this.filterData() })
 
       }.bind(this);
     }.bind(this)
@@ -2654,7 +2686,7 @@ if(value!=null){
             showInLegend: true,
             pointStyle: 'line',
             pointBorderWidth: 5,
-            yValueFormatString: "$#,##0",
+            yValueFormatString: "###,###,###,###",
             data: this.state.consumptions.map((item, index) => (item.forecastedConsumption))
           }, {
             label: i18n.t('static.report.actualConsumption'),
@@ -2664,6 +2696,7 @@ if(value!=null){
             pointBorderColor: '#fff',
             pointHoverBackgroundColor: '#fff',
             pointHoverBorderColor: 'rgba(179,181,198,1)',
+            yValueFormatString: "###,###,###,###",
             data: this.state.consumptions.map((item, index) => (item.actualConsumption)),
           }
         ],
@@ -2904,7 +2937,7 @@ if(value!=null){
                                 id="planningUnitId"
                                 bsSize="sm"
                                 onChange={this.filterData}
-                               onChange={(e) => { this.storeProduct(e);  }}
+                                onChange={(e) => { this.storeProduct(e); }}
                               >
                                 <option value="0">{i18n.t('static.common.select')}</option>
                                 {planningUnits.length > 0
@@ -2933,7 +2966,7 @@ if(value!=null){
                                 name="planningUnitId"
                                 id="planningUnitId"
                                 bsSize="sm"
-                                onChange={(e) => { this.storeProduct(e);  }}
+                                onChange={(e) => { this.storeProduct(e); }}
                               >
                                 <option value="0">{i18n.t('static.common.select')}</option>
                                 {offlinePlanningUnitList.length > 0
@@ -3034,7 +3067,7 @@ if(value!=null){
 
                             <tbody>
                               <>
-                                <tr style={{fontWeight:'bold'}}>
+                                <tr style={{ fontWeight: 'bold' }}>
                                   <th style={{ width: '140px' }}></th>
                                   {
                                     this.state.consumptions.length > 0
@@ -3053,7 +3086,7 @@ if(value!=null){
                                     this.state.consumptions.length > 0
                                     &&
                                     this.state.consumptions.map((item, idx) =>
-                                      <td id="addr0" key={idx}>
+                                      <td id="addr0" key={idx} className="textcolor-purple">
                                         {this.formatter(this.state.consumptions[idx].forecastedConsumption)}
                                       </td>
                                     )
@@ -3083,7 +3116,7 @@ if(value!=null){
 
                             <tbody>
                               <>
-                                <tr style={{fontWeight:'bold'}}>
+                                <tr style={{ fontWeight: 'bold' }}>
                                   <th style={{ width: '140px' }}></th>
                                   {
                                     this.state.offlineConsumptionList.length > 0
@@ -3102,7 +3135,7 @@ if(value!=null){
                                     this.state.offlineConsumptionList.length > 0
                                     &&
                                     this.state.offlineConsumptionList.map((item, idx) =>
-                                      <td id="addr0" key={idx}>
+                                      <td id="addr0" key={idx} className="textcolor-purple">
                                         {this.formatter(this.state.offlineConsumptionList[idx].forecastedConsumption)}
                                       </td>
                                     )
