@@ -597,27 +597,50 @@ class RealmCountryRegion extends Component {
                 }
 
                 //GLN
+                // var col = ("D").concat(parseInt(y) + 1);
+                // var value = this.el.getValueFromCoords(3, y);
+                // var reg = /^[0-9\b]+$/;
+                // // console.log("---------VAL----------", value);
+                // if (value != "" && (isNaN(Number.parseFloat(value)) || value < 0 || value.length != 13)) {
+                //     this.el.setStyle(col, "background-color", "transparent");
+                //     this.el.setStyle(col, "background-color", "yellow");
+                //     valid = false;
+                //     if (isNaN(Number.parseInt(value)) || value < 0) {
+                //         this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                //     }
+                //     else if (value.length != 13) {
+                //         this.el.setComments(col, i18n.t('static.region.glnvalue'));
+                //     }
+                // }
+                // // else if (value.length != 13) {
+                // //     this.el.setStyle(col, "background-color", "transparent");
+                // //     this.el.setStyle(col, "background-color", "yellow");
+                // //     this.el.setComments(col, "Should be 13 digit");
+                // // }
+                // else {
+                //     this.el.setStyle(col, "background-color", "transparent");
+                //     this.el.setComments(col, "");
+                // }
+
                 var col = ("D").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(3, y);
                 var reg = /^[0-9\b]+$/;
-                // console.log("---------VAL----------", value);
-                if (value != "" && (isNaN(Number.parseFloat(value)) || value < 0 || value.length != 13)) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    valid = false;
-                    if (isNaN(Number.parseInt(value)) || value < 0) {
-                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                if (value != "") {
+                    if (value.length > 0 && (isNaN(parseInt(value)) || !(reg.test(value)) || value.length != 13)) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        valid = false;
+                        if (value.length != 13) {
+                            this.el.setComments(col, i18n.t('static.region.glnvalue'));
+                        } else {
+                            this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        }
                     }
-                    else if (value.length != 13) {
-                        this.el.setComments(col, i18n.t('static.region.glnvalue'));
+                    else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
                     }
-                }
-                // else if (value.length != 13) {
-                //     this.el.setStyle(col, "background-color", "transparent");
-                //     this.el.setStyle(col, "background-color", "yellow");
-                //     this.el.setComments(col, "Should be 13 digit");
-                // }
-                else {
+                } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
                 }

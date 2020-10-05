@@ -373,9 +373,10 @@ export default class EditOrganisationComponent extends Component {
                                                         <Label htmlFor="organisationCode">{i18n.t('static.organisation.organisationcode')} <span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             bsSize="sm"
-                                                            readOnly
+                                                            // readOnly
                                                             type="text" name="organisationCode" valid={!errors.organisationCode}
-                                                            invalid={touched.organisationCode && !!errors.organisationCode}
+                                                            // invalid={touched.organisationCode && !!errors.organisationCode}
+                                                            invalid={(touched.organisationCode && !!errors.organisationCode) || !!errors.organisationCode}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.organisation.organisationCode}
