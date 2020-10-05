@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import ProgramService from "../../api/ProgramService";
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import {
@@ -78,7 +79,7 @@ export default class Steptwo extends Component {
 
     getRealmCountryList() {
         // AuthenticationService.setupAxiosInterceptors();
-        console.log("in get realmCOuntry list----->",this.props.items.program.realm.realmId);
+        console.log("in get realmCOuntry list----->", this.props.items.program.realm.realmId);
         ProgramService.getRealmCountryList(this.props.items.program.realm.realmId)
             .then(response => {
                 if (response.status == 200) {
@@ -90,7 +91,46 @@ export default class Steptwo extends Component {
                         message: response.data.messageCode
                     })
                 }
-            })
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
     }
     componentDidMount() {
 
@@ -108,6 +148,7 @@ export default class Steptwo extends Component {
 
         return (
             <>
+                <AuthenticationServiceComponent history={this.props.history} />
                 <Formik
                     initialValues={initialValuesTwo}
                     validate={validateTwo(validationSchemaTwo)}
@@ -145,8 +186,8 @@ export default class Steptwo extends Component {
                                     </FormGroup>
 
                                     <FormGroup>
-                                        
-                        <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.props.previousToStepOne} > <i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
+
+                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.props.previousToStepOne} > <i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
                                         &nbsp;
                                         <Button color="info" size="md" className="float-left mr-1" type="submit" onClick={() => this.touchAllTwo(setTouched, errors)} disabled={!isValid}>{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
                                         &nbsp;

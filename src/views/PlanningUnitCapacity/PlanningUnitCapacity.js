@@ -822,18 +822,38 @@ class PlanningUnitCapacity extends Component {
                 }).catch(
                     error => {
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
                         } else {
                             switch (error.response ? error.response.status : "") {
-                                case 500:
+
                                 case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
                                 case 404:
                                 case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
                                 case 412:
-                                    this.setState({ message: error.response.messageCode });
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
                                     break;
                                 default:
-                                    this.setState({ message: 'static.unkownError' });
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
                                     break;
                             }
                         }
@@ -1192,24 +1212,43 @@ class PlanningUnitCapacity extends Component {
                             }).catch(
                                 error => {
                                     if (error.message === "Network Error") {
-                                        this.setState({ message: error.message });
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
                                     } else {
-                                        switch (error.response.status) {
-                                            case 500:
+                                        switch (error.response ? error.response.status : "") {
+
                                             case 401:
+                                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                                break;
+                                            case 403:
+                                                this.props.history.push(`/accessDenied`)
+                                                break;
+                                            case 500:
                                             case 404:
                                             case 406:
+                                                this.setState({
+                                                    message: error.response.data.messageCode,
+                                                    loading: false
+                                                });
+                                                break;
                                             case 412:
-                                                this.setState({ loading: false, message: error.response.messageCode });
+                                                this.setState({
+                                                    message: error.response.data.messageCode,
+                                                    loading: false
+                                                });
                                                 break;
                                             default:
-                                                this.setState({ loading: false, message: 'static.unkownError' });
+                                                this.setState({
+                                                    message: 'static.unkownError',
+                                                    loading: false
+                                                });
                                                 break;
                                         }
                                     }
                                 }
                             );
-
                     } else {
                         this.setState({
                             message: response.data.messageCode, loading: false
@@ -1222,19 +1261,38 @@ class PlanningUnitCapacity extends Component {
                 }).catch(
                     error => {
                         if (error.message === "Network Error") {
-                            this.setState({ loading: false, message: error.message });
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
                         } else {
                             switch (error.response ? error.response.status : "") {
-                                case 500:
+
                                 case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
                                 case 404:
                                 case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
                                 case 412:
-                                    this.setState({ loading: false, message: error.response.data.messageCode });
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
                                     break;
                                 default:
-                                    this.setState({ loading: false, message: 'static.unkownError' });
-                                    console.log("Error code unkown");
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
                                     break;
                             }
                         }
@@ -1253,21 +1311,39 @@ class PlanningUnitCapacity extends Component {
 
         }).catch(
             error => {
-                console.log(JSON.stringify(error))
                 if (error.message === "Network Error") {
-                    this.setState({ message: error.message });
+                    this.setState({
+                        message: 'static.unkownError',
+                        loading: false
+                    });
                 } else {
                     switch (error.response ? error.response.status : "") {
-                        case 500:
+
                         case 401:
+                            this.props.history.push(`/login/static.message.sessionExpired`)
+                            break;
+                        case 403:
+                            this.props.history.push(`/accessDenied`)
+                            break;
+                        case 500:
                         case 404:
                         case 406:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
                         case 412:
-                            this.setState({ message: error.response.messageCode });
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
                             break;
                         default:
-                            this.setState({ message: 'static.unkownError' });
-                            console.log("Error code unkown");
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
                             break;
                     }
                 }
@@ -1518,11 +1594,7 @@ class PlanningUnitCapacity extends Component {
         return (
 
             <div className="animated fadeIn">
-                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
-                    this.setState({ message: message })
-                }} loading={(loading) => {
-                    this.setState({ loading: loading })
-                }} />
+                <AuthenticationServiceComponent history={this.props.history} />
                 {/* <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
                 }} /> */}
@@ -1544,7 +1616,7 @@ class PlanningUnitCapacity extends Component {
                             <div style={{ display: this.state.loading ? "block" : "none" }}>
                                 <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                     <div class="align-items-center">
-                                        <div ><h4> <strong>Loading...</strong></h4></div>
+                                        <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
                                         <div class="spinner-border blue ml-4" role="status">
                                         </div>
                                     </div>

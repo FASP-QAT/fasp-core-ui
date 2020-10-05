@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import i18n from '../../i18n';
 import HealthAreaService from "../../api/HealthAreaService";
 import AuthenticationService from '../Common/AuthenticationService.js';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 
 import { Formik } from 'formik';
 import * as Yup from 'yup'
@@ -85,7 +86,7 @@ export default class StepOne extends Component {
         }
     }
 
-    componentDidMount() { 
+    componentDidMount() {
         console.log("-----------------------------------FIRST STEP-------->", this.props.items);
         // AuthenticationService.setupAxiosInterceptors();
         HealthAreaService.getRealmList()
@@ -99,7 +100,46 @@ export default class StepOne extends Component {
                         message: response.data.messageCode
                     })
                 }
-            })
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
     }
     render() {
         const { realmList } = this.state;
@@ -114,11 +154,11 @@ export default class StepOne extends Component {
 
         return (
             <>
-
+                <AuthenticationServiceComponent history={this.props.history} />
                 <Formik
                     enableReinitialize={true}
                     initialValues={{
-                        realmId:this.props.items.program.realm.realmId
+                        realmId: this.props.items.program.realm.realmId
                     }}
                     validate={validate(validationSchema)}
                     onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -139,7 +179,7 @@ export default class StepOne extends Component {
                             setTouched
                         }) => (
                                 <Form className="needs-validation" onSubmit={handleSubmit} noValidate name='realmForm'>
-                             
+
                                     <FormGroup>
                                         <Label htmlFor="select">{i18n.t('static.program.realm')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
@@ -157,7 +197,7 @@ export default class StepOne extends Component {
                                         </Input>
                                         <FormFeedback className="red">{errors.realmId}</FormFeedback>
                                         {/* <Button color="info" size="md" className="float-right mr-1" type="button" name="planningPrevious" id="planningPrevious" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}>Next <i className="fa fa-angle-double-right"></i></Button> */}
-                                       
+
                                     </FormGroup>
 
                                     <FormGroup className="pb-3">

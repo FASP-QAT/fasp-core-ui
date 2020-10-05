@@ -1254,5 +1254,7 @@
     "static.add.addOrganisation": "Add Organisation",
     "static.list.listProgram": "List Program",
     "static.add.totalProgram": "Total Program",
-    "static.report.qatProblemActionReport": "QAT Probelm Action Report"
+    "static.report.qatProblemActionReport": "QAT Probelm Action Report",
+    "static.procurementAgent.AddProcurementAgent": "Add Procurement Agent",
+    "static.budget.redRow": "*Rows in red indicate that Budget has either lapsed or has no money in it"
 }

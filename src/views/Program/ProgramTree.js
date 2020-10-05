@@ -90,22 +90,38 @@ class Program extends Component {
                 }).catch(
                     error => {
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message, loading: false, color: "red" });
-                            this.hideFirstComponent()
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
                         } else {
-                            switch (error.response.status) {
-                                case 500:
+                            switch (error.response ? error.response.status : "") {
+
                                 case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
                                 case 404:
                                 case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
                                 case 412:
-                                    this.setState({ message: error.response.data.messageCode, loading: false, color: "red" });
-                                    this.hideFirstComponent()
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
                                     break;
                                 default:
-                                    this.setState({ message: 'static.unkownError', loading: false, color: "red" });
-                                    this.hideFirstComponent()
-                                    console.log("Error code unkown");
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
                                     break;
                             }
                         }
@@ -163,28 +179,42 @@ class Program extends Component {
                                 }
                             }).catch(
                                 error => {
-
                                     if (error.message === "Network Error") {
-                                        this.setState({ message: error.message });
-                                        this.hideFirstComponent()
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
                                     } else {
                                         switch (error.response ? error.response.status : "") {
-                                            case 500:
+
                                             case 401:
+                                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                                break;
+                                            case 403:
+                                                this.props.history.push(`/accessDenied`)
+                                                break;
+                                            case 500:
                                             case 404:
                                             case 406:
+                                                this.setState({
+                                                    message: error.response.data.messageCode,
+                                                    loading: false
+                                                });
+                                                break;
                                             case 412:
-                                                this.setState({ message: error.response.data.messageCode });
-                                                this.hideFirstComponent()
+                                                this.setState({
+                                                    message: error.response.data.messageCode,
+                                                    loading: false
+                                                });
                                                 break;
                                             default:
-                                                this.setState({ message: 'static.unkownError' });
-                                                this.hideFirstComponent()
-                                                console.log("Error code unkown");
+                                                this.setState({
+                                                    message: 'static.unkownError',
+                                                    loading: false
+                                                });
                                                 break;
                                         }
                                     }
-                                    this.setState({ loading: false, color: "red" })
                                 }
                             );
                         //     } else {
@@ -229,23 +259,38 @@ class Program extends Component {
                 }).catch(
                     error => {
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message, loading: false, color: "red" });
-                            this.hideFirstComponent()
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
                         } else {
-                            this.setState({ loading: false })
                             switch (error.response ? error.response.status : "") {
-                                case 500:
+
                                 case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
                                 case 404:
                                 case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
                                 case 412:
-                                    this.setState({ message: error.response.data.messageCode, color: "red" });
-                                    this.hideFirstComponent()
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
                                     break;
                                 default:
-                                    this.setState({ message: 'static.unkownError', color: "red" });
-                                    this.hideFirstComponent()
-                                    console.log("Error code unkown");
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
                                     break;
                             }
                         }
@@ -298,11 +343,7 @@ class Program extends Component {
         return (
             <div className="animated fadeIn">
                 {/* <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5> */}
-                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
-                    this.setState({ message: message })
-                }} loading={(loading) => {
-                    this.setState({ loading: loading })
-                }} />
+                <AuthenticationServiceComponent history={this.props.history} />
                 <h5 >{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 className={this.state.color} id="div1">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row style={{ display: this.state.loading ? "none" : "block" }}>
@@ -695,42 +736,44 @@ class Program extends Component {
                         })
                         .catch(
                             error => {
-                                this.setState({ loading: false })
                                 if (error.message === "Network Error") {
-                                    this.setState({ message: error.message, loading: false, color: "red" });
-                                    this.hideFirstComponent()
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
                                 } else {
                                     switch (error.response ? error.response.status : "") {
-                                        case 500:
+
                                         case 401:
+                                            this.props.history.push(`/login/static.message.sessionExpired`)
+                                            break;
+                                        case 403:
+                                            this.props.history.push(`/accessDenied`)
+                                            break;
+                                        case 500:
                                         case 404:
                                         case 406:
+                                            this.setState({
+                                                message: error.response.data.messageCode,
+                                                loading: false
+                                            });
+                                            break;
                                         case 412:
-                                            this.setState({ message: error.response.data.messageCode, loading: false, color: "red" });
-                                            this.hideFirstComponent()
+                                            this.setState({
+                                                message: error.response.data.messageCode,
+                                                loading: false
+                                            });
                                             break;
                                         default:
-                                            this.setState({ message: 'static.unkownError', loading: false, color: "red" });
-                                            this.hideFirstComponent()
-                                            console.log("Error code unkown");
+                                            this.setState({
+                                                message: 'static.unkownError',
+                                                loading: false
+                                            });
                                             break;
                                     }
-                                    // switch (error.message) {
-                                    //     case "Network Error":
-                                    //         this.setState({
-                                    //             message: error.message
-                                    //         })
-                                    //         this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errortext'))
-                                    //         break
-                                    //     default:
-                                    //         this.setState({
-                                    //             message: error.response
-                                    //         })
-                                    //         this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errortext'))
-                                    //         break
                                 }
                             }
-                        )
+                        );
 
                 } else {
                     this.setState({ loading: false, color: "red" })

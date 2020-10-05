@@ -1158,6 +1158,7 @@ import HealthAreaService from "../../api/HealthAreaService"
 import UserService from "../../api/UserService"
 import RealmCountryService from "../../api/RealmCountryService"
 import AuthenticationService from '../Common/AuthenticationService.js';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import i18n from '../../i18n'
 import getLabelText from '../../CommonComponent/getLabelText';
 
@@ -1646,18 +1647,38 @@ class AccessControlComponent extends Component {
                 }).catch(
                     error => {
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
                         } else {
                             switch (error.response ? error.response.status : "") {
-                                case 500:
+
                                 case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
                                 case 404:
                                 case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
                                 case 412:
-                                    this.setState({ message: error.response.data.messageCode });
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
                                     break;
                                 default:
-                                    this.setState({ message: 'static.unkownError' });
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
                                     break;
                             }
                         }
@@ -1721,7 +1742,46 @@ class AccessControlComponent extends Component {
                                                                             this.hideSecondComponent();
                                                                         })
                                                                 }
-                                                            })
+                                                            }).catch(
+                                                                error => {
+                                                                    if (error.message === "Network Error") {
+                                                                        this.setState({
+                                                                            message: 'static.unkownError',
+                                                                            loading: false
+                                                                        });
+                                                                    } else {
+                                                                        switch (error.response ? error.response.status : "") {
+
+                                                                            case 401:
+                                                                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                                                                break;
+                                                                            case 403:
+                                                                                this.props.history.push(`/accessDenied`)
+                                                                                break;
+                                                                            case 500:
+                                                                            case 404:
+                                                                            case 406:
+                                                                                this.setState({
+                                                                                    message: error.response.data.messageCode,
+                                                                                    loading: false
+                                                                                });
+                                                                                break;
+                                                                            case 412:
+                                                                                this.setState({
+                                                                                    message: error.response.data.messageCode,
+                                                                                    loading: false
+                                                                                });
+                                                                                break;
+                                                                            default:
+                                                                                this.setState({
+                                                                                    message: 'static.unkownError',
+                                                                                    loading: false
+                                                                                });
+                                                                                break;
+                                                                        }
+                                                                    }
+                                                                }
+                                                            );
                                                     } else {
                                                         this.setState({
                                                             message: response.data.messageCode
@@ -1734,18 +1794,38 @@ class AccessControlComponent extends Component {
                                                 }).catch(
                                                     error => {
                                                         if (error.message === "Network Error") {
-                                                            this.setState({ message: error.message });
+                                                            this.setState({
+                                                                message: 'static.unkownError',
+                                                                loading: false
+                                                            });
                                                         } else {
                                                             switch (error.response ? error.response.status : "") {
-                                                                case 500:
+
                                                                 case 401:
+                                                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                                                    break;
+                                                                case 403:
+                                                                    this.props.history.push(`/accessDenied`)
+                                                                    break;
+                                                                case 500:
                                                                 case 404:
                                                                 case 406:
+                                                                    this.setState({
+                                                                        message: error.response.data.messageCode,
+                                                                        loading: false
+                                                                    });
+                                                                    break;
                                                                 case 412:
-                                                                    this.setState({ message: error.response.data.messageCode });
+                                                                    this.setState({
+                                                                        message: error.response.data.messageCode,
+                                                                        loading: false
+                                                                    });
                                                                     break;
                                                                 default:
-                                                                    this.setState({ message: 'static.unkownError' });
+                                                                    this.setState({
+                                                                        message: 'static.unkownError',
+                                                                        loading: false
+                                                                    });
                                                                     break;
                                                             }
                                                         }
@@ -1760,18 +1840,38 @@ class AccessControlComponent extends Component {
                                     }).catch(
                                         error => {
                                             if (error.message === "Network Error") {
-                                                this.setState({ message: error.message });
+                                                this.setState({
+                                                    message: 'static.unkownError',
+                                                    loading: false
+                                                });
                                             } else {
                                                 switch (error.response ? error.response.status : "") {
-                                                    case 500:
+
                                                     case 401:
+                                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                                        break;
+                                                    case 403:
+                                                        this.props.history.push(`/accessDenied`)
+                                                        break;
+                                                    case 500:
                                                     case 404:
                                                     case 406:
+                                                        this.setState({
+                                                            message: error.response.data.messageCode,
+                                                            loading: false
+                                                        });
+                                                        break;
                                                     case 412:
-                                                        this.setState({ message: error.response.data.messageCode });
+                                                        this.setState({
+                                                            message: error.response.data.messageCode,
+                                                            loading: false
+                                                        });
                                                         break;
                                                     default:
-                                                        this.setState({ message: 'static.unkownError' });
+                                                        this.setState({
+                                                            message: 'static.unkownError',
+                                                            loading: false
+                                                        });
                                                         break;
                                                 }
                                             }
@@ -1789,18 +1889,38 @@ class AccessControlComponent extends Component {
                         }).catch(
                             error => {
                                 if (error.message === "Network Error") {
-                                    this.setState({ message: error.message });
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
                                 } else {
                                     switch (error.response ? error.response.status : "") {
-                                        case 500:
+
                                         case 401:
+                                            this.props.history.push(`/login/static.message.sessionExpired`)
+                                            break;
+                                        case 403:
+                                            this.props.history.push(`/accessDenied`)
+                                            break;
+                                        case 500:
                                         case 404:
                                         case 406:
+                                            this.setState({
+                                                message: error.response.data.messageCode,
+                                                loading: false
+                                            });
+                                            break;
                                         case 412:
-                                            this.setState({ message: error.response.data.messageCode });
+                                            this.setState({
+                                                message: error.response.data.messageCode,
+                                                loading: false
+                                            });
                                             break;
                                         default:
-                                            this.setState({ message: 'static.unkownError' });
+                                            this.setState({
+                                                message: 'static.unkownError',
+                                                loading: false
+                                            });
                                             break;
                                     }
                                 }
@@ -1818,24 +1938,43 @@ class AccessControlComponent extends Component {
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
                     } else {
                         switch (error.response ? error.response.status : "") {
-                            case 500:
+
                             case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
                             case 404:
                             case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
                             case 412:
-                                this.setState({ message: error.response.data.messageCode });
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
                                 break;
                             default:
-                                this.setState({ message: 'static.unkownError' });
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
                                 break;
                         }
                     }
                 }
             );
-
 
     }
 
@@ -1978,9 +2117,7 @@ class AccessControlComponent extends Component {
         return (
 
             <div className="animated fadeIn">
-                {/* <AuthenticationServiceComponent history={this.props.history} message={(message) => {
-                    this.setState({ message: message })
-                }} /> */}
+                <AuthenticationServiceComponent history={this.props.history} />
                 <h5>{i18n.t(this.props.match.params.message)}</h5>
                 <h5>{i18n.t(this.state.message)}</h5>
 
