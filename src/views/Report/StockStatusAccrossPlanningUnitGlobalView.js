@@ -1052,7 +1052,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
   }
 
   roundN = num => {
-    return parseFloat(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
+    return parseFloat(Math.round(num * Math.pow(10, 1)) / Math.pow(10, 1)).toFixed(1);
   }
   round = num => {
     return parseFloat(Math.round(num * Math.pow(10, 0)) / Math.pow(10, 0)).toFixed(0);
@@ -1255,6 +1255,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
     let tracercategory = document.getElementById('tracerCategoryId').value
     let realmId = document.getElementById('realmId').value
     let date = moment(new Date(this.state.singleValue2.year, this.state.singleValue2.month, 0)).startOf('month').format('YYYY-MM-DD')
+    console.log(realmId)
     if (realmId > 0 && this.state.countryValues.length > 0 && tracercategory != 0) {
       this.setState({ loading: true })
       var inputjson = {
@@ -1512,7 +1513,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
                             type="select" name="realmId" id="realmId"
                             onChange={(e) => { this.getCountrys(); this.getTracerCategoryList(); this.filterData(); }}
                           >
-                            <option value="">{i18n.t('static.common.select')}</option>
+                            <option value="0">{i18n.t('static.common.select')}</option>
                             {realms}
                           </Input>
 

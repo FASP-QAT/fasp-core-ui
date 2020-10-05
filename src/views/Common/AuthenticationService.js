@@ -89,7 +89,9 @@ class AuthenticationService {
                 return 1;
             if (roleList.includes("ROLE_REALM_ADMIN"))
                 return 2;
-            return 3;
+            if (roleList.includes("ROLE_PROGRAM_ADMIN"))
+                return 3;
+            return 4;
         }
     }
 

@@ -1658,6 +1658,7 @@ class ShipmentGlobalDemandView extends Component {
             let tableHeadTemp = [];
             tableHeadTemp.push(i18n.t('static.dashboard.product'));
             for (var i = 0; i < tableHead.length; i++) {
+                console.log(tableHead[i])
                 tableHeadTemp.push((tableHead[i].replaceAll(',', ' ')).replaceAll(' ', '%20'));
             }
             tableHeadTemp.push(i18n.t('static.supplyPlan.total'));
@@ -1666,7 +1667,8 @@ class ShipmentGlobalDemandView extends Component {
             re = this.state.procurementAgentSplit;
             for (var item = 0; item < re.length; item++) {
                 let item1 = Object.values(re[item].procurementAgentQty);
-                A.push([this.addDoubleQuoteToRowContent([(getLabelText(re[item].planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), item1, re[item].total])])
+                console.log(item1)
+                A.push([this.addDoubleQuoteToRowContent([(getLabelText(re[item].planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),...item1, re[item].total])])
             }
             for (var i = 0; i < A.length; i++) {
                 csvRow.push(A[i].join(","))
