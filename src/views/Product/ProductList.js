@@ -55,7 +55,7 @@ class ProductList extends Component {
   } 
 
   componentDidMount() {
-    AuthenticationService.setupAxiosInterceptors();
+    // AuthenticationService.setupAxiosInterceptors();
     ProductService.getProductList()
       .then(response => {
         if (response.status == 200) {

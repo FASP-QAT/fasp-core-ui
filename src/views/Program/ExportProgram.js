@@ -226,11 +226,7 @@ export default class ExportProgram extends Component {
         return (
             <div className="animated fadeIn">
                 {/* <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5> */}
-                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
-                    this.setState({ message: message })
-                }} loading={(loading) => {
-                    this.setState({ loading: loading })
-                }} />
+                <AuthenticationServiceComponent history={this.props.history} />
                 <Card className="mt-2" style={{ display: this.state.loading ? "none" : "block" }}>
                     <Formik
                         initialValues={initialValues}

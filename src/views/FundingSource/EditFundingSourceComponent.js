@@ -90,7 +90,7 @@ class EditFundingSourceComponent extends Component {
     }
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         FundingSourceService.getFundingSourceById(this.props.match.params.fundingSourceId).then(response => {
             if (response.status == 200) {
                 console.log("RESP----", response.data);
@@ -184,7 +184,7 @@ class EditFundingSourceComponent extends Component {
                                     this.setState({
                                         loading: true
                                     })
-                                    AuthenticationService.setupAxiosInterceptors();
+                                    // AuthenticationService.setupAxiosInterceptors();
                                     console.log("FUNDING_SOURCE----", this.state.fundingSource);
                                     FundingSourceService.updateFundingSource(this.state.fundingSource)
                                         .then(response => {
@@ -239,6 +239,7 @@ class EditFundingSourceComponent extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.fundingSource.label.label_en}
+                                                            maxLength={255}
                                                             required />
                                                         <FormFeedback className="red">{errors.fundingSource}</FormFeedback>
                                                     </FormGroup>
@@ -335,7 +336,7 @@ class EditFundingSourceComponent extends Component {
     }
 
     resetClicked() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         FundingSourceService.getFundingSourceById(this.props.match.params.fundingSourceId).then(response => {
             this.setState({
                 fundingSource: response.data

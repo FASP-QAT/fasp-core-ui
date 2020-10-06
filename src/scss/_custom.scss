@@ -2084,6 +2084,12 @@ input::placeholder {
   .background-red {
   // background-color: red;
   background-color: #cc4e4e!important;
+}.textcolor-red {
+  // background-color: red;
+  color: #cc4e4e!important;
+}.textcolor-purple {
+  // background-color: red;
+  color:  rgb(170, 85, 161);
 }
 
 .background-red-problemList td:not(:last-child){

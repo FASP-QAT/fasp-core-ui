@@ -163,7 +163,7 @@ export default class PipelineProgramSetup extends Component {
     }
     endProgramInfoStepFive() {
         console.log("program Data=======>", this.state.program);
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         PipelineService.addProgramToQatTempTable(this.state.program, this.props.match.params.pipelineId).then(response => {
             if (response.status == "200") {
                 this.setState({
@@ -181,7 +181,46 @@ export default class PipelineProgramSetup extends Component {
                 })
             }
         }
-        )
+        ).catch(
+            error => {
+                if (error.message === "Network Error") {
+                    this.setState({
+                        message: 'static.unkownError',
+                        loading: false
+                    });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+
+                        case 401:
+                            this.props.history.push(`/login/static.message.sessionExpired`)
+                            break;
+                        case 403:
+                            this.props.history.push(`/accessDenied`)
+                            break;
+                        case 500:
+                        case 404:
+                        case 406:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        case 412:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        default:
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                            break;
+                    }
+                }
+            }
+        );
 
     }
 
@@ -209,7 +248,7 @@ export default class PipelineProgramSetup extends Component {
         // console.log("planning unit data---->",this.refs.child.savePlanningUnits());
         var planningUnits = this.refs.child.savePlanningUnits();
         var checkValidation = this.refs.child.checkValidation();
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         PipelineService.addProgramToQatTempPlanningUnits(planningUnits, this.props.match.params.pipelineId).
             then(response => {
                 if (response.status == "200") {
@@ -260,7 +299,7 @@ export default class PipelineProgramSetup extends Component {
         var datasources = this.refs.datasourcechild.saveDataSource();
         var checkValidation = this.refs.datasourcechild.checkValidation();
         // console.log("consumption save------>",consumption);
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         PipelineService.addProgramToQatTempDataSource(datasources, this.props.match.params.pipelineId).
             then(response => {
                 // console.log("consumption add response--->", response);
@@ -297,7 +336,7 @@ export default class PipelineProgramSetup extends Component {
         var consumption = this.refs.fundingSourceChild.saveFundingSource();
         var checkValidation = this.refs.fundingSourceChild.checkValidation();
         // console.log("consumption save------>",consumption);
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         PipelineService.addQatTempFundingSource(consumption, this.props.match.params.pipelineId).
             then(response => {
                 // console.log("consumption add response--->", response);
@@ -342,7 +381,7 @@ export default class PipelineProgramSetup extends Component {
         var inventory = this.refs.procurementAgentChild.saveProcurementAgent();
         var checkValidation = this.refs.procurementAgentChild.checkValidation();
         console.log("inventory-----data---", inventory);
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         PipelineService.addQatTempProcurementAgent(inventory, this.props.match.params.pipelineId).
             then(response => {
                 if (response.status == "200") {
@@ -353,7 +392,7 @@ export default class PipelineProgramSetup extends Component {
                             shipmentStatus: false,
                             dataSourceStatus: false,
                             fundingSourceStatus: false,
-                            procurmentAgnetStatus:false,
+                            procurmentAgnetStatus: false,
                         });
 
                         document.getElementById('stepOne').style.display = 'none';
@@ -379,7 +418,7 @@ export default class PipelineProgramSetup extends Component {
         var consumption = this.refs.consumptionChild.saveConsumption();
         var checkValidation = this.refs.consumptionChild.checkValidation();
         console.log("inventory-----data---", consumption);
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         PipelineService.addQatTempConsumption(consumption, this.props.match.params.pipelineId).
             then(response => {
                 if (response.status == "200") {
@@ -390,7 +429,7 @@ export default class PipelineProgramSetup extends Component {
                             shipmentStatus: false,
                             dataSourceStatus: false,
                             fundingSourceStatus: false,
-                            procurmentAgnetStatus:false,
+                            procurmentAgnetStatus: false,
                         });
 
                         document.getElementById('stepOne').style.display = 'none';
@@ -416,7 +455,7 @@ export default class PipelineProgramSetup extends Component {
         var inventory = this.refs.inventoryChild.saveInventory();
         var checkValidation = this.refs.inventoryChild.checkValidation();
         console.log("inventory-----data---", inventory);
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         PipelineService.addQatTempInventory(inventory, this.props.match.params.pipelineId).
             then(response => {
                 if (response.status == "200") {
@@ -427,7 +466,7 @@ export default class PipelineProgramSetup extends Component {
                             shipmentStatus: true,
                             dataSourceStatus: false,
                             fundingSourceStatus: false,
-                            procurmentAgnetStatus:false,
+                            procurmentAgnetStatus: false,
                         });
 
                         document.getElementById('stepOne').style.display = 'none';
@@ -513,7 +552,7 @@ export default class PipelineProgramSetup extends Component {
             shipmentStatus: false,
             dataSourceStatus: false,
             fundingSourceStatus: false,
-            procurmentAgnetStatus:false,
+            procurmentAgnetStatus: false,
         });
         document.getElementById('stepOne').style.display = 'block';
         document.getElementById('stepTwo').style.display = 'none';
@@ -532,7 +571,7 @@ export default class PipelineProgramSetup extends Component {
             shipmentStatus: false,
             dataSourceStatus: false,
             fundingSourceStatus: false,
-            procurmentAgnetStatus:false,
+            procurmentAgnetStatus: false,
         });
         document.getElementById('stepOne').style.display = 'none';
         document.getElementById('stepTwo').style.display = 'block';
@@ -551,7 +590,7 @@ export default class PipelineProgramSetup extends Component {
             shipmentStatus: false,
             dataSourceStatus: true,
             fundingSourceStatus: false,
-            procurmentAgnetStatus:false,
+            procurmentAgnetStatus: false,
         });
         document.getElementById('stepOne').style.display = 'none';
         document.getElementById('stepTwo').style.display = 'none';
@@ -570,7 +609,7 @@ export default class PipelineProgramSetup extends Component {
             shipmentStatus: false,
             dataSourceStatus: false,
             fundingSourceStatus: true,
-            procurmentAgnetStatus:false,
+            procurmentAgnetStatus: false,
         });
         document.getElementById('stepOne').style.display = 'none';
         document.getElementById('stepTwo').style.display = 'none';
@@ -588,7 +627,7 @@ export default class PipelineProgramSetup extends Component {
             shipmentStatus: false,
             dataSourceStatus: false,
             fundingSourceStatus: false,
-            procurmentAgnetStatus:true,
+            procurmentAgnetStatus: true,
         });
         document.getElementById('stepOne').style.display = 'none';
         document.getElementById('stepTwo').style.display = 'none';
@@ -606,7 +645,7 @@ export default class PipelineProgramSetup extends Component {
             shipmentStatus: false,
             dataSourceStatus: false,
             fundingSourceStatus: false,
-            procurmentAgnetStatus:false,
+            procurmentAgnetStatus: false,
         });
         document.getElementById('stepOne').style.display = 'none';
         document.getElementById('stepTwo').style.display = 'none';
@@ -624,7 +663,7 @@ export default class PipelineProgramSetup extends Component {
             shipmentStatus: false,
             dataSourceStatus: false,
             fundingSourceStatus: false,
-            procurmentAgnetStatus:false,
+            procurmentAgnetStatus: false,
         });
         document.getElementById('stepOne').style.display = 'none';
         document.getElementById('stepTwo').style.display = 'none';
@@ -704,7 +743,7 @@ export default class PipelineProgramSetup extends Component {
 
     getRegionList(e) {
 
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         ProgramService.getRegionList(e.target.value)
             .then(response => {
                 if (response.status == 200) {
@@ -724,12 +763,51 @@ export default class PipelineProgramSetup extends Component {
                         message: response.data.messageCode
                     })
                 }
-            })
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
     }
 
     componentDidMount() {
         // console.log("pipelineProgramId----->", this.props.match.params.pipelineId);
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         PipelineService.getQatTempPorgramByPipelineId(this.props.match.params.pipelineId)
             .then(response => {
                 console.log("my resp---", response);
@@ -754,7 +832,46 @@ export default class PipelineProgramSetup extends Component {
                                         message: response.data.messageCode
                                     })
                                 }
-                            })
+                            }).catch(
+                                error => {
+                                    if (error.message === "Network Error") {
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                    } else {
+                                        switch (error.response ? error.response.status : "") {
+                
+                                            case 401:
+                                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                                break;
+                                            case 403:
+                                                this.props.history.push(`/accessDenied`)
+                                                break;
+                                            case 500:
+                                            case 404:
+                                            case 406:
+                                                this.setState({
+                                                    message: error.response.data.messageCode,
+                                                    loading: false
+                                                });
+                                                break;
+                                            case 412:
+                                                this.setState({
+                                                    message: error.response.data.messageCode,
+                                                    loading: false
+                                                });
+                                                break;
+                                            default:
+                                                this.setState({
+                                                    message: 'static.unkownError',
+                                                    loading: false
+                                                });
+                                                break;
+                                        }
+                                    }
+                                }
+                            );
                     } else {
                         console.log("in else------->");
                         PipelineService.getPipelineProgramDataById(this.props.match.params.pipelineId)
@@ -785,7 +902,46 @@ export default class PipelineProgramSetup extends Component {
                                                         message: response.data.messageCode
                                                     })
                                                 }
-                                            })
+                                            }).catch(
+                                                error => {
+                                                    if (error.message === "Network Error") {
+                                                        this.setState({
+                                                            message: 'static.unkownError',
+                                                            loading: false
+                                                        });
+                                                    } else {
+                                                        switch (error.response ? error.response.status : "") {
+                                
+                                                            case 401:
+                                                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                                                break;
+                                                            case 403:
+                                                                this.props.history.push(`/accessDenied`)
+                                                                break;
+                                                            case 500:
+                                                            case 404:
+                                                            case 406:
+                                                                this.setState({
+                                                                    message: error.response.data.messageCode,
+                                                                    loading: false
+                                                                });
+                                                                break;
+                                                            case 412:
+                                                                this.setState({
+                                                                    message: error.response.data.messageCode,
+                                                                    loading: false
+                                                                });
+                                                                break;
+                                                            default:
+                                                                this.setState({
+                                                                    message: 'static.unkownError',
+                                                                    loading: false
+                                                                });
+                                                                break;
+                                                        }
+                                                    }
+                                                }
+                                            );
 
                                     }
 
@@ -800,18 +956,38 @@ export default class PipelineProgramSetup extends Component {
                             }).catch(
                                 error => {
                                     if (error.message === "Network Error") {
-                                        this.setState({ message: error.message });
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
                                     } else {
                                         switch (error.response ? error.response.status : "") {
-                                            case 500:
+                
                                             case 401:
+                                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                                break;
+                                            case 403:
+                                                this.props.history.push(`/accessDenied`)
+                                                break;
+                                            case 500:
                                             case 404:
                                             case 406:
+                                                this.setState({
+                                                    message: error.response.data.messageCode,
+                                                    loading: false
+                                                });
+                                                break;
                                             case 412:
-                                                this.setState({ message: error.response.data.messageCode });
+                                                this.setState({
+                                                    message: error.response.data.messageCode,
+                                                    loading: false
+                                                });
                                                 break;
                                             default:
-                                                this.setState({ message: 'static.unkownError' });
+                                                this.setState({
+                                                    message: 'static.unkownError',
+                                                    loading: false
+                                                });
                                                 break;
                                         }
                                     }
@@ -831,18 +1007,38 @@ export default class PipelineProgramSetup extends Component {
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
                     } else {
                         switch (error.response ? error.response.status : "") {
-                            case 500:
+
                             case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
                             case 404:
                             case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
                             case 412:
-                                this.setState({ message: error.response.data.messageCode });
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
                                 break;
                             default:
-                                this.setState({ message: 'static.unkownError' });
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
                                 break;
                         }
                     }
@@ -1173,7 +1369,7 @@ export default class PipelineProgramSetup extends Component {
                                             <CardBody className="pt-0">
                                                 {/* <h3>Consumption</h3> */}
                                                 {/* {this.state.consumptionStatus && <PipelineProgramConsumption ref="consumptionChild" pipelineId={this.props.match.params.pipelineId} pipelineConsumptionList={this.state.pipelineConsumptionList}></PipelineProgramConsumption>} */}
-                                              {this.state.dataSourceStatus && <PipelineProgramDataSource ref="datasourcechild" pipelineId={this.props.match.params.pipelineId}></PipelineProgramDataSource>}  
+                                                {this.state.dataSourceStatus && <PipelineProgramDataSource ref="datasourcechild" pipelineId={this.props.match.params.pipelineId}></PipelineProgramDataSource>}
                                             </CardBody>
                                             {/*  <CardFooter>
                                                 <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepTwo} > <i className="fa fa-angle-double-left"></i> Previous</Button>
@@ -1200,7 +1396,7 @@ export default class PipelineProgramSetup extends Component {
                                             <CardBody className="pt-0">
                                                 {/* <h3>Consumption</h3> */}
                                                 {/* {this.state.consumptionStatus && <PipelineProgramConsumption ref="consumptionChild" pipelineId={this.props.match.params.pipelineId} pipelineConsumptionList={this.state.pipelineConsumptionList}></PipelineProgramConsumption>} */}
-                                               {this.state.fundingSourceStatus && <PipelineProgramFundingSource ref="fundingSourceChild" pipelineId={this.props.match.params.pipelineId}></PipelineProgramFundingSource>} 
+                                                {this.state.fundingSourceStatus && <PipelineProgramFundingSource ref="fundingSourceChild" pipelineId={this.props.match.params.pipelineId}></PipelineProgramFundingSource>}
                                             </CardBody>
                                             {/* <CardFooter>
                                                 <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepTwo} > <i className="fa fa-angle-double-left"></i> Previous</Button>

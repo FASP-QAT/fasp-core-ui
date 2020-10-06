@@ -213,7 +213,7 @@ if(value!=null){
     }
 
     getCountrylist() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         let realmId = AuthenticationService.getRealmId();
         RealmCountryService.getRealmCountryrealmIdById(realmId)
             .then(response => {
@@ -248,7 +248,7 @@ if(value!=null){
 
     getPrograms = () => {
         if (navigator.onLine) {
-            AuthenticationService.setupAxiosInterceptors();
+            // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramList()
                 .then(response => {
                     this.setState({
@@ -529,7 +529,7 @@ if(value!=null){
 
                 }
                 else {
-                    AuthenticationService.setupAxiosInterceptors();
+                    // AuthenticationService.setupAxiosInterceptors();
 
                     ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
                         console.log('**' + JSON.stringify(response.data))
@@ -783,7 +783,7 @@ if(value!=null){
                 /*var inputjson={
                 "realmCountryIds":CountryIds,"programIds":programIds,"planningUnitIds":planningUnitIds,"startDate": startDate
                }*/
-                AuthenticationService.setupAxiosInterceptors();
+                // AuthenticationService.setupAxiosInterceptors();
 
                 ReportService.getStockOverTime(input)
                     .then(response => {

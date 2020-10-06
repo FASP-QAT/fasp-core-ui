@@ -17,23 +17,38 @@ class LogoutComponent extends Component {
 
 
     componentDidMount() {
-        let keysToRemove = ["token-" + AuthenticationService.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken"];
-        let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-        if (navigator.onLine && localStorage.getItem('token-' + decryptedCurUser) != null && localStorage.getItem('token-' + decryptedCurUser) != "") {
-            AuthenticationService.setupAxiosInterceptors();
-            LogoutService.logout()
-                .then(response => {
-                    if (response.status == 200) {
-                        // this.props.history.push(`/login/static.logoutSuccess`)
-                    }
-                }).catch(
-                    error => {
-                        this.props.history.push(`/login/static.logoutSuccess`)
-                    }
-                );
+        console.log("########### Logout component did mount start ####################")
+        if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != "") {
+            let keysToRemove = ["token-" + AuthenticationService.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken"];
+            let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+            if (navigator.onLine && localStorage.getItem('token-' + decryptedCurUser) != null && localStorage.getItem('token-' + decryptedCurUser) != "") {
+                // AuthenticationService.setupAxiosInterceptors();
+                console.log("########### Going to call Logout api####################")
+                LogoutService.logout()
+                    .then(response => {
+                        console.log("logout component success");
+                        if (response.status == 200) {
+                            keysToRemove.forEach(k => localStorage.removeItem(k));
+                            console.log("########### Logout component did mount end ####################")
+                            // Newly added code below
+                            delete axios.defaults.headers.common["Authorization"];
+                            this.props.history.push(`/login/${this.props.match.params.message}`)
+                        }
+                    }).catch(
+                        error => {
+                            console.log("logout component error");
+                            keysToRemove.forEach(k => localStorage.removeItem(k));
+                            this.props.history.push(`/login/static.logoutError`)
+                        }
+                    );
+            } else {
+                keysToRemove.forEach(k => localStorage.removeItem(k));
+                this.props.history.push(`/login/${this.props.match.params.message}`)
+            }
+        } else {
+            this.props.history.push(`/login/static.accessDenied`)
         }
-        keysToRemove.forEach(k => localStorage.removeItem(k));
-        this.props.history.push(`/login/${this.props.match.params.message}`)
+
     }
     render() {
         return (

@@ -2422,7 +2422,7 @@ console.log(list)
                   }
                   ]
                 })*/
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         ReportService.getStockStatusData(inputjson)
           .then(response => {
             console.log(JSON.stringify(response.data));
@@ -2469,7 +2469,7 @@ console.log(list)
 
   getPrograms = () => {
     if (navigator.onLine) {
-      AuthenticationService.setupAxiosInterceptors();
+      // AuthenticationService.setupAxiosInterceptors();
       ProgramService.getProgramList()
         .then(response => {
           console.log(JSON.stringify(response.data))
@@ -2704,7 +2704,7 @@ console.log(list)
 
         }
         else {
-          AuthenticationService.setupAxiosInterceptors();
+          // AuthenticationService.setupAxiosInterceptors();
 
           ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
             console.log('**' + JSON.stringify(response.data))

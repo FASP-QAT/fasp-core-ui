@@ -736,7 +736,7 @@ export default class DataSourceListComponent extends Component {
     }
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         this.hideFirstComponent();
         ProgramService.getProgramList()
             .then(response => {
@@ -757,26 +757,46 @@ export default class DataSourceListComponent extends Component {
                 }
 
             })
-        // .catch(
-        //     error => {
-        //         if (error.message === "Network Error") {
-        //             this.setState({ message: error.message });
-        //         } else {
-        //             switch (error.response ? error.response.status : "") {
-        //                 case 500:
-        //                 case 401:
-        //                 case 404:
-        //                 case 406:
-        //                 case 412:
-        //                     this.setState({ message: error.response.data.messageCode });
-        //                     break;
-        //                 default:
-        //                     this.setState({ message: 'static.unkownError' });
-        //                     break;
-        //             }
-        //         }
-        //     }
-        // );
+            .catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
 
         RealmService.getRealmListAll()
             .then(response => {
@@ -788,26 +808,46 @@ export default class DataSourceListComponent extends Component {
                     this.setState({ message: response.data.messageCode, loading: false })
                 }
             })
-        // .catch(
-        //     error => {
-        //         if (error.message === "Network Error") {
-        //             this.setState({ message: error.message });
-        //         } else {
-        //             switch (error.response ? error.response.status : "") {
-        //                 case 500:
-        //                 case 401:
-        //                 case 404:
-        //                 case 406:
-        //                 case 412:
-        //                     this.setState({ message: error.response.data.messageCode });
-        //                     break;
-        //                 default:
-        //                     this.setState({ message: 'static.unkownError' });
-        //                     break;
-        //             }
-        //         }
-        //     }
-        // );
+            .catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
 
         DataSourceTypeService.getDataSourceTypeList().then(response => {
             console.log(response.data)
@@ -816,26 +856,46 @@ export default class DataSourceListComponent extends Component {
 
             })
         })
-        // .catch(
-        //     error => {
-        //         if (error.message === "Network Error") {
-        //             this.setState({ message: error.message });
-        //         } else {
-        //             switch (error.response.status) {
-        //                 case 500:
-        //                 case 401:
-        //                 case 404:
-        //                 case 406:
-        //                 case 412:
-        //                     this.setState({ message: error.response.data.messageCode });
-        //                     break;
-        //                 default:
-        //                     this.setState({ message: 'static.unkownError' });
-        //                     break;
-        //             }
-        //         }
-        //     }
-        // );
+            .catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
 
         DataSourceService.getAllDataSourceList().then(response => {
             // this.setState({
@@ -846,6 +906,46 @@ export default class DataSourceListComponent extends Component {
                 dataSourceList: response.data, selSource: response.data, loading: false
             }, () => { this.buildJexcel() })
         })
+            .catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
 
     }
     loaded = function (instance, cell, x, y, value) {
@@ -928,11 +1028,7 @@ export default class DataSourceListComponent extends Component {
 
         return (
             <div className="animated">
-                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
-                    this.setState({ message: message })
-                }} loading={(loading) => {
-                    this.setState({ loading: loading })
-                }} />
+                <AuthenticationServiceComponent history={this.props.history} />
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
@@ -1016,7 +1112,7 @@ export default class DataSourceListComponent extends Component {
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
-                            <div ><h4> <strong>Loading...</strong></h4></div>
+                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
                             <div class="spinner-border blue ml-4" role="status">
 

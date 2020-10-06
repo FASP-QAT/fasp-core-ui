@@ -1655,7 +1655,7 @@ class EditSupplyPlanStatus extends Component {
     getPlanningUnit = () => {
         let programId = this.props.match.params.programId;
 
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
 
         ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
             console.log('**' + JSON.stringify(response.data))
@@ -1737,7 +1737,7 @@ class EditSupplyPlanStatus extends Component {
 
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         ProgramService.getProgramData({ "programId": this.props.match.params.programId, "versionId": this.props.match.params.versionId })
             .then(response => {
                 console.log(response.data)
@@ -1792,7 +1792,7 @@ class EditSupplyPlanStatus extends Component {
                 }
             )
 
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         ProgramService.getVersionStatusList().then(response => {
             console.log('**' + JSON.stringify(response.data))
             this.setState({
@@ -2965,7 +2965,7 @@ class EditSupplyPlanStatus extends Component {
         this.props.history.push(`/report/supplyPlanVersionAndReview/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
     resetClicked = () => {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         ProgramService.getProgramData({ "programId": this.props.match.params.programId, "versionId": this.props.match.params.versionId })
             .then(response => {
                 console.log(response.data) 
