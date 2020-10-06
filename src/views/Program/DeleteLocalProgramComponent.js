@@ -49,7 +49,8 @@ class DeleteLocalProgramComponent extends Component {
             label: i18n.t('static.program.yes'),
             onClick: () => {
               console.log("programIds---", programIds);
-              this.deleteLocalProgram(programIds);
+              this.deleteLocalProgramFromProgramData(programIds);
+              this.deleteLocalProgramFromDownloadedProgramData(programIds);
             }
           },
           {
@@ -73,7 +74,7 @@ class DeleteLocalProgramComponent extends Component {
 
   }
 
-  deleteLocalProgram = (programIds) => {
+  deleteLocalProgramFromProgramData = (programIds) => {
     console.log("yes delete---------------", programIds)
     var db1;
     getDatabase();
@@ -106,13 +107,63 @@ class DeleteLocalProgramComponent extends Component {
           console.log("myResult---", myResult);
           this.setState({
             message: i18n.t('static.program.deleteLocalProgramSuccess'),
-            loading: false
+            loading: false,
+            programs: [],
+            programValues: []
+          }, () => {
+            this.getPrograms();
           })
         }.bind(this);
       }.bind(this)
     }
     this.setState({ programs: [] })
     this.getPrograms();
+  }
+
+  deleteLocalProgramFromDownloadedProgramData = (programIds) => {
+    console.log("yes delete 1---------------", programIds)
+    var db1;
+    getDatabase();
+    for (let i = 0; i <= programIds.length; i++) {
+      var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+      openRequest.onerror = function (event) {
+        this.setState({
+          message: i18n.t('static.program.errortext'),
+          color: 'red'
+        })
+        // this.hideFirstComponent()
+      }.bind(this);
+      openRequest.onsuccess = function (e) {
+        db1 = e.target.result;
+        var transaction = db1.transaction(['downloadedProgramData'], 'readwrite');
+        var program = transaction.objectStore('downloadedProgramData');
+        var getRequest = program.delete(programIds[i]);
+        var proList = []
+        getRequest.onerror = function (event) {
+          this.setState({
+            message: i18n.t('static.program.errortext'),
+            color: 'red'
+          })
+          // this.hideFirstComponent()
+        }.bind(this);
+        getRequest.onsuccess = function (event) {
+          var myResult = [];
+          myResult = getRequest.result;
+
+          console.log("myResult---", myResult);
+          this.setState({
+            message: i18n.t('static.program.deleteLocalProgramSuccess'),
+            loading: false,
+            programs: [],
+            programValues: []
+          }, () => {
+            this.getPrograms();
+          })
+        }.bind(this);
+      }.bind(this)
+    }
+    // this.setState({ programs: [] })
+    // this.getPrograms();
   }
 
   getPrograms() {
@@ -182,6 +233,7 @@ class DeleteLocalProgramComponent extends Component {
   loading = () => <div className="animated fadeIn pt-1 text-center">Loading...</div>
 
   render() {
+    console.log("program values-------------",this.state.programValues);
     const { programs } = this.state;
     let programList = programs.length > 0
       && programs.map((item, i) => {
