@@ -268,15 +268,20 @@ class Login extends Component {
 
                           }
                           else {
+                            console.log("offline emailId---", emailId)
                             var decryptedPassword = AuthenticationService.isUserLoggedIn(emailId);
+                            console.log("offline decryptedPassword---", decryptedPassword)
                             if (decryptedPassword != "") {
                               bcrypt.compare(password, decryptedPassword, function (err, res) {
                                 if (err) {
+                                  console.log("offline error---", err)
                                   this.setState({ message: 'static.label.labelFail' });
                                 }
                                 if (res) {
                                   let tempUser = localStorage.getItem("tempUser");
+                                  console.log("offline tempuser---", tempUser)
                                   let user = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + tempUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+                                  console.log("offline user next---", user)
                                   let keysToRemove = ["curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken"];
                                   keysToRemove.forEach(k => localStorage.removeItem(k))
 
@@ -295,11 +300,13 @@ class Login extends Component {
 
                                   }
                                 } else {
+                                  console.log("offline invalid credentials---")
                                   this.setState({ message: 'static.message.login.invalidCredentials' });
                                 }
                               }.bind(this));
                             }
                             else {
+                              console.log("offline decryptedPassword empty---", decryptedPassword)
                               this.setState({ message: 'static.message.login.invalidCredentials' });
                             }
                           }
@@ -394,8 +401,8 @@ class Login extends Component {
                   and delivers health commodities, offers comprehensive technical assistance to strengthen
                   national supply chain systems, and provides global supply chain leadership. For more
                   information, visit <a href="https://www.ghsupplychain.org/" target="_blank">ghsupplychain.org</a>. The information provided in this tool is not
-                                                                                    official U.S. government information and does not represent the views or positions of the
-                                                                                    Agency for International Development or the U.S. government.
+                                                                                      official U.S. government information and does not represent the views or positions of the
+                                                                                      Agency for International Development or the U.S. government.
               </p>
                 </CardBody>
                 <Row className="text-center Login-bttom-logo">
