@@ -101,7 +101,7 @@ class Login extends Component {
 
   componentDidMount() {
     console.log("############## Login component did mount #####################");
-    delete axios.defaults.headers.common["Authorization"];
+   // delete axios.defaults.headers.common["Authorization"];
     this.logoutMessagehide();
     console.log("--------Going to call version api-----------")
     AuthenticationService.clearUserDetails()
