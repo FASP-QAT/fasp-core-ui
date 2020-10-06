@@ -812,8 +812,7 @@ export default class ConsumptionDetails extends React.Component {
             data[14] = problemList[j].realmProblem.problem.problemId
             data[15] = problemList[j].realmProblem.problem.actionUrl
             data[16] = problemList[j].realmProblem.criticality.id
-
-
+            data[17] = getLabelText(problemList[j].realmProblem.criticality.label, this.state.lang)
             problemArray[count] = data;
             count++;
         }
@@ -900,6 +899,10 @@ export default class ConsumptionDetails extends React.Component {
                 {
                     title: 'criticalitiId',
                     type: 'hidden',
+                },
+                {
+                    title: 'Criticality',
+                    type: 'text',
                 },
 
 
@@ -1003,36 +1006,36 @@ export default class ConsumptionDetails extends React.Component {
 
         jExcelLoadedFunction(instance);
 
-        var elInstance = instance.jexcel;
-        var json = elInstance.getJson();
-        for (var j = 0; j < json.length; j++) {
-            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P']
-            var rowData = elInstance.getRowData(j);
-            var criticalityId = rowData[16];
-            var problemStatusId = rowData[12];
-            if (criticalityId == 3 && problemStatusId == 1) {
-                for (var i = 0; i < colArr.length; i++) {
-                    elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
-                    elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', '#f48282');
-                    let textColor = contrast('#f48282');
-                    elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'color', textColor);
-                }
-            } else if (criticalityId == 2 && problemStatusId == 1) {
-                for (var i = 0; i < colArr.length; i++) {
-                    elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
-                    elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'orange');
-                    let textColor = contrast('orange');
-                    elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'color', textColor);
-                }
-            } else if (criticalityId == 1 && problemStatusId == 1) {
-                for (var i = 0; i < colArr.length; i++) {
-                    elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
-                    elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'yellow');
-                    let textColor = contrast('yellow');
-                    elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'color', textColor);
-                }
-            }
-        }
+        // var elInstance = instance.jexcel;
+        // var json = elInstance.getJson();
+        // for (var j = 0; j < json.length; j++) {
+        //     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P']
+        //     var rowData = elInstance.getRowData(j);
+        //     var criticalityId = rowData[16];
+        //     var problemStatusId = rowData[12];
+        //     if (criticalityId == 3 && problemStatusId == 1) {
+        //         for (var i = 0; i < colArr.length; i++) {
+        //             elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
+        //             elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', '#f48282');
+        //             let textColor = contrast('#f48282');
+        //             elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'color', textColor);
+        //         }
+        //     } else if (criticalityId == 2 && problemStatusId == 1) {
+        //         for (var i = 0; i < colArr.length; i++) {
+        //             elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
+        //             elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'orange');
+        //             let textColor = contrast('orange');
+        //             elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'color', textColor);
+        //         }
+        //     } else if (criticalityId == 1 && problemStatusId == 1) {
+        //         for (var i = 0; i < colArr.length; i++) {
+        //             elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
+        //             elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'yellow');
+        //             let textColor = contrast('yellow');
+        //             elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'color', textColor);
+        //         }
+        //     }
+        // }
     }
 
     getProblemListAfterCalculation() {
@@ -1102,10 +1105,20 @@ export default class ConsumptionDetails extends React.Component {
                     var programJson = JSON.parse(programData);
 
                     var problemReportList = (programJson.problemReportList);
+                    var problemReportFilterList = problemReportList;
 
                     if (problemStatusId != -1) {
-
-                        var problemReportFilterList = problemReportList.filter(c => c.problemStatus.id == problemStatusId && c.problemType.id == problemTypeId);
+                        // var problemReportFilterList = problemReportList.filter(c => c.problemStatus.id == problemStatusId && c.problemType.id == problemTypeId);
+                        problemReportFilterList = problemReportList.filter(c => c.problemStatus.id == problemStatusId);
+                        this.setState({
+                            data: problemReportFilterList,
+                            message: ''
+                        },
+                            () => {
+                                this.buildJExcel();
+                            });
+                    } if (problemTypeId != -1) {
+                        problemReportFilterList = problemReportList.filter(c => c.problemType.id == problemTypeId);
                         this.setState({
                             data: problemReportFilterList,
                             message: ''
@@ -1114,7 +1127,7 @@ export default class ConsumptionDetails extends React.Component {
                                 this.buildJExcel();
                             });
                     } else {
-                        var problemReportFilterList = problemReportList.filter(c => c.problemType.id == problemTypeId);
+
                         this.setState({
                             data: problemReportFilterList,
                             message: ''
@@ -1122,6 +1135,7 @@ export default class ConsumptionDetails extends React.Component {
                             () => {
                                 this.buildJExcel();
                             });
+
                     }
                     // console.log("problemReportFilterList---->", problemReportFilterList);
 
@@ -1234,167 +1248,6 @@ export default class ConsumptionDetails extends React.Component {
                 )
             }, this);
 
-        const columns = [
-            {
-                dataField: 'program.programCode',
-                text: i18n.t('static.program.programCode'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { width: '80px' },
-                // formatter: (cell, row) => {
-                //     return getLabelText(cell, this.state.lang);
-                // }
-            },
-            {
-                dataField: 'versionId',
-                text: i18n.t('static.program.versionId'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { width: '60px' },
-            },
-            {
-                dataField: 'region.label',
-                text: i18n.t('static.region.region'),
-                hidden: true,
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { width: '80px' },
-                formatter: (cell, row) => {
-                    if (cell != null && cell != "") {
-                        return getLabelText(cell, this.state.lang);
-                    }
-                }
-
-            },
-            {
-                dataField: 'planningUnit.label',
-                text: i18n.t('static.planningunit.planningunit'),
-                sort: true,
-                hidden: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { width: '170px' },
-                formatter: (cell, row) => {
-                    return getLabelText(cell, this.state.lang);
-                }
-            },
-            {
-                dataField: 'dt',
-                text: i18n.t('static.report.month'),
-                sort: true,
-                hidden: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { width: '100px' },
-                formatter: (cell, row) => {
-                    if (cell != null && cell != "") {
-                        var modifiedDate = moment(cell).format('MMM-YY');
-                        return modifiedDate;
-                    }
-                }
-            },
-            {
-                dataField: 'createdDate',
-                text: i18n.t('static.report.createdDate'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { width: '100px' },
-                formatter: (cell, row) => {
-                    if (cell != null && cell != "") {
-                        var modifiedDate = moment(cell).format('MMM-YY');
-                        console.log("date===>", modifiedDate);
-                        return modifiedDate;
-                    }
-                }
-            },
-            {
-                dataField: 'realmProblem.problem.label',
-                text: i18n.t('static.report.problemDescription'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { width: '230px' },
-                formatter: (cell, row) => {
-                    return getProblemDesc(row, this.state.lang);
-                }
-            },
-            {
-                dataField: 'realmProblem.problem.actionLabel',
-                text: i18n.t('static.report.suggession'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { width: '250px' },
-                formatter: (cell, row) => {
-                    // return getLabelText(cell, this.state.lang);
-                    return getSuggestion(row, this.state.lang);
-                }
-            },
-            {
-                dataField: 'problemStatus.label',
-                text: i18n.t('static.report.problemStatus'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { width: '90px' },
-                formatter: (cell, row) => {
-                    return getLabelText(cell, this.state.lang);
-                }
-            },
-            {
-                dataField: 'problemTransList',
-                text: i18n.t('static.program.notes'),
-                sort: true,
-                align: 'center',
-                style: { width: '100px' },
-                headerAlign: 'center',
-                style: { width: '170px' },
-                formatter: (cell, row) => {
-                    return this.getNote(row, this.state.lang);
-                }
-            },
-            {
-                dataField: 'realmProblem.problem.actionUrl',
-                text: i18n.t('static.common.action'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { width: '50px' },
-                formatter: this.buttonFormatter
-            }
-
-        ];
-        const options = {
-            hidePageListOnlyOnePage: true,
-            firstPageText: i18n.t('static.common.first'),
-            prePageText: i18n.t('static.common.back'),
-            nextPageText: i18n.t('static.common.next'),
-            lastPageText: i18n.t('static.common.last'),
-            nextPageTitle: i18n.t('static.common.firstPage'),
-            prePageTitle: i18n.t('static.common.prevPage'),
-            firstPageTitle: i18n.t('static.common.nextPage'),
-            lastPageTitle: i18n.t('static.common.lastPage'),
-            showTotal: true,
-            paginationTotalRenderer: customTotal,
-            disablePageTitle: true,
-            sizePerPageList: [{
-                text: '10', value: 10
-            }, {
-                text: '30', value: 30
-            }
-                ,
-            {
-                text: '50', value: 50
-            },
-            {
-                text: 'All', value: this.state.data.length
-            }]
-        }
-
         return (
 
             <div className="animated">
@@ -1447,7 +1300,7 @@ export default class ConsumptionDetails extends React.Component {
                                                 onChange={this.fetchData}
                                             // value={1}
                                             >
-                                                <option value="-1">{i18n.t('static.common.all')}</option>
+                                                {/* <option value="-1">{i18n.t('static.common.all')}</option> */}
                                                 {problemStatus}
                                             </Input>
                                         </InputGroup>
@@ -1463,10 +1316,10 @@ export default class ConsumptionDetails extends React.Component {
                                                 name="problemTypeId" id="problemTypeId"
                                                 onChange={this.fetchData}
                                             >
-                                                {/* <option value="0">Please select</option> */}
-                                                <option value="1">Automatic</option>
-                                                <option value="2">Manual</option>
-                                                <option value="3">Automatic / Manual</option>
+                                                <option value="-1">{i18n.t('static.common.all')}</option>
+                                                <option value="1">{i18n.t('static.report.problemAction.automatic')}</option>
+                                                <option value="2">{i18n.t('static.report.problemAction.manual')}</option>
+                                                {/* <option value="3">Automatic / Manual</option> */}
                                             </Input>
                                         </InputGroup>
                                     </div>

@@ -15,6 +15,7 @@ import CryptoJS from 'crypto-js';
 import moment, { months } from 'moment';
 
 import React, { Component } from "react";
+import openProblem from '../CommonComponent/openProblem.js';
 
 export default class QatProblemActions extends Component {
 
@@ -170,14 +171,15 @@ export default class QatProblemActions extends Component {
                                 }
                             }
                             for (var pp = 0; pp < programList.length; pp++) {
-                                console.log("=====>in for====>", programList[pp]);
+                                // console.log("=====>in for====>", programList[pp]);
                                 var versionID = versionIDs[pp];
                                 var problemActionIndex = 0;
                                 problemActionList = programList[pp].problemReportList;
+                                // console.log("problemActionList=====>", problemActionList);
                                 problemActionIndex = programList[pp].problemReportList.length;
                                 var regionList = programList[pp].regionList;
                                 problemList = problemRequest.result.filter(c => c.realm.id == programList[pp].realmCountry.realm.realmId);
-                                console.log("test=====>problem List===>", problemList);
+                                // console.log("test=====>problem List===>", problemList);
                                 planningUnitList = planningUnitResult.filter(c => c.program.id == programList[pp].programId);
                                 // for (var r = 0; r < regionList.length; r++) {
                                 for (var p = 0; p < planningUnitList.length; p++) {
@@ -193,15 +195,79 @@ export default class QatProblemActions extends Component {
                                                 // for (var m = 1; m <= numberOfMonths; m++) {
                                                 var myStartDate = moment(Date.now()).subtract(numberOfMonths, 'months').startOf('month').format("YYYY-MM-DD");
                                                 var myEndDate = moment(Date.now()).subtract(1, 'months').endOf('month').format("YYYY-MM-DD");
-                                                var filteredConsumptionList = consumptionList.filter(c => moment(c.consumptionDate).format('YYYY-MM-DD') >= myStartDate && moment(c.consumptionDate).format('YYYY-MM-DD') <= myEndDate && c.actualFlag.toString() == "true");
+                                                // var filteredConsumptionList = consumptionList.filter(c => moment(c.consumptionDate).format('YYYY-MM-DD') >= myStartDate && moment(c.consumptionDate).format('YYYY-MM-DD') <= myEndDate && c.actualFlag.toString() == "true");
+                                                var filteredConsumptionList = consumptionList.filter(c => moment(c.consumptionDate).format('YYYY-MM-DD') >= myStartDate && moment(c.consumptionDate).format('YYYY-MM-DD') <= myEndDate && c.actualFlag.toString() == "true" && c.active == true);
+
+                                                if (problemActionList[prob] != undefined) {
+                                                    var myStartDate1 = moment(problemActionList[prob].dt).subtract(numberOfMonths, 'months').startOf('month').format("YYYY-MM-DD");
+                                                    var myEndDate1 = moment(problemActionList[prob].dt).subtract(1, 'months').endOf('month').format("YYYY-MM-DD");
+                                                    // console.log("myStartDate1====>", myStartDate1);
+                                                    // console.log("myEndDate1====>", myEndDate1);
+                                                    var filteredConsumptionList1 = consumptionList.filter(c => moment(c.consumptionDate).format('YYYY-MM-DD') >= myStartDate1 && moment(c.consumptionDate).format('YYYY-MM-DD') <= myEndDate1 && c.actualFlag.toString() == "true" && c.active == true);
+                                                    var index1 = problemActionList.findIndex(
+                                                        c => moment(c.dt).format("YYYY-MM") == moment(problemActionList[prob].dt).format("YYYY-MM")
+                                                            && c.region.id == regionList[r].regionId
+                                                            && c.planningUnit.id == planningUnitList[p].planningUnit.id
+                                                            && c.program.id == programList[pp].programId
+                                                            && c.realmProblem.problem.problemId == 1
+                                                        // && c.versionId == versionID
+                                                    );
+                                                    // console.log("filteredConsumptionList1====>", filteredConsumptionList1);
+                                                    // console.log("index1====>", index1);
+
+                                                    if (filteredConsumptionList1.length > 0 && index1 != -1 && problemActionList[index1].problemStatus.id == 1) {
+                                                        var filterObj = problemActionList[index1];
+                                                        var transList = filterObj.problemTransList;
+                                                        let tempProblemTransObj = {
+                                                            problemReportTransId: '',
+                                                            problemStatus: {
+                                                                id: 2,
+                                                                label: {
+                                                                    active: true,
+                                                                    labelId: 462,
+                                                                    label_en: "Resolved",
+                                                                    label_sp: null,
+                                                                    label_fr: null,
+                                                                    label_pr: null
+                                                                }
+                                                            },
+                                                            notes: 'Resolved',
+                                                            createdBy: {
+                                                                userId: userId,
+                                                                username: username
+                                                            },
+                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
+                                                        }
+                                                        transList.push(tempProblemTransObj);
+                                                        filterObj.problemTransList = transList;
+
+                                                        var problemStatusObject = {
+                                                            id: 2,
+                                                            label: {
+                                                                active: true,
+                                                                labelId: 462,
+                                                                label_en: "Resolved",
+                                                                label_sp: null,
+                                                                label_fr: null,
+                                                                label_pr: null
+                                                            }
+                                                        }
+                                                        filterObj.problemStatus = problemStatusObject;
+                                                    } else {
+                                                        // auto open logic for index -1 =====************=========
+                                                        if (filteredConsumptionList1.length == 0 && index1 != -1 && problemActionList[index1].problemStatus.id == 2) {
+                                                            openProblem(index1, username, userId, problemActionList);
+                                                        }
+                                                    }
+                                                }
                                                 var index = problemActionList.findIndex(
                                                     c => moment(c.dt).format("YYYY-MM") == moment(Date.now()).format("YYYY-MM")
                                                         && c.region.id == regionList[r].regionId
                                                         && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                         && c.program.id == programList[pp].programId
                                                         && c.realmProblem.problem.problemId == 1
-                                                        // && c.versionId == versionID
-                                                        );
+                                                    // && c.versionId == versionID
+                                                );
                                                 if (filteredConsumptionList.length == 0) {
                                                     // console.log("index====>", index);
                                                     if (index == -1) {
@@ -276,13 +342,15 @@ export default class QatProblemActions extends Component {
                                                         problemActionList.push(json);
                                                         problemActionIndex++;
                                                     } else {
-                                                        // problemActionList[index].isFound = 1;
+                                                        // auto open logic for index 1************========= problemActionList[index].isFound = 1;
+                                                        if (index != -1 && problemActionList[index].problemStatus.id == 2) {
+                                                            openProblem(index, username, userId, problemActionList);
+                                                        }
                                                     }
 
                                                 } else {
                                                     if (index != -1 && problemActionList[index].problemStatus.id == 1) {
-                                                        // console.log("****** in logic to make isfound 0 consumption**********",problemActionList[index]);
-                                                        // problemActionList[index].isFound = 0;
+                                                        // console.log("****** in logic to make isfound 0 consumption**********",problemActionList[index]====problemActionList[index].isFound = 0);
                                                         var filterObj = problemActionList[index];
                                                         var transList = filterObj.problemTransList;
                                                         let tempProblemTransObj = {
@@ -338,16 +406,75 @@ export default class QatProblemActions extends Component {
                                                 // for (var mi = 1; mi <= numberOfMonthsInventory; mi++) {
                                                 var myStartDateInventory = moment(Date.now()).subtract(numberOfMonthsInventory, 'months').startOf('month').format("YYYY-MM-DD");
                                                 var myEndDateInventory = moment(Date.now()).subtract(1, 'months').endOf('month').format("YYYY-MM-DD");
-
-                                                var filterInventoryList = inventoryList.filter(c => moment(c.inventoryDate).format('YYYY-MM-DD') >= myStartDateInventory && moment(c.inventoryDate).format('YYYY-MM-DD') <= myEndDateInventory);
+                                                var filterInventoryList = inventoryList.filter(c => moment(c.inventoryDate).format('YYYY-MM-DD') >= myStartDateInventory && moment(c.inventoryDate).format('YYYY-MM-DD') <= myEndDateInventory && c.active == true);
                                                 var index = problemActionList.findIndex(
                                                     c => moment(c.dt).format("YYYY-MM") == moment(Date.now()).format("YYYY-MM")
                                                         && c.region.id == regionList[r].regionId
                                                         && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                         && c.program.id == programList[pp].programId
                                                         && c.realmProblem.problem.problemId == 2
+                                                    // && c.versionId == versionID
+                                                );
+                                                // console.log("prob====>", prob)
+                                                if (problemActionList[prob] != undefined) {
+                                                    var myStartDateInventory1 = moment(problemActionList[prob].dt).subtract(numberOfMonthsInventory, 'months').startOf('month').format("YYYY-MM-DD");
+                                                    var myEndDateInventory1 = moment(problemActionList[prob].dt).subtract(1, 'months').endOf('month').format("YYYY-MM-DD");
+                                                    var filterInventoryList1 = inventoryList.filter(c => moment(c.inventoryDate).format('YYYY-MM-DD') >= myStartDateInventory1 && moment(c.inventoryDate).format('YYYY-MM-DD') <= myEndDateInventory1 && c.active == true);
+                                                    var index1 = problemActionList.findIndex(
+                                                        c => moment(c.dt).format("YYYY-MM") == moment(problemActionList[prob].dt).format("YYYY-MM")
+                                                            && c.region.id == regionList[r].regionId
+                                                            && c.planningUnit.id == planningUnitList[p].planningUnit.id
+                                                            && c.program.id == programList[pp].programId
+                                                            && c.realmProblem.problem.problemId == 2
                                                         // && c.versionId == versionID
-                                                        );
+                                                    );
+
+                                                    if (filterInventoryList1.length > 0 && index1 != -1 && problemActionList[index1].problemStatus.id == 1) {
+
+                                                        var filterObj = problemActionList[index1];
+                                                        var transList = filterObj.problemTransList;
+                                                        let tempProblemTransObj = {
+                                                            problemReportTransId: '',
+                                                            problemStatus: {
+                                                                id: 2,
+                                                                label: {
+                                                                    active: true,
+                                                                    labelId: 462,
+                                                                    label_en: "Resolved",
+                                                                    label_sp: null,
+                                                                    label_fr: null,
+                                                                    label_pr: null
+                                                                }
+                                                            },
+                                                            notes: 'Resolved',
+                                                            createdBy: {
+                                                                userId: userId,
+                                                                username: username
+                                                            },
+                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
+                                                        }
+                                                        transList.push(tempProblemTransObj);
+                                                        filterObj.problemTransList = transList;
+
+                                                        var problemStatusObject = {
+                                                            id: 2,
+                                                            label: {
+                                                                active: true,
+                                                                labelId: 462,
+                                                                label_en: "Resolved",
+                                                                label_sp: null,
+                                                                label_fr: null,
+                                                                label_pr: null
+                                                            }
+                                                        }
+                                                        filterObj.problemStatus = problemStatusObject;
+                                                    } else {
+                                                        if (filterInventoryList1.length == 0 && index1 != -1 && problemActionList[index1].problemStatus.id == 2) {
+                                                            openProblem(index1, username, userId, problemActionList);
+                                                        }
+                                                    }
+                                                }
+
 
                                                 if (filterInventoryList.length == 0) {
                                                     if (index == -1) {
@@ -410,7 +537,7 @@ export default class QatProblemActions extends Component {
                                                                             label_pr: null
                                                                         }
                                                                     },
-                                                                    notes: "Second test",
+                                                                    notes: "Open",
                                                                     createdBy: {
                                                                         userId: userId,
                                                                         username: username
@@ -424,7 +551,10 @@ export default class QatProblemActions extends Component {
                                                         problemActionList.push(json);
                                                         problemActionIndex++;
                                                     } else {
-                                                        // problemActionList[index].isFound = 1;
+                                                        // problemActionList[index].isFound = 1 ==== auto open logic for problem;
+                                                        if (index != -1 && problemActionList[index].problemStatus.id == 2) {
+                                                            openProblem(index, username, userId, problemActionList);
+                                                        }
                                                     }
                                                 } else {
                                                     if (index != -1 && problemActionList[index].problemStatus.id == 1) {
@@ -480,7 +610,7 @@ export default class QatProblemActions extends Component {
                                             var shipmentList = programList[pp].shipmentList;
                                             // console.log("shipmentList=======>", shipmentList);
                                             var myDateShipment = moment(Date.now()).format("YYYY-MM-DD");
-                                            var filteredShipmentList = shipmentList.filter(c => moment(c.expectedDeliveryDate).add(parseInt(problemList[prob].data1), 'days').format('YYYY-MM-DD') < moment(myDateShipment).format('YYYY-MM-DD') && c.shipmentStatus.id != 7);
+                                            var filteredShipmentList = shipmentList.filter(c => moment(c.expectedDeliveryDate).add(parseInt(problemList[prob].data1), 'days').format('YYYY-MM-DD') < moment(myDateShipment).format('YYYY-MM-DD') && c.shipmentStatus.id != 7 && c.active == true);
                                             if (filteredShipmentList.length > 0) {
 
                                                 var shipmentIdsFromShipmnetList = [];
@@ -499,15 +629,15 @@ export default class QatProblemActions extends Component {
                                                             c => c.program.id == programList[pp].programId
                                                                 && c.shipmentId == filteredShipmentList[s].shipmentId
                                                                 && c.realmProblem.problem.problemId == 3
-                                                                // && c.versionId == versionID
-                                                                );
+                                                            // && c.versionId == versionID
+                                                        );
                                                     } else {
                                                         indexShipment = problemActionList.findIndex(
                                                             c => c.program.id == programList[pp].programId
                                                                 && c.index == filteredShipmentList[s].index
                                                                 && c.realmProblem.problem.problemId == 3
-                                                                // && c.versionId == versionID
-                                                                );
+                                                            // && c.versionId == versionID
+                                                        );
                                                         newAddShipment = true;
                                                     }
 
@@ -575,7 +705,7 @@ export default class QatProblemActions extends Component {
                                                                             label_pr: null
                                                                         }
                                                                     },
-                                                                    notes: "Second test",
+                                                                    notes: "Open",
                                                                     createdBy: {
                                                                         userId: userId,
                                                                         username: username
@@ -589,6 +719,9 @@ export default class QatProblemActions extends Component {
                                                         problemActionIndex++;
                                                     } else {
                                                         // make shipmet problem status eual to open========
+                                                        if (indexShipment != -1 && problemActionList[indexShipment].problemStatus.id == 2) {
+                                                            openProblem(indexShipment, username, userId, problemActionList);
+                                                        }
                                                     }
                                                 }
                                                 for (var kb = 0; kb < problemActionList.length; kb++) {
@@ -600,6 +733,9 @@ export default class QatProblemActions extends Component {
                                                         }
                                                         if (shipmentIdsFromShipmnetList.includes(kbShipmentId)) {
                                                             // make status open 
+                                                            if (problemActionList[kb].problemStatus.id == 2){
+                                                                openProblem(kb, username, userId, problemActionList);
+                                                            }
                                                         } else {
                                                             // make shipmentStatus resolved=============
                                                             //console.log("****** in logic to make status resolved  in shipmnet**********", problemActionList[index]);
@@ -618,7 +754,7 @@ export default class QatProblemActions extends Component {
                                                                         label_pr: null
                                                                     }
                                                                 },
-                                                                notes: 'Resolved one',
+                                                                notes: 'Resolved',
                                                                 createdBy: {
                                                                     userId: userId,
                                                                     username: username
@@ -664,7 +800,7 @@ export default class QatProblemActions extends Component {
                                                                     label_pr: null
                                                                 }
                                                             },
-                                                            notes: 'Resolved two',
+                                                            notes: 'Resolved',
                                                             createdBy: {
                                                                 userId: userId,
                                                                 username: username
@@ -702,16 +838,77 @@ export default class QatProblemActions extends Component {
                                                 // for (var m = 1; m <= numberOfMonthsInFunture; m++) {
                                                 var myStartDateFuture = moment(Date.now()).add(1, 'months').startOf('month').format("YYYY-MM-DD");
                                                 var myEndDateFuture = moment(Date.now()).add(numberOfMonthsInFunture, 'months').endOf('month').format("YYYY-MM-DD");
-                                                var filteredConsumptionListTwo = consumptionList.filter(c => moment(c.consumptionDate).format('YYYY-MM-DD') >= myStartDateFuture && moment(c.consumptionDate).format('YYYY-MM-DD') <= myEndDateFuture && c.actualFlag.toString() == "false");
+                                                var filteredConsumptionListTwo = consumptionList.filter(c => moment(c.consumptionDate).format('YYYY-MM-DD') >= myStartDateFuture && moment(c.consumptionDate).format('YYYY-MM-DD') <= myEndDateFuture && c.actualFlag.toString() == "false" && c.active==true);
                                                 var index = problemActionList.findIndex(
                                                     c => moment(c.dt).format("YYYY-MM") == moment(Date.now()).format("YYYY-MM")
                                                         && c.region.id == regionList[r].regionId
                                                         && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                         && c.program.id == programList[pp].programId
                                                         && c.realmProblem.problem.problemId == 8
-                                                        // && c.versionId == versionID
-                                                        );
+                                                    // && c.versionId == versionID
+                                                );
 
+
+                                                if (problemActionList[prob] != undefined) {
+
+                                                    var myStartDateFuture1 = moment(problemActionList[prob].dt).add(1, 'months').startOf('month').format("YYYY-MM-DD");
+                                                    var myEndDateFuture1 = moment(problemActionList[prob].dt).add(numberOfMonthsInFunture, 'months').endOf('month').format("YYYY-MM-DD");
+                                                    var filteredConsumptionListTwo1 = consumptionList.filter(c => moment(c.consumptionDate).format('YYYY-MM-DD') >= myStartDateFuture1 && moment(c.consumptionDate).format('YYYY-MM-DD') <= myEndDateFuture1 && c.actualFlag.toString() == "false" && c.active==true);
+                                                    var index1 = problemActionList.findIndex(
+                                                        c => moment(c.dt).format("YYYY-MM") == moment(problemActionList[prob].dt).format("YYYY-MM")
+                                                            && c.region.id == regionList[r].regionId
+                                                            && c.planningUnit.id == planningUnitList[p].planningUnit.id
+                                                            && c.program.id == programList[pp].programId
+                                                            && c.realmProblem.problem.problemId == 8
+                                                        // && c.versionId == versionID
+                                                    );
+
+                                                    if (filteredConsumptionListTwo1.length == 18 && index1 != -1 && problemActionList[index1].problemStatus.id == 1) {
+
+                                                        var filterObj = problemActionList[index1];
+                                                        var transList = filterObj.problemTransList;
+                                                        let tempProblemTransObj = {
+                                                            problemReportTransId: '',
+                                                            problemStatus: {
+                                                                id: 2,
+                                                                label: {
+                                                                    active: true,
+                                                                    labelId: 462,
+                                                                    label_en: "Resolved",
+                                                                    label_sp: null,
+                                                                    label_fr: null,
+                                                                    label_pr: null
+                                                                }
+                                                            },
+                                                            notes: 'Resolved',
+                                                            createdBy: {
+                                                                userId: userId,
+                                                                username: username
+                                                            },
+                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
+                                                        }
+                                                        transList.push(tempProblemTransObj);
+                                                        filterObj.problemTransList = transList;
+
+                                                        var problemStatusObject = {
+                                                            id: 2,
+                                                            label: {
+                                                                active: true,
+                                                                labelId: 462,
+                                                                label_en: "Resolved",
+                                                                label_sp: null,
+                                                                label_fr: null,
+                                                                label_pr: null
+                                                            }
+                                                        }
+                                                        filterObj.problemStatus = problemStatusObject;
+
+                                                    } else {
+                                                        if (filteredConsumptionListTwo1.length != 18 && index1 != -1 && problemActionList[index1].problemStatus.id == 2) {
+                                                            openProblem(index1, username, userId, problemActionList);
+                                                        }
+                                                    }
+                                                }
                                                 if (filteredConsumptionListTwo.length != 18) {
                                                     if (index == -1) {
                                                         var json = {
@@ -771,7 +968,7 @@ export default class QatProblemActions extends Component {
                                                                             label_pr: null
                                                                         }
                                                                     },
-                                                                    notes: "Second test",
+                                                                    notes: "Open",
                                                                     createdBy: {
                                                                         userId: userId,
                                                                         username: username
@@ -784,8 +981,10 @@ export default class QatProblemActions extends Component {
                                                         problemActionList.push(json);
                                                         problemActionIndex++;
                                                     } else {
-                                                        // problemActionList[index].isFound = 1;
-
+                                                        // problemActionList[index].isFound = 1===== auto open logic;
+                                                        if (index != -1 && problemActionList[index].problemStatus.id == 2) {
+                                                            openProblem(index, username, userId, problemActionList);
+                                                        }
                                                     }
 
                                                 } else {
@@ -860,15 +1059,15 @@ export default class QatProblemActions extends Component {
                                                             c => c.program.id == programList[pp].programId
                                                                 && c.shipmentId == filteredShipmentList[s].shipmentId
                                                                 && c.realmProblem.problem.problemId == 4
-                                                                // && c.versionId == versionID
-                                                                );
+                                                            // && c.versionId == versionID
+                                                        );
                                                     } else {
                                                         indexShipment = problemActionList.findIndex(
                                                             c => c.program.id == programList[pp].programId
                                                                 && c.index == filteredShipmentList[s].index
                                                                 && c.realmProblem.problem.problemId == 4
-                                                                // && c.versionId == versionID
-                                                                );
+                                                            // && c.versionId == versionID
+                                                        );
                                                         newAddShipment = true;
                                                     }
 
@@ -936,7 +1135,7 @@ export default class QatProblemActions extends Component {
                                                                             label_pr: null
                                                                         }
                                                                     },
-                                                                    notes: "Second test",
+                                                                    notes: "Open",
                                                                     createdBy: {
                                                                         userId: userId,
                                                                         username: username
@@ -950,6 +1149,9 @@ export default class QatProblemActions extends Component {
                                                         problemActionIndex++;
                                                     } else {
                                                         // make shipmet problem status eual to open========
+                                                        if (indexShipment != -1 && problemActionList[indexShipment].problemStatus.id == 2) {
+                                                            openProblem(indexShipment, username, userId, problemActionList);
+                                                        }
                                                     }
 
                                                 }
@@ -961,6 +1163,10 @@ export default class QatProblemActions extends Component {
                                                         }
                                                         if (shipmentIdsFromShipmnetList.includes(kbShipmentId)) {
                                                             // make status open 
+                                                            if (problemActionList[kb].problemStatus.id == 2){
+                                                                openProblem(kb, username, userId, problemActionList);
+                                                            }
+
                                                         } else {
                                                             // make shipmentStatus resolved=============
                                                             //console.log("****** in logic to make status resolved  in shipmnet**********", problemActionList[index]);
@@ -1076,15 +1282,15 @@ export default class QatProblemActions extends Component {
                                                             c => c.program.id == programList[pp].programId
                                                                 && c.shipmentId == filteredShipmentList[s].shipmentId
                                                                 && c.realmProblem.problem.problemId == 5
-                                                                // && c.versionId == versionID
-                                                                );
+                                                            // && c.versionId == versionID
+                                                        );
                                                     } else {
                                                         indexShipment = problemActionList.findIndex(
                                                             c => c.program.id == programList[pp].programId
                                                                 && c.index == filteredShipmentList[s].index
                                                                 && c.realmProblem.problem.problemId == 5
-                                                                // && c.versionId == versionID
-                                                                );
+                                                            // && c.versionId == versionID
+                                                        );
                                                         newAddShipment = true;
                                                     }
 
@@ -1152,7 +1358,7 @@ export default class QatProblemActions extends Component {
                                                                             label_pr: null
                                                                         }
                                                                     },
-                                                                    notes: "Second test",
+                                                                    notes: "Open",
                                                                     createdBy: {
                                                                         userId: userId,
                                                                         username: username
@@ -1166,6 +1372,9 @@ export default class QatProblemActions extends Component {
                                                         problemActionIndex++;
                                                     } else {
                                                         // make shipmet problem status eual to open========
+                                                        if (indexShipment != -1 && problemActionList[indexShipment].problemStatus.id == 2) {
+                                                            openProblem(indexShipment, username, userId, problemActionList);
+                                                        }
                                                     }
 
                                                 }
@@ -1177,6 +1386,9 @@ export default class QatProblemActions extends Component {
                                                         }
                                                         if (shipmentIdsFromShipmnetList.includes(kbShipmentId)) {
                                                             // make status open 
+                                                            if (problemActionList[kb].problemStatus.id == 2){
+                                                                openProblem(kb, username, userId, problemActionList);
+                                                            }
                                                         } else {
                                                             // make shipmentStatus resolved=============
                                                             //console.log("****** in logic to make status resolved  in shipmnet**********", problemActionList[index]);
@@ -1293,15 +1505,15 @@ export default class QatProblemActions extends Component {
                                                             c => c.program.id == programList[pp].programId
                                                                 && c.shipmentId == filteredShipmentList[s].shipmentId
                                                                 && c.realmProblem.problem.problemId == 6
-                                                                // && c.versionId == versionID
-                                                                );
+                                                            // && c.versionId == versionID
+                                                        );
                                                     } else {
                                                         indexShipment = problemActionList.findIndex(
                                                             c => c.program.id == programList[pp].programId
                                                                 && c.index == filteredShipmentList[s].index
                                                                 && c.realmProblem.problem.problemId == 6
-                                                                // && c.versionId == versionID
-                                                                );
+                                                            // && c.versionId == versionID
+                                                        );
                                                         newAddShipment = true;
                                                     }
 
@@ -1369,7 +1581,7 @@ export default class QatProblemActions extends Component {
                                                                             label_pr: null
                                                                         }
                                                                     },
-                                                                    notes: "Second test",
+                                                                    notes: "Open",
                                                                     createdBy: {
                                                                         userId: userId,
                                                                         username: username
@@ -1383,6 +1595,9 @@ export default class QatProblemActions extends Component {
                                                         problemActionIndex++;
                                                     } else {
                                                         // make shipmet problem status eual to open========
+                                                        if (indexShipment != -1 && problemActionList[indexShipment].problemStatus.id == 2) {
+                                                            openProblem(indexShipment, username, userId, problemActionList);
+                                                        }
                                                     }
 
                                                 }
@@ -1394,6 +1609,9 @@ export default class QatProblemActions extends Component {
                                                         }
                                                         if (shipmentIdsFromShipmnetList.includes(kbShipmentId)) {
                                                             // make status open 
+                                                            if (problemActionList[kb].problemStatus.id == 2){
+                                                                openProblem(kb, username, userId, problemActionList);
+                                                            }
                                                         } else {
                                                             // make shipmentStatus resolved=============
                                                             //console.log("****** in logic to make status resolved  in shipmnet**********", problemActionList[index]);
@@ -1510,15 +1728,15 @@ export default class QatProblemActions extends Component {
                                                             c => c.program.id == programList[pp].programId
                                                                 && c.shipmentId == filteredShipmentList[s].shipmentId
                                                                 && c.realmProblem.problem.problemId == 7
-                                                                // && c.versionId == versionID
-                                                                );
+                                                            // && c.versionId == versionID
+                                                        );
                                                     } else {
                                                         indexShipment = problemActionList.findIndex(
                                                             c => c.program.id == programList[pp].programId
                                                                 && c.index == filteredShipmentList[s].index
                                                                 && c.realmProblem.problem.problemId == 7
-                                                                // && c.versionId == versionID
-                                                                );
+                                                            // && c.versionId == versionID
+                                                        );
                                                         newAddShipment = true;
                                                     }
 
@@ -1586,7 +1804,7 @@ export default class QatProblemActions extends Component {
                                                                             label_pr: null
                                                                         }
                                                                     },
-                                                                    notes: "Second test",
+                                                                    notes: "Open",
                                                                     createdBy: {
                                                                         userId: userId,
                                                                         username: username
@@ -1600,6 +1818,9 @@ export default class QatProblemActions extends Component {
                                                         problemActionIndex++;
                                                     } else {
                                                         // make shipmet problem status eual to open========
+                                                        if (indexShipment != -1 && problemActionList[indexShipment].problemStatus.id == 2) {
+                                                            openProblem(indexShipment, username, userId, problemActionList);
+                                                        }
                                                     }
 
                                                 }
@@ -1611,6 +1832,9 @@ export default class QatProblemActions extends Component {
                                                         }
                                                         if (shipmentIdsFromShipmnetList.includes(kbShipmentId)) {
                                                             // make status open 
+                                                            if (problemActionList[kb].problemStatus.id == 2){
+                                                                openProblem(kb, username, userId, problemActionList);
+                                                            }
                                                         } else {
                                                             // make shipmentStatus resolved=============
                                                             //console.log("****** in logic to make status resolved  in shipmnet**********", problemActionList[index]);
@@ -1710,17 +1934,108 @@ export default class QatProblemActions extends Component {
                                                 if (planningUnitObj.forecastingUnit.tracerCategory.id == 17 || planningUnitObj.forecastingUnit.tracerCategory.id == 3) {
                                                     var consumptionList = programList[pp].consumptionList;
                                                     consumptionList = consumptionList.filter(c => c.region.id == regionList[r].regionId && c.planningUnit.id == planningUnitList[p].planningUnit.id);
+
                                                     var myStartDate = moment(Date.now()).add(1, 'months').startOf('month').format("YYYY-MM-DD");
                                                     var myEndDate = moment(Date.now()).add(numberOfMonthsInFuture, 'months').endOf('month').format("YYYY-MM-DD");
-                                                    consumptionList = consumptionList.filter(c => c.consumptionDate >= myStartDate && c.consumptionDate <= myEndDate);
+                                                    consumptionList = consumptionList.filter(c => c.consumptionDate >= myStartDate && c.consumptionDate <= myEndDate && c.active==true) ;
                                                     var index = problemActionList.findIndex(
                                                         c => moment(c.dt).format("YYYY-MM") == moment(Date.now()).format("YYYY-MM")
                                                             && c.region.id == regionList[r].regionId
                                                             && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                             && c.program.id == programList[pp].programId
                                                             && c.realmProblem.problem.problemId == 10
+                                                        // && c.versionId == versionID
+                                                    );
+
+                                                    if (problemActionList[prob] != undefined) {
+                                                        var consumptionList1 = programList[pp].consumptionList;
+                                                        consumptionList1 = consumptionList1.filter(c => c.region.id == regionList[r].regionId && c.planningUnit.id == planningUnitList[p].planningUnit.id);
+                                                        var myStartDate1 = moment(problemActionList[prob].dt).add(1, 'months').startOf('month').format("YYYY-MM-DD");
+                                                        var myEndDate1 = moment(problemActionList[prob].dt).add(numberOfMonthsInFuture, 'months').endOf('month').format("YYYY-MM-DD");
+                                                        consumptionList1 = consumptionList1.filter(c => c.consumptionDate >= myStartDate1 && c.consumptionDate <= myEndDate1 && c.active==true);
+                                                        var index1 = problemActionList.findIndex(
+                                                            c => moment(c.dt).format("YYYY-MM") == moment(problemActionList[prob].dt).format("YYYY-MM")
+                                                                && c.region.id == regionList[r].regionId
+                                                                && c.planningUnit.id == planningUnitList[p].planningUnit.id
+                                                                && c.program.id == programList[pp].programId
+                                                                && c.realmProblem.problem.problemId == 10
                                                             // && c.versionId == versionID
-                                                            );
+                                                        );
+
+                                                        if (consumptionList1.length > problemList[prob].data2) {
+                                                            var conQtyArray1 = [];
+                                                            for (var i = 0; i < consumptionList1.length; i++) {
+                                                                conQtyArray1.push(consumptionList1[i].consumptionQty);
+                                                            }
+                                                            // console.log("consumptionArray====>", conQtyArray);
+                                                            // ======================
+                                                            var a1 = conQtyArray1;
+                                                            var check1 = false;
+                                                            var currArray1 = [];
+                                                            var spanLength1 = problemList[prob].data2 - 1;
+                                                            for (var i = 0; i < a1.length - spanLength1; i++) {
+                                                                var currArray1 = [];
+                                                                for (var j = 0; j < problemList[prob].data2; j++) {
+                                                                    currArray1.push(a1[i + j]);
+                                                                }
+                                                                const allEqual1 = arr1 => arr1.every(v => v === arr1[0]);
+                                                                if (allEqual1(currArray1)) {
+                                                                    check1 = true;
+                                                                    break;
+                                                                } else {
+                                                                    check1 = false;
+                                                                }
+                                                            }
+
+                                                            if (check1 != true && index1 != -1 && problemActionList[index1].problemStatus.id == 1) {
+
+                                                                var filterObj = problemActionList[index1];
+                                                                var transList = filterObj.problemTransList;
+                                                                let tempProblemTransObj = {
+                                                                    problemReportTransId: '',
+                                                                    problemStatus: {
+                                                                        id: 2,
+                                                                        label: {
+                                                                            active: true,
+                                                                            labelId: 462,
+                                                                            label_en: "Resolved",
+                                                                            label_sp: null,
+                                                                            label_fr: null,
+                                                                            label_pr: null
+                                                                        }
+                                                                    },
+                                                                    notes: 'Resolved',
+                                                                    createdBy: {
+                                                                        userId: userId,
+                                                                        username: username
+                                                                    },
+                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
+                                                                }
+                                                                transList.push(tempProblemTransObj);
+                                                                filterObj.problemTransList = transList;
+
+                                                                var problemStatusObject = {
+                                                                    id: 2,
+                                                                    label: {
+                                                                        active: true,
+                                                                        labelId: 462,
+                                                                        label_en: "Resolved",
+                                                                        label_sp: null,
+                                                                        label_fr: null,
+                                                                        label_pr: null
+                                                                    }
+                                                                }
+                                                                filterObj.problemStatus = problemStatusObject;
+
+                                                            } else {
+                                                                // auto open problem logic==========>
+                                                                if (check1 == true && index1 != -1 && problemActionList[index1].problemStatus.id == 2) {
+                                                                    openProblem(index1, username, userId, problemActionList);
+                                                                }
+                                                            }
+                                                        }
+
+                                                    }
 
                                                     if (consumptionList.length > problemList[prob].data2) {
                                                         var conQtyArray = [];
@@ -1806,7 +2121,7 @@ export default class QatProblemActions extends Component {
                                                                                     label_pr: null
                                                                                 }
                                                                             },
-                                                                            notes: "Second test",
+                                                                            notes: "Open",
                                                                             createdBy: {
                                                                                 userId: userId,
                                                                                 username: username
@@ -1818,7 +2133,10 @@ export default class QatProblemActions extends Component {
                                                                 problemActionList.push(json);
                                                                 problemActionIndex++;
                                                             } else {
-
+                                                                // auto open problem logic for index
+                                                                if (index != -1 && problemActionList[index].problemStatus.id == 2) {
+                                                                    openProblem(index, username, userId, problemActionList);
+                                                                }
                                                             }
                                                         }
                                                         else {
@@ -1906,16 +2224,104 @@ export default class QatProblemActions extends Component {
                                                     var myStartDate = moment(Date.now()).add(1, 'months').startOf('month').format("YYYY-MM-DD");
                                                     var myEndDate = moment(Date.now()).add(numberOfMonthsInFuture, 'months').endOf('month').format("YYYY-MM-DD");
                                                     // console.log("startDate===>", myStartDate, "stopDate====>", myEndDate);
-                                                    consumptionList = consumptionList.filter(c => c.consumptionDate >= myStartDate && c.consumptionDate <= myEndDate);
+                                                    consumptionList = consumptionList.filter(c => c.consumptionDate >= myStartDate && c.consumptionDate <= myEndDate && c.active==true);
                                                     var index = problemActionList.findIndex(
                                                         c => moment(c.dt).format("YYYY-MM") == moment(Date.now()).format("YYYY-MM")
                                                             && c.region.id == regionList[r].regionId
                                                             && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                             && c.program.id == programList[pp].programId
-                                                            && c.realmProblem.problem.problemId == 10
-                                                            // && c.versionId == versionID
-                                                            );
+                                                            && c.realmProblem.problem.problemId == 14
+                                                        // && c.versionId == versionID
+                                                    );
 
+                                                    if (problemActionList[prob] != undefined) {
+                                                        var consumptionList1 = programList[pp].consumptionList;
+                                                        consumptionList1 = consumptionList1.filter(c => c.region.id == regionList[r].regionId && c.planningUnit.id == planningUnitList[p].planningUnit.id);
+                                                        var myStartDate1 = moment(problemActionList[prob].dt).add(1, 'months').startOf('month').format("YYYY-MM-DD");
+                                                        var myEndDate1 = moment(problemActionList[prob].dt).add(numberOfMonthsInFuture, 'months').endOf('month').format("YYYY-MM-DD");
+                                                        consumptionList1 = consumptionList1.filter(c => c.consumptionDate >= myStartDate1 && c.consumptionDate <= myEndDate1 && c.active==true);
+                                                        var index1 = problemActionList.findIndex(
+                                                            c => moment(c.dt).format("YYYY-MM") == moment(problemActionList[prob].dt).format("YYYY-MM")
+                                                                && c.region.id == regionList[r].regionId
+                                                                && c.planningUnit.id == planningUnitList[p].planningUnit.id
+                                                                && c.program.id == programList[pp].programId
+                                                                && c.realmProblem.problem.problemId == 14
+                                                            // && c.versionId == versionID
+                                                        );
+
+                                                        if (consumptionList1.length > problemList[prob].data2) {
+                                                            var conQtyArray1 = [];
+                                                            for (var i = 0; i < consumptionList1.length; i++) {
+                                                                conQtyArray1.push(consumptionList1[i].consumptionQty);
+                                                            }
+                                                            // console.log("consumptionArray====>", conQtyArray);
+                                                            // ======================
+                                                            var a1 = conQtyArray1;
+                                                            var check1 = false;
+                                                            var currArray1 = [];
+                                                            var spanLength1 = problemList[prob].data2 - 1;
+                                                            for (var i = 0; i < a1.length - spanLength1; i++) {
+                                                                var currArray1 = [];
+                                                                for (var j = 0; j < problemList[prob].data2; j++) {
+                                                                    currArray1.push(a1[i + j]);
+                                                                }
+                                                                const allEqual1 = arr1 => arr1.every(v => v === arr1[0]);
+                                                                if (allEqual1(currArray1)) {
+                                                                    check1 = true;
+                                                                    break;
+                                                                } else {
+                                                                    check1 = false;
+                                                                }
+                                                            }
+
+                                                            if (check1 != true && index1 != -1 && problemActionList[index1].problemStatus.id == 1) {
+
+                                                                var filterObj = problemActionList[index1];
+                                                                var transList = filterObj.problemTransList;
+                                                                let tempProblemTransObj = {
+                                                                    problemReportTransId: '',
+                                                                    problemStatus: {
+                                                                        id: 2,
+                                                                        label: {
+                                                                            active: true,
+                                                                            labelId: 462,
+                                                                            label_en: "Resolved",
+                                                                            label_sp: null,
+                                                                            label_fr: null,
+                                                                            label_pr: null
+                                                                        }
+                                                                    },
+                                                                    notes: 'Resolved',
+                                                                    createdBy: {
+                                                                        userId: userId,
+                                                                        username: username
+                                                                    },
+                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
+                                                                }
+                                                                transList.push(tempProblemTransObj);
+                                                                filterObj.problemTransList = transList;
+
+                                                                var problemStatusObject = {
+                                                                    id: 2,
+                                                                    label: {
+                                                                        active: true,
+                                                                        labelId: 462,
+                                                                        label_en: "Resolved",
+                                                                        label_sp: null,
+                                                                        label_fr: null,
+                                                                        label_pr: null
+                                                                    }
+                                                                }
+                                                                filterObj.problemStatus = problemStatusObject;
+
+                                                            } else {
+                                                                // auto open logic for index1
+                                                                if (check1 == true && index1 != -1 && problemActionList[index1].problemStatus.id == 2) {
+                                                                    openProblem(index1, username, userId, problemActionList);
+                                                                }
+                                                            }
+                                                        }
+                                                    }
                                                     if (consumptionList.length > problemList[prob].data2) {
                                                         var conQtyArray = [];
                                                         for (var i = 0; i < consumptionList.length; i++) {
@@ -2000,7 +2406,7 @@ export default class QatProblemActions extends Component {
                                                                                     label_pr: null
                                                                                 }
                                                                             },
-                                                                            notes: "Second test",
+                                                                            notes: "Open",
                                                                             createdBy: {
                                                                                 userId: userId,
                                                                                 username: username
@@ -2012,7 +2418,10 @@ export default class QatProblemActions extends Component {
                                                                 problemActionList.push(json);
                                                                 problemActionIndex++;
                                                             } else {
-
+                                                                // auto open logic for index
+                                                                if (index != -1 && problemActionList[index].problemStatus.id == 2) {
+                                                                    openProblem(index, username, userId, problemActionList);
+                                                                }
                                                             }
                                                         }
                                                         else {
@@ -2083,16 +2492,105 @@ export default class QatProblemActions extends Component {
                                                     var myStartDate = moment(Date.now()).add(1, 'months').startOf('month').format("YYYY-MM-DD");
                                                     var myEndDate = moment(Date.now()).add(numberOfMonthsInFuture, 'months').endOf('month').format("YYYY-MM-DD");
                                                     // console.log("startDate===>", myStartDate, "stopDate====>", myEndDate);
-                                                    consumptionList = consumptionList.filter(c => c.consumptionDate >= myStartDate && c.consumptionDate <= myEndDate);
+                                                    consumptionList = consumptionList.filter(c => c.consumptionDate >= myStartDate && c.consumptionDate <= myEndDate && c.active==true);
                                                     var index = problemActionList.findIndex(
                                                         c => moment(c.dt).format("YYYY-MM") == moment(Date.now()).format("YYYY-MM")
                                                             && c.region.id == regionList[r].regionId
                                                             && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                             && c.program.id == programList[pp].programId
-                                                            && c.realmProblem.problem.problemId == 10
-                                                            // && c.versionId == versionID
-                                                            );
+                                                            && c.realmProblem.problem.problemId == 15
+                                                        // && c.versionId == versionID
+                                                    );
 
+                                                    if (problemActionList[prob] != undefined) {
+
+                                                        var consumptionList1 = programList[pp].consumptionList;
+                                                        consumptionList1 = consumptionList1.filter(c => c.region.id == regionList[r].regionId && c.planningUnit.id == planningUnitList[p].planningUnit.id);
+                                                        var myStartDate1 = moment(problemActionList[prob].dt).add(1, 'months').startOf('month').format("YYYY-MM-DD");
+                                                        var myEndDate1 = moment(problemActionList[prob].dt).add(numberOfMonthsInFuture, 'months').endOf('month').format("YYYY-MM-DD");
+                                                        consumptionList1 = consumptionList1.filter(c => c.consumptionDate >= myStartDate1 && c.consumptionDate <= myEndDate1 && c.active==true);
+                                                        var index1 = problemActionList.findIndex(
+                                                            c => moment(c.dt).format("YYYY-MM") == moment(problemActionList[prob].dt).format("YYYY-MM")
+                                                                && c.region.id == regionList[r].regionId
+                                                                && c.planningUnit.id == planningUnitList[p].planningUnit.id
+                                                                && c.program.id == programList[pp].programId
+                                                                && c.realmProblem.problem.problemId == 15
+                                                            // && c.versionId == versionID
+                                                        );
+
+                                                        if (consumptionList1.length > problemList[prob].data2) {
+                                                            var conQtyArray1 = [];
+                                                            for (var i = 0; i < consumptionList1.length; i++) {
+                                                                conQtyArray1.push(consumptionList1[i].consumptionQty);
+                                                            }
+                                                            // console.log("consumptionArray====>", conQtyArray);
+                                                            // ======================
+                                                            var a1 = conQtyArray1;
+                                                            var check1 = false;
+                                                            var currArray1 = [];
+                                                            var spanLength1 = problemList[prob].data2 - 1;
+                                                            for (var i = 0; i < a1.length - spanLength1; i++) {
+                                                                var currArray1 = [];
+                                                                for (var j = 0; j < problemList[prob].data2; j++) {
+                                                                    currArray1.push(a1[i + j]);
+                                                                }
+                                                                const allEqual1 = arr1 => arr1.every(v => v === arr1[0]);
+                                                                if (allEqual1(currArray1)) {
+                                                                    check1 = true;
+                                                                    break;
+                                                                } else {
+                                                                    check1 = false;
+                                                                }
+                                                            }
+
+                                                            if (check1 != true && index1 != -1 && problemActionList[index1].problemStatus.id == 1) {
+
+                                                                var filterObj = problemActionList[index1];
+                                                                var transList = filterObj.problemTransList;
+                                                                let tempProblemTransObj = {
+                                                                    problemReportTransId: '',
+                                                                    problemStatus: {
+                                                                        id: 2,
+                                                                        label: {
+                                                                            active: true,
+                                                                            labelId: 462,
+                                                                            label_en: "Resolved",
+                                                                            label_sp: null,
+                                                                            label_fr: null,
+                                                                            label_pr: null
+                                                                        }
+                                                                    },
+                                                                    notes: 'Resolved',
+                                                                    createdBy: {
+                                                                        userId: userId,
+                                                                        username: username
+                                                                    },
+                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
+                                                                }
+                                                                transList.push(tempProblemTransObj);
+                                                                filterObj.problemTransList = transList;
+
+                                                                var problemStatusObject = {
+                                                                    id: 2,
+                                                                    label: {
+                                                                        active: true,
+                                                                        labelId: 462,
+                                                                        label_en: "Resolved",
+                                                                        label_sp: null,
+                                                                        label_fr: null,
+                                                                        label_pr: null
+                                                                    }
+                                                                }
+                                                                filterObj.problemStatus = problemStatusObject;
+
+                                                            } else {
+                                                                // auto open logic for index1
+                                                                if (check1 == true && index1 != -1 && problemActionList[index1].problemStatus.id == 2) {
+                                                                    openProblem(index1, username, userId, problemActionList);
+                                                                }
+                                                            }
+                                                        }
+                                                    }
                                                     if (consumptionList.length > problemList[prob].data2) {
                                                         var conQtyArray = [];
                                                         for (var i = 0; i < consumptionList.length; i++) {
@@ -2179,7 +2677,7 @@ export default class QatProblemActions extends Component {
                                                                                     label_pr: null
                                                                                 }
                                                                             },
-                                                                            notes: "Second test",
+                                                                            notes: "Open",
                                                                             createdBy: {
                                                                                 userId: userId,
                                                                                 username: username
@@ -2191,7 +2689,10 @@ export default class QatProblemActions extends Component {
                                                                 problemActionList.push(json);
                                                                 problemActionIndex++;
                                                             } else {
-
+                                                                // auto open logic for index
+                                                                if (index != -1 && problemActionList[index].problemStatus.id == 2) {
+                                                                    openProblem(index, username, userId, problemActionList);
+                                                                }
                                                             }
                                                         }
                                                         else {
@@ -2312,8 +2813,120 @@ export default class QatProblemActions extends Component {
                                                     && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                     && c.program.id == programList[pp].programId
                                                     && c.realmProblem.problem.problemId == 11
+                                                // && c.versionId == versionID
+                                            );
+
+
+                                            if (problemActionList[prob] != undefined) {
+                                                var mosArray1 = [];
+                                                // problemList[prob].data1 AND problemList[prob].data2 is the range  i:e t to t+6 months
+                                                // problemList[prob].data1=0
+                                                // problemList[prob].data2=6
+                                                for (var mosCounter1 = problemList[prob].data1; mosCounter1 <= problemList[prob].data2; mosCounter1++) {
+                                                    var m1 = moment(problemActionList[prob].dt).add(mosCounter1, 'months').utcOffset('-0500').format("YYYY-MM-DD");
+                                                    var mStartDate1 = moment(m1).startOf('month').format("YYYY-MM-DD");
+                                                    var mEndDate1 = moment(m1).endOf('month').format("YYYY-MM-DD");
+                                                    var programId1 = programList[pp].programId;
+                                                    // var regionId = -1;
+                                                    var planningUnitId1 = planningUnitList[p].planningUnit.id;
+                                                    var supplyPlanJson1 = programList[pp].supplyPlan.filter(c => c.planningUnitId == planningUnitId1 && moment(c.transDate).format("YYYY-MM-DD") == moment(mStartDate1).format("YYYY-MM-DD"));
+
+                                                    var mos1 = "";
+                                                    var maxForMonths1 = "";
+                                                    var minForMonths1 = "";
+                                                    var closingBalance1 = "";
+                                                    var amcCalcualted1 = "";
+
+
+                                                    if (supplyPlanJson1.length > 0) {
+                                                        mos1 = supplyPlanJson1[0].mos;
+                                                        maxForMonths1 = supplyPlanJson1[0].maxStockMoS;
+                                                        minForMonths1 = supplyPlanJson1[0].minStockMoS;
+                                                        closingBalance1 = supplyPlanJson1[0].closingBalance;
+                                                        amcCalcualted1 = supplyPlanJson1[0].amc;
+                                                    }
+
+                                                    mosArray1.push(
+                                                        {
+                                                            mos1: mos1,
+                                                            maxForMonths1: maxForMonths1,
+                                                            minForMonths1: minForMonths1,
+                                                            month1: m1,
+                                                            closingBalance1: closingBalance1,
+                                                            amcCalcualted1: amcCalcualted1
+                                                        });
+
+                                                }
+                                                // console.log("planningUnitId====>", planningUnitId);
+                                                console.log("mosArray============>$@##", mosArray1);
+                                                // for loop on array mosArray
+                                                var monthWithMosLessThenMin1 = '';
+                                                for (var element = 0; element < mosArray1.length; element++) {
+                                                    // console.log("mos element===>", mosArray[element]);
+                                                    if (mosArray1[element].mos1 < mosArray1[element].minForMonths1) {
+                                                        monthWithMosLessThenMin1 = mosArray1[element].month1;
+                                                        break;
+                                                    } else {
+                                                    }
+                                                }
+                                                console.log("monthWithMosLessThenMin======>", monthWithMosLessThenMin1);
+                                                var index1 = problemActionList.findIndex(
+                                                    c => moment(c.dt).format("YYYY-MM") == moment(problemActionList[prob].dt).format("YYYY-MM")
+                                                        // && c.region.id == regionList[r].regionId
+                                                        && c.planningUnit.id == planningUnitList[p].planningUnit.id
+                                                        && c.program.id == programList[pp].programId
+                                                        && c.realmProblem.problem.problemId == 11
                                                     // && c.versionId == versionID
-                                                    );
+                                                );
+
+
+                                                if (monthWithMosLessThenMin1 == '' && index1 != -1 && problemActionList[index1].problemStatus.id == 1) {
+
+                                                    var filterObj = problemActionList[index1];
+                                                    var transList = filterObj.problemTransList;
+                                                    let tempProblemTransObj = {
+                                                        problemReportTransId: '',
+                                                        problemStatus: {
+                                                            id: 2,
+                                                            label: {
+                                                                active: true,
+                                                                labelId: 462,
+                                                                label_en: "Resolved",
+                                                                label_sp: null,
+                                                                label_fr: null,
+                                                                label_pr: null
+                                                            }
+                                                        },
+                                                        notes: 'Resolved',
+                                                        createdBy: {
+                                                            userId: userId,
+                                                            username: username
+                                                        },
+                                                        createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
+                                                    }
+                                                    transList.push(tempProblemTransObj);
+                                                    filterObj.problemTransList = transList;
+
+                                                    var problemStatusObject = {
+                                                        id: 2,
+                                                        label: {
+                                                            active: true,
+                                                            labelId: 462,
+                                                            label_en: "Resolved",
+                                                            label_sp: null,
+                                                            label_fr: null,
+                                                            label_pr: null
+                                                        }
+                                                    }
+                                                    filterObj.problemStatus = problemStatusObject;
+
+                                                } else {
+                                                    // auto open logic for index1
+                                                    if (monthWithMosLessThenMin1 != '' && index1 != -1 && problemActionList[index1].problemStatus.id == 2) {
+                                                        openProblem(index1, username, userId, problemActionList);
+                                                    }
+                                                }
+                                            }
 
                                             if (monthWithMosLessThenMin != '') {
                                                 // console.log("min mos month from array ======>", monthWithMosLessThenMin);
@@ -2398,6 +3011,10 @@ export default class QatProblemActions extends Component {
                                                         problemActionList.push(json);
                                                         problemActionIndex++;
                                                     } else {
+                                                        //auto open for index=======>
+                                                        if (index != -1 && problemActionList[index].problemStatus.id == 2) {
+                                                            openProblem(index, username, userId, problemActionList);
+                                                        }
                                                     }
                                                 } else {
                                                     console.log("dont falg problem mos is not less then min ");
@@ -2515,8 +3132,118 @@ export default class QatProblemActions extends Component {
                                                     && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                     && c.program.id == programList[pp].programId
                                                     && c.realmProblem.problem.problemId == 16
+                                                // && c.versionId == versionID
+                                            );
+
+
+                                            if (problemActionList[prob] != undefined) {
+
+                                                var mosArray1 = [];
+                                                // problemList[prob].data1 AND problemList[prob].data2 is the range  i:e t to t+6 months
+                                                // problemList[prob].data1=0
+                                                // problemList[prob].data2=6
+                                                for (var mosCounter1 = problemList[prob].data1; mosCounter1 <= problemList[prob].data2; mosCounter1++) {
+
+                                                    var m1 = moment(Date.now()).add(mosCounter1, 'months').utcOffset('-0500').format("YYYY-MM-DD");
+                                                    var mStartDate1 = moment(m1).startOf('month').format("YYYY-MM-DD");
+                                                    var mEndDate1 = moment(m1).endOf('month').format("YYYY-MM-DD");
+                                                    var programId1 = programList[pp].programId;
+                                                    // var regionId = -1;
+                                                    var planningUnitId1 = planningUnitList[p].planningUnit.id;
+                                                    var supplyPlanJson1 = programList[pp].supplyPlan.filter(c => c.planningUnitId == planningUnitId1 && moment(c.transDate).format("YYYY-MM-DD") == moment(mStartDate1).format("YYYY-MM-DD"));
+
+                                                    var mos1 = "";
+                                                    var maxForMonths1 = "";
+                                                    var minForMonths1 = "";
+                                                    var closingBalance1 = "";
+                                                    var amcCalcualted1 = "";
+
+                                                    if (supplyPlanJson1.length > 0) {
+                                                        mos1 = supplyPlanJson1[0].mos;
+                                                        maxForMonths1 = supplyPlanJson1[0].maxStockMoS;
+                                                        minForMonths1 = supplyPlanJson1[0].minStockMoS;
+                                                        closingBalance1 = supplyPlanJson1[0].closingBalance;
+                                                        amcCalcualted1 = supplyPlanJson1[0].amc;
+                                                    }
+
+                                                    mosArray1.push(
+                                                        {
+                                                            mos1: mos1,
+                                                            maxForMonths1: maxForMonths1,
+                                                            minForMonths1: minForMonths1,
+                                                            month1: m1,
+                                                            closingBalance1: closingBalance1,
+                                                            amcCalcualted1: amcCalcualted1
+                                                        });
+
+                                                }
+                                                // console.log("planningUnitId====>", planningUnitId);
+                                                // console.log("mosArray============>$@##", mosArray);
+                                                // for loop on array mosArray
+                                                // var monthWithMosLessThenMin = '';
+                                                var monthWithMosGreaterThenMax1 = '';
+                                                for (var element = 0; element < mosArray1.length; element++) {
+                                                    // console.log("mos element===>", mosArray[element]);
+                                                    if (mosArray1[element].mos1 > mosArray1[element].maxForMonths1) {
+                                                        monthWithMosGreaterThenMax1 = mosArray1[element].month1;
+                                                        break;
+                                                    } else {
+                                                    }
+                                                }
+                                                var index1 = problemActionList.findIndex(
+                                                    c => moment(c.dt).format("YYYY-MM") == moment(problemActionList[prob].dt).format("YYYY-MM")
+                                                        // && c.region.id == regionList[r].regionId
+                                                        && c.planningUnit.id == planningUnitList[p].planningUnit.id
+                                                        && c.program.id == programList[pp].programId
+                                                        && c.realmProblem.problem.problemId == 16
                                                     // && c.versionId == versionID
-                                                    );
+                                                );
+
+                                                if (monthWithMosGreaterThenMax1 == '' && index1 != -1 && problemActionList[index1].problemStatus.id == 1) {
+                                                    var filterObj = problemActionList[index1];
+                                                    var transList = filterObj.problemTransList;
+                                                    let tempProblemTransObj = {
+                                                        problemReportTransId: '',
+                                                        problemStatus: {
+                                                            id: 2,
+                                                            label: {
+                                                                active: true,
+                                                                labelId: 462,
+                                                                label_en: "Resolved",
+                                                                label_sp: null,
+                                                                label_fr: null,
+                                                                label_pr: null
+                                                            }
+                                                        },
+                                                        notes: 'Resolved',
+                                                        createdBy: {
+                                                            userId: userId,
+                                                            username: username
+                                                        },
+                                                        createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
+                                                    }
+                                                    transList.push(tempProblemTransObj);
+                                                    filterObj.problemTransList = transList;
+
+                                                    var problemStatusObject = {
+                                                        id: 2,
+                                                        label: {
+                                                            active: true,
+                                                            labelId: 462,
+                                                            label_en: "Resolved",
+                                                            label_sp: null,
+                                                            label_fr: null,
+                                                            label_pr: null
+                                                        }
+                                                    }
+                                                    filterObj.problemStatus = problemStatusObject;
+                                                } else {
+                                                    // auto open logic for index1
+                                                    if (monthWithMosGreaterThenMax1 != '' && index1 != -1 && problemActionList[index1].problemStatus.id == 2) {
+                                                        openProblem(index1, username, userId, problemActionList);
+                                                    }
+                                                }
+                                            }
 
                                             if (monthWithMosGreaterThenMax != '') {
                                                 // console.log("min mos month from array ======>", monthWithMosGreaterThenMax);
@@ -2598,6 +3325,10 @@ export default class QatProblemActions extends Component {
                                                         problemActionList.push(json);
                                                         problemActionIndex++;
                                                     } else {
+                                                        // auto open logic for index=======>
+                                                        if (index != -1 && problemActionList[index].problemStatus.id == 2) {
+                                                            openProblem(index, username, userId, problemActionList);
+                                                        }
                                                     }
                                                 } else {
                                                     console.log("dont falg problem mos is not greater then max ####### ");
@@ -2666,7 +3397,6 @@ export default class QatProblemActions extends Component {
                                                 var programId = programList[pp].programId;
                                                 // var regionId = -1;
                                                 var planningUnitId = planningUnitList[p].planningUnit.id;
-
                                                 var supplyPlanJson = programList[pp].supplyPlan.filter(c => c.planningUnitId == planningUnitId && moment(c.transDate).format("YYYY-MM-DD") == moment(mStartDate).format("YYYY-MM-DD"));
 
                                                 var mos = "";
@@ -2683,9 +3413,6 @@ export default class QatProblemActions extends Component {
                                                     closingBalance = supplyPlanJson[0].closingBalance;
                                                     amcCalcualted = supplyPlanJson[0].amc;
                                                 }
-
-
-
                                                 mosArray.push(
                                                     {
                                                         mos: mos,
@@ -2715,20 +3442,127 @@ export default class QatProblemActions extends Component {
                                                     && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                     && c.program.id == programList[pp].programId
                                                     && c.realmProblem.problem.problemId == 17
+                                                // && c.versionId == versionID
+                                            );
+
+                                            if (problemActionList[prob] != undefined) {
+
+                                                var mosArray1 = [];
+                                                // problemList[prob].data1 AND problemList[prob].data2 is the range  i:e t to t+6 months
+                                                // problemList[prob].data1=0
+                                                // problemList[prob].data2=6
+                                                for (var mosCounter1 = problemList[prob].data1; mosCounter1 <= problemList[prob].data2; mosCounter1++) {
+                                                    // console.log("mosCounter====>", mosCounter);
+                                                    var m1 = moment(problemActionList[prob].dt).add(mosCounter1, 'months').utcOffset('-0500').format("YYYY-MM-DD");
+                                                    var mStartDate1 = moment(m1).startOf('month').format("YYYY-MM-DD");
+                                                    var mEndDate1 = moment(m1).endOf('month').format("YYYY-MM-DD");
+
+                                                    // }
+                                                    var programId1 = programList[pp].programId;
+                                                    // var regionId = -1;
+                                                    var planningUnitId1 = planningUnitList[p].planningUnit.id;
+                                                    var supplyPlanJson1 = programList[pp].supplyPlan.filter(c => c.planningUnitId == planningUnitId1 && moment(c.transDate).format("YYYY-MM-DD") == moment(mStartDate1).format("YYYY-MM-DD"));
+
+                                                    var mos1 = "";
+                                                    var maxForMonths1 = "";
+                                                    var minForMonths1 = "";
+                                                    var closingBalance1 = "";
+                                                    var amcCalcualted1 = "";
+                                                    if (supplyPlanJson1.length > 0) {
+                                                        mos1 = supplyPlanJson1[0].mos;
+                                                        maxForMonths1 = supplyPlanJson1[0].maxStockMoS;
+                                                        minForMonths1 = supplyPlanJson1[0].minStockMoS;
+                                                        closingBalance1 = supplyPlanJson1[0].closingBalance;
+                                                        amcCalcualted1 = supplyPlanJson1[0].amc;
+                                                    }
+                                                    mosArray1.push(
+                                                        {
+                                                            mos1: mos1,
+                                                            maxForMonths1: maxForMonths1,
+                                                            minForMonths1: minForMonths1,
+                                                            month1: m1,
+                                                            closingBalance1: closingBalance1,
+                                                            amcCalcualted1: amcCalcualted1
+                                                        });
+
+                                                }
+                                                // console.log("planningUnitId====>", planningUnitId);
+                                                // console.log("mosArray============>$@##", mosArray);
+                                                // for loop on array mosArray
+                                                var monthWithMosLessThenMin1 = '';
+                                                for (var element = 0; element < mosArray1.length; element++) {
+                                                    // console.log("mos element===>", mosArray[element]);
+                                                    if (mosArray1[element].mos1 < mosArray1[element].minForMonths1) {
+                                                        monthWithMosLessThenMin1 = mosArray1[element].month1;
+                                                        break;
+                                                    } else {
+                                                    }
+                                                }
+                                                var index1 = problemActionList.findIndex(
+                                                    c => moment(c.dt).format("YYYY-MM") == moment(problemActionList[prob].dt).format("YYYY-MM")
+                                                        // && c.region.id == regionList[r].regionId
+                                                        && c.planningUnit.id == planningUnitList[p].planningUnit.id
+                                                        && c.program.id == programList[pp].programId
+                                                        && c.realmProblem.problem.problemId == 17
                                                     // && c.versionId == versionID
-                                                    );
+                                                );
+
+                                                if (monthWithMosLessThenMin1 == '' && index1 != -1 && problemActionList[index1].problemStatus.id == 1) {
+
+                                                    var filterObj = problemActionList[index1];
+                                                    var transList = filterObj.problemTransList;
+                                                    let tempProblemTransObj = {
+                                                        problemReportTransId: '',
+                                                        problemStatus: {
+                                                            id: 2,
+                                                            label: {
+                                                                active: true,
+                                                                labelId: 462,
+                                                                label_en: "Resolved",
+                                                                label_sp: null,
+                                                                label_fr: null,
+                                                                label_pr: null
+                                                            }
+                                                        },
+                                                        notes: 'Resolved',
+                                                        createdBy: {
+                                                            userId: userId,
+                                                            username: username
+                                                        },
+                                                        createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
+                                                    }
+                                                    transList.push(tempProblemTransObj);
+                                                    filterObj.problemTransList = transList;
+
+                                                    var problemStatusObject = {
+                                                        id: 2,
+                                                        label: {
+                                                            active: true,
+                                                            labelId: 462,
+                                                            label_en: "Resolved",
+                                                            label_sp: null,
+                                                            label_fr: null,
+                                                            label_pr: null
+                                                        }
+                                                    }
+                                                    filterObj.problemStatus = problemStatusObject;
+
+                                                } else {
+                                                    // auto open logic for index1=======>
+                                                    if (monthWithMosLessThenMin1 != '' && index1 != -1 && problemActionList[index1].problemStatus.id == 2) {
+                                                        openProblem(index1, username, userId, problemActionList);
+                                                    }
+                                                }
+                                            }
 
                                             if (monthWithMosLessThenMin != '') {
                                                 // console.log("min mos month from array ======>", monthWithMosLessThenMin);
                                                 var getStartDate = moment(monthWithMosLessThenMin).subtract(3, 'months').format('YYYY-MM-DD') < moment(Date.now()).format('YYYY-MM-DD') ? moment(Date.now()).format('YYYY-MM-DD') : moment(monthWithMosLessThenMin).subtract(3, 'months').format('YYYY-MM-DD');
                                                 var getEndDate = moment(monthWithMosLessThenMin).add(4, 'months').format('YYYY-MM-DD');
                                                 // console.log("startDate=====>", getStartDate, "endDate=====>", getEndDate);
-
                                                 var shipmentListForMonths = programList[pp].shipmentList;
                                                 var filteredShipmentListForMonths = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM-DD') >= moment(getStartDate).format('YYYY-MM-DD') && moment(c.expectedDeliveryDate).format('YYYY-MM-DD') <= moment(getEndDate).format('YYYY-MM-DD'));
                                                 // console.log("filteredShipmentListForMonths=====>", filteredShipmentListForMonths);
-
-
                                                 if (filteredShipmentListForMonths.length == 0) {
                                                     // console.log("flag a problem mos is less then min and dont have shipment withing lead times");
                                                     if (index == -1) {
@@ -2802,6 +3636,10 @@ export default class QatProblemActions extends Component {
                                                         problemActionList.push(json);
                                                         problemActionIndex++;
                                                     } else {
+                                                        // auto open logic for index
+                                                        if (index != -1 && problemActionList[index].problemStatus.id == 2) {
+                                                            openProblem(index, username, userId, problemActionList);
+                                                        }
                                                     }
                                                 } else {
                                                     console.log("dont falg problem mos is  less then min but have shipment in lead times ");
@@ -2869,10 +3707,7 @@ export default class QatProblemActions extends Component {
                                                 var programId = programList[pp].programId;
                                                 // var regionId = -1;
                                                 var planningUnitId = planningUnitList[p].planningUnit.id;
-
-
                                                 var supplyPlanJson = programList[pp].supplyPlan.filter(c => c.planningUnitId == planningUnitId && moment(c.transDate).format("YYYY-MM-DD") == moment(mStartDate).format("YYYY-MM-DD"));
-
                                                 var mos = "";
                                                 var maxForMonths = "";
                                                 var minForMonths = "";
@@ -2917,20 +3752,127 @@ export default class QatProblemActions extends Component {
                                                     && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                     && c.program.id == programList[pp].programId
                                                     && c.realmProblem.problem.problemId == 18
+                                                // && c.versionId == versionID
+                                            );
+
+
+
+                                            if (problemActionList[prob] != undefined) {
+                                                var mosArray1 = [];
+                                                // problemList[prob].data1 AND problemList[prob].data2 is the range  i:e t to t+6 months
+                                                // problemList[prob].data1=0
+                                                // problemList[prob].data2=6
+                                                for (var mosCounter181 = parseInt(problemList[prob].data1); mosCounter181 <= parseInt(problemList[prob].data2); mosCounter181++) {
+                                                    // console.log("mosCounter18====>", mosCounter18);
+                                                    var m1 = moment(Date.now()).add(mosCounter181, 'months').utcOffset('-0500').format("YYYY-MM-DD");
+                                                    var mStartDate1 = moment(m1).startOf('month').format("YYYY-MM-DD");
+                                                    var mEndDate1 = moment(m1).endOf('month').format("YYYY-MM-DD");
+
+                                                    // }
+                                                    var programId1 = programList[pp].programId;
+                                                    // var regionId = -1;
+                                                    var planningUnitId1 = planningUnitList[p].planningUnit.id;
+                                                    var supplyPlanJson1 = programList[pp].supplyPlan.filter(c => c.planningUnitId == planningUnitId1 && moment(c.transDate).format("YYYY-MM-DD") == moment(mStartDate1).format("YYYY-MM-DD"));
+                                                    var mos1 = "";
+                                                    var maxForMonths1 = "";
+                                                    var minForMonths1 = "";
+                                                    var closingBalance1 = "";
+                                                    var amcCalcualted1 = "";
+                                                    if (supplyPlanJson1.length > 0) {
+                                                        mos1 = supplyPlanJson1[0].mos;
+                                                        maxForMonths1 = supplyPlanJson1[0].maxStockMoS;
+                                                        minForMonths1 = supplyPlanJson1[0].minStockMoS;
+                                                        closingBalance1 = supplyPlanJson1[0].closingBalance;
+                                                        amcCalcualted1 = supplyPlanJson1[0].amc;
+                                                    }
+
+                                                    mosArray1.push(
+                                                        {
+                                                            mos1: mos1,
+                                                            maxForMonths1: maxForMonths1,
+                                                            minForMonths1: minForMonths1,
+                                                            month1: m1,
+                                                            closingBalance1: closingBalance1,
+                                                            amcCalcualted1: amcCalcualted1
+                                                        });
+
+                                                }
+                                                // console.log("planningUnitId====>", planningUnitId);
+                                                // console.log("mosArray============>$@##", mosArray);
+                                                // for loop on array mosArray
+                                                var monthWithMosLessThenMin1 = '';
+                                                for (var element = 0; element < mosArray1.length; element++) {
+                                                    // console.log("mos element===>", mosArray[element]);
+                                                    if (mosArray1[element].mos1 < mosArray1[element].minForMonths1) {
+                                                        monthWithMosLessThenMin1 = mosArray1[element].month1;
+                                                        break;
+                                                    } else {
+                                                    }
+                                                }
+                                                var index1 = problemActionList.findIndex(
+                                                    c => moment(c.dt).format("YYYY-MM") == moment(problemActionList[prob].dt).format("YYYY-MM")
+                                                        // && c.region.id == regionList[r].regionId
+                                                        && c.planningUnit.id == planningUnitList[p].planningUnit.id
+                                                        && c.program.id == programList[pp].programId
+                                                        && c.realmProblem.problem.problemId == 18
                                                     // && c.versionId == versionID
-                                                    );
+                                                );
+
+                                                if (monthWithMosLessThenMin1 == '' && index1 != -1 && problemActionList[index1].problemStatus.id == 1) {
+                                                    var filterObj = problemActionList[index1];
+                                                    var transList = filterObj.problemTransList;
+                                                    let tempProblemTransObj = {
+                                                        problemReportTransId: '',
+                                                        problemStatus: {
+                                                            id: 2,
+                                                            label: {
+                                                                active: true,
+                                                                labelId: 462,
+                                                                label_en: "Resolved",
+                                                                label_sp: null,
+                                                                label_fr: null,
+                                                                label_pr: null
+                                                            }
+                                                        },
+                                                        notes: 'Resolved',
+                                                        createdBy: {
+                                                            userId: userId,
+                                                            username: username
+                                                        },
+                                                        createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
+                                                    }
+                                                    transList.push(tempProblemTransObj);
+                                                    filterObj.problemTransList = transList;
+
+                                                    var problemStatusObject = {
+                                                        id: 2,
+                                                        label: {
+                                                            active: true,
+                                                            labelId: 462,
+                                                            label_en: "Resolved",
+                                                            label_sp: null,
+                                                            label_fr: null,
+                                                            label_pr: null
+                                                        }
+                                                    }
+                                                    filterObj.problemStatus = problemStatusObject;
+
+                                                } else {
+                                                    // auto open logic for index1 ======>
+                                                    if (monthWithMosLessThenMin1 != '' && index1 != -1 && problemActionList[index1].problemStatus.id == 2) {
+                                                        openProblem(index1, username, userId, problemActionList);
+                                                    }
+                                                }
+                                            }
 
                                             if (monthWithMosLessThenMin != '') {
                                                 // console.log("min mos month from array ======>", monthWithMosLessThenMin);
                                                 var getStartDate = moment(monthWithMosLessThenMin).subtract(3, 'months').format('YYYY-MM-DD') < moment(Date.now()).format('YYYY-MM-DD') ? moment(Date.now()).format('YYYY-MM-DD') : moment(monthWithMosLessThenMin).subtract(3, 'months').format('YYYY-MM-DD');
                                                 var getEndDate = moment(monthWithMosLessThenMin).add(4, 'months').format('YYYY-MM-DD');
                                                 // console.log("startDate=====>", getStartDate, "endDate=====>", getEndDate);
-
                                                 var shipmentListForMonths = programList[pp].shipmentList;
                                                 var filteredShipmentListForMonths = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM-DD') >= moment(getStartDate).format('YYYY-MM-DD') && moment(c.expectedDeliveryDate).format('YYYY-MM-DD') <= moment(getEndDate).format('YYYY-MM-DD'));
                                                 // console.log("filteredShipmentListForMonths=====>", filteredShipmentListForMonths);
-
-
                                                 if (filteredShipmentListForMonths.length > 0) {
                                                     // console.log("flag a problem mos is less then min and have shipment withing lead times");
                                                     if (index == -1) {
@@ -3003,6 +3945,10 @@ export default class QatProblemActions extends Component {
                                                         problemActionList.push(json);
                                                         problemActionIndex++;
                                                     } else {
+                                                        // auto open logic for index =======>
+                                                        if (index != -1 && problemActionList[index].problemStatus.id == 2) {
+                                                            openProblem(index, username, userId, problemActionList);
+                                                        }
                                                     }
                                                 } else {
                                                     console.log("dont falg problem mos is not less then min ");
@@ -3069,9 +4015,7 @@ export default class QatProblemActions extends Component {
                                                 var programId = programList[pp].programId;
                                                 // var regionId = -1;
                                                 var planningUnitId = planningUnitList[p].planningUnit.id;
-
                                                 var supplyPlanJson = programList[pp].supplyPlan.filter(c => c.planningUnitId == planningUnitId && moment(c.transDate).format("YYYY-MM-DD") == moment(mStartDate).format("YYYY-MM-DD"));
-
                                                 var mos = "";
                                                 var maxForMonths = "";
                                                 var minForMonths = "";
@@ -3086,8 +4030,6 @@ export default class QatProblemActions extends Component {
                                                     closingBalance = supplyPlanJson[0].closingBalance;
                                                     amcCalcualted = supplyPlanJson[0].amc;
                                                 }
-
-
                                                 mosArray.push(
                                                     {
                                                         mos: mos,
@@ -3118,8 +4060,121 @@ export default class QatProblemActions extends Component {
                                                     && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                     && c.program.id == programList[pp].programId
                                                     && c.realmProblem.problem.problemId == 19
+                                                // && c.versionId == versionID
+                                            );
+
+
+                                            if (problemActionList[prob] != undefined) {
+                                                var mosArray1 = [];
+                                                // problemList[prob].data1 AND problemList[prob].data2 is the range  i:e t to t+6 months
+                                                // problemList[prob].data1=0
+                                                // problemList[prob].data2=6
+                                                for (var mosCounter1 = parseInt(problemList[prob].data1); mosCounter1 <= parseInt(problemList[prob].data2); mosCounter1++) {
+                                                    // console.log("mosCounter====>", mosCounter);
+                                                    var m1 = moment(problemActionList[prob].dt).add(mosCounter1, 'months').utcOffset('-0500').format("YYYY-MM-DD");
+                                                    var mStartDate1 = moment(m1).startOf('month').format("YYYY-MM-DD");
+                                                    var mEndDate1 = moment(m1).endOf('month').format("YYYY-MM-DD");
+
+                                                    // }
+                                                    var programId = programList[pp].programId;
+                                                    // var regionId = -1;
+                                                    var planningUnitId1 = planningUnitList[p].planningUnit.id;
+                                                    var supplyPlanJson1 = programList[pp].supplyPlan.filter(c => c.planningUnitId == planningUnitId1 && moment(c.transDate).format("YYYY-MM-DD") == moment(mStartDate1).format("YYYY-MM-DD"));
+                                                    var mos1 = "";
+                                                    var maxForMonths1 = "";
+                                                    var minForMonths1 = "";
+                                                    var closingBalance1 = "";
+                                                    var amcCalcualted1 = "";
+
+
+                                                    if (supplyPlanJson1.length > 0) {
+                                                        mos1 = supplyPlanJson1[0].mos;
+                                                        maxForMonths1 = supplyPlanJson1[0].maxStockMoS;
+                                                        minForMonths1 = supplyPlanJson1[0].minStockMoS;
+                                                        closingBalance1 = supplyPlanJson1[0].closingBalance;
+                                                        amcCalcualted1 = supplyPlanJson1[0].amc;
+                                                    }
+                                                    mosArray1.push(
+                                                        {
+                                                            mos1: mos1,
+                                                            maxForMonths1: maxForMonths1,
+                                                            minForMonths1: minForMonths1,
+                                                            month1: m1,
+                                                            closingBalance1: closingBalance1,
+                                                            amcCalcualted1: amcCalcualted1
+                                                        });
+
+                                                }
+                                                // console.log("planningUnitId====>", planningUnitId);
+                                                // console.log("mosArray============>$@##", mosArray);
+                                                // for loop on array mosArray
+                                                // var monthWithMosLessThenMin = '';
+                                                var monthWithMosGreaterThenMax1 = '';
+                                                for (var element = 0; element < mosArray1.length; element++) {
+                                                    // console.log("mos element===>", mosArray[element]);
+                                                    if (mosArray1[element].mos1 > mosArray1[element].maxForMonths1) {
+                                                        monthWithMosGreaterThenMax1 = mosArray1[element].month1;
+                                                        break;
+                                                    } else {
+                                                    }
+                                                }
+                                                var index1 = problemActionList.findIndex(
+                                                    c => moment(c.dt).format("YYYY-MM") == moment(problemActionList[prob].dt).format("YYYY-MM")
+                                                        // && c.region.id == regionList[r].regionId
+                                                        && c.planningUnit.id == planningUnitList[p].planningUnit.id
+                                                        && c.program.id == programList[pp].programId
+                                                        && c.realmProblem.problem.problemId == 19
                                                     // && c.versionId == versionID
-                                                    );
+                                                );
+
+                                                if (monthWithMosGreaterThenMax1 == '' && index1 != -1 && problemActionList[index1].problemStatus.id == 1) {
+
+                                                    var filterObj = problemActionList[index1];
+                                                    var transList = filterObj.problemTransList;
+                                                    let tempProblemTransObj = {
+                                                        problemReportTransId: '',
+                                                        problemStatus: {
+                                                            id: 2,
+                                                            label: {
+                                                                active: true,
+                                                                labelId: 462,
+                                                                label_en: "Resolved",
+                                                                label_sp: null,
+                                                                label_fr: null,
+                                                                label_pr: null
+                                                            }
+                                                        },
+                                                        notes: 'Resolved',
+                                                        createdBy: {
+                                                            userId: userId,
+                                                            username: username
+                                                        },
+                                                        createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
+                                                    }
+                                                    transList.push(tempProblemTransObj);
+                                                    filterObj.problemTransList = transList;
+
+                                                    var problemStatusObject = {
+                                                        id: 2,
+                                                        label: {
+                                                            active: true,
+                                                            labelId: 462,
+                                                            label_en: "Resolved",
+                                                            label_sp: null,
+                                                            label_fr: null,
+                                                            label_pr: null
+                                                        }
+                                                    }
+                                                    filterObj.problemStatus = problemStatusObject;
+
+                                                } else {
+                                                    // auto open logic for index1
+                                                    if (monthWithMosGreaterThenMax1 != '' && index1 != -1 && problemActionList[index1].problemStatus.id == 2) {
+                                                        openProblem(index1, username, userId, problemActionList);
+                                                    }
+                                                }
+
+                                            }
 
                                             if (monthWithMosGreaterThenMax != '') {
                                                 // console.log("min mos month from array ======>", monthWithMosGreaterThenMax);
@@ -3201,6 +4256,10 @@ export default class QatProblemActions extends Component {
                                                         problemActionList.push(json);
                                                         problemActionIndex++;
                                                     } else {
+                                                        // auto open logic for index
+                                                        if (index != -1 && problemActionList[index].problemStatus.id == 2) {
+                                                            openProblem(index, username, userId, problemActionList);
+                                                        }
                                                     }
                                                 } else {
                                                     console.log("dont falg problem mos is not greater then max ####### ");
@@ -3317,20 +4376,134 @@ export default class QatProblemActions extends Component {
                                                     && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                     && c.program.id == programList[pp].programId
                                                     && c.realmProblem.problem.problemId == 20
+                                                // && c.versionId == versionID
+                                            );
+
+
+                                            if (problemActionList[prob] != undefined) {
+                                                var mosArray1 = [];
+                                                // problemList[prob].data1 AND problemList[prob].data2 is the range  i:e t to t+6 months
+                                                // problemList[prob].data1=0
+                                                // problemList[prob].data2=6
+                                                for (var mosCounter1 = parseInt(problemList[prob].data1); mosCounter1 <= parseInt(problemList[prob].data2); mosCounter1++) {
+                                                    // console.log("mosCounter====>", mosCounter);
+                                                    var m1 = moment(problemActionList[prob].dt).add(mosCounter1, 'months').utcOffset('-0500').format("YYYY-MM-DD");
+                                                    var mStartDate1 = moment(m1).startOf('month').format("YYYY-MM-DD");
+                                                    var mEndDate1 = moment(m1).endOf('month').format("YYYY-MM-DD");
+
+                                                    // }
+                                                    var programId1 = programList[pp].programId;
+                                                    // var regionId = -1;
+                                                    var planningUnitId1 = planningUnitList[p].planningUnit.id;
+
+
+                                                    var supplyPlanJson1 = programList[pp].supplyPlan.filter(c => c.planningUnitId == planningUnitId1 && moment(c.transDate).format("YYYY-MM-DD") == moment(mStartDate1).format("YYYY-MM-DD"));
+
+                                                    var mos1 = "";
+                                                    var maxForMonths1 = "";
+                                                    var minForMonths1 = "";
+                                                    var closingBalance1 = "";
+                                                    var amcCalcualted1 = "";
+
+
+                                                    if (supplyPlanJson1.length > 0) {
+                                                        mos1 = supplyPlanJson1[0].mos;
+                                                        maxForMonths1 = supplyPlanJson1[0].maxStockMoS;
+                                                        minForMonths1 = supplyPlanJson1[0].minStockMoS;
+                                                        closingBalance1 = supplyPlanJson1[0].closingBalance;
+                                                        amcCalcualted1 = supplyPlanJson1[0].amc;
+                                                    }
+
+                                                    mosArray1.push(
+                                                        {
+                                                            mos1: mos1,
+                                                            maxForMonths1: maxForMonths1,
+                                                            minForMonths1: minForMonths1,
+                                                            month1: m1,
+                                                            closingBalance1: closingBalance1,
+                                                            amcCalcualted1: amcCalcualted1
+                                                        });
+
+                                                }
+                                                // console.log("planningUnitId====>", planningUnitId);
+                                                // console.log("mosArray============>$@##", mosArray);
+                                                // for loop on array mosArray
+                                                var monthWithMosLessThenMin1 = '';
+                                                for (var element = 0; element < mosArray1.length; element++) {
+                                                    // console.log("mos element===>", mosArray[element]);
+                                                    if (mosArray1[element].mos1 < mosArray1[element].minForMonths1) {
+                                                        monthWithMosLessThenMin1 = mosArray1[element].month1;
+                                                        break;
+                                                    } else {
+                                                    }
+                                                }
+                                                var index1 = problemActionList.findIndex(
+                                                    c => moment(c.dt).format("YYYY-MM") == moment(problemActionList[prob].dt).format("YYYY-MM")
+                                                        // && c.region.id == regionList[r].regionId
+                                                        && c.planningUnit.id == planningUnitList[p].planningUnit.id
+                                                        && c.program.id == programList[pp].programId
+                                                        && c.realmProblem.problem.problemId == 20
                                                     // && c.versionId == versionID
-                                                    );
+                                                );
+
+
+                                                if (monthWithMosLessThenMin1 == '' && index1 != -1 && problemActionList[index1].problemStatus.id == 1) {
+
+                                                    var filterObj = problemActionList[index1];
+                                                    var transList = filterObj.problemTransList;
+                                                    let tempProblemTransObj = {
+                                                        problemReportTransId: '',
+                                                        problemStatus: {
+                                                            id: 2,
+                                                            label: {
+                                                                active: true,
+                                                                labelId: 462,
+                                                                label_en: "Resolved",
+                                                                label_sp: null,
+                                                                label_fr: null,
+                                                                label_pr: null
+                                                            }
+                                                        },
+                                                        notes: 'Resolved',
+                                                        createdBy: {
+                                                            userId: userId,
+                                                            username: username
+                                                        },
+                                                        createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
+                                                    }
+                                                    transList.push(tempProblemTransObj);
+                                                    filterObj.problemTransList = transList;
+
+                                                    var problemStatusObject = {
+                                                        id: 2,
+                                                        label: {
+                                                            active: true,
+                                                            labelId: 462,
+                                                            label_en: "Resolved",
+                                                            label_sp: null,
+                                                            label_fr: null,
+                                                            label_pr: null
+                                                        }
+                                                    }
+                                                    filterObj.problemStatus = problemStatusObject;
+                                                } else {
+                                                    // auto open logic for index1
+                                                    if (monthWithMosLessThenMin1 != '' && index1 != -1 && problemActionList[index1].problemStatus.id == 2) {
+                                                        openProblem(index1, username, userId, problemActionList);
+                                                    }
+                                                }
+
+                                            }
+
 
                                             if (monthWithMosLessThenMin != '') {
                                                 // console.log("min mos month from array ======>", monthWithMosLessThenMin);
                                                 var getStartDate = moment(monthWithMosLessThenMin).subtract(3, 'months').format('YYYY-MM-DD') < moment(Date.now()).format('YYYY-MM-DD') ? moment(Date.now()).format('YYYY-MM-DD') : moment(monthWithMosLessThenMin).subtract(3, 'months').format('YYYY-MM-DD');
                                                 var getEndDate = moment(monthWithMosLessThenMin).add(4, 'months').format('YYYY-MM-DD');
                                                 // console.log("startDate=====>", getStartDate, "endDate=====>", getEndDate);
-
                                                 var shipmentListForMonths = programList[pp].shipmentList;
                                                 var filteredShipmentListForMonths = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM-DD') >= moment(getStartDate).format('YYYY-MM-DD') && moment(c.expectedDeliveryDate).format('YYYY-MM-DD') <= moment(getEndDate).format('YYYY-MM-DD'));
                                                 // console.log("filteredShipmentListForMonths=====>", filteredShipmentListForMonths);
-
-
                                                 if (filteredShipmentListForMonths.length == 0) {
                                                     // console.log("flag a problem mos is less then min and dont have shipment withing lead times");
                                                     if (index == -1) {
@@ -3404,6 +4577,10 @@ export default class QatProblemActions extends Component {
                                                         problemActionList.push(json);
                                                         problemActionIndex++;
                                                     } else {
+                                                        // auto open logic for index
+                                                        if (index != -1 && problemActionList[index].problemStatus.id == 2) {
+                                                            openProblem(index, username, userId, problemActionList);
+                                                        }
                                                     }
                                                 } else {
                                                     console.log("dont falg problem mos is  less then min but have shipment in lead times ");
@@ -3464,23 +4641,94 @@ export default class QatProblemActions extends Component {
                                                 // console.log("tMinusOneDate--->",tMinusOneDate);
                                                 // console.log("tMinusOneDate--->",tMinusTwoDate);
                                                 // console.log("tMinusOneDate--->",tMinusThreeDate);
-
-                                                var consumptionListFortMinusOneDate = consumptionList.filter(c => moment(c.consumptionDate).format('YYYY-MM') == moment(tMinusOneDate).format('YYYY-MM') && c.actualFlag.toString() == "true");
-                                                var consumptionListFortMinusTwoDate = consumptionList.filter(c => moment(c.consumptionDate).format('YYYY-MM') == moment(tMinusTwoDate).format('YYYY-MM') && c.actualFlag.toString() == "true");
-                                                var consumptionListFortMinusThreeDate = consumptionList.filter(c => moment(c.consumptionDate).format('YYYY-MM') == moment(tMinusThreeDate).format('YYYY-MM') && c.actualFlag.toString() == "true");
-
+                                                var consumptionListFortMinusOneDate = consumptionList.filter(c => moment(c.consumptionDate).format('YYYY-MM') == moment(tMinusOneDate).format('YYYY-MM') && c.actualFlag.toString() == "true" && c.active==true);
+                                                var consumptionListFortMinusTwoDate = consumptionList.filter(c => moment(c.consumptionDate).format('YYYY-MM') == moment(tMinusTwoDate).format('YYYY-MM') && c.actualFlag.toString() == "true" && c.active==true);
+                                                var consumptionListFortMinusThreeDate = consumptionList.filter(c => moment(c.consumptionDate).format('YYYY-MM') == moment(tMinusThreeDate).format('YYYY-MM') && c.actualFlag.toString() == "true" && c.active==true);
                                                 // console.log("consumptionListFortMinusOneDate--->",consumptionListFortMinusOneDate.length);
                                                 // console.log("consumptionListFortMinusTwoDate--->",consumptionListFortMinusTwoDate.length);
                                                 // console.log("consumptionListFortMinusThreeDate--->",consumptionListFortMinusThreeDate.length);
-
                                                 var index = problemActionList.findIndex(
                                                     c => moment(c.dt).format("YYYY-MM") == moment(Date.now()).format("YYYY-MM")
                                                         && c.region.id == regionList[r].regionId
                                                         && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                         && c.program.id == programList[pp].programId
                                                         && c.realmProblem.problem.problemId == 21
+                                                    // && c.versionId == versionID
+                                                );
+
+                                                if (problemActionList[prob] != undefined) {
+
+                                                    var consumptionList1 = programList[pp].consumptionList;
+                                                    consumptionList1 = consumptionList1.filter(c => c.region.id == regionList[r].regionId && c.planningUnit.id == planningUnitList[p].planningUnit.id);
+
+                                                    var tMinusOneDate1 = moment(problemActionList[prob].dt).subtract(1, 'months').endOf('month').format("YYYY-MM-DD");
+                                                    var tMinusTwoDate1 = moment(problemActionList[prob].dt).subtract(2, 'months').endOf('month').format("YYYY-MM-DD");
+                                                    var tMinusThreeDate1 = moment(problemActionList[prob].dt).subtract(3, 'months').endOf('month').format("YYYY-MM-DD");
+                                                    // console.log("tMinusOneDate--->",tMinusOneDate);
+                                                    // console.log("tMinusOneDate--->",tMinusTwoDate);
+                                                    // console.log("tMinusOneDate--->",tMinusThreeDate);
+                                                    var consumptionListFortMinusOneDate1 = consumptionList1.filter(c => moment(c.consumptionDate).format('YYYY-MM') == moment(tMinusOneDate1).format('YYYY-MM') && c.actualFlag.toString() == "true" && c.active==true);
+                                                    var consumptionListFortMinusTwoDate1 = consumptionList1.filter(c => moment(c.consumptionDate).format('YYYY-MM') == moment(tMinusTwoDate1).format('YYYY-MM') && c.actualFlag.toString() == "true" && c.active==true);
+                                                    var consumptionListFortMinusThreeDate1 = consumptionList1.filter(c => moment(c.consumptionDate).format('YYYY-MM') == moment(tMinusThreeDate1).format('YYYY-MM') && c.actualFlag.toString() == "true" && c.active==true);
+                                                    // console.log("consumptionListFortMinusOneDate--->",consumptionListFortMinusOneDate.length);
+                                                    // console.log("consumptionListFortMinusTwoDate--->",consumptionListFortMinusTwoDate.length);
+                                                    // console.log("consumptionListFortMinusThreeDate--->",consumptionListFortMinusThreeDate.length);
+                                                    var index1 = problemActionList.findIndex(
+                                                        c => moment(c.dt).format("YYYY-MM") == moment(problemActionList[prob].dt).format("YYYY-MM")
+                                                            && c.region.id == regionList[r].regionId
+                                                            && c.planningUnit.id == planningUnitList[p].planningUnit.id
+                                                            && c.program.id == programList[pp].programId
+                                                            && c.realmProblem.problem.problemId == 21
                                                         // && c.versionId == versionID
-                                                        );
+                                                    );
+
+                                                    if (consumptionListFortMinusOneDate1.length == 0 && consumptionListFortMinusThreeDate1.length == 0 && consumptionListFortMinusTwoDate1.length > 0) {
+                                                        // auto open logic for index1
+                                                        if (index1 != -1 && problemActionList[index1].problemStatus.id == 2) {
+                                                            openProblem(index1, username, userId, problemActionList);
+                                                        }
+                                                    } else {
+                                                        if (index1 != -1 && problemActionList[index1].problemStatus.id == 1) {
+                                                            var filterObj = problemActionList[index1];
+                                                            var transList = filterObj.problemTransList;
+                                                            let tempProblemTransObj = {
+                                                                problemReportTransId: '',
+                                                                problemStatus: {
+                                                                    id: 2,
+                                                                    label: {
+                                                                        active: true,
+                                                                        labelId: 462,
+                                                                        label_en: "Resolved",
+                                                                        label_sp: null,
+                                                                        label_fr: null,
+                                                                        label_pr: null
+                                                                    }
+                                                                },
+                                                                notes: 'Resolved',
+                                                                createdBy: {
+                                                                    userId: userId,
+                                                                    username: username
+                                                                },
+                                                                createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
+                                                            }
+                                                            transList.push(tempProblemTransObj);
+                                                            filterObj.problemTransList = transList;
+
+                                                            var problemStatusObject = {
+                                                                id: 2,
+                                                                label: {
+                                                                    active: true,
+                                                                    labelId: 462,
+                                                                    label_en: "Resolved",
+                                                                    label_sp: null,
+                                                                    label_fr: null,
+                                                                    label_pr: null
+                                                                }
+                                                            }
+                                                            filterObj.problemStatus = problemStatusObject;
+                                                        }
+                                                    }
+                                                }
 
                                                 if (consumptionListFortMinusOneDate.length > 0 && consumptionListFortMinusThreeDate.length > 0 && consumptionListFortMinusTwoDate.length == 0) {
                                                     // console.log("rais prob--------");
@@ -3555,7 +4803,10 @@ export default class QatProblemActions extends Component {
                                                         problemActionList.push(json);
                                                         problemActionIndex++;
                                                     } else {
-                                                        // problemActionList[index].isFound = 1;
+                                                        // problemActionList[index].isFound = 1 auot open logic for index;
+                                                        if (index != -1 && problemActionList[index].problemStatus.id == 2) {
+                                                            openProblem(index, username, userId, problemActionList);
+                                                        }
                                                     }
 
                                                 } else {
@@ -3630,7 +4881,6 @@ export default class QatProblemActions extends Component {
                                     // this.setState({executionStatus:1});
                                     // return executionStatus;
                                     console.log("time taken in sec===>", performance.now());
-
                                     // this.props.updateState(false);
                                     // this.props.fetchData(false);
                                     if (this.props.updateState != undefined) {
@@ -3639,11 +4889,8 @@ export default class QatProblemActions extends Component {
                                     }
 
                                 }.bind(this);
-
                                 console.log("problemList for each program=====>", problemActionList);
-
                             }
-
 
                         }.bind(this);
                     }.bind(this);

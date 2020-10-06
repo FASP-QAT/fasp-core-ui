@@ -576,15 +576,15 @@ export default class EditLanguageComponent extends Component {
             },
             {
                 dataField: 'createdBy.username',
-                text: i18n.t('static.report.createdBy'),
+                text: i18n.t('static.report.lastmodifiedby'),
                 sort: true,
                 align: 'center',
                 style: { width: '80px' },
                 headerAlign: 'center',
             },
             {
-                dataField: 'createdDate',
-                text: i18n.t('static.report.createdDate'),
+                dataField: 'createdDate', 
+                text: i18n.t('static.report.lastmodifieddate'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',

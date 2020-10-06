@@ -1252,6 +1252,8 @@
     "static.add.addOrganisation": "Add Organisation",
     "static.list.listProgram": "List Program",
     "static.add.totalProgram": "Total Program",
-    "static.report.qatProblemActionReport": "QAT Probelm Action Report"
+    "static.report.qatProblemActionReport": "QAT Probelm Action Report",
+    "static.report.problemAction.automatic":"Automatic",
+    "static.report.problemAction.manual":"Manual"
     
 }
