@@ -143,7 +143,7 @@ export default class SyncMasterData extends Component {
         console.log('Program List', programList);
         var valid = true;
         for (var i = 0; i < programList.length; i++) {
-            AuthenticationService.setupAxiosInterceptors();
+            // AuthenticationService.setupAxiosInterceptors();
             if (navigator.onLine) {
                 //Code to Sync Country list
                 MasterSyncService.syncProgram(programList[i].programId, programList[i].version, date)
@@ -347,7 +347,7 @@ export default class SyncMasterData extends Component {
                         var validation = this.syncProgramData(lastSyncDate, myResult);
                         console.log("Validation", validation);
                         if (validation) {
-                            AuthenticationService.setupAxiosInterceptors();
+                            // AuthenticationService.setupAxiosInterceptors();
                             if (navigator.onLine && window.getComputedStyle(document.getElementById("retryButtonDiv")).display == "none") {
                                 //Code to Sync Language list
                                 MasterSyncService.getLanguageListForSync(lastSyncDate)

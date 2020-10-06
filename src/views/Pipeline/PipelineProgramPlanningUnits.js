@@ -549,7 +549,7 @@ export default class PipelineProgramPlanningUnits extends Component {
     componentDidMount() {
         var productCategoryList = [];
         // var realmId = document.getElementById("realmId").value;
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         ProductCategoryServcie.getProductCategoryListByRealmId(1)
             .then(response => {
                 // productCategoryList = response.data;
@@ -591,7 +591,7 @@ export default class PipelineProgramPlanningUnits extends Component {
 
                 var planningUnitListQat = [];
                 // var activePlanningUnitList=[];
-                AuthenticationService.setupAxiosInterceptors();
+                // AuthenticationService.setupAxiosInterceptors();
                 PlanningUnitService.getActivePlanningUnitList()
                     .then(response => {
                         if (response.status == 200) {
@@ -606,7 +606,7 @@ export default class PipelineProgramPlanningUnits extends Component {
                             }
                             this.setState({ planningUnitListQat: planningUnitListQat });
 
-                            AuthenticationService.setupAxiosInterceptors();
+                            // AuthenticationService.setupAxiosInterceptors();
                             PipelineService.getQatTempPlanningUnitList(this.props.pipelineId)
                                 .then(response => {
                                     if (response.status == 200) {
@@ -618,8 +618,8 @@ export default class PipelineProgramPlanningUnits extends Component {
                                             //seting this for loaded function
                                             this.setState({ planningUnitList: planningUnitList });
                                             //seting this for loaded function
-                                            console.log("planning Unit list==>",planningUnitList);
-                                        
+                                            console.log("planning Unit list==>", planningUnitList);
+
                                             if (planningUnitList.length != 0) {
                                                 for (var j = 0; j < planningUnitList.length; j++) {
                                                     data = [];
@@ -627,9 +627,9 @@ export default class PipelineProgramPlanningUnits extends Component {
                                                     data[0] = planningUnitList[j].pipelineProductCategoryName;
                                                     data[1] = planningUnitList[j].pipelineProductName;
 
-                                                    if(planningUnitList[j].productCategoryId==0){
+                                                    if (planningUnitList[j].productCategoryId == 0) {
                                                         data[2] = -1;
-                                                    }else{
+                                                    } else {
                                                         data[2] = planningUnitList[j].productCategoryId;
                                                     }
                                                     data[3] = planningUnitList[j].planningUnitId;
@@ -861,7 +861,46 @@ export default class PipelineProgramPlanningUnits extends Component {
                                     } else {
                                         this.setState({ message: response.data.messageCode, loading: false })
                                     }
-                                });
+                                }).catch(
+                                    error => {
+                                        if (error.message === "Network Error") {
+                                            this.setState({
+                                                message: 'static.unkownError',
+                                                loading: false
+                                            });
+                                        } else {
+                                            switch (error.response ? error.response.status : "") {
+
+                                                case 401:
+                                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                                    break;
+                                                case 403:
+                                                    this.props.history.push(`/accessDenied`)
+                                                    break;
+                                                case 500:
+                                                case 404:
+                                                case 406:
+                                                    this.setState({
+                                                        message: error.response.data.messageCode,
+                                                        loading: false
+                                                    });
+                                                    break;
+                                                case 412:
+                                                    this.setState({
+                                                        message: error.response.data.messageCode,
+                                                        loading: false
+                                                    });
+                                                    break;
+                                                default:
+                                                    this.setState({
+                                                        message: 'static.unkownError',
+                                                        loading: false
+                                                    });
+                                                    break;
+                                            }
+                                        }
+                                    }
+                                );
 
                         } else {
                             this.setState({ message: response.data.messageCode, loading: false })
@@ -870,18 +909,38 @@ export default class PipelineProgramPlanningUnits extends Component {
                     }).catch(
                         error => {
                             if (error.message === "Network Error") {
-                                this.setState({ message: error.message, loading: false });
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
                             } else {
                                 switch (error.response ? error.response.status : "") {
-                                    case 500:
+
                                     case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
                                     case 404:
                                     case 406:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
                                     case 412:
-                                        this.setState({ message: error.response.data.messageCode, loading: false });
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
                                         break;
                                     default:
-                                        this.setState({ message: 'static.unkownError', loading: false });
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
                                         break;
                                 }
                             }
@@ -889,7 +948,46 @@ export default class PipelineProgramPlanningUnits extends Component {
                     );
 
 
-            });
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
 
 
     }
@@ -901,11 +999,7 @@ export default class PipelineProgramPlanningUnits extends Component {
     render() {
         return (
             <>
-                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
-                    this.setState({ message: message })
-                }} loading={(loading) => {
-                    this.setState({ loading: loading })
-                }} />
+                <AuthenticationServiceComponent history={this.props.history} />
                 <h4 className="red">{this.props.message}</h4>
                 <div className="table-responsive" style={{ display: this.state.loading ? "none" : "block" }} >
 
@@ -915,7 +1009,7 @@ export default class PipelineProgramPlanningUnits extends Component {
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
-                            <div ><h4> <strong>Loading...</strong></h4></div>
+                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
                             <div class="spinner-border blue ml-4" role="status">
 

@@ -15,7 +15,7 @@ export default class PipelineProgramProcurementAgent extends Component {
         this.state = {
             procurementAgentList: [],
             mapProcurementAgentEl: '',
-            loading:true
+            loading: true
         }
         this.loaded = this.loaded.bind(this);
         this.changed = this.changed.bind(this);
@@ -133,7 +133,7 @@ export default class PipelineProgramProcurementAgent extends Component {
     componentDidMount() {
         var ProcurementAgentListQat = [];
         // var activeDataSourceList=[];
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         ProcurementAgentService.getProcurementAgentListAll()
             .then(response => {
                 if (response.status == 200) {
@@ -149,7 +149,7 @@ export default class PipelineProgramProcurementAgent extends Component {
                     this.setState({ ProcurementAgentListQat: ProcurementAgentListQat });
 
 
-                    AuthenticationService.setupAxiosInterceptors();
+                    // AuthenticationService.setupAxiosInterceptors();
                     PipelineService.getQatTempProcurementAgentList(this.props.pipelineId)
                         .then(response => {
                             if (response.status == 200) {
@@ -235,13 +235,91 @@ export default class PipelineProgramProcurementAgent extends Component {
 
                                 }
                             } else {
-                                this.setState({ message: response.data.messageCode,loading:false })
+                                this.setState({ message: response.data.messageCode, loading: false })
                             }
-                        });
+                        }).catch(
+                            error => {
+                                if (error.message === "Network Error") {
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
+                                } else {
+                                    switch (error.response ? error.response.status : "") {
+
+                                        case 401:
+                                            this.props.history.push(`/login/static.message.sessionExpired`)
+                                            break;
+                                        case 403:
+                                            this.props.history.push(`/accessDenied`)
+                                            break;
+                                        case 500:
+                                        case 404:
+                                        case 406:
+                                            this.setState({
+                                                message: error.response.data.messageCode,
+                                                loading: false
+                                            });
+                                            break;
+                                        case 412:
+                                            this.setState({
+                                                message: error.response.data.messageCode,
+                                                loading: false
+                                            });
+                                            break;
+                                        default:
+                                            this.setState({
+                                                message: 'static.unkownError',
+                                                loading: false
+                                            });
+                                            break;
+                                    }
+                                }
+                            }
+                        );
 
 
                 }
-            })
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
 
 
 
@@ -249,17 +327,13 @@ export default class PipelineProgramProcurementAgent extends Component {
     }
 
     loadedJexcelCommonFunction = function (instance, cell, x, y, value) {
-        jExcelLoadedFunctionPipeline(instance,0);
+        jExcelLoadedFunctionPipeline(instance, 0);
     }
 
     render() {
         return (
             <>
-             <AuthenticationServiceComponent history={this.props.history} message={(message) => {
-                    this.setState({ message: message })
-                }} loading={(loading) => {
-                    this.setState({ loading: loading })
-                }} />
+                <AuthenticationServiceComponent history={this.props.history} />
                 <h4 className="red">{this.props.message}</h4>
                 <div className="table-responsive" style={{ display: this.state.loading ? "none" : "block" }}>
 
@@ -269,7 +343,7 @@ export default class PipelineProgramProcurementAgent extends Component {
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
-                            <div ><h4> <strong>Loading...</strong></h4></div>
+                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
                             <div class="spinner-border blue ml-4" role="status">
 

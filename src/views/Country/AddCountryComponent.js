@@ -160,7 +160,6 @@
 //     }
 
 //     componentDidMount() {
-//         AuthenticationService.setupAxiosInterceptors();
 //         // LanguageService.getLanguageListActive().then(response => {
 //         //     if (response.status == 200) {
 //         //         this.setState({
@@ -638,7 +637,6 @@ export default class AddCountryComponent extends Component {
     }
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
         // LanguageService.getLanguageListActive().then(response => {
         //     if (response.status == 200) {
         //         this.setState({
@@ -682,26 +680,46 @@ export default class AddCountryComponent extends Component {
                 })
             }
         })
-        // .catch(
-        //     error => {
-        //         if (error.message === "Network Error") {
-        //             this.setState({ message: error.message });
-        //         } else {
-        //             switch (error.response ? error.response.status : "") {
-        //                 case 500:
-        //                 case 401:
-        //                 case 404:
-        //                 case 406:
-        //                 case 412:
-        //                     this.setState({ message: error.response.data.messageCode });
-        //                     break;
-        //                 default:
-        //                     this.setState({ message: 'static.unkownError' });
-        //                     console.log("Error code unkown");
-        //                     break;
-        //             }
-        //         }
-        //     });
+            .catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
     }
 
     Capitalize(str) {
@@ -731,11 +749,7 @@ export default class AddCountryComponent extends Component {
             }, this);
         return (
             <div className="animated fadeIn">
-                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
-                    this.setState({ message: message })
-                }} loading={(loading) => {
-                    this.setState({ loading: loading })
-                }} />
+                <AuthenticationServiceComponent history={this.props.history} />
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row style={{ display: this.state.loading ? "none" : "block" }}>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
@@ -769,22 +783,41 @@ export default class AddCountryComponent extends Component {
                                         .catch(
                                             error => {
                                                 if (error.message === "Network Error") {
-                                                    this.setState({ message: error.message, loading: false });
+                                                    this.setState({
+                                                        message: 'static.unkownError',
+                                                        loading: false
+                                                    });
                                                 } else {
                                                     switch (error.response ? error.response.status : "") {
-                                                        case 500:
+
                                                         case 401:
+                                                            this.props.history.push(`/login/static.message.sessionExpired`)
+                                                            break;
+                                                        case 403:
+                                                            this.props.history.push(`/accessDenied`)
+                                                            break;
+                                                        case 500:
                                                         case 404:
                                                         case 406:
+                                                            this.setState({
+                                                                message: error.response.data.messageCode,
+                                                                loading: false
+                                                            });
+                                                            break;
                                                         case 412:
-                                                            this.setState({ message: error.response.data.messageCode, loading: false });
+                                                            this.setState({
+                                                                message: error.response.data.messageCode,
+                                                                loading: false
+                                                            });
                                                             break;
                                                         default:
-                                                            this.setState({ message: 'static.unkownError', loading: false });
+                                                            this.setState({
+                                                                message: 'static.unkownError',
+                                                                loading: false
+                                                            });
                                                             break;
                                                     }
                                                 }
-
                                             }
                                         );
                                 }}

@@ -21,13 +21,13 @@ const initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         realmId: Yup.string()
-            .required( i18n.t('static.realmcountry.validrealm')),
+            .required(i18n.t('static.realmcountry.validrealm')),
         procurementAgentCode: Yup.string()
-            .required( i18n.t('static.realmcountry.validcode')),
+            .required(i18n.t('static.realmcountry.validcode')),
         procurementAgentName: Yup.string()
-            .required( i18n.t('static.realmcountry.validname')),
+            .required(i18n.t('static.realmcountry.validname')),
         submittedToApprovedLeadTime: Yup.string()
-            .required( i18n.t('static.realmcountry.validsubmittoapprove'))
+            .required(i18n.t('static.realmcountry.validsubmittoapprove'))
     })
 }
 
@@ -135,49 +135,69 @@ class AddRealmCountryComponent extends Component {
     }
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         RealmService.getRealmListAll()
-        .then(response => {
-            if (response.status == 200) {
-                this.setState({
-                    realms: response.data
-                })
-            } else {
-                this.setState({
-                    message: response.data.messageCode
-                },
-                    () => {
-                        this.hideSecondComponent();
+            .then(response => {
+                if (response.status == 200) {
+                    this.setState({
+                        realms: response.data
                     })
-            }
-        }).catch(
-            error => {
-                if (error.message === "Network Error") {
-                    this.setState({ message: error.message });
                 } else {
-                    switch (error.response ? error.response.status : "") {
-                        case 500:
-                        case 401:
-                        case 404:
-                        case 406:
-                        case 412:
-                            this.setState({ message: error.response.data.messageCode });
-                            break;
-                        default:
-                            this.setState({ message: 'static.unkownError' });
-                            break;
+                    this.setState({
+                        message: response.data.messageCode
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
+                }
+            })
+            .catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
                     }
                 }
-            }
-        );
-
+            );
         CountryService.getCountryListAll()
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
                         countries: response.data.data
                     })
-                }else{
+                } else {
                     this.setState({
                         message: response.data.messageCode
                     },
@@ -186,20 +206,45 @@ class AddRealmCountryComponent extends Component {
                         })
 
                 }
-                
-            }).catch(
+
+            })
+            .catch(
                 error => {
-                    switch (error.message) {
-                        case "Network Error":
-                            this.setState({
-                                message: error.message
-                            })
-                            break
-                        default:
-                            this.setState({
-                                message: error.response.data.message
-                            })
-                            break
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
                     }
                 }
             );
@@ -216,7 +261,7 @@ class AddRealmCountryComponent extends Component {
                     </option>
                 )
             }, this);
-        
+
         // let countryList = countries.length > 0
         //     && countries.map((item, i) => {
         //         return (
@@ -227,18 +272,14 @@ class AddRealmCountryComponent extends Component {
         //     }, this);
         return (
             <div className="animated fadeIn">
-                   <AuthenticationServiceComponent history={this.props.history} message={(message) => {
-                    this.setState({ message: message })
-                }} loading={(loading) => {
-                    this.setState({ loading: loading })
-                }} />
-                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                <AuthenticationServiceComponent history={this.props.history} />
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
 
                             <CardHeader>
-                                <i className="icon-note"></i><strong>Add Procurement Agent</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.procurementAgent.AddProcurementAgent')}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 initialValues={initialValues}
@@ -259,17 +300,41 @@ class AddRealmCountryComponent extends Component {
                                         })
                                         .catch(
                                             error => {
-                                                switch (error.message) {
-                                                    case "Network Error":
-                                                        this.setState({
-                                                            message: error.message
-                                                        })
-                                                        break
-                                                    default:
-                                                        this.setState({
-                                                            message: error.response.data.message
-                                                        })
-                                                        break
+                                                if (error.message === "Network Error") {
+                                                    this.setState({
+                                                        message: 'static.unkownError',
+                                                        loading: false
+                                                    });
+                                                } else {
+                                                    switch (error.response ? error.response.status : "") {
+
+                                                        case 401:
+                                                            this.props.history.push(`/login/static.message.sessionExpired`)
+                                                            break;
+                                                        case 403:
+                                                            this.props.history.push(`/accessDenied`)
+                                                            break;
+                                                        case 500:
+                                                        case 404:
+                                                        case 406:
+                                                            this.setState({
+                                                                message: error.response.data.messageCode,
+                                                                loading: false
+                                                            });
+                                                            break;
+                                                        case 412:
+                                                            this.setState({
+                                                                message: error.response.data.messageCode,
+                                                                loading: false
+                                                            });
+                                                            break;
+                                                        default:
+                                                            this.setState({
+                                                                message: 'static.unkownError',
+                                                                loading: false
+                                                            });
+                                                            break;
+                                                    }
                                                 }
                                             }
                                         );
@@ -289,7 +354,7 @@ class AddRealmCountryComponent extends Component {
                                             <Form onSubmit={handleSubmit} noValidate name='procurementAgentForm'>
                                                 <CardBody>
                                                     <FormGroup>
-                                                        <Label htmlFor="realmId">Realm</Label>
+                                                        <Label htmlFor="realmId">{i18n.t('static.supplier.realm')}</Label>
                                                         <Input
                                                             type="select"
                                                             name="realmId"
@@ -307,7 +372,7 @@ class AddRealmCountryComponent extends Component {
                                                         <FormFeedback>{errors.realmId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="countryId">Country</Label>
+                                                        <Label htmlFor="countryId">{i18n.t('static.report.country')}</Label>
                                                         <Input
                                                             type="select"
                                                             name="countryId"
@@ -325,7 +390,7 @@ class AddRealmCountryComponent extends Component {
                                                         <FormFeedback>{errors.countryId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="procurementAgentCode">Procurement Agent Code</Label>
+                                                        <Label for="procurementAgentCode">{i18n.t('static.report.procurementagentcode')}</Label>
                                                         <Input type="text"
                                                             name="procurementAgentCode"
                                                             id="procurementAgentCode"
@@ -340,7 +405,7 @@ class AddRealmCountryComponent extends Component {
                                                         <FormFeedback>{errors.procurementAgentCode}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="procurementAgentName">Procurement Agent Name</Label>
+                                                        <Label for="procurementAgentName">{i18n.t('static.procurementAgent.procurementAgentName')}</Label>
                                                         <Input type="text"
                                                             name="procurementAgentName"
                                                             id="procurementAgentName"
@@ -354,7 +419,7 @@ class AddRealmCountryComponent extends Component {
                                                         <FormFeedback>{errors.procurementAgentName}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="submittedToApprovedLeadTime">Submitted To Approved Lead Time</Label>
+                                                        <Label for="submittedToApprovedLeadTime">{i18n.t('static.program.submittoapproveleadtime')}</Label>
                                                         <Input type="number"
                                                             name="submittedToApprovedLeadTime"
                                                             id="submittedToApprovedLeadTime"
@@ -370,8 +435,8 @@ class AddRealmCountryComponent extends Component {
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
-                                                        <Button type="submit" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}>Submit</Button>
-                                                        <Button type="reset" color="danger" className="mr-1" onClick={this.cancelClicked}>Cancel</Button>
+                                                        <Button type="submit" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}>{i18n.t('static.common.submit')}Submit</Button>
+                                                        <Button type="reset" color="danger" className="mr-1" onClick={this.cancelClicked}>{i18n.t('static.common.cancel')}</Button>
                                                     </FormGroup>
                                                 </CardFooter>
                                             </Form>
@@ -385,7 +450,7 @@ class AddRealmCountryComponent extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/procurementAgent/listProcurementAgent/`+ 'red/' +i18n.t('static.program.actioncancelled'))
+        this.props.history.push(`/procurementAgent/listProcurementAgent/` + 'red/' + i18n.t('static.program.actioncancelled'))
     }
 }
 

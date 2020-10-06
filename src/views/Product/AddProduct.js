@@ -93,7 +93,7 @@ export default class AddProduct extends Component {
         this.getDependentLists = this.getDependentLists.bind(this);
     }
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         RealmServcie.getRealmListAll()
             .then(response => {
                 if (response.status == 200) {
@@ -160,7 +160,7 @@ export default class AddProduct extends Component {
     }
 
     getDependentLists(event) {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         ProductService.getProdcutCategoryListByRealmId(event.target.value)
             .then(response => {
                 if (response.status == 200) {

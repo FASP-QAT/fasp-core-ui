@@ -1108,7 +1108,7 @@ class SupplyPlanVersionAndReview extends Component {
     componentDidMount() {
         this.hideFirstComponent();
         // clearTimeout(this.timeout);
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         this.getCountrylist();
         this.getPrograms()
         this.getStatusList()
@@ -1147,7 +1147,7 @@ class SupplyPlanVersionAndReview extends Component {
     }
 
     getCountrylist() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         let realmId = AuthenticationService.getRealmId();
         RealmCountryService.getRealmCountryrealmIdById(realmId)
             .then(response => {
@@ -1197,7 +1197,7 @@ class SupplyPlanVersionAndReview extends Component {
     }
 
     getPrograms() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         ProgramService.getProgramList()
             .then(response => {
                 console.log(JSON.stringify(response.data))
@@ -1233,7 +1233,7 @@ class SupplyPlanVersionAndReview extends Component {
 
     }
     getVersionTypeList() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         ProgramService.getVersionTypeList().then(response => {
             console.log('**' + JSON.stringify(response.data))
             this.setState({
@@ -1242,7 +1242,7 @@ class SupplyPlanVersionAndReview extends Component {
         })
     }
     getStatusList() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         ProgramService.getVersionStatusList().then(response => {
             console.log('**' + JSON.stringify(response.data))
             this.setState({
@@ -1285,7 +1285,7 @@ class SupplyPlanVersionAndReview extends Component {
         console.log('endDate', endDate)
         if (programId != 0 && countryId != 0) {
             this.setState({ loading: true })
-            AuthenticationService.setupAxiosInterceptors();
+            // AuthenticationService.setupAxiosInterceptors();
             ReportService.getProgramVersionList(programId, countryId, versionStatusId, versionTypeId, startDate, endDate)
                 .then(response => {
                     console.log(JSON.stringify(response.data))

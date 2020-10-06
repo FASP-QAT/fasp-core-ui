@@ -1015,7 +1015,7 @@ export default class CostOfInventory extends Component {
 
     getPrograms = () => {
         if (navigator.onLine) {
-            AuthenticationService.setupAxiosInterceptors();
+            // AuthenticationService.setupAxiosInterceptors();
             //let realmId = AuthenticationService.getRealmId();
             ProgramService.getProgramList()
                 .then(response => {
@@ -1599,7 +1599,7 @@ export default class CostOfInventory extends Component {
                     "dt": moment(new Date(this.state.singleValue2.year, (this.state.singleValue2.month - 1), 1)).startOf('month').format('YYYY-MM-DD'),
                     "includePlannedShipments": document.getElementById("includePlanningShipments").value.toString()=="true" ? 1 : 0
                 }
-                AuthenticationService.setupAxiosInterceptors();
+                // AuthenticationService.setupAxiosInterceptors();
                 ReportService.costOfInventory(inputjson).then(response => {
                     console.log("costOfInentory=====>", response.data);
                     this.setState({

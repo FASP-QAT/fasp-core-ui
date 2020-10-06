@@ -1902,7 +1902,7 @@ class ProcurementAgentExport extends Component {
 
     getPrograms = () => {
         if (navigator.onLine) {
-            AuthenticationService.setupAxiosInterceptors();
+            // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramList()
                 .then(response => {
                     // console.log(JSON.stringify(response.data))
@@ -1998,7 +1998,7 @@ class ProcurementAgentExport extends Component {
 
     getProcurementAgent = () => {
         if (navigator.onLine) {
-            AuthenticationService.setupAxiosInterceptors();
+            // AuthenticationService.setupAxiosInterceptors();
             ProcurementAgentService.getProcurementAgentListAll()
                 .then(response => {
                     // console.log(JSON.stringify(response.data))
@@ -2232,7 +2232,7 @@ class ProcurementAgentExport extends Component {
 
                 }
                 else {
-                    AuthenticationService.setupAxiosInterceptors();
+                    // AuthenticationService.setupAxiosInterceptors();
 
                     //let productCategoryId = document.getElementById("productCategoryId").value;
                     ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
@@ -2889,7 +2889,7 @@ class ProcurementAgentExport extends Component {
                         includePlannedShipments: includePlannedShipments,
                     }
                     console.log("inputjson-------", inputjson);
-                    AuthenticationService.setupAxiosInterceptors();
+                    // AuthenticationService.setupAxiosInterceptors();
                     ReportService.procurementAgentExporttList(inputjson)
                         .then(response => {
                             console.log("Online Data------", response.data);
@@ -3141,7 +3141,7 @@ class ProcurementAgentExport extends Component {
                         planningUnitIds: planningUnitIds,
                         includePlannedShipments: includePlannedShipments,
                     }
-                    AuthenticationService.setupAxiosInterceptors();
+                    // AuthenticationService.setupAxiosInterceptors();
                     ReportService.fundingSourceExportList(inputjson)
                         .then(response => {
                             // console.log(JSON.stringify(response.data))
@@ -3386,7 +3386,7 @@ class ProcurementAgentExport extends Component {
                         planningUnitIds: planningUnitIds,
                         includePlannedShipments: includePlannedShipments,
                     }
-                    AuthenticationService.setupAxiosInterceptors();
+                    // AuthenticationService.setupAxiosInterceptors();
                     ReportService.AggregateShipmentByProduct(inputjson)
                         .then(response => {
                             console.log("Online Data------", response.data);
@@ -3515,7 +3515,7 @@ class ProcurementAgentExport extends Component {
 
     getFundingSource = () => {
         if (navigator.onLine) {
-            AuthenticationService.setupAxiosInterceptors();
+            // AuthenticationService.setupAxiosInterceptors();
             FundingSourceService.getFundingSourceListAll()
                 .then(response => {
                     // console.log(JSON.stringify(response.data))

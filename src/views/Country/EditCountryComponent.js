@@ -168,7 +168,6 @@
 //     }
 
 //     componentDidMount() {
-//         AuthenticationService.setupAxiosInterceptors();
 //         CountryService.getCountryById(this.props.match.params.countryId).then(response => {
 //             if (response.status == 200) {
 //                 this.setState({
@@ -520,7 +519,6 @@
 //     }
 
 //     resetClicked() {
-//         AuthenticationService.setupAxiosInterceptors();
 //         CountryService.getCountryById(this.props.match.params.countryId).then(response => {
 //             this.setState({
 //                 country: response.data
@@ -797,7 +795,6 @@ export default class UpdateCountryComponent extends Component {
     }
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
         CountryService.getCountryById(this.props.match.params.countryId).then(response => {
             if (response.status == 200) {
                 this.setState({
@@ -862,49 +859,88 @@ export default class UpdateCountryComponent extends Component {
                     })
                 }
             })
-            // .catch(
-            //     error => {
-            //         if (error.message === "Network Error") {
-            //             this.setState({ message: error.message });
-            //         } else {
-            //             switch (error.response ? error.response.status : "") {
-            //                 case 500:
-            //                 case 401:
-            //                 case 404:
-            //                 case 406:
-            //                 case 412:
-            //                     this.setState({ message: error.response.data.messageCode });
-            //                     break;
-            //                 default:
-            //                     this.setState({ message: 'static.unkownError' });
-            //                     console.log("Error code unkown");
-            //                     break;
-            //             }
-            //         }
-            //     });
+                .catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
+                                    break;
+                            }
+                        }
+                    }
+                );
 
         })
-        // .catch(
-        //     error => {
-        //         if (error.message === "Network Error") {
-        //             this.setState({ message: error.message });
-        //         } else {
-        //             switch (error.response ? error.response.status : "") {
-        //                 case 500:
-        //                 case 401:
-        //                 case 404:
-        //                 case 406:
-        //                 case 412:
-        //                     this.setState({ message: error.response.data.messageCode });
-        //                     break;
-        //                 default:
-        //                     this.setState({ message: 'static.unkownError' });
-        //                     console.log("Error code unkown");
-        //                     break;
-        //             }
-        //         }
-        //     }
-        // );
+            .catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
 
     }
     Capitalize(str) {
@@ -967,7 +1003,46 @@ export default class UpdateCountryComponent extends Component {
                                                         this.hideSecondComponent();
                                                     })
                                             }
-                                        })
+                                        }).catch(
+                                            error => {
+                                                if (error.message === "Network Error") {
+                                                    this.setState({
+                                                        message: 'static.unkownError',
+                                                        loading: false
+                                                    });
+                                                } else {
+                                                    switch (error.response ? error.response.status : "") {
+
+                                                        case 401:
+                                                            this.props.history.push(`/login/static.message.sessionExpired`)
+                                                            break;
+                                                        case 403:
+                                                            this.props.history.push(`/accessDenied`)
+                                                            break;
+                                                        case 500:
+                                                        case 404:
+                                                        case 406:
+                                                            this.setState({
+                                                                message: error.response.data.messageCode,
+                                                                loading: false
+                                                            });
+                                                            break;
+                                                        case 412:
+                                                            this.setState({
+                                                                message: error.response.data.messageCode,
+                                                                loading: false
+                                                            });
+                                                            break;
+                                                        default:
+                                                            this.setState({
+                                                                message: 'static.unkownError',
+                                                                loading: false
+                                                            });
+                                                            break;
+                                                    }
+                                                }
+                                            }
+                                        );
                                 }}
 
 
@@ -1168,7 +1243,6 @@ export default class UpdateCountryComponent extends Component {
     }
 
     resetClicked() {
-        AuthenticationService.setupAxiosInterceptors();
         CountryService.getCountryById(this.props.match.params.countryId).then(response => {
             this.setState({
                 country: response.data
@@ -1185,26 +1259,46 @@ export default class UpdateCountryComponent extends Component {
                     })
                 }
             })
-            // .catch(
-            //     error => {
-            //         if (error.message === "Network Error") {
-            //             this.setState({ message: error.message });
-            //         } else {
-            //             switch (error.response ? error.response.status : "") {
-            //                 case 500:
-            //                 case 401:
-            //                 case 404:
-            //                 case 406:
-            //                 case 412:
-            //                     this.setState({ message: error.response.data.messageCode });
-            //                     break;
-            //                 default:
-            //                     this.setState({ message: 'static.unkownError' });
-            //                     console.log("Error code unkown");
-            //                     break;
-            //             }
-            //         }
-            //     });
+                .catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
+                                    break;
+                            }
+                        }
+                    }
+                );
 
             CurrencyService.getCurrencyListActive().then(response => {
                 if (response.status == 200) {
@@ -1217,50 +1311,88 @@ export default class UpdateCountryComponent extends Component {
                     })
                 }
             })
-            // .catch(
-            //     error => {
-            //         if (error.message === "Network Error") {
-            //             this.setState({ message: error.message });
-            //         } else {
-            //             switch (error.response ? error.response.status : "") {
-            //                 case 500:
-            //                 case 401:
-            //                 case 404:
-            //                 case 406:
-            //                 case 412:
-            //                     this.setState({ message: error.response.data.messageCode });
-            //                     break;
-            //                 default:
-            //                     this.setState({ message: 'static.unkownError' });
-            //                     console.log("Error code unkown");
-            //                     break;
-            //             }
-            //         }
-            //     });
+                .catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
+                                    break;
+                            }
+                        }
+                    }
+                );
 
         })
-        // .catch(
-        //     error => {
-        //         if (error.message === "Network Error") {
-        //             this.setState({ message: error.message });
-        //         } else {
-        //             switch (error.response ? error.response.status : "") {
-        //                 case 500:
-        //                 case 401:
-        //                 case 404:
-        //                 case 406:
-        //                 case 412:
-        //                     this.setState({ message: error.response.data.messageCode });
-        //                     break;
-        //                 default:
-        //                     this.setState({ message: 'static.unkownError' });
-        //                     console.log("Error code unkown");
-        //                     break;
-        //             }
-        //         }
-        //     }
-        // );
+            .catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
 
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
     }
 
 }
