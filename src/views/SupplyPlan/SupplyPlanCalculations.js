@@ -688,7 +688,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                         }
 
                         var mos = "";
-                        if (closingBalance != 0) {
+                        if (closingBalance != 0 && amc != 0) {
                             mos = parseFloat(closingBalance / amc).toFixed(4);
                         } else {
                             mos = 0;

@@ -1262,5 +1262,9 @@
     "static.procurementAgent.AddProcurementAgent": "Add Procurement Agent",
     "static.budget.redRow": "*Rows in red indicate that Budget has either lapsed or has no money in it",
     "static.program.deleteLocalProgram" : "Delete Local Program",
-    "static.program.deleteLocalProgramSuccess" : "Local Program(s) deleted successfully"
+    "static.program.deleteLocalProgramSuccess" : "Local Program(s) deleted successfully",
+    "static.supplyplan.consumptionDataEntry":"Consumption data entry",
+    "static.supplyplan.adjustmentDataEntry":"Adjustment and inventory details data entry",
+    "static.supplyplan.shipmentDataEntry":"Shipment data entry",
+    "static.supplyPlan.noteBelowGraph":"Note: If you remove an element it doesn't actually adjust the numbers"
 }

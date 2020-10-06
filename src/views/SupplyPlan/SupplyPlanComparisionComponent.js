@@ -23,6 +23,7 @@ import InventoryInSupplyPlanComponent from "./InventoryInSupplyPlan";
 import ConsumptionInSupplyPlanComponent from "./ConsumptionInSupplyPlan";
 import { calculateSupplyPlan } from "./SupplyPlanCalculations";
 import AuthenticationServiceComponent from "../Common/AuthenticationServiceComponent";
+import { Link } from "react-router-dom";
 
 const entityname = i18n.t('static.dashboard.supplyPlan')
 export default class SupplyPlanComponent extends React.Component {
@@ -564,7 +565,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 this.setState({
                                     planningUnitList: proList,
                                     programPlanningUnitList: myResult,
-                                    planningUnitListAll:myResult,
+                                    planningUnitListAll: myResult,
                                     regionList: regionList,
                                     programJson: programJson,
                                     dataSourceListAll: dataSourceListAll,
@@ -2164,6 +2165,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             <Bar id="cool-canvas1" data={bar1} options={chartOptions1} />
                                         </div>
                                     </div>
+                                    <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span>
                                 </div>}
                         </div>
                     </div>
@@ -2202,6 +2204,12 @@ export default class SupplyPlanComponent extends React.Component {
                             <li><span className="purplelegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.forecastedConsumption')}</span></li>
                             <li><span className=" blacklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.actualConsumption')} </span></li>
                         </ul>
+                        <div className="card-header-actions">
+                            <a className="card-header-action">
+                                {/* <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggle() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span> */}
+                                <Link to={`/consumptionDetails/` + this.props.items.programId + `/0/` + this.props.items.planningUnitId} target="_blank"><small className="dataEntryLink">{i18n.t('static.supplyplan.consumptionDataEntry')}</small></Link>
+                            </a>
+                        </div>
                     </ModalHeader>
                     <div style={{ display: this.state.loading ? "none" : "block" }}>
                         <ModalBody>
@@ -2295,7 +2303,14 @@ export default class SupplyPlanComponent extends React.Component {
                 {/* Adjustments modal */}
                 <Modal isOpen={this.state.adjustments}
                     className={'modal-lg ' + this.props.className, "modalWidth"}>
-                    <ModalHeader toggle={() => this.toggleLarge('Adjustments')} className="modalHeaderSupplyPlan">{i18n.t('static.supplyPlan.adjustmentsDetails')}</ModalHeader>
+                    <ModalHeader toggle={() => this.toggleLarge('Adjustments')} className="modalHeaderSupplyPlan">{i18n.t('static.supplyPlan.adjustmentsDetails')}
+                        <div className="card-header-actions">
+                            <a className="card-header-action">
+                                {/* <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggle() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span> */}
+                                <Link to={`/inventory/addInventory/` + this.props.items.programId + `/0/` + this.props.items.planningUnitId} target="_blank"><small className="dataEntryLink">{i18n.t('static.supplyplan.adjustmentDataEntry')}</small></Link>
+                            </a>
+                        </div>
+                    </ModalHeader>
                     <div style={{ display: this.state.loading ? "none" : "block" }}>
                         <ModalBody>
                             <h6 className="red" id="div2">{this.state.inventoryDuplicateError || this.state.inventoryNoStockError || this.state.inventoryError}</h6>
@@ -2473,6 +2488,12 @@ export default class SupplyPlanComponent extends React.Component {
                             <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyOrder')}</span></li>
                             <li><span className=" greylegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.doNotIncludeInProjectedShipment')} </span></li>
                         </ul>
+                        <div className="card-header-actions">
+                            <a className="card-header-action">
+                                {/* <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggle() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span> */}
+                                <Link to={`/shipment/shipmentDetails/` + this.props.items.programId + `/0/` + this.props.items.planningUnitId} target="_blank"><small className="dataEntryLink">{i18n.t('static.supplyplan.shipmentDataEntry')}</small></Link>
+                            </a>
+                        </div>
                     </ModalHeader>
                     <div style={{ display: this.state.loading ? "none" : "block" }}>
                         <ModalBody>
