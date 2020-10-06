@@ -904,5 +904,9 @@
     "static.add.addOrganisation": "Adicionar Organização",
     "static.list.listProgram": "Programa de lista",
     "static.add.totalProgram": "Programa Total",
-    "static.report.qatProblemActionReport": "Relatório de ação do problema QAT"
+    "static.report.qatProblemActionReport": "Relatório de ação do problema QAT",
+    "static.program.confirmDelete": "Tem certeza de que deseja excluir o (s) programa (s) local (is)?",
+    "static.program.deleteLocalProgramSuccess" : "Programa (s) local (is) excluído (s) com sucesso",
+    "static.common.delete": "Excluir",
+    "static.program.deleteLocalProgram" : "Excluir programa local"
 }
