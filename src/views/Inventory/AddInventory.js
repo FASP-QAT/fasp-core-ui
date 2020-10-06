@@ -8,7 +8,7 @@ import {
 } from 'reactstrap';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME } from '../../Constants.js';
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, DELIVERED_SHIPMENT_STATUS } from '../../Constants.js';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import InventoryInSupplyPlanComponent from "../SupplyPlan/InventoryInSupplyPlan";
@@ -36,7 +36,7 @@ export default class AddInventory extends Component {
             inventoryChangedFlag: 0,
             inventoryDataType: { value: 1, label: i18n.t('static.inventory.inventory') },
             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth()+2 },
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() },
         }
         this.options = props.options;
@@ -310,6 +310,21 @@ export default class AddInventory extends Component {
                     var batchList = []
                     var batchInfoList = programJson.batchInfoList;
                     console.log("Batch info list from program json", batchInfoList);
+
+                    var batchList = [];
+                    var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == planningUnitId && c.active.toString() == "true" && c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS);
+
+                    for (var sl = 0; sl < shipmentList.length; sl++) {
+                        var bdl = shipmentList[sl].batchInfoList;
+                        for (var bd = 0; bd < bdl.length; bd++) {
+                            var index = batchList.findIndex(c => c.batchNo == bdl[bd].batch.batchNo);
+                            if (index == -1) {
+                                var batchDetailsToPush = batchInfoList.filter(c => c.batchNo == bdl[bd].batch.batchNo && c.planningUnitId == planningUnitId)[0];
+                                batchList.push(batchDetailsToPush);
+                            }
+                        }
+                    }
+
                     var inventoryListUnFiltered = (programJson.inventoryList);
                     var inventoryList = (programJson.inventoryList).filter(c =>
                         c.planningUnit.id == planningUnitId &&
@@ -321,7 +336,7 @@ export default class AddInventory extends Component {
                     }
                     inventoryList = inventoryList.filter(c => moment(c.inventoryDate).format("YYYY-MM-DD") >= moment(startDate).format("YYYY-MM-DD") && moment(c.inventoryDate).format("YYYY-MM-DD") <= moment(stopDate).format("YYYY-MM-DD"))
                     this.setState({
-                        batchInfoList: batchInfoList,
+                        batchInfoList: batchList,
                         programJson: programJson,
                         inventoryListUnFiltered: inventoryListUnFiltered,
                         inventoryList: inventoryList,

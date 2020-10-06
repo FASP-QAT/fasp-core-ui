@@ -1002,8 +1002,8 @@
     "static.whatIf.validScenario": "Select Scenario",
     "static.whatIf.scenario": "Scenario",
     "static.whatIf.scenarioList": "Scenario List",
-    "static.whatIf.increaseConsumption": "Increase consumption",
-    "static.whatIf.decreaseConsumption": "Decrease consumption",
+    "static.whatIf.increaseConsumption": "Increase forecasted consumption",
+    "static.whatIf.decreaseConsumption": "Decrease forecasted consumption",
     "static.whatIf.removeUnFundedShipments": "Remove all unfunded shipments",
     "static.supplyPlan.currentSupplyPlan": "Current Supply Plan",
     "static.supplyPlan.supplyPlanForV": "Supply Plan for V",
@@ -1253,6 +1253,7 @@
     "static.add.addOrganisation": "Add Organisation",
     "static.list.listProgram": "List Program",
     "static.add.totalProgram": "Total Program",
-    "static.report.qatProblemActionReport": "QAT Probelm Action Report"
+    "static.report.qatProblemActionReport": "QAT Probelm Action Report",
+    "static.shipmentDataEntry.shipmentStatus":"Status"
     
 }
