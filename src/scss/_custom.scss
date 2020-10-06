@@ -3451,3 +3451,39 @@ margin-left: -45px;
   background-color: #e4e5e6!important;
   color: #20a8d8;
   }
+
+  .view {
+    margin: auto;
+    width: 100%;
+    overflow-x: scroll;
+    overflow-y: visible;
+    padding: 0;
+    // width: 600px;
+}
+
+.wrapper {
+    position: relative;
+    overflow: auto;
+    border: 1px solid black;
+    white-space: nowrap;
+}
+
+.sticky-col {
+    position: sticky;
+    position: -webkit-sticky;
+    background-color: white;
+}
+
+.first-col {
+    width: 100px;
+    min-width: 100px;
+    max-width: 100px;
+    left: 0px;
+}
+
+.second-col {
+    width: 150px;
+    min-width: 150px;
+    max-width: 150px;
+    left: 100px;
+}
