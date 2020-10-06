@@ -409,14 +409,14 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             data[21] = "";
                                             data[22] = 0;
                                             data[23] = 1;
-                                            data[24] = 1;
+                                            data[24] = true;
                                             data[25] = 0;
                                             shipmentsArr[0] = data;
                                         }
                                         var options = {
                                             data: shipmentsArr,
                                             columns: [
-                                                { type: 'dropdown', title: i18n.t('static.supplyPlan.shipmentStatus'), source: shipmentStatusList, filter: this.filterShipmentStatus, width: 100 },
+                                                { type: 'dropdown', title: i18n.t('static.shipmentDataEntry.shipmentStatus'), source: shipmentStatusList, filter: this.filterShipmentStatus, width: 100 },
                                                 { type: 'calendar', title: i18n.t('static.common.receivedate'), options: { format: JEXCEL_DATE_FORMAT }, width: 100 },
                                                 { type: 'dropdown', title: i18n.t('static.procurementagent.procurementagent'), source: procurementAgentList, filter: this.filterProcurementAgent, width: 120 },
                                                 { type: 'dropdown', title: i18n.t('static.subfundingsource.fundingsource'), source: fundingSourceList, filter: this.filterFundingSource, width: 120 },
@@ -702,7 +702,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                     console.log("Received Date", receivedDate)
                                                                     var addLeadTimes = 0;
                                                                     if (papuResult.localProcurementAgent) {
-                                                                        addLeadTimes = this.state.programPlanningUnitList.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
+                                                                        addLeadTimes = this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
                                                                         var leadTimesPerStatus = addLeadTimes / 5;
                                                                         expectedArrivedDate = moment(expectedDeliveryDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
                                                                         expectedShippedDate = moment(expectedArrivedDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
@@ -952,7 +952,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                                 var cell = elInstance.getCell(`F${parseInt(1) + 1}`)
                                                                                 cell.classList.remove('readonly');
                                                                                 var cell = elInstance.getCell(`G${parseInt(0) + 1}`)
-                                                                                cell.classList.add('readonly');
+                                                                                cell.classList.remove('readonly');
                                                                                 var cell = elInstance.getCell(`G${parseInt(1) + 1}`)
                                                                                 cell.classList.remove('readonly');
                                                                             } else {
@@ -1050,7 +1050,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         data[21] = "";
         data[22] = 0;
         data[23] = 1;
-        data[24] = 1;
+        data[24] = true;
         data[25] = 0;
         obj.insertRow(data);
         console.log("Json.length", json.length);
@@ -1061,7 +1061,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         obj.setValueFromCoords(20, json.length, true, true);
         obj.setValueFromCoords(22, json.length, 0, true);
         obj.setValueFromCoords(23, json.length, 1, true);
-        obj.setValueFromCoords(24, json.length, 1, true);
+        obj.setValueFromCoords(24, json.length, true, true);
         obj.setValueFromCoords(25, json.length, 0, true);
         if (this.props.shipmentPage == "shipmentDataEntry") {
             var showOption = (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
@@ -1226,7 +1226,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         console.log("Expected delivery date", expectedDeliveryDate);
                         if (papuResult.localProcurementAgent) {
                             console.log("In if");
-                            addLeadTimes = this.state.programPlanningUnitList.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
+                            addLeadTimes = this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
                             var leadTimesPerStatus = addLeadTimes / 5;
                             expectedArrivedDate = moment(expectedDeliveryDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
                             expectedShippedDate = moment(expectedArrivedDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
@@ -1300,11 +1300,25 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         if (x == 1) {
             console.log("Changed 1 =>", value);
             var shipmentDatesJson = rowData[21];
+            var shipmentStatus = rowData[0];
             console.log("shipmentDatesJson", shipmentDatesJson);
-            if (shipmentDatesJson.receivedDate != "" && shipmentDatesJson.receivedDate != null && shipmentDatesJson.receivedDate != undefined && shipmentDatesJson.receivedDate != "Invalid date") {
-                shipmentDatesJson.receivedDate = moment(value).format("YYYY-MM-DD");
-                elInstance.setValueFromCoords(21, y, shipmentDatesJson, true);
+            if (shipmentDatesJson != "") {
+            } else {
+                shipmentDatesJson = {
+                    receivedDate: "",
+                    expectedDeliveryDate: ""
+                }
+            }
+            if (shipmentStatus == DELIVERED_SHIPMENT_STATUS) {
+                if (value != "" && value != null && value != "Invalid date") {
+                    shipmentDatesJson.receivedDate = moment(value).format("YYYY-MM-DD");
+                } else {
+                    shipmentDatesJson.receivedDate = "";
+                }
                 console.log("In if");
+                if (shipmentDatesJson != "") {
+                    elInstance.setValueFromCoords(21, y, shipmentDatesJson, true);
+                }
             } else {
                 shipmentDatesJson.expectedDeliveryDate = moment(value).format("YYYY-MM-DD");
                 elInstance.setValueFromCoords(21, y, shipmentDatesJson, true);
@@ -1365,6 +1379,20 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         if (x == 0) {
             var valid = checkValidtion("text", "A", y, value, elInstance);
             if (valid == true) {
+                var shipmentDates = rowData[21];
+                if (value == DELIVERED_SHIPMENT_STATUS) {
+                    if (shipmentDates.receivedDate != "" && shipmentDates.receivedDate != null && shipmentDates.receivedDate != "Invalid date") {
+                        elInstance.setValueFromCoords(1, y, shipmentDates.receivedDate, true);
+                    } else {
+                        elInstance.setValueFromCoords(1, y, "", true);
+                    }
+                } else {
+                    if (shipmentDates.expectedDeliveryDate != "" && shipmentDates.expectedDeliveryDate != null && shipmentDates.expectedDeliveryDate != "Invalid date") {
+                        elInstance.setValueFromCoords(1, y, shipmentDates.expectedDeliveryDate, true);
+                    } else {
+                        elInstance.setValueFromCoords(1, y, "", true);
+                    }
+                }
                 if (value == SUBMITTED_SHIPMENT_STATUS || value == ARRIVED_SHIPMENT_STATUS || value == SHIPPED_SHIPMENT_STATUS || value == DELIVERED_SHIPMENT_STATUS || value == APPROVED_SHIPMENT_STATUS) {
                     var budget = rowData[4];
                     var valid = checkValidtion("text", "E", y, budget, elInstance);
@@ -1386,8 +1414,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     positiveValidation("C", y, elInstance);
                     positiveValidation("D", y, elInstance);
                 }
-                console.log("rowData[1]", rowData[1])
-                if (rowData[16] == -1 && (rowData[1] == "" || rowData[1] == null || rowData[1] == undefined)) {
+                console.log("rowData[21] for lead time", rowData[21].expectedDeliveryDate)
+                if (rowData[16] == -1 && (rowData[21].expectedDeliveryDate == "" || rowData[21].expectedDeliveryDate == null || rowData[21].expectedDeliveryDate == "Invalid date")) {
                     this.calculateLeadTimesOnChange(y);
                 }
 
@@ -1443,7 +1471,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         elInstance.setValueFromCoords(10, y, pricePerUnit, true);
                     }
                 }
-                if (rowData[16] == -1 && (rowData[1] == "" || rowData[1] == null || rowData[1] == undefined)) {
+                console.log("rowData[21] for lead time", rowData[21].expectedDeliveryDate)
+                if (rowData[16] == -1 && (rowData[21].expectedDeliveryDate == "" || rowData[21].expectedDeliveryDate == null || rowData[21].expectedDeliveryDate == "Invalid date")) {
                     this.calculateLeadTimesOnChange(y);
                 }
             } else {
@@ -1515,7 +1544,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         elInstance.setValueFromCoords(12, y, freightCost.toFixed(2), true);
                     }
                 }
-                if (rowData[16] == -1 && (rowData[1] == "" || rowData[1] == null || rowData[1] == undefined)) {
+                console.log("rowData[21] for lead time", rowData[21].expectedDeliveryDate)
+                if (rowData[16] == -1 && (rowData[21].expectedDeliveryDate == "" || rowData[21].expectedDeliveryDate == null || rowData[21].expectedDeliveryDate == "Invalid date")) {
                     this.calculateLeadTimesOnChange(y);
                 }
             } else {
@@ -1544,10 +1574,12 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
 
         if (x == 1) {
             var batchDetails = rowData[17];
-            var findAutoGenerated = batchDetails.findIndex(c => c.batch.autoGenerated.toString() == "true");
-            if (findAutoGenerated != -1) {
-                batchDetails[findAutoGenerated].batch.expiryDate = moment(value).add(this.props.items.shelfLife, 'months').startOf('month').format("YYYY-MM-DD")
-                elInstance.setValueFromCoords(17, y, batchDetails, true);
+            if (batchDetails.length > 0) {
+                var findAutoGenerated = batchDetails.findIndex(c => c.batch.autoGenerated.toString() == "true");
+                if (findAutoGenerated != -1) {
+                    batchDetails[findAutoGenerated].batch.expiryDate = moment(value).add(this.props.items.shelfLife, 'months').startOf('month').format("YYYY-MM-DD")
+                    elInstance.setValueFromCoords(17, y, batchDetails, true);
+                }
             }
         }
 
@@ -1934,7 +1966,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     var receivedDate = shipmentDatesJson.receivedDate;
                     var expectedDeliveryDate = shipmentDatesJson.expectedDeliveryDate;
                     if (papuResult.localProcurementAgent) {
-                        addLeadTimes = this.state.programPlanningUnitList.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
+                        addLeadTimes = this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
                         expectedDeliveryDate = moment(Date.now()).add((addLeadTimes * 30), 'days').format("YYYY-MM-DD");
                     } else {
                         var ppUnit = papuResult;
@@ -1962,8 +1994,17 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         arrivedDate = moment(shippedDate).add(parseInt(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
                         expectedDeliveryDate = moment(arrivedDate).add(parseInt(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
                     }
-                    if (moment(elInstance.getValueFromCoords(1, y)).format("YYYY-MM-DD") != moment(expectedDeliveryDate).format("YYYY-MM-DD")) {
+                    if (moment(elInstance.getValueFromCoords(1, y)).format("YYYY-MM-DD") != moment(expectedDeliveryDate).format("YYYY-MM-DD") && shipmentStatus != DELIVERED_SHIPMENT_STATUS) {
+                        console.log("In if for calculate lead times", expectedDeliveryDate);
                         elInstance.setValueFromCoords(1, y, expectedDeliveryDate, true);
+                    } else {
+                        shipmentDatesJson.expectedDeliveryDate = expectedDeliveryDate;
+                        elInstance.setValueFromCoords(21, y, shipmentDatesJson, true);
+                        console.log("In else for calculate lead times", expectedDeliveryDate);
+                        if (shipmentStatus != DELIVERED_SHIPMENT_STATUS) {
+                            console.log("In else if for calculate lead times", expectedDeliveryDate);
+                            elInstance.setValueFromCoords(1, y, expectedDeliveryDate, true);
+                        }
                     }
                 }.bind(this)
             }.bind(this)
@@ -2031,7 +2072,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             console.log("Expected delivery date", expectedDeliveryDate);
                             if (papuResult.localProcurementAgent) {
                                 console.log("In if");
-                                addLeadTimes = this.state.programPlanningUnitList.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
+                                addLeadTimes = this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
                                 var leadTimesPerStatus = addLeadTimes / 5;
                                 expectedArrivedDate = moment(expectedDeliveryDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
                                 expectedShippedDate = moment(expectedArrivedDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
@@ -2087,61 +2128,61 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         }
 
         if (x == 2 && y == 1) {
-            if (rowDataForDates1[1] != "" && rowDataForDates1[2] != "" && moment(rowDataForDates1[2]).format("YYYY-MM-DD") < moment(rowDataForDates1[1]).format("YYYY-MM-DD")) {
+            if (rowDataForDates1[1] != "" && rowDataForDates1[1] != null && rowDataForDates1[1] != "Invalid date" && rowDataForDates1[2] != "" && rowDataForDates1[2] != null && rowDataForDates1[2] != "Invalid date" && moment(rowDataForDates1[2]).format("YYYY-MM-DD") < moment(rowDataForDates1[1]).format("YYYY-MM-DD")) {
                 inValid("C", 1, i18n.t('static.message.invaliddate'), elInstance);
             }
         }
 
         if (x == 3 && y == 1) {
-            if (rowDataForDates1[2] != "" && rowDataForDates1[3] != "" && moment(rowDataForDates1[3]).format("YYYY-MM-DD") < moment(rowDataForDates1[2]).format("YYYY-MM-DD")) {
+            if (rowDataForDates1[2] != "" && rowDataForDates1[2] != null && rowDataForDates1[2] != "Invalid date" && rowDataForDates1[3] != "" && rowDataForDates1[3] != null && rowDataForDates1[3] != "Invalid date" && moment(rowDataForDates1[3]).format("YYYY-MM-DD") < moment(rowDataForDates1[2]).format("YYYY-MM-DD")) {
                 inValid("D", 1, i18n.t('static.message.invaliddate'), elInstance);
             }
-            if (rowDataForDates1[1] != "" && rowDataForDates1[3] != "" && moment(rowDataForDates1[3]).format("YYYY-MM-DD") < moment(rowDataForDates1[1]).format("YYYY-MM-DD")) {
+            if (rowDataForDates1[1] != "" && rowDataForDates1[1] != null && rowDataForDates1[1] != "Invalid date" && rowDataForDates1[3] != "" && rowDataForDates1[3] != null && rowDataForDates1[3] != "Invalid date" && moment(rowDataForDates1[3]).format("YYYY-MM-DD") < moment(rowDataForDates1[1]).format("YYYY-MM-DD")) {
                 inValid("D", 1, i18n.t('static.message.invaliddate'), elInstance);
             }
         }
 
         if (x == 4 && y == 1) {
-            if (rowDataForDates1[3] != "" && rowDataForDates1[4] != "" && moment(rowDataForDates1[4]).format("YYYY-MM-DD") < moment(rowDataForDates1[3]).format("YYYY-MM-DD")) {
+            if (rowDataForDates1[3] != "" && rowDataForDates1[3] != null && rowDataForDates1[3] != "Invalid date" && rowDataForDates1[4] != "" && rowDataForDates1[4] != null && rowDataForDates1[4] != "Invalid date" && moment(rowDataForDates1[4]).format("YYYY-MM-DD") < moment(rowDataForDates1[3]).format("YYYY-MM-DD")) {
                 inValid("E", 1, i18n.t('static.message.invaliddate'), elInstance);
             }
-            if (rowDataForDates1[2] != "" && rowDataForDates1[4] != "" && moment(rowDataForDates1[4]).format("YYYY-MM-DD") < moment(rowDataForDates1[2]).format("YYYY-MM-DD")) {
+            if (rowDataForDates1[2] != "" && rowDataForDates1[2] != null && rowDataForDates1[2] != "Invalid date" && rowDataForDates1[4] != "" && moment(rowDataForDates1[4]).format("YYYY-MM-DD") < moment(rowDataForDates1[2]).format("YYYY-MM-DD")) {
                 inValid("E", 1, i18n.t('static.message.invaliddate'), elInstance);
             }
-            if (rowDataForDates1[1] != "" && rowDataForDates1[4] != "" && moment(rowDataForDates1[4]).format("YYYY-MM-DD") < moment(rowDataForDates1[1]).format("YYYY-MM-DD")) {
+            if (rowDataForDates1[1] != "" && rowDataForDates1[1] != null && rowDataForDates1[1] != "Invalid date" && rowDataForDates1[4] != "" && rowDataForDates1[4] != null && rowDataForDates1[4] != "Invalid date" && moment(rowDataForDates1[4]).format("YYYY-MM-DD") < moment(rowDataForDates1[1]).format("YYYY-MM-DD")) {
                 inValid("E", 1, i18n.t('static.message.invaliddate'), elInstance);
             }
         }
 
         if (x == 5 && y == 1) {
-            if (rowDataForDates1[4] != "" && rowDataForDates1[5] != "" && moment(rowDataForDates1[5]).format("YYYY-MM-DD") < moment(rowDataForDates1[4]).format("YYYY-MM-DD")) {
+            if (rowDataForDates1[4] != "" && rowDataForDates1[4] != null && rowDataForDates1[4] != "Invalid date" && rowDataForDates1[5] != "" && rowDataForDates1[5] != null && rowDataForDates1[5] != "Invalid date" && moment(rowDataForDates1[5]).format("YYYY-MM-DD") < moment(rowDataForDates1[4]).format("YYYY-MM-DD")) {
                 inValid("F", 1, i18n.t('static.message.invaliddate'), elInstance);
             }
-            if (rowDataForDates1[3] != "" && rowDataForDates1[5] != "" && moment(rowDataForDates1[5]).format("YYYY-MM-DD") < moment(rowDataForDates1[3]).format("YYYY-MM-DD")) {
+            if (rowDataForDates1[3] != "" && rowDataForDates1[3] != null && rowDataForDates1[3] != "Invalid date" && rowDataForDates1[5] != "" && rowDataForDates1[5] != null && rowDataForDates1[5] != "Invalid date" && moment(rowDataForDates1[5]).format("YYYY-MM-DD") < moment(rowDataForDates1[3]).format("YYYY-MM-DD")) {
                 inValid("F", 1, i18n.t('static.message.invaliddate'), elInstance);
             }
-            if (rowDataForDates1[2] != "" && rowDataForDates1[5] != "" && moment(rowDataForDates1[5]).format("YYYY-MM-DD") < moment(rowDataForDates1[2]).format("YYYY-MM-DD")) {
+            if (rowDataForDates1[2] != "" && rowDataForDates1[2] != null && rowDataForDates1[2] != "Invalid date" && rowDataForDates1[5] != "" && rowDataForDates1[5] != null && rowDataForDates1[5] != "Invalid date" && moment(rowDataForDates1[5]).format("YYYY-MM-DD") < moment(rowDataForDates1[2]).format("YYYY-MM-DD")) {
                 inValid("F", 1, i18n.t('static.message.invaliddate'), elInstance);
             }
-            if (rowDataForDates1[1] != "" && rowDataForDates1[5] != "" && moment(rowDataForDates1[5]).format("YYYY-MM-DD") < moment(rowDataForDates1[1]).format("YYYY-MM-DD")) {
+            if (rowDataForDates1[1] != "" && rowDataForDates1[1] != null && rowDataForDates1[1] != "Invalid date" && rowDataForDates1[5] != "" && rowDataForDates1[5] != null && rowDataForDates1[5] != "Invalid date" && moment(rowDataForDates1[5]).format("YYYY-MM-DD") < moment(rowDataForDates1[1]).format("YYYY-MM-DD")) {
                 inValid("F", 1, i18n.t('static.message.invaliddate'), elInstance);
             }
         }
 
         if (x == 6 && y == 1) {
-            if (rowDataForDates1[5] != "" && rowDataForDates1[6] != "" && moment(rowDataForDates1[6]).format("YYYY-MM-DD") < moment(rowDataForDates1[5]).format("YYYY-MM-DD")) {
+            if (rowDataForDates1[5] != "" && rowDataForDates1[5] != null && rowDataForDates1[5] != "Invalid date" && rowDataForDates1[6] != "" && rowDataForDates1[6] != null && rowDataForDates1[6] != "Invalid date" && moment(rowDataForDates1[6]).format("YYYY-MM-DD") < moment(rowDataForDates1[5]).format("YYYY-MM-DD")) {
                 inValid("G", 1, i18n.t('static.message.invaliddate'), elInstance);
             }
-            if (rowDataForDates1[4] != "" && rowDataForDates1[6] != "" && moment(rowDataForDates1[6]).format("YYYY-MM-DD") < moment(rowDataForDates1[4]).format("YYYY-MM-DD")) {
+            if (rowDataForDates1[4] != "" && rowDataForDates1[4] != null && rowDataForDates1[4] != "Invalid date" && rowDataForDates1[6] != "" && rowDataForDates1[6] != null && rowDataForDates1[6] != "Invalid date" && moment(rowDataForDates1[6]).format("YYYY-MM-DD") < moment(rowDataForDates1[4]).format("YYYY-MM-DD")) {
                 inValid("G", 1, i18n.t('static.message.invaliddate'), elInstance);
             }
-            if (rowDataForDates1[3] != "" && rowDataForDates1[6] != "" && moment(rowDataForDates1[6]).format("YYYY-MM-DD") < moment(rowDataForDates1[3]).format("YYYY-MM-DD")) {
+            if (rowDataForDates1[3] != "" && rowDataForDates1[3] != null && rowDataForDates1[3] != "Invalid date" && rowDataForDates1[6] != "" && rowDataForDates1[6] != null && rowDataForDates1[6] != "Invalid date" && moment(rowDataForDates1[6]).format("YYYY-MM-DD") < moment(rowDataForDates1[3]).format("YYYY-MM-DD")) {
                 inValid("G", 1, i18n.t('static.message.invaliddate'), elInstance);
             }
-            if (rowDataForDates1[2] != "" && rowDataForDates1[6] != "" && moment(rowDataForDates1[6]).format("YYYY-MM-DD") < moment(rowDataForDates1[2]).format("YYYY-MM-DD")) {
+            if (rowDataForDates1[2] != "" && rowDataForDates1[2] != null && rowDataForDates1[2] != "Invalid date" && rowDataForDates1[6] != "" && rowDataForDates1[6] != null && rowDataForDates1[6] != "Invalid date" && moment(rowDataForDates1[6]).format("YYYY-MM-DD") < moment(rowDataForDates1[2]).format("YYYY-MM-DD")) {
                 inValid("G", 1, i18n.t('static.message.invaliddate'), elInstance);
             }
-            if (rowDataForDates1[1] != "" && rowDataForDates1[6] != "" && moment(rowDataForDates1[6]).format("YYYY-MM-DD") < moment(rowDataForDates1[1]).format("YYYY-MM-DD")) {
+            if (rowDataForDates1[1] != "" && rowDataForDates1[1] != null && rowDataForDates1[1] != "Invalid date" && rowDataForDates1[6] != "" && rowDataForDates1[6] != null && rowDataForDates1[6] != "Invalid date" && moment(rowDataForDates1[6]).format("YYYY-MM-DD") < moment(rowDataForDates1[1]).format("YYYY-MM-DD")) {
                 inValid("G", 1, i18n.t('static.message.invaliddate'), elInstance);
             }
         }
@@ -2211,7 +2252,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     }
 
                     if (papuResult.localProcurementAgent) {
-                        addLeadTimes = this.state.programPlanningUnitList.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
+                        addLeadTimes = this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
                         var leadTimesPerStatus = addLeadTimes / 5;
                         if (x == 1) {
                             submittedDate = moment(plannedDate).add(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
@@ -2318,67 +2359,67 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             valid = false;
         }
 
-        if (rowDataForDates1[1] != "" && rowDataForDates1[2] != "" && moment(rowDataForDates1[2]).format("YYYY-MM-DD") < moment(rowDataForDates1[1]).format("YYYY-MM-DD")) {
+        if (rowDataForDates1[1] != "" && rowDataForDates1[1] != null && rowDataForDates1[1] != "Invalid date" && rowDataForDates1[2] != "" && rowDataForDates1[2] != null && rowDataForDates1[2] != "Invalid date" && moment(rowDataForDates1[2]).format("YYYY-MM-DD") < moment(rowDataForDates1[1]).format("YYYY-MM-DD")) {
             inValid("C", 1, i18n.t('static.message.invaliddate'), elInstance);
             valid = false;
         }
 
-        if (rowDataForDates1[2] != "" && rowDataForDates1[3] != "" && moment(rowDataForDates1[3]).format("YYYY-MM-DD") < moment(rowDataForDates1[2]).format("YYYY-MM-DD")) {
+        if (rowDataForDates1[2] != "" && rowDataForDates1[2] != null && rowDataForDates1[2] != "Invalid date" && rowDataForDates1[3] != "" && rowDataForDates1[3] != null && rowDataForDates1[3] != "Invalid date" && moment(rowDataForDates1[3]).format("YYYY-MM-DD") < moment(rowDataForDates1[2]).format("YYYY-MM-DD")) {
             inValid("D", 1, i18n.t('static.message.invaliddate'), elInstance);
             valid = false;
         }
-        if (rowDataForDates1[1] != "" && rowDataForDates1[3] != "" && moment(rowDataForDates1[3]).format("YYYY-MM-DD") < moment(rowDataForDates1[1]).format("YYYY-MM-DD")) {
+        if (rowDataForDates1[1] != "" && rowDataForDates1[1] != null && rowDataForDates1[1] != "Invalid date" && rowDataForDates1[3] != "" && rowDataForDates1[3] != null && rowDataForDates1[3] != "Invalid date" && moment(rowDataForDates1[3]).format("YYYY-MM-DD") < moment(rowDataForDates1[1]).format("YYYY-MM-DD")) {
             inValid("D", 1, i18n.t('static.message.invaliddate'), elInstance);
             valid = false;
         }
 
-        if (rowDataForDates1[3] != "" && rowDataForDates1[4] != "" && moment(rowDataForDates1[4]).format("YYYY-MM-DD") < moment(rowDataForDates1[3]).format("YYYY-MM-DD")) {
+        if (rowDataForDates1[3] != "" && rowDataForDates1[3] != null && rowDataForDates1[3] != "Invalid date" && rowDataForDates1[4] != "" && rowDataForDates1[4] != null && rowDataForDates1[4] != "Invalid date" && moment(rowDataForDates1[4]).format("YYYY-MM-DD") < moment(rowDataForDates1[3]).format("YYYY-MM-DD")) {
             inValid("E", 1, i18n.t('static.message.invaliddate'), elInstance);
             valid = false;
         }
-        if (rowDataForDates1[2] != "" && rowDataForDates1[4] != "" && moment(rowDataForDates1[4]).format("YYYY-MM-DD") < moment(rowDataForDates1[2]).format("YYYY-MM-DD")) {
+        if (rowDataForDates1[2] != "" && rowDataForDates1[2] != null && rowDataForDates1[2] != "Invalid date" && rowDataForDates1[4] != "" && rowDataForDates1[4] != null && rowDataForDates1[4] != "Invalid date" && moment(rowDataForDates1[4]).format("YYYY-MM-DD") < moment(rowDataForDates1[2]).format("YYYY-MM-DD")) {
             inValid("E", 1, i18n.t('static.message.invaliddate'), elInstance);
             valid = false;
         }
-        if (rowDataForDates1[1] != "" && rowDataForDates1[4] != "" && moment(rowDataForDates1[4]).format("YYYY-MM-DD") < moment(rowDataForDates1[1]).format("YYYY-MM-DD")) {
+        if (rowDataForDates1[1] != "" && rowDataForDates1[1] != null && rowDataForDates1[1] != "Invalid date" && rowDataForDates1[4] != "" && rowDataForDates1[4] != null && rowDataForDates1[4] != "Invalid date" && moment(rowDataForDates1[4]).format("YYYY-MM-DD") < moment(rowDataForDates1[1]).format("YYYY-MM-DD")) {
             inValid("E", 1, i18n.t('static.message.invaliddate'), elInstance);
             valid = false;
         }
 
-        if (rowDataForDates1[4] != "" && rowDataForDates1[5] != "" && moment(rowDataForDates1[5]).format("YYYY-MM-DD") < moment(rowDataForDates1[4]).format("YYYY-MM-DD")) {
+        if (rowDataForDates1[4] != "" && rowDataForDates1[4] != null && rowDataForDates1[4] != "Invalid date" && rowDataForDates1[5] != "" && rowDataForDates1[5] != null && rowDataForDates1[5] != "Invalid date" && moment(rowDataForDates1[5]).format("YYYY-MM-DD") < moment(rowDataForDates1[4]).format("YYYY-MM-DD")) {
             inValid("F", 1, i18n.t('static.message.invaliddate'), elInstance);
             valid = false;
         }
-        if (rowDataForDates1[3] != "" && rowDataForDates1[5] != "" && moment(rowDataForDates1[5]).format("YYYY-MM-DD") < moment(rowDataForDates1[3]).format("YYYY-MM-DD")) {
+        if (rowDataForDates1[3] != "" && rowDataForDates1[3] != null && rowDataForDates1[3] != "Invalid date" && rowDataForDates1[5] != "" && rowDataForDates1[5] != null && rowDataForDates1[5] != "Invalid date" && moment(rowDataForDates1[5]).format("YYYY-MM-DD") < moment(rowDataForDates1[3]).format("YYYY-MM-DD")) {
             inValid("F", 1, i18n.t('static.message.invaliddate'), elInstance);
             valid = false;
         }
-        if (rowDataForDates1[2] != "" && rowDataForDates1[5] != "" && moment(rowDataForDates1[5]).format("YYYY-MM-DD") < moment(rowDataForDates1[2]).format("YYYY-MM-DD")) {
+        if (rowDataForDates1[2] != "" && rowDataForDates1[2] != null && rowDataForDates1[2] != "Invalid date" && rowDataForDates1[5] != "" && rowDataForDates1[5] != null && rowDataForDates1[5] != "Invalid date" && moment(rowDataForDates1[5]).format("YYYY-MM-DD") < moment(rowDataForDates1[2]).format("YYYY-MM-DD")) {
             inValid("F", 1, i18n.t('static.message.invaliddate'), elInstance);
             valid = false;
         }
-        if (rowDataForDates1[1] != "" && rowDataForDates1[5] != "" && moment(rowDataForDates1[5]).format("YYYY-MM-DD") < moment(rowDataForDates1[1]).format("YYYY-MM-DD")) {
+        if (rowDataForDates1[1] != "" && rowDataForDates1[1] != null && rowDataForDates1[1] != "Invalid date" && rowDataForDates1[5] != "" && rowDataForDates1[5] != null && rowDataForDates1[5] != "Invalid date" && moment(rowDataForDates1[5]).format("YYYY-MM-DD") < moment(rowDataForDates1[1]).format("YYYY-MM-DD")) {
             inValid("F", 1, i18n.t('static.message.invaliddate'), elInstance);
             valid = false;
         }
 
-        if (rowDataForDates1[5] != "" && rowDataForDates1[6] != "" && moment(rowDataForDates1[6]).format("YYYY-MM-DD") < moment(rowDataForDates1[5]).format("YYYY-MM-DD")) {
+        if (rowDataForDates1[5] != "" && rowDataForDates1[5] != null && rowDataForDates1[5] != "Invalid date" && rowDataForDates1[6] != "" && rowDataForDates1[6] != null && rowDataForDates1[6] != "Invalid date" && moment(rowDataForDates1[6]).format("YYYY-MM-DD") < moment(rowDataForDates1[5]).format("YYYY-MM-DD")) {
             inValid("G", 1, i18n.t('static.message.invaliddate'), elInstance);
             valid = false;
         }
-        if (rowDataForDates1[4] != "" && rowDataForDates1[6] != "" && moment(rowDataForDates1[6]).format("YYYY-MM-DD") < moment(rowDataForDates1[4]).format("YYYY-MM-DD")) {
+        if (rowDataForDates1[4] != "" && rowDataForDates1[4] != null && rowDataForDates1[4] != "Invalid date" && rowDataForDates1[6] != "" && rowDataForDates1[6] != null && rowDataForDates1[6] != "Invalid date" && moment(rowDataForDates1[6]).format("YYYY-MM-DD") < moment(rowDataForDates1[4]).format("YYYY-MM-DD")) {
             inValid("G", 1, i18n.t('static.message.invaliddate'), elInstance);
             valid = false;
         }
-        if (rowDataForDates1[3] != "" && rowDataForDates1[6] != "" && moment(rowDataForDates1[6]).format("YYYY-MM-DD") < moment(rowDataForDates1[3]).format("YYYY-MM-DD")) {
+        if (rowDataForDates1[3] != "" && rowDataForDates1[3] != null && rowDataForDates1[3] != "Invalid date" && rowDataForDates1[6] != "" && rowDataForDates1[6] != null && rowDataForDates1[6] != "Invalid date" && moment(rowDataForDates1[6]).format("YYYY-MM-DD") < moment(rowDataForDates1[3]).format("YYYY-MM-DD")) {
             inValid("G", 1, i18n.t('static.message.invaliddate'), elInstance);
             valid = false;
         }
-        if (rowDataForDates1[2] != "" && rowDataForDates1[6] != "" && moment(rowDataForDates1[6]).format("YYYY-MM-DD") < moment(rowDataForDates1[2]).format("YYYY-MM-DD")) {
+        if (rowDataForDates1[2] != "" && rowDataForDates1[2] != null && rowDataForDates1[2] != "Invalid date" && rowDataForDates1[6] != "" && rowDataForDates1[6] != null && rowDataForDates1[6] != "Invalid date" && moment(rowDataForDates1[6]).format("YYYY-MM-DD") < moment(rowDataForDates1[2]).format("YYYY-MM-DD")) {
             inValid("G", 1, i18n.t('static.message.invaliddate'), elInstance);
             valid = false;
         }
-        if (rowDataForDates1[1] != "" && rowDataForDates1[6] != "" && moment(rowDataForDates1[6]).format("YYYY-MM-DD") < moment(rowDataForDates1[1]).format("YYYY-MM-DD")) {
+        if (rowDataForDates1[1] != "" && rowDataForDates1[1] != null && rowDataForDates1[1] != "Invalid date" && rowDataForDates1[6] != "" && rowDataForDates1[6] != null && rowDataForDates1[6] != "Invalid date" && moment(rowDataForDates1[6]).format("YYYY-MM-DD") < moment(rowDataForDates1[1]).format("YYYY-MM-DD")) {
             inValid("G", 1, i18n.t('static.message.invaliddate'), elInstance);
             valid = false;
         }
@@ -2445,7 +2486,10 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 if (validation == true) {
                     if (rowData[0] == SUBMITTED_SHIPMENT_STATUS || rowData[0] == ARRIVED_SHIPMENT_STATUS || rowData[0] == SHIPPED_SHIPMENT_STATUS || rowData[0] == DELIVERED_SHIPMENT_STATUS || rowData[0] == APPROVED_SHIPMENT_STATUS) {
                         var budget = rowData[4];
-                        checkValidtion("text", "E", y, budget, elInstance);
+                        var v = checkValidtion("text", "E", y, budget, elInstance);
+                        if (v == false) {
+                            valid = false;
+                        }
                         var procurementAgent = rowData[2];
                         var fundingSource = rowData[3];
                         if (procurementAgent == TBD_PROCUREMENT_AGENT_ID) {
@@ -2496,6 +2540,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         positiveValidation("D", y, elInstance);
                     }
 
+                } else {
+                    valid = false;
                 }
 
                 var validation = checkValidtion("text", "C", y, rowData[2], elInstance);

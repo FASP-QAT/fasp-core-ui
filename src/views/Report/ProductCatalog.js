@@ -1537,15 +1537,14 @@ class ProductCatalog extends Component {
         };
 
         this.getPrograms = this.getPrograms.bind(this);
-        this.consolidatedProgramList = this.consolidatedProgramList.bind(this);
         this.fetchData = this.fetchData.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
         this.getProductCategories = this.getProductCategories.bind(this);
         this.getTracerCategoryList = this.getTracerCategoryList.bind(this);
     }
-    addDoubleQuoteToRowContent=(arr)=>{
-        return arr.map(ele=>'"'+ele+'"')
-     }
+    addDoubleQuoteToRowContent = (arr) => {
+        return arr.map(ele => '"' + ele + '"')
+    }
 
     exportCSV(columns) {
         var csvRow = [];
@@ -1564,15 +1563,15 @@ class ProductCatalog extends Component {
         var A = [this.addDoubleQuoteToRowContent(headers)];
         this.state.outPutList.map(
             ele => A.push(this.addDoubleQuoteToRowContent([
-                (getLabelText(ele.program.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
-                (getLabelText(ele.productCategory.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
-                (getLabelText(ele.tracerCategory.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
-                (getLabelText(ele.forecastingUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
-                (getLabelText(ele.fUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
-                ele.genericName.labelId != 0 ? (getLabelText(ele.genericName, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20') : '',
+               getLabelText(ele.program.label, this.state.lang).replaceAll(' ', '%20'),
+                getLabelText(ele.productCategory.label, this.state.lang).replaceAll(' ', '%20'),
+                getLabelText(ele.tracerCategory.label, this.state.lang).replaceAll(' ', '%20'),
+                getLabelText(ele.forecastingUnit.label, this.state.lang).replaceAll(' ', '%20'),
+                getLabelText(ele.fUnit.label, this.state.lang).replaceAll(' ', '%20'),
+                ele.genericName.labelId != 0 ? getLabelText(ele.genericName, this.state.lang).replaceAll(' ', '%20') : '',
                 ele.forecastingtoPlanningUnitMultiplier,
-                (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
-                (getLabelText(ele.pUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
+                getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(' ', '%20'),
+                getLabelText(ele.pUnit.label, this.state.lang).replaceAll(' ', '%20'),
                 ele.minMonthsOfStock,
                 ele.reorderFrequencyInMonths,
                 ele.shelfLife,
@@ -1691,227 +1690,97 @@ class ProductCatalog extends Component {
         var programId = document.getElementById('programId').value;
         if (programId > 0) {
 
-            if (navigator.onLine) {
 
-                // AuthenticationService.setupAxiosInterceptors();
-                ProgramService.getProgramById(programId).then(response => {
-                    var programJson;
-                    var realmId = 0;
-                    if (response.status == 200) {
-                        programJson = response.data;
-                        realmId = programJson.realmCountry.realm.realmId;
+            AuthenticationService.setupAxiosInterceptors();
+            let realmId = AuthenticationService.getRealmId();
+            TracerCategoryService.getTracerCategoryByProgramId(realmId, programId).then(response => {
 
-                        // AuthenticationService.setupAxiosInterceptors();
-                        TracerCategoryService.getTracerCategoryByRealmId(realmId).then(response => {
+                if (response.status == 200) {
+                    this.setState({
+                        tracerCategories: response.data
+                    })
+                }
 
-                            if (response.status == 200) {
-                                this.setState({
-                                    tracerCategories: response.data
-                                })
-                            }
-
-                        }).catch(error => {
-                            if (error.message === "Network Error") {
-                                this.setState({ message: error.message });
-                            } else {
-                                switch (error.response ? error.response.status : "") {
-                                    case 500:
-                                    case 401:
-                                    case 404:
-                                    case 406:
-                                    case 412:
-                                        this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }) });
-                                        break;
-                                    default:
-                                        this.setState({ message: 'static.unkownError' });
-                                        break;
-                                }
-                            }
-                        }
-                        );
-
-
+            }).catch(error => {
+                if (error.message === "Network Error") {
+                    this.setState({ message: error.message });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+                        case 500:
+                        case 401:
+                        case 404:
+                        case 406:
+                        case 412:
+                            this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }) });
+                            break;
+                        default:
+                            this.setState({ message: 'static.unkownError' });
+                            break;
                     }
-                    // console.log("++++++++++++++++", realmId);
-                }).catch(
-                    error => {
-                        this.setState({
-                            procurementAgents: []
-                        })
-
-                        if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
-                        } else {
-                            switch (error.response ? error.response.status : "") {
-                                case 500:
-                                case 401:
-                                case 404:
-                                case 406:
-                                case 412:
-                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }) });
-                                    break;
-                                default:
-                                    this.setState({ message: 'static.unkownError' });
-                                    break;
-                            }
-                        }
-                    }
-                );
-
-            } else {
-                var programId = document.getElementById('programId').value;
-                const lan = 'en';
-                const { tracerCategories } = this.state
-                var proList = tracerCategories;
-
-                var db1;
-                getDatabase();
-                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                openRequest.onsuccess = function (e) {
-                    db1 = e.target.result;
-
-                    var transaction = db1.transaction(['tracerCategory'], 'readwrite');
-                    var program = transaction.objectStore('tracerCategory');
-                    var getRequest = program.getAll();
-                    getRequest.onerror = function (event) {
-                        // Handle errors!
-                    };
-                    getRequest.onsuccess = function (event) {
-
-                        var ptransaction = db1.transaction(['program'], 'readwrite');
-                        var p = ptransaction.objectStore('program');
-                        var getRequestP = p.getAll();
-                        getRequestP.onerror = function (event) {
-                            // Handle errors!
-                        };
-                        getRequestP.onsuccess = function (event) {
-
-                            var filterProgram = getRequestP.result.filter(c => c.programId == programId);
-                            console.log("filterProgram====", filterProgram);
-                            var realmId = filterProgram[0].realmCountry.realm.realmId;
-                            console.log("====", realmId);
-
-                            var myResult = [];
-                            myResult = getRequest.result.filter(c => c.realm.id == realmId);
-                            this.setState({
-                                tracerCategories: myResult
-                            })
-
-                        }.bind(this)
-                    }.bind(this)
-                }.bind(this)
-                // this.setState({
-                //     tracerCategories: []
-                // })
+                }
             }
+            );
+
+        } else {
+            this.setState({
+                message: i18n.t('static.common.selectProgram'),
+                productCategories: [],
+                tracerCategories: []
+            })
         }
     }
 
 
 
     getPrograms() {
-        if (navigator.onLine) {
-            // AuthenticationService.setupAxiosInterceptors();
-            let realmId = AuthenticationService.getRealmId();
-            // ProgramService.getProgramByRealmId(realmId)
-            ProgramService.getProgramList()
-                .then(response => {
-                    console.log(JSON.stringify(response.data))
-                    this.setState({
-                        programs: response.data, loading: false
-                    }, () => { this.consolidatedProgramList() })
-                }).catch(
-                    error => {
-                        this.setState({
-                            programs: [], loading: false
-                        }, () => { this.consolidatedProgramList() })
-                        if (error.message === "Network Error") {
-                            this.setState({ message: error.message, loading: false });
-                        } else {
-                            switch (error.response ? error.response.status : "") {
-                                case 500:
-                                case 401:
-                                case 404:
-                                case 406:
-                                case 412:
-                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }), loading: false });
-                                    break;
-                                default:
-                                    this.setState({ message: 'static.unkownError', loading: false });
-                                    break;
-                            }
-                        }
-                    }
-                );
-        } else {
-            console.log('offline')
-            this.consolidatedProgramList()
-            this.setState({ loading: false })
-        }
-    }
 
-    consolidatedProgramList = () => {
-        const lan = 'en';
-        const { programs } = this.state
-        var proList = programs;
-
-        var db1;
-        getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-            var transaction = db1.transaction(['programData'], 'readwrite');
-            var program = transaction.objectStore('programData');
-            var getRequest = program.getAll();
-
-            getRequest.onerror = function (event) {
-                // Handle errors!
-            };
-            getRequest.onsuccess = function (event) {
-                var myResult = [];
-                myResult = getRequest.result;
-                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                for (var i = 0; i < myResult.length; i++) {
-                    if (myResult[i].userId == userId) {
-                        var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
-                        var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
-                        console.log(programNameLabel)
-
-                        var f = 0
-                        for (var k = 0; k < this.state.programs.length; k++) {
-                            if (this.state.programs[k].programId == programData.programId) {
-                                f = 1;
-                                console.log('already exist')
-                            }
-                        }
-                        if (f == 0) {
-                            proList.push(programData)
-                        }
-                    }
-                }
+        AuthenticationService.setupAxiosInterceptors();
+        let realmId = AuthenticationService.getRealmId();
+        // ProgramService.getProgramByRealmId(realmId)
+        ProgramService.getProgramList()
+            .then(response => {
+                console.log(JSON.stringify(response.data))
                 this.setState({
-                    programs: proList
-                }, () => {
-                    this.getProductCategories()
+                    programs: response.data, loading: false
+                }, () => { })
+            }).catch(
+                error => {
+                    this.setState({
+                        programs: [], loading: false
+                    }, () => {})
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message, loading: false });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }), loading: false });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError', loading: false });
+                                break;
+                        }
+                    }
                 }
-                )
-
-            }.bind(this);
-
-        }.bind(this);
+            );
     }
+
+
 
     getProductCategories() {
 
-        // alert(navigator.onLine);
+     
+        let programId = document.getElementById("programId").value
+        console.log(programId)
+        if (programId > 0) {
 
-        if (navigator.onLine) {
-            // AuthenticationService.setupAxiosInterceptors();
+            AuthenticationService.setupAxiosInterceptors();
             let realmId = AuthenticationService.getRealmId();
-            ProductService.getProductCategoryList(realmId)
+
+            ProductService.getProductCategoryListByProgram(realmId, programId)
                 .then(response => {
                     console.log(response.data);
                     // var list = response.data.slice(1);
@@ -1945,39 +1814,11 @@ class ProductCatalog extends Component {
                     }
                 );
         } else {
-            // alert("in else");
-            const lan = 'en';
-            const { productCategories } = this.state
-            var proList = productCategories;
-
-            var db1;
-            getDatabase();
-            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-            openRequest.onsuccess = function (e) {
-                db1 = e.target.result;
-                var transaction = db1.transaction(['productCategory'], 'readwrite');
-                var program = transaction.objectStore('productCategory');
-                var getRequest = program.getAll();
-
-                getRequest.onerror = function (event) {
-                    // Handle errors!
-                };
-                getRequest.onsuccess = function (event) {
-                    var myResult = [];
-                    myResult = getRequest.result;
-                    // alert("hi---");
-                    console.log("offline result==>", myResult);
-
-                    // for (var i = 0; i < myResult.length; i++) {
-                    //     var databytes = CryptoJS.AES.decrypt(myResult[i].productCategory, SECRET_KEY);
-                    //     var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
-                    //     proList.push(programData)
-                    // }
-                    this.setState({
-                        productCategories: myResult
-                    })
-                }.bind(this)
-            }.bind(this)
+            this.setState({
+                message: i18n.t('static.common.selectProgram'),
+                productCategories: [],
+                tracerCategories: []
+            })
         }
     }
 
@@ -2021,7 +1862,7 @@ class ProductCatalog extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [80, 80, 80,90,0,80,80,80,0,0,80,80,80,70],
+            colWidths: [80, 80, 80, 90, 0, 80, 80, 80, 0, 0, 80, 80, 80, 70],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
@@ -2577,7 +2418,7 @@ class ProductCatalog extends Component {
                                                 id="programId"
                                                 bsSize="sm"
                                                 // onChange={this.filterVersion}
-                                                onChange={(e) => { this.fetchData(); this.getTracerCategoryList(); }}
+                                                onChange={(e) => { this.fetchData(); this.getProductCategories(); this.getTracerCategoryList(); }}
                                             >
                                                 <option value="0">{i18n.t('static.common.select')}</option>
                                                 {programs.length > 0

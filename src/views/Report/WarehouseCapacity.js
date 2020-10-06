@@ -550,6 +550,9 @@ import ReportService from '../../api/ReportService';
 import RealmCountryService from '../../api/RealmCountryService';
 import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
 import MultiSelect from 'react-multi-select-component';
+import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
+import jexcel from 'jexcel';
+import "../../../node_modules/jexcel/dist/jexcel.css";
 
 class warehouseCapacity extends Component {
     constructor(props) {
@@ -588,9 +591,9 @@ class warehouseCapacity extends Component {
     formatLabel(cell, row) {
         return getLabelText(cell, this.state.lang);
     }
-    addDoubleQuoteToRowContent=(arr)=>{
-        return arr.map(ele=>'"'+ele+'"')
-     }
+    addDoubleQuoteToRowContent = (arr) => {
+        return arr.map(ele => '"' + ele + '"')
+    }
 
     exportCSV() {
 
@@ -618,7 +621,7 @@ class warehouseCapacity extends Component {
 
         for (var item = 0; item < re.length; item++) {
             // A.push([(getLabelText(re[item].realmCountry.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),(getLabelText(re[item].region.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),(getLabelText(re[item].programList.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),re[item].gln, re[item].capacityCbm])
-            A.push(this.addDoubleQuoteToRowContent([(getLabelText(re[item].realmCountry.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(re[item].region.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(re[item].programList[0].label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), re[item].gln==null?'':re[item].gln, re[item].capacityCbm]))
+            A.push(this.addDoubleQuoteToRowContent([(getLabelText(re[item].realmCountry.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(re[item].region.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (re[item].programList.map(ele=>{return getLabelText(ele.label,this.state.lang)})).join('\n').replaceAll(' ', '%20'), re[item].gln == null ? '' : re[item].gln, re[item].capacityCbm]))
             for (var item1 = 1; item1 < re[item].programList.length; item1++) {
                 A.push(this.addDoubleQuoteToRowContent(['', '', (getLabelText(re[item].programList[item1].label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), '', '']))
             }
@@ -731,12 +734,19 @@ class warehouseCapacity extends Component {
         const doc = new jsPDF(orientation, unit, size);
 
         doc.setFontSize(8);
-
+        let headers = [
+            i18n.t('static.region.country'),
+            i18n.t('static.region.region'),
+            i18n.t('static.program.program'),
+            i18n.t('static.region.gln'),
+            i18n.t('static.region.capacitycbm')
+             ]
+let data=this.state.data.map(elt=>[getLabelText(elt.realmCountry.label, this.state.lang), getLabelText(elt.region.label, this.state.lang), (elt.programList.map(ele=>{return getLabelText(ele.label,this.state.lang)})).join('\n'), elt.gln == null ? '' : elt.gln, elt.capacityCbm])
         let content = {
             margin: { top: 40, left: 100, bottom: 50 },
             startY: 150,
-            // head: [headers],
-            // body: data,
+             head: [headers],
+             body: data,
             styles: { lineWidth: 1, fontSize: 8, cellWidth: 80, halign: 'center' },
             columnStyles: {
                 0: { cellWidth: 113 },
@@ -745,17 +755,17 @@ class warehouseCapacity extends Component {
                 3: { cellWidth: 113 },
                 4: { cellWidth: 113 },
             },
-            html: '#mytable',
-            // bodyStyles: { minCellHeight: 15 },
-            didDrawCell: function (data) {
-                if (data.column.index === 5 && data.cell.section === 'body') {
-                    var td = data.cell.raw;
-                    var img = td.getElementsByTagName('img')[0];
-                    var dim = data.cell.height - data.cell.padding('vertical');
-                    var textPos = data.cell.textPos;
-                    doc.addImage(img.src, textPos.x, textPos.y, dim, dim);
-                }
-            }
+            // html: '#mytable',
+            // // bodyStyles: { minCellHeight: 15 },
+            // didDrawCell: function (data) {
+            //     if (data.column.index === 5 && data.cell.section === 'body') {
+            //         var td = data.cell.raw;
+            //         var img = td.getElementsByTagName('img')[0];
+            //         var dim = data.cell.height - data.cell.padding('vertical');
+            //         var textPos = data.cell.textPos;
+            //         doc.addImage(img.src, textPos.x, textPos.y, dim, dim);
+            //     }
+            // }
         };
 
         doc.autoTable(content);
@@ -949,11 +959,16 @@ class warehouseCapacity extends Component {
                         this.setState({
                             data: response.data,
                             message: '', loading: false
+                        }, () => {
+                            this.buildJexcel()
                         })
                     }).catch(
                         error => {
                             this.setState({
                                 data: [], loading: false
+                            }, () => {
+                                this.el = jexcel(document.getElementById("tableDiv"), '');
+                                this.el.destroy();
                             })
                             if (error.message === "Network Error") {
                                 this.setState({ loading: false, message: error.message });
@@ -975,9 +990,15 @@ class warehouseCapacity extends Component {
                     );
 
             } else if (this.state.programValues.length == 0) {
-                this.setState({ message: i18n.t('static.common.selectProgram'), data: [] });
+                this.setState({ message: i18n.t('static.common.selectProgram'), data: [] }, () => {
+                    this.el = jexcel(document.getElementById("tableDiv"), '');
+                    this.el.destroy();
+                });
             } else if (countryId == 0) {
-                this.setState({ message: i18n.t('static.healtharea.countrytext'), data: [] });
+                this.setState({ message: i18n.t('static.healtharea.countrytext'), data: [] }, () => {
+                    this.el = jexcel(document.getElementById("tableDiv"), '');
+                    this.el.destroy();
+                });
             }
 
 
@@ -993,7 +1014,7 @@ class warehouseCapacity extends Component {
 
                 openRequest.onerror = function (event) {
                     this.setState({
-                        loading:false
+                        loading: false
                     })
                 }.bind(this);
                 openRequest.onsuccess = function (e) {
@@ -1005,7 +1026,10 @@ class warehouseCapacity extends Component {
 
                     programRequest.onerror = function (event) {
                         this.setState({
-                            loading:false
+                            loading: false
+                        }, () => {
+                            this.el = jexcel(document.getElementById("tableDiv"), '');
+                            this.el.destroy();
                         })
                     }.bind(this);
                     programRequest.onsuccess = function (event) {
@@ -1046,6 +1070,8 @@ class warehouseCapacity extends Component {
                         console.log("final wareHouseCapacity Report---", regionList);
                         this.setState({
                             data: offlineData, loading: false
+                        }, () => {
+                            this.buildJexcel()
                         });
                     }.bind(this)
                 }.bind(this)
@@ -1053,12 +1079,107 @@ class warehouseCapacity extends Component {
                 this.setState({
                     data: [],
                     loading: false
+                }, () => {
+                    this.el = jexcel(document.getElementById("tableDiv"), '');
+                    this.el.destroy();
                 });
             }
 
 
         }
 
+    }
+    buildJexcel = () => {
+        let regionList = this.state.data;
+        // console.log("regionList---->", regionList);
+        let regionListArray = [];
+        let count = 0;
+        for (var j = 0; j < regionList.length; j++) {
+            data = [];
+
+            data[0] = getLabelText(regionList[j].realmCountry.label, this.state.lang)
+            data[1] = getLabelText(regionList[j].region.label, this.state.lang)
+            data[2] = (regionList[j].programList.map((item, idx1) => { return (getLabelText(regionList[j].programList[idx1].label, this.state.lang)) })).join(' \n')
+            data[3] = regionList[j].gln
+            data[4] = (regionList[j].capacityCbm).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+
+            regionListArray[count] = data;
+            count++;
+        }
+        // if (regionList.length == 0) {
+        //     data = [];
+        //     regionListArray[0] = data;
+        // }
+        // console.log("regionListArray---->", regionListArray);
+        this.el = jexcel(document.getElementById("tableDiv"), '');
+        this.el.destroy();
+        var json = [];
+        var data = regionListArray;
+        var options = {
+            data: data,
+            columnDrag: true,
+            // colWidths: [150, 150, 100,150, 150, 100,100],
+            colHeaderClasses: ["Reqasterisk"],
+            columns: [
+
+                {
+                    title: i18n.t('static.region.country'),
+                    type: 'text',
+                    readOnly: true
+                }
+                ,
+                {
+                    title: i18n.t('static.region.region'),
+                    type: 'text',
+                    readOnly: true
+                }
+                , {
+                    title: i18n.t('static.program.program'),
+                    type: 'text',
+                    readOnly: true
+                },
+
+                {
+                    title: i18n.t('static.region.gln'),
+                    type: 'text',
+                    readOnly: true
+                }, {
+                    title: i18n.t('static.region.capacitycbm'),
+                    type: 'text',
+                    readOnly: true
+                }
+            ],
+            text: {
+                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
+                show: '',
+                entries: '',
+            },
+            onload: this.loaded,
+            pagination: 10,
+            search: true,
+            columnSorting: true,
+            tableOverflow: true,
+            wordWrap: true,
+            allowInsertColumn: false,
+            allowManualInsertColumn: false,
+            allowDeleteRow: false,
+            onselection: this.selected,
+            oneditionend: this.onedit,
+            copyCompatibility: true,
+            allowExport: false,
+            paginationOptions: [10, 25, 50],
+            position: 'top',
+            contextMenu: false,
+
+        };
+        var regionEl = jexcel(document.getElementById("tableDiv"), options);
+        this.el = regionEl;
+        this.setState({
+            regionEl: regionEl, loading: false
+        })
+    }
+    loaded = function (instance, cell, x, y, value) {
+        jExcelLoadedFunction(instance);
     }
 
     render() {
@@ -1106,18 +1227,18 @@ class warehouseCapacity extends Component {
                     <div className="Card-header-reporticon">
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.report.warehouseCapacity')}</strong> */}
 
-                            
-                              
-                            {
-                                this.state.data.length > 0 &&
-                                <div className="card-header-actions">
-                                    <a className="card-header-action">
-                                        <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />
-                                    </a>
-                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
-                                </div>
-                            }
-                      
+
+
+                        {
+                            this.state.data.length > 0 &&
+                            <div className="card-header-actions">
+                                <a className="card-header-action">
+                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />
+                                </a>
+                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
+                            </div>
+                        }
+
                     </div>
                     <CardBody className="pb-lg-2 pt-lg-0 ">
                         <div className="" >
@@ -1225,8 +1346,8 @@ class warehouseCapacity extends Component {
                                 </Form>
 
                                 <Col md="12 pl-0">
-
-                                    <div className="row">
+                                    <div id="tableDiv" className="jexcelremoveReadonlybackground"> </div>
+                                    {/*  <div className="row">
                                         <div className="col-md-12">
                                             {this.state.data.length > 0 &&
                                                 <Table id="mytable" responsive className="table-striped table-hover table-bordered text-center mt-2">
@@ -1267,7 +1388,7 @@ class warehouseCapacity extends Component {
                                                 </Table>
                                             }
                                         </div>
-                                    </div>
+                                    </div>*/}
 
                                 </Col>
                             </div>
