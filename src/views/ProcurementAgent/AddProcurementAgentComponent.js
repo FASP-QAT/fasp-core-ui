@@ -10,6 +10,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import { SketchPicker } from 'react-color';
+import { ALPHABET_NUMBER_REGEX, SPACE_REGEX } from '../../Constants.js';
 import reactCSS from 'reactcss'
 
 import getLabelText from '../../CommonComponent/getLabelText';
@@ -29,8 +30,11 @@ const validationSchema = function (values) {
     return Yup.object().shape({
         realmId: Yup.string()
             .required(i18n.t('static.common.realmtext')),
+        // procurementAgentCode: Yup.string()
+        //     .matches(/^\S*$/, i18n.t('static.validNoSpace.string'))
+        //     .required(i18n.t('static.procurementagent.codetext')),
         procurementAgentCode: Yup.string()
-            .matches(/^\S*$/, i18n.t('static.validNoSpace.string'))
+            .matches(ALPHABET_NUMBER_REGEX, i18n.t('static.message.alphabetnumerallowed'))
             .required(i18n.t('static.procurementagent.codetext')),
         procurementAgentName: Yup.string()
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
@@ -41,11 +45,13 @@ const validationSchema = function (values) {
         submittedToApprovedLeadTime: Yup.string()
             .required(i18n.t('static.procurementagent.submitToApproveLeadTime'))
             .min(0, i18n.t('static.program.validvaluetext'))
-            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
+            // .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
+            .matches(/^\s*(?=.*[1-9])\d{1,2}(?:\.\d{1,2})?\s*$/, i18n.t('static.program.validBudgetAmount')),
         approvedToShippedLeadTime: Yup.string()
             .required(i18n.t('static.procurementagent.approvedToShippedLeadTime'))
             .min(0, i18n.t('static.program.validvaluetext'))
-            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
+            // .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
+            .matches(/^\s*(?=.*[1-9])\d{1,2}(?:\.\d{1,2})?\s*$/, i18n.t('static.program.validBudgetAmount')),
         // submittedToApprovedLeadTime: Yup.number()
         //     .typeError(i18n.t('static.procurementUnit.validNumberText'))
         //     .required(i18n.t('static.procurementagent.submitToApproveLeadTime'))
@@ -161,7 +167,8 @@ class AddProcurementAgentComponent extends Component {
             procurementAgent.colorHtmlCode = event.target.value.toUpperCase();
         }
         if (event.target.name == "procurementAgentCode") {
-            procurementAgent.procurementAgentCode = event.target.value.toUpperCase();
+            // procurementAgent.procurementAgentCode = event.target.value.toUpperCase();
+            procurementAgent.procurementAgentCode = event.target.value;
         }
         if (event.target.name == "procurementAgentName") {
             procurementAgent.label.label_en = event.target.value;
@@ -429,6 +436,7 @@ class AddProcurementAgentComponent extends Component {
                                                             invalid={touched.procurementAgentName && !!errors.procurementAgentName}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
+                                                            maxLength={255}
                                                             required
                                                             value={this.Capitalize(this.state.procurementAgent.label.label_en)}
                                                         />
@@ -448,8 +456,9 @@ class AddProcurementAgentComponent extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             required
-                                                            maxLength={6}
-                                                            value={this.Capitalize(this.state.procurementAgent.procurementAgentCode)}
+                                                            maxLength={10}
+                                                            // value={this.Capitalize(this.state.procurementAgent.procurementAgentCode)}
+                                                            value={this.state.procurementAgent.procurementAgentCode}
                                                         />
                                                         {/* </InputGroupAddon> */}
                                                         <FormFeedback className="red">{errors.procurementAgentCode}</FormFeedback>

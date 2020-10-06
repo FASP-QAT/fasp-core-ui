@@ -308,6 +308,7 @@ class AddFundingSourceComponent extends Component {
                               invalid={touched.fundingSource && !!errors.fundingSource}
                               onChange={(e) => { handleChange(e); this.dataChange(e) }}
                               onBlur={handleBlur}
+                              maxLength={255}
                               value={this.Capitalize(this.state.fundingSource.label.label_en)}
                               required />
                             <FormFeedback className="red">{errors.fundingSource}</FormFeedback>

@@ -239,6 +239,7 @@ class EditFundingSourceComponent extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.fundingSource.label.label_en}
+                                                            maxLength={255}
                                                             required />
                                                         <FormFeedback className="red">{errors.fundingSource}</FormFeedback>
                                                     </FormGroup>

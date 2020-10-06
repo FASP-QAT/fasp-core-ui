@@ -11,6 +11,7 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import { SketchPicker } from 'react-color';
 import reactCSS from 'reactcss'
 import getLabelText from '../../CommonComponent/getLabelText';
+import { ALPHABET_NUMBER_REGEX, SPACE_REGEX } from '../../Constants.js';
 const entityname = i18n.t('static.procurementagent.procurementagent');
 
 const initialValues = {
@@ -22,17 +23,21 @@ const initialValues = {
 
 const validationSchema = function (values) {
     return Yup.object().shape({
+        procurementAgentCode: Yup.string()
+            .matches(ALPHABET_NUMBER_REGEX, i18n.t('static.message.alphabetnumerallowed'))
+            .required(i18n.t('static.procurementagent.codetext')),
         procurementAgentName: Yup.string()
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.procurementAgent.procurementagentnametext')),
         submittedToApprovedLeadTime: Yup.string()
             .required(i18n.t('static.procurementagent.submitToApproveLeadTime'))
             .min(0, i18n.t('static.program.validvaluetext'))
-            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
+            // .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
+            .matches(/^\s*(?=.*[1-9])\d{1,2}(?:\.\d{1,2})?\s*$/, i18n.t('static.program.validBudgetAmount')),
         approvedToShippedLeadTime: Yup.string()
             .required(i18n.t('static.procurementagent.approvedToShippedLeadTime'))
             .min(0, i18n.t('static.program.validvaluetext'))
-            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
+            .matches(/^\s*(?=.*[1-9])\d{1,2}(?:\.\d{1,2})?\s*$/, i18n.t('static.program.validBudgetAmount')),
         // colorHtmlCode: Yup.string()
         //     .max(6, i18n.t('static.common.max6digittext'))
         //     .required(i18n.t('static.procurementAgent.procurementAgentHTMLCode')),
@@ -420,6 +425,7 @@ class EditProcurementAgentComponent extends Component {
                                                             invalid={(touched.procurementAgentName && !!errors.procurementAgentName) || !!errors.procurementAgentName}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
+                                                            maxLength={255}
                                                             required
                                                             value={getLabelText(this.state.procurementAgent.label, this.state.lang)}
                                                         />
@@ -434,7 +440,10 @@ class EditProcurementAgentComponent extends Component {
                                                             bsSize="sm"
                                                             name="procurementAgentCode"
                                                             id="procurementAgentCode"
-                                                            readOnly={true}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            valid={!errors.procurementAgentCode}
+                                                            invalid={(touched.procurementAgentCode && !!errors.procurementAgentCode) || !!errors.procurementAgentCode}
+                                                            // readOnly={true}
                                                             value={this.state.procurementAgent.procurementAgentCode}
                                                         />
                                                         {/* </InputGroupAddon> */}
