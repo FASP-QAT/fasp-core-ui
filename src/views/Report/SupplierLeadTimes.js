@@ -1739,7 +1739,7 @@ class SupplierLeadTimes extends Component {
         let programIds = this.state.programValues;
         if (programIds.length > 0) {
             this.setState({ loading: true })
-            AuthenticationService.setupAxiosInterceptors();
+            // AuthenticationService.setupAxiosInterceptors();
 
             ReportService.getProcurementAgentExportData(programIds)
                 .then(response => {
@@ -1786,7 +1786,7 @@ class SupplierLeadTimes extends Component {
 
     getPrograms() {
         if (navigator.onLine) {
-            AuthenticationService.setupAxiosInterceptors();
+            // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramList()
                 .then(response => {
                     console.log(JSON.stringify(response.data))
@@ -2007,7 +2007,7 @@ class SupplierLeadTimes extends Component {
 
                 }
                 else {
-                    AuthenticationService.setupAxiosInterceptors();
+                    // AuthenticationService.setupAxiosInterceptors();
                     // this.setState({planningUnits:[]});
                     //let productCategoryId = document.getElementById("productCategoryId").value;
                     ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
@@ -2059,7 +2059,7 @@ class SupplierLeadTimes extends Component {
 
     getProcurementAgent = () => {
         if (navigator.onLine) {
-            AuthenticationService.setupAxiosInterceptors();
+            // AuthenticationService.setupAxiosInterceptors();
             ProcurementAgentService.getProcurementAgentListAll()
                 .then(response => {
                     // console.log(JSON.stringify(response.data))
@@ -2170,7 +2170,7 @@ class SupplierLeadTimes extends Component {
                 }
                 console.log("json---", json);
                 // alert("in");
-                AuthenticationService.setupAxiosInterceptors();
+                // AuthenticationService.setupAxiosInterceptors();
                 ReportService.programLeadTimes(json)
                     .then(response => {
                         console.log("-----response", JSON.stringify(response.data));

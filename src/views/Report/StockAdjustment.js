@@ -1033,7 +1033,7 @@ class StockAdjustmentComponent extends Component {
 
     getPrograms = () => {
         if (navigator.onLine) {
-            AuthenticationService.setupAxiosInterceptors();
+            // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramList()
                 .then(response => {
                     // console.log(JSON.stringify(response.data))
@@ -1272,7 +1272,7 @@ class StockAdjustmentComponent extends Component {
 
             }
             else {
-                AuthenticationService.setupAxiosInterceptors();
+                // AuthenticationService.setupAxiosInterceptors();
 
                 //let productCategoryId = document.getElementById("productCategoryId").value;
                 ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
@@ -1684,7 +1684,7 @@ class StockAdjustmentComponent extends Component {
                     stopDate: endDate,
                     planningUnitIds: planningUnitIds
                 }
-                AuthenticationService.setupAxiosInterceptors();
+                // AuthenticationService.setupAxiosInterceptors();
                 console.log("inputJson---->", inputjson);
                 ReportService.stockAdjustmentList(inputjson)
                     .then(response => {

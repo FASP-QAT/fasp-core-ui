@@ -1984,7 +1984,7 @@ class ProductCatalog extends Component {
 
                 this.setState({ loading: true })
                 console.log("json---", json);
-                AuthenticationService.setupAxiosInterceptors();
+                // AuthenticationService.setupAxiosInterceptors();
                 ReportService.programProductCatalog(json)
                     .then(response => {
                         console.log("-----response", JSON.stringify(response.data));

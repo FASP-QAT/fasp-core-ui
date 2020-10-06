@@ -581,7 +581,7 @@ class warehouseCapacity extends Component {
     componentDidMount() {
 
         if (navigator.onLine) {
-            AuthenticationService.setupAxiosInterceptors();
+            // AuthenticationService.setupAxiosInterceptors();
             this.getCountrylist();
             this.getPrograms();
         } else {
@@ -789,7 +789,7 @@ let data=this.state.data.map(elt=>[getLabelText(elt.realmCountry.label, this.sta
     }
 
     getCountrylist() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         let realmId = AuthenticationService.getRealmId();
         RealmCountryService.getRealmCountryrealmIdById(realmId)
             .then(response => {
@@ -863,7 +863,7 @@ let data=this.state.data.map(elt=>[getLabelText(elt.realmCountry.label, this.sta
 
     getPrograms() {
         if (navigator.onLine) {
-            AuthenticationService.setupAxiosInterceptors();
+            // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramList()
                 .then(response => {
                     // console.log(JSON.stringify(response.data))
@@ -948,7 +948,7 @@ let data=this.state.data.map(elt=>[getLabelText(elt.realmCountry.label, this.sta
             console.log("countryId---", countryId);
             if (this.state.programValues.length > 0 && countryId > 0) {
                 this.setState({ loading: true })
-                AuthenticationService.setupAxiosInterceptors();
+                // AuthenticationService.setupAxiosInterceptors();
                 let inputjson = {
                     realmCountryId: countryId,
                     programIds: programId

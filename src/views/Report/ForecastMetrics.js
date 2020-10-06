@@ -1555,7 +1555,7 @@ class ForecastMetrics extends Component {
       var inputjson = {
         "realmCountryIds": CountryIds, "programIds": programIds, "planningUnitIds": planningUnitIds, "startDate": startDate, "previousMonths": monthInCalc
       }
-      AuthenticationService.setupAxiosInterceptors();
+      // AuthenticationService.setupAxiosInterceptors();
 
       ReportService.getForecastError(inputjson)
         .then(response => {
@@ -1616,7 +1616,7 @@ class ForecastMetrics extends Component {
 
   getCountrys() {
     if (navigator.onLine) {
-      AuthenticationService.setupAxiosInterceptors();
+      // AuthenticationService.setupAxiosInterceptors();
       let realmId = AuthenticationService.getRealmId();
       RealmCountryService.getRealmCountryrealmIdById(realmId)
         .then(response => {
@@ -1709,7 +1709,7 @@ class ForecastMetrics extends Component {
   }
 
   getPrograms() {
-    AuthenticationService.setupAxiosInterceptors();
+    // AuthenticationService.setupAxiosInterceptors();
     //let realmId = AuthenticationService.getRealmId();
     ProgramService.getProgramList()
       .then(response => {
@@ -1743,7 +1743,7 @@ class ForecastMetrics extends Component {
   }
 
   getProductCategories() {
-    AuthenticationService.setupAxiosInterceptors();
+    // AuthenticationService.setupAxiosInterceptors();
     let realmId = AuthenticationService.getRealmId();
     ProductService.getProductCategoryList(realmId)
       .then(response => {
@@ -1778,7 +1778,7 @@ class ForecastMetrics extends Component {
 
   }
   componentDidMount() {
-    AuthenticationService.setupAxiosInterceptors();
+    // AuthenticationService.setupAxiosInterceptors();
     this.getPrograms()
     this.getCountrys();
 

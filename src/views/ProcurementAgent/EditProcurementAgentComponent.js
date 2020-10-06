@@ -212,7 +212,7 @@ class EditProcurementAgentComponent extends Component {
     }
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         ProcurementAgentService.getProcurementAgentById(this.props.match.params.procurementAgentId).then(response => {
             if (response.status == 200) {
                 this.setState({
@@ -230,7 +230,46 @@ class EditProcurementAgentComponent extends Component {
             }
 
 
-        })
+        }).catch(
+            error => {
+                if (error.message === "Network Error") {
+                    this.setState({
+                        message: 'static.unkownError',
+                        loading: false
+                    });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+
+                        case 401:
+                            this.props.history.push(`/login/static.message.sessionExpired`)
+                            break;
+                        case 403:
+                            this.props.history.push(`/accessDenied`)
+                            break;
+                        case 500:
+                        case 404:
+                        case 406:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        case 412:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        default:
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                            break;
+                    }
+                }
+            }
+        );
     }
     render() {
         const styles = reactCSS({
@@ -265,7 +304,7 @@ class EditProcurementAgentComponent extends Component {
         });
         return (
             <div className="animated fadeIn">
-                <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} loading={this.changeLoading} />
+                <AuthenticationServiceComponent history={this.props.history} />
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row style={{ display: this.state.loading ? "none" : "block" }}>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
@@ -290,7 +329,7 @@ class EditProcurementAgentComponent extends Component {
                                         loading: true
                                     })
                                     console.log("COLOR----->", this.state.procurementAgent);
-                                    AuthenticationService.setupAxiosInterceptors();
+                                    // AuthenticationService.setupAxiosInterceptors();
                                     ProcurementAgentService.updateProcurementAgent(this.state.procurementAgent)
                                         .then(response => {
                                             if (response.status == 200) {
@@ -303,7 +342,46 @@ class EditProcurementAgentComponent extends Component {
                                                         this.hideSecondComponent();
                                                     })
                                             }
-                                        })
+                                        }).catch(
+                                            error => {
+                                                if (error.message === "Network Error") {
+                                                    this.setState({
+                                                        message: 'static.unkownError',
+                                                        loading: false
+                                                    });
+                                                } else {
+                                                    switch (error.response ? error.response.status : "") {
+
+                                                        case 401:
+                                                            this.props.history.push(`/login/static.message.sessionExpired`)
+                                                            break;
+                                                        case 403:
+                                                            this.props.history.push(`/accessDenied`)
+                                                            break;
+                                                        case 500:
+                                                        case 404:
+                                                        case 406:
+                                                            this.setState({
+                                                                message: error.response.data.messageCode,
+                                                                loading: false
+                                                            });
+                                                            break;
+                                                        case 412:
+                                                            this.setState({
+                                                                message: error.response.data.messageCode,
+                                                                loading: false
+                                                            });
+                                                            break;
+                                                        default:
+                                                            this.setState({
+                                                                message: 'static.unkownError',
+                                                                loading: false
+                                                            });
+                                                            break;
+                                                    }
+                                                }
+                                            }
+                                        );
                                 }}
                                 render={
                                     ({
@@ -506,7 +584,7 @@ class EditProcurementAgentComponent extends Component {
     }
 
     resetClicked() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         ProcurementAgentService.getProcurementAgentById(this.props.match.params.procurementAgentId).then(response => {
             this.setState({
                 procurementAgent: response.data, loading: false
@@ -514,7 +592,46 @@ class EditProcurementAgentComponent extends Component {
             let color = AuthenticationService.hexToRgbA(this.state.procurementAgent.colorHtmlCode);
             this.setState({ rgba: color })
 
-        })
+        }).catch(
+            error => {
+                if (error.message === "Network Error") {
+                    this.setState({
+                        message: 'static.unkownError',
+                        loading: false
+                    });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+
+                        case 401:
+                            this.props.history.push(`/login/static.message.sessionExpired`)
+                            break;
+                        case 403:
+                            this.props.history.push(`/accessDenied`)
+                            break;
+                        case 500:
+                        case 404:
+                        case 406:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        case 412:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        default:
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                            break;
+                    }
+                }
+            }
+        );
     }
 }
 

@@ -2381,7 +2381,7 @@ class ShipmentGlobalDemandView extends Component {
     }
 
     getRelamList = () => {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         RealmService.getRealmListAll()
             .then(response => {
                 if (response.status == 200) {
@@ -2419,7 +2419,7 @@ class ShipmentGlobalDemandView extends Component {
     getShipmentStatusList() {
         const { shipmentStatuses } = this.state
         if (navigator.onLine) {
-            AuthenticationService.setupAxiosInterceptors();
+            // AuthenticationService.setupAxiosInterceptors();
             ShipmentStatusService.getShipmentStatusListActive()
                 .then(response => {
                     this.setState({
@@ -2473,7 +2473,7 @@ class ShipmentGlobalDemandView extends Component {
 
     getFundingSource = () => {
         if (navigator.onLine) {
-            AuthenticationService.setupAxiosInterceptors();
+            // AuthenticationService.setupAxiosInterceptors();
             FundingSourceService.getFundingSourceListAll()
                 .then(response => {
                     // console.log(JSON.stringify(response.data))
@@ -2696,7 +2696,7 @@ class ShipmentGlobalDemandView extends Component {
     }
 
     getProductCategories() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         let realmId = document.getElementById("realmId").value;
         ProductService.getProductCategoryList(realmId)
             .then(response => {
@@ -2778,9 +2778,9 @@ class ShipmentGlobalDemandView extends Component {
 
             }
             else {
-                AuthenticationService.setupAxiosInterceptors();
+                // AuthenticationService.setupAxiosInterceptors();
                 let productCategoryId = document.getElementById("productCategoryId").value;
-                AuthenticationService.setupAxiosInterceptors();
+                // AuthenticationService.setupAxiosInterceptors();
                 if (productCategoryId != -1) {
                     PlanningUnitService.getPlanningUnitByProductCategoryId(productCategoryId).then(response => {
                         // console.log("PLANNING-UNIT--->", response.data);

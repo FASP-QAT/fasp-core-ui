@@ -1633,7 +1633,7 @@ if(value!=null){
   }
   getPrograms = () => {
     if (navigator.onLine) {
-      AuthenticationService.setupAxiosInterceptors();
+      // AuthenticationService.setupAxiosInterceptors();
       ProgramService.getProgramList()
         .then(response => {
           console.log(JSON.stringify(response.data))
@@ -1873,7 +1873,7 @@ if(value!=null){
 
         }
         else {
-          AuthenticationService.setupAxiosInterceptors();
+          // AuthenticationService.setupAxiosInterceptors();
 
           ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
             console.log('**' + JSON.stringify(response.data))
@@ -2039,7 +2039,7 @@ if(value!=null){
       } else {
 
         this.setState({ loading: true })
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         ReportService.getForecastMatricsOverTime(input)
           .then(response => {
             console.log(JSON.stringify(response.data));

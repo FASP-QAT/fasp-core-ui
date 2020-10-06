@@ -424,7 +424,7 @@ class AnnualShipmentCost extends Component {
                 } else {
                     // alert("in else online version");
                     console.log("json---", json);
-                    AuthenticationService.setupAxiosInterceptors();
+                    // AuthenticationService.setupAxiosInterceptors();
                     ReportService.getAnnualShipmentCost(json)
                         .then(response => {
                             console.log("-----response", JSON.stringify(response.data));
@@ -492,7 +492,7 @@ class AnnualShipmentCost extends Component {
 
     getPrograms() {
         if (navigator.onLine) {
-            AuthenticationService.setupAxiosInterceptors();
+            // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramList()
                 .then(response => {
                     console.log(JSON.stringify(response.data))
@@ -1088,7 +1088,7 @@ class AnnualShipmentCost extends Component {
 
                 }
                 else {
-                    AuthenticationService.setupAxiosInterceptors();
+                    // AuthenticationService.setupAxiosInterceptors();
 
                     //let productCategoryId = document.getElementById("productCategoryId").value;
                     ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
@@ -1129,7 +1129,7 @@ class AnnualShipmentCost extends Component {
     }
 
     getProductCategories() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         let realmId = AuthenticationService.getRealmId();
         ProductService.getProductCategoryList(realmId)
             .then(response => {
@@ -1166,7 +1166,7 @@ class AnnualShipmentCost extends Component {
     getFundingSourceList() {
         const { fundingSources } = this.state
         if (navigator.onLine) {
-            AuthenticationService.setupAxiosInterceptors();
+            // AuthenticationService.setupAxiosInterceptors();
             FundingSourceService.getFundingSourceListAll()
                 .then(response => {
                     this.setState({
@@ -1225,7 +1225,7 @@ class AnnualShipmentCost extends Component {
     getProcurementAgentList() {
         const { procurementAgents } = this.state
         if (navigator.onLine) {
-            AuthenticationService.setupAxiosInterceptors();
+            // AuthenticationService.setupAxiosInterceptors();
 
             ProcurementAgentService.getProcurementAgentListAll()
                 .then(response => {
@@ -1282,7 +1282,7 @@ class AnnualShipmentCost extends Component {
     getShipmentStatusList() {
         const { shipmentStatuses } = this.state
         if (navigator.onLine) {
-            AuthenticationService.setupAxiosInterceptors();
+            // AuthenticationService.setupAxiosInterceptors();
             ShipmentStatusService.getShipmentStatusListActive()
                 .then(response => {
                     this.setState({
