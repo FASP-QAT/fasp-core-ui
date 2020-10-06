@@ -990,15 +990,9 @@ export default class SupplyPlanComponent extends React.Component {
                                         <td className="BorderNoneSupplyPlan"></td>
                                         <td align="left"><b>{i18n.t('static.supplyPlan.endingBalance')}</b></td>
                                         {
-<<<<<<< HEAD
                                             this.state.closingBalanceArray.map((item1, count) => {
                                                 return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}><b><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></b></td>)
                                             })
-=======
-                                            this.state.closingBalanceArray.map(item1 => (
-                                                <td align="right"><b><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></b></td>
-                                            ))
->>>>>>> dev
                                         }
                                     </tr>
                                     <tr>
