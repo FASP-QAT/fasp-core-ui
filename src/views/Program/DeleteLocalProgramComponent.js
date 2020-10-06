@@ -36,11 +36,7 @@ class DeleteLocalProgramComponent extends Component {
   }
 
   confirmDeleteLocalProgram = () => {
-    console.log("programValues length---", this.state.programValues.length);
-    console.log("programs length---", this.state.programs.length);
-    console.log("map---------", this.state.programValues.map(ele => (ele.value).toString()));
     let programIds = this.state.programValues.length == 0 ? [] : this.state.programValues.map(ele => (ele.value).toString());
-    console.log("programIds------", programIds);
     if (this.state.programValues.length > 0) {
       confirmAlert({
         message: i18n.t('static.program.confirmDelete'),
@@ -48,8 +44,8 @@ class DeleteLocalProgramComponent extends Component {
           {
             label: i18n.t('static.program.yes'),
             onClick: () => {
-              console.log("programIds---", programIds);
-              this.deleteLocalProgram(programIds);
+              this.deleteLocalProgramFromProgramData(programIds);
+              this.deleteLocalProgramFromDownloadedProgramData(programIds);
             }
           },
           {
@@ -73,8 +69,7 @@ class DeleteLocalProgramComponent extends Component {
 
   }
 
-  deleteLocalProgram = (programIds) => {
-    console.log("yes delete---------------", programIds)
+  deleteLocalProgramFromProgramData = (programIds) => {
     var db1;
     getDatabase();
     for (let i = 0; i <= programIds.length; i++) {
@@ -103,16 +98,64 @@ class DeleteLocalProgramComponent extends Component {
           var myResult = [];
           myResult = getRequest.result;
 
-          console.log("myResult---", myResult);
           this.setState({
             message: i18n.t('static.program.deleteLocalProgramSuccess'),
-            loading: false
+            loading: false,
+            programs: [],
+            programValues: []
+          }, () => {
+            this.getPrograms();
           })
         }.bind(this);
       }.bind(this)
     }
     this.setState({ programs: [] })
     this.getPrograms();
+  }
+
+  deleteLocalProgramFromDownloadedProgramData = (programIds) => {
+    var db1;
+    getDatabase();
+    for (let i = 0; i <= programIds.length; i++) {
+      var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+      openRequest.onerror = function (event) {
+        this.setState({
+          message: i18n.t('static.program.errortext'),
+          color: 'red'
+        })
+        // this.hideFirstComponent()
+      }.bind(this);
+      openRequest.onsuccess = function (e) {
+        db1 = e.target.result;
+        var transaction = db1.transaction(['downloadedProgramData'], 'readwrite');
+        var program = transaction.objectStore('downloadedProgramData');
+        var getRequest = program.delete(programIds[i]);
+        var proList = []
+        getRequest.onerror = function (event) {
+          this.setState({
+            message: i18n.t('static.program.errortext'),
+            color: 'red'
+          })
+          // this.hideFirstComponent()
+        }.bind(this);
+        getRequest.onsuccess = function (event) {
+          var myResult = [];
+          myResult = getRequest.result;
+
+          console.log("myResult---", myResult);
+          this.setState({
+            message: i18n.t('static.program.deleteLocalProgramSuccess'),
+            loading: false,
+            programs: [],
+            programValues: []
+          }, () => {
+            this.getPrograms();
+          })
+        }.bind(this);
+      }.bind(this)
+    }
+    // this.setState({ programs: [] })
+    // this.getPrograms();
   }
 
   getPrograms() {
@@ -158,7 +201,6 @@ class DeleteLocalProgramComponent extends Component {
             proList.push(programJson)
           }
         }
-        console.log("proList---", proList);
         this.setState({
           programs: proList, loading: false
         })
@@ -173,7 +215,6 @@ class DeleteLocalProgramComponent extends Component {
   }
 
   onRadioBtnClick(radioSelected) {
-    console.log("yes---------------");
     this.setState({
       radioSelected: radioSelected,
     });
@@ -199,7 +240,7 @@ class DeleteLocalProgramComponent extends Component {
         <h5 className="red">{i18n.t(this.state.message)}</h5>
 
         <Card style={{ display: this.state.loading ? "none" : "block" }}>
-          <CardBody className="pb-lg-2 pt-lg-0">
+          <CardBody className="pb-lg-2 pt-lg-2">
             <div ref={ref}>
               <Form >
                 <div className="pl-0">
@@ -227,8 +268,10 @@ class DeleteLocalProgramComponent extends Component {
 
           </CardBody>
 
-          <CardFooter>
+          <CardFooter className="pb-4">
+          <FormGroup className="pb-1">
             <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.confirmDeleteLocalProgram}><i className="fa fa-trash"></i> {i18n.t('static.common.delete')}</Button>
+            </FormGroup>
           </CardFooter>
         </Card>
         <div style={{ display: this.state.loading ? "block" : "none" }}>

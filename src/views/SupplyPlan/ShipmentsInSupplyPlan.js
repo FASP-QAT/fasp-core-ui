@@ -2885,7 +2885,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                 freightCost: parseFloat(freightCost.toString().replaceAll("\,", "")).toFixed(2),
                                 notes: map.get("13"),
                                 planningUnit: {
-                                    id: document.getElementById("planningUnitId").value
+                                    id: document.getElementById("planningUnitId").value,
+                                    label:(this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0]).planningUnit.label
                                 },
                                 procurementAgent: {
                                     id: map.get("2")

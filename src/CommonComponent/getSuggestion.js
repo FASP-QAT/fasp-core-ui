@@ -9,7 +9,7 @@ export default function getSuggestion(row, lang) {
         var numberOfMonths = parseInt(row.realmProblem.data1);
         var monthString = '';
         for (var m = 1; m <= numberOfMonths; m++) {
-            var curMonth = moment(Date.now()).subtract(m, 'months').startOf('month').format("MMM-YY");
+            var curMonth = moment(row.dt).subtract(m, 'months').startOf('month').format("MMM-YY");
             monthString = monthString.concat(curMonth + ",");
         }
         var desc_en = row.realmProblem.problem.actionLabel.label_en;
@@ -40,7 +40,7 @@ export default function getSuggestion(row, lang) {
         var numberOfMonths = parseInt(row.realmProblem.data1);
         var monthString = '';
         for (var m = 1; m <= numberOfMonths; m++) {
-            var curMonth = moment(Date.now()).subtract(m, 'months').startOf('month').format("MMM-YY");
+            var curMonth = moment(row.dt).subtract(m, 'months').startOf('month').format("MMM-YY");
             monthString = monthString.concat(curMonth + ",");
         }
 
@@ -242,8 +242,8 @@ export default function getSuggestion(row, lang) {
         // var label = row.realmProblem.problem.label;
         // label.label_en = "Dynamic forecasting is not used for certain commodity groups (Malaria, ARV, VMMC)";
         // return getLabelText(label, lang);
-        var myStartDate = moment(Date.now()).add(1, 'months').startOf('month').format("MMM-YY");
-        var myEndDate = moment(Date.now()).add(row.realmProblem.data1, 'months').endOf('month').format("MMM-YY");
+        var myStartDate = moment(row.dt).add(1, 'months').startOf('month').format("MMM-YY");
+        var myEndDate = moment(row.dt).add(row.realmProblem.data1, 'months').endOf('month').format("MMM-YY");
         // var desc = row.realmProblem.problem.actionLabel.label_en;
         // const result = desc.split('<%PLANNING_UNIT%>').join(row.planningUnit.label.label_en).split('<%REGION%>').join(row.region.label.label_en).split('<%DT%>').join(myStartDate + " to " + myEndDate);
         // var label = row.realmProblem.problem.actionLabel;
@@ -464,7 +464,7 @@ export default function getSuggestion(row, lang) {
         return getLabelText(label, lang);
     }
     if (row.realmProblem.problem.problemId == 21) {
-        var gapMonth = moment(Date.now()).subtract(2, 'months').startOf('month').format("MMM-YY");
+        var gapMonth = moment(row.dt).subtract(2, 'months').startOf('month').format("MMM-YY");
 
         var desc_en = row.realmProblem.problem.actionLabel.label_en;
         var desc_fr = row.realmProblem.problem.actionLabel.label_fr;
