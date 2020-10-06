@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import {
   Card,
-  CardBody, FormGroup, Label, Form, InputGroupAddon, Button
+  CardBody, CardFooter, FormGroup, Label, Form, InputGroupAddon, Button
 } from 'reactstrap';
 import i18n from '../../i18n'
 import getLabelText from '../../CommonComponent/getLabelText';
@@ -36,25 +36,32 @@ class DeleteLocalProgramComponent extends Component {
   }
 
   confirmDeleteLocalProgram = () => {
-    confirmAlert({
-      message: i18n.t('static.program.confirmDelete'),
-      buttons: [
-        {
-          label: i18n.t('static.program.yes'),
-          onClick: () => {
-            this.deleteLocalProgram();
+    console.log("programValues length---", this.state.programValues.length);
+    console.log("programs length---", this.state.programs.length);
+    console.log("map---------", this.state.programValues.map(ele => (ele.value).toString()));
+    let programIds = this.state.programValues.length == 0 ? [] : this.state.programValues.map(ele => (ele.value).toString());
+    console.log("programIds------", programIds);
+    if (this.state.programValues.length > 0) {
+      confirmAlert({
+        message: i18n.t('static.program.confirmDelete'),
+        buttons: [
+          {
+            label: i18n.t('static.program.yes'),
+            onClick: () => {
+              console.log("programIds---", programIds);
+              this.deleteLocalProgram(programIds);
+            }
+          },
+          {
+            label: i18n.t('static.program.no')
           }
-        },
-        {
-          label: i18n.t('static.program.no')
-        }
-      ]
-    });
+        ]
+      });
+    } else {
+      this.setState({ message: i18n.t('static.common.selectProgram') });
+    }
   }
 
-  deleteLocalProgram = () => {
-    console.log("yes delete---------------")
-  }
   handleChangeProgram(programIds) {
     programIds = programIds.sort(function (a, b) {
       return parseInt(a.value) - parseInt(b.value);
@@ -64,6 +71,48 @@ class DeleteLocalProgramComponent extends Component {
       programLabels: programIds.map(ele => ele.label)
     })
 
+  }
+
+  deleteLocalProgram = (programIds) => {
+    console.log("yes delete---------------", programIds)
+    var db1;
+    getDatabase();
+    for (let i = 0; i <= programIds.length; i++) {
+      var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+      openRequest.onerror = function (event) {
+        this.setState({
+          message: i18n.t('static.program.errortext'),
+          color: 'red'
+        })
+        // this.hideFirstComponent()
+      }.bind(this);
+      openRequest.onsuccess = function (e) {
+        db1 = e.target.result;
+        var transaction = db1.transaction(['programData'], 'readwrite');
+        var program = transaction.objectStore('programData');
+        var getRequest = program.delete(programIds[i]);
+        var proList = []
+        getRequest.onerror = function (event) {
+          this.setState({
+            message: i18n.t('static.program.errortext'),
+            color: 'red'
+          })
+          // this.hideFirstComponent()
+        }.bind(this);
+        getRequest.onsuccess = function (event) {
+          var myResult = [];
+          myResult = getRequest.result;
+
+          console.log("myResult---", myResult);
+          this.setState({
+            message: i18n.t('static.program.deleteLocalProgramSuccess'),
+            loading: false
+          })
+        }.bind(this);
+      }.bind(this)
+    }
+    this.setState({ programs: [] })
+    this.getPrograms();
   }
 
   getPrograms() {
@@ -124,6 +173,7 @@ class DeleteLocalProgramComponent extends Component {
   }
 
   onRadioBtnClick(radioSelected) {
+    console.log("yes---------------");
     this.setState({
       radioSelected: radioSelected,
     });
@@ -169,15 +219,17 @@ class DeleteLocalProgramComponent extends Component {
                       />
 
                     </FormGroup>
-                    <div style={{ marginTop: '25px' }}>
-                      <Button color="secondary Gobtn btn-sm" onClick={this.confirmDeleteLocalProgram}>{i18n.t('static.common.go')}</Button>
-                    </div>
+
                   </div>
                 </div>
               </Form>
             </div>
 
           </CardBody>
+
+          <CardFooter>
+            <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.confirmDeleteLocalProgram}><i className="fa fa-times"></i> {i18n.t('static.common.delete')}</Button>
+          </CardFooter>
         </Card>
         <div style={{ display: this.state.loading ? "block" : "none" }}>
           <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >

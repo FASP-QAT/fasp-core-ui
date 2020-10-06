@@ -13,6 +13,7 @@
     "static.common.displayName": "Enter Display Name",
     "static.common.dashboard": "Dashboard",
     "static.program.realmcountry": "Country",
+    "static.program.realmcountrydashboard": "Realm Country",
     "static.program.program": "Program",
     "static.message.user.usernameExists": "Username already exists",
     "static.message.user.emailIdExists": "Email address already exists",
@@ -386,6 +387,7 @@
     "static.common.dlink": " Delink",
     "static.common.deleterow": "Delete Row",
     "static.common.remove": "Remove",
+    "static.common.delete": "Delete",
     "static.healtharea.healtharea": "Technical Area",
     "static.healtharea.healthareacode": " Technical Area Code",
     "static.organisation.organisation": "Organization",
@@ -1245,8 +1247,8 @@
     "static.add.addLanguage": "Add Language",
     "static.dashboard.viewSupplyPlan": "View Supply Plans Waiting for Approval",
     "static.dashboard.supplyPlanWaiting": "Supply Plans Waiting for Approval",
-    "static.list.listCountry": "List Country",
-    "static.add.addCountry": "Add Country",
+    "static.list.listCountry": "List Realm Country",
+    "static.add.addCountry": "Add Realm Country",
     "static.list.listTechnicalArea": "List TechnicalArea",
     "static.add.addTechnicalArea": "Add TechnicalArea",
     "static.list.listRegion": "List Region",
@@ -1258,5 +1260,6 @@
     "static.report.qatProblemActionReport": "QAT Probelm Action Report",
     "static.procurementAgent.AddProcurementAgent": "Add Procurement Agent",
     "static.budget.redRow": "*Rows in red indicate that Budget has either lapsed or has no money in it",
-    "static.program.deleteLocalProgram" : "Delete Local Program"
+    "static.program.deleteLocalProgram" : "Delete Local Program",
+    "static.program.deleteLocalProgramSuccess" : "Local Program(s) deleted successfully"
 }

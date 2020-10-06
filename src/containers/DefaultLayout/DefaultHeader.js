@@ -54,7 +54,7 @@ class DefaultHeader extends Component {
     </NavItem>*/}
           <NavItem className="px-3">
             {console.log("Inside header called---", this)}
-            {/* <NavLink to="#" className="nav-link" ><b>{this.props.title}</b></NavLink> */}
+            <NavLink to="#" className="nav-link" ><b>{this.props.title}</b></NavLink>
           </NavItem>
         </Nav>
         <Nav className="ml-auto " navbar>

@@ -1045,7 +1045,7 @@ class DefaultLayout extends Component {
                               {
                                 name: i18n.t('static.program.deleteLocalProgram'),
                                 url: '/program/deleteLocalProgram',
-                                icon: 'fa fa-download',
+                                icon: 'fa fa-trash',
                                 attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DELETE_LOCAL_PROGARM') ? false : true) }
                                 // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DOWNLOAD_PROGARM') ? false : true) }
                               },
@@ -1569,7 +1569,7 @@ class DefaultLayout extends Component {
                               {
                                 name: i18n.t('static.program.deleteLocalProgram'),
                                 url: '/program/deleteLocalProgram',
-                                icon: 'fa fa-download',
+                                icon: 'fa fa-trash',
                                 attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DELETE_LOCAL_PROGARM') ? false : true) }
                               },
                               {
