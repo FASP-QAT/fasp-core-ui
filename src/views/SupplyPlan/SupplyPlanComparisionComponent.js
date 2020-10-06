@@ -2225,7 +2225,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         {
                                             this.state.monthsArray.map((item, count) => {
                                                 if (count < 7) {
-                                                    return (<th className="supplyplanTdWidthForMonths">{item.monthName.concat(" ").concat(item.monthYear)}</th>)
+                                                    return (<th className={count==2 ? "supplyplan-Thead supplyplanTdWidthForMonths" : "supplyplanTdWidthForMonths"}>{item.monthName.concat(" ").concat(item.monthYear)}</th>)
                                                 }
                                             })
                                         }
@@ -2325,7 +2325,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         {
                                             this.state.monthsArray.map((item, count) => {
                                                 if (count < 7) {
-                                                    return (<th colSpan="2">{item.monthName.concat(" ").concat(item.monthYear)}</th>)
+                                                    return (<th colSpan="2" className={count==2 ? "supplyplan-Thead" : ""}>{item.monthName.concat(" ").concat(item.monthYear)}</th>)
                                                 }
                                             })
                                         }

@@ -1268,5 +1268,7 @@
     "static.supplyplan.consumptionDataEntry":"Consumption data entry",
     "static.supplyplan.adjustmentDataEntry":"Adjustment and inventory details data entry",
     "static.supplyplan.shipmentDataEntry":"Shipment data entry",
-    "static.supplyPlan.noteBelowGraph":"Note: If you remove an element it doesn't actually adjust the numbers"
+    "static.supplyPlan.noteBelowGraph":"Note: If you remove an element it doesn't actually adjust the numbers",
+    "static.common.max26digittext":"Maximum 26 characters only",
+    "static.message.alphaspeccharnumtext": "Only letters, numbers and special characters like /,- are allowed"
 }
