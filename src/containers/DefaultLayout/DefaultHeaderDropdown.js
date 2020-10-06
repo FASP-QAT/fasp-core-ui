@@ -75,6 +75,7 @@ class DefaultHeaderDropdown extends Component {
   }
 
   changeLanguage(lang) {
+console.log("Going to change language---",lang)
     localStorage.setItem('lang', lang);
     AuthenticationService.updateUserLanguage(lang);
     if (navigator.onLine) {
