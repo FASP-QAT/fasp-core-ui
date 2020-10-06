@@ -15,24 +15,44 @@ export default class UserAgreementComponent extends Component {
         this.decline = this.decline.bind(this);
     }
     accept() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         UserService.acceptUserAgreement().then(response => {
             this.props.history.push(`/masterDataSync`)
         }).catch(
             error => {
                 if (error.message === "Network Error") {
-                    this.setState({ message: error.message });
+                    this.setState({
+                        message: 'static.unkownError',
+                        loading: false
+                    });
                 } else {
                     switch (error.response ? error.response.status : "") {
-                        case 500:
+
                         case 401:
+                            this.props.history.push(`/login/static.message.sessionExpired`)
+                            break;
+                        case 403:
+                            this.props.history.push(`/accessDenied`)
+                            break;
+                        case 500:
                         case 404:
-                        case 412:
                         case 406:
-                            this.setState({ message: error.response.data.messageCode });
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        case 412:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
                             break;
                         default:
-                            this.setState({ message: 'static.unkownError' });
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
                             break;
                     }
                 }
@@ -55,189 +75,189 @@ export default class UserAgreementComponent extends Component {
                                 <strong>{i18n.t('static.user.agreement')}</strong>
                             </CardHeader>
                             <CardBody>
-                            <Col xs="11" sm="11">
-                                <div className="text-justify">
-                                <h4 className="UserTitle">End-User License Agreement</h4>
-                                    <p>
-                                    This End-User License Agreement (EULA) is a legal agreement between you, either in your 
-                                    capacity as an individual or duly authorized agent acting as or on behalf an 
-                                    entity, and Chemonics International (hereinafter “Chemonics” or “Owner”)
-                                    for your authorized use of its  Quantification Analytics Tool (QAT) and its applications. 
-                                    IF YOU DO NOT AGREE TO ALL OF THE TERMS OF THIS EULA, DO NOT INSTALL, USE OR COPY THE
-                                     SOFTWARE. 
+                                <Col xs="11" sm="11">
+                                    <div className="text-justify">
+                                        <h4 className="UserTitle">End-User License Agreement</h4>
+                                        <p>
+                                            This End-User License Agreement (EULA) is a legal agreement between you, either in your
+                                            capacity as an individual or duly authorized agent acting as or on behalf an
+                                            entity, and Chemonics International (hereinafter “Chemonics” or “Owner”)
+                                            for your authorized use of its  Quantification Analytics Tool (QAT) and its applications.
+                                            IF YOU DO NOT AGREE TO ALL OF THE TERMS OF THIS EULA, DO NOT INSTALL, USE OR COPY THE
+                                             SOFTWARE.
                                     </p>
-                                    <p>
-                                    <h4 className="UserTitle">Summary</h4>
-  <ul class="list-group">
-    <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i>  &nbsp;&nbsp;<p>You must agree to all of the terms of this EULA to use this Software.</p></li>
-    <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp;&nbsp;<p>If so, you may use the Software for free and for any lawful purpose.</p></li>
-    <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i>&nbsp; &nbsp;<p align="justifly">This Software automatically communicates with QAT servers for three reasons: <br></br>(1) To receive and install updates<br></br> (2) To send error reports and <br></br>(3) To send anonymized usage information. <br></br>You can view sample data to see what information is sent, and you may opt out of sending the anonymized usage data.</p></li>
-    <li class="list-summery "><i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p>This Software is provided "as-is" with no warranties, and you agree that the Owner or Administrator are not liable for anything you do with it.</p></li>
-  </ul>
+                                        <p>
+                                            <h4 className="UserTitle">Summary</h4>
+                                            <ul class="list-group">
+                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i>  &nbsp;&nbsp;<p>You must agree to all of the terms of this EULA to use this Software.</p></li>
+                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp;&nbsp;<p>If so, you may use the Software for free and for any lawful purpose.</p></li>
+                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i>&nbsp; &nbsp;<p align="justifly">This Software automatically communicates with QAT servers for three reasons: <br></br>(1) To receive and install updates<br></br> (2) To send error reports and <br></br>(3) To send anonymized usage information. <br></br>You can view sample data to see what information is sent, and you may opt out of sending the anonymized usage data.</p></li>
+                                                <li class="list-summery "><i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p>This Software is provided "as-is" with no warranties, and you agree that the Owner or Administrator are not liable for anything you do with it.</p></li>
+                                            </ul>
+                                        </p>
+                                        <p>
+                                            <h4 className="UserTitle">The Agreement</h4>
+                                            By downloading, installing, using, or copying the Software, you accept and agree to be bound by the terms of this EULA. If you do not agree to all the terms of this EULA, you may not download, install, use or copy the Software.
+                                          
   </p>
-<p>
-  <h4 className="UserTitle">The Agreement</h4>
-  By downloading, installing, using, or copying the Software, you accept and agree to be bound by the terms of this EULA. If you do not agree to all the terms of this EULA, you may not download, install, use or copy the Software. 
+                                        <p>
+                                            <h4 className="UserTitle"> The License</h4>
+                                            This EULA entitles you to install as many copies of the Software as you want and use the Software for any lawful purpose consistent with this EULA Your license to use the Software is expressly conditioned upon your agreement to all the terms of this EULA. This software is licensed, not sold. Notwithstanding any provision in this EULA to the contrary, this EULA shall not bind the U.S. Agency for International Development (USAID) nor any person acting in their capacity as a USAID employee or staff member.  In the event that a EULA is executed by any such person, that EULA shall be considered null and void.
+                                          All other rights, privileges, duties, and obligations of the Owner pursuant to GHSC-PSM Contract through incorporation by clause or reference remain in effect and fully enforceable, and will control in the event of any discrepancy between the GHSC-PSM Contract and any provision herein included and  created by this EULA.
+                                          
+  </p>
+                                        <p>
 
-  </p>
-  <p>
-  <h4 className="UserTitle"> The License</h4>
-  This EULA entitles you to install as many copies of the Software as you want and use the Software for any lawful purpose consistent with this EULA Your license to use the Software is expressly conditioned upon your agreement to all the terms of this EULA. This software is licensed, not sold. Notwithstanding any provision in this EULA to the contrary, this EULA shall not bind the U.S. Agency for International Development (USAID) nor any person acting in their capacity as a USAID employee or staff member.  In the event that a EULA is executed by any such person, that EULA shall be considered null and void.  
-All other rights, privileges, duties, and obligations of the Owner pursuant to GHSC-PSM Contract through incorporation by clause or reference remain in effect and fully enforceable, and will control in the event of any discrepancy between the GHSC-PSM Contract and any provision herein included and  created by this EULA. 
 
-  </p>
-  <p>
-  
-    
-  <h4 className="UserTitle"> The Restrictions</h4>
-  <div className="rounded-list list-group">
+                                            <h4 className="UserTitle"> The Restrictions</h4>
+                                            <div className="rounded-list list-group">
+                                                <ol className="list-group">
+                                                    <li class=""> &nbsp;&nbsp;<p>When using the Software you must use it in a manner that complies with the applicable laws in the jurisdiction(s) in which you use the Software.</p></li>
+                                                    <li class=" ">&nbsp; &nbsp; <p>You may not sell, resell, rent, lease or exchange the Software for anything of value.</p></li>
+                                                    <li class=" "> &nbsp; &nbsp;<p>You may redistribute the software, but it must include this EULA and you may not repackage or bundle the Software with any other software.</p></li>
+                                                    <li class=" "> &nbsp; &nbsp;<p>You may not remove or alter any proprietary notices or marks on the Software.</p></li>
+                                                </ol>
+                                            </div>
+                                        </p>
+                                        <p>
+                                            <h4 className="UserTitle">Privacy Notices</h4>
+                                            <div className="rounded-list list-group">
+                                                The Software automatically communicates with QAT servers for three purposes :
   <ol className="list-group">
-    <li class=""> &nbsp;&nbsp;<p>When using the Software you must use it in a manner that complies with the applicable laws in the jurisdiction(s) in which you use the Software.</p></li>
-    <li class=" ">&nbsp; &nbsp; <p>You may not sell, resell, rent, lease or exchange the Software for anything of value.</p></li>
-    <li class=" "> &nbsp; &nbsp;<p>You may redistribute the software, but it must include this EULA and you may not repackage or bundle the Software with any other software.</p></li>
-    <li class=" "> &nbsp; &nbsp;<p>You may not remove or alter any proprietary notices or marks on the Software.</p></li>
-  </ol>
-  </div>
-  </p>
-  <p>
-      <h4 className="UserTitle">Privacy Notices</h4>
-      <div className="rounded-list list-group">
-      The Software automatically communicates with QAT servers for three purposes : 
-  <ol className="list-group">
-    <li class=""> &nbsp;&nbsp;<p>Updating the Software</p></li>
-    <li class=" ">&nbsp; &nbsp; <p>Sending error reports and</p></li>
-    <li class=" "> &nbsp; &nbsp;<p>Sending anonymized usage data so we may improve the Software.</p></li>
-    <li class=" "> &nbsp; &nbsp;<p>If you would like to learn more about the specific information we send,<br></br> please visit <a href="https://desktop.QAT.org/usage-data/" target=" /blank">https://desktop.QAT.org/usage-data/</a>.</p></li>
-  </ol>
-  </div>
-      </p>
+                                                    <li class=""> &nbsp;&nbsp;<p>Updating the Software</p></li>
+                                                    <li class=" ">&nbsp; &nbsp; <p>Sending error reports and</p></li>
+                                                    <li class=" "> &nbsp; &nbsp;<p>Sending anonymized usage data so we may improve the Software.</p></li>
+                                                    <li class=" "> &nbsp; &nbsp;<p>If you would like to learn more about the specific information we send,<br></br> please visit <a href="https://desktop.QAT.org/usage-data/" target=" /blank">https://desktop.QAT.org/usage-data/</a>.</p></li>
+                                                </ol>
+                                            </div>
+                                        </p>
 
-      <p>
-      <h4 className="UserTitle">Automatic Software Updates</h4>
-      {/* <div className="rounded-list list-group"> */}
-      <p>The Software sends information described at the URL above to determine whether 
-          there are any patches, bug fixes, updates, upgrades or other modifications 
-          to improve the Software. You agree that the Software may automatically install 
-          any such improvements to the Software on your computer without providing any 
-          further notice or receiving any additional consent. This feature may not be 
-          disabled. If you do not want to receive automatic updates, you must uninstall 
+                                        <p>
+                                            <h4 className="UserTitle">Automatic Software Updates</h4>
+                                            {/* <div className="rounded-list list-group"> */}
+                                            <p>The Software sends information described at the URL above to determine whether
+                                                there are any patches, bug fixes, updates, upgrades or other modifications
+                                                to improve the Software. You agree that the Software may automatically install
+                                                any such improvements to the Software on your computer without providing any
+                                                further notice or receiving any additional consent. This feature may not be
+                                                disabled. If you do not want to receive automatic updates, you must uninstall
           the Software. </p>
-      
-  <ul className="list-group">
-    <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp;&nbsp;<p><strong>Error Reports :</strong> In order to help us improve the Software, when the Software encounters certain errors, it will automatically send some information to QAT about the error (as described at the URL above). This feature may not be disabled. If you do not want to send error reports to QAT, you must uninstall the Software.</p></li>
-    <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i>&nbsp; &nbsp; <p><strong>Anonymized Usage Data :</strong> QAT collects anonymized data about your usage of the Software to help us improve it. Approximately once a day the Software sends such data (as described in more detail at the URL above) to QAT's servers. If you do not want to send anonymized usage data to QAT, you may opt out by changing your settings in the Preferences view.</p></li>
-    <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p><strong>Master Data and Reference Data Sync :</strong> The offline app regularly sends and receives data from the web application. This cannot be disabled as it is a core component of the application.</p></li>
-    
-  </ul>
-  {/* </div> */}
-      </p>
-      <p>
-      <h4 className="UserTitle">Open-Source Notices</h4>
-<p>The Software may be subject to open-source software licenses ("Open-Source Components"), 
-    which means any software license approved as open-source licenses by the Open Source 
-    Initiative or any substantially similar licenses, including without limitation any 
-    license that, as a condition of distribution of the software licensed under such 
-    license, requires that the distributor make the software available in source code 
-    format. The Software documentation includes copies of the licenses applicable to the 
-    Open-Source Components. 
+
+                                            <ul className="list-group">
+                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp;&nbsp;<p><strong>Error Reports :</strong> In order to help us improve the Software, when the Software encounters certain errors, it will automatically send some information to QAT about the error (as described at the URL above). This feature may not be disabled. If you do not want to send error reports to QAT, you must uninstall the Software.</p></li>
+                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i>&nbsp; &nbsp; <p><strong>Anonymized Usage Data :</strong> QAT collects anonymized data about your usage of the Software to help us improve it. Approximately once a day the Software sends such data (as described in more detail at the URL above) to QAT's servers. If you do not want to send anonymized usage data to QAT, you may opt out by changing your settings in the Preferences view.</p></li>
+                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p><strong>Master Data and Reference Data Sync :</strong> The offline app regularly sends and receives data from the web application. This cannot be disabled as it is a core component of the application.</p></li>
+
+                                            </ul>
+                                            {/* </div> */}
+                                        </p>
+                                        <p>
+                                            <h4 className="UserTitle">Open-Source Notices</h4>
+                                            <p>The Software may be subject to open-source software licenses ("Open-Source Components"),
+                                                which means any software license approved as open-source licenses by the Open Source
+                                                Initiative or any substantially similar licenses, including without limitation any
+                                                license that, as a condition of distribution of the software licensed under such
+                                                license, requires that the distributor make the software available in source code
+                                                format. The Software documentation includes copies of the licenses applicable to the
+                                                Open-Source Components.
 </p>
-<p>To the extent there is conflict between the license terms covering the Open-Source 
-    Components and this EULA, the terms of such licenses will apply in lieu of the terms 
-    of this EULA. To the extent the terms of the licenses applicable to Open-Source 
-    Components prohibit any of the restrictions in this Agreement with respect to such
-     Open-Source Component, such restrictions will not apply to such Open-Source Component.
-      To the extent the terms of the licenses applicable to Open-Source Components require 
-      Licensor to make an offer to provide source code in connection with the Product, 
-      such offer is hereby made, and you may exercise it by 
+                                            <p>To the extent there is conflict between the license terms covering the Open-Source
+                                                Components and this EULA, the terms of such licenses will apply in lieu of the terms
+                                                of this EULA. To the extent the terms of the licenses applicable to Open-Source
+                                                Components prohibit any of the restrictions in this Agreement with respect to such
+                                                 Open-Source Component, such restrictions will not apply to such Open-Source Component.
+                                                  To the extent the terms of the licenses applicable to Open-Source Components require
+                                                  Licensor to make an offer to provide source code in connection with the Product,
+                                                  such offer is hereby made, and you may exercise it by
       contacting <a href="support@QAT.org" target=" /blank">support@QAT.org</a></p>
-      </p>
+                                        </p>
 
-      <p>
-      <h4 className="UserTitle">Intellectual Property Notices</h4>
-<p>This license, the software subject matter thereof, and The Software in and of itself
-     are subject to and controlled by the relevant controlling terms and conditions 
-     related to intellectual property enumerated by clause or incorporated under the
-      GHSC-PSM prime contract, namely 48 CFR 752.227-14 Rights in Data (general) and
-       USAID’s unlimited license to the QAT and its applications pursuant thereto, 
-       and this section of the license must be in agreement therewith in order to be 
-       enforceable.  
+                                        <p>
+                                            <h4 className="UserTitle">Intellectual Property Notices</h4>
+                                            <p>This license, the software subject matter thereof, and The Software in and of itself
+                                                 are subject to and controlled by the relevant controlling terms and conditions
+                                                 related to intellectual property enumerated by clause or incorporated under the
+                                                  GHSC-PSM prime contract, namely 48 CFR 752.227-14 Rights in Data (general) and
+                                                   USAID’s unlimited license to the QAT and its applications pursuant thereto,
+                                                   and this section of the license must be in agreement therewith in order to be
+                                                   enforceable.
 </p>
-<p>The Software and all worldwide copyrights, trade secrets, and other intellectual
-     property rights therein are the exclusive property of QAT. QAT reserves all rights 
-     in and to the Software not expressly granted to you in this EULA. 
+                                            <p>The Software and all worldwide copyrights, trade secrets, and other intellectual
+                                                 property rights therein are the exclusive property of QAT. QAT reserves all rights
+                                                 in and to the Software not expressly granted to you in this EULA.
 </p>
-<p>The names QAT, QAT Desktop, and related QAT logos and/or stylized names are trademarks 
-    of QAT. You agree not to display or use these trademarks in any manner without the 
-    Owner’s prior, written permission, except as allowed by QAT's Logos and 
+                                            <p>The names QAT, QAT Desktop, and related QAT logos and/or stylized names are trademarks
+                                                of QAT. You agree not to display or use these trademarks in any manner without the
+                                                Owner’s prior, written permission, except as allowed by QAT's Logos and
     Usage Policy:  <a href="https://QAT.com/logos." target=" /blank">https://QAT.com/logos</a>.</p>
-      </p>
-      <p>
-      <h4 className="UserTitle">Disclaimers and Limitations on Liability</h4>
-      <p>THE SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, AND NO WARRANTY, EITHER EXPRESS OR IMPLIED, IS GIVEN. YOUR USE OF THE SOFTWARE IS AT YOUR SOLE RISK.<br></br> The Owner does not warrant that</p>
-      <ul className="list-group">
-    <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp;&nbsp;<p>The Software will meet your specific requirements.</p></li>
-    <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i>&nbsp; &nbsp; <p>The Software is fully compatible with any particular platform.</p></li>
-    <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p> Your use of the Software will be uninterrupted, timely, secure, or error-free.</p></li>
-    <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p>The results that may be obtained from the use of the Software will be accurate or reliable. </p></li>
-    <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p> The quality of any products, services, information, or other material purchased or obtained by you through the Software will meet your expectations. </p></li>
-    <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p>Or any errors in the Software will be corrected.</p></li>
-   
-    
-  </ul>
-  <p>
-  YOU EXPRESSLY UNDERSTAND AND AGREE THAT THE OWNER SHALL NOT BE LIABLE FOR ANY DIRECT, 
-  INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL OR EXEMPLARY DAMAGES, INCLUDING BUT NOT 
-  LIMITED TO, DAMAGES FOR LOSS OF PROFITS, GOODWILL, USE, DATA OR OTHER INTANGIBLE 
-  LOSSES (EVEN IF THE OWNER HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES) 
-  RELATED TO THE  SOFTWARE,<br></br>Including, For Example: 
-  </p>
-  <ul className="list-group">
-    <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp;&nbsp;<p>The use or the inability to use the Software.</p></li>
-    <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i>&nbsp; &nbsp; <p>The cost of procurement of substitute goods and services resulting 
-        from any goods, data, information or services purchased or obtained or messages received or
-         transactions entered into through or from the Software.</p></li>
-    <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p> Unauthorized access to or alteration of your transmissions or data.</p></li>
-    <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p>Statements or conduct of any third-party on the Software .</p></li>
-    <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p> Or any other matter relating to the Software.</p></li>
-  </ul>
-  <p>The Owner reserves the right at any time and from time to time to modify or discontinue,
-      ily or permanently, the Software (or any part thereof) with or without notice. 
-      The Owner shall not be liable to you or to any third-party for any modification,
-       price change, suspension or discontinuance of the Software. </p>
-      </p>
+                                        </p>
+                                        <p>
+                                            <h4 className="UserTitle">Disclaimers and Limitations on Liability</h4>
+                                            <p>THE SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, AND NO WARRANTY, EITHER EXPRESS OR IMPLIED, IS GIVEN. YOUR USE OF THE SOFTWARE IS AT YOUR SOLE RISK.<br></br> The Owner does not warrant that</p>
+                                            <ul className="list-group">
+                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp;&nbsp;<p>The Software will meet your specific requirements.</p></li>
+                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i>&nbsp; &nbsp; <p>The Software is fully compatible with any particular platform.</p></li>
+                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p> Your use of the Software will be uninterrupted, timely, secure, or error-free.</p></li>
+                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p>The results that may be obtained from the use of the Software will be accurate or reliable. </p></li>
+                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p> The quality of any products, services, information, or other material purchased or obtained by you through the Software will meet your expectations. </p></li>
+                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p>Or any errors in the Software will be corrected.</p></li>
 
-      <p>
-      <h4 className="UserTitle">Miscellaneous </h4>
-      <div className="rounded-list list-group">
-        <ol className="list-group">
-    <li class=""> &nbsp;&nbsp;<p>If you configure the Software to work with one or more accounts 
-        on the <a href="QuantificationAnalytics.org" target=" /blank">QuantificationAnalytics.org</a> website or with an instance of QAT Desktop, your use 
+
+                                            </ul>
+                                            <p>
+                                                YOU EXPRESSLY UNDERSTAND AND AGREE THAT THE OWNER SHALL NOT BE LIABLE FOR ANY DIRECT,
+                                                INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL OR EXEMPLARY DAMAGES, INCLUDING BUT NOT
+                                                LIMITED TO, DAMAGES FOR LOSS OF PROFITS, GOODWILL, USE, DATA OR OTHER INTANGIBLE
+                                                LOSSES (EVEN IF THE OWNER HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES)
+  RELATED TO THE  SOFTWARE,<br></br>Including, For Example:
+  </p>
+                                            <ul className="list-group">
+                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp;&nbsp;<p>The use or the inability to use the Software.</p></li>
+                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i>&nbsp; &nbsp; <p>The cost of procurement of substitute goods and services resulting
+                                                    from any goods, data, information or services purchased or obtained or messages received or
+         transactions entered into through or from the Software.</p></li>
+                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p> Unauthorized access to or alteration of your transmissions or data.</p></li>
+                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p>Statements or conduct of any third-party on the Software .</p></li>
+                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p> Or any other matter relating to the Software.</p></li>
+                                            </ul>
+                                            <p>The Owner reserves the right at any time and from time to time to modify or discontinue,
+                                                ily or permanently, the Software (or any part thereof) with or without notice.
+                                                The Owner shall not be liable to you or to any third-party for any modification,
+       price change, suspension or discontinuance of the Software. </p>
+                                        </p>
+
+                                        <p>
+                                            <h4 className="UserTitle">Miscellaneous </h4>
+                                            <div className="rounded-list list-group">
+                                                <ol className="list-group">
+                                                    <li class=""> &nbsp;&nbsp;<p>If you configure the Software to work with one or more accounts
+        on the <a href="QuantificationAnalytics.org" target=" /blank">QuantificationAnalytics.org</a> website or with an instance of QAT Desktop, your use
         of the Software will also be governed by the <a href="QuantificationAnalytics.org" target=" /blank">QuantificationAnalytics.org</a> website Terms of
          Service and/or the license agreement applicable to your instance of QAT Desktop.</p>
-         </li>
-    <li class=" ">&nbsp; &nbsp; <p>The failure of QAT to exercise or enforce any right or
+                                                    </li>
+                                                    <li class=" ">&nbsp; &nbsp; <p>The failure of QAT to exercise or enforce any right or
          provision of this EULA shall not constitute a waiver of such right or provision.</p></li>
-    <li class=" "> &nbsp; &nbsp;<p>This EULA constitutes the entire agreement between you and  the Owner, and governs your use of the Software,
-         superseding any prior agreements between you and the Owner (including, but not limited
-          to, any prior versions of the EULA), and subject to all terms, conditions, and 
-          obligations between Owner and . You further agree to fully and completely indemnify
-           Owner from any and all individual and aggregate claims for damages that may be
-            brought against Owner with regard to or arising from the aforementioned conditions 
-            in this clause (Incorporations by Reference: ADS 318 Intellectual Property 
+                                                    <li class=" "> &nbsp; &nbsp;<p>This EULA constitutes the entire agreement between you and  the Owner, and governs your use of the Software,
+                                                         superseding any prior agreements between you and the Owner (including, but not limited
+                                                          to, any prior versions of the EULA), and subject to all terms, conditions, and
+                                                          obligations between Owner and . You further agree to fully and completely indemnify
+                                                           Owner from any and all individual and aggregate claims for damages that may be
+                                                            brought against Owner with regard to or arising from the aforementioned conditions
+                                                            in this clause (Incorporations by Reference: ADS 318 Intellectual Property
             Rights.</p></li>
-    <li class=" "> &nbsp; &nbsp;<p>You agree that this EULA and your use of the Software 
-        are governed under District of Columbia law and any dispute related to the 
-        Software must be brought in a tribunal of competent jurisdiction located in 
+                                                    <li class=" "> &nbsp; &nbsp;<p>You agree that this EULA and your use of the Software
+                                                        are governed under District of Columbia law and any dispute related to the
+                                                        Software must be brought in a tribunal of competent jurisdiction located in
         or near Washington, DC. </p></li>
-        <li class=" "> &nbsp; &nbsp;<p>Please send any questions about this EULA to <a href="support@QAT.org">support@QAT.org</a></p></li>
-  </ol>
-  </div>
-      </p>
+                                                    <li class=" "> &nbsp; &nbsp;<p>Please send any questions about this EULA to <a href="support@QAT.org">support@QAT.org</a></p></li>
+                                                </ol>
+                                            </div>
+                                        </p>
 
-     
 
-      
-                                </div>
+
+
+                                    </div>
                                 </Col>
                             </CardBody>
 

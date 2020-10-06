@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import ProgramService from "../../api/ProgramService";
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import {
@@ -91,7 +92,7 @@ export default class PipelineProgramDataStepThree extends Component {
     // }
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         ProgramService.getHealthAreaList(1)
             .then(response => {
                 if (response.status == 200) {
@@ -103,9 +104,46 @@ export default class PipelineProgramDataStepThree extends Component {
                         message: response.data.messageCode
                     })
                 }
-            }).catch(error => {
-                console.log("error--------", error);
-            })
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
     }
 
     render() {
@@ -121,6 +159,7 @@ export default class PipelineProgramDataStepThree extends Component {
 
         return (
             <>
+                <AuthenticationServiceComponent history={this.props.history} />
                 <Formik
                     enableReinitialize={true}
                     initialValues={{ healthAreaId: this.props.items.program.healthArea.id }}

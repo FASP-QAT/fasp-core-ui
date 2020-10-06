@@ -114,7 +114,7 @@ export default class AddDimensionComponent extends Component {
 
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         this.setState({ loading: false })
 
     }
@@ -128,11 +128,7 @@ export default class AddDimensionComponent extends Component {
 
         return (
             <div className="animated fadeIn">
-                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
-                    this.setState({ message: message })
-                }} loading={(loading) => {
-                    this.setState({ loading: loading })
-                }} />
+                <AuthenticationServiceComponent history={this.props.history} />
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row style={{ display: this.state.loading ? "none" : "block" }}>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
@@ -166,24 +162,43 @@ export default class AddDimensionComponent extends Component {
                                         .catch(
                                             error => {
                                                 if (error.message === "Network Error") {
-                                                    this.setState({ message: error.message, loading: false });
+                                                    this.setState({
+                                                        message: 'static.unkownError',
+                                                        loading: false
+                                                    });
                                                 } else {
                                                     switch (error.response ? error.response.status : "") {
-                                                        case 500:
+
                                                         case 401:
+                                                            this.props.history.push(`/login/static.message.sessionExpired`)
+                                                            break;
+                                                        case 403:
+                                                            this.props.history.push(`/accessDenied`)
+                                                            break;
+                                                        case 500:
                                                         case 404:
                                                         case 406:
+                                                            this.setState({
+                                                                message: error.response.data.messageCode,
+                                                                loading: false
+                                                            });
+                                                            break;
                                                         case 412:
-                                                            this.setState({ message: error.response.data.messageCode, loading: false });
+                                                            this.setState({
+                                                                message: error.response.data.messageCode,
+                                                                loading: false
+                                                            });
                                                             break;
                                                         default:
-                                                            this.setState({ message: 'static.unkownError', loading: false });
+                                                            this.setState({
+                                                                message: 'static.unkownError',
+                                                                loading: false
+                                                            });
                                                             break;
                                                     }
-
                                                 }
                                             }
-                                        )
+                                        );
                                     setTimeout(() => {
                                         setSubmitting(false)
                                     }, 2000)

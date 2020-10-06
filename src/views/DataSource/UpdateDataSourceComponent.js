@@ -163,7 +163,7 @@ export default class UpdateDataSourceComponent extends Component {
 
     componentDidMount() {
 
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
 
         DataSourceService.getDataSourceById(this.props.match.params.dataSourceId).then(response => {
             if (response.status == 200) {
@@ -183,6 +183,46 @@ export default class UpdateDataSourceComponent extends Component {
 
 
         })
+            .catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
 
     }
 
@@ -200,7 +240,7 @@ export default class UpdateDataSourceComponent extends Component {
 
         return (
             <div className="animated fadeIn">
-                <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} loading={this.changeLoading} />
+                <AuthenticationServiceComponent history={this.props.history} />
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row style={{ display: this.state.loading ? "none" : "block" }}>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
@@ -219,7 +259,7 @@ export default class UpdateDataSourceComponent extends Component {
                                     this.setState({
                                         loading: true
                                     })
-                                    AuthenticationService.setupAxiosInterceptors();
+                                    // AuthenticationService.setupAxiosInterceptors();
                                     DataSourceService.editDataSource(this.state.dataSource)
                                         .then(response => {
                                             if (response.status == 200) {
@@ -233,6 +273,46 @@ export default class UpdateDataSourceComponent extends Component {
                                                     })
                                             }
                                         })
+                                        .catch(
+                                            error => {
+                                                if (error.message === "Network Error") {
+                                                    this.setState({
+                                                        message: 'static.unkownError',
+                                                        loading: false
+                                                    });
+                                                } else {
+                                                    switch (error.response ? error.response.status : "") {
+
+                                                        case 401:
+                                                            this.props.history.push(`/login/static.message.sessionExpired`)
+                                                            break;
+                                                        case 403:
+                                                            this.props.history.push(`/accessDenied`)
+                                                            break;
+                                                        case 500:
+                                                        case 404:
+                                                        case 406:
+                                                            this.setState({
+                                                                message: error.response.data.messageCode,
+                                                                loading: false
+                                                            });
+                                                            break;
+                                                        case 412:
+                                                            this.setState({
+                                                                message: error.response.data.messageCode,
+                                                                loading: false
+                                                            });
+                                                            break;
+                                                        default:
+                                                            this.setState({
+                                                                message: 'static.unkownError',
+                                                                loading: false
+                                                            });
+                                                            break;
+                                                    }
+                                                }
+                                            }
+                                        );
                                 }}
                                 render={
                                     ({
@@ -356,7 +436,7 @@ export default class UpdateDataSourceComponent extends Component {
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
-                            <div ><h4> <strong>Loading...</strong></h4></div>
+                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
                             <div class="spinner-border blue ml-4" role="status">
 
@@ -373,13 +453,53 @@ export default class UpdateDataSourceComponent extends Component {
     }
 
     resetClicked() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         DataSourceService.getDataSourceById(this.props.match.params.dataSourceId).then(response => {
             this.setState({
                 dataSource: response.data
             });
 
         })
+            .catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
 
     }
 

@@ -925,15 +925,15 @@ class ApplicationDashboard extends Component {
                             {/* <i className="icon-settings"></i> */}
                           </DropdownToggle>
                           <DropdownMenu right>
-                            <DropdownItem onClick={() => this.redirectToCrud("/country/listCountry")}>{i18n.t('static.list.listCountry')}</DropdownItem>
-                            <DropdownItem onClick={() => this.redirectToCrud("/country/addCountry")}>{i18n.t('static.add.addCountry')}</DropdownItem>
+                            <DropdownItem onClick={() => this.redirectToCrud("/realmCountry/listRealmCountry")}>{i18n.t('static.list.listCountry')}</DropdownItem>
+                            <DropdownItem onClick={() => this.redirectToCrud("/realm/listRealm")}>{i18n.t('static.add.addCountry')}</DropdownItem>
 
                           </DropdownMenu>
                         </Dropdown>
                       </ButtonGroup>
                     </div>
 
-                    <div className="TextTittle ">{i18n.t('static.program.realmcountry')}</div>
+                    <div className="TextTittle ">{i18n.t('static.program.realmcountrydashboard')}</div>
                     <div className="text-count">{this.state.dashboard.REALM_COUNTRY_COUNT}</div>
                     <div className="chart-wrapper mt-4 pb-2" >
                       {/* <Line data={cardChartData3} options={cardChartOpts3} height={70} /> */}

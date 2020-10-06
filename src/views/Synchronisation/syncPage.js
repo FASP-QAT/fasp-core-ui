@@ -674,28 +674,46 @@ export default class syncPage extends Component {
         })
           .catch(
             error => {
-              this.setState({
-                statuses: [],
-                loading: false,
-                color: "red"
-              })
               if (error.message === "Network Error") {
-                this.setState({ message: error.message });
+                this.setState({
+                  message: 'static.unkownError',
+                  loading: false,
+                  statuses: [],
+                });
               } else {
                 switch (error.response ? error.response.status : "") {
-                  case 500:
+
                   case 401:
+                    this.props.history.push(`/login/static.message.sessionExpired`)
+                    break;
+                  case 403:
+                    this.props.history.push(`/accessDenied`)
+                    break;
+                  case 500:
                   case 404:
                   case 406:
+                    this.setState({
+                      message: error.response.data.messageCode,
+                      loading: false,
+                      statuses: [],
+                    });
+                    break;
                   case 412:
-                    this.setState({ message: error.response.data.messageCode });
+                    this.setState({
+                      message: error.response.data.messageCode,
+                      loading: false,
+                      statuses: [],
+                    });
                     break;
                   default:
-                    this.setState({ message: 'static.unkownError' });
+                    this.setState({
+                      message: 'static.unkownError',
+                      loading: false,
+                      statuses: [],
+                    });
                     break;
                 }
               }
-              this.hideFirstComponent()
             }
           );
       }.bind(this);
@@ -1707,21 +1725,38 @@ export default class syncPage extends Component {
         .catch(
           error => {
             if (error.message === "Network Error") {
-              this.setState({ message: error.message, loading: false, color: "red" });
-              this.hideFirstComponent()
+              this.setState({
+                message: 'static.unkownError',
+                loading: false
+              });
             } else {
               switch (error.response ? error.response.status : "") {
-                case 500:
+
                 case 401:
+                  this.props.history.push(`/login/static.message.sessionExpired`)
+                  break;
+                case 403:
+                  this.props.history.push(`/accessDenied`)
+                  break;
+                case 500:
                 case 404:
                 case 406:
+                  this.setState({
+                    message: error.response.data.messageCode,
+                    loading: false
+                  });
+                  break;
                 case 412:
-                  this.setState({ message: error.response.data.messageCode, loading: false, color: "red" });
-                  this.hideFirstComponent()
+                  this.setState({
+                    message: error.response.data.messageCode,
+                    loading: false
+                  });
                   break;
                 default:
-                  this.setState({ message: 'static.unkownError', loading: false, color: "red" });
-                  this.hideFirstComponent()
+                  this.setState({
+                    message: 'static.unkownError',
+                    loading: false
+                  });
                   break;
               }
             }
@@ -2191,11 +2226,7 @@ export default class syncPage extends Component {
 
     return (
       <div className="animated fadeIn">
-        <AuthenticationServiceComponent history={this.props.history} message={(message) => {
-          this.setState({ message: message })
-        }} loading={(loading) => {
-          this.setState({ loading: loading })
-        }} />
+        <AuthenticationServiceComponent history={this.props.history} />
         <h5 id="div1" className={this.state.color}>{i18n.t(this.state.message, { entityname })}</h5>
         <h5 className="red" id="div2">{this.state.noFundsBudgetError || this.state.commitVersionError}</h5>
         <Row style={{ display: this.state.loading ? "none" : "block" }}>
@@ -2590,32 +2621,37 @@ export default class syncPage extends Component {
               error => {
                 if (error.message === "Network Error") {
                   this.setState({
-                    message: error.message,
-                    color: "red",
+                    message: 'static.unkownError',
                     loading: false
-                  })
-                  this.hideFirstComponent();
+                  });
                 } else {
                   switch (error.response ? error.response.status : "") {
-                    case 500:
+
                     case 401:
+                      this.props.history.push(`/login/static.message.sessionExpired`)
+                      break;
+                    case 403:
+                      this.props.history.push(`/accessDenied`)
+                      break;
+                    case 500:
                     case 404:
                     case 406:
+                      this.setState({
+                        message: error.response.data.messageCode,
+                        loading: false
+                      });
+                      break;
                     case 412:
                       this.setState({
                         message: error.response.data.messageCode,
-                        color: "red",
                         loading: false
-                      })
-                      this.hideFirstComponent();
+                      });
                       break;
                     default:
                       this.setState({
                         message: 'static.unkownError',
-                        color: "red",
                         loading: false
-                      })
-                      this.hideFirstComponent();
+                      });
                       break;
                   }
                 }

@@ -162,7 +162,7 @@ loading:false
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     if (navigator.onLine) {
-                                        AuthenticationService.setupAxiosInterceptors();
+                                        // AuthenticationService.setupAxiosInterceptors();
                                         UserService.changePassword(AuthenticationService.getLoggedInUserId(), values.oldPassword, values.newPassword)
                                             .then(response => {
                                                 localStorage.setItem('password', CryptoJS.AES.encrypt((response.data.hashPass).toString(), `${SECRET_KEY}`));

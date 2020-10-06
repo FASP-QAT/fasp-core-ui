@@ -113,7 +113,7 @@ class AddprogramPlanningUnit extends Component {
         var programObj;
         // var realmId = document.getElementById("realmId").value;
 
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
 
         ProgramService.getProgramById(this.props.match.params.programId).then(response => {
             if (response.status == 200) {
@@ -175,7 +175,7 @@ class AddprogramPlanningUnit extends Component {
                                         }
 
 
-                                        AuthenticationService.setupAxiosInterceptors();
+                                        // AuthenticationService.setupAxiosInterceptors();
                                         ProgramService.getProgramPlaningUnitListByProgramId(this.state.programId)
                                             .then(response => {
                                                 if (response.status == 200) {
@@ -298,22 +298,22 @@ class AddprogramPlanningUnit extends Component {
                                                             var rowData = elInstance.getRowData(y);
                                                             // var productCategoryId = rowData[0];
                                                             var programPlanningUnitId = rowData[9];
-                                                            if(programPlanningUnitId==0){
+                                                            if (programPlanningUnitId == 0) {
                                                                 var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
                                                                 cell1.classList.remove('readonly');
 
                                                                 var cell2 = elInstance.getCell(`A${parseInt(y) + 1}`)
                                                                 cell2.classList.remove('readonly');
 
-                                                                
-                                                            }else{
+
+                                                            } else {
                                                                 var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
                                                                 cell1.classList.add('readonly');
 
                                                                 var cell2 = elInstance.getCell(`A${parseInt(y) + 1}`)
                                                                 cell2.classList.add('readonly');
 
-                                                               
+
                                                             }
                                                         },
                                                         pagination: 10,
@@ -514,30 +514,87 @@ class AddprogramPlanningUnit extends Component {
                                             }).catch(
                                                 error => {
                                                     if (error.message === "Network Error") {
-                                                        this.setState({ message: error.message, loading: false });
+                                                        this.setState({
+                                                            message: 'static.unkownError',
+                                                            loading: false
+                                                        });
                                                     } else {
                                                         switch (error.response ? error.response.status : "") {
-                                                            case 500:
+
                                                             case 401:
+                                                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                                                break;
+                                                            case 403:
+                                                                this.props.history.push(`/accessDenied`)
+                                                                break;
+                                                            case 500:
                                                             case 404:
                                                             case 406:
+                                                                this.setState({
+                                                                    message: error.response.data.messageCode,
+                                                                    loading: false
+                                                                });
+                                                                break;
                                                             case 412:
-                                                                this.setState({ message: error.response.data.messageCode, loading: false });
+                                                                this.setState({
+                                                                    message: error.response.data.messageCode,
+                                                                    loading: false
+                                                                });
                                                                 break;
                                                             default:
-                                                                this.setState({ message: 'static.unkownError', loading: false });
-                                                                console.log("Error code unkown");
+                                                                this.setState({
+                                                                    message: 'static.unkownError',
+                                                                    loading: false
+                                                                });
                                                                 break;
                                                         }
                                                     }
                                                 }
                                             );
-
                                     } else {
                                         list = [];
                                         this.setState({ loading: false });
                                     }
-                                });
+                                }).catch(
+                                    error => {
+                                        if (error.message === "Network Error") {
+                                            this.setState({
+                                                message: 'static.unkownError',
+                                                loading: false
+                                            });
+                                        } else {
+                                            switch (error.response ? error.response.status : "") {
+
+                                                case 401:
+                                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                                    break;
+                                                case 403:
+                                                    this.props.history.push(`/accessDenied`)
+                                                    break;
+                                                case 500:
+                                                case 404:
+                                                case 406:
+                                                    this.setState({
+                                                        message: error.response.data.messageCode,
+                                                        loading: false
+                                                    });
+                                                    break;
+                                                case 412:
+                                                    this.setState({
+                                                        message: error.response.data.messageCode,
+                                                        loading: false
+                                                    });
+                                                    break;
+                                                default:
+                                                    this.setState({
+                                                        message: 'static.unkownError',
+                                                        loading: false
+                                                    });
+                                                    break;
+                                            }
+                                        }
+                                    }
+                                );
                         } else {
                             productCategoryListNew = []
                             this.setState({
@@ -545,7 +602,46 @@ class AddprogramPlanningUnit extends Component {
                                 loading: false
                             })
                         }
-                    });
+                    }).catch(
+                        error => {
+                            if (error.message === "Network Error") {
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
+
+                                    case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
+                                    case 404:
+                                    case 406:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    case 412:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    default:
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                        break;
+                                }
+                            }
+                        }
+                    );
             } else {
                 productCategoryListNew = []
                 this.setState({
@@ -554,7 +650,46 @@ class AddprogramPlanningUnit extends Component {
                 })
             }
 
-        });
+        }).catch(
+            error => {
+                if (error.message === "Network Error") {
+                    this.setState({
+                        message: 'static.unkownError',
+                        loading: false
+                    });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+
+                        case 401:
+                            this.props.history.push(`/login/static.message.sessionExpired`)
+                            break;
+                        case 403:
+                            this.props.history.push(`/accessDenied`)
+                            break;
+                        case 500:
+                        case 404:
+                        case 406:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        case 412:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        default:
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                            break;
+                    }
+                }
+            }
+        );
 
     }
 
@@ -1091,7 +1226,7 @@ class AddprogramPlanningUnit extends Component {
                 }
 
             }
-            AuthenticationService.setupAxiosInterceptors();
+            // AuthenticationService.setupAxiosInterceptors();
             console.log("SUBMIT----", planningUnitArray);
             ProgramService.addprogramPlanningUnitMapping(planningUnitArray)
                 .then(response => {
@@ -1109,19 +1244,38 @@ class AddprogramPlanningUnit extends Component {
                 }).catch(
                     error => {
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message, loading: false });
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
                         } else {
                             switch (error.response ? error.response.status : "") {
-                                case 500:
+
                                 case 401:
-                                case 404: 
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
                                 case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
                                 case 412:
-                                    this.setState({ message: error.response.data.messageCode, loading: false });
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
                                     break;
                                 default:
-                                    this.setState({ message: 'static.unkownError', loading: false });
-                                    console.log("Error code unkown");
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
                                     break;
                             }
                         }
@@ -1182,7 +1336,7 @@ class AddprogramPlanningUnit extends Component {
                     <div style={{ display: this.state.loading ? "block" : "none" }}>
                         <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                             <div class="align-items-center">
-                                <div ><h4> <strong>Loading...</strong></h4></div>
+                                <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
 
                                 <div class="spinner-border blue ml-4" role="status">
 

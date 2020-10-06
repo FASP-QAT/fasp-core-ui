@@ -1306,7 +1306,7 @@ class ShipmentSummery extends Component {
 
     getPrograms = () => {
         if (navigator.onLine) {
-            AuthenticationService.setupAxiosInterceptors();
+            // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramList()
                 .then(response => {
                     // console.log(JSON.stringify(response.data))
@@ -1546,7 +1546,7 @@ class ShipmentSummery extends Component {
 
                 }
                 else {
-                    AuthenticationService.setupAxiosInterceptors();
+                    // AuthenticationService.setupAxiosInterceptors();
 
                     //let productCategoryId = document.getElementById("productCategoryId").value;
                     ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {

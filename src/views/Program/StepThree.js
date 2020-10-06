@@ -3,6 +3,7 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import ProgramService from "../../api/ProgramService";
 import { Formik } from 'formik';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import * as Yup from 'yup'
 import {
     Button, FormFeedback, CardBody,
@@ -75,7 +76,7 @@ export default class StepThree extends Component {
     }
 
     getHealthAreaList() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         ProgramService.getHealthAreaList(this.props.items.program.realm.realmId)
             .then(response => {
                 if (response.status == 200) {
@@ -87,7 +88,46 @@ export default class StepThree extends Component {
                         message: response.data.messageCode
                     })
                 }
-            })
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
     }
 
     componentDidMount() {
@@ -107,6 +147,7 @@ export default class StepThree extends Component {
 
         return (
             <>
+                <AuthenticationServiceComponent history={this.props.history} />
                 <Formik
                     initialValues={initialValuesThree}
                     validate={validateThree(validationSchemaThree)}
@@ -147,8 +188,8 @@ export default class StepThree extends Component {
                                         <FormFeedback className="red">{errors.healthAreaId}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup>
-                                        
-                        <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.props.previousToStepTwo} ><i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
+
+                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.props.previousToStepTwo} ><i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
                                         &nbsp;
                                         <Button color="info" size="md" className="float-left mr-1" type="submit" name="healthAreaSub" id="healthAreaSub" onClick={() => this.touchAllThree(setTouched, errors)} disabled={!isValid}>{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
                                         &nbsp;

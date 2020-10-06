@@ -38,6 +38,7 @@ import {
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import { getStyle, hexToRgba } from '@coreui/coreui-pro/dist/js/coreui-utilities'
 import AuthenticationService from '../Common/AuthenticationService';
+import i18n from '../../i18n'
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
 
@@ -219,18 +220,96 @@ class RealmDashboard extends Component {
           this.setState({
             dashboard: response.data
           })
-        })
+        }).catch(
+          error => {
+            if (error.message === "Network Error") {
+              this.setState({
+                message: 'static.unkownError',
+                loading: false
+              });
+            } else {
+              switch (error.response ? error.response.status : "") {
+
+                case 401:
+                  this.props.history.push(`/login/static.message.sessionExpired`)
+                  break;
+                case 403:
+                  this.props.history.push(`/accessDenied`)
+                  break;
+                case 500:
+                case 404:
+                case 406:
+                  this.setState({
+                    message: error.response.data.messageCode,
+                    loading: false
+                  });
+                  break;
+                case 412:
+                  this.setState({
+                    message: error.response.data.messageCode,
+                    loading: false
+                  });
+                  break;
+                default:
+                  this.setState({
+                    message: 'static.unkownError',
+                    loading: false
+                  });
+                  break;
+              }
+            }
+          }
+        );
       DashboardService.realmLevelDashboardUserList(this.state.realmId)
         .then(response => {
           console.log("users response===", response);
           this.setState({
             users: response.data
           })
-        })
+        }).catch(
+          error => {
+            if (error.message === "Network Error") {
+              this.setState({
+                message: 'static.unkownError',
+                loading: false
+              });
+            } else {
+              switch (error.response ? error.response.status : "") {
+
+                case 401:
+                  this.props.history.push(`/login/static.message.sessionExpired`)
+                  break;
+                case 403:
+                  this.props.history.push(`/accessDenied`)
+                  break;
+                case 500:
+                case 404:
+                case 406:
+                  this.setState({
+                    message: error.response.data.messageCode,
+                    loading: false
+                  });
+                  break;
+                case 412:
+                  this.setState({
+                    message: error.response.data.messageCode,
+                    loading: false
+                  });
+                  break;
+                default:
+                  this.setState({
+                    message: 'static.unkownError',
+                    loading: false
+                  });
+                  break;
+              }
+            }
+          }
+        );
     }
   }
 
-  loading = () => <div className="animated fadeIn pt-1 text-center">Loading...</div>
+  loading = () => <div className="animated fadeIn pt-1 text-center">{i18n.t('static.common.loading')}</div>
 
   render() {
     const { activeIndex } = this.state;
@@ -258,9 +337,7 @@ class RealmDashboard extends Component {
 
     return (
       <div className="animated fadeIn">
-        <AuthenticationServiceComponent history={this.props.history} message={(message) => {
-          this.setState({ message: message })
-        }} />
+        <AuthenticationServiceComponent history={this.props.history} />
         <Online>
           <Row className="mt-2">
             <Col xs="12" sm="6" lg="3">

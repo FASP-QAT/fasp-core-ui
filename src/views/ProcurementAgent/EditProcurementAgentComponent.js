@@ -11,6 +11,7 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import { SketchPicker } from 'react-color';
 import reactCSS from 'reactcss'
 import getLabelText from '../../CommonComponent/getLabelText';
+import { ALPHABET_NUMBER_REGEX, SPACE_REGEX } from '../../Constants.js';
 const entityname = i18n.t('static.procurementagent.procurementagent');
 
 const initialValues = {
@@ -22,17 +23,21 @@ const initialValues = {
 
 const validationSchema = function (values) {
     return Yup.object().shape({
+        procurementAgentCode: Yup.string()
+            .matches(ALPHABET_NUMBER_REGEX, i18n.t('static.message.alphabetnumerallowed'))
+            .required(i18n.t('static.procurementagent.codetext')),
         procurementAgentName: Yup.string()
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.procurementAgent.procurementagentnametext')),
         submittedToApprovedLeadTime: Yup.string()
             .required(i18n.t('static.procurementagent.submitToApproveLeadTime'))
             .min(0, i18n.t('static.program.validvaluetext'))
-            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
+            // .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
+            .matches(/^\s*(?=.*[1-9])\d{1,2}(?:\.\d{1,2})?\s*$/, i18n.t('static.program.validBudgetAmount')),
         approvedToShippedLeadTime: Yup.string()
             .required(i18n.t('static.procurementagent.approvedToShippedLeadTime'))
             .min(0, i18n.t('static.program.validvaluetext'))
-            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
+            .matches(/^\s*(?=.*[1-9])\d{1,2}(?:\.\d{1,2})?\s*$/, i18n.t('static.program.validBudgetAmount')),
         // colorHtmlCode: Yup.string()
         //     .max(6, i18n.t('static.common.max6digittext'))
         //     .required(i18n.t('static.procurementAgent.procurementAgentHTMLCode')),
@@ -207,7 +212,7 @@ class EditProcurementAgentComponent extends Component {
     }
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         ProcurementAgentService.getProcurementAgentById(this.props.match.params.procurementAgentId).then(response => {
             if (response.status == 200) {
                 this.setState({
@@ -225,7 +230,46 @@ class EditProcurementAgentComponent extends Component {
             }
 
 
-        })
+        }).catch(
+            error => {
+                if (error.message === "Network Error") {
+                    this.setState({
+                        message: 'static.unkownError',
+                        loading: false
+                    });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+
+                        case 401:
+                            this.props.history.push(`/login/static.message.sessionExpired`)
+                            break;
+                        case 403:
+                            this.props.history.push(`/accessDenied`)
+                            break;
+                        case 500:
+                        case 404:
+                        case 406:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        case 412:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        default:
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                            break;
+                    }
+                }
+            }
+        );
     }
     render() {
         const styles = reactCSS({
@@ -260,7 +304,7 @@ class EditProcurementAgentComponent extends Component {
         });
         return (
             <div className="animated fadeIn">
-                <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} loading={this.changeLoading} />
+                <AuthenticationServiceComponent history={this.props.history} />
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row style={{ display: this.state.loading ? "none" : "block" }}>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
@@ -285,7 +329,7 @@ class EditProcurementAgentComponent extends Component {
                                         loading: true
                                     })
                                     console.log("COLOR----->", this.state.procurementAgent);
-                                    AuthenticationService.setupAxiosInterceptors();
+                                    // AuthenticationService.setupAxiosInterceptors();
                                     ProcurementAgentService.updateProcurementAgent(this.state.procurementAgent)
                                         .then(response => {
                                             if (response.status == 200) {
@@ -298,7 +342,46 @@ class EditProcurementAgentComponent extends Component {
                                                         this.hideSecondComponent();
                                                     })
                                             }
-                                        })
+                                        }).catch(
+                                            error => {
+                                                if (error.message === "Network Error") {
+                                                    this.setState({
+                                                        message: 'static.unkownError',
+                                                        loading: false
+                                                    });
+                                                } else {
+                                                    switch (error.response ? error.response.status : "") {
+
+                                                        case 401:
+                                                            this.props.history.push(`/login/static.message.sessionExpired`)
+                                                            break;
+                                                        case 403:
+                                                            this.props.history.push(`/accessDenied`)
+                                                            break;
+                                                        case 500:
+                                                        case 404:
+                                                        case 406:
+                                                            this.setState({
+                                                                message: error.response.data.messageCode,
+                                                                loading: false
+                                                            });
+                                                            break;
+                                                        case 412:
+                                                            this.setState({
+                                                                message: error.response.data.messageCode,
+                                                                loading: false
+                                                            });
+                                                            break;
+                                                        default:
+                                                            this.setState({
+                                                                message: 'static.unkownError',
+                                                                loading: false
+                                                            });
+                                                            break;
+                                                    }
+                                                }
+                                            }
+                                        );
                                 }}
                                 render={
                                     ({
@@ -342,6 +425,7 @@ class EditProcurementAgentComponent extends Component {
                                                             invalid={(touched.procurementAgentName && !!errors.procurementAgentName) || !!errors.procurementAgentName}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
+                                                            maxLength={255}
                                                             required
                                                             value={getLabelText(this.state.procurementAgent.label, this.state.lang)}
                                                         />
@@ -356,7 +440,10 @@ class EditProcurementAgentComponent extends Component {
                                                             bsSize="sm"
                                                             name="procurementAgentCode"
                                                             id="procurementAgentCode"
-                                                            readOnly={true}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            valid={!errors.procurementAgentCode}
+                                                            invalid={(touched.procurementAgentCode && !!errors.procurementAgentCode) || !!errors.procurementAgentCode}
+                                                            // readOnly={true}
                                                             value={this.state.procurementAgent.procurementAgentCode}
                                                         />
                                                         {/* </InputGroupAddon> */}
@@ -497,7 +584,7 @@ class EditProcurementAgentComponent extends Component {
     }
 
     resetClicked() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         ProcurementAgentService.getProcurementAgentById(this.props.match.params.procurementAgentId).then(response => {
             this.setState({
                 procurementAgent: response.data, loading: false
@@ -505,7 +592,46 @@ class EditProcurementAgentComponent extends Component {
             let color = AuthenticationService.hexToRgbA(this.state.procurementAgent.colorHtmlCode);
             this.setState({ rgba: color })
 
-        })
+        }).catch(
+            error => {
+                if (error.message === "Network Error") {
+                    this.setState({
+                        message: 'static.unkownError',
+                        loading: false
+                    });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+
+                        case 401:
+                            this.props.history.push(`/login/static.message.sessionExpired`)
+                            break;
+                        case 403:
+                            this.props.history.push(`/accessDenied`)
+                            break;
+                        case 500:
+                        case 404:
+                        case 406:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        case 412:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        default:
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                            break;
+                    }
+                }
+            }
+        );
     }
 }
 

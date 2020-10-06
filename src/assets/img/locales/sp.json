@@ -1179,5 +1179,9 @@
     "static.add.addOrganisation": "Agregar organización",
     "static.list.listProgram": "Programa de lista",
     "static.add.totalProgram": "Programa total",
-    "static.report.qatProblemActionReport": "Informe de acción de QAT Probelm"
+    "static.report.qatProblemActionReport": "Informe de acción de QAT Probelm",
+    "static.program.confirmDelete": "¿Está seguro de que desea eliminar los programas locales?",
+    "static.program.deleteLocalProgramSuccess" : "Programa (s) local (s) eliminado correctamente",
+    "static.common.delete": "Eliminar",
+    "static.program.deleteLocalProgram" : "Eliminar programa local"
 }

@@ -1363,7 +1363,7 @@ class FunderExport extends Component {
 
     getPrograms = () => {
         if (navigator.onLine) {
-            AuthenticationService.setupAxiosInterceptors();
+            // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramList()
                 .then(response => {
                     // console.log(JSON.stringify(response.data))
@@ -1458,7 +1458,7 @@ class FunderExport extends Component {
 
     getFundingSource = () => {
         if (navigator.onLine) {
-            AuthenticationService.setupAxiosInterceptors();
+            // AuthenticationService.setupAxiosInterceptors();
             FundingSourceService.getFundingSourceListAll()
                 .then(response => {
                     // console.log(JSON.stringify(response.data))
@@ -1679,7 +1679,7 @@ class FunderExport extends Component {
 
             }
             else {
-                AuthenticationService.setupAxiosInterceptors();
+                // AuthenticationService.setupAxiosInterceptors();
 
                 //let productCategoryId = document.getElementById("productCategoryId").value;
                 ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
@@ -2037,7 +2037,7 @@ class FunderExport extends Component {
                     planningUnitIds: planningUnitIds,
                     includePlannedShipments: includePlannedShipments,
                 }
-                AuthenticationService.setupAxiosInterceptors();
+                // AuthenticationService.setupAxiosInterceptors();
                 ReportService.fundingSourceExportList(inputjson)
                     .then(response => {
                         // console.log(JSON.stringify(response.data))
