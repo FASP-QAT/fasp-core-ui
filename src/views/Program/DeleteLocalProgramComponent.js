@@ -240,7 +240,7 @@ class DeleteLocalProgramComponent extends Component {
         <h5 className="red">{i18n.t(this.state.message)}</h5>
 
         <Card style={{ display: this.state.loading ? "none" : "block" }}>
-          <CardBody className="pb-lg-2 pt-lg-0">
+          <CardBody className="pb-lg-2 pt-lg-2">
             <div ref={ref}>
               <Form >
                 <div className="pl-0">
@@ -268,8 +268,10 @@ class DeleteLocalProgramComponent extends Component {
 
           </CardBody>
 
-          <CardFooter>
+          <CardFooter className="pb-4">
+          <FormGroup className="pb-1">
             <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.confirmDeleteLocalProgram}><i className="fa fa-trash"></i> {i18n.t('static.common.delete')}</Button>
+            </FormGroup>
           </CardFooter>
         </Card>
         <div style={{ display: this.state.loading ? "block" : "none" }}>
