@@ -228,7 +228,7 @@ class DeleteLocalProgramComponent extends Component {
           </CardBody>
 
           <CardFooter>
-            <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.confirmDeleteLocalProgram}><i className="fa fa-times"></i> {i18n.t('static.common.delete')}</Button>
+            <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.confirmDeleteLocalProgram}><i className="fa fa-trash"></i> {i18n.t('static.common.delete')}</Button>
           </CardFooter>
         </Card>
         <div style={{ display: this.state.loading ? "block" : "none" }}>
