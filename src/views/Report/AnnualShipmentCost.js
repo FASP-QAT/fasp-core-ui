@@ -239,185 +239,7 @@ class AnnualShipmentCost extends Component {
                                     this.setState({ outPutList: outPutList, message: '', loading: false });
 
 
-                                    /*  console.log("4----", shipmentList);
-                                      // alert(planningUnitId); && (c.inventoryDate>=startDate&& c.inventoryDate<=endDate))
-                                      console.log("dates---", moment(startDate).format('YYYY-MM-DD'), "---->", moment(endDate).format('YYYY-MM-DD'));
-                                      // var list = shipmentList.filter(c => c.planningUnit.id == planningUnitId && (c.shippedDate >= '2018-07-01' && c.shippedDate <= '2020-07-31'));
-                                      console.log("5----", reportbaseValue);
-                                      var list = [];
-                                      if (reportbaseValue == 1) {
-                                          list = shipmentList.filter(c => c.planningUnit.id == planningUnitId && (moment(c.plannedDate).format('YYYY-MM-DD') >= moment(startDate).format('YYYY-MM-DD') && moment(c.plannedDate).format('YYYY-MM-DD') <= moment(endDate).format('YYYY-MM-DD')));
-                                      } else {
-                                          list = shipmentList.filter(c => c.planningUnit.id == planningUnitId && ((moment(c.receivedDate).format('YYYY-MM-DD') >= moment(startDate).format('YYYY-MM-DD') && moment(c.receivedDate).format('YYYY-MM-DD') <= moment(endDate).format('YYYY-MM-DD'))||(moment(c.expectedDeliveryDate).format('YYYY-MM-DD') >= moment(startDate).format('YYYY-MM-DD') && moment(c.expectedDeliveryDate).format('YYYY-MM-DD') <= moment(endDate).format('YYYY-MM-DD'))));
-                                      }
-                                      // var list = shipmentList.filter(c => c.planningUnit.id == planningUnitId && (c.shippedDate >=moment(startDate).format('YYYY-MM-DD') && c.shippedDate <= moment(endDate).format('YYYY-MM-DD')));
-                                      var procurementAgentId = document.getElementById("procurementAgentId").value;
-                                      var fundingSourceId = document.getElementById("fundingSourceId").value;
-                                      var shipmentStatusId = document.getElementById("shipmentStatusId").value;
-      
-                                      if (procurementAgentId != -1) {
-                                          list = list.filter(c => c.procurementAgent.id == procurementAgentId);
-                                      }
-                                      if (fundingSourceId != -1) {
-                                          list = list.filter(c => c.fundingSource.id == fundingSourceId);
-                                      }
-                                      if (shipmentStatusId != -1) {
-                                          list = list.filter(c => c.shipmentStatus.id == shipmentStatusId);
-                                      }
-                                      var availableProcure = [...new Set(list.map(ele => ele.procurementAgent.id))];
-                                      var availableFunding = [...new Set(list.map(ele => ele.fundingSource.id))];
-                                      console.log(availableProcure)
-                                      console.log(availableFunding)
-                                      var list1 = list
-                                      availableProcure.map(p => {
-                                          availableFunding.map(f => {
-                                              console.log(p, '======', f)
-                                              list = list1.filter(c => c.procurementAgent.id == p && c.fundingSource.id == f)
-                                              if (list.length > 0) {
-                                                  var fundingSource = this.state.fundingSources.filter(c => c.fundingSourceId == f)[0]
-                                                  var procurementAgent = this.state.procurementAgents.filter(c => c.procurementAgentId == p)[0]
-                                                  console.log(fundingSource)
-                                                  console.log(procurementAgent)
-                                                  var json = {
-                                                      'FUNDING_SOURCE_ID': fundingSource.fundingSourceId,
-                                                      'PROCUREMENT_AGENT_ID': procurementAgent.procurementAgentId,
-                                                      'fundingsource': fundingSource.label.label_en,
-                                                      'procurementAgent': procurementAgent.label.label_en,
-                                                      'PLANNING_UNIT_ID': document.getElementById('planningUnitId').value,
-                                                      'planningUnit': list[0].planningUnit.label.label_en
-      
-                                                  };
-                                                  for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++) {
-                                                      var dtstr = from + "-" + String(1).padStart(2, '0') + "-01"
-                                                      var enddtStr = from + "-" + String(12).padStart(2, '0') + '-' + new Date(from, 12, 0).getDate()
-                                                      console.log(dtstr, ' ', enddtStr)
-                                                      var list2 = []
-                                                      if (reportbaseValue == 1) {
-                                                          list2 = list.filter(c => (c.plannedDate >= dtstr && c.plannedDate <= enddtStr));
-                                                      } else {
-                                                          list2 = list.filter(c => (c.receivedDate >= dtstr && c.receivedDate <= enddtStr || c.expectedDeliveryDate >= dtstr && c.enddtStr <= endDate));
-                                                      }
-                                                      console.log(list2)
-                                                      var cost = 0;
-                                                      for (var k = 0; k < list2.length; k++) {
-                                                          cost += parseFloat(list2[k].productCost) + parseFloat(list2[k].freightCost);
-                                                      }
-                                                      json[from] = cost
-                                                      console.log(json)
-                                                  }
-                                                  outPutList.push(json);
-                                              }
-                                          })
-                                      })
-                                      this.setState({ outPutList: outPutList, message: '' });
-      
-      
-                                      /*  console.log("4----", shipmentList);
-                                        // alert(planningUnitId); && (c.inventoryDate>=startDate&& c.inventoryDate<=endDate))
-                                        console.log("dates---", moment(startDate).format('YYYY-MM-DD'), "---->", moment(endDate).format('YYYY-MM-DD'));
-                                        // var list = shipmentList.filter(c => c.planningUnit.id == planningUnitId && (c.shippedDate >= '2018-07-01' && c.shippedDate <= '2020-07-31'));
-                                        console.log("5----", reportbaseValue);
-                                        var list = [];
-                                        if (reportbaseValue == 1) {
-                                            list = shipmentList.filter(c => c.planningUnit.id == planningUnitId && (moment(c.plannedDate).format('YYYY-MM-DD') >= moment(startDate).format('YYYY-MM-DD') && moment(c.plannedDate).format('YYYY-MM-DD') <= moment(endDate).format('YYYY-MM-DD')));
-                                        } else {
-                                            list = shipmentList.filter(c => c.planningUnit.id == planningUnitId && ((moment(c.receivedDate).format('YYYY-MM-DD') >= moment(startDate).format('YYYY-MM-DD') && moment(c.receivedDate).format('YYYY-MM-DD') <= moment(endDate).format('YYYY-MM-DD'))||(moment(c.expectedDeliveryDate).format('YYYY-MM-DD') >= moment(startDate).format('YYYY-MM-DD') && moment(c.expectedDeliveryDate).format('YYYY-MM-DD') <= moment(endDate).format('YYYY-MM-DD'))));
-                                        }
-                                        // var list = shipmentList.filter(c => c.planningUnit.id == planningUnitId && (c.shippedDate >=moment(startDate).format('YYYY-MM-DD') && c.shippedDate <= moment(endDate).format('YYYY-MM-DD')));
-                                        var procurementAgentId = document.getElementById("procurementAgentId").value;
-                                        var fundingSourceId = document.getElementById("fundingSourceId").value;
-                                        var shipmentStatusId = document.getElementById("shipmentStatusId").value;
-        
-                                        if (procurementAgentId != -1) {
-                                            list = list.filter(c => c.procurementAgent.id == procurementAgentId);
-                                        }
-                                        if (fundingSourceId != -1) {
-                                            list = list.filter(c => c.fundingSource.id == fundingSourceId);
-                                        }
-                                        if (shipmentStatusId != -1) {
-                                            list = list.filter(c => c.shipmentStatus.id == shipmentStatusId);
-                                        }
-                                        console.log("6----", list);
-        
-                                       
-                                        var procurementAgentList = [];
-                                        list.map(item => {
-                                            var procurementAgentId = item.procurementAgent.id;
-                                            var index = procurementAgentList.findIndex(c => c == procurementAgentId);
-                                            if (index == -1) {
-                                                procurementAgentList.push(procurementAgentId);
-                                            }
-                                        });
-                                        console.log("7----", procurementAgentList);
-        
-                                        var fundingSourceList = [];
-                                        procurementAgentList.map(f => {
-                                            var l = list.filter(c => c.procurementAgent.id == f);
-                                            l.map(pa => {
-                                                var fundingSourceId = pa.fundingSource.id;
-                                                var index = fundingSourceList.findIndex(c => c.fundingSourceId == fundingSourceId && c.procurementAgentId == f);
-                                                if (index == -1) {
-                                                    var procurementAgent = papuResult.filter(c => c.procurementAgentId == f)[0];
-                                                    var procurementAgentName = getLabelText(procurementAgent.label, this.state.lang);
-        
-                                                    var fundingSource = fsResult.filter(c => c.fundingSourceId == fundingSourceId)[0];
-                                                    var fundingSourceName = getLabelText(fundingSource.label, this.state.lang);
-        
-                                                    fundingSourceList.push({ procurementAgentName: procurementAgentName, fundingSourceName: fundingSourceName, fundingSourceId: fundingSourceId, procurementAgentId: f });
-                                                }
-        
-                                            });
-                                        });
-                                        console.log("8----", fundingSourceList);
-                                        console.log("9----", list);
-                                        fundingSourceList.map(fs => {
-                                            var myArray = [];
-                                            var monthstartfrom=this.state.rangeValue.from.month
-                                            for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++) {
-                                                var cost = 0;
-                                                for (var month = monthstartfrom; month <= 12; month++) {
-                                                    var dtstr = from + "-" + String(month).padStart(2, '0') + "-01"
-                                                    var enddtStr = from + "-" + String(month).padStart(2, '0') + '-' + new Date(from, month, 0).getDate()
-                                                    console.log(dtstr, ' ', enddtStr)
-                                                    var dt = dtstr
-                                                var l = list.filter(c => c.procurementAgent.id == fs.procurementAgentId && c.fundingSource.id == fs.fundingSourceId && (reportbaseValue == 1?c.plannedDate >= dt && c.plannedDate <= enddtStr:(c.receivedDate >= dt && c.receivedDate <= enddtStr||c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr)));
-                                               console.log("10----------",l)
-                                              
-                                                for (var k = 0; k < l.length; k++) {
-                                                    cost += parseFloat(l[k].productCost) + parseFloat(l[k].freightCost);
-                                                }
-                                                // myArray.push({ [from]: cost });
-                                                if (month == this.state.rangeValue.to.month && from == to) {
-                                                    myArray.push({ 'from': from, 'cost': cost });
-                                                    var json = {
-                                                        'FUNDING_SOURCE_ID': fs.fundingSourceId,
-                                                        'PROCUREMENT_AGENT_ID': fs.procurementAgentId,
-                                                        'fundingsource': fs.fundingSourceName,
-                                                        'procurementAgent': fs.procurementAgentName,
-                                                        'PLANNING_UNIT_ID': document.getElementById('planningUnitId').value,
-                                                        'planningUnit': planningUnitName
-                
-                                                    };
-                
-                                                    for (var j = 0; j < myArray.length; j++) {
-                                                        json[myArray[j].from] = myArray[j].cost;
-                                                    }
-                                                    outPutList.push(json);
-                                                    return;
-                                                  }
-        
-                                            }
-                                            myArray.push({ 'from': from, 'cost': cost });
-                                            monthstartfrom = 1
-                                        }
-                                            var skillsSelect = document.getElementById("planningUnitId");
-                                            var planningUnitName = skillsSelect.options[skillsSelect.selectedIndex].text;
-        
-                                            
-                                        });
-                                        console.log("9----", outPutList);
-                                        this.setState({ outPutList: outPutList, message: '' });*/
-                                }.bind(this)
+                                   }.bind(this)
                             }.bind(this)
                         }.bind(this)
                     }.bind(this)
@@ -597,10 +419,7 @@ class AnnualShipmentCost extends Component {
         return x1 + x2;
     }
     show() {
-        /* if (!this.state.showed) {
-             setTimeout(() => {this.state.closeable = true}, 250)
-             this.setState({ showed: true })
-         }*/
+      
     }
     handleRangeChange(value, text, listIndex) {
         //
@@ -866,17 +685,7 @@ class AnnualShipmentCost extends Component {
         doc.setFontSize(8);
 
 
-        /* var canvas = document.getElementById("cool-canvas");
-         //creates image
-         
-         var canvasImg = canvas.toDataURL("image/png",1.0);
-         var width = doc.internal.pageSize.width;    
-         var height = doc.internal.pageSize.height;
-         var h1=50;
-         var aspectwidth1= (width-h1);*/
-
-        // doc.addHTML(document.getElementById('div_id'), 10, 120);
-        addHeaders(doc)
+         addHeaders(doc)
         addFooters(doc)
         doc.autoTable({ pagesplit: true })
         return doc;
@@ -891,11 +700,7 @@ class AnnualShipmentCost extends Component {
         var string = doc.output('datauristring');
         var embed = "<embed width='100%' height='100%' src='" + string + "'/>"
         document.getElementById("pdf").innerHTML = embed
-        /* var x = window.open();
-         x.document.open();
-         x.document.write(embed);
-         x.document.close();*/
-    }
+     }
 
 
 
@@ -1004,42 +809,6 @@ class AnnualShipmentCost extends Component {
 
 
     }
-
-    // getPlanningUnit() {
-
-    //     AuthenticationService.setupAxiosInterceptors();
-    //     let productCategoryId = document.getElementById("productCategoryId").value;
-    //     PlanningUnitService.getPlanningUnitByProductCategoryId(productCategoryId).then(response => {
-    //         console.log('**' + JSON.stringify(response.data))
-    //         this.setState({
-    //             planningUnits: response.data,
-    //         })
-    //     })
-    //         .catch(
-    //             error => {
-    //                 this.setState({
-    //                     planningUnits: [],
-    //                 })
-    //                 if (error.message === "Network Error") {
-    //                     this.setState({ message: error.message });
-    //                 } else {
-    //                     switch (error.response ? error.response.status : "") {
-    //                         case 500:
-    //                         case 401:
-    //                         case 404:
-    //                         case 406:
-    //                         case 412:
-    //                             this.setState({ message: error.response.data.messageCode });
-    //                             break;
-    //                         default:
-    //                             this.setState({ message: 'static.unkownError' });
-    //                             break;
-    //                     }
-    //                 }
-    //             }
-    //         );
-    //     this.fetchData();
-    // }
 
     getPlanningUnit = () => {
         let programId = document.getElementById("programId").value;

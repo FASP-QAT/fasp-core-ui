@@ -649,6 +649,10 @@ label.arrow_label:after {
   color: #212721 !important;
 }
 
+.jexcel > tbody > tr > td.readonly.shipmentEntry {
+  color: red !important;
+}
+
 .whitebtnColor .btn-info {
   color: #fff !important;
 }
@@ -2356,6 +2360,13 @@ input::placeholder {
     font-size: 12px!important;
     font-weight: bold!important;
   }
+
+  .dataEntryLink{
+    color: #20a8d8 !important;
+    font-size: 12px!important;
+    font-weight: bold!important;
+  }
+  
   .formulasheading{
     font-size:14px!important;
     font-weight: bold!important;
