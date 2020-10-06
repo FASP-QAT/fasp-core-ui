@@ -75,6 +75,7 @@ class DefaultHeaderDropdown extends Component {
   }
 
   changeLanguage(lang) {
+    console.log("Going to change language---",lang)
     localStorage.setItem('lang', lang);
     AuthenticationService.updateUserLanguage(lang);
     if (navigator.onLine) {
@@ -98,7 +99,12 @@ class DefaultHeaderDropdown extends Component {
             });
           })
     }
+    else{
+      console.log("Going to change language you are offline---")
+    }
+    console.log("Going to change language call changeLanguage function---")
     i18n.changeLanguage(lang)
+    console.log("Going to change language reload location reload---")
     window.location.reload();
 
   }
