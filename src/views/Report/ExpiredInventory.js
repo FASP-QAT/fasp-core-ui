@@ -91,7 +91,7 @@ export default class ExpiredInventory extends Component {
     }
     getPrograms = () => {
         if (navigator.onLine) {
-            AuthenticationService.setupAxiosInterceptors();
+            // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramList()
                 .then(response => {
                     console.log(JSON.stringify(response.data))
@@ -331,7 +331,7 @@ export default class ExpiredInventory extends Component {
 
                 }
                 else {
-                    AuthenticationService.setupAxiosInterceptors();
+                    // AuthenticationService.setupAxiosInterceptors();
 
                     ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
                         console.log('**' + JSON.stringify(response.data))
@@ -471,7 +471,7 @@ export default class ExpiredInventory extends Component {
                     }.bind(this)
                 }.bind(this)
             } else {
-                AuthenticationService.setupAxiosInterceptors();
+                // AuthenticationService.setupAxiosInterceptors();
                 this.setState({ loading: true })
                 ReportService.getExpiredStock(json)
                     .then(response => {

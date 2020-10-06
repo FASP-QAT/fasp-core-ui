@@ -25,6 +25,10 @@ class TracerCategoryService {
         return axios.get(`${API_URL}/api/tracerCategory/realmId/${json}`, {}
         );
     }
+    getTracerCategoryByProgramId(realmId,programId) {
+        return axios.get(`${API_URL}/api/tracerCategory/realmId/${realmId}/programId/${programId}`, {}
+        );
+    }
 
 }
 

@@ -1512,7 +1512,7 @@ class StockStatusAcrossPlanningUnits extends Component {
 
     getPrograms = () => {
         if (navigator.onLine) {
-            AuthenticationService.setupAxiosInterceptors();
+            // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramList()
                 .then(response => {
                     console.log(JSON.stringify(response.data))
@@ -1699,7 +1699,7 @@ class StockStatusAcrossPlanningUnits extends Component {
     }
 
     roundN = num => {
-        return parseFloat(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
+        return parseFloat(Math.round(num * Math.pow(10, 1)) / Math.pow(10, 1)).toFixed(1);
     }
     round = num => {
         return parseFloat(Math.round(num * Math.pow(10, 0)) / Math.pow(10, 0)).toFixed(0);
@@ -1776,9 +1776,9 @@ class StockStatusAcrossPlanningUnits extends Component {
 
         for (var j = 0; j < dataStockStatus.length; j++) {
             let data1 = '';
-            if (dataStockStatus[j].mos < dataStockStatus[j].minMos) {
+            if (this.roundN(dataStockStatus[j].mos) < dataStockStatus[j].minMos) {
                 data1 = i18n.t('static.report.low')
-            } else if (dataStockStatus[j].mos > dataStockStatus[j].maxMos) {
+            } else if (this.roundN(dataStockStatus[j].mos) > dataStockStatus[j].maxMos) {
                 data1 = i18n.t('static.report.excess')
             } else {
                 data1 = i18n.t('static.report.ok')
@@ -2166,7 +2166,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                           amc: 23957
                       }]
                   })*/
-                AuthenticationService.setupAxiosInterceptors();
+                // AuthenticationService.setupAxiosInterceptors();
                 ReportService.stockStatusForProgram(inputjson)
                     .then(response => {
                         console.log(JSON.stringify(response.data));
@@ -2448,7 +2448,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                                                             name="programId"
                                                             id="programId"
                                                             bsSize="sm"
-                                                            onChange={(e) => { this.filterVersion(); this.fetchData() }}
+                                                            onChange={(e) => { this.filterVersion();  }}
                                                         >
                                                             <option value="0">{i18n.t('static.common.select')}</option>
                                                             {programList}

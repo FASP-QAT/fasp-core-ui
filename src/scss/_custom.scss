@@ -2084,6 +2084,12 @@ input::placeholder {
   .background-red {
   // background-color: red;
   background-color: #cc4e4e!important;
+}.textcolor-red {
+  // background-color: red;
+  color: #cc4e4e!important;
+}.textcolor-purple {
+  // background-color: red;
+  color:  rgb(170, 85, 161);
 }
 
 .background-red-problemList td:not(:last-child){
@@ -3427,15 +3433,16 @@ margin-left: -45px;
 //supply plan graph align with table 
 .graphwidth{
   width: 1407px!important;
+  max-width: 1407px!important;
   // margin-right: -597px;
-  margin-left: 211px;
+  margin-left: 212px;
 
 }
-@media (min-width: 992px){
+@media (min-width: 1920px){
   .graphwidth{
-    width: 1413px!important;
-    // margin-right: -597px;
-    margin-left: 217px;
+    width: 1571px!important;
+    max-width: 1571px!important;
+    margin-left: 238px;
   
   }
 }

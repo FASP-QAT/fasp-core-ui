@@ -75,80 +75,6 @@ const getErrorsFromValidationError = (validationError) => {
     }, {})
 }
 
-const chartOptions = {
-    title: {
-        display: true,
-        text: i18n.t('static.dashboard.stockstatus')
-    },
-    scales: {
-        yAxes: [{
-            id: 'A',
-            scaleLabel: {
-                display: true,
-                labelString: i18n.t('static.dashboard.unit'),
-                fontColor: 'black'
-            },
-            stacked: false,
-            ticks: {
-                beginAtZero: true,
-                fontColor: 'black',
-                callback: function (value) {
-                    return value.toLocaleString();
-                }
-            },
-            gridLines: {
-                color: 'rgba(171,171,171,171)',
-                borderDash: [8, 4],
-            },
-            position: 'left',
-        },
-        {
-            id: 'B',
-            scaleLabel: {
-                display: true,
-                labelString: i18n.t('static.dashboard.months'),
-                fontColor: 'black'
-            },
-            stacked: false,
-            ticks: {
-                beginAtZero: true,
-                fontColor: 'black'
-            },
-            gridLines: {
-                color: 'rgba(171,171,171,1)',
-                lineWidth: 0.5
-            },
-            position: 'right',
-        }
-        ],
-        xAxes: [{
-            ticks: {
-                fontColor: 'black'
-            },
-        }]
-    },
-    tooltips: {
-        callbacks: {
-            label: function (tooltipItems, data) {
-                return (tooltipItems.yLabel.toLocaleString());
-            }
-        },
-        enabled: false,
-        custom: CustomTooltips
-    },
-    maintainAspectRatio: false
-    ,
-    legend: {
-        display: true,
-        position: 'bottom',
-        labels: {
-            usePointStyle: true,
-            fontColor: 'black'
-        }
-    }
-}
-
-
 export default class WhatIfReportComponent extends React.Component {
 
     constructor(props) {
@@ -691,17 +617,60 @@ export default class WhatIfReportComponent extends React.Component {
                     }.bind(this)
                 } else if (this.state.scenarioId == 4) {
                     var shipmentList = programJson.shipmentList;
-                    var shipmentUnFundedList = shipmentList.filter(c => moment(c.submittedDate).format("YYYY-MM-DD") <= moment(Date.now()).format("YYYY-MM-DD") && (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS));
+                    var shipmentUnFundedList = shipmentList.filter(c => (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS));
                     var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
                     console.log("Shipment un funded shipment", shipmentUnFundedList, "Min Date", minDate);
                     for (var i = 0; i < shipmentUnFundedList.length; i++) {
-                        var index = 0;
-                        if (shipmentUnFundedList[i].shipmentId > 0) {
-                            index = shipmentList.findIndex(c => c.shipmentId == shipmentUnFundedList[i].shipmentId);
+                        var papuResult = this.state.procurementAgentListForWhatIf.filter(c => c.procurementAgentId == shipmentUnFundedList[i].procurementAgent.id)[0];
+                        var plannedDate = shipmentUnFundedList[i].plannedDate;
+                        var submittedDate = shipmentUnFundedList[i].submittedDate;
+                        var approvedDate = shipmentUnFundedList[i].approvedDate;
+                        var shippedDate = shipmentUnFundedList[i].shippedDate;
+                        var arrivedDate = shipmentUnFundedList[i].arrivedDate;
+                        var receivedDate = shipmentUnFundedList[i].receivedDate;
+                        var expectedDeliveryDate = shipmentUnFundedList[i].expectedDeliveryDate;
+                        if (papuResult.localProcurementAgent) {
+                            var addLeadTimes = this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
+                            var leadTimesPerStatus = addLeadTimes / 5;
+                            arrivedDate = moment(expectedDeliveryDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                            shippedDate = moment(arrivedDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                            approvedDate = moment(shippedDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                            submittedDate = moment(approvedDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                            plannedDate = moment(submittedDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
                         } else {
-                            index = shipmentUnFundedList[i].index;
+                            var ppUnit = papuResult;
+                            var submittedToApprovedLeadTime = ppUnit.submittedToApprovedLeadTime;
+                            if (submittedToApprovedLeadTime == 0 || submittedToApprovedLeadTime == "" || submittedToApprovedLeadTime == null) {
+                                submittedToApprovedLeadTime = programJson.submittedToApprovedLeadTime;
+                            }
+                            var approvedToShippedLeadTime = "";
+                            approvedToShippedLeadTime = ppUnit.approvedToShippedLeadTime;
+                            if (approvedToShippedLeadTime == 0 || approvedToShippedLeadTime == "" || approvedToShippedLeadTime == null) {
+                                approvedToShippedLeadTime = programJson.approvedToShippedLeadTime;
+                            }
+
+                            var shippedToArrivedLeadTime = ""
+                            if (shipmentUnFundedList[i].shipmentMode == "Air") {
+                                shippedToArrivedLeadTime = parseFloat(programJson.shippedToArrivedByAirLeadTime);
+                            } else {
+                                shippedToArrivedLeadTime = parseFloat(programJson.shippedToArrivedBySeaLeadTime);
+                            }
+
+                            arrivedDate = moment(expectedDeliveryDate).subtract(parseInt(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
+                            shippedDate = moment(arrivedDate).subtract(parseInt(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                            approvedDate = moment(shippedDate).subtract(parseInt(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                            submittedDate = moment(approvedDate).subtract(parseInt(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                            plannedDate = moment(submittedDate).subtract(parseInt(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
                         }
-                        shipmentList[index].active = 0;
+                        if (moment(submittedDate).format("YYYY-MM-DD") < moment(Date.now()).format("YYYY-MM-DD")) {
+                            var index = 0;
+                            if (shipmentUnFundedList[i].shipmentId > 0) {
+                                index = shipmentList.findIndex(c => c.shipmentId == shipmentUnFundedList[i].shipmentId);
+                            } else {
+                                index = shipmentUnFundedList[i].index;
+                            }
+                            shipmentList[index].accountFlag = 0;
+                        }
                     }
                     programJson.shipmentList = shipmentList;
                     programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
@@ -730,17 +699,60 @@ export default class WhatIfReportComponent extends React.Component {
                     }.bind(this)
                 } else if (this.state.scenarioId == 5) {
                     var shipmentList = programJson.shipmentList;
-                    var shipmentUnFundedList = shipmentList.filter(c => moment(c.approvedDate).format("YYYY-MM-DD") <= moment(Date.now()).format("YYYY-MM-DD") && (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS));
+                    var shipmentUnFundedList = shipmentList.filter(c => (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS));
                     console.log("Shipment un funded shipment", shipmentUnFundedList, "Min Date", minDate);
                     var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
                     for (var i = 0; i < shipmentUnFundedList.length; i++) {
-                        var index = 0;
-                        if (shipmentUnFundedList[i].shipmentId > 0) {
-                            index = shipmentList.findIndex(c => c.shipmentId == shipmentUnFundedList[i].shipmentId);
+                        var papuResult = this.state.procurementAgentListForWhatIf.filter(c => c.procurementAgentId == shipmentUnFundedList[i].procurementAgent.id)[0];
+                        var plannedDate = shipmentUnFundedList[i].plannedDate;
+                        var submittedDate = shipmentUnFundedList[i].submittedDate;
+                        var approvedDate = shipmentUnFundedList[i].approvedDate;
+                        var shippedDate = shipmentUnFundedList[i].shippedDate;
+                        var arrivedDate = shipmentUnFundedList[i].arrivedDate;
+                        var receivedDate = shipmentUnFundedList[i].receivedDate;
+                        var expectedDeliveryDate = shipmentUnFundedList[i].expectedDeliveryDate;
+                        if (papuResult.localProcurementAgent) {
+                            var addLeadTimes = this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
+                            var leadTimesPerStatus = addLeadTimes / 5;
+                            arrivedDate = moment(expectedDeliveryDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                            shippedDate = moment(arrivedDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                            approvedDate = moment(shippedDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                            submittedDate = moment(approvedDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                            plannedDate = moment(submittedDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
                         } else {
-                            index = shipmentUnFundedList[i].index;
+                            var ppUnit = papuResult;
+                            var submittedToApprovedLeadTime = ppUnit.submittedToApprovedLeadTime;
+                            if (submittedToApprovedLeadTime == 0 || submittedToApprovedLeadTime == "" || submittedToApprovedLeadTime == null) {
+                                submittedToApprovedLeadTime = programJson.submittedToApprovedLeadTime;
+                            }
+                            var approvedToShippedLeadTime = "";
+                            approvedToShippedLeadTime = ppUnit.approvedToShippedLeadTime;
+                            if (approvedToShippedLeadTime == 0 || approvedToShippedLeadTime == "" || approvedToShippedLeadTime == null) {
+                                approvedToShippedLeadTime = programJson.approvedToShippedLeadTime;
+                            }
+
+                            var shippedToArrivedLeadTime = ""
+                            if (shipmentUnFundedList[i].shipmentMode == "Air") {
+                                shippedToArrivedLeadTime = parseFloat(programJson.shippedToArrivedByAirLeadTime);
+                            } else {
+                                shippedToArrivedLeadTime = parseFloat(programJson.shippedToArrivedBySeaLeadTime);
+                            }
+
+                            arrivedDate = moment(expectedDeliveryDate).subtract(parseInt(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
+                            shippedDate = moment(arrivedDate).subtract(parseInt(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                            approvedDate = moment(shippedDate).subtract(parseInt(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                            submittedDate = moment(approvedDate).subtract(parseInt(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                            plannedDate = moment(submittedDate).subtract(parseInt(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
                         }
-                        shipmentList[index].active = 0;
+                        if (moment(approvedDate).format("YYYY-MM-DD") < moment(Date.now()).format("YYYY-MM-DD")) {
+                            var index = 0;
+                            if (shipmentUnFundedList[i].shipmentId > 0) {
+                                index = shipmentList.findIndex(c => c.shipmentId == shipmentUnFundedList[i].shipmentId);
+                            } else {
+                                index = shipmentUnFundedList[i].index;
+                            }
+                            shipmentList[index].accountFlag = 0;
+                        }
                     }
                     programJson.shipmentList = shipmentList;
                     programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
@@ -770,17 +782,70 @@ export default class WhatIfReportComponent extends React.Component {
                 } else if (this.state.scenarioId == 6) {
                     console.log("In6")
                     var shipmentList = programJson.shipmentList;
-                    var shipmentUnFundedList = shipmentList.filter(c => (moment(c.shippedDate).format("YYYY-MM-DD") <= moment(Date.now()).format("YYYY-MM-DD") && (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS || c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS)) || (moment(c.arrivedDate).format("YYYY-MM-DD") <= moment(Date.now()).format("YYYY-MM-DD") && (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS || c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS || c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS)));
+                    // var shipmentUnFundedList = shipmentList.filter(c => (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS || c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS)) || (moment(c.arrivedDate).format("YYYY-MM-DD") <= moment(Date.now()).format("YYYY-MM-DD") && (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS || c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS || c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS));
+                    var shipmentUnFundedList = shipmentList.filter(c => (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS || c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS || c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS));
                     var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
                     console.log("Shipment un funded shipment", shipmentUnFundedList, "Min Date", minDate);
                     for (var i = 0; i < shipmentUnFundedList.length; i++) {
-                        var index = 0;
-                        if (shipmentUnFundedList[i].shipmentId > 0) {
-                            index = shipmentList.findIndex(c => c.shipmentId == shipmentUnFundedList[i].shipmentId);
+                        var papuResult = this.state.procurementAgentListForWhatIf.filter(c => c.procurementAgentId == shipmentUnFundedList[i].procurementAgent.id)[0];
+                        var plannedDate = shipmentUnFundedList[i].plannedDate;
+                        var submittedDate = shipmentUnFundedList[i].submittedDate;
+                        var approvedDate = shipmentUnFundedList[i].approvedDate;
+                        var shippedDate = shipmentUnFundedList[i].shippedDate;
+                        var arrivedDate = shipmentUnFundedList[i].arrivedDate;
+                        var receivedDate = shipmentUnFundedList[i].receivedDate;
+                        var expectedDeliveryDate = shipmentUnFundedList[i].expectedDeliveryDate;
+                        if (papuResult.localProcurementAgent) {
+                            var addLeadTimes = this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
+                            var leadTimesPerStatus = addLeadTimes / 5;
+                            arrivedDate = moment(expectedDeliveryDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                            shippedDate = moment(arrivedDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                            approvedDate = moment(shippedDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                            submittedDate = moment(approvedDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                            plannedDate = moment(submittedDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
                         } else {
-                            index = shipmentUnFundedList[i].index;
+                            var ppUnit = papuResult;
+                            var submittedToApprovedLeadTime = ppUnit.submittedToApprovedLeadTime;
+                            if (submittedToApprovedLeadTime == 0 || submittedToApprovedLeadTime == "" || submittedToApprovedLeadTime == null) {
+                                submittedToApprovedLeadTime = programJson.submittedToApprovedLeadTime;
+                            }
+                            var approvedToShippedLeadTime = "";
+                            approvedToShippedLeadTime = ppUnit.approvedToShippedLeadTime;
+                            if (approvedToShippedLeadTime == 0 || approvedToShippedLeadTime == "" || approvedToShippedLeadTime == null) {
+                                approvedToShippedLeadTime = programJson.approvedToShippedLeadTime;
+                            }
+
+                            var shippedToArrivedLeadTime = ""
+                            if (shipmentUnFundedList[i].shipmentMode == "Air") {
+                                shippedToArrivedLeadTime = parseFloat(programJson.shippedToArrivedByAirLeadTime);
+                            } else {
+                                shippedToArrivedLeadTime = parseFloat(programJson.shippedToArrivedBySeaLeadTime);
+                            }
+
+                            arrivedDate = moment(expectedDeliveryDate).subtract(parseInt(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
+                            shippedDate = moment(arrivedDate).subtract(parseInt(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                            approvedDate = moment(shippedDate).subtract(parseInt(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                            submittedDate = moment(approvedDate).subtract(parseInt(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                            plannedDate = moment(submittedDate).subtract(parseInt(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
                         }
-                        shipmentList[index].active = 0;
+                        if (moment(shippedDate).format("YYYY-MM-DD") < moment(Date.now()).format("YYYY-MM-DD") && ((shipmentUnFundedList[i].shipmentStatus.id == PLANNED_SHIPMENT_STATUS || shipmentUnFundedList[i].shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || shipmentUnFundedList[i].shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS || shipmentUnFundedList[i].shipmentStatus.id == APPROVED_SHIPMENT_STATUS))) {
+                            var index = 0;
+                            if (shipmentUnFundedList[i].shipmentId > 0) {
+                                index = shipmentList.findIndex(c => c.shipmentId == shipmentUnFundedList[i].shipmentId);
+                            } else {
+                                index = shipmentUnFundedList[i].index;
+                            }
+                            shipmentList[index].accountFlag = 0;
+                        }
+                        if (moment(arrivedDate).format("YYYY-MM-DD") <= moment(Date.now()).format("YYYY-MM-DD") && ((shipmentUnFundedList[i].shipmentStatus.id == PLANNED_SHIPMENT_STATUS || shipmentUnFundedList[i].shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || shipmentUnFundedList[i].shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS || shipmentUnFundedList[i].shipmentStatus.id == APPROVED_SHIPMENT_STATUS || shipmentUnFundedList[i].shipmentStatus.id == SHIPPED_SHIPMENT_STATUS))) {
+                            var index = 0;
+                            if (shipmentUnFundedList[i].shipmentId > 0) {
+                                index = shipmentList.findIndex(c => c.shipmentId == shipmentUnFundedList[i].shipmentId);
+                            } else {
+                                index = shipmentUnFundedList[i].index;
+                            }
+                            shipmentList[index].accountFlag = 0;
+                        }
                     }
                     programJson.shipmentList = shipmentList;
                     programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
@@ -1310,6 +1375,7 @@ export default class WhatIfReportComponent extends React.Component {
                                     this.setState({
                                         planningUnitList: proList,
                                         programPlanningUnitList: myResult,
+                                        planningUnitListAll: myResult,
                                         regionList: regionList,
                                         programJson: programJson,
                                         dataSourceListAll: dataSourceListAll,
@@ -1470,6 +1536,9 @@ export default class WhatIfReportComponent extends React.Component {
                     papuRequest.onsuccess = function (event) {
                         var papuResult = [];
                         papuResult = papuRequest.result;
+                        this.setState({
+                            procurementAgentListForWhatIf: papuResult
+                        })
                         console.log("ProgramJson", programJson);
                         var supplyPlanData = [];
                         if (programJson.supplyPlan != undefined) {
@@ -1486,7 +1555,7 @@ export default class WhatIfReportComponent extends React.Component {
                                     manualShipmentsTotalData.push(jsonList[0].manualTotalQty);
 
                                     // Tomorrow begin from here
-                                    var shipmentDetails = programJson.shipmentList.filter(c => c.active == true && c.planningUnit.id == this.state.planningUnitId && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag == true && (c.shipmentStatus.id != DELIVERED_SHIPMENT_STATUS ? (c.expectedDeliveryDate >= m[n].startDate && c.expectedDeliveryDate <= m[n].endDate) : (c.receivedDate >= m[n].startDate && c.receivedDate <= m[n].endDate)) && c.erpFlag.toString() == "false");
+                                    var shipmentDetails = programJson.shipmentList.filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag == true && (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? (c.receivedDate >= m[n].startDate && c.receivedDate <= m[n].endDate) : (c.expectedDeliveryDate >= m[n].startDate && c.expectedDeliveryDate <= m[n].endDate)) && c.erpFlag.toString() == "false");
                                     var sd1 = [];
                                     var sd2 = [];
                                     var sd3 = [];
@@ -1646,7 +1715,7 @@ export default class WhatIfReportComponent extends React.Component {
                                     erpShipmentsTotalData.push(jsonList[0].erpTotalQty);
 
 
-                                    var shipmentDetails = programJson.shipmentList.filter(c => c.active == true && c.planningUnit.id == this.state.planningUnitId && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag == true && (c.shipmentStatus.id != DELIVERED_SHIPMENT_STATUS ? (c.expectedDeliveryDate >= m[n].startDate && c.expectedDeliveryDate <= m[n].endDate) : (c.receivedDate >= m[n].startDate && c.receivedDate <= m[n].endDate)) && c.erpFlag.toString() == "true");
+                                    var shipmentDetails = programJson.shipmentList.filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag == true && (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? (c.receivedDate >= m[n].startDate && c.receivedDate <= m[n].endDate) : (c.expectedDeliveryDate >= m[n].startDate && c.expectedDeliveryDate <= m[n].endDate)) && c.erpFlag.toString() == "true");
                                     var sd1 = [];
                                     var sd2 = [];
                                     var sd3 = [];
@@ -2281,6 +2350,21 @@ export default class WhatIfReportComponent extends React.Component {
                 var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                 var programJson = JSON.parse(programData);
                 var batchInfoList = programJson.batchInfoList;
+
+                var batchList = [];
+                var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == planningUnitId && c.active.toString() == "true" && c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS);
+                console.log("Shipment list=============>", shipmentList);
+                for (var sl = 0; sl < shipmentList.length; sl++) {
+                    var bdl = shipmentList[sl].batchInfoList;
+                    for (var bd = 0; bd < bdl.length; bd++) {
+                        var index = batchList.findIndex(c => c.batchNo == bdl[bd].batch.batchNo);
+                        if (index == -1) {
+                            var batchDetailsToPush = batchInfoList.filter(c => c.batchNo == bdl[bd].batch.batchNo && c.planningUnitId == planningUnitId)[0];
+                            batchList.push(batchDetailsToPush);
+                        }
+                    }
+                }
+                console.log("Btach List============>", batchList);
                 var consumptionListUnFiltered = (programJson.consumptionList);
                 var consumptionList = consumptionListUnFiltered.filter(con =>
                     con.planningUnit.id == planningUnitId
@@ -2289,7 +2373,7 @@ export default class WhatIfReportComponent extends React.Component {
                 this.setState({
                     programJsonAfterConsumptionClicked: programJson,
                     consumptionListUnFiltered: consumptionListUnFiltered,
-                    batchInfoList: batchInfoList,
+                    batchInfoList: batchList,
                     programJson: programJson,
                     consumptionList: consumptionList,
                     showConsumption: 1,
@@ -2342,6 +2426,20 @@ export default class WhatIfReportComponent extends React.Component {
                 var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                 var programJson = JSON.parse(programData);
                 var batchInfoList = programJson.batchInfoList;
+
+                var batchList = [];
+                var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == planningUnitId && c.active.toString() == "true" && c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS);
+
+                for (var sl = 0; sl < shipmentList.length; sl++) {
+                    var bdl = shipmentList[sl].batchInfoList;
+                    for (var bd = 0; bd < bdl.length; bd++) {
+                        var index = batchList.findIndex(c => c.batchNo == bdl[bd].batch.batchNo);
+                        if (index == -1) {
+                            var batchDetailsToPush = batchInfoList.filter(c => c.batchNo == bdl[bd].batch.batchNo && c.planningUnitId == planningUnitId)[0];
+                            batchList.push(batchDetailsToPush);
+                        }
+                    }
+                }
                 var inventoryListUnFiltered = (programJson.inventoryList);
                 var inventoryList = (programJson.inventoryList).filter(c =>
                     c.planningUnit.id == planningUnitId &&
@@ -2354,7 +2452,7 @@ export default class WhatIfReportComponent extends React.Component {
                     inventoryList = inventoryList.filter(c => c.adjustmentQty != "" && c.adjustmentQty != undefined && c.adjustmentQty != null);
                 }
                 this.setState({
-                    batchInfoList: batchInfoList,
+                    batchInfoList: batchList,
                     programJson: programJson,
                     inventoryListUnFiltered: inventoryListUnFiltered,
                     inventoryList: inventoryList,
@@ -2483,6 +2581,78 @@ export default class WhatIfReportComponent extends React.Component {
     // Shipments Functionality
 
     tabPane() {
+        const chartOptions = {
+            title: {
+                display: true,
+                text: this.state.planningUnit != "" && this.state.planningUnit != undefined && this.state.planningUnit != null ? entityname + " - " + this.state.planningUnit.label : entityname
+            },
+            scales: {
+                yAxes: [{
+                    id: 'A',
+                    scaleLabel: {
+                        display: true,
+                        labelString: i18n.t('static.dashboard.unit'),
+                        fontColor: 'black'
+                    },
+                    stacked: false,
+                    ticks: {
+                        beginAtZero: true,
+                        fontColor: 'black',
+                        callback: function (value) {
+                            return value.toLocaleString();
+                        }
+                    },
+                    gridLines: {
+                        color: 'rgba(171,171,171,171)',
+                        borderDash: [8, 4],
+                    },
+                    position: 'left',
+                },
+                {
+                    id: 'B',
+                    scaleLabel: {
+                        display: true,
+                        labelString: i18n.t('static.dashboard.months'),
+                        fontColor: 'black'
+                    },
+                    stacked: false,
+                    ticks: {
+                        beginAtZero: true,
+                        fontColor: 'black'
+                    },
+                    gridLines: {
+                        color: 'rgba(171,171,171,1)',
+                        lineWidth: 0.5
+                    },
+                    position: 'right',
+                }
+                ],
+                xAxes: [{
+                    ticks: {
+                        fontColor: 'black'
+                    },
+                }]
+            },
+            tooltips: {
+                callbacks: {
+                    label: function (tooltipItems, data) {
+                        return (tooltipItems.yLabel.toLocaleString());
+                    }
+                },
+                enabled: false,
+                custom: CustomTooltips
+            },
+            maintainAspectRatio: false
+            ,
+            legend: {
+                display: true,
+                position: 'bottom',
+                labels: {
+                    usePointStyle: true,
+                    fontColor: 'black'
+                }
+            }
+        }
         let bar = {}
         if (this.state.jsonArrForGraph.length > 0)
             bar = {
@@ -3010,9 +3180,9 @@ export default class WhatIfReportComponent extends React.Component {
                                     <td className="BorderNoneSupplyPlan"></td>
                                     <td align="left"><b>{i18n.t('static.supplyPlan.endingBalance')}</b></td>
                                     {
-                                        this.state.closingBalanceArray.map(item1 => (
-                                            <td align="right"><b><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></b></td>
-                                        ))
+                                        this.state.closingBalanceArray.map((item1, count) => {
+                                            return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}><b><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></b></td>)
+                                        })
                                     }
                                 </tr>
                                 <tr>
@@ -3519,11 +3689,7 @@ export default class WhatIfReportComponent extends React.Component {
 
         return (
             <div className="animated fadeIn">
-                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
-                    this.setState({ message: message })
-                }} loading={(loading) => {
-                    this.setState({ loading: loading })
-                }} />
+                <AuthenticationServiceComponent history={this.props.history} />
                 <h5 className={this.state.color} id="div1">{i18n.t(this.state.message, { entityname }) || this.state.supplyPlanError}</h5>
                 <SupplyPlanFormulas ref="formulaeChild" />
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
@@ -3679,24 +3845,24 @@ export default class WhatIfReportComponent extends React.Component {
                 this.setState({
                     shipmentListUnFiltered: shipmentListUnFiltered
                 })
-                var shipmentList = [];
+                var shipmentList = programJson.shipmentList.filter(c => c.active.toString() == "true");
                 // var tableEditableBasedOnSupplyPlan = true;
                 if (supplyPlanType == 'deliveredShipments') {
-                    shipmentList = programJson.shipmentList.filter(c => c.receivedDate >= startDate && c.receivedDate <= endDate && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS));
+                    shipmentList = shipmentList.filter(c => (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? c.receivedDate >= startDate && c.receivedDate <= endDate : c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate) && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS));
                 } else if (supplyPlanType == 'shippedShipments') {
-                    shipmentList = programJson.shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || c.shipmentStatus.id == ARRIVED_SHIPMENT_STATUS));
+                    shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || c.shipmentStatus.id == ARRIVED_SHIPMENT_STATUS));
                 } else if (supplyPlanType == 'orderedShipments') {
-                    shipmentList = programJson.shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS));
+                    shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS));
                 } else if (supplyPlanType == 'plannedShipments') {
-                    shipmentList = programJson.shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS));
+                    shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS));
                 } else if (supplyPlanType == 'deliveredErpShipments') {
-                    shipmentList = shipmentList = programJson.shipmentList.filter(c => c.receivedDate >= startDate && c.receivedDate <= endDate && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS));
+                    shipmentList = shipmentList.filter(c => (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? c.receivedDate >= startDate && c.receivedDate <= endDate : c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate) && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS));
                 } else if (supplyPlanType == 'shippedErpShipments') {
-                    shipmentList = shipmentList = programJson.shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || c.shipmentStatus.id == ARRIVED_SHIPMENT_STATUS));
+                    shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || c.shipmentStatus.id == ARRIVED_SHIPMENT_STATUS));
                 } else if (supplyPlanType == 'orderedErpShipments') {
-                    shipmentList = shipmentList = programJson.shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS));
+                    shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS));
                 } else if (supplyPlanType == 'plannedErpShipments') {
-                    shipmentList = shipmentList = programJson.shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS));
+                    shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS));
                 }
                 this.setState({
                     showShipments: 1,

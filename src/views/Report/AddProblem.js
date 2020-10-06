@@ -73,6 +73,13 @@ class AddRoleComponent extends Component {
 
   }
 
+  hideSecondComponent() {
+    document.getElementById('div2').style.display = 'block';
+    setTimeout(function () {
+      document.getElementById('div2').style.display = 'none';
+    }, 8000);
+  }
+
   touchAll(setTouched, errors) {
     setTouched({
       programId: true,
@@ -97,12 +104,6 @@ class AddRoleComponent extends Component {
         break
       }
     }
-  }
-
-  hideSecondComponent() {
-    setTimeout(function () {
-      document.getElementById('div2').style.display = 'none';
-    }, 8000);
   }
 
   componentDidMount() {
@@ -290,7 +291,10 @@ class AddRoleComponent extends Component {
       this.setState({
         message: i18n.t('static.program.errortext'),
         color: 'red'
-      })
+      },
+        () => {
+          this.hideSecondComponent();
+        })
     }.bind(this);
     openRequest.onsuccess = function (e) {
 
@@ -304,7 +308,10 @@ class AddRoleComponent extends Component {
         this.setState({
           message: i18n.t('static.program.errortext'),
           color: 'red'
-        })
+        },
+          () => {
+            this.hideSecondComponent();
+          })
       }.bind(this);
       programRequest.onsuccess = function (event) {
 
@@ -329,7 +336,10 @@ class AddRoleComponent extends Component {
         planningunitRequest.onerror = function (event) {
           this.setState({
             supplyPlanError: i18n.t('static.program.errortext')
-          })
+          },
+            () => {
+              this.hideSecondComponent();
+            })
         }.bind(this);
         planningunitRequest.onsuccess = function (e) {
           var planningUnitResult = [];
@@ -346,7 +356,10 @@ class AddRoleComponent extends Component {
             this.setState({
               message: i18n.t('static.program.errortext'),
               color: 'red'
-            })
+            },
+              () => {
+                this.hideSecondComponent();
+              })
           }.bind(this);
           getRequestP.onsuccess = function (event) {
             var probList = [];
@@ -410,7 +423,9 @@ class AddRoleComponent extends Component {
                     label: {
                       label_en: 'Manual'
                     }
-                  }, createdBy: {
+                  }, 
+                  reviewed:false,
+                  createdBy: {
                     userId: userId,
                     username: username
                   },
@@ -458,7 +473,10 @@ class AddRoleComponent extends Component {
                   this.setState({
                     message: i18n.t('static.program.errortext'),
                     color: 'red'
-                  })
+                  },
+                    () => {
+                      this.hideSecondComponent();
+                    })
                 }.bind(this);
                 putRequest.onsuccess = function (event) {
                   var programId = document.getElementById("programId").value;
@@ -469,6 +487,7 @@ class AddRoleComponent extends Component {
 
               } else {
                 this.props.history.push(`/report/addProblem/` + 'red/' + i18n.t('static.problem.allreadyExist'));
+                this.hideSecondComponent();
                 console.log("in else============>");
 
               }

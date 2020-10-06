@@ -1658,6 +1658,7 @@ class ShipmentGlobalDemandView extends Component {
             let tableHeadTemp = [];
             tableHeadTemp.push(i18n.t('static.dashboard.product'));
             for (var i = 0; i < tableHead.length; i++) {
+                console.log(tableHead[i])
                 tableHeadTemp.push((tableHead[i].replaceAll(',', ' ')).replaceAll(' ', '%20'));
             }
             tableHeadTemp.push(i18n.t('static.supplyPlan.total'));
@@ -1666,7 +1667,8 @@ class ShipmentGlobalDemandView extends Component {
             re = this.state.procurementAgentSplit;
             for (var item = 0; item < re.length; item++) {
                 let item1 = Object.values(re[item].procurementAgentQty);
-                A.push([this.addDoubleQuoteToRowContent([(getLabelText(re[item].planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), item1, re[item].total])])
+                console.log(item1)
+                A.push([this.addDoubleQuoteToRowContent([(getLabelText(re[item].planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),...item1, re[item].total])])
             }
             for (var i = 0; i < A.length; i++) {
                 csvRow.push(A[i].join(","))
@@ -2379,7 +2381,7 @@ class ShipmentGlobalDemandView extends Component {
     }
 
     getRelamList = () => {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         RealmService.getRealmListAll()
             .then(response => {
                 if (response.status == 200) {
@@ -2417,7 +2419,7 @@ class ShipmentGlobalDemandView extends Component {
     getShipmentStatusList() {
         const { shipmentStatuses } = this.state
         if (navigator.onLine) {
-            AuthenticationService.setupAxiosInterceptors();
+            // AuthenticationService.setupAxiosInterceptors();
             ShipmentStatusService.getShipmentStatusListActive()
                 .then(response => {
                     this.setState({
@@ -2471,7 +2473,7 @@ class ShipmentGlobalDemandView extends Component {
 
     getFundingSource = () => {
         if (navigator.onLine) {
-            AuthenticationService.setupAxiosInterceptors();
+            // AuthenticationService.setupAxiosInterceptors();
             FundingSourceService.getFundingSourceListAll()
                 .then(response => {
                     // console.log(JSON.stringify(response.data))
@@ -2694,7 +2696,7 @@ class ShipmentGlobalDemandView extends Component {
     }
 
     getProductCategories() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         let realmId = document.getElementById("realmId").value;
         ProductService.getProductCategoryList(realmId)
             .then(response => {
@@ -2776,9 +2778,9 @@ class ShipmentGlobalDemandView extends Component {
 
             }
             else {
-                AuthenticationService.setupAxiosInterceptors();
+                // AuthenticationService.setupAxiosInterceptors();
                 let productCategoryId = document.getElementById("productCategoryId").value;
-                AuthenticationService.setupAxiosInterceptors();
+                // AuthenticationService.setupAxiosInterceptors();
                 if (productCategoryId != -1) {
                     PlanningUnitService.getPlanningUnitByProductCategoryId(productCategoryId).then(response => {
                         // console.log("PLANNING-UNIT--->", response.data);

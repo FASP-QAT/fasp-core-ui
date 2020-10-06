@@ -6,6 +6,7 @@ import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import { Offline, Online } from "react-detect-offline";
 import { Redirect, Route, Switch } from 'react-router-dom';
 import { Container } from 'reactstrap';
+import IdleTimer from 'react-idle-timer';
 
 // routes config
 //import routes from '../../routes';
@@ -137,6 +138,7 @@ const AddProduct = React.lazy(() => import('../../views/Product/AddProduct'));
 const ListProdct = React.lazy(() => import('../../views/Product/ProductList'));
 const EditProdct = React.lazy(() => import('../../views/Product/EditProduct'));
 const ProgramTree = React.lazy(() => import('../../views/Program/ProgramTree'));
+const DeleteLocalPrograms = React.lazy(() => import('../../views/Program/DeleteLocalProgramComponent'));
 const ExportProgram = React.lazy(() => import('../../views/Program/ExportProgram'));
 const ImportProgram = React.lazy(() => import('../../views/Program/ImportProgram'));
 // const MasterDataSync = React.lazy(() => import('../../views/SyncMasterData/SyncMasterData'));
@@ -250,7 +252,7 @@ const routes = [
   { path: '/consumptionDetails/:programId/:versionId/:planningUnitId', name: 'static.consumptionDetailHead.consumptionDetail', component: ConsumptionDetails },
   { path: '/shipment/shipmentDetails/:programId/:versionId/:planningUnitId', name: 'static.shipmentDetailHead.shipmentDetail', component: ShipmentList },
   { path: '/report/addProblem/:color/:message', name: 'static.breadcrum.add', entityname: 'static.report.problem', component: AddProblem },
-  { path: '/report/problemList/:color/:message', exact:true,name: 'static.breadcrum.list', entityname: 'static.dashboard.qatProblem', component: ProblemList },
+  { path: '/report/problemList/:color/:message', exact: true, name: 'static.breadcrum.list', entityname: 'static.dashboard.qatProblem', component: ProblemList },
   { path: '/report/problemList/:programId/:color/:message', name: 'static.breadcrum.list', entityname: 'static.dashboard.qatProblem', component: ProblemList },
   // { path: '/report/problemList', name: 'Qat Problem List', component: ProblemList },
 
@@ -272,6 +274,7 @@ const routes = [
 
   { path: '/', exact: true, name: 'static.home' },
   { path: '/programTree', name: 'static.dashboard.program', component: ProgramTree },
+  { path: '/program/deleteLocalProgram', name: 'static.program.deleteLocalProgram', component: DeleteLocalPrograms },
   { path: '/diamension/AddDiamension', name: 'static.breadcrum.add', entityname: 'static.dashboard.dimensionheader', component: AddDimension },
   { path: '/dimension/listDimension', exact: true, name: 'static.breadcrum.list', entityname: 'static.dashboard.dimension', component: DimensionList },
   // { path: '/dimension/listDimension/:message', component: DimensionList },
@@ -589,8 +592,47 @@ class DefaultLayout extends Component {
     super(props);
     this.state = {
       businessFunctions: [],
-      name: ""
+      name: "",
+      //Timer
+      timeout: 1000 * 3600 * 1,
+      showModal: false,
+      userLoggedIn: false,
+      isTimedOut: false
     }
+    this.idleTimer = null
+    this.onAction = this._onAction.bind(this)
+    this.onActive = this._onActive.bind(this)
+    this.onIdle = this._onIdle.bind(this)
+  }
+  checkEvent = (e) => {
+    console.log("checkEvent called---", e);
+    if (e.type != "mousemove") {
+      this._onAction(e);
+    }
+  }
+  _onAction(e) {
+    console.log('user did something', e)
+    console.log('user event type', e.type)
+    this.setState({ isTimedOut: false })
+  }
+
+  _onActive(e) {
+    console.log('user is active', e)
+    this.setState({ isTimedOut: false })
+  }
+
+  _onIdle(e) {
+    console.log('user is idle', e)
+    const isTimedOut = this.state.isTimedOut
+    if (isTimedOut) {
+      console.log("user timed out")
+      this.props.history.push('/logout/static.message.sessionExpired')
+    } else {
+      this.setState({ showModal: true })
+      this.idleTimer.reset();
+      this.setState({ isTimedOut: true })
+    }
+
   }
 
   displayHeaderTitle = (name) => {
@@ -609,13 +651,14 @@ class DefaultLayout extends Component {
       }
       this.setState({ businessFunctions: bfunction });
     }
+    console.log("has business function---", this.state.businessFunctions.includes('ROLE_BF_DELETE_LOCAL_PROGARM'));
 
   }
 
   loading = () => <div className="animated fadeIn pt-1 text-center"><div className="sk-spinner sk-spinner-pulse"></div></div>;
   changePassword(e) {
     e.preventDefault();
-    AuthenticationService.setupAxiosInterceptors();
+    // AuthenticationService.setupAxiosInterceptors();
     this.props.history.push(`/changePassword`);
   }
   signOut(e) {
@@ -646,8 +689,19 @@ class DefaultLayout extends Component {
 
   render() {
     console.log('in I18n defaultlayout')
+    let events = ["keydown", "mousedown"];
     return (
       <div className="app">
+        <IdleTimer
+          ref={ref => { this.idleTimer = ref }}
+          element={document}
+          onActive={this.onActive}
+          onIdle={this.onIdle}
+          onAction={this.checkEvent}
+          debounce={250}
+          timeout={this.state.timeout}
+          events={events}
+        />
         <AppHeader fixed>
           <Suspense fallback={this.loading()}>
             <DefaultHeader onLogout={e => this.signOut(e)} onChangePassword={e => this.changePassword(e)} onChangeDashboard={e => this.showDashboard(e)} title={this.state.name} />
@@ -987,6 +1041,13 @@ class DefaultLayout extends Component {
                                 url: '/program/downloadProgram',
                                 icon: 'fa fa-download',
                                 attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DOWNLOAD_PROGARM') ? false : true) }
+                              },
+                              {
+                                name: i18n.t('static.program.deleteLocalProgram'),
+                                url: '/program/deleteLocalProgram',
+                                icon: 'fa fa-trash',
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DELETE_LOCAL_PROGARM') ? false : true) }
+                                // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DOWNLOAD_PROGARM') ? false : true) }
                               },
                               {
                                 name: i18n.t('static.dashboard.importprogram'),
@@ -1383,7 +1444,7 @@ class DefaultLayout extends Component {
                                 name: i18n.t('static.dashboard.shipmentGlobalDemandViewheader'),
                                 url: '/report/shipmentGlobalDemandView',
                                 icon: 'fa fa-wpforms',
-                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_GLOBAL_VIEW_REPORT') ? false : true) }
                               },
                               {
                                 name: i18n.t('static.report.shipmentCostReport'),
@@ -1505,6 +1566,12 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-list',
                             // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DOWNLOAD_PROGRAM') ? false : true) },
                             children: [
+                              {
+                                name: i18n.t('static.program.deleteLocalProgram'),
+                                url: '/program/deleteLocalProgram',
+                                icon: 'fa fa-trash',
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DELETE_LOCAL_PROGARM') ? false : true) }
+                              },
                               {
                                 name: i18n.t('static.dashboard.importprogram'),
                                 url: '/program/importProgram',
@@ -1718,6 +1785,11 @@ class DefaultLayout extends Component {
                                 url: '/report/consumption',
                                 icon: 'fa fa-exchange',
                                 attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_REPORT') ? false : true) }
+                              }, {
+                                name: i18n.t('static.report.forecasterrorovertime'),
+                                url: '/report/forecastOverTheTime',
+                                icon: 'fa fa-line-chart',
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT') ? false : true) }
                               },
 
                             ]
@@ -1768,7 +1840,7 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.report.shipmentReports'),
                             icon: 'fa fa-list',
-                            attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_ANNUAL_SHIPMENT_COST_REPORT')) ? false : true) },
+                            attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_GLOBAL_VIEW_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_ANNUAL_SHIPMENT_COST_REPORT')) ? false : true) },
                             children: [
                               {
                                 name: i18n.t('static.report.shipmentDetailReport'),
@@ -1780,7 +1852,7 @@ class DefaultLayout extends Component {
                                 name: i18n.t('static.dashboard.shipmentGlobalDemandViewheader'),
                                 url: '/report/shipmentGlobalDemandView',
                                 icon: 'fa fa-wpforms',
-                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_GLOBAL_VIEW_REPORT') ? false : true) }
                               },
                               {
                                 name: i18n.t('static.report.shipmentCostReport'),
@@ -1875,7 +1947,7 @@ class DefaultLayout extends Component {
                             (
                               <route.component {...props} onClick={this.displayHeaderTitle(i18n.t(route.name, { entityname: i18n.t(route.entityname) }))} />
                             ) : (
-                              <Redirect to={{ pathname: "/login/static.accessDenied" }} />
+                              <Redirect to={{ pathname: "/accessDenied" }} />
                             )
                         }
                       />

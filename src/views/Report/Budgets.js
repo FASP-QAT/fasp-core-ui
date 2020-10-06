@@ -138,7 +138,7 @@ class Budgets extends Component {
         columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ', '%20') });
 
         var A = [this.addDoubleQuoteToRowContent(headers)]
-        this.state.selBudget.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.budget.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), "\"" + (ele.budget.code.replaceAll(',', ' ')).replaceAll(' ', '%20') + "\"", (ele.fundingSource.code.replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.currency.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), this.roundN(ele.budgetAmt), this.roundN(ele.plannedBudgetAmt), this.roundN(ele.orderedBudgetAmt), this.roundN((ele.budgetAmt - (ele.plannedBudgetAmt + ele.orderedBudgetAmt))), this.formatDate(ele.startDate), this.formatDate(ele.stopDate)])));
+        this.state.selBudget.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.budget.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), (ele.budget.code.replaceAll(',', ' ')).replaceAll(' ', '%20') , (ele.fundingSource.code.replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.currency.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), this.roundN(ele.budgetAmt), this.roundN(ele.plannedBudgetAmt), this.roundN(ele.orderedBudgetAmt), this.roundN((ele.budgetAmt - (ele.plannedBudgetAmt + ele.orderedBudgetAmt))), this.formatDate(ele.startDate), this.formatDate(ele.stopDate)])));
 
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
@@ -334,7 +334,7 @@ console.log(plannedShipmentbudget)
             } else {
                 this.setState({ loading: true })
                 var inputjson = { "programId": programId, "versionId": versionId }
-                AuthenticationService.setupAxiosInterceptors();
+                // AuthenticationService.setupAxiosInterceptors();
                 ReportService.budgetReport(inputjson)
                     .then(response => {
                         console.log(JSON.stringify(response.data));
@@ -385,7 +385,7 @@ console.log(plannedShipmentbudget)
 
     getPrograms = () => {
         if (navigator.onLine) {
-            AuthenticationService.setupAxiosInterceptors();
+            // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramList()
                 .then(response => {
                     console.log(JSON.stringify(response.data))
@@ -682,7 +682,7 @@ console.log(plannedShipmentbudget)
                     label: i18n.t('static.budget.allocatedShipmentOrdered'),
                     type: 'horizontalBar',
                     stack: 1,
-                    backgroundColor: '#042e6a',
+                    backgroundColor: '#118b70',
                     borderColor: 'rgba(179,181,198,1)',
                     pointBackgroundColor: 'rgba(179,181,198,1)',
                     pointBorderColor: '#fff',
@@ -694,7 +694,7 @@ console.log(plannedShipmentbudget)
                     label: i18n.t('static.budget.allocatedShipmentPlanned'),
                     type: 'horizontalBar',
                     stack: 1,
-                    backgroundColor: '#6a82a8',
+                    backgroundColor: '#EDB944',
                     borderColor: 'rgba(179,181,198,1)',
                     pointBackgroundColor: 'rgba(179,181,198,1)',
                     pointBorderColor: '#fff',
@@ -707,7 +707,7 @@ console.log(plannedShipmentbudget)
                     label: i18n.t('static.report.remainingBudgetAmt'),
                     type: 'horizontalBar',
                     stack: 1,
-                    backgroundColor: '#8aa9e6',
+                    backgroundColor: '#cfcdc9',
                     borderColor: 'rgba(179,181,198,1)',
                     pointBackgroundColor: 'rgba(179,181,198,1)',
                     pointBorderColor: '#fff',

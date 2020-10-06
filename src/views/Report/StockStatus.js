@@ -2077,7 +2077,7 @@ class StockStatus extends Component {
   }
 
   formatter = value => {
-
+if(value!=null){
     var cell1 = value
     cell1 += '';
     var x = cell1.split('.');
@@ -2087,7 +2087,10 @@ class StockStatus extends Component {
     while (rgx.test(x1)) {
       x1 = x1.replace(rgx, '$1' + ',' + '$2');
     }
-    return x1 + x2;
+    return x1 + x2;}
+    else{
+      return ''
+    }
   }
   makeText = m => {
     if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
@@ -2319,7 +2322,7 @@ class StockStatus extends Component {
                 console.log(dtstr, ' ', enddtStr)
                 var dt = dtstr
                 var list = programJson.supplyPlan.filter(c => c.planningUnitId == planningUnitId && c.transDate == dt)
-
+console.log(list)
                 if (list.length > 0) {
                   var shiplist = shipmentList.filter(c => c.receivedDate==null ||c.receivedDate==""?(c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr):(c.receivedDate >= dt && c.receivedDate <= enddtStr))
 
@@ -2419,7 +2422,7 @@ class StockStatus extends Component {
                   }
                   ]
                 })*/
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         ReportService.getStockStatusData(inputjson)
           .then(response => {
             console.log(JSON.stringify(response.data));
@@ -2466,7 +2469,7 @@ class StockStatus extends Component {
 
   getPrograms = () => {
     if (navigator.onLine) {
-      AuthenticationService.setupAxiosInterceptors();
+      // AuthenticationService.setupAxiosInterceptors();
       ProgramService.getProgramList()
         .then(response => {
           console.log(JSON.stringify(response.data))
@@ -2701,7 +2704,7 @@ class StockStatus extends Component {
 
         }
         else {
-          AuthenticationService.setupAxiosInterceptors();
+          // AuthenticationService.setupAxiosInterceptors();
 
           ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
             console.log('**' + JSON.stringify(response.data))
@@ -2869,7 +2872,7 @@ class StockStatus extends Component {
           showInLegend: true,
           pointStyle: 'line',
           yValueFormatString: "$#,##0",
-          data: this.state.stockStatusList.map((item, index) => (item.mos))
+          data: this.state.stockStatusList.map((item, index) => (this.roundN(item.mos)))
         }
         , /*{
           type: "line",
@@ -2891,7 +2894,7 @@ class StockStatus extends Component {
           label: i18n.t('static.supplyPlan.delivered'),
           yAxisID: 'A',
           stack: 1,
-          backgroundColor: '#042e6a',
+          backgroundColor: '#118b70',
           borderColor: 'rgba(179,181,198,1)',
           pointBackgroundColor: 'rgba(179,181,198,1)',
           pointBorderColor: '#fff',

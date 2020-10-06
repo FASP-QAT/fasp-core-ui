@@ -1362,7 +1362,41 @@ const options = {
 const options1 = {
     title: {
         display: true,
-        text: i18n.t('static.shipment.shipmentProcurementAgent'),
+        text:i18n.t('static.shipment.shipmentfundingSource'),
+        fontColor: 'black'
+    },
+    scales: {
+        xAxes: [{
+            labelMaxWidth: 100,
+            stacked: true,
+            gridLines: {
+                display: false
+            },
+        }],
+        yAxes: [{
+            stacked: true,
+            labelString: i18n.t('static.shipment.amount'),
+        }],
+    },
+    tooltips: {
+        enabled: false,
+        custom: CustomTooltips
+    },
+    maintainAspectRatio: false
+    ,
+    legend: {
+        display: true,
+        position: 'bottom',
+        labels: {
+            usePointStyle: true,
+            fontColor: 'black'
+        }
+    }
+}
+const options2 = {
+    title: {
+        display: true,
+        text:i18n.t('static.shipment.shipmentProcurementAgent'),
         fontColor: 'black'
     },
     scales: {
@@ -1439,7 +1473,20 @@ const chartData1 = {
         }
     ]
 };
-
+const backgroundColor = [
+'#002f6c',
+'#212721',
+'#20a8d8',
+'#4dbd74',
+'#f86c6b',
+'#d1e3f5',
+'#118b70',
+'#EDB944',
+'#F48521',
+'#ED5626',
+'#cfcdc9',
+'#004876', '#0063a0', '#007ecc', '#0093ee', '#82caf8', '#c8e6f4'
+]
 // var bar_chart = new Chart(bar_ctx, {
 //     type: 'bar',
 //     data: chartData,
@@ -1862,7 +1909,7 @@ class ShipmentGlobalView extends Component {
                 "realmCountryIds": CountryIds, "programIds": programIds, "planningUnitIds": planningUnitIds, "startDate": startDate, "stopDate": stopDate
             }
             // console.log('***' + inputjson)
-            AuthenticationService.setupAxiosInterceptors();
+            // AuthenticationService.setupAxiosInterceptors();
 
             ReportService.getGlobalConsumptiondata(inputjson)
                 .then(response => {
@@ -1912,7 +1959,7 @@ class ShipmentGlobalView extends Component {
 
     getCountrys() {
 
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         let realmId = AuthenticationService.getRealmId();
         RealmCountryService.getRealmCountryrealmIdById(realmId)
             .then(response => {
@@ -1947,7 +1994,7 @@ class ShipmentGlobalView extends Component {
     getPlanningUnit() {
 
         let productCategoryId = document.getElementById("productCategoryId").value;
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         if (productCategoryId != -1) {
             PlanningUnitService.getPlanningUnitByProductCategoryId(productCategoryId).then(response => {
                 this.setState({
@@ -2022,7 +2069,7 @@ class ShipmentGlobalView extends Component {
     }
 
     getRelamList = () => {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         RealmService.getRealmListAll()
             .then(response => {
                 if (response.status == 200) {
@@ -2059,7 +2106,7 @@ class ShipmentGlobalView extends Component {
 
     getProcurementAgent = () => {
 
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         ProcurementAgentService.getProcurementAgentListAll()
             .then(response => {
                 // console.log(JSON.stringify(response.data))
@@ -2093,7 +2140,7 @@ class ShipmentGlobalView extends Component {
 
     getFundingSource = () => {
 
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         FundingSourceService.getFundingSourceListAll()
             .then(response => {
                 // console.log(JSON.stringify(response.data))
@@ -2126,7 +2173,7 @@ class ShipmentGlobalView extends Component {
     }
 
     getProductCategories() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         let realmId = AuthenticationService.getRealmId();
         ProductService.getProductCategoryList(realmId)
             .then(response => {
@@ -2241,7 +2288,7 @@ class ShipmentGlobalView extends Component {
                 fundingSourceProcurementAgentIds: fundingSourceProcurementAgentIds
             }
             console.log("INPUTJSON--------->", inputjson);
-            AuthenticationService.setupAxiosInterceptors();
+            // AuthenticationService.setupAxiosInterceptors();
             ReportService.ShipmentGlobalView(inputjson)
                 .then(response => {
                     console.log("RESP------", response.data);
@@ -2427,7 +2474,9 @@ class ShipmentGlobalView extends Component {
         })
         this.setState({
             procurementAgentValues: procurementAgentIds.map(ele => ele),
-            procurementAgentLabels: procurementAgentIds.map(ele => ele.label)
+            procurementAgentLabels: procurementAgentIds.map(ele => ele.label),
+            fundingSourceValues: [],
+            fundingSourceLabels:[]
         }, () => {
 
             this.fetchData();
@@ -2440,7 +2489,9 @@ class ShipmentGlobalView extends Component {
         })
         this.setState({
             fundingSourceValues: fundingSourceIds.map(ele => ele),
-            fundingSourceLabels: fundingSourceIds.map(ele => ele.label)
+            fundingSourceLabels: fundingSourceIds.map(ele => ele.label),
+            procurementAgentValues:[],
+            procurementAgentLabels:[]
         }, () => {
 
             this.fetchData();
@@ -2512,21 +2563,7 @@ class ShipmentGlobalView extends Component {
                 )
             }, this);
 
-        const backgroundColor = [
-            '#4dbd74',
-            '#c8ced3',
-            '#000',
-            '#ffc107',
-            '#f86c6b',
-            '#20a8d8',
-            '#042e6a',
-            '#59cacc',
-            '#118b70',
-            '#EDB944',
-            '#F48521',
-            '#ED5626',
-            '#3fe488'
-        ]
+       
 
         const pickerLang = {
             months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
@@ -2599,42 +2636,18 @@ class ShipmentGlobalView extends Component {
 
 
 
-        const bar1 = {
+        var bar1 =[]
+        const dataSet= displaylabel.map((item, index) => ({ label: item, data: displayObject[index], borderWidth: 0, backgroundColor: backgroundColor[index] }))
+        bar1= {
 
-            // labels: ["Jan 2019", "Feb 2019", "Mar 2019", "Apr 2019", "May 19", "Jun 19", "Jul 19", "Aug 2019", "Sep 2019", "Oct 2019", "Nov 2019", "Dec 2019"],
-            // datasets: [
-            //     {
-            //         label: 'PSM',
-            //         data: [3000, 40000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            //         backgroundColor: '#4dbd74',
-            //         borderWidth: 0,
-            //     }, {
-            //         label: 'GF',
-            //         data: [3000, 0, 4000, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            //         backgroundColor: '#f86c6b',
-            //         borderWidth: 0
-            //     },
-            //     {
-            //         label: 'Local',
-            //         data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            //         backgroundColor: '#8aa9e6',
-            //         borderWidth: 0,
-            //     },
-            //     {
-            //         label: 'Govt',
-            //         data: [0, 0, 0, 30000, 0, 0, 0, 0, 0, 0, 0, 0],
-            //         backgroundColor: '#EDB944',
-            //         borderWidth: 0,
-            //     }
-            // ]
 
 
             labels: [...new Set(this.state.dateSplitList.map(ele => (moment(ele.transDate, 'YYYY-MM-dd').format('MMM YYYY'))))],
-            datasets: displaylabel.map((item, index) => ({ label: item, data: displayObject[index], borderWidth: 0, backgroundColor: backgroundColor[index] })),
+            datasets:dataSet
 
         }
-
-        let viewby = this.state.viewby;
+        console.log(bar1)
+       let viewby = this.state.viewby;
 
 
         return (
@@ -2851,8 +2864,8 @@ class ShipmentGlobalView extends Component {
                                     {this.state.dateSplitList.length > 0 &&
                                         <div className="col-md-6">
                                             <div className="chart-wrapper chart-graph-report">
-                                                {/* <Bar id="cool-canvas" data={bar} options={options} /> */}
-                                                <Bar id="cool-canvas2" data={bar1} options={options1} />
+                                                {console.log(bar1)/* <Bar id="cool-canvas" data={bar} options={options} /> */}
+                                                <Bar id="cool-canvas2" data={bar1} options={this.state.viewby==1?options1:options2} />
                                             </div>
                                         </div>
                                     }

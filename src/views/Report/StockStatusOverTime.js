@@ -129,7 +129,7 @@ class StockStatusOverTime extends Component {
     }
 
     roundN = num => {
-        return parseFloat(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
+        return parseFloat(Math.round(num * Math.pow(10, 1)) / Math.pow(10, 1)).toFixed(1);
     }
     formatAmc = value => {
         return Math.ceil(value)
@@ -138,7 +138,7 @@ class StockStatusOverTime extends Component {
         return moment(value).format('MMM YY')
     }
     formatter = value => {
-
+if(value!=null){
         var cell1 = value
         cell1 += '';
         var x = cell1.split('.');
@@ -148,7 +148,10 @@ class StockStatusOverTime extends Component {
         while (rgx.test(x1)) {
             x1 = x1.replace(rgx, '$1' + ',' + '$2');
         }
-        return x1 + x2;
+        return x1 + x2;}
+        else{
+            return ''
+        }
     }
 
     handlePlanningUnitChange = (event) => {
@@ -210,7 +213,7 @@ class StockStatusOverTime extends Component {
     }
 
     getCountrylist() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         let realmId = AuthenticationService.getRealmId();
         RealmCountryService.getRealmCountryrealmIdById(realmId)
             .then(response => {
@@ -245,7 +248,7 @@ class StockStatusOverTime extends Component {
 
     getPrograms = () => {
         if (navigator.onLine) {
-            AuthenticationService.setupAxiosInterceptors();
+            // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramList()
                 .then(response => {
                     this.setState({
@@ -526,7 +529,7 @@ class StockStatusOverTime extends Component {
 
                 }
                 else {
-                    AuthenticationService.setupAxiosInterceptors();
+                    // AuthenticationService.setupAxiosInterceptors();
 
                     ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
                         console.log('**' + JSON.stringify(response.data))
@@ -780,7 +783,7 @@ class StockStatusOverTime extends Component {
                 /*var inputjson={
                 "realmCountryIds":CountryIds,"programIds":programIds,"planningUnitIds":planningUnitIds,"startDate": startDate
                }*/
-                AuthenticationService.setupAxiosInterceptors();
+                // AuthenticationService.setupAxiosInterceptors();
 
                 ReportService.getStockOverTime(input)
                     .then(response => {

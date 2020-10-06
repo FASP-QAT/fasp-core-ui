@@ -478,32 +478,28 @@ export default class EditLanguageComponent extends Component {
                     };
                     problemStatusRequest.onsuccess = function (e) {
                         var myResult = [];
-                        // myResult = problemStatusRequest.result;
+                        myResult = problemStatusRequest.result;
+                        myResult = myResult.filter(c => c.userManaged == true);
+                        // let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+                        // let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+                        // console.log("decryptedUser=====>", decryptedUser);
 
-                        let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-                        let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+                        // var roleList = decryptedUser.roleList;
+                        // var roleArray = []
+                        // for (var r = 0; r < roleList.length; r++) {
+                        //     roleArray.push(roleList[r].roleId)
+                        // }
 
-                        console.log("decryptedUser=====>", decryptedUser);
+                        // if (roleArray.includes("ROLE_PROGRAM_ADMIN") || roleArray.includes("ROLE_REALM_ADMIN")) {
+                        //     myResult = problemStatusRequest.result;
+                        // } else {
+                        //     var filterList = problemStatusRequest.result;
+                        //     for (var l = 0; l < 2; l++) {
+                        //         var filterList = problemStatusRequest.result;
+                        //         myResult.push(filterList[l]);
+                        //     }
+                        // }
 
-
-                        var roleList = decryptedUser.roleList;
-                        // console.log("user Role====>",roleList);
-                        var roleArray = []
-                        for (var r = 0; r < roleList.length; r++) {
-                            roleArray.push(roleList[r].roleId)
-                        }
-                        // console.log("user Role array====>",roleArray);
-                        if (roleArray.includes("ROLE_PROGRAM_ADMIN") || roleArray.includes("ROLE_REALM_ADMIN")) {
-                            // console.log("in if=======>");
-                            myResult = problemStatusRequest.result;
-                        } else {
-                            var filterList = problemStatusRequest.result;
-                            // console.log("in else======>");
-                            for (var l = 0; l < 2; l++) {
-                                var filterList = problemStatusRequest.result;
-                                myResult.push(filterList[l]);
-                            }
-                        }
                         var proList = []
                         for (var i = 0; i < myResult.length; i++) {
                             var Json = {
@@ -583,7 +579,7 @@ export default class EditLanguageComponent extends Component {
                 headerAlign: 'center',
             },
             {
-                dataField: 'createdDate', 
+                dataField: 'createdDate',
                 text: i18n.t('static.report.lastmodifieddate'),
                 sort: true,
                 align: 'center',

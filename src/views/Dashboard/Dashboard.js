@@ -27,7 +27,7 @@ hideSecondComponent() {
     console.log("MESSAGE===",this.props.match.params.message);
     this.hideFirstComponent();
     if (navigator.onLine) {
-      AuthenticationService.setupAxiosInterceptors();
+      // AuthenticationService.setupAxiosInterceptors();
     }
   }
 
