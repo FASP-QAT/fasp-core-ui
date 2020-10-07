@@ -54,6 +54,7 @@ const validationSchema = function (values, t) {
             .required(i18n.t('static.country.currencytext')),
         budgetCode: Yup.string()
             // .matches(ALPHABET_NUMBER_REGEX, i18n.t('static.message.alphabetnumerallowed'))
+            .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly'))
             .max(10, i18n.t('static.common.max10digittext'))
             .required(i18n.t('static.budget.budgetCodeText')),
     })
