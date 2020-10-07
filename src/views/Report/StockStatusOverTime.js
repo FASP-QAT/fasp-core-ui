@@ -46,10 +46,32 @@ const options = {
                 },
                 ticks: {
                     beginAtZero: true,
-                    fontColor: 'black'
+                    fontColor: 'black',
+                    callback: function (value) {
+                        var cell1 = value
+                        cell1 += '';
+                        var x = cell1.split('.');
+                        var x1 = x[0];
+                        var x2 = x.length > 1 ? '.' + x[1] : '';
+                        var rgx = /(\d+)(\d{3})/;
+                        while (rgx.test(x1)) {
+                          x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                        }
+                        return x1 + x2;
+              
+                      }
+                    
                 }
             }
         ], xAxes: [{
+            scaleLabel: {
+              display: true,
+              labelString: i18n.t('static.report.month'),
+              fontColor: 'black',
+              fontStyle: "normal",
+              fontSize: "12"
+            },
+      
             ticks: {
                 fontColor: 'black'
             }
@@ -58,7 +80,20 @@ const options = {
     tooltips: {
         mode: 'index',
         enabled: false,
-        custom: CustomTooltips
+        custom: CustomTooltips,
+        callback: function (value) {
+            var cell1 = value
+            cell1 += '';
+            var x = cell1.split('.');
+            var x1 = x[0];
+            var x2 = x.length > 1 ? '.' + x[1] : '';
+            var rgx = /(\d+)(\d{3})/;
+            while (rgx.test(x1)) {
+              x1 = x1.replace(rgx, '$1' + ',' + '$2');
+            }
+            return x1 + x2;
+  
+          }
     },
     maintainAspectRatio: false,
     legend: {
@@ -132,7 +167,7 @@ class StockStatusOverTime extends Component {
         return parseFloat(Math.round(num * Math.pow(10, 1)) / Math.pow(10, 1)).toFixed(1);
     }
     formatAmc = value => {
-        return Math.ceil(value)
+        return parseFloat(Math.round(value * Math.pow(10, 0)) / Math.pow(10, 0)).toFixed(0);
     }
     dateFormatter = value => {
         return moment(value).format('MMM YY')
@@ -1104,7 +1139,7 @@ addDoubleQuoteToRowContent=(arr)=>{
             '#f86c6b'
         ]
         console.log(this.state.matricsList)
-        var v = this.state.planningUnitValues.map(pu => this.state.matricsList.filter(c => c.planningUnit.id == pu.value).map(ele => (ele.mos)))
+        var v = this.state.planningUnitValues.map(pu => this.state.matricsList.filter(c => c.planningUnit.id == pu.value).map(ele => this.roundN(ele.mos)))
         var dts = Array.from(new Set(this.state.matricsList.map(ele => (this.dateFormatter(ele.dt)))))
         console.log(dts)
         const bar = {

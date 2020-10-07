@@ -423,7 +423,9 @@ class AddRoleComponent extends Component {
                     label: {
                       label_en: 'Manual'
                     }
-                  }, createdBy: {
+                  }, 
+                  reviewed:false,
+                  createdBy: {
                     userId: userId,
                     username: username
                   },
@@ -447,7 +449,7 @@ class AddRoleComponent extends Component {
                           label_pr: null
                         }
                       },
-                      notes: "",
+                      notes: document.getElementById('notes').value,
                       createdBy: {
                         userId: userId,
                         username: username
@@ -632,6 +634,20 @@ class AddRoleComponent extends Component {
                               {problems}
                             </Input>
                             <FormFeedback className="red">{errors.problemId}</FormFeedback>
+                          </FormGroup>
+                          <FormGroup>
+                            <Label>{i18n.t('static.common.notes')}</Label>
+                            <Input type="textarea"
+                              bsSize="sm"
+                              name="notes"
+                              id="notes"
+                              // valid={!errors.problemId}
+                              // invalid={touched.problemId && !!errors.problemId}
+                              // onChange={(e) => { handleChange(e) }}
+                              // onBlur={handleBlur}
+                              // required
+                            >
+                            </Input>
                           </FormGroup>
                         </CardBody>
                         <CardFooter>

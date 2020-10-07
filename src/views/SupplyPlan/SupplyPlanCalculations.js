@@ -688,7 +688,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                         }
 
                         var mos = "";
-                        if (closingBalance != 0) {
+                        if (closingBalance != 0 && amc != 0) {
                             mos = parseFloat(closingBalance / amc).toFixed(4);
                         } else {
                             mos = 0;
@@ -781,7 +781,11 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                         props.updateState("inventoryChangedFlag", 0);
                         console.log("after update state")
                         if (props.inventoryPage != "inventoryDataEntry") {
-                            props.updateState("message", i18n.t('static.message.adjustmentsSaved'));
+                            if (props.items.inventoryType == 1) {
+                                props.updateState("message", i18n.t('static.message.inventorySaved'));
+                            } else {
+                                props.updateState("message", i18n.t('static.message.adjustmentsSaved'));
+                            }
                             props.toggleLarge('Adjustments');
                             if (props.inventoryPage != "supplyPlanCompare") {
                                 props.formSubmit(props.items.planningUnit, props.items.monthCount);
