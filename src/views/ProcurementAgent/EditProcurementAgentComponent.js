@@ -24,20 +24,22 @@ const initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         procurementAgentCode: Yup.string()
-            .matches(ALPHABET_NUMBER_REGEX, i18n.t('static.message.alphabetnumerallowed'))
+            // .matches(ALPHABET_NUMBER_REGEX, i18n.t('static.message.alphabetnumerallowed'))
+            .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly'))
             .required(i18n.t('static.procurementagent.codetext')),
         procurementAgentName: Yup.string()
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.procurementAgent.procurementagentnametext')),
         submittedToApprovedLeadTime: Yup.string()
+            .matches(/^\s*(?=.*[1-9])\d{1,2}(?:\.\d{1,2})?\s*$/, i18n.t('static.message.2digitDecimal'))
             .required(i18n.t('static.procurementagent.submitToApproveLeadTime'))
-            .min(0, i18n.t('static.program.validvaluetext'))
-            // .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
-            .matches(/^\s*(?=.*[1-9])\d{1,2}(?:\.\d{1,2})?\s*$/, i18n.t('static.program.validBudgetAmount')),
+            .min(0, i18n.t('static.program.validvaluetext')),
+        // .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
         approvedToShippedLeadTime: Yup.string()
+            .matches(/^\s*(?=.*[1-9])\d{1,2}(?:\.\d{1,2})?\s*$/, i18n.t('static.message.2digitDecimal'))
             .required(i18n.t('static.procurementagent.approvedToShippedLeadTime'))
             .min(0, i18n.t('static.program.validvaluetext'))
-            .matches(/^\s*(?=.*[1-9])\d{1,2}(?:\.\d{1,2})?\s*$/, i18n.t('static.program.validBudgetAmount')),
+
         // colorHtmlCode: Yup.string()
         //     .max(6, i18n.t('static.common.max6digittext'))
         //     .required(i18n.t('static.procurementAgent.procurementAgentHTMLCode')),
@@ -444,6 +446,7 @@ class EditProcurementAgentComponent extends Component {
                                                             valid={!errors.procurementAgentCode}
                                                             invalid={(touched.procurementAgentCode && !!errors.procurementAgentCode) || !!errors.procurementAgentCode}
                                                             // readOnly={true}
+                                                            maxLength={10}
                                                             value={this.state.procurementAgent.procurementAgentCode}
                                                         />
                                                         {/* </InputGroupAddon> */}

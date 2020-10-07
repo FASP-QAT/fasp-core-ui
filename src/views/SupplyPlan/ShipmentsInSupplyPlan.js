@@ -5,7 +5,7 @@ import i18n from '../../i18n';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunctionOnlyHideRow, checkValidtion, inValid, positiveValidation, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { SECRET_KEY, SHIPMENT_DATA_SOURCE_TYPE, DELIVERED_SHIPMENT_STATUS, TBD_PROCUREMENT_AGENT_ID, TBD_FUNDING_SOURCE, SUBMITTED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, DECIMAL_NO_REGEX, INTEGER_NO_REGEX, CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, INDEXED_DB_VERSION, INDEXED_DB_NAME, ALPHABET_NUMBER_REGEX, JEXCEL_DATE_FORMAT } from "../../Constants";
+import { SECRET_KEY, SHIPMENT_DATA_SOURCE_TYPE, DELIVERED_SHIPMENT_STATUS, TBD_PROCUREMENT_AGENT_ID, TBD_FUNDING_SOURCE, SUBMITTED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, DECIMAL_NO_REGEX, INTEGER_NO_REGEX, CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, INDEXED_DB_VERSION, INDEXED_DB_NAME, ALPHABET_NUMBER_REGEX, JEXCEL_DATE_FORMAT, BATCH_PREFIX, NONE_SELECTED_DATA_SOURCE_ID, LABEL_WITH_SPECIAL_SYMBOL_REGEX, BATCH_NO_REGEX } from "../../Constants";
 import moment from "moment";
 import { paddingZero, generateRandomAplhaNumericCode, contrast } from "../../CommonComponent/JavascriptCommonFunctions";
 import CryptoJS from 'crypto-js'
@@ -359,9 +359,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             data[7] = shipmentMode;//H
                                             data[8] = shipmentList[i].shipmentQty;//I
                                             data[9] = shipmentList[i].currency.currencyId;//J
-                                            data[10] = shipmentList[i].rate;//K
+                                            data[10] = parseFloat(shipmentList[i].rate).toFixed(2);//K
                                             data[11] = `=ROUND(K${parseInt(i) + 1}*I${parseInt(i) + 1},2)`;//L
-                                            data[12] = shipmentList[i].freightCost;//M
+                                            data[12] = parseFloat(shipmentList[i].freightCost).toFixed(2);//M
                                             data[13] = shipmentList[i].notes;//N
                                             data[14] = shipmentList[i].erpFlag;//O
                                             data[15] = shipmentList[i].shipmentStatus.id;//P
@@ -391,7 +391,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             data[3] = "";
                                             data[4] = "";
                                             data[5] = "";
-                                            data[6] = "";
+                                            data[6] = NONE_SELECTED_DATA_SOURCE_ID;
                                             data[7] = "";
                                             data[8] = 0;
                                             data[9] = "";
@@ -1032,7 +1032,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         data[3] = "";
         data[4] = "";
         data[5] = "";
-        data[6] = "";
+        data[6] = NONE_SELECTED_DATA_SOURCE_ID;
         data[7] = "";
         data[8] = 0;
         data[9] = "";
@@ -1054,6 +1054,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         data[25] = 0;
         obj.insertRow(data);
         console.log("Json.length", json.length);
+        obj.setValueFromCoords(6, json.length, NONE_SELECTED_DATA_SOURCE_ID, true);
         obj.setValueFromCoords(14, json.length, false, true);
         obj.setValueFromCoords(16, json.length, -1, true);
         obj.setValueFromCoords(18, json.length, 0, true);
@@ -1151,9 +1152,13 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     console.log("In if");
                     shipmentInstance.setStyle(col, "color", "#000");
                     shipmentInstance.setStyle(col, "color", "red");
+                    var cell = shipmentInstance.getCell(`L${parseInt(i) + 1}`)
+                    cell.classList.add('shipmentEntry');
                 } else {
                     console.log("In else")
                     shipmentInstance.setStyle(col, "color", "#000");
+                    var cell = shipmentInstance.getCell(`L${parseInt(i) + 1}`)
+                    cell.classList.remove('shipmentEntry');
                 }
             }
         }
@@ -1341,9 +1346,13 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     console.log("In if");
                     elInstance.setStyle(col, "color", "#000");
                     elInstance.setStyle(col, "color", "red");
+                    var cell = elInstance.getCell(`L${parseInt(y) + 1}`)
+                    cell.classList.add('shipmentEntry');
                 } else {
                     console.log("In else")
                     elInstance.setStyle(col, "color", "#000");
+                    var cell = elInstance.getCell(`L${parseInt(y) + 1}`)
+                    cell.classList.remove('shipmentEntry');
                 }
 
                 if (rowData[24].toString() == "false") {
@@ -1362,9 +1371,13 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         console.log("In if");
                         elInstance.setStyle(col, "color", "#000");
                         elInstance.setStyle(col, "color", "red");
+                        var cell = elInstance.getCell(`L${parseInt(y) + 1}`)
+                        cell.classList.add('shipmentEntry');
                     } else {
                         console.log("In else")
                         elInstance.setStyle(col, "color", "#000");
+                        var cell = elInstance.getCell(`L${parseInt(y) + 1}`)
+                        cell.classList.remove('shipmentEntry');
                     }
                 }
             }
@@ -1756,9 +1769,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             positiveValidation("A", y, elInstance);
             elInstance.setValueFromCoords(6, y, 0, true);
             if (value != "") {
-                if (value.length > 23) {
-                    inValid("A", y, i18n.t('static.common.max23digittext'), elInstance);
-                } else if (!ALPHABET_NUMBER_REGEX.test(value)) {
+                if (value.length > 26) {
+                    inValid("A", y, i18n.t('static.common.max26digittext'), elInstance);
+                } else if (!BATCH_NO_REGEX.test(value)) {
                     inValid("A", y, i18n.t('static.message.alphabetnumerallowed'), elInstance);
                 } else {
                     positiveValidation("A", y, elInstance);
@@ -1817,10 +1830,10 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 var rowData = elInstance.getRowData(y);
                 var value = rowData[0];
                 if (value != "") {
-                    if (value.length > 23) {
-                        inValid("A", y, i18n.t('static.common.max23digittext'), elInstance);
+                    if (value.length > 26) {
+                        inValid("A", y, i18n.t('static.common.max26digittext'), elInstance);
                         valid = false;
-                    } else if (!ALPHABET_NUMBER_REGEX.test(value)) {
+                    } else if (!BATCH_NO_REGEX.test(value)) {
                         inValid("A", y, i18n.t('static.message.alphabetnumerallowed'), elInstance);
                         valid = false;
                     } else {
@@ -1868,7 +1881,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     var planningUnitId = document.getElementById("planningUnitId").value;
                     programId = paddingZero(programId, 0, 6);
                     planningUnitId = paddingZero(planningUnitId, 0, 8);
-                    batchNo = (programId).concat(planningUnitId).concat(moment(Date.now()).format("YYMMDD")).concat(generateRandomAplhaNumericCode(3));
+                    batchNo = (BATCH_PREFIX).concat(programId).concat(planningUnitId).concat(moment(Date.now()).format("YYMMDD")).concat(generateRandomAplhaNumericCode(3));
                     autoGenerated = true
                 }
                 var batchInfoList = this.state.batchInfoListAll.filter(c => c.batchNo == map.get("0"));
@@ -2780,7 +2793,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                         var planningUnitId = document.getElementById("planningUnitId").value;
                                         programId = paddingZero(programId, 0, 6);
                                         planningUnitId = paddingZero(planningUnitId, 0, 8);
-                                        var batchNo = (programId).concat(planningUnitId).concat(moment(Date.now()).format("YYMMDD")).concat(generateRandomAplhaNumericCode(3));
+                                        var batchNo = (BATCH_PREFIX).concat(programId).concat(planningUnitId).concat(moment(Date.now()).format("YYMMDD")).concat(generateRandomAplhaNumericCode(3));
                                         console.log("BatchNo", batchNo)
                                         var json1 = {
                                             shipmentTransBatchInfoId: 0,
@@ -2817,7 +2830,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                 console.log("In if")
                                 var programId = (document.getElementById("programId").value).split("_")[0];
                                 var planningUnitId = document.getElementById("planningUnitId").value;
-                                var batchNo = (paddingZero(programId, 0, 6)).concat(paddingZero(planningUnitId, 0, 8)).concat(moment(Date.now()).format("YYMMDD")).concat(generateRandomAplhaNumericCode(3));
+                                var batchNo = (BATCH_PREFIX).concat(paddingZero(programId, 0, 6)).concat(paddingZero(planningUnitId, 0, 8)).concat(moment(Date.now()).format("YYMMDD")).concat(generateRandomAplhaNumericCode(3));
                                 // if (shipmentDatesJson.receivedDate != "" && shipmentDatesJson.receivedDate != null && shipmentDatesJson.receivedDate != undefined && shipmentDatesJson.receivedDate != "Invalid date") {
                                 //     expiryDate = moment(shipmentDatesJson.receivedDate).add(this.props.items.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
                                 // }
@@ -2886,7 +2899,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                 notes: map.get("13"),
                                 planningUnit: {
                                     id: document.getElementById("planningUnitId").value,
-                                    label:(this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0]).planningUnit.label
+                                    label: (this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0]).planningUnit.label
                                 },
                                 procurementAgent: {
                                     id: map.get("2")
@@ -2937,7 +2950,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                         var planningUnitId = document.getElementById("planningUnitId").value;
                                         programId = paddingZero(programId, 0, 6);
                                         planningUnitId = paddingZero(planningUnitId, 0, 8);
-                                        var batchNo = (programId).concat(planningUnitId).concat(moment(Date.now()).format("YYMMDD")).concat(generateRandomAplhaNumericCode(3));
+                                        var batchNo = (BATCH_PREFIX).concat(programId).concat(planningUnitId).concat(moment(Date.now()).format("YYMMDD")).concat(generateRandomAplhaNumericCode(3));
                                         console.log("BatchNo", batchNo)
                                         var json1 = {
                                             shipmentTransBatchInfoId: 0,
@@ -2968,7 +2981,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             if (shipmentBatchInfoList == "" && shipmentBatchInfoList.length == 0) {
                                 var programId = (document.getElementById("programId").value).split("_")[0];
                                 var planningUnitId = document.getElementById("planningUnitId").value;
-                                var batchNo = (paddingZero(programId, 0, 6)).concat(paddingZero(planningUnitId, 0, 8)).concat(moment(Date.now()).format("YYMMDD")).concat(generateRandomAplhaNumericCode(3));
+                                var batchNo = (BATCH_PREFIX).concat(paddingZero(programId, 0, 6)).concat(paddingZero(planningUnitId, 0, 8)).concat(moment(Date.now()).format("YYMMDD")).concat(generateRandomAplhaNumericCode(3));
                                 var expiryDate = moment(expectedDeliveryDate).add(this.props.items.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
                                 // if (shipmentDatesJson.receivedDate != "" && shipmentDatesJson.receivedDate != null && shipmentDatesJson.receivedDate != undefined && shipmentDatesJson.receivedDate != "Invalid date") {
                                 //     expiryDate = moment(shipmentDatesJson.receivedDate).add(this.props.items.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
