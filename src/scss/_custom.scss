@@ -3540,3 +3540,24 @@ margin-left: -45px;
 .clone tbody th {
 	visibility:visible;
 }
+
+.quantimedProgressbartext1 {
+  // left: 7px;
+  left: -2%;
+  transform: translateX(18%) scale(1);
+}
+.quantimedProgressbartext2 {
+  // left: 16%;
+  left: 28%;
+  transform: translateX(18%) scale(1);
+}
+.quantimedProgressbartext3 {
+  // left: 16%;
+  left: 62%;
+  // transform: translateX(18%) scale(1);
+}
+.quantimedProgressbartext4 {
+  // left: 16%;
+  left: 92.5%;
+  transform: translateX(18%) scale(1);
+}

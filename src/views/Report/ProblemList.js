@@ -680,8 +680,9 @@ export default class ConsumptionDetails extends React.Component {
         this.getProblemListAfterCalculation = this.getProblemListAfterCalculation.bind(this);
 
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
-
-
+        this.exportCSV = this.exportCSV.bind(this);
+        this.exportPDF = this.exportPDF.bind(this);
+        this.addDoubleQuoteToRowContent = this.addDoubleQuoteToRowContent.bind(this);
     }
 
     updateState(ekValue) {
@@ -773,6 +774,8 @@ export default class ConsumptionDetails extends React.Component {
 
     };
 
+
+
     rowClassNameFormat(row, rowIdx) {
         // row is whole row object
         // rowIdx is index of row
@@ -829,7 +832,7 @@ export default class ConsumptionDetails extends React.Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [10, 10, 50, 50, 10, 10, 10, 50, 200, 200, 50, 50],
+            colWidths: [10, 10, 50, 50, 10, 10, 10, 50, 180, 180, 50, 100],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
@@ -901,7 +904,7 @@ export default class ConsumptionDetails extends React.Component {
                     type: 'hidden',
                 },
                 {
-                    title: 'Criticality',
+                    title: i18n.t('static.problemAction.criticality'),
                     type: 'text',
                 },
 
@@ -973,6 +976,156 @@ export default class ConsumptionDetails extends React.Component {
         this.setState({
             loading: false, languageEl: languageEl
         })
+    }
+
+    addDoubleQuoteToRowContent = (arr) => {
+        return arr.map(ele => '"' + ele + '"')
+    }
+    exportCSV(columns) {
+        var csvRow = [];
+        csvRow.push(i18n.t('static.program.program') + ' , ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20'));
+        csvRow.push('')
+        csvRow.push((i18n.t('static.report.problemStatus')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("problemStatusId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+        csvRow.push('')
+        csvRow.push((i18n.t('static.report.problemType')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("problemTypeId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+        csvRow.push('')
+        csvRow.push('')
+        csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
+        csvRow.push('')
+        const headers = [];
+        headers.push(i18n.t('static.program.programCode').replaceAll(' ', '%20'));
+        headers.push(i18n.t('static.program.versionId').replaceAll(' ', '%20'));
+        headers.push(i18n.t('static.report.createdDate').replaceAll(' ', '%20'));
+        headers.push(i18n.t('static.report.problemDescription').replaceAll(' ', '%20'));
+        headers.push(i18n.t('static.report.suggession').replaceAll(' ', '%20'));
+        headers.push(i18n.t('static.report.problemStatus').replaceAll(' ', '%20'));
+        headers.push(i18n.t('static.program.notes').replaceAll(' ', '%20'));
+        headers.push(i18n.t('static.problemAction.criticality').replaceAll(' ', '%20'));
+        // columns.map((item, idx) => { item.hidden == true ? '' : headers[idx] = ((item.text).replaceAll(' ', '%20'))});
+        var A = [this.addDoubleQuoteToRowContent(headers)];
+        this.state.data.map(
+            ele => A.push(this.addDoubleQuoteToRowContent([
+                (ele.program.code).replaceAll(' ', '%20'),
+                ele.versionId,
+                moment(ele.createdDate).format('MMM-YY').replaceAll(' ', '%20'),
+                getProblemDesc(ele, this.state.lang).replaceAll(' ', '%20'),
+                getSuggestion(ele, this.state.lang).replaceAll(' ', '%20'),
+                getLabelText(ele.problemStatus.label, this.state.lang).replaceAll(' ', '%20'),
+                this.getNote(ele, this.state.lang).replaceAll(' ', '%20'),
+                getLabelText(ele.realmProblem.criticality.label, this.state.lang).replaceAll(' ', '%20')
+            ])));
+        for (var i = 0; i < A.length; i++) {
+            csvRow.push(A[i].join(","))
+        }
+        var csvString = csvRow.join("%0A")
+        var a = document.createElement("a")
+        a.href = 'data:attachment/csv,' + csvString
+        a.target = "_Blank"
+        a.download = i18n.t('static.report.qatProblemActionReport') + '.csv';
+        document.body.appendChild(a)
+        a.click() 
+    }
+
+    exportPDF(columns) {
+        const addFooters = doc => {
+            const pageCount = doc.internal.getNumberOfPages()
+
+            for (var i = 1; i <= pageCount; i++) {
+                doc.setFont('helvetica', 'bold')
+                doc.setFontSize(6)
+                doc.setPage(i)
+                doc.setPage(i)
+                doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
+                    align: 'center'
+                })
+
+                doc.text('Copyright © 2020 Quantification Analytics Tool', doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+                    align: 'center'
+                })
+            }
+        }
+        const addHeaders = doc => {
+            const pageCount = doc.internal.getNumberOfPages()
+
+            for (var i = 1; i <= pageCount; i++) {
+                doc.setFont('helvetica', 'bold')
+                doc.setFontSize(12)
+                doc.setFont('helvetica', 'bold')
+                doc.setPage(i)
+                doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
+                doc.setTextColor("#002f6c");
+                doc.text(i18n.t('static.report.qatProblemActionReport'), doc.internal.pageSize.width / 2, 60, {
+                    align: 'center'
+                })
+                if (i == 1) {
+                    doc.setFontSize(8)
+                    doc.setFont('helvetica', 'normal')
+                    doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
+                        align: 'left'
+                    })
+
+                    doc.text(i18n.t('static.report.problemStatus') + ' : ' + document.getElementById("problemStatusId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
+                        align: 'left'
+                    })
+                    doc.text(i18n.t('static.report.problemType') + ' : ' + document.getElementById("problemTypeId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
+                        align: 'left'
+                    })
+
+                }
+
+
+
+            }
+        }
+        const unit = "pt";
+        const size = "A4"; // Use A1, A2, A3 or A4
+        const orientation = "landscape"; // portrait or landscape
+        const marginLeft = 10;
+        const doc = new jsPDF(orientation, unit, size, true);
+        doc.setFontSize(8);
+        const title = i18n.t('static.report.qatProblemActionReport');
+        var width = doc.internal.pageSize.width;
+        var height = doc.internal.pageSize.height;
+        var h1 = 50;
+
+        const headers = [];
+        headers.push(i18n.t('static.program.programCode'));
+        headers.push(i18n.t('static.program.versionId'));
+        headers.push(i18n.t('static.report.createdDate'));
+        headers.push(i18n.t('static.report.problemDescription'));
+        headers.push(i18n.t('static.report.suggession'));
+        headers.push(i18n.t('static.report.problemStatus'));
+        headers.push(i18n.t('static.program.notes'));
+        headers.push(i18n.t('static.problemAction.criticality'));
+        // columns.map((item, idx) => { headers[idx] = (item.text) });
+        let data = this.state.data.map(ele => [
+            (ele.program.code),
+            ele.versionId,
+            moment(ele.createdDate).format('MMM-YY'),
+            getProblemDesc(ele, this.state.lang),
+            getSuggestion(ele, this.state.lang),
+            getLabelText(ele.problemStatus.label, this.state.lang),
+            this.getNote(ele, this.state.lang),
+            getLabelText(ele.realmProblem.criticality.label, this.state.lang)
+        ]);
+
+        let content = {
+            margin: { top: 90, bottom: 70 },
+            startY: 200,
+            head: [headers],
+            body: data,
+            styles: { lineWidth: 1, fontSize: 8, cellWidth: 55, halign: 'center' },
+            columnStyles: {
+                3: { cellWidth: 170 },
+                4: { cellWidth: 170 },
+                6: { cellWidth: 150 },
+               
+            }
+        };
+        doc.autoTable(content);
+        addHeaders(doc)
+        addFooters(doc)
+        doc.save(i18n.t('static.report.qatProblemActionReport') + '.pdf')
     }
 
     selected = function (instance, cell, x, y, value) {
@@ -1107,9 +1260,26 @@ export default class ConsumptionDetails extends React.Component {
                     var problemReportList = (programJson.problemReportList);
                     var problemReportFilterList = problemReportList;
 
+                    if (problemStatusId == -1) {
+
+                        problemReportFilterList = problemReportList.filter(c => c.problemStatus.id == 1 || c.problemStatus.id == 3);
+                        this.setState({
+                            data: problemReportFilterList,
+                            message: ''
+                        },
+                            () => {
+                                this.buildJExcel();
+                            });
+                    }
                     if (problemStatusId != -1) {
                         // var problemReportFilterList = problemReportList.filter(c => c.problemStatus.id == problemStatusId && c.problemType.id == problemTypeId);
-                        problemReportFilterList = problemReportList.filter(c => c.problemStatus.id == problemStatusId);
+                        if (problemStatusId == 2) {
+                            var myStartDate = moment(Date.now()).subtract(6, 'months').startOf('month').format("YYYY-MM-DD");
+                            // var myEndDate = moment(Date.now()).format("YYYY-MM-DD");
+                            problemReportFilterList = problemReportList.filter(c => moment(c.createdDate).format("YYYY-MM-DD") >= myStartDate && c.problemStatus.id == problemStatusId);
+                        } else {
+                            problemReportFilterList = problemReportList.filter(c => c.problemStatus.id == problemStatusId);
+                        }
                         this.setState({
                             data: problemReportFilterList,
                             message: ''
@@ -1248,6 +1418,167 @@ export default class ConsumptionDetails extends React.Component {
                 )
             }, this);
 
+        const columns = [
+            {
+                dataField: 'program.programCode',
+                text: i18n.t('static.program.programCode'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                style: { width: '80px' },
+                // formatter: (cell, row) => {
+                //     return getLabelText(cell, this.state.lang);
+                // }
+            },
+            {
+                dataField: 'versionId',
+                text: i18n.t('static.program.versionId'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                style: { width: '60px' },
+            },
+            {
+                dataField: 'region.label',
+                text: i18n.t('static.region.region'),
+                hidden: true,
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                style: { width: '80px' },
+                formatter: (cell, row) => {
+                    if (cell != null && cell != "") {
+                        return getLabelText(cell, this.state.lang);
+                    }
+                }
+
+            },
+            {
+                dataField: 'planningUnit.label',
+                text: i18n.t('static.planningunit.planningunit'),
+                sort: true,
+                hidden: true,
+                align: 'center',
+                headerAlign: 'center',
+                style: { width: '170px' },
+                formatter: (cell, row) => {
+                    return getLabelText(cell, this.state.lang);
+                }
+            },
+            {
+                dataField: 'dt',
+                text: i18n.t('static.report.month'),
+                sort: true,
+                hidden: true,
+                align: 'center',
+                headerAlign: 'center',
+                style: { width: '100px' },
+                formatter: (cell, row) => {
+                    if (cell != null && cell != "") {
+                        var modifiedDate = moment(cell).format('MMM-YY');
+                        return modifiedDate;
+                    }
+                }
+            },
+            {
+                dataField: 'createdDate',
+                text: i18n.t('static.report.createdDate'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                style: { width: '100px' },
+                formatter: (cell, row) => {
+                    if (cell != null && cell != "") {
+                        var modifiedDate = moment(cell).format('MMM-YY');
+                        console.log("date===>", modifiedDate);
+                        return modifiedDate;
+                    }
+                }
+            },
+            {
+                dataField: 'realmProblem.problem.label',
+                text: i18n.t('static.report.problemDescription'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                style: { width: '230px' },
+                formatter: (cell, row) => {
+                    return getProblemDesc(row, this.state.lang);
+                }
+            },
+            {
+                dataField: 'realmProblem.problem.actionLabel',
+                text: i18n.t('static.report.suggession'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                style: { width: '250px' },
+                formatter: (cell, row) => {
+                    // return getLabelText(cell, this.state.lang);
+                    return getSuggestion(row, this.state.lang);
+                }
+            },
+            {
+                dataField: 'problemStatus.label',
+                text: i18n.t('static.report.problemStatus'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                style: { width: '90px' },
+                formatter: (cell, row) => {
+                    return getLabelText(cell, this.state.lang);
+                }
+            },
+            {
+                dataField: 'problemTransList',
+                text: i18n.t('static.program.notes'),
+                sort: true,
+                align: 'center',
+                style: { width: '100px' },
+                headerAlign: 'center',
+                style: { width: '170px' },
+                formatter: (cell, row) => {
+                    return this.getNote(row, this.state.lang);
+                }
+            },
+            {
+                dataField: 'realmProblem.problem.actionUrl',
+                text: i18n.t('static.common.action'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                style: { width: '50px' },
+                formatter: this.buttonFormatter
+            }
+
+        ];
+        const options = {
+            hidePageListOnlyOnePage: true,
+            firstPageText: i18n.t('static.common.first'),
+            prePageText: i18n.t('static.common.back'),
+            nextPageText: i18n.t('static.common.next'),
+            lastPageText: i18n.t('static.common.last'),
+            nextPageTitle: i18n.t('static.common.firstPage'),
+            prePageTitle: i18n.t('static.common.prevPage'),
+            firstPageTitle: i18n.t('static.common.nextPage'),
+            lastPageTitle: i18n.t('static.common.lastPage'),
+            showTotal: true,
+            paginationTotalRenderer: customTotal,
+            disablePageTitle: true,
+            sizePerPageList: [{
+                text: '10', value: 10
+            }, {
+                text: '30', value: 30
+            }
+                ,
+            {
+                text: '50', value: 50
+            },
+            {
+                text: 'All', value: this.state.data.length
+            }]
+        }
+
         return (
 
             <div className="animated">
@@ -1269,6 +1600,12 @@ export default class ConsumptionDetails extends React.Component {
                             </div>
                         </div>
                     </div>
+                   { this.state.data.length > 0 && <div className="Card-header-reporticon">
+                        <div className="card-header-actions">
+                            <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF(columns)} />
+                            <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title="Export CSV" onClick={() => this.exportCSV(columns)} />
+                        </div>
+                    </div>}
                     <CardBody className="pb-lg-5 pt-lg-0">
                         <Col md="9 pl-1">
                             <div className="d-md-flex Selectdiv2">
@@ -1300,7 +1637,7 @@ export default class ConsumptionDetails extends React.Component {
                                                 onChange={this.fetchData}
                                             // value={1}
                                             >
-                                                {/* <option value="-1">{i18n.t('static.common.all')}</option> */}
+                                                <option value="-1">Open / Addressed</option>
                                                 {problemStatus}
                                             </Input>
                                         </InputGroup>

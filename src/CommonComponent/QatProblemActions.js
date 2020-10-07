@@ -249,7 +249,7 @@ export default class QatProblemActions extends Component {
                                                             // console.log("filteredConsumptionList1====>", filteredConsumptionList1);
                                                             // console.log("index1====>", index1);
 
-                                                            if (filteredConsumptionList1.length > 0 && index1 != -1 && problemActionList[index1].problemStatus.id == 1) {
+                                                            if (filteredConsumptionList1.length > 0 && index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3 )) {
                                                                 var filterObj = problemActionList[index1];
                                                                 var transList = filterObj.problemTransList;
                                                                 let tempProblemTransObj = {
@@ -385,7 +385,7 @@ export default class QatProblemActions extends Component {
                                                             }
 
                                                         } else {
-                                                            if (index != -1 && problemActionList[index].problemStatus.id == 1) {
+                                                            if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3 )) {
                                                                 // console.log("****** in logic to make isfound 0 consumption**********",problemActionList[index]====problemActionList[index].isFound = 0);
                                                                 var filterObj = problemActionList[index];
                                                                 var transList = filterObj.problemTransList;
@@ -465,7 +465,7 @@ export default class QatProblemActions extends Component {
                                                                 // && c.versionId == versionID
                                                             );
 
-                                                            if (filterInventoryList1.length > 0 && index1 != -1 && problemActionList[index1].problemStatus.id == 1) {
+                                                            if (filterInventoryList1.length > 0 && index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3 )) {
 
                                                                 var filterObj = problemActionList[index1];
                                                                 var transList = filterObj.problemTransList;
@@ -595,7 +595,7 @@ export default class QatProblemActions extends Component {
                                                                 }
                                                             }
                                                         } else {
-                                                            if (index != -1 && problemActionList[index].problemStatus.id == 1) {
+                                                            if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3 )) {
                                                                 // problemActionList[index].isFound = 0;
                                                                 //console.log("****** in logic to make isfound 0 inventory**********", problemActionList[index]);
                                                                 var filterObj = problemActionList[index];
@@ -766,7 +766,7 @@ export default class QatProblemActions extends Component {
                                                         }
                                                         for (var kb = 0; kb < problemActionList.length; kb++) {
                                                             // problemActionList[d].program.id == programList[pp].programId
-                                                            if (problemActionList[kb].realmProblem.problem.problemId == 3 && problemActionList[kb].program.id == programList[pp].programId && problemActionList[kb].problemStatus.id == 1) {
+                                                            if (problemActionList[kb].realmProblem.problem.problemId == 3 && problemActionList[kb].program.id == programList[pp].programId && (problemActionList[kb].problemStatus.id == 1 || problemActionList[kb].problemStatus.id == 3)) {
                                                                 var kbShipmentId = problemActionList[kb].shipmentId;
                                                                 if (kbShipmentId == 0) {
                                                                     kbShipmentId = problemActionList[kb].index;
@@ -823,7 +823,7 @@ export default class QatProblemActions extends Component {
 
                                                     } else {
                                                         for (var d = 0; d < problemActionList.length; d++) {
-                                                            if (problemActionList[d].realmProblem.problem.problemId == 3 && problemActionList[d].program.id == programList[pp].programId && problemActionList[d].problemStatus.id == 1) {
+                                                            if (problemActionList[d].realmProblem.problem.problemId == 3 && problemActionList[d].program.id == programList[pp].programId && (problemActionList[d].problemStatus.id == 1 || problemActionList[d].problemStatus.id == 3)) {
                                                                 var index = d;
                                                                 var filterObj = problemActionList[index];
                                                                 var transList = filterObj.problemTransList;
@@ -903,7 +903,7 @@ export default class QatProblemActions extends Component {
                                                                 // && c.versionId == versionID
                                                             );
 
-                                                            if (filteredConsumptionListTwo1.length == 18 && index1 != -1 && problemActionList[index1].problemStatus.id == 1) {
+                                                            if (filteredConsumptionListTwo1.length == 18 && index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3 )) {
 
                                                                 var filterObj = problemActionList[index1];
                                                                 var transList = filterObj.problemTransList;
@@ -1030,7 +1030,7 @@ export default class QatProblemActions extends Component {
                                                             }
 
                                                         } else {
-                                                            if (index != -1 && problemActionList[index].problemStatus.id == 1) {
+                                                            if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3 )) {
                                                                 // problemActionList[index].isFound = 0;
                                                                 // console.log("****** in logic to make isfound 0 future 18 consumption**********", problemActionList[index]);
                                                                 var filterObj = problemActionList[index];
@@ -1239,7 +1239,7 @@ export default class QatProblemActions extends Component {
                                                             }
                                                         }
                                                         for (var kb = 0; kb < problemActionList.length; kb++) {
-                                                            if (problemActionList[kb].realmProblem.problem.problemId == 4 && problemActionList[kb].problemStatus.id == 1) {
+                                                            if (problemActionList[kb].realmProblem.problem.problemId == 4 && (problemActionList[kb].problemStatus.id == 1 || problemActionList[kb].problemStatus.id == 3)) {
                                                                 var kbShipmentId = problemActionList[kb].shipmentId;
                                                                 if (kbShipmentId == 0) {
                                                                     kbShipmentId = problemActionList[kb].index;
@@ -1295,7 +1295,7 @@ export default class QatProblemActions extends Component {
                                                         }
                                                     } else {
                                                         for (var d = 0; d < problemActionList.length; d++) {
-                                                            if (problemActionList[d].realmProblem.problem.problemId == 4 && problemActionList[d].program.id == programList[pp].programId && problemActionList[d].problemStatus.id == 1) {
+                                                            if (problemActionList[d].realmProblem.problem.problemId == 4 && problemActionList[d].program.id == programList[pp].programId && (problemActionList[d].problemStatus.id == 1 || problemActionList[d].problemStatus.id == 3)) {
                                                                 var index = d;
                                                                 var filterObj = problemActionList[index];
                                                                 var transList = filterObj.problemTransList;
@@ -1507,7 +1507,7 @@ export default class QatProblemActions extends Component {
                                                         }
                                                         }
                                                         for (var kb = 0; kb < problemActionList.length; kb++) {
-                                                            if (problemActionList[kb].realmProblem.problem.problemId == 5 && problemActionList[kb].problemStatus.id == 1) {
+                                                            if (problemActionList[kb].realmProblem.problem.problemId == 5 && (problemActionList[kb].problemStatus.id == 1 || problemActionList[kb].problemStatus.id == 3)) {
                                                                 var kbShipmentId = problemActionList[kb].shipmentId;
                                                                 if (kbShipmentId == 0) {
                                                                     kbShipmentId = problemActionList[kb].index;
@@ -1562,7 +1562,7 @@ export default class QatProblemActions extends Component {
                                                         }
                                                     } else {
                                                         for (var d = 0; d < problemActionList.length; d++) {
-                                                            if (problemActionList[d].realmProblem.problem.problemId == 5 && problemActionList[d].program.id == programList[pp].programId && problemActionList[d].problemStatus.id == 1) {
+                                                            if (problemActionList[d].realmProblem.problem.problemId == 5 && problemActionList[d].program.id == programList[pp].programId && (problemActionList[d].problemStatus.id == 1 || problemActionList[d].problemStatus.id == 3)) {
                                                                 var index = d;
                                                                 var filterObj = problemActionList[index];
                                                                 var transList = filterObj.problemTransList;
@@ -1775,7 +1775,7 @@ export default class QatProblemActions extends Component {
                                                         }
                                                         }
                                                         for (var kb = 0; kb < problemActionList.length; kb++) {
-                                                            if (problemActionList[kb].realmProblem.problem.problemId == 6 && problemActionList[kb].problemStatus.id == 1) {
+                                                            if (problemActionList[kb].realmProblem.problem.problemId == 6 && (problemActionList[kb].problemStatus.id == 1 || problemActionList[kb].problemStatus.id == 3)) {
                                                                 var kbShipmentId = problemActionList[kb].shipmentId;
                                                                 if (kbShipmentId == 0) {
                                                                     kbShipmentId = problemActionList[kb].index;
@@ -1830,7 +1830,7 @@ export default class QatProblemActions extends Component {
                                                         }
                                                     } else {
                                                         for (var d = 0; d < problemActionList.length; d++) {
-                                                            if (problemActionList[d].realmProblem.problem.problemId == 6 && problemActionList[d].program.id == programList[pp].programId && problemActionList[d].problemStatus.id == 1) {
+                                                            if (problemActionList[d].realmProblem.problem.problemId == 6 && problemActionList[d].program.id == programList[pp].programId && (problemActionList[d].problemStatus.id == 1 || problemActionList[d].problemStatus.id == 3)) {
                                                                 var index = d;
                                                                 var filterObj = problemActionList[index];
                                                                 var transList = filterObj.problemTransList;
@@ -2040,7 +2040,7 @@ export default class QatProblemActions extends Component {
                                                         }
                                                         }
                                                         for (var kb = 0; kb < problemActionList.length; kb++) {
-                                                            if (problemActionList[kb].realmProblem.problem.problemId == 7 && problemActionList[kb].problemStatus.id == 1) {
+                                                            if (problemActionList[kb].realmProblem.problem.problemId == 7 && (problemActionList[kb].problemStatus.id == 1 || problemActionList[kb].problemStatus.id == 3)) {
                                                                 var kbShipmentId = problemActionList[kb].shipmentId;
                                                                 if (kbShipmentId == 0) {
                                                                     kbShipmentId = problemActionList[kb].index;
@@ -2095,7 +2095,7 @@ export default class QatProblemActions extends Component {
                                                         }
                                                     } else {
                                                         for (var d = 0; d < problemActionList.length; d++) {
-                                                            if (problemActionList[d].realmProblem.problem.problemId == 7 && problemActionList[d].program.id == programList[pp].programId && problemActionList[d].problemStatus.id == 1) {
+                                                            if (problemActionList[d].realmProblem.problem.problemId == 7 && problemActionList[d].program.id == programList[pp].programId && (problemActionList[d].problemStatus.id == 1 || problemActionList[d].problemStatus.id == 3)) {
                                                                 var index = d;
                                                                 var filterObj = problemActionList[index];
                                                                 var transList = filterObj.problemTransList;
@@ -2202,7 +2202,7 @@ export default class QatProblemActions extends Component {
                                                                         }
                                                                     }
 
-                                                                    if (check1 != true && index1 != -1 && problemActionList[index1].problemStatus.id == 1) {
+                                                                    if (check1 != true && index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3 )) {
 
                                                                         var filterObj = problemActionList[index1];
                                                                         var transList = filterObj.problemTransList;
@@ -2358,7 +2358,7 @@ export default class QatProblemActions extends Component {
                                                                 }
                                                                 else {
                                                                     console.log("dont flag problem=====>");
-                                                                    if (index != -1 && problemActionList[index].problemStatus.id == 1) {
+                                                                    if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3 )) {
                                                                         // console.log("****** in logic to make isfound 0 future 18 consumption**********", problemActionList[index]);
                                                                         var filterObj = problemActionList[index];
                                                                         var transList = filterObj.problemTransList;
@@ -2491,7 +2491,7 @@ export default class QatProblemActions extends Component {
                                                                         }
                                                                     }
 
-                                                                    if (check1 != true && index1 != -1 && problemActionList[index1].problemStatus.id == 1) {
+                                                                    if (check1 != true && index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3 )) {
 
                                                                         var filterObj = problemActionList[index1];
                                                                         var transList = filterObj.problemTransList;
@@ -2645,7 +2645,7 @@ export default class QatProblemActions extends Component {
                                                                 }
                                                                 else {
                                                                     // console.log("dont flag problem=====>");
-                                                                    if (index != -1 && problemActionList[index].problemStatus.id == 1) {
+                                                                    if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3 )) {
                                                                         // console.log("****** in logic to make isfound 0 future 18 consumption**********", problemActionList[index]);
                                                                         var filterObj = problemActionList[index];
                                                                         var transList = filterObj.problemTransList;
@@ -2762,7 +2762,7 @@ export default class QatProblemActions extends Component {
                                                                         }
                                                                     }
 
-                                                                    if (check1 != true && index1 != -1 && problemActionList[index1].problemStatus.id == 1) {
+                                                                    if (check1 != true && index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3 )) {
 
                                                                         var filterObj = problemActionList[index1];
                                                                         var transList = filterObj.problemTransList;
@@ -2918,7 +2918,7 @@ export default class QatProblemActions extends Component {
                                                                 }
                                                                 else {
                                                                     // console.log("dont flag problem=====>");
-                                                                    if (index != -1 && problemActionList[index].problemStatus.id == 1) {
+                                                                    if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3 )) {
                                                                         // console.log("****** in logic to make isfound 0 future 18 consumption**********", problemActionList[index]);
                                                                         var filterObj = problemActionList[index];
                                                                         var transList = filterObj.problemTransList;
@@ -3101,7 +3101,7 @@ export default class QatProblemActions extends Component {
                                                         );
 
 
-                                                        if (monthWithMosLessThenMin1 == '' && index1 != -1 && problemActionList[index1].problemStatus.id == 1) {
+                                                        if (monthWithMosLessThenMin1 == '' && index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3 )) {
 
                                                             var filterObj = problemActionList[index1];
                                                             var transList = filterObj.problemTransList;
@@ -3247,7 +3247,7 @@ export default class QatProblemActions extends Component {
                                                         // console.log("index*************>", index);
                                                         // console.log("versionId************", versionID);
 
-                                                        if (index != -1 && problemActionList[index].problemStatus.id == 1 && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
+                                                        if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3 ) && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
                                                             console.log("//////at this point resolve the problem.");
                                                             var filterObj = problemActionList[index];
                                                             var transList = filterObj.problemTransList;
@@ -3422,7 +3422,7 @@ export default class QatProblemActions extends Component {
                                                             // && c.versionId == versionID
                                                         );
 
-                                                        if (monthWithMosGreaterThenMax1 == '' && index1 != -1 && problemActionList[index1].problemStatus.id == 1) {
+                                                        if (monthWithMosGreaterThenMax1 == '' && index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3 )) {
                                                             var filterObj = problemActionList[index1];
                                                             var transList = filterObj.problemTransList;
                                                             let tempProblemTransObj = {
@@ -3560,7 +3560,7 @@ export default class QatProblemActions extends Component {
                                                         }
                                                     } else {
                                                         // console.log("no months with MOS greater then max ===#########");
-                                                        if (index != -1 && problemActionList[index].problemStatus.id == 1 && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
+                                                        if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3 ) && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
                                                             // console.log("//////at this point resolve the problem. ###########");
                                                             var filterObj = problemActionList[index];
                                                             var transList = filterObj.problemTransList;
@@ -3732,7 +3732,7 @@ export default class QatProblemActions extends Component {
                                                             // && c.versionId == versionID
                                                         );
 
-                                                        if (monthWithMosLessThenMin1 == '' && index1 != -1 && problemActionList[index1].problemStatus.id == 1) {
+                                                        if (monthWithMosLessThenMin1 == '' && index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3 )) {
 
                                                             var filterObj = problemActionList[index1];
                                                             var transList = filterObj.problemTransList;
@@ -3873,7 +3873,7 @@ export default class QatProblemActions extends Component {
                                                         }
                                                     } else {
                                                         console.log("no months with MOS less then min or have shipmnet coming withing lead time===#########");
-                                                        if (index != -1 && problemActionList[index].problemStatus.id == 1 && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
+                                                        if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3 ) && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
                                                             // console.log("//////at this point resolve the problem.");
                                                             var filterObj = problemActionList[index];
                                                             var transList = filterObj.problemTransList;
@@ -4045,7 +4045,7 @@ export default class QatProblemActions extends Component {
                                                             // && c.versionId == versionID
                                                         );
 
-                                                        if (monthWithMosLessThenMin1 == '' && index1 != -1 && problemActionList[index1].problemStatus.id == 1) {
+                                                        if (monthWithMosLessThenMin1 == '' && index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3 )) {
                                                             var filterObj = problemActionList[index1];
                                                             var transList = filterObj.problemTransList;
                                                             let tempProblemTransObj = {
@@ -4184,7 +4184,7 @@ export default class QatProblemActions extends Component {
                                                         }
                                                     } else {
                                                         // console.log("no months with MOS less then min ===#########");
-                                                        if (index != -1 && problemActionList[index].problemStatus.id == 1 && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
+                                                        if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3 ) && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
                                                             // console.log("//////at this point resolve the problem.");
                                                             var filterObj = problemActionList[index];
                                                             var transList = filterObj.problemTransList;
@@ -4356,7 +4356,7 @@ export default class QatProblemActions extends Component {
                                                             // && c.versionId == versionID
                                                         );
 
-                                                        if (monthWithMosGreaterThenMax1 == '' && index1 != -1 && problemActionList[index1].problemStatus.id == 1) {
+                                                        if (monthWithMosGreaterThenMax1 == '' && index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3 )) {
 
                                                             var filterObj = problemActionList[index1];
                                                             var transList = filterObj.problemTransList;
@@ -4497,7 +4497,7 @@ export default class QatProblemActions extends Component {
                                                         }
                                                     } else {
                                                         // console.log("no months with MOS greater then max ===#########");
-                                                        if (index != -1 && problemActionList[index].problemStatus.id == 1 && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
+                                                        if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3 ) && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
                                                             // console.log("//////at this point resolve the problem. ###########");
                                                             var filterObj = problemActionList[index];
                                                             var transList = filterObj.problemTransList;
@@ -4678,7 +4678,7 @@ export default class QatProblemActions extends Component {
                                                         );
 
 
-                                                        if (monthWithMosLessThenMin1 == '' && index1 != -1 && problemActionList[index1].problemStatus.id == 1) {
+                                                        if (monthWithMosLessThenMin1 == '' && index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3 )) {
 
                                                             var filterObj = problemActionList[index1];
                                                             var transList = filterObj.problemTransList;
@@ -4820,7 +4820,7 @@ export default class QatProblemActions extends Component {
                                                         }
                                                     } else {
                                                         // console.log("no months with MOS less then min or have shipmnet coming withing lead time===#########");
-                                                        if (index != -1 && problemActionList[index].problemStatus.id == 1 && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
+                                                        if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3 ) && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
                                                             // console.log("//////at this point resolve the problem.");
                                                             var filterObj = problemActionList[index];
                                                             var transList = filterObj.problemTransList;
@@ -4921,7 +4921,7 @@ export default class QatProblemActions extends Component {
                                                                     openProblem(index1, username, userId, problemActionList);
                                                                 }
                                                             } else {
-                                                                if (index1 != -1 && problemActionList[index1].problemStatus.id == 1) {
+                                                                if (index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3 )) {
                                                                     var filterObj = problemActionList[index1];
                                                                     var transList = filterObj.problemTransList;
                                                                     let tempProblemTransObj = {
@@ -5046,7 +5046,7 @@ export default class QatProblemActions extends Component {
 
                                                         } else {
                                                             // console.log("dont rais prob--------");
-                                                            if (index != -1 && problemActionList[index].problemStatus.id == 1) {
+                                                            if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3 )) {
                                                                 // console.log("resolve the problem problem id 21");
                                                                 // problemActionList[index].isFound = 0;
                                                                 var filterObj = problemActionList[index];
