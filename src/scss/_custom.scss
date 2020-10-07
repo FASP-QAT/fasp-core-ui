@@ -3333,8 +3333,8 @@ margin-left: -45px;
 
 .versionColor{
   color:#cb3828;
-  font-weight: 600;
-  font-size: 13px;
+  font-weight: 500;
+  font-size: 12px !important;
 }
 ///sidebar css
 @media (min-width: 992px){
@@ -3561,3 +3561,11 @@ margin-left: -45px;
   left: 92.5%;
   transform: translateX(18%) scale(1);
 }
+.en-btnlogin{
+  color: #002f6c !important;
+  background-color: transparent !important;
+  border-color: transparent !important;
+  }
+  .logo-MarginTop{
+  margin-top: -2%!important;
+  }

@@ -1222,6 +1222,8 @@ class AuthenticationService {
             } else {
                 return "/logout/static.message.sessionChange";
             }
+        }else{
+            return "/accessDenied";
         }
     }
     clearUserDetails() {
