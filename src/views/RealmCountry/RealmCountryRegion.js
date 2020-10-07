@@ -499,7 +499,7 @@ class RealmCountryRegion extends Component {
                             label_en: map1.get("1"),
                         },
                         capacityCbm: map1.get("2").replace(",", ""),
-                        gln: map1.get("3"),
+                        gln: (map1.get("3") === '' ? null : map1.get("3")),
                         active: map1.get("4"),
                         realmCountry: {
                             realmCountryId: parseInt(map1.get("5"))
@@ -546,7 +546,8 @@ class RealmCountryRegion extends Component {
                                 case 404:
                                 case 406:
                                     this.setState({
-                                        message: error.response.data.messageCode,
+                                        // message: error.response.data.messageCode,
+                                        message: i18n.t('static.region.duplicateGLN'),
                                         loading: false
                                     });
                                     break;
