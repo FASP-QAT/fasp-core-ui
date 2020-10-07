@@ -841,12 +841,13 @@ export default class SupplyPlanComponent extends React.Component {
                             <span className="supplyplan-rarrow" onClick={this.rightClicked}> {i18n.t('static.supplyPlan.scrollToRight')} <i className="cui-arrow-right icons" ></i> </span>
                         </div>
                         {/* </Row> */}
-                        <div className="table-responsive">
-                            <Table className="table-bordered text-center mt-2 overflowhide" bordered size="sm" options={this.options}>
+                        <div className="table-scroll">
+                            <div className="table-wrap table-responsive">
+                            <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" options={this.options}>
                                 <thead>
                                     <tr>
                                         <th className="BorderNoneSupplyPlan"></th>
-                                        <th className="supplyplanTdWidth"></th>
+                                        <th className="supplyplanTdWidth sticky-col first-col clone"></th>
                                         {
                                             this.state.monthsArray.map(item => {
                                                 var currentDate = moment(Date.now()).startOf('month').format("YYYY-MM-DD");
@@ -863,7 +864,7 @@ export default class SupplyPlanComponent extends React.Component {
 
                                     <tr bgcolor='#d9d9d9'>
                                         <td className="BorderNoneSupplyPlan"></td>
-                                        <td align="left"><b>{i18n.t('static.supplyPlan.openingBalance')}</b></td>
+                                        <td align="left" className="sticky-col first-col clone" style={{backgroundColor:'#d9d9d9'}}><b>{i18n.t('static.supplyPlan.openingBalance')}</b></td>
                                         {
                                             this.state.openingBalanceArray.map(item1 => (
                                                 <td align="right"><b><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></b></td>
@@ -872,7 +873,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     </tr>
                                     <tr>
                                         <td className="BorderNoneSupplyPlan"></td>
-                                        <td align="left"><b>- {i18n.t('static.supplyPlan.consumption')}</b></td>
+                                        <td align="left" className="sticky-col first-col clone"><b>- {i18n.t('static.supplyPlan.consumption')}</b></td>
                                         {
                                             this.state.consumptionTotalData.map((item1, count) => {
                                                 if (item1.consumptionType == 1) {
@@ -887,7 +888,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         <td className="BorderNoneSupplyPlan" onClick={() => this.toggleAccordionTotalShipments()}>
                                             {this.state.showTotalShipment ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
                                         </td>
-                                        <td align="left"><b>+ {i18n.t('static.dashboard.shipments')}</b></td>
+                                        <td align="left" className="sticky-col first-col clone"><b>+ {i18n.t('static.dashboard.shipments')}</b></td>
                                         {
                                             this.state.shipmentsTotalData.map(item1 => (
                                                 <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
@@ -897,7 +898,7 @@ export default class SupplyPlanComponent extends React.Component {
 
                                     <tr className="totalShipments">
                                         <td className="BorderNoneSupplyPlan"></td>
-                                        <td align="left">&emsp;&emsp;{i18n.t('static.supplyPlan.suggestedShipments')}</td>
+                                        <td align="left" className="sticky-col first-col clone">&emsp;&emsp;{i18n.t('static.supplyPlan.suggestedShipments')}</td>
                                         {
                                             this.state.suggestedShipmentsTotalData.map(item1 => {
                                                 if (item1.suggestedOrderQty.toString() != "") {
@@ -922,7 +923,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         <td className="BorderNoneSupplyPlan" onClick={() => this.toggleAccordionManualShipments()}>
                                             {this.state.showManualShipment ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
                                         </td>
-                                        <td align="left">&emsp;&emsp;{i18n.t('static.supplyPlan.manualEntryShipments')}</td>
+                                        <td align="left" className="sticky-col first-col clone">&emsp;&emsp;{i18n.t('static.supplyPlan.manualEntryShipments')}</td>
                                         {
                                             this.state.manualShipmentsTotalData.map((item1, count) => {
                                                 var currentMonthDate = moment(Date.now()).format("YYYY-MM");
@@ -937,7 +938,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     </tr>
                                     <tr className="manualShipments">
                                         <td className="BorderNoneSupplyPlan"></td>
-                                        <td align="left">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.delivered')}</td>
+                                        <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.delivered')}</td>
 
                                         {
                                             this.state.deliveredShipmentsTotalData.map(item1 => {
@@ -953,7 +954,7 @@ export default class SupplyPlanComponent extends React.Component {
 
                                     <tr className="manualShipments">
                                         <td className="BorderNoneSupplyPlan"></td>
-                                        <td align="left">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.shipped')}</td>
+                                        <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.shipped')}</td>
                                         {
                                             this.state.shippedShipmentsTotalData.map(item1 => {
                                                 if (item1.toString() != "") {
@@ -967,7 +968,7 @@ export default class SupplyPlanComponent extends React.Component {
 
                                     <tr className="manualShipments">
                                         <td className="BorderNoneSupplyPlan"></td>
-                                        <td align="left">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.ordered')}</td>
+                                        <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.ordered')}</td>
                                         {
                                             this.state.orderedShipmentsTotalData.map(item1 => {
                                                 if (item1.toString() != "") {
@@ -980,7 +981,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     </tr>
                                     <tr className="manualShipments">
                                         <td className="BorderNoneSupplyPlan"></td>
-                                        <td align="left">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.planned')}</td>
+                                        <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.planned')}</td>
                                         {
                                             this.state.plannedShipmentsTotalData.map(item1 => {
                                                 if (item1.toString() != "") {
@@ -995,7 +996,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         <td className="BorderNoneSupplyPlan" onClick={() => this.toggleAccordionErpShipments()}>
                                             {this.state.showErpShipment ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
                                         </td>
-                                        <td align="left">&emsp;&emsp;{i18n.t('static.supplyPlan.erpShipments')}</td>
+                                        <td align="left" className="sticky-col first-col clone">&emsp;&emsp;{i18n.t('static.supplyPlan.erpShipments')}</td>
                                         {
                                             this.state.erpShipmentsTotalData.map(item1 => (
                                                 <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
@@ -1004,7 +1005,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     </tr>
                                     <tr className="erpShipments">
                                         <td className="BorderNoneSupplyPlan"></td>
-                                        <td align="left">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.delivered')}</td>
+                                        <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.delivered')}</td>
                                         {
                                             this.state.deliveredErpShipmentsTotalData.map(item1 => {
                                                 if (item1.toString() != "") {
@@ -1018,7 +1019,7 @@ export default class SupplyPlanComponent extends React.Component {
 
                                     <tr className="erpShipments">
                                         <td className="BorderNoneSupplyPlan"></td>
-                                        <td align="left">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.shipped')}</td>
+                                        <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.shipped')}</td>
                                         {
                                             this.state.shippedErpShipmentsTotalData.map(item1 => {
                                                 if (item1.toString() != "") {
@@ -1031,7 +1032,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     </tr>
                                     <tr className="erpShipments">
                                         <td className="BorderNoneSupplyPlan"></td>
-                                        <td align="left">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.ordered')}</td>
+                                        <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.ordered')}</td>
                                         {
                                             this.state.orderedErpShipmentsTotalData.map(item1 => {
                                                 if (item1.toString() != "") {
@@ -1044,7 +1045,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     </tr>
                                     <tr className="erpShipments">
                                         <td className="BorderNoneSupplyPlan"></td>
-                                        <td align="left">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.planned')}</td>
+                                        <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.planned')}</td>
                                         {
                                             this.state.plannedErpShipmentsTotalData.map(item1 => {
                                                 if (item1.toString() != "") {
@@ -1057,7 +1058,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     </tr>
                                     <tr>
                                         <td className="BorderNoneSupplyPlan"></td>
-                                        <td align="left"><b>+/- {i18n.t('static.supplyPlan.adjustments')}</b></td>
+                                        <td align="left" className="sticky-col first-col clone"><b>+/- {i18n.t('static.supplyPlan.adjustments')}</b></td>
                                         {
                                             this.state.inventoryTotalData.map((item1, count) => {
                                                 return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>)
@@ -1066,7 +1067,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     </tr>
                                     <tr>
                                         <td className="BorderNoneSupplyPlan"></td>
-                                        <td align="left"><b>- {i18n.t('static.supplyplan.exipredStock')}</b></td>
+                                        <td align="left" className="sticky-col first-col clone"><b>- {i18n.t('static.supplyplan.exipredStock')}</b></td>
                                         {
                                             this.state.expiredStockArr.map(item1 => {
                                                 if (item1.toString() != "") {
@@ -1083,7 +1084,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     </tr>
                                     <tr bgcolor='#d9d9d9'>
                                         <td className="BorderNoneSupplyPlan"></td>
-                                        <td align="left"><b>{i18n.t('static.supplyPlan.endingBalance')}</b></td>
+                                        <td align="left" className="sticky-col first-col clone" style={{backgroundColor:'#d9d9d9'}}><b>{i18n.t('static.supplyPlan.endingBalance')}</b></td>
                                         {
                                             this.state.closingBalanceArray.map((item1, count) => {
                                                 return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}><b><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></b></td>)
@@ -1092,7 +1093,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     </tr>
                                     <tr>
                                         <td className="BorderNoneSupplyPlan"></td>
-                                        <td align="left"><b>{i18n.t('static.supplyPlan.monthsOfStock')}</b></td>
+                                        <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.supplyPlan.monthsOfStock')}</b></td>
                                         {
                                             this.state.monthsOfStockArray.map(item1 => (
                                                 <td align="right"><b><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></b></td>
@@ -1101,7 +1102,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     </tr>
                                     <tr>
                                         <td className="BorderNoneSupplyPlan"></td>
-                                        <td align="left">{i18n.t('static.supplyPlan.amc')}</td>
+                                        <td align="left" className="sticky-col first-col clone">{i18n.t('static.supplyPlan.amc')}</td>
                                         {
                                             this.state.amcTotalData.map(item1 => (
                                                 <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
@@ -1110,7 +1111,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     </tr>
                                     <tr>
                                         <td className="BorderNoneSupplyPlan"></td>
-                                        <td align="left">{i18n.t('static.supplyPlan.minStockMos')}</td>
+                                        <td align="left" className="sticky-col first-col clone">{i18n.t('static.supplyPlan.minStockMos')}</td>
                                         {
                                             this.state.minStockMoS.map(item1 => (
                                                 <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
@@ -1119,7 +1120,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     </tr>
                                     <tr>
                                         <td className="BorderNoneSupplyPlan"></td>
-                                        <td align="left">{i18n.t('static.supplyPlan.maxStockMos')}</td>
+                                        <td align="left" className="sticky-col first-col clone">{i18n.t('static.supplyPlan.maxStockMos')}</td>
                                         {
                                             this.state.maxStockMoS.map(item1 => (
                                                 <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
@@ -1128,7 +1129,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     </tr>
                                     <tr>
                                         <td className="BorderNoneSupplyPlan"></td>
-                                        <td align="left">{i18n.t('static.supplyPlan.unmetDemandStr')}</td>
+                                        <td align="left" className="sticky-col first-col clone">{i18n.t('static.supplyPlan.unmetDemandStr')}</td>
                                         {
                                             this.state.unmetDemand.map(item1 => (
                                                 <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
@@ -1153,6 +1154,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     </div>
                                 }
 
+                            </div>
                             </div>
 
                         </div>

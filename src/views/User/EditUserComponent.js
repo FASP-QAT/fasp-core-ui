@@ -51,7 +51,7 @@ const validationSchema = function (values) {
                     return document.getElementById("needPhoneValidation").value === "true";
 
                 },
-                then: Yup.string().min(4, i18n.t('static.user.validphonemindigit'))
+                then: Yup.string().min(6, i18n.t('static.user.validphonemindigit'))
                     .max(15, i18n.t('static.user.validphonemaxdigit'))
                     .matches(/^[0-9]*$/, i18n.t('static.user.validnumber'))
                     .required(i18n.t('static.user.validphone')),

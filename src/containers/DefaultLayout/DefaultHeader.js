@@ -35,10 +35,12 @@ class DefaultHeader extends Component {
     return (
       <React.Fragment>
         <AppSidebarToggler className="d-lg-none" display="md" mobile />
-        <AppNavbarBrand
+        <NavLink to="#" >
+        <AppNavbarBrand onClick={this.props.onChangeDashboard}
           full={{ src: logo, width: 180, height: 50, alt: 'QAT Logo' }}
           minimized={{ src: QAT, width: 50, height: 50, alt: 'QAT Logo' }}
         />
+        </NavLink>
         <AppSidebarToggler className="d-md-down-none" display="lg" />
         {/* <Nav className="d-md-down-none" navbar>
           <NavItem className="px-3">
@@ -46,7 +48,7 @@ class DefaultHeader extends Component {
           </NavItem>
          
         </Nav> */}
-        <Nav className="d-md-down-none" navbar>
+        <Nav className="" navbar>
 
 
           {/*          <NavItem className="px-3">

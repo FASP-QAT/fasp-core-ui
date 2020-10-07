@@ -21,7 +21,8 @@ const validationSchema = function (values) {
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.fundingsource.fundingsourcetext')),
         fundingSourceCode: Yup.string()
-            .matches(/^[a-zA-Z]+$/, i18n.t('static.common.alphabetsOnly'))
+            // .matches(/^[a-zA-Z]+$/, i18n.t('static.common.alphabetsOnly'))
+            .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly'))
             .required(i18n.t('static.fundingsource.fundingsourceCodeText')),
     })
 }

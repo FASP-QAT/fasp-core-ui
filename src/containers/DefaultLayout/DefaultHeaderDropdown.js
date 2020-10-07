@@ -70,12 +70,12 @@ class DefaultHeaderDropdown extends Component {
     // this.togglechangemaster = this.togglechangemaster.bind(this);
     this.dashboard = this.dashboard.bind(this);
   }
-  dashboard(){
-    this.props.history.push(`/ApplicationDashboard/`)  
+  dashboard() {
+    this.props.history.push(`/ApplicationDashboard/`)
   }
 
   changeLanguage(lang) {
-    console.log("Going to change language---",lang)
+    console.log("Going to change language---", lang)
     localStorage.setItem('lang', lang);
     AuthenticationService.updateUserLanguage(lang);
     if (navigator.onLine) {
@@ -83,10 +83,13 @@ console.log("Going to change online")
       AuthenticationService.setupAxiosInterceptors();
       UserService.updateUserLanguage(lang)
         .then(response => {
-console.log("Going to change language api success---",lang)
+          console.log("Going to change language api success---", lang)
+          i18n.changeLanguage(lang)
+          console.log("Going to change language reload location reload---")
+          window.location.reload();
         }).catch(
           error => {
-console.log("Going to change language api error---",error)
+            console.log("Going to change language api error---", error)
             if (error.message === "Network Error") {
               this.setState({ message: error.message });
             } else {
@@ -102,13 +105,16 @@ console.log("Going to change language api error---",error)
             });
           })
     }
-    else{
+    else {
       console.log("Going to change language you are offline---")
+      i18n.changeLanguage(lang)
+      console.log("Going to change language reload location reload---")
+      window.location.reload();
     }
-    console.log("Going to change language call changeLanguage function---")
-    i18n.changeLanguage(lang)
-    console.log("Going to change language reload location reload---")
-//    window.location.reload();
+    // console.log("Going to change language call changeLanguage function---")
+    // i18n.changeLanguage(lang)
+    // console.log("Going to change language reload location reload---")
+    // window.location.reload();
 
   }
 
@@ -301,8 +307,8 @@ console.log("Going to change language api error---",error)
   dropMssgs() {
     const itemsCount = 7;
     return (
-      <InitialTicketPageComponent/>
-      
+      <InitialTicketPageComponent />
+
       // <Dropdown nav  >
 
       //   <img src={imageHelp} className="HelpIcon" title="Help" onClick={this.togglehelp} />
@@ -401,107 +407,107 @@ console.log("Going to change language api error---",error)
 
 
       //   </Modal>
-        // {/*Change Additaion master */}
-        // {/* <Modal isOpen={this.state.changeadditional} toggle={this.togglechangeadditional}>
-        //           <ModalHeader toggle={this.togglechangeadditional} className="ModalHead modal-info-Headher"><strong>Add/Update Planning Unit</strong></ModalHeader>
-        //           <ModalBody>
-        //            <div>
-        //            <FormGroup>
-        //           <Label >Forecasting Unit</Label>
-        //           <Input type="text" />
-        //         </FormGroup>
-        //         <FormGroup>
-        //           <Label >Unit</Label>
-        //           <Input type="text"  />
-        //         </FormGroup>
-        //         <FormGroup>
-        //           <Label >Planning Unit</Label>
-        //           <Input type="text"  />
-        //         </FormGroup>
-        //         <FormGroup>
-        //           <Label >Multiplier</Label>
-        //           <Input type="text"  />
-        //         </FormGroup>
-        //            </div>
-        //           </ModalBody>
-        //           <ModalFooter>
-                   
-        //             <Button color="success" onClick={this.togglechangeadditional}>Submit</Button>
-        //           </ModalFooter>
-        //         </Modal> */}
+      // {/*Change Additaion master */}
+      // {/* <Modal isOpen={this.state.changeadditional} toggle={this.togglechangeadditional}>
+      //           <ModalHeader toggle={this.togglechangeadditional} className="ModalHead modal-info-Headher"><strong>Add/Update Planning Unit</strong></ModalHeader>
+      //           <ModalBody>
+      //            <div>
+      //            <FormGroup>
+      //           <Label >Forecasting Unit</Label>
+      //           <Input type="text" />
+      //         </FormGroup>
+      //         <FormGroup>
+      //           <Label >Unit</Label>
+      //           <Input type="text"  />
+      //         </FormGroup>
+      //         <FormGroup>
+      //           <Label >Planning Unit</Label>
+      //           <Input type="text"  />
+      //         </FormGroup>
+      //         <FormGroup>
+      //           <Label >Multiplier</Label>
+      //           <Input type="text"  />
+      //         </FormGroup>
+      //            </div>
+      //           </ModalBody>
+      //           <ModalFooter>
 
-        // {/* <DropdownMenu right className="dropdown-menu-lg">
-        //   <DropdownItem header tag="div"><strong>You have {itemsCount} messages</strong></DropdownItem>
-        //   <DropdownItem href="#">
-        //     <div className="message">
-        //       <div className="pt-3 mr-3 float-left">
-        //         <div className="avatar">
-        //           <img src={image7} className="img-avatar" alt="admin@bootstrapmaster.com" />
-        //           <span className="avatar-status badge-success"></span>
-        //         </div>
-        //       </div>
-        //       <div>
-        //         <small className="text-muted">John Doe</small>
-        //         <small className="text-muted float-right mt-1">Just now</small>
-        //       </div>
-        //       <div className="text-truncate font-weight-bold"><span className="fa fa-exclamation text-danger"></span> Important message</div>
-        //       <div className="small text-muted text-truncate">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt...
-        //       </div>
-        //     </div>
-        //   </DropdownItem>
-        //   <DropdownItem href="#">
-        //     <div className="message">
-        //       <div className="pt-3 mr-3 float-left">
-        //         <div className="avatar">
-        //           <img src={image6} className="img-avatar" alt="admin@bootstrapmaster.com" />
-        //           <span className="avatar-status badge-warning"></span>
-        //         </div>
-        //       </div>
-        //       <div>
-        //         <small className="text-muted">Jane Doe</small>
-        //         <small className="text-muted float-right mt-1">5 minutes ago</small>
-        //       </div>
-        //       <div className="text-truncate font-weight-bold">Lorem ipsum dolor sit amet</div>
-        //       <div className="small text-muted text-truncate">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt...
-        //       </div>
-        //     </div>
-        //   </DropdownItem>
-        //   <DropdownItem href="#">
-        //     <div className="message">
-        //       <div className="pt-3 mr-3 float-left">
-        //         <div className="avatar">
-        //           <img src={image5} className="img-avatar" alt="admin@bootstrapmaster.com" />
-        //           <span className="avatar-status badge-danger"></span>
-        //         </div>
-        //       </div>
-        //       <div>
-        //         <small className="text-muted">Janet Doe</small>
-        //         <small className="text-muted float-right mt-1">1:52 PM</small>
-        //       </div>
-        //       <div className="text-truncate font-weight-bold">Lorem ipsum dolor sit amet</div>
-        //       <div className="small text-muted text-truncate">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt...
-        //       </div>
-        //     </div>
-        //   </DropdownItem>
-        //   <DropdownItem href="#">
-        //     <div className="message">
-        //       <div className="pt-3 mr-3 float-left">
-        //         <div className="avatar">
-        //           <img src={image4} className="img-avatar" alt="admin@bootstrapmaster.com" />
-        //           <span className="avatar-status badge-info"></span>
-        //         </div>
-        //       </div>
-        //       <div>
-        //         <small className="text-muted">Joe Doe</small>
-        //         <small className="text-muted float-right mt-1">4:03 AM</small>
-        //       </div>
-        //       <div className="text-truncate font-weight-bold">Lorem ipsum dolor sit amet</div>
-        //       <div className="small text-muted text-truncate">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt...
-        //       </div>
-        //     </div>
-        //   </DropdownItem>
-        //   <DropdownItem href="#" className="text-center"><strong>View all messages</strong></DropdownItem>
-        // </DropdownMenu> */}
+      //             <Button color="success" onClick={this.togglechangeadditional}>Submit</Button>
+      //           </ModalFooter>
+      //         </Modal> */}
+
+      // {/* <DropdownMenu right className="dropdown-menu-lg">
+      //   <DropdownItem header tag="div"><strong>You have {itemsCount} messages</strong></DropdownItem>
+      //   <DropdownItem href="#">
+      //     <div className="message">
+      //       <div className="pt-3 mr-3 float-left">
+      //         <div className="avatar">
+      //           <img src={image7} className="img-avatar" alt="admin@bootstrapmaster.com" />
+      //           <span className="avatar-status badge-success"></span>
+      //         </div>
+      //       </div>
+      //       <div>
+      //         <small className="text-muted">John Doe</small>
+      //         <small className="text-muted float-right mt-1">Just now</small>
+      //       </div>
+      //       <div className="text-truncate font-weight-bold"><span className="fa fa-exclamation text-danger"></span> Important message</div>
+      //       <div className="small text-muted text-truncate">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt...
+      //       </div>
+      //     </div>
+      //   </DropdownItem>
+      //   <DropdownItem href="#">
+      //     <div className="message">
+      //       <div className="pt-3 mr-3 float-left">
+      //         <div className="avatar">
+      //           <img src={image6} className="img-avatar" alt="admin@bootstrapmaster.com" />
+      //           <span className="avatar-status badge-warning"></span>
+      //         </div>
+      //       </div>
+      //       <div>
+      //         <small className="text-muted">Jane Doe</small>
+      //         <small className="text-muted float-right mt-1">5 minutes ago</small>
+      //       </div>
+      //       <div className="text-truncate font-weight-bold">Lorem ipsum dolor sit amet</div>
+      //       <div className="small text-muted text-truncate">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt...
+      //       </div>
+      //     </div>
+      //   </DropdownItem>
+      //   <DropdownItem href="#">
+      //     <div className="message">
+      //       <div className="pt-3 mr-3 float-left">
+      //         <div className="avatar">
+      //           <img src={image5} className="img-avatar" alt="admin@bootstrapmaster.com" />
+      //           <span className="avatar-status badge-danger"></span>
+      //         </div>
+      //       </div>
+      //       <div>
+      //         <small className="text-muted">Janet Doe</small>
+      //         <small className="text-muted float-right mt-1">1:52 PM</small>
+      //       </div>
+      //       <div className="text-truncate font-weight-bold">Lorem ipsum dolor sit amet</div>
+      //       <div className="small text-muted text-truncate">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt...
+      //       </div>
+      //     </div>
+      //   </DropdownItem>
+      //   <DropdownItem href="#">
+      //     <div className="message">
+      //       <div className="pt-3 mr-3 float-left">
+      //         <div className="avatar">
+      //           <img src={image4} className="img-avatar" alt="admin@bootstrapmaster.com" />
+      //           <span className="avatar-status badge-info"></span>
+      //         </div>
+      //       </div>
+      //       <div>
+      //         <small className="text-muted">Joe Doe</small>
+      //         <small className="text-muted float-right mt-1">4:03 AM</small>
+      //       </div>
+      //       <div className="text-truncate font-weight-bold">Lorem ipsum dolor sit amet</div>
+      //       <div className="small text-muted text-truncate">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt...
+      //       </div>
+      //     </div>
+      //   </DropdownItem>
+      //   <DropdownItem href="#" className="text-center"><strong>View all messages</strong></DropdownItem>
+      // </DropdownMenu> */}
       // </Dropdown>
     );
   }
