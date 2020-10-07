@@ -79,11 +79,14 @@ class DefaultHeaderDropdown extends Component {
     localStorage.setItem('lang', lang);
     AuthenticationService.updateUserLanguage(lang);
     if (navigator.onLine) {
+console.log("Going to change online")
       AuthenticationService.setupAxiosInterceptors();
       UserService.updateUserLanguage(lang)
         .then(response => {
+console.log("Going to change language api success---",lang)
         }).catch(
           error => {
+console.log("Going to change language api error---",error)
             if (error.message === "Network Error") {
               this.setState({ message: error.message });
             } else {
@@ -105,7 +108,7 @@ class DefaultHeaderDropdown extends Component {
     console.log("Going to change language call changeLanguage function---")
     i18n.changeLanguage(lang)
     console.log("Going to change language reload location reload---")
-    window.location.reload();
+//    window.location.reload();
 
   }
 
