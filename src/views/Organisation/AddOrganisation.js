@@ -30,10 +30,11 @@ const validationSchema = function (values) {
             .required(i18n.t('static.common.realmtext')),
         organisationName: Yup.string()
             // .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
-            .matches(/^\S+(?: \S+)*$/,i18n.t('static.validSpace.string'))
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.organisation.organisationtext')),
         organisationCode: Yup.string()
-            .matches(ALPHABET_NUMBER_REGEX, i18n.t('static.message.alphabetnumerallowed'))
+            // .matches(ALPHABET_NUMBER_REGEX, i18n.t('static.message.alphabetnumerallowed'))
+            .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly'))
             .required(i18n.t('static.common.displayName'))
             .max(4, i18n.t('static.organisation.organisationcodemax4digittext')),
         realmCountryId: Yup.string()
@@ -145,14 +146,53 @@ export default class AddOrganisationComponent extends Component {
 
     componentDidMount() {
         console.log("IN componentDidMount------------------");
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         CountryService.getCountryListAll()
             .then(response => {
                 console.log("country list---", response.data);
                 this.setState({
                     countries: response.data, loading: false,
                 })
-            })
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
 
         UserService.getRealmList()
             .then(response => {
@@ -161,7 +201,46 @@ export default class AddOrganisationComponent extends Component {
                     realms: response.data,
                     loading: false,
                 })
-            })
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
     }
     hideSecondComponent() {
         setTimeout(function () {
@@ -182,7 +261,7 @@ export default class AddOrganisationComponent extends Component {
     }
 
     getRealmCountryList(e) {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         OrganisationService.getRealmCountryList(e.target.value)
             .then(response => {
                 console.log("Realm Country List list---", response.data);
@@ -202,7 +281,46 @@ export default class AddOrganisationComponent extends Component {
                         message: response.data.messageCode
                     })
                 }
-            })
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
 
     }
 
@@ -241,11 +359,7 @@ export default class AddOrganisationComponent extends Component {
 
         return (
             <div className="animated fadeIn">
-                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
-                    this.setState({ message: message })
-                }} loading={(loading) => {
-                    this.setState({ loading: loading })
-                }} />
+                <AuthenticationServiceComponent history={this.props.history} />
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row style={{ display: this.state.loading ? "none" : "block" }}>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
@@ -272,7 +386,46 @@ export default class AddOrganisationComponent extends Component {
                                                         message: response.data.messageCode, loading: false
                                                     })
                                                 }
-                                            })
+                                            }).catch(
+                                                error => {
+                                                    if (error.message === "Network Error") {
+                                                        this.setState({
+                                                            message: 'static.unkownError',
+                                                            loading: false
+                                                        });
+                                                    } else {
+                                                        switch (error.response ? error.response.status : "") {
+
+                                                            case 401:
+                                                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                                                break;
+                                                            case 403:
+                                                                this.props.history.push(`/accessDenied`)
+                                                                break;
+                                                            case 500:
+                                                            case 404:
+                                                            case 406:
+                                                                this.setState({
+                                                                    message: error.response.data.messageCode,
+                                                                    loading: false
+                                                                });
+                                                                break;
+                                                            case 412:
+                                                                this.setState({
+                                                                    message: error.response.data.messageCode,
+                                                                    loading: false
+                                                                });
+                                                                break;
+                                                            default:
+                                                                this.setState({
+                                                                    message: 'static.unkownError',
+                                                                    loading: false
+                                                                });
+                                                                break;
+                                                        }
+                                                    }
+                                                }
+                                            );
                                     }
 
 
@@ -382,7 +535,7 @@ export default class AddOrganisationComponent extends Component {
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
-                            <div ><h4> <strong>Loading...</strong></h4></div>
+                            <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
 
                             <div class="spinner-border blue ml-4" role="status">
 

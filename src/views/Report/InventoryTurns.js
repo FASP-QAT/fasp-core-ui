@@ -1000,7 +1000,7 @@ export default class InventoryTurns extends Component {
 
     getPrograms = () => {
         if (navigator.onLine) {
-            AuthenticationService.setupAxiosInterceptors();
+            // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramList()
                 .then(response => {
                     console.log(JSON.stringify(response.data))
@@ -1646,9 +1646,9 @@ var inputJson={
     "programId":this.state.CostOfInventoryInput.programId,
     "versionId":this.state.CostOfInventoryInput.versionId,
     "dt":moment(this.state.CostOfInventoryInput.dt).startOf('month').format('YYYY-MM-DD'),
-    "includePlanningShipments":this.state.CostOfInventoryInput.includePlanningShipments.toString()=="true"?1:0
+    "includePlannedShipments":this.state.CostOfInventoryInput.includePlanningShipments.toString()=="true"?1:0
 }
-                AuthenticationService.setupAxiosInterceptors();
+                // AuthenticationService.setupAxiosInterceptors();
                 ReportService.inventoryTurns(inputJson).then(response => {
                     console.log("costOfInentory=====>", response.data);
                     this.setState({

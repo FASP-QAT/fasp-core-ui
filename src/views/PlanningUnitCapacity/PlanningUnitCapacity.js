@@ -804,7 +804,7 @@ class PlanningUnitCapacity extends Component {
                 }
             }
             console.log("changedpapuList----->", changedpapuList);
-            AuthenticationService.setupAxiosInterceptors();
+            // AuthenticationService.setupAxiosInterceptors();
             PlanningUnitService.editPlanningUnitCapacity(changedpapuList)
                 .then(response => {
                     if (response.status == 200) {
@@ -822,18 +822,38 @@ class PlanningUnitCapacity extends Component {
                 }).catch(
                     error => {
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
                         } else {
                             switch (error.response ? error.response.status : "") {
-                                case 500:
+
                                 case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
                                 case 404:
                                 case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
                                 case 412:
-                                    this.setState({ message: error.response.messageCode });
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
                                     break;
                                 default:
-                                    this.setState({ message: 'static.unkownError' });
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
                                     break;
                             }
                         }
@@ -924,19 +944,19 @@ class PlanningUnitCapacity extends Component {
             columns: [
 
                 {
-                    title: "Planning Unit",
+                    title: i18n.t('static.dashboard.planningunit'),
                     type: 'text',
                     readOnly: true
                 },
                 {
-                    title: "Supplier",
+                    title: i18n.t('static.dashboard.supplier'),
                     type: 'autocomplete',
                     source: supplierList,
                     filter: this.filterSupplier
 
                 },
                 {
-                    title: "Start Date",
+                    title: i18n.t('static.common.startdate'),
                     type: 'calendar',
                     options: {
                         format: JEXCEL_DATE_FORMAT
@@ -944,18 +964,18 @@ class PlanningUnitCapacity extends Component {
 
                 },
                 {
-                    title: "End Date",
+                    title: i18n.t('static.common.stopdate'),
                     type: 'calendar',
                     options: {
                         format: JEXCEL_DATE_FORMAT
                     }
                 },
                 {
-                    title: "Capacity",
+                    title: i18n.t('static.planningunit.capacity'),
                     type: 'number',
                 },
                 {
-                    title: "Is Active",
+                    title: i18n.t('static.common.status'),
                     type: 'checkbox'
                 },
                 {
@@ -1151,7 +1171,7 @@ class PlanningUnitCapacity extends Component {
 
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         PlanningUnitService.getPlanningUnitById(this.props.match.params.planningUnitId).then(response => {
             if (response.status == 200) {
                 console.log(response.data);
@@ -1192,24 +1212,43 @@ class PlanningUnitCapacity extends Component {
                             }).catch(
                                 error => {
                                     if (error.message === "Network Error") {
-                                        this.setState({ message: error.message });
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
                                     } else {
-                                        switch (error.response.status) {
-                                            case 500:
+                                        switch (error.response ? error.response.status : "") {
+
                                             case 401:
+                                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                                break;
+                                            case 403:
+                                                this.props.history.push(`/accessDenied`)
+                                                break;
+                                            case 500:
                                             case 404:
                                             case 406:
+                                                this.setState({
+                                                    message: error.response.data.messageCode,
+                                                    loading: false
+                                                });
+                                                break;
                                             case 412:
-                                                this.setState({ loading: false, message: error.response.messageCode });
+                                                this.setState({
+                                                    message: error.response.data.messageCode,
+                                                    loading: false
+                                                });
                                                 break;
                                             default:
-                                                this.setState({ loading: false, message: 'static.unkownError' });
+                                                this.setState({
+                                                    message: 'static.unkownError',
+                                                    loading: false
+                                                });
                                                 break;
                                         }
                                     }
                                 }
                             );
-
                     } else {
                         this.setState({
                             message: response.data.messageCode, loading: false
@@ -1222,19 +1261,38 @@ class PlanningUnitCapacity extends Component {
                 }).catch(
                     error => {
                         if (error.message === "Network Error") {
-                            this.setState({ loading: false, message: error.message });
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
                         } else {
                             switch (error.response ? error.response.status : "") {
-                                case 500:
+
                                 case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
                                 case 404:
                                 case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
                                 case 412:
-                                    this.setState({ loading: false, message: error.response.data.messageCode });
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
                                     break;
                                 default:
-                                    this.setState({ loading: false, message: 'static.unkownError' });
-                                    console.log("Error code unkown");
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
                                     break;
                             }
                         }
@@ -1253,21 +1311,39 @@ class PlanningUnitCapacity extends Component {
 
         }).catch(
             error => {
-                console.log(JSON.stringify(error))
                 if (error.message === "Network Error") {
-                    this.setState({ message: error.message });
+                    this.setState({
+                        message: 'static.unkownError',
+                        loading: false
+                    });
                 } else {
                     switch (error.response ? error.response.status : "") {
-                        case 500:
+
                         case 401:
+                            this.props.history.push(`/login/static.message.sessionExpired`)
+                            break;
+                        case 403:
+                            this.props.history.push(`/accessDenied`)
+                            break;
+                        case 500:
                         case 404:
                         case 406:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
                         case 412:
-                            this.setState({ message: error.response.messageCode });
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
                             break;
                         default:
-                            this.setState({ message: 'static.unkownError' });
-                            console.log("Error code unkown");
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
                             break;
                     }
                 }
@@ -1518,11 +1594,7 @@ class PlanningUnitCapacity extends Component {
         return (
 
             <div className="animated fadeIn">
-                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
-                    this.setState({ message: message })
-                }} loading={(loading) => {
-                    this.setState({ loading: loading })
-                }} />
+                <AuthenticationServiceComponent history={this.props.history} />
                 {/* <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
                 }} /> */}
@@ -1544,7 +1616,7 @@ class PlanningUnitCapacity extends Component {
                             <div style={{ display: this.state.loading ? "block" : "none" }}>
                                 <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                     <div class="align-items-center">
-                                        <div ><h4> <strong>Loading...</strong></h4></div>
+                                        <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
                                         <div class="spinner-border blue ml-4" role="status">
                                         </div>
                                     </div>
@@ -1556,7 +1628,7 @@ class PlanningUnitCapacity extends Component {
                         <FormGroup>
                             <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                             <Button type="submit" size="md" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                            <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> Add Row</Button>
+                            <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>
                             &nbsp;
                 </FormGroup>
                     </CardFooter>

@@ -73,6 +73,13 @@ class AddRoleComponent extends Component {
 
   }
 
+  hideSecondComponent() {
+    document.getElementById('div2').style.display = 'block';
+    setTimeout(function () {
+      document.getElementById('div2').style.display = 'none';
+    }, 8000);
+  }
+
   touchAll(setTouched, errors) {
     setTouched({
       programId: true,
@@ -99,16 +106,10 @@ class AddRoleComponent extends Component {
     }
   }
 
-  hideSecondComponent() {
-    setTimeout(function () {
-      document.getElementById('div2').style.display = 'none';
-    }, 8000);
-  }
-
   componentDidMount() {
     var db1;
     getDatabase();
-    var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
+    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
     openRequest.onerror = function (event) {
       this.setState({
         message: i18n.t('static.program.errortext'),
@@ -165,7 +166,7 @@ class AddRoleComponent extends Component {
         getRequestP.onsuccess = function (event) {
           var probList = [];
           probList = getRequestP.result;
-          var filteredList=probList.filter(c=>c.problemType.id !=1)
+          var filteredList = probList.filter(c => c.problemType.id != 1)
           console.log("problemList====>", filteredList);
           this.setState({ problemList: filteredList });
 
@@ -181,7 +182,7 @@ class AddRoleComponent extends Component {
     var db1;
     var storeOS;
     getDatabase();
-    var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
+    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
     openRequest.onerror = function (event) {
       this.setState({
         message: i18n.t('static.program.errortext'),
@@ -228,7 +229,7 @@ class AddRoleComponent extends Component {
         this.setState({ programId: programId });
         var db1;
         getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         var regionList = []
         openRequest.onerror = function (event) {
           this.setState({
@@ -284,13 +285,16 @@ class AddRoleComponent extends Component {
 
     var db1;
     getDatabase();
-    var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
+    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
     var regionList = []
     openRequest.onerror = function (event) {
       this.setState({
         message: i18n.t('static.program.errortext'),
         color: 'red'
-      })
+      },
+        () => {
+          this.hideSecondComponent();
+        })
     }.bind(this);
     openRequest.onsuccess = function (e) {
 
@@ -304,7 +308,10 @@ class AddRoleComponent extends Component {
         this.setState({
           message: i18n.t('static.program.errortext'),
           color: 'red'
-        })
+        },
+          () => {
+            this.hideSecondComponent();
+          })
       }.bind(this);
       programRequest.onsuccess = function (event) {
 
@@ -329,7 +336,10 @@ class AddRoleComponent extends Component {
         planningunitRequest.onerror = function (event) {
           this.setState({
             supplyPlanError: i18n.t('static.program.errortext')
-          })
+          },
+            () => {
+              this.hideSecondComponent();
+            })
         }.bind(this);
         planningunitRequest.onsuccess = function (e) {
           var planningUnitResult = [];
@@ -346,7 +356,10 @@ class AddRoleComponent extends Component {
             this.setState({
               message: i18n.t('static.program.errortext'),
               color: 'red'
-            })
+            },
+              () => {
+                this.hideSecondComponent();
+              })
           }.bind(this);
           getRequestP.onsuccess = function (event) {
             var probList = [];
@@ -410,7 +423,9 @@ class AddRoleComponent extends Component {
                     label: {
                       label_en: 'Manual'
                     }
-                  }, createdBy: {
+                  }, 
+                  reviewed:false,
+                  createdBy: {
                     userId: userId,
                     username: username
                   },
@@ -434,7 +449,7 @@ class AddRoleComponent extends Component {
                           label_pr: null
                         }
                       },
-                      notes: "",
+                      notes: document.getElementById('notes').value,
                       createdBy: {
                         userId: userId,
                         username: username
@@ -458,17 +473,21 @@ class AddRoleComponent extends Component {
                   this.setState({
                     message: i18n.t('static.program.errortext'),
                     color: 'red'
-                  })
+                  },
+                    () => {
+                      this.hideSecondComponent();
+                    })
                 }.bind(this);
                 putRequest.onsuccess = function (event) {
-
-                  this.props.history.push(`/report/problemList/` + 'green/' + i18n.t('static.problem.addedSuccessfully'));
+                  var programId = document.getElementById("programId").value;
+                  this.props.history.push(`/report/problemList/` + programId + '/green/' + i18n.t('static.problem.addedSuccessfully'));
 
                 }.bind(this);
 
 
               } else {
                 this.props.history.push(`/report/addProblem/` + 'red/' + i18n.t('static.problem.allreadyExist'));
+                this.hideSecondComponent();
                 console.log("in else============>");
 
               }
@@ -615,6 +634,20 @@ class AddRoleComponent extends Component {
                               {problems}
                             </Input>
                             <FormFeedback className="red">{errors.problemId}</FormFeedback>
+                          </FormGroup>
+                          <FormGroup>
+                            <Label>{i18n.t('static.common.notes')}</Label>
+                            <Input type="textarea"
+                              bsSize="sm"
+                              name="notes"
+                              id="notes"
+                              // valid={!errors.problemId}
+                              // invalid={touched.problemId && !!errors.problemId}
+                              // onChange={(e) => { handleChange(e) }}
+                              // onBlur={handleBlur}
+                              // required
+                            >
+                            </Input>
                           </FormGroup>
                         </CardBody>
                         <CardFooter>

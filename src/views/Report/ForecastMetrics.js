@@ -1170,9 +1170,11 @@ class ForecastMetrics extends Component {
     console.log("cell----", cell);
     if (cell != null && cell != "") {
       return this.roundN(cell) + '%';
-    } else if ((cell == "0" && row.months == 0) || cell == null) {
+    } else if ((cell == "0" && row.months == 0)) {
       return "No data points containing both actual and forecast consumption ";
-    } else {
+    } else if(cell == null){
+      return "No data points containing  actual consumption ";
+    }else {
       return "0%"
     }
   }
@@ -1498,8 +1500,8 @@ class ForecastMetrics extends Component {
         if (forecastError > 50) {
           for (var i = 0; i < colArr.length; i++) {
             elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
-            elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', '#f48282');
-            let textColor = contrast('#f48282');
+          //  elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', '#f48282');
+            let textColor = 'red'//contrast('#f48282');
             elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'color', textColor);
           }
         } else {
@@ -1553,7 +1555,7 @@ class ForecastMetrics extends Component {
       var inputjson = {
         "realmCountryIds": CountryIds, "programIds": programIds, "planningUnitIds": planningUnitIds, "startDate": startDate, "previousMonths": monthInCalc
       }
-      AuthenticationService.setupAxiosInterceptors();
+      // AuthenticationService.setupAxiosInterceptors();
 
       ReportService.getForecastError(inputjson)
         .then(response => {
@@ -1614,7 +1616,7 @@ class ForecastMetrics extends Component {
 
   getCountrys() {
     if (navigator.onLine) {
-      AuthenticationService.setupAxiosInterceptors();
+      // AuthenticationService.setupAxiosInterceptors();
       let realmId = AuthenticationService.getRealmId();
       RealmCountryService.getRealmCountryrealmIdById(realmId)
         .then(response => {
@@ -1707,7 +1709,7 @@ class ForecastMetrics extends Component {
   }
 
   getPrograms() {
-    AuthenticationService.setupAxiosInterceptors();
+    // AuthenticationService.setupAxiosInterceptors();
     //let realmId = AuthenticationService.getRealmId();
     ProgramService.getProgramList()
       .then(response => {
@@ -1741,7 +1743,7 @@ class ForecastMetrics extends Component {
   }
 
   getProductCategories() {
-    AuthenticationService.setupAxiosInterceptors();
+    // AuthenticationService.setupAxiosInterceptors();
     let realmId = AuthenticationService.getRealmId();
     ProductService.getProductCategoryList(realmId)
       .then(response => {
@@ -1776,7 +1778,7 @@ class ForecastMetrics extends Component {
 
   }
   componentDidMount() {
-    AuthenticationService.setupAxiosInterceptors();
+    // AuthenticationService.setupAxiosInterceptors();
     this.getPrograms()
     this.getCountrys();
 

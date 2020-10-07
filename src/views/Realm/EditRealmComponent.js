@@ -22,12 +22,12 @@ let initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         realmCode: Yup.string()
-        .matches(/^\S*$/,i18n.t('static.validNoSpace.string'))
-        .required(i18n.t('static.realm.realmCodeText'))
-        .max(6, i18n.t('static.realm.realmCodeLength')),
+            .matches(/^\S*$/, i18n.t('static.validNoSpace.string'))
+            .required(i18n.t('static.realm.realmCodeText'))
+            .max(6, i18n.t('static.realm.realmCodeLength')),
         label: Yup.string()
-        .matches(/^\S+(?: \S+)*$/,i18n.t('static.validSpace.string'))
-        .required(i18n.t('static.realm.realmNameText')),
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
+            .required(i18n.t('static.realm.realmNameText')),
         minMosMinGaurdrail: Yup.number()
             .typeError(i18n.t('static.procurementUnit.validNumberText'))
             .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
@@ -193,7 +193,7 @@ export default class UpdateDataSourceComponent extends Component {
     }
 
     componentDidMount(str) {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         RealmService.getRealmById(this.props.match.params.realmId).then(response => {
             if (response.status == 200) {
                 this.setState({
@@ -212,6 +212,46 @@ export default class UpdateDataSourceComponent extends Component {
 
 
         })
+            .catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
     }
 
     Capitalize(str) {
@@ -226,7 +266,7 @@ export default class UpdateDataSourceComponent extends Component {
 
         return (
             <div className="animated fadeIn">
-                <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} loading={this.changeLoading} />
+                <AuthenticationServiceComponent history={this.props.history} />
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row style={{ display: this.state.loading ? "none" : "block" }}>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
@@ -250,7 +290,7 @@ export default class UpdateDataSourceComponent extends Component {
                                     this.setState({
                                         loading: true
                                     })
-                                    AuthenticationService.setupAxiosInterceptors();
+                                    // AuthenticationService.setupAxiosInterceptors();
                                     RealmService.updateRealm(this.state.realm)
                                         .then(response => {
                                             if (response.status == 200) {
@@ -264,6 +304,46 @@ export default class UpdateDataSourceComponent extends Component {
                                                     })
                                             }
                                         })
+                                        .catch(
+                                            error => {
+                                                if (error.message === "Network Error") {
+                                                    this.setState({
+                                                        message: 'static.unkownError',
+                                                        loading: false
+                                                    });
+                                                } else {
+                                                    switch (error.response ? error.response.status : "") {
+
+                                                        case 401:
+                                                            this.props.history.push(`/login/static.message.sessionExpired`)
+                                                            break;
+                                                        case 403:
+                                                            this.props.history.push(`/accessDenied`)
+                                                            break;
+                                                        case 500:
+                                                        case 404:
+                                                        case 406:
+                                                            this.setState({
+                                                                message: error.response.data.messageCode,
+                                                                loading: false
+                                                            });
+                                                            break;
+                                                        case 412:
+                                                            this.setState({
+                                                                message: error.response.data.messageCode,
+                                                                loading: false
+                                                            });
+                                                            break;
+                                                        default:
+                                                            this.setState({
+                                                                message: 'static.unkownError',
+                                                                loading: false
+                                                            });
+                                                            break;
+                                                    }
+                                                }
+                                            }
+                                        );
                                 }}
 
 
@@ -289,7 +369,8 @@ export default class UpdateDataSourceComponent extends Component {
                                                             id="label"
                                                             bsSize="sm"
                                                             valid={!errors.label}
-                                                            invalid={touched.label && !!errors.label || this.state.realm.label.label_en == ''}
+                                                            // invalid={touched.label && !!errors.label || this.state.realm.label.label_en == ''}
+                                                            invalid={(touched.label && !!errors.label) || !!errors.label}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.realm.label.label_en}
@@ -303,7 +384,8 @@ export default class UpdateDataSourceComponent extends Component {
                                                             id="realmCode"
                                                             bsSize="sm"
                                                             valid={!errors.realmCode}
-                                                            invalid={touched.realmCode && !!errors.realmCode || this.state.realm.realmCode == ''}
+                                                            // invalid={touched.realmCode && !!errors.realmCode || this.state.realm.realmCode == ''}
+                                                            invalid={(touched.realmCode && !!errors.realmCode) || !!errors.realmCode}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.realm.realmCode}
@@ -318,7 +400,8 @@ export default class UpdateDataSourceComponent extends Component {
                                                             id="minMosMinGaurdrail"
                                                             bsSize="sm"
                                                             valid={!errors.minMosMinGaurdrail && (this.state.realm.minMosMinGaurdrail >= 0)}
-                                                            invalid={(touched.minMosMinGaurdrail && !!errors.minMosMinGaurdrail) || (this.state.realm.minMosMinGaurdrail < 0 || (this.state.realm.minMosMinGaurdrail).toString() == '')}
+                                                            // invalid={(touched.minMosMinGaurdrail && !!errors.minMosMinGaurdrail) || (this.state.realm.minMosMinGaurdrail < 0 || (this.state.realm.minMosMinGaurdrail).toString() == '')}
+                                                            invalid={(touched.minMosMinGaurdrail && !!errors.minMosMinGaurdrail) || (this.state.realm.minMosMinGaurdrail < 0 || !!errors.minMosMinGaurdrail)}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.realm.minMosMinGaurdrail}
@@ -333,7 +416,8 @@ export default class UpdateDataSourceComponent extends Component {
                                                             id="minMosMaxGaurdrail"
                                                             bsSize="sm"
                                                             valid={!errors.minMosMaxGaurdrail && (this.state.realm.minMosMaxGaurdrail >= 0)}
-                                                            invalid={(touched.minMosMaxGaurdrail && !!errors.minMosMaxGaurdrail) || (this.state.realm.minMosMaxGaurdrail < 0 || (this.state.realm.minMosMaxGaurdrail).toString() == '')}
+                                                            // invalid={(touched.minMosMaxGaurdrail && !!errors.minMosMaxGaurdrail) || (this.state.realm.minMosMaxGaurdrail < 0 || (this.state.realm.minMosMaxGaurdrail).toString() == '')}
+                                                            invalid={(touched.minMosMaxGaurdrail && !!errors.minMosMaxGaurdrail) || (this.state.realm.minMosMaxGaurdrail < 0 || !!errors.minMosMaxGaurdrail)}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.realm.minMosMaxGaurdrail}
@@ -348,7 +432,8 @@ export default class UpdateDataSourceComponent extends Component {
                                                             id="maxMosMaxGaurdrail"
                                                             bsSize="sm"
                                                             valid={!errors.maxMosMaxGaurdrail && (this.state.realm.maxMosMaxGaurdrail >= 0)}
-                                                            invalid={(touched.maxMosMaxGaurdrail && !!errors.maxMosMaxGaurdrail) || (this.state.realm.maxMosMaxGaurdrail < 0 || (this.state.realm.maxMosMaxGaurdrail).toString() == '')}
+                                                            // invalid={(touched.maxMosMaxGaurdrail && !!errors.maxMosMaxGaurdrail) || (this.state.realm.maxMosMaxGaurdrail < 0 || (this.state.realm.maxMosMaxGaurdrail).toString() == '')}
+                                                            invalid={(touched.maxMosMaxGaurdrail && !!errors.maxMosMaxGaurdrail) || (this.state.realm.maxMosMaxGaurdrail < 0 || !!errors.maxMosMaxGaurdrail)}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.realm.maxMosMaxGaurdrail}
@@ -487,7 +572,7 @@ export default class UpdateDataSourceComponent extends Component {
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
-                            <div ><h4> <strong>Loading...</strong></h4></div>
+                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
                             <div class="spinner-border blue ml-4" role="status">
 
@@ -500,7 +585,7 @@ export default class UpdateDataSourceComponent extends Component {
     }
 
     resetClicked() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         RealmService.getRealmById(this.props.match.params.realmId).then(response => {
             this.setState({
                 realm: response.data
@@ -509,19 +594,38 @@ export default class UpdateDataSourceComponent extends Component {
         }).catch(
             error => {
                 if (error.message === "Network Error") {
-                    this.setState({ message: error.message });
+                    this.setState({
+                        message: 'static.unkownError',
+                        loading: false
+                    });
                 } else {
                     switch (error.response ? error.response.status : "") {
-                        case 500:
+
                         case 401:
+                            this.props.history.push(`/login/static.message.sessionExpired`)
+                            break;
+                        case 403:
+                            this.props.history.push(`/accessDenied`)
+                            break;
+                        case 500:
                         case 404:
                         case 406:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
                         case 412:
-                            this.setState({ message: error.response.data.messageCode });
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
                             break;
                         default:
-                            this.setState({ message: 'static.unkownError' });
-                            console.log("Error code unkown");
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
                             break;
                     }
                 }

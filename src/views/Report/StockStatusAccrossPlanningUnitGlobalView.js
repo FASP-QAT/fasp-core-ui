@@ -1015,7 +1015,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
 
   }
   getRelamList = () => {
-    AuthenticationService.setupAxiosInterceptors();
+    // AuthenticationService.setupAxiosInterceptors();
     RealmService.getRealmListAll()
       .then(response => {
         if (response.status == 200) {
@@ -1052,7 +1052,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
   }
 
   roundN = num => {
-    return parseFloat(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
+    return parseFloat(Math.round(num * Math.pow(10, 1)) / Math.pow(10, 1)).toFixed(1);
   }
   round = num => {
     return parseFloat(Math.round(num * Math.pow(10, 0)) / Math.pow(10, 0)).toFixed(0);
@@ -1173,7 +1173,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
           var planningText = doc.splitTextToSize(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.join(' , '), doc.internal.pageSize.width * 3 / 4);
           doc.text(doc.internal.pageSize.width / 8, 130, planningText)
 
-          doc.text(i18n.t('static.tracercategory.tracercategory') + ' : ' + document.getElementById("tracerCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130+(this.state.countryValues.length ), {
+          doc.text(i18n.t('static.tracercategory.tracercategory') + ' : ' + document.getElementById("tracerCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150+(this.state.countryValues.length ), {
             align: 'left'
           })
         }
@@ -1195,7 +1195,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
     var data = [];
     this.state.data.map(elt => elt.programData.map(p => data.push([getLabelText(elt.planningUnit.label, this.state.lang), getLabelText(p.program.label, this.state.lang), this.formatter(this.round(p.amc)), this.formatter(this.round(p.finalClosingBalance)), this.formatter(this.roundN(p.mos)), p.minMos, p.maxMos])));
     var height = doc.internal.pageSize.height;
-    var startY = 130 + (this.state.countryValues.length * 2)+20
+    var startY = 150 + (this.state.countryValues.length * 2)+20
     let content = {
       margin: { top: 80, bottom: 50 },
       startY: startY,
@@ -1255,6 +1255,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
     let tracercategory = document.getElementById('tracerCategoryId').value
     let realmId = document.getElementById('realmId').value
     let date = moment(new Date(this.state.singleValue2.year, this.state.singleValue2.month, 0)).startOf('month').format('YYYY-MM-DD')
+    console.log(realmId)
     if (realmId > 0 && this.state.countryValues.length > 0 && tracercategory != 0) {
       this.setState({ loading: true })
       var inputjson = {
@@ -1264,7 +1265,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
         "dt": date
 
       }
-      AuthenticationService.setupAxiosInterceptors();
+      // AuthenticationService.setupAxiosInterceptors();
       ReportService.stockStatusAcrossProducts(inputjson)
         .then(response => {
           console.log('response', JSON.stringify(response.data));
@@ -1333,7 +1334,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
   }
 
   getCountrys = () => {
-    AuthenticationService.setupAxiosInterceptors();
+    // AuthenticationService.setupAxiosInterceptors();
     let realmId = document.getElementById('realmId').value
     RealmCountryService.getRealmCountryrealmIdById(realmId)
       .then(response => {
@@ -1368,7 +1369,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
 
   getTracerCategoryList() {
 
-    AuthenticationService.setupAxiosInterceptors();
+    // AuthenticationService.setupAxiosInterceptors();
     let realmId = document.getElementById('realmId').value
     TracerCategoryService.getTracerCategoryByRealmId(realmId).then(response => {
 
@@ -1401,7 +1402,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
   }
 
   componentDidMount() {
-    AuthenticationService.setupAxiosInterceptors();
+    // AuthenticationService.setupAxiosInterceptors();
     this.getRelamList();
 
   }
@@ -1512,7 +1513,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
                             type="select" name="realmId" id="realmId"
                             onChange={(e) => { this.getCountrys(); this.getTracerCategoryList(); this.filterData(); }}
                           >
-                            <option value="">{i18n.t('static.common.select')}</option>
+                            <option value="0">{i18n.t('static.common.select')}</option>
                             {realms}
                           </Input>
 

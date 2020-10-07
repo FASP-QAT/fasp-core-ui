@@ -138,7 +138,6 @@
 
 
 //     componentDidMount() {
-//         AuthenticationService.setupAxiosInterceptors();
 //     }
 
 //     Capitalize(str) {
@@ -370,7 +369,7 @@ const validationSchema = function (values) {
     return Yup.object().shape({
         currencyCode: Yup.string()
             // .matches(ALPHABETS_REGEX, i18n.t('static.common.alphabetsOnly'))
-            .matches(/^\S*$/,i18n.t('static.validNoSpace.string'))
+            .matches(/^\S*$/, i18n.t('static.validNoSpace.string'))
             .required(i18n.t('static.currency.currencycodetext')),
         // max(4, i18n.t('static.currency.currencycodemax4digittext')),
         // currencySymbol: Yup.string()
@@ -380,7 +379,7 @@ const validationSchema = function (values) {
         //     matches(/^([^0-9]*)$/, i18n.t('static.currency.numbernotallowedtext')),
         label: Yup.string()
             // .matches(SPACE_REGEX, i18n.t('static.message.rolenamevalidtext'))
-            .matches(/^\S+(?: \S+)*$/,i18n.t('static.validSpace.string'))
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.currency.currencytext')),
         conversionRate: Yup.string()
             .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.currency.conversionrateNumberTwoDecimalPlaces'))
@@ -437,7 +436,7 @@ export default class AddCurrencyComponent extends Component {
             document.getElementById('div2').style.display = 'none';
         }, 8000);
     }
- 
+
 
     dataChange(event) {
         console.log(event.target.name)
@@ -491,7 +490,6 @@ export default class AddCurrencyComponent extends Component {
 
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
         this.setState({ loading: false })
     }
 
@@ -503,11 +501,7 @@ export default class AddCurrencyComponent extends Component {
 
         return (
             <div className="animated fadeIn">
-                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
-                    this.setState({ message: message })
-                }} loading={(loading) => {
-                    this.setState({ loading: loading })
-                }} />
+                <AuthenticationServiceComponent history={this.props.history} />
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row style={{ display: this.state.loading ? "none" : "block" }}>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
@@ -535,7 +529,46 @@ export default class AddCurrencyComponent extends Component {
                                                         this.hideSecondComponent();
                                                     })
                                             }
-                                        })
+                                        }).catch(
+                                            error => {
+                                                if (error.message === "Network Error") {
+                                                    this.setState({
+                                                        message: 'static.unkownError',
+                                                        loading: false
+                                                    });
+                                                } else {
+                                                    switch (error.response ? error.response.status : "") {
+
+                                                        case 401:
+                                                            this.props.history.push(`/login/static.message.sessionExpired`)
+                                                            break;
+                                                        case 403:
+                                                            this.props.history.push(`/accessDenied`)
+                                                            break;
+                                                        case 500:
+                                                        case 404:
+                                                        case 406:
+                                                            this.setState({
+                                                                message: error.response.data.messageCode,
+                                                                loading: false
+                                                            });
+                                                            break;
+                                                        case 412:
+                                                            this.setState({
+                                                                message: error.response.data.messageCode,
+                                                                loading: false
+                                                            });
+                                                            break;
+                                                        default:
+                                                            this.setState({
+                                                                message: 'static.unkownError',
+                                                                loading: false
+                                                            });
+                                                            break;
+                                                    }
+                                                }
+                                            }
+                                        );
 
                                 }}
 
@@ -679,7 +712,7 @@ export default class AddCurrencyComponent extends Component {
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
-                            <div ><h4> <strong>Loading...</strong></h4></div>
+                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
                             <div class="spinner-border blue ml-4" role="status">
 

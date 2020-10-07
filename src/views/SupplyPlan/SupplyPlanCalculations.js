@@ -185,8 +185,10 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                         // Shipments part
                         // Getting shipments list for planning unit
                         var shipmentList = (programJsonForStoringTheResult.shipmentList).filter(c => c.active == true && c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag == true);
+                        console.log("Shipment list----------------->", shipmentList);
                         // Getting shipment list for a month
-                        var shipmentArr = shipmentList.filter(c => (c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate))
+                        var shipmentArr = shipmentList.filter(c => (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date") ? (c.receivedDate >= startDate && c.receivedDate <= endDate) : (c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate))
+                        console.log("Shipment Arr----------------->", shipmentArr);
                         var shipmentTotalQty = 0;
                         var shipmentTotalQtyWps = 0;
                         var manualTotalQty = 0;
@@ -214,6 +216,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                         for (var j = 0; j < shipmentArr.length; j++) {
                             // Adding total shipment qty
                             shipmentTotalQty += parseInt((shipmentArr[j].shipmentQty));
+                            console.log("(shipmentArr[j].shipmentQty)", (shipmentArr[j].shipmentQty));
                             // Adding total shipment qty wps
                             if (shipmentArr[j].shipmentStatus.id != PLANNED_SHIPMENT_STATUS && shipmentArr[j].shipmentStatus.id != ON_HOLD_SHIPMENT_STATUS && shipmentArr[j].shipmentStatus.id != SUBMITTED_SHIPMENT_STATUS) {
                                 shipmentTotalQtyWps += parseInt((shipmentArr[j].shipmentQty));
@@ -311,7 +314,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                             var inventoryListForRegion = inventoryList.filter(c => c.region != null && c.region.id != 0 && c.region.id == regionList[r].id);
                             console.log("inventiryListForRegion", inventoryListForRegion);
                             // Check how many regions have reported actual stock count
-                            var noOfEntriesOfActualStockCount = (inventoryListForRegion.filter(c => c.actualQty != 0 && c.actualQty != null && c.actualQty != "")).length;
+                            var noOfEntriesOfActualStockCount = (inventoryListForRegion.filter(c => c.actualQty != undefined && c.actualQty != null && c.actualQty != "")).length;
                             // Adding count of regions reporting actual inventory
                             if (noOfEntriesOfActualStockCount > 0) {
                                 regionsReportingActualInventory += 1;
@@ -320,7 +323,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                 // If region have reported actual stock count that only consider actual stock count
                                 if (noOfEntriesOfActualStockCount > 0) {
                                     console.log("Actual stock count", actualStockCount);
-                                    if (inventoryListForRegion[inv].actualQty != "" && inventoryListForRegion[inv].actualQty != null && inventoryListForRegion[inv].actualQty != 0) {
+                                    if (inventoryListForRegion[inv].actualQty != "" && inventoryListForRegion[inv].actualQty != null && inventoryListForRegion[inv].actualQty != undefined) {
                                         actualStockCount += Math.round(parseFloat(inventoryListForRegion[inv].actualQty) * parseFloat(inventoryListForRegion[inv].multiplier));
                                     }
                                     var batchListForInventory = inventoryListForRegion[inv].batchInfoList;
@@ -354,7 +357,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     }
                                 } else {
                                     // If region has not reported actual stock count we will only consider adjustments
-                                    if (inventoryListForRegion[inv].adjustmentQty != "" && inventoryListForRegion[inv].adjustmentQty != null && inventoryListForRegion[inv].adjustmentQty != 0) {
+                                    if (inventoryListForRegion[inv].adjustmentQty != "" && inventoryListForRegion[inv].adjustmentQty != null && inventoryListForRegion[inv].adjustmentQty != undefined) {
                                         adjustmentQty += Math.round(parseFloat(inventoryListForRegion[inv].adjustmentQty) * parseFloat(inventoryListForRegion[inv].multiplier));
                                     }
                                     // Check batch details for adjustments if available
@@ -478,16 +481,22 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
 
                         // Calculations of national adjustments
                         var nationalAdjustment = 0;
+                        console.log("National adjustment");
                         // Check if all the regions have reported actual inventory and expected stock is not equal to actual stock make an national adjustment
+                        console.log("regionsReportingActualInventory", regionsReportingActualInventory, "totalNoOfRegions", totalNoOfRegions, "expectedStock", expectedStock, "actualStockCount", actualStockCount, "Adjutsment qty", adjustmentQty);
                         if (regionsReportingActualInventory == totalNoOfRegions && expectedStock != actualStockCount) {
+                            console.log("In first if");
                             nationalAdjustment = actualStockCount - expectedStock;
                         } else if (inventoryList.length != 0 && actualStockCount > (expectedStock + adjustmentQty)) {
+                            console.log("In second if");
                             // If actual stock count is greater than expected + adjustment qty that consider that stock as national adjustment
                             nationalAdjustment = actualStockCount - expectedStock;
                         } else if (regionsReportingActualInventory > 0 && expectedStock < 0) {
+                            console.log("In 3rd if");
                             // If expected is less than 0 than make an national adjustment
                             nationalAdjustment = actualStockCount - expectedStock;
                         }
+                        console.log("National adjutsment", nationalAdjustment);
                         // Calculations of national adjustments wps
                         var nationalAdjustmentWps = 0;
                         // Check if all the regions have reported actual inventory and expected stock is not equal to actual stock make an national adjustment wps
@@ -679,8 +688,10 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                         }
 
                         var mos = "";
-                        if (closingBalance != 0) {
+                        if (closingBalance != 0 && amc != 0) {
                             mos = parseFloat(closingBalance / amc).toFixed(4);
+                        } else {
+                            mos = 0;
                         }
 
                         var json = {
@@ -770,7 +781,11 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                         props.updateState("inventoryChangedFlag", 0);
                         console.log("after update state")
                         if (props.inventoryPage != "inventoryDataEntry") {
-                            props.updateState("message", i18n.t('static.message.adjustmentsSaved'));
+                            if (props.items.inventoryType == 1) {
+                                props.updateState("message", i18n.t('static.message.inventorySaved'));
+                            } else {
+                                props.updateState("message", i18n.t('static.message.adjustmentsSaved'));
+                            }
                             props.toggleLarge('Adjustments');
                             if (props.inventoryPage != "supplyPlanCompare") {
                                 props.formSubmit(props.items.planningUnit, props.items.monthCount);

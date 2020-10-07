@@ -51,7 +51,7 @@ const validationSchema = function (values) {
                     return document.getElementById("needPhoneValidation").value === "true";
 
                 },
-                then: Yup.string().min(4, i18n.t('static.user.validphonemindigit'))
+                then: Yup.string().min(6, i18n.t('static.user.validphonemindigit'))
                     .max(15, i18n.t('static.user.validphonemaxdigit'))
                     .matches(/^[0-9]*$/, i18n.t('static.user.validnumber'))
                     .required(i18n.t('static.user.validphone')),
@@ -240,7 +240,7 @@ class EditUserComponent extends Component {
             () => { });
     }
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         document.getElementById("roleValid").value = false;
         // console.log("USERID --> ", this.props.match.params.userId);
         UserService.getUserByUserId(this.props.match.params.userId).then(response => {
@@ -250,7 +250,10 @@ class EditUserComponent extends Component {
                     loading: false
                 }, (
                 ) => {
-                    // console.log("state after update---", this.state.user);
+                    // console.log("state after update--- 1", response.data);
+                    // if(response.data.phoneNumber == null){
+                    //     console.log("state after update--- 2");
+                    // }
                     // console.log("Role list---", this.state.user.roleList);
                 });
             } else {
@@ -263,7 +266,46 @@ class EditUserComponent extends Component {
             }
 
 
-        })
+        }).catch(
+            error => {
+                if (error.message === "Network Error") {
+                    this.setState({
+                        message: 'static.unkownError',
+                        loading: false
+                    });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+
+                        case 401:
+                            this.props.history.push(`/login/static.message.sessionExpired`)
+                            break;
+                        case 403:
+                            this.props.history.push(`/accessDenied`)
+                            break;
+                        case 500:
+                        case 404:
+                        case 406:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        case 412:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        default:
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                            break;
+                    }
+                }
+            }
+        );
 
         LanguageService.getLanguageList()
             .then(response => {
@@ -283,18 +325,38 @@ class EditUserComponent extends Component {
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
-                        this.setState({ message: error.message, loading: false });
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
                     } else {
                         switch (error.response ? error.response.status : "") {
-                            case 500:
+
                             case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
                             case 404:
                             case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
                             case 412:
-                                this.setState({ message: error.response.data.messageCode, loading: false });
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
                                 break;
                             default:
-                                this.setState({ message: 'static.unkownError', loading: false });
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
                                 break;
                         }
                     }
@@ -318,18 +380,38 @@ class EditUserComponent extends Component {
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
-                        this.setState({ message: error.message, loading: false });
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
                     } else {
                         switch (error.response ? error.response.status : "") {
-                            case 500:
+
                             case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
                             case 404:
                             case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
                             case 412:
-                                this.setState({ message: error.response.data.messageCode, loading: false });
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
                                 break;
                             default:
-                                this.setState({ message: 'static.unkownError', loading: false });
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
                                 break;
                         }
                     }
@@ -360,18 +442,38 @@ class EditUserComponent extends Component {
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
-                        this.setState({ message: error.message, loading: false });
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
                     } else {
                         switch (error.response ? error.response.status : "") {
-                            case 500:
+
                             case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
                             case 404:
                             case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
                             case 412:
-                                this.setState({ message: error.response.data.messageCode, loading: false });
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
                                 break;
                             default:
-                                this.setState({ message: 'static.unkownError', loading: false });
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
                                 break;
                         }
                     }
@@ -404,9 +506,9 @@ class EditUserComponent extends Component {
 
         return (
             <div className="animated fadeIn">
-                <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} loading={this.changeLoading} />
+                <AuthenticationServiceComponent history={this.props.history} />
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-                <Row>
+                <Row style={{ display: this.state.loading ? "none" : "block" }}>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             {/* <CardHeader>
@@ -418,7 +520,7 @@ class EditUserComponent extends Component {
                                     username: this.state.user.username,
                                     realmId: this.state.user.realm.realmId,
                                     emailId: this.state.user.emailId,
-                                    phoneNumber: this.state.user.phoneNumber,
+                                    phoneNumber: (this.state.user.phoneNumber == null ? '' : this.state.user.phoneNumber),
                                     roles: this.state.user.roleList,
                                     languageId: this.state.user.language.languageId,
                                     roleId: this.state.user.roleList
@@ -449,24 +551,43 @@ class EditUserComponent extends Component {
                                         .catch(
                                             error => {
                                                 if (error.message === "Network Error") {
-                                                    this.setState({ message: error.message, loading: false });
+                                                    this.setState({
+                                                        message: 'static.unkownError',
+                                                        loading: false
+                                                    });
                                                 } else {
                                                     switch (error.response ? error.response.status : "") {
-                                                        case 500:
+
                                                         case 401:
+                                                            this.props.history.push(`/login/static.message.sessionExpired`)
+                                                            break;
+                                                        case 403:
+                                                            this.props.history.push(`/accessDenied`)
+                                                            break;
+                                                        case 500:
                                                         case 404:
                                                         case 406:
+                                                            this.setState({
+                                                                message: error.response.data.messageCode,
+                                                                loading: false
+                                                            });
+                                                            break;
                                                         case 412:
-                                                            this.setState({ message: error.response.data.messageCode, loading: false });
+                                                            this.setState({
+                                                                message: error.response.data.messageCode,
+                                                                loading: false
+                                                            });
                                                             break;
                                                         default:
-                                                            this.setState({ message: 'static.unkownError', loading: false });
+                                                            this.setState({
+                                                                message: 'static.unkownError',
+                                                                loading: false
+                                                            });
                                                             break;
                                                     }
                                                 }
                                             }
                                         );
-
 
                                 }}
                                 render={
@@ -494,7 +615,7 @@ class EditUserComponent extends Component {
                                                         type="hidden"
                                                         name="needPhoneValidation"
                                                         id="needPhoneValidation"
-                                                        value={(this.state.user.phoneNumber === '' ? false : true)}
+                                                        value={((this.state.user.phoneNumber === '' || this.state.user.phoneNumber == null) ? false : true)}
                                                     />
                                                     <FormGroup>
                                                         <Label htmlFor="realmId">{i18n.t('static.realm.realm')}<span class="red Reqasterisk">*</span></Label><Input
@@ -514,9 +635,11 @@ class EditUserComponent extends Component {
                                                             id="username"
                                                             bsSize="sm"
                                                             valid={!errors.username}
-                                                            invalid={touched.username && !!errors.username || this.state.user.username == ''}
+                                                            // invalid={touched.username && !!errors.username || this.state.user.username == ''}
+                                                            invalid={(touched.username && !!errors.username) || !!errors.username}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
+                                                            maxLength={25}
                                                             required
                                                             value={this.state.user.username}
                                                         /> <FormFeedback className="red">{errors.username}</FormFeedback>
@@ -528,9 +651,11 @@ class EditUserComponent extends Component {
                                                             id="emailId"
                                                             bsSize="sm"
                                                             valid={!errors.emailId}
-                                                            invalid={touched.emailId && !!errors.emailId || this.state.user.emailId == ''}
+                                                            // invalid={touched.emailId && !!errors.emailId || this.state.user.emailId == ''}
+                                                            invalid={(touched.emailId && !!errors.emailId) || !!errors.emailId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
+                                                            maxLength={50}
                                                             required
                                                             value={this.state.user.emailId}
                                                         />
@@ -543,7 +668,8 @@ class EditUserComponent extends Component {
                                                             id="phoneNumber"
                                                             bsSize="sm"
                                                             valid={!errors.phoneNumber}
-                                                            invalid={touched.phoneNumber && !!errors.phoneNumber}
+                                                            // invalid={touched.phoneNumber && !!errors.phoneNumber}
+                                                            invalid={(touched.phoneNumber && !!errors.phoneNumber) || !!errors.phoneNumber}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             required
@@ -597,7 +723,8 @@ class EditUserComponent extends Component {
                                                             id="languageId"
                                                             bsSize="sm"
                                                             valid={!errors.languageId}
-                                                            invalid={touched.languageId && !!errors.languageId || this.state.user.language.languageId == ''}
+                                                            // invalid={touched.languageId && !!errors.languageId || this.state.user.language.languageId == ''}
+                                                            invalid={touched.languageId && !!errors.languageId || !!errors.languageId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             required
@@ -657,6 +784,17 @@ class EditUserComponent extends Component {
                         </Card>
                     </Col>
                 </Row>
+                <Row style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </Row>
             </div>
         );
     }
@@ -670,7 +808,46 @@ class EditUserComponent extends Component {
                 user: response.data
             });
 
-        })
+        }).catch(
+            error => {
+                if (error.message === "Network Error") {
+                    this.setState({
+                        message: 'static.unkownError',
+                        loading: false
+                    });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+
+                        case 401:
+                            this.props.history.push(`/login/static.message.sessionExpired`)
+                            break;
+                        case 403:
+                            this.props.history.push(`/accessDenied`)
+                            break;
+                        case 500:
+                        case 404:
+                        case 406:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        case 412:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        default:
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                            break;
+                    }
+                }
+            }
+        );
     }
 }
 

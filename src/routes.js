@@ -193,6 +193,7 @@ const StockStatusMatrixReport = React.lazy(() => import('./views/Report/StockSta
 const StockStatusReport = React.lazy(() => import('./views/Report/StockStatus'));
 const GlobalConsumptionReport = React.lazy(() => import('./views/Report/GlobalConsumption'));
 const ProgramOnboarding = React.lazy(() => import('./views/Program/ProgramOnboarding'));
+const DeleteLocalPrograms = React.lazy(() => import('./views/Program/DeleteLocalProgramComponent'));
 const ShipmentList = React.lazy(() => import('./views/Shipment/ShipmentDetails'));
 const ForecastMetricsOverTime = React.lazy(() => import('./views/Report/ForecastMetricsOverTime'));
 const pipeline = React.lazy(() => import('./views/Pipeline/PipelineProgramImport'));
@@ -228,6 +229,7 @@ const StockAdjustment = React.lazy(() => import('./views/Report/StockAdjustment'
 const StockStatusReportAcrossPlanningUnits = React.lazy(() => import('./views/Report/StockStatusAcrossPlanningUnits'));
 const ExpiredInventory = React.lazy(() => import('./views/Report/ExpiredInventory'));
 const Budgets = React.lazy(() => import('./views/Report/Budgets'));
+
 // const EditProblem = React.lazy(() => import('./views/Problem/EditProblem'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
@@ -236,7 +238,8 @@ const routes = [
   { path: '/consumptionDetails/:programId/:versionId/:planningUnitId', name: i18n.t('static.dashboard.consumptiondetails'), component: ConsumptionDetails },
   { path: '/shipment/shipmentDetails/:programId/:versionId/:planningUnitId', name: i18n.t('static.dashboard.shipmentdetails'), component: ShipmentList },
   { path: '/report/addProblem/:color/:message', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.report.problem') }), component: AddProblem },
-  { path: '/report/problemList/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.qatProblem') }), component: ProblemList },
+  { path: '/report/problemList/:color/:message', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.qatProblem') }), component: ProblemList },
+  { path: '/report/problemList/:programId/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.qatProblem') }), component: ProblemList },
   // { path: '/report/problemList', name: 'Qat Problem List', component: ProblemList },
 
   { path: '/problem/editProblem', name: ' Edit Problem', component: EditProblem },
@@ -378,7 +381,7 @@ const routes = [
   { path: '/user/addUser', exact: true, name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.addupdateuser') }), component: AddUser },
   { path: '/user/editUser/:userId', exact: true, name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.addupdateuser') }), component: EditUser },
   { path: '/user/accessControl/:userId', exact: true, name: i18n.t('static.dashboard.useraccessctrl'), component: AccessControl },
-  { path: '/accessDenied', exact: true, component: AccessDenied },
+  { path: '/accessDenied', exact: true, name: i18n.t('static.accessDenied'), component: AccessDenied },
 
   // { path: '/dashboard/:message', component: Dashboard },
   { path: '/dashboard/:color/:message', component: Dashboard },
@@ -496,6 +499,7 @@ const routes = [
   { path: '/report/shipmentSummery/:message', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.report.shipmentSummeryReport'), component: ShipmentSummery },
   { path: '/report/stockStatusAcrossPlanningUnits', name: i18n.t('static.dashboard.stockstatusacrossplanningunit'), component: StockStatusReportAcrossPlanningUnits },
   { path: '/report/budgets', name: i18n.t('static.dashboard.budgetheader'), component: Budgets },
+  { path: '/program/deleteLocalProgram', name: i18n.t('static.program.deleteLocalProgram'), component: DeleteLocalPrograms },
 
 
 

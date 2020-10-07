@@ -29,7 +29,8 @@ const validationSchema = function (values) {
       .required(i18n.t('static.fundingsource.fundingsourcetext')),
     fundingSourceCode: Yup.string()
       // .max(6, i18n.t('static.common.max6digittext'))
-      .matches(/^[a-zA-Z]+$/, i18n.t('static.common.alphabetsOnly'))
+      // .matches(/^[a-zA-Z]+$/, i18n.t('static.common.alphabetsOnly'))
+      .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly'))
       .required(i18n.t('static.fundingsource.fundingsourceCodeText')),
   })
 }
@@ -128,7 +129,7 @@ class AddFundingSourceComponent extends Component {
     }
   }
   componentDidMount() {
-    AuthenticationService.setupAxiosInterceptors();
+    // AuthenticationService.setupAxiosInterceptors();
     RealmService.getRealmListAll()
       .then(response => {
         if (response.status == 200) {
@@ -136,7 +137,46 @@ class AddFundingSourceComponent extends Component {
         } else {
           this.setState({ message: response.data.messageCode, loading: false })
         }
-      })
+      }).catch(
+        error => {
+          if (error.message === "Network Error") {
+            this.setState({
+              message: 'static.unkownError',
+              loading: false
+            });
+          } else {
+            switch (error.response ? error.response.status : "") {
+
+              case 401:
+                this.props.history.push(`/login/static.message.sessionExpired`)
+                break;
+              case 403:
+                this.props.history.push(`/accessDenied`)
+                break;
+              case 500:
+              case 404:
+              case 406:
+                this.setState({
+                  message: error.response.data.messageCode,
+                  loading: false
+                });
+                break;
+              case 412:
+                this.setState({
+                  message: error.response.data.messageCode,
+                  loading: false
+                });
+                break;
+              default:
+                this.setState({
+                  message: 'static.unkownError',
+                  loading: false
+                });
+                break;
+            }
+          }
+        }
+      );
   }
   hideSecondComponent() {
     setTimeout(function () {
@@ -156,11 +196,7 @@ class AddFundingSourceComponent extends Component {
       }, this);
     return (
       <div className="animated fadeIn">
-        <AuthenticationServiceComponent history={this.props.history} message={(message) => {
-          this.setState({ message: message })
-        }} loading={(loading) => {
-          this.setState({ loading: loading })
-        }} />
+        <AuthenticationServiceComponent history={this.props.history} />
         <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
         <Row style={{ display: this.state.loading ? "none" : "block" }}>
           <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
@@ -189,7 +225,46 @@ class AddFundingSourceComponent extends Component {
                             this.hideSecondComponent();
                           })
                       }
-                    })
+                    }).catch(
+                      error => {
+                        if (error.message === "Network Error") {
+                          this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                          });
+                        } else {
+                          switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                              this.props.history.push(`/login/static.message.sessionExpired`)
+                              break;
+                            case 403:
+                              this.props.history.push(`/accessDenied`)
+                              break;
+                            case 500:
+                            case 404:
+                            case 406:
+                              this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                              });
+                              break;
+                            case 412:
+                              this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                              });
+                              break;
+                            default:
+                              this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                              });
+                              break;
+                          }
+                        }
+                      }
+                    );
                 }}
                 render={
                   ({
@@ -234,6 +309,7 @@ class AddFundingSourceComponent extends Component {
                               invalid={touched.fundingSource && !!errors.fundingSource}
                               onChange={(e) => { handleChange(e); this.dataChange(e) }}
                               onBlur={handleBlur}
+                              maxLength={255}
                               value={this.Capitalize(this.state.fundingSource.label.label_en)}
                               required />
                             <FormFeedback className="red">{errors.fundingSource}</FormFeedback>
@@ -276,7 +352,7 @@ class AddFundingSourceComponent extends Component {
         <div style={{ display: this.state.loading ? "block" : "none" }}>
           <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
             <div class="align-items-center">
-              <div ><h4> <strong>Loading...</strong></h4></div>
+              <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
               <div class="spinner-border blue ml-4" role="status">
 

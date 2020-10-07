@@ -21,7 +21,8 @@ const validationSchema = function (values) {
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.fundingsource.fundingsourcetext')),
         fundingSourceCode: Yup.string()
-            .matches(/^[a-zA-Z]+$/, i18n.t('static.common.alphabetsOnly'))
+            // .matches(/^[a-zA-Z]+$/, i18n.t('static.common.alphabetsOnly'))
+            .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly'))
             .required(i18n.t('static.fundingsource.fundingsourceCodeText')),
     })
 }
@@ -90,7 +91,7 @@ class EditFundingSourceComponent extends Component {
     }
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         FundingSourceService.getFundingSourceById(this.props.match.params.fundingSourceId).then(response => {
             if (response.status == 200) {
                 console.log("RESP----", response.data);
@@ -184,7 +185,7 @@ class EditFundingSourceComponent extends Component {
                                     this.setState({
                                         loading: true
                                     })
-                                    AuthenticationService.setupAxiosInterceptors();
+                                    // AuthenticationService.setupAxiosInterceptors();
                                     console.log("FUNDING_SOURCE----", this.state.fundingSource);
                                     FundingSourceService.updateFundingSource(this.state.fundingSource)
                                         .then(response => {
@@ -234,10 +235,12 @@ class EditFundingSourceComponent extends Component {
                                                             id="fundingSource"
                                                             bsSize="sm"
                                                             valid={!errors.fundingSource}
-                                                            invalid={touched.fundingSource && !!errors.fundingSource || this.state.fundingSource.label.label_en == ''}
+                                                            // invalid={touched.fundingSource && !!errors.fundingSource || this.state.fundingSource.label.label_en == ''}
+                                                            invalid={(touched.fundingSource && !!errors.fundingSource) || !!errors.fundingSource}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.fundingSource.label.label_en}
+                                                            maxLength={255}
                                                             required />
                                                         <FormFeedback className="red">{errors.fundingSource}</FormFeedback>
                                                     </FormGroup>
@@ -248,7 +251,8 @@ class EditFundingSourceComponent extends Component {
                                                             id="fundingSourceCode"
                                                             bsSize="sm"
                                                             valid={!errors.fundingSourceCode && this.state.fundingSource.fundingSourceCode != ''}
-                                                            invalid={touched.fundingSourceCode && !!errors.fundingSourceCode || this.state.fundingSource.fundingSourceCode == ''}
+                                                            // invalid={touched.fundingSourceCode && !!errors.fundingSourceCode || this.state.fundingSource.fundingSourceCode == ''}
+                                                            invalid={(touched.fundingSourceCode && !!errors.fundingSourceCode) || !!errors.fundingSourceCode}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.fundingSource.fundingSourceCode}
@@ -313,7 +317,7 @@ class EditFundingSourceComponent extends Component {
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
-                            <div ><h4> <strong>Loading...</strong></h4></div>
+                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
                             <div class="spinner-border blue ml-4" role="status">
 
@@ -333,7 +337,7 @@ class EditFundingSourceComponent extends Component {
     }
 
     resetClicked() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         FundingSourceService.getFundingSourceById(this.props.match.params.fundingSourceId).then(response => {
             this.setState({
                 fundingSource: response.data

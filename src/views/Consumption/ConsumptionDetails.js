@@ -7,7 +7,7 @@ import {
 } from 'reactstrap';
 import { Formik } from 'formik';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, DELIVERED_SHIPMENT_STATUS } from '../../Constants.js'
 import getLabelText from '../../CommonComponent/getLabelText'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import i18n from '../../i18n';
@@ -304,20 +304,36 @@ export default class ConsumptionDetails extends React.Component {
                     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                     var programJson = JSON.parse(programData);
                     var batchInfoList = programJson.batchInfoList;
+                    var batchList = [];
+                    var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == planningUnitId && c.active.toString() == "true" && c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS);
+
+                    for (var sl = 0; sl < shipmentList.length; sl++) {
+                        var bdl = shipmentList[sl].batchInfoList;
+                        for (var bd = 0; bd < bdl.length; bd++) {
+                            var index = batchList.findIndex(c => c.batchNo == bdl[bd].batch.batchNo);
+                            if (index == -1) {
+                                var batchDetailsToPush = batchInfoList.filter(c => c.batchNo == bdl[bd].batch.batchNo && c.planningUnitId == planningUnitId)[0];
+                                batchList.push(batchDetailsToPush);
+                            }
+                        }
+                    }
+
                     var consumptionListUnFiltered = (programJson.consumptionList);
                     var consumptionList = (programJson.consumptionList).filter(c =>
                         c.planningUnit.id == planningUnitId &&
                         c.region != null && c.region.id != 0 &&
                         moment(c.consumptionDate).format("YYYY-MM-DD") >= moment(startDate).format("YYYY-MM-DD") && moment(c.consumptionDate).format("YYYY-MM-DD") <= moment(stopDate).format("YYYY-MM-DD"));
                     this.setState({
-                        batchInfoList: batchInfoList,
+                        batchInfoList: batchList,
                         programJson: programJson,
                         consumptionListUnFiltered: consumptionListUnFiltered,
                         consumptionList: consumptionList,
                         showConsumption: 1,
                         consumptionMonth: "",
                         consumptionStartDate: "",
-                        consumptionRegion: ""
+                        consumptionRegion: "",
+                        startDate: startDate,
+                        stopDate: stopDate
                     })
                     this.refs.consumptionChild.showConsumptionData();
                 }.bind(this)
@@ -362,11 +378,7 @@ export default class ConsumptionDetails extends React.Component {
         }
         return (
             <div className="animated fadeIn">
-                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
-                    this.setState({ message: message })
-                }} loading={(loading) => {
-                    this.setState({ loading: loading })
-                }} />
+                <AuthenticationServiceComponent history={this.props.history} />
                 <h5 className={this.state.color} id="div1">{i18n.t(this.state.message, { entityname }) || this.state.supplyPlanError}</h5>
                 <h5 id="div2" className="red">{this.state.consumptionDuplicateError || this.state.consumptionNoStockError || this.state.consumptionError}</h5>
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>

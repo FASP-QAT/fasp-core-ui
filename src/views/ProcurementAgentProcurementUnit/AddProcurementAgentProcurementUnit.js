@@ -116,7 +116,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
         console.log('hasDuplicate', hasDuplicate);
         if (hasDuplicate) {
             this.setState({
-                message: 'Duplicate Procurement Unit Details Found',
+                message: i18n.t('static.procurementUnit.duplicateProcurementUnit'),
                 changedFlag: 0,
 
             },
@@ -169,7 +169,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
 
             }
             console.log("procurementUnitArray----->", procurementUnitArray);
-            AuthenticationService.setupAxiosInterceptors();
+            // AuthenticationService.setupAxiosInterceptors();
             ProcurementAgentService.addprocurementAgentProcurementUnitMapping(procurementUnitArray)
                 .then(response => {
                     if (response.status == "200") {
@@ -187,19 +187,38 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                 }).catch(
                     error => {
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message, loading: false });
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
                         } else {
                             switch (error.response ? error.response.status : "") {
-                                case 500:
+
                                 case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
                                 case 404:
                                 case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
                                 case 412:
-                                    this.setState({ message: error.response.data.messageCode, loading: false });
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
                                     break;
                                 default:
-                                    this.setState({ message: 'static.unkownError', loading: false });
-                                    console.log("Error code unkown");
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
                                     break;
                             }
                         }
@@ -422,7 +441,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
         var procurmentAgentListJexcel = [];
         var procurmentUnitListJexcel = [];
 
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         ProcurementAgentService.getProcurementAgentProcurementUnitList(this.state.procurementAgentId)
             .then(response => {
                 if (response.status == 200) {
@@ -431,7 +450,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                     if (myResponse.length > 0) {
                         this.setState({ rows: myResponse });
                     }
-                    AuthenticationService.setupAxiosInterceptors();
+                    // AuthenticationService.setupAxiosInterceptors();
                     ProcurementAgentService.getProcurementAgentListAll().then(response => {
                         if (response.status == "200") {
                             // console.log("second--->", response.data);
@@ -445,7 +464,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                 }
                                 procurmentAgentListJexcel.push(procurementAgentJson);
                             }
-                            AuthenticationService.setupAxiosInterceptors();
+                            // AuthenticationService.setupAxiosInterceptors();
                             ProcurementUnitService.getProcurementUnitList().then(response => {
                                 if (response.status == 200) {
                                     // console.log("third ffff---->", response.data);
@@ -730,19 +749,38 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                             }).catch(
                                 error => {
                                     if (error.message === "Network Error") {
-                                        this.setState({ message: error.message });
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
                                     } else {
                                         switch (error.response ? error.response.status : "") {
-                                            case 500:
+
                                             case 401:
+                                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                                break;
+                                            case 403:
+                                                this.props.history.push(`/accessDenied`)
+                                                break;
+                                            case 500:
                                             case 404:
                                             case 406:
+                                                this.setState({
+                                                    message: error.response.data.messageCode,
+                                                    loading: false
+                                                });
+                                                break;
                                             case 412:
-                                                this.setState({ message: error.response.data.messageCode });
+                                                this.setState({
+                                                    message: error.response.data.messageCode,
+                                                    loading: false
+                                                });
                                                 break;
                                             default:
-                                                this.setState({ message: 'static.unkownError' });
-                                                console.log("Error code unkown 1");
+                                                this.setState({
+                                                    message: 'static.unkownError',
+                                                    loading: false
+                                                });
                                                 break;
                                         }
                                     }
@@ -760,19 +798,38 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                     }).catch(
                         error => {
                             if (error.message === "Network Error") {
-                                this.setState({ message: error.message });
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
                             } else {
                                 switch (error.response ? error.response.status : "") {
-                                    case 500:
+
                                     case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
                                     case 404:
                                     case 406:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
                                     case 412:
-                                        this.setState({ message: error.response.data.messageCode });
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
                                         break;
                                     default:
-                                        this.setState({ message: 'static.unkownError' });
-                                        console.log("Error code unkown 2");
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
                                         break;
                                 }
                             }
@@ -789,19 +846,38 @@ export default class AddProcurementAgentProcurementUnit extends Component {
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
                     } else {
                         switch (error.response ? error.response.status : "") {
-                            case 500:
+
                             case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
                             case 404:
                             case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
                             case 412:
-                                this.setState({ message: error.response.data.messageCode });
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
                                 break;
                             default:
-                                this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown 3", error.response.data.messageCode);
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
                                 break;
                         }
                     }
@@ -822,11 +898,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
     render() {
         return (
             <div className="animated fadeIn">
-                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
-                    this.setState({ message: message })
-                }} loading={(loading) => {
-                    this.setState({ loading: loading })
-                }} />
+                <AuthenticationServiceComponent history={this.props.history} />
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
                 <div style={{ display: this.state.loading ? "none" : "block" }}>
 
@@ -854,7 +926,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
 
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 <Button type="submit" size="md" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRowInJexcel()}> <i className="fa fa-plus"></i> Add Row</Button>
+                                <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRowInJexcel()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>
                             </FormGroup>
 
                         </CardFooter>
@@ -864,7 +936,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                 <Row style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
-                            <div ><h4> <strong>Loading...</strong></h4></div>
+                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
                             <div class="spinner-border blue ml-4" role="status">
 

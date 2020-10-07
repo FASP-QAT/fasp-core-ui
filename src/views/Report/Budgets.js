@@ -50,15 +50,45 @@ const chartoptions =
         }],
         xAxes: [{
             ticks: {
-                fontColor: 'black'
+                fontColor: 'black',
+                callback: function (value) {
+                    var cell1 = value
+                    cell1 += '';
+                    var x = cell1.split('.');
+                    var x1 = x[0];
+                    var x2 = x.length > 1 ? '.' + x[1] : '';
+                    var rgx = /(\d+)(\d{3})/;
+                    while (rgx.test(x1)) {
+                      x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                    }
+                    return x1 + x2;
+          
+                  }
             }
         }]
     },
 
     tooltips: {
         enabled: false,
-        custom: CustomTooltips
-    },
+        custom: CustomTooltips,
+        callbacks: {
+            label: function (tooltipItem, data) {
+      
+              let label = data.labels[tooltipItem.index];
+              let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+      
+              var cell1 = value
+              cell1 += '';
+              var x = cell1.split('.');
+              var x1 = x[0];
+              var x2 = x.length > 1 ? '.' + x[1] : '';
+              var rgx = /(\d+)(\d{3})/;
+              while (rgx.test(x1)) {
+                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+              }
+              return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
+            }
+    }},
     maintainAspectRatio: false,
     legend: {
         display: true,
@@ -138,7 +168,7 @@ class Budgets extends Component {
         columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ', '%20') });
 
         var A = [this.addDoubleQuoteToRowContent(headers)]
-        this.state.selBudget.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.budget.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), "\"" + (ele.budget.code.replaceAll(',', ' ')).replaceAll(' ', '%20') + "\"", (ele.fundingSource.code.replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.currency.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), this.roundN(ele.budgetAmt), this.roundN(ele.plannedBudgetAmt), this.roundN(ele.orderedBudgetAmt), this.roundN((ele.budgetAmt - (ele.plannedBudgetAmt + ele.orderedBudgetAmt))), this.formatDate(ele.startDate), this.formatDate(ele.stopDate)])));
+        this.state.selBudget.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.budget.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), (ele.budget.code.replaceAll(',', ' ')).replaceAll(' ', '%20') , (ele.fundingSource.code.replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.currency.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), this.roundN(ele.budgetAmt), this.roundN(ele.plannedBudgetAmt), this.roundN(ele.orderedBudgetAmt), this.roundN((ele.budgetAmt - (ele.plannedBudgetAmt + ele.orderedBudgetAmt))), this.formatDate(ele.startDate), this.formatDate(ele.stopDate)])));
 
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
@@ -334,7 +364,7 @@ console.log(plannedShipmentbudget)
             } else {
                 this.setState({ loading: true })
                 var inputjson = { "programId": programId, "versionId": versionId }
-                AuthenticationService.setupAxiosInterceptors();
+                // AuthenticationService.setupAxiosInterceptors();
                 ReportService.budgetReport(inputjson)
                     .then(response => {
                         console.log(JSON.stringify(response.data));
@@ -385,7 +415,7 @@ console.log(plannedShipmentbudget)
 
     getPrograms = () => {
         if (navigator.onLine) {
-            AuthenticationService.setupAxiosInterceptors();
+            // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramList()
                 .then(response => {
                     console.log(JSON.stringify(response.data))
@@ -679,10 +709,10 @@ console.log(plannedShipmentbudget)
             labels: budgets.map(ele => getLabelText(ele.label, this.state.lang)),
             datasets: [
                 {
-                    label: 'Budget Allocated To Shipment (Ordered)',
+                    label: i18n.t('static.budget.allocatedShipmentOrdered'),
                     type: 'horizontalBar',
                     stack: 1,
-                    backgroundColor: '#042e6a',
+                    backgroundColor: '#118b70',
                     borderColor: 'rgba(179,181,198,1)',
                     pointBackgroundColor: 'rgba(179,181,198,1)',
                     pointBorderColor: '#fff',
@@ -691,10 +721,10 @@ console.log(plannedShipmentbudget)
                     data: data1
                 },
                 {
-                    label: 'Budget Allocated To Shipment (Planned)',
+                    label: i18n.t('static.budget.allocatedShipmentPlanned'),
                     type: 'horizontalBar',
                     stack: 1,
-                    backgroundColor: '#6a82a8',
+                    backgroundColor: '#EDB944',
                     borderColor: 'rgba(179,181,198,1)',
                     pointBackgroundColor: 'rgba(179,181,198,1)',
                     pointBorderColor: '#fff',
@@ -704,10 +734,10 @@ console.log(plannedShipmentbudget)
                 },
 
                 {
-                    label: 'Budget Remaining',
+                    label: i18n.t('static.report.remainingBudgetAmt'),
                     type: 'horizontalBar',
                     stack: 1,
-                    backgroundColor: '#8aa9e6',
+                    backgroundColor: '#cfcdc9',
                     borderColor: 'rgba(179,181,198,1)',
                     pointBackgroundColor: 'rgba(179,181,198,1)',
                     pointBorderColor: '#fff',
@@ -903,7 +933,7 @@ console.log(plannedShipmentbudget)
                         <Col md="11 pl-0">
                             <div className="row">
                                 <FormGroup className="col-md-3">
-                                    <Label htmlFor="appendedInputButton">Program</Label>
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                     <div className="controls ">
                                         <InputGroup>
                                             <Input
@@ -921,7 +951,7 @@ console.log(plannedShipmentbudget)
                                     </div>
                                 </FormGroup>
                                 <FormGroup className="col-md-3">
-                                    <Label htmlFor="appendedInputButton">Version</Label>
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
                                     <div className="controls ">
                                         <InputGroup>
                                             <Input
@@ -955,7 +985,7 @@ console.log(plannedShipmentbudget)
                                         </div>
                                         <div className="col-md-12">
                                             <button className="mr-1 mb-2 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
-                                                {this.state.show ? 'Hide Data' : 'Show Data'}
+                                                {this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
                                             </button>
 
                                         </div>

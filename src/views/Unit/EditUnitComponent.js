@@ -138,7 +138,7 @@ export default class EditUnitComponent extends Component {
         }
     }
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         UnitService.getUnitById(this.props.match.params.unitId).then(response => {
             if (response.status == 200) {
                 this.setState({
@@ -155,7 +155,46 @@ export default class EditUnitComponent extends Component {
                     })
             }
 
-        })
+        }).catch(
+            error => {
+                if (error.message === "Network Error") {
+                    this.setState({
+                        message: 'static.unkownError',
+                        loading: false
+                    });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+
+                        case 401:
+                            this.props.history.push(`/login/static.message.sessionExpired`)
+                            break;
+                        case 403:
+                            this.props.history.push(`/accessDenied`)
+                            break;
+                        case 500:
+                        case 404:
+                        case 406:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        case 412:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        default:
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                            break;
+                    }
+                }
+            }
+        );
 
     }
 
@@ -169,7 +208,7 @@ export default class EditUnitComponent extends Component {
     render() {
         return (
             <div className="animated fadeIn">
-                <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} loading={this.changeLoading} />
+                <AuthenticationServiceComponent history={this.props.history} />
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row style={{ display: this.state.loading ? "none" : "block" }}>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
@@ -189,7 +228,7 @@ export default class EditUnitComponent extends Component {
                                     this.setState({
                                         loading: true
                                     })
-                                    AuthenticationService.setupAxiosInterceptors();
+                                    // AuthenticationService.setupAxiosInterceptors();
                                     UnitService.updateUnit(this.state.unit).then(response => {
                                         console.log(response)
                                         if (response.status == 200) {
@@ -204,7 +243,46 @@ export default class EditUnitComponent extends Component {
                                         }
 
                                     }
-                                    )
+                                    ).catch(
+                                        error => {
+                                            if (error.message === "Network Error") {
+                                                this.setState({
+                                                    message: 'static.unkownError',
+                                                    loading: false
+                                                });
+                                            } else {
+                                                switch (error.response ? error.response.status : "") {
+
+                                                    case 401:
+                                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                                        break;
+                                                    case 403:
+                                                        this.props.history.push(`/accessDenied`)
+                                                        break;
+                                                    case 500:
+                                                    case 404:
+                                                    case 406:
+                                                        this.setState({
+                                                            message: error.response.data.messageCode,
+                                                            loading: false
+                                                        });
+                                                        break;
+                                                    case 412:
+                                                        this.setState({
+                                                            message: error.response.data.messageCode,
+                                                            loading: false
+                                                        });
+                                                        break;
+                                                    default:
+                                                        this.setState({
+                                                            message: 'static.unkownError',
+                                                            loading: false
+                                                        });
+                                                        break;
+                                                }
+                                            }
+                                        }
+                                    );
 
                                 }}
                                 render={
@@ -231,7 +309,8 @@ export default class EditUnitComponent extends Component {
                                                             name="dimensionId"
                                                             id="dimensionId"
                                                             valid={!errors.dimensionId}
-                                                            invalid={touched.dimensionId && !!errors.dimensionId || this.state.unit.dimension.dimensionId == ''}
+                                                            // invalid={touched.dimensionId && !!errors.dimensionId || this.state.unit.dimension.dimensionId == ''}
+                                                            invalid={(touched.dimensionId && !!errors.dimensionId) || !!errors.dimensionId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             readOnly={true}
@@ -250,7 +329,8 @@ export default class EditUnitComponent extends Component {
                                                             id="unitName"
                                                             bsSize="sm"
                                                             valid={!errors.unitName}
-                                                            invalid={touched.unitName && !!errors.unitName || this.state.unit.label.label_en == ''}
+                                                            // invalid={touched.unitName && !!errors.unitName || this.state.unit.label.label_en == ''}
+                                                            invalid={(touched.unitName && !!errors.unitName) || !!errors.unitName}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.unit.label.label_en}
@@ -264,7 +344,8 @@ export default class EditUnitComponent extends Component {
                                                             id="unitCode"
                                                             bsSize="sm"
                                                             valid={!errors.unitCode}
-                                                            invalid={touched.unitCode && !!errors.unitCode || this.state.unit.unitCode == ''}
+                                                            // invalid={touched.unitCode && !!errors.unitCode || this.state.unit.unitCode == ''}
+                                                            invalid={(touched.unitCode && !!errors.unitCode) || !!errors.unitCode}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             required
@@ -325,7 +406,7 @@ export default class EditUnitComponent extends Component {
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
-                            <div ><h4> <strong>Loading...</strong></h4></div>
+                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
                             <div class="spinner-border blue ml-4" role="status">
 
@@ -345,13 +426,52 @@ export default class EditUnitComponent extends Component {
     }
 
     resetClicked() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         UnitService.getUnitById(this.props.match.params.unitId).then(response => {
             this.setState({
                 unit: response.data
             });
 
-        })
+        }).catch(
+            error => {
+                if (error.message === "Network Error") {
+                    this.setState({
+                        message: 'static.unkownError',
+                        loading: false
+                    });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+
+                        case 401:
+                            this.props.history.push(`/login/static.message.sessionExpired`)
+                            break;
+                        case 403:
+                            this.props.history.push(`/accessDenied`)
+                            break;
+                        case 500:
+                        case 404:
+                        case 406:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        case 412:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        default:
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                            break;
+                    }
+                }
+            }
+        );
     }
 
 }

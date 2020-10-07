@@ -680,8 +680,9 @@ export default class ConsumptionDetails extends React.Component {
         this.getProblemListAfterCalculation = this.getProblemListAfterCalculation.bind(this);
 
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
-
-
+        this.exportCSV = this.exportCSV.bind(this);
+        this.exportPDF = this.exportPDF.bind(this);
+        this.addDoubleQuoteToRowContent = this.addDoubleQuoteToRowContent.bind(this);
     }
 
     updateState(ekValue) {
@@ -761,12 +762,19 @@ export default class ConsumptionDetails extends React.Component {
                         problemStatusList: proList
                     })
 
+                    var programIdd = this.props.match.params.programId;
+                    if (programIdd != '' && programIdd != undefined) {
+                        document.getElementById("programId").value = programIdd;
+                        this.getProblemListAfterCalculation();
+                    }
 
                 }.bind(this);
             }.bind(this);
         }.bind(this);
 
     };
+
+
 
     rowClassNameFormat(row, rowIdx) {
         // row is whole row object
@@ -807,8 +815,7 @@ export default class ConsumptionDetails extends React.Component {
             data[14] = problemList[j].realmProblem.problem.problemId
             data[15] = problemList[j].realmProblem.problem.actionUrl
             data[16] = problemList[j].realmProblem.criticality.id
-
-
+            data[17] = getLabelText(problemList[j].realmProblem.criticality.label, this.state.lang)
             problemArray[count] = data;
             count++;
         }
@@ -825,7 +832,7 @@ export default class ConsumptionDetails extends React.Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [10, 10, 50, 50, 10, 10, 10, 50, 200, 200, 50, 50],
+            colWidths: [10, 10, 50, 50, 10, 10, 10, 50, 180, 180, 50, 100],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
@@ -896,6 +903,10 @@ export default class ConsumptionDetails extends React.Component {
                     title: 'criticalitiId',
                     type: 'hidden',
                 },
+                {
+                    title: i18n.t('static.problemAction.criticality'),
+                    type: 'text',
+                },
 
 
             ],
@@ -940,9 +951,11 @@ export default class ConsumptionDetails extends React.Component {
                                 var versionId = this.el.getValueFromCoords(3, y)
 
                                 // if (this.el.getValueFromCoords(14, y) != 2) {
-                                this.props.history.push({
-                                    pathname: `${this.el.getValueFromCoords(15, y)}/${programId}/${versionId}/${planningunitId}`,
-                                });
+
+                                // this.props.history.push({
+                                //     pathname: `${this.el.getValueFromCoords(15, y)}/${programId}/${versionId}/${planningunitId}`,
+                                // });
+                                window.open(window.location.origin + `/#${this.el.getValueFromCoords(15, y)}/${programId}/${versionId}/${planningunitId}`);
                                 // } else {
                                 //     this.props.history.push({
                                 //         pathname: `${this.el.getValueFromCoords(15, y)}`,
@@ -965,6 +978,156 @@ export default class ConsumptionDetails extends React.Component {
         })
     }
 
+    addDoubleQuoteToRowContent = (arr) => {
+        return arr.map(ele => '"' + ele + '"')
+    }
+    exportCSV(columns) {
+        var csvRow = [];
+        csvRow.push(i18n.t('static.program.program') + ' , ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20'));
+        csvRow.push('')
+        csvRow.push((i18n.t('static.report.problemStatus')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("problemStatusId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+        csvRow.push('')
+        csvRow.push((i18n.t('static.report.problemType')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("problemTypeId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+        csvRow.push('')
+        csvRow.push('')
+        csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
+        csvRow.push('')
+        const headers = [];
+        headers.push(i18n.t('static.program.programCode').replaceAll(' ', '%20'));
+        headers.push(i18n.t('static.program.versionId').replaceAll(' ', '%20'));
+        headers.push(i18n.t('static.report.createdDate').replaceAll(' ', '%20'));
+        headers.push(i18n.t('static.report.problemDescription').replaceAll(' ', '%20'));
+        headers.push(i18n.t('static.report.suggession').replaceAll(' ', '%20'));
+        headers.push(i18n.t('static.report.problemStatus').replaceAll(' ', '%20'));
+        headers.push(i18n.t('static.program.notes').replaceAll(' ', '%20'));
+        headers.push(i18n.t('static.problemAction.criticality').replaceAll(' ', '%20'));
+        // columns.map((item, idx) => { item.hidden == true ? '' : headers[idx] = ((item.text).replaceAll(' ', '%20'))});
+        var A = [this.addDoubleQuoteToRowContent(headers)];
+        this.state.data.map(
+            ele => A.push(this.addDoubleQuoteToRowContent([
+                (ele.program.code).replaceAll(' ', '%20'),
+                ele.versionId,
+                moment(ele.createdDate).format('MMM-YY').replaceAll(' ', '%20'),
+                getProblemDesc(ele, this.state.lang).replaceAll(' ', '%20'),
+                getSuggestion(ele, this.state.lang).replaceAll(' ', '%20'),
+                getLabelText(ele.problemStatus.label, this.state.lang).replaceAll(' ', '%20'),
+                this.getNote(ele, this.state.lang).replaceAll(' ', '%20'),
+                getLabelText(ele.realmProblem.criticality.label, this.state.lang).replaceAll(' ', '%20')
+            ])));
+        for (var i = 0; i < A.length; i++) {
+            csvRow.push(A[i].join(","))
+        }
+        var csvString = csvRow.join("%0A")
+        var a = document.createElement("a")
+        a.href = 'data:attachment/csv,' + csvString
+        a.target = "_Blank"
+        a.download = i18n.t('static.report.qatProblemActionReport') + '.csv';
+        document.body.appendChild(a)
+        a.click() 
+    }
+
+    exportPDF(columns) {
+        const addFooters = doc => {
+            const pageCount = doc.internal.getNumberOfPages()
+
+            for (var i = 1; i <= pageCount; i++) {
+                doc.setFont('helvetica', 'bold')
+                doc.setFontSize(6)
+                doc.setPage(i)
+                doc.setPage(i)
+                doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
+                    align: 'center'
+                })
+
+                doc.text('Copyright © 2020 Quantification Analytics Tool', doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+                    align: 'center'
+                })
+            }
+        }
+        const addHeaders = doc => {
+            const pageCount = doc.internal.getNumberOfPages()
+
+            for (var i = 1; i <= pageCount; i++) {
+                doc.setFont('helvetica', 'bold')
+                doc.setFontSize(12)
+                doc.setFont('helvetica', 'bold')
+                doc.setPage(i)
+                doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
+                doc.setTextColor("#002f6c");
+                doc.text(i18n.t('static.report.qatProblemActionReport'), doc.internal.pageSize.width / 2, 60, {
+                    align: 'center'
+                })
+                if (i == 1) {
+                    doc.setFontSize(8)
+                    doc.setFont('helvetica', 'normal')
+                    doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
+                        align: 'left'
+                    })
+
+                    doc.text(i18n.t('static.report.problemStatus') + ' : ' + document.getElementById("problemStatusId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
+                        align: 'left'
+                    })
+                    doc.text(i18n.t('static.report.problemType') + ' : ' + document.getElementById("problemTypeId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
+                        align: 'left'
+                    })
+
+                }
+
+
+
+            }
+        }
+        const unit = "pt";
+        const size = "A4"; // Use A1, A2, A3 or A4
+        const orientation = "landscape"; // portrait or landscape
+        const marginLeft = 10;
+        const doc = new jsPDF(orientation, unit, size, true);
+        doc.setFontSize(8);
+        const title = i18n.t('static.report.qatProblemActionReport');
+        var width = doc.internal.pageSize.width;
+        var height = doc.internal.pageSize.height;
+        var h1 = 50;
+
+        const headers = [];
+        headers.push(i18n.t('static.program.programCode'));
+        headers.push(i18n.t('static.program.versionId'));
+        headers.push(i18n.t('static.report.createdDate'));
+        headers.push(i18n.t('static.report.problemDescription'));
+        headers.push(i18n.t('static.report.suggession'));
+        headers.push(i18n.t('static.report.problemStatus'));
+        headers.push(i18n.t('static.program.notes'));
+        headers.push(i18n.t('static.problemAction.criticality'));
+        // columns.map((item, idx) => { headers[idx] = (item.text) });
+        let data = this.state.data.map(ele => [
+            (ele.program.code),
+            ele.versionId,
+            moment(ele.createdDate).format('MMM-YY'),
+            getProblemDesc(ele, this.state.lang),
+            getSuggestion(ele, this.state.lang),
+            getLabelText(ele.problemStatus.label, this.state.lang),
+            this.getNote(ele, this.state.lang),
+            getLabelText(ele.realmProblem.criticality.label, this.state.lang)
+        ]);
+
+        let content = {
+            margin: { top: 90, bottom: 70 },
+            startY: 200,
+            head: [headers],
+            body: data,
+            styles: { lineWidth: 1, fontSize: 8, cellWidth: 55, halign: 'center' },
+            columnStyles: {
+                3: { cellWidth: 170 },
+                4: { cellWidth: 170 },
+                6: { cellWidth: 150 },
+               
+            }
+        };
+        doc.autoTable(content);
+        addHeaders(doc)
+        addFooters(doc)
+        doc.save(i18n.t('static.report.qatProblemActionReport') + '.pdf')
+    }
+
     selected = function (instance, cell, x, y, value) {
 
         if ((x == 0 && value != 0) || (y == 0)) {
@@ -975,10 +1138,17 @@ export default class ConsumptionDetails extends React.Component {
                 if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROBLEM')) {
                     let problemStatusId = document.getElementById('problemStatusId').value;
                     let problemTypeId = document.getElementById('problemTypeId').value;
+                    var index = 0;
+                    if (this.el.getValueFromCoords(1, x) == "") {
+                        var index = 0;
+                    } else {
+                        index = this.el.getValueFromCoords(1, x);
+                    }
                     // console.log("problemReportId--------------------------", this.el.getValueFromCoords(0, x));
                     // console.log("problemActionIndex--------------------------", this.el.getValueFromCoords(1, x));
+                    console.log("URL", `/report/editProblem/${this.el.getValueFromCoords(0, x)}/${this.state.programId}/${index}/${problemStatusId}/${problemTypeId}`);
                     this.props.history.push({
-                        pathname: `/report/editProblem/${this.el.getValueFromCoords(0, x)}/ ${this.state.programId}/${this.el.getValueFromCoords(1, x)}/${problemStatusId}/${problemTypeId}`,
+                        pathname: `/report/editProblem/${this.el.getValueFromCoords(0, x)}/${this.state.programId}/${index}/${problemStatusId}/${problemTypeId}`,
                     });
                 }
             }
@@ -989,36 +1159,36 @@ export default class ConsumptionDetails extends React.Component {
 
         jExcelLoadedFunction(instance);
 
-        var elInstance = instance.jexcel;
-        var json = elInstance.getJson();
-        for (var j = 0; j < json.length; j++) {
-            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P']
-            var rowData = elInstance.getRowData(j);
-            var criticalityId = rowData[16];
-            var problemStatusId = rowData[12];
-            if (criticalityId == 3 && problemStatusId == 1) {
-                for (var i = 0; i < colArr.length; i++) {
-                    elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
-                    elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', '#f48282');
-                    let textColor = contrast('#f48282');
-                    elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'color', textColor);
-                }
-            } else if (criticalityId == 2 && problemStatusId == 1) {
-                for (var i = 0; i < colArr.length; i++) {
-                    elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
-                    elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'orange');
-                    let textColor = contrast('orange');
-                    elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'color', textColor);
-                }
-            } else if (criticalityId == 1 && problemStatusId == 1) {
-                for (var i = 0; i < colArr.length; i++) {
-                    elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
-                    elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'yellow');
-                    let textColor = contrast('yellow');
-                    elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'color', textColor);
-                }
-            }
-        }
+        // var elInstance = instance.jexcel;
+        // var json = elInstance.getJson();
+        // for (var j = 0; j < json.length; j++) {
+        //     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P']
+        //     var rowData = elInstance.getRowData(j);
+        //     var criticalityId = rowData[16];
+        //     var problemStatusId = rowData[12];
+        //     if (criticalityId == 3 && problemStatusId == 1) {
+        //         for (var i = 0; i < colArr.length; i++) {
+        //             elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
+        //             elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', '#f48282');
+        //             let textColor = contrast('#f48282');
+        //             elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'color', textColor);
+        //         }
+        //     } else if (criticalityId == 2 && problemStatusId == 1) {
+        //         for (var i = 0; i < colArr.length; i++) {
+        //             elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
+        //             elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'orange');
+        //             let textColor = contrast('orange');
+        //             elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'color', textColor);
+        //         }
+        //     } else if (criticalityId == 1 && problemStatusId == 1) {
+        //         for (var i = 0; i < colArr.length; i++) {
+        //             elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
+        //             elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'yellow');
+        //             let textColor = contrast('yellow');
+        //             elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'color', textColor);
+        //         }
+        //     }
+        // }
     }
 
     getProblemListAfterCalculation() {
@@ -1035,8 +1205,11 @@ export default class ConsumptionDetails extends React.Component {
 
         let programId = document.getElementById('programId').value;
         this.setState({ programId: programId });
-        this.refs.problemListChild.qatProblemActions(programId);
-
+        if (programId != 0) {
+            this.refs.problemListChild.qatProblemActions(programId);
+        } else {
+            this.setState({ message: i18n.t('static.common.selectProgram'), data: [], loading: false });
+        }
 
     }
     fetchData() {
@@ -1085,10 +1258,37 @@ export default class ConsumptionDetails extends React.Component {
                     var programJson = JSON.parse(programData);
 
                     var problemReportList = (programJson.problemReportList);
+                    var problemReportFilterList = problemReportList;
 
+                    if (problemStatusId == -1) {
+
+                        problemReportFilterList = problemReportList.filter(c => c.problemStatus.id == 1 || c.problemStatus.id == 3);
+                        this.setState({
+                            data: problemReportFilterList,
+                            message: ''
+                        },
+                            () => {
+                                this.buildJExcel();
+                            });
+                    }
                     if (problemStatusId != -1) {
-
-                        var problemReportFilterList = problemReportList.filter(c => c.problemStatus.id == problemStatusId && c.problemType.id == problemTypeId);
+                        // var problemReportFilterList = problemReportList.filter(c => c.problemStatus.id == problemStatusId && c.problemType.id == problemTypeId);
+                        if (problemStatusId == 2) {
+                            var myStartDate = moment(Date.now()).subtract(6, 'months').startOf('month').format("YYYY-MM-DD");
+                            // var myEndDate = moment(Date.now()).format("YYYY-MM-DD");
+                            problemReportFilterList = problemReportList.filter(c => moment(c.createdDate).format("YYYY-MM-DD") >= myStartDate && c.problemStatus.id == problemStatusId);
+                        } else {
+                            problemReportFilterList = problemReportList.filter(c => c.problemStatus.id == problemStatusId);
+                        }
+                        this.setState({
+                            data: problemReportFilterList,
+                            message: ''
+                        },
+                            () => {
+                                this.buildJExcel();
+                            });
+                    } if (problemTypeId != -1) {
+                        problemReportFilterList = problemReportList.filter(c => c.problemType.id == problemTypeId);
                         this.setState({
                             data: problemReportFilterList,
                             message: ''
@@ -1097,7 +1297,7 @@ export default class ConsumptionDetails extends React.Component {
                                 this.buildJExcel();
                             });
                     } else {
-                        var problemReportFilterList = problemReportList.filter(c => c.problemType.id == problemTypeId);
+
                         this.setState({
                             data: problemReportFilterList,
                             message: ''
@@ -1105,6 +1305,7 @@ export default class ConsumptionDetails extends React.Component {
                             () => {
                                 this.buildJExcel();
                             });
+
                     }
                     // console.log("problemReportFilterList---->", problemReportFilterList);
 
@@ -1114,21 +1315,21 @@ export default class ConsumptionDetails extends React.Component {
             }.bind(this)
         }
         else if (programId == 0) {
-            this.setState({ message: i18n.t('static.common.selectProgram'), data: [],loading:false },
+            this.setState({ message: i18n.t('static.common.selectProgram'), data: [], loading: false },
                 () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
                     this.el.destroy();
                 });
         }
         else if (problemStatusId == 0) {
-            this.setState({ message: i18n.t('static.report.selectProblemStatus'), data: [],loading:false },
+            this.setState({ message: i18n.t('static.report.selectProblemStatus'), data: [], loading: false },
                 () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
                     this.el.destroy();
                 });
         }
         else if (problemTypeId == 0) {
-            this.setState({ message: i18n.t('static.report.selectProblemType'), data: [] ,loading:false},
+            this.setState({ message: i18n.t('static.report.selectProblemType'), data: [], loading: false },
                 () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
                     this.el.destroy();
@@ -1392,11 +1593,19 @@ export default class ConsumptionDetails extends React.Component {
                     <div className="Card-header-addicon">
                         <div className="card-header-actions">
                             <div className="card-header-action">
-
+                                {this.state.programId != 0 && <a href="javascript:void();" title="Recalculate" onClick={this.getProblemListAfterCalculation}><i className="fa fa-refresh"></i></a>}
+                                &nbsp;&nbsp;
                                 {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_PROBLEM') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addMannualProblem}><i className="fa fa-plus-square"></i></a>}
+
                             </div>
                         </div>
                     </div>
+                   { this.state.data.length > 0 && <div className="Card-header-reporticon">
+                        <div className="card-header-actions">
+                            <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF(columns)} />
+                            <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title="Export CSV" onClick={() => this.exportCSV(columns)} />
+                        </div>
+                    </div>}
                     <CardBody className="pb-lg-5 pt-lg-0">
                         <Col md="9 pl-1">
                             <div className="d-md-flex Selectdiv2">
@@ -1428,7 +1637,7 @@ export default class ConsumptionDetails extends React.Component {
                                                 onChange={this.fetchData}
                                             // value={1}
                                             >
-                                                <option value="-1">{i18n.t('static.common.all')}</option>
+                                                <option value="-1">Open / Addressed</option>
                                                 {problemStatus}
                                             </Input>
                                         </InputGroup>
@@ -1444,10 +1653,10 @@ export default class ConsumptionDetails extends React.Component {
                                                 name="problemTypeId" id="problemTypeId"
                                                 onChange={this.fetchData}
                                             >
-                                                {/* <option value="0">Please select</option> */}
-                                                <option value="1">Automatic</option>
-                                                <option value="2">Manual</option>
-                                                <option value="3">Automatic / Manual</option>
+                                                <option value="-1">{i18n.t('static.common.all')}</option>
+                                                <option value="1">{i18n.t('static.report.problemAction.automatic')}</option>
+                                                <option value="2">{i18n.t('static.report.problemAction.manual')}</option>
+                                                {/* <option value="3">Automatic / Manual</option> */}
                                             </Input>
                                         </InputGroup>
                                     </div>

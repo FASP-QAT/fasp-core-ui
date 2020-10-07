@@ -14,12 +14,18 @@ class AuthenticationService {
         var decryptedPassword = "";
         for (var i = 0; i < localStorage.length; i++) {
             var value = localStorage.getItem(localStorage.key(i));
+            console.log("offline value---", value);
             if (localStorage.key(i).includes("user-")) {
                 let user = JSON.parse(CryptoJS.AES.decrypt(value.toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+                console.log("offline user---", user);
                 let decryptedEmailId = user.emailId;
-                if (decryptedEmailId == emailId) {
+                console.log("offline decryptedEmailId---", decryptedEmailId);
+                if (decryptedEmailId.toUpperCase() == emailId.toUpperCase()) {
+                    console.log("offline equals---");
                     localStorage.setItem("tempUser", user.userId);
+                    console.log("offline user id---", localStorage.getItem("tempUser"));
                     decryptedPassword = user.password;
+                    console.log("offline decryptedPassword---",decryptedPassword);
                 }
             }
 
@@ -89,7 +95,9 @@ class AuthenticationService {
                 return 1;
             if (roleList.includes("ROLE_REALM_ADMIN"))
                 return 2;
-            return 3;
+            if (roleList.includes("ROLE_PROGRAM_ADMIN"))
+                return 3;
+            return 4;
         }
     }
 
@@ -163,9 +171,13 @@ class AuthenticationService {
         return decryptedUser.sessionExpiresOn;
     }
     updateUserLanguage(languageCode) {
+        console.log("Going to change language code---",languageCode)
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+        console.log("Going to change language decryptedCurUser---",decryptedCurUser)
         let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem('user-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8))
+        console.log("Going to change language decryptedUser---",decryptedUser)
         decryptedUser.language.languageCode = languageCode;
+        console.log("Going to change language decryptedUser after change---",decryptedUser)
         localStorage.removeItem('user-' + decryptedCurUser);
         localStorage.setItem('user-' + decryptedCurUser, CryptoJS.AES.encrypt(JSON.stringify(decryptedUser), `${SECRET_KEY}`));
     }
@@ -182,24 +194,28 @@ class AuthenticationService {
     setupAxiosInterceptors() {
         // axios.defaults.headers.common['Authorization'] = '';
         // delete axios.defaults.headers.common['Authorization'];
-        let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-        let decryptedToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-        let basicAuthHeader = 'Bearer ' + decryptedToken
-        axios.defaults.headers.common['Authorization'] = basicAuthHeader;
-        // axios.interceptors.request.use(
-        //     (config) => {
-        //         config.headers.authorization = decryptedToken ? basicAuthHeader : '';
-        //         return config;
-        //     }
-        // )
+        console.log("############## Going to call axios interceptos################", localStorage.getItem('curUser'));
+        if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != "") {
+            console.log("Inside set up axios");
+            let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+            let decryptedToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+            let basicAuthHeader = 'Bearer ' + decryptedToken
+            axios.defaults.headers.common['Authorization'] = basicAuthHeader;
+            // axios.interceptors.request.use(
+            //     (config) => {
+            //         config.headers.authorization = decryptedToken ? basicAuthHeader : '';
+            //         return config;
+            //     }
+            // )
 
 
-        // // Add a response interceptor
-        // axios.interceptors.response.use(function (response) {
-        //     return response;
-        // }, function (error) {
-        //     return Promise.reject(error);
-        // });
+            // // Add a response interceptor
+            // axios.interceptors.response.use(function (response) {
+            //     return response;
+            // }, function (error) {
+            //     return Promise.reject(error);
+            // });
+        }
 
     }
 
@@ -427,11 +443,12 @@ class AuthenticationService {
             let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
             if (navigator.onLine && (localStorage.getItem('token-' + decryptedCurUser) == null || localStorage.getItem('token-' + decryptedCurUser) == "")) {
                 console.log("token not available");
-                return false;
+                return true;
             }
             console.log("going to check bf functions");
             var bfunction = this.getLoggedInUserRoleBusinessFunctionArray();
-            console.log("includes---" + bfunction.includes("ROLE_BF_MANAGE_UNIT"))
+            console.log("route bfunction--->", bfunction);
+            console.log("includes---" + bfunction.includes("ROLE_BF_DELETE_LOCAL_PROGARM"))
             switch (route) {
                 case "/user/addUser":
                     if (bfunction.includes("ROLE_BF_MANAGE_USER")) {
@@ -1024,6 +1041,13 @@ class AuthenticationService {
                         return true;
                     }
                     break;
+                case "/program/deleteLocalProgram":
+                    console.log("Going to check if condition")
+                    if (bfunction.includes("ROLE_BF_DELETE_LOCAL_PROGARM")) {
+                        console.log("Going to check if condition")
+                        return true;
+                    }
+                    break;
                 case "/program/importProgram":
                     if (bfunction.includes("ROLE_BF_IMPORT_EXPORT_PROGARM")) {
                         return true;
@@ -1105,33 +1129,39 @@ class AuthenticationService {
                     break;
                 case "/logout/:message":
                 case "/logout":
+                case "/accessDenied":
                     return true;
                     break;
                 case "/problem/editProblem":
                     if (bfunction.includes("ROLE_BF_EDIT_PROBLEM")) {
                         return true;
                     }
-                    // return true
                     break;
                 case "/consumptionDetails/:programId/:versionId/:planningUnitId": return true
                     break;
+                case "/report/problemList/:programId/:color/:message":
                 case "/report/problemList/:color/:message":
                     if (bfunction.includes("ROLE_BF_PROBLEM_AND_ACTION_REPORT")) {
                         return true;
                     }
-                    // return true
                     break;
                 case "/report/addProblem/:color/:message":
                     if (bfunction.includes("ROLE_BF_ADD_PROBLEM")) {
                         return true;
                     }
-                    //  return true
                     break;
                 default:
-                    console.log("Inside default-");
+                    console.log("default case");
                     return false;
             }
+            // localStorage.removeItem("token-" + decryptedCurUser);
+        } else {
+            console.log("else in route");
+            return true;
         }
+        console.log("route access denied------------------------");
+        // let keysToRemove = ["curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken"];
+        // keysToRemove.forEach(k => localStorage.removeItem(k))
         return false;
 
     }
@@ -1153,11 +1183,55 @@ class AuthenticationService {
         throw new Error('Bad Hex');
     }
 
-    clearLocalStorage(){
-        console.log("################ Clear local storage started ################");
-        let keysToRemove = ["token-" + AuthenticationService.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken"];
+    validateRequest() {
+        console.log("inside validate request")
+        if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != "") {
+            let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+            if (this.checkTypeOfSession()) {
+                if (navigator.onLine) {
+                    if (localStorage.getItem('token-' + decryptedCurUser) != null && localStorage.getItem('token-' + decryptedCurUser) != "") {
+                        // if (this.checkLastActionTaken()) {
+                        //     var lastActionTakenStorage = CryptoJS.AES.decrypt(localStorage.getItem('lastActionTaken').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+                        //     var lastActionTaken = moment(lastActionTakenStorage);
+                        //     console.log("last action taken common component inside if---", lastActionTaken);
+                        //     localStorage.removeItem('lastActionTaken');
+                        //     localStorage.setItem('lastActionTaken', CryptoJS.AES.encrypt((moment(new Date()).format("YYYY-MM-DD HH:mm:ss")).toString(), `${SECRET_KEY}`));
+                        return "";
+                        // } else {
+                        //     var lastActionTakenStorage = CryptoJS.AES.decrypt(localStorage.getItem('lastActionTaken').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+                        //     var lastActionTaken = moment(lastActionTakenStorage);
+                        //     console.log("last action taken common component session expired---", lastActionTaken);
+                        //     localStorage.removeItem('lastActionTaken');
+                        //     return "/logout/static.message.sessionExpired";
+                        // }
+                    } else {
+                        console.log("common component token error");
+                        return "/logout/static.message.tokenError";
+                    }
+                }
+                // else {
+                //     console.log("common component user is offline");
+                //     if (this.checkLastActionTaken()) {
+                //         localStorage.removeItem('lastActionTaken');
+                //         localStorage.setItem('lastActionTaken', CryptoJS.AES.encrypt((moment(new Date()).format("YYYY-MM-DD HH:mm:ss")).toString(), `${SECRET_KEY}`));
+                //     } else {
+                //         console.log("common component offline session expired");
+                //         return "/logout/static.message.sessionExpired";
+                //     }
+                // }
+            } else {
+                return "/logout/static.message.sessionChange";
+            }
+        }
+    }
+    clearUserDetails() {
+        let keysToRemove;
+        if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != "") {
+            keysToRemove = ["token-" + this.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken"];
+        } else {
+            keysToRemove = ["curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken"];
+        }
         keysToRemove.forEach(k => localStorage.removeItem(k));
-        console.log("################ Clear local storage completed ################");
     }
 
 }

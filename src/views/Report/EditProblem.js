@@ -20,6 +20,8 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import DatePicker from 'react-datepicker';
 import '../../../node_modules/react-datepicker/dist/react-datepicker.css';
 import { DATE_FORMAT_SM, DATE_PLACEHOLDER_TEXT } from '../../Constants.js';
+import getProblemDesc from '../../CommonComponent/getProblemDesc';
+import getSuggestion from '../../CommonComponent/getSuggestion';
 // import AuthenticationService from '../../views/Common/AuthenticationService.js'
 
 
@@ -251,7 +253,7 @@ export default class EditLanguageComponent extends Component {
         // let { notes } = this.state
         // console.log("in capti;ized====>");
         var notes = str.charAt(0).toUpperCase() + str.slice(1)
-        this.setState({notes:notes});
+        this.setState({ notes: notes });
     }
     dataChange(event) {
 
@@ -286,7 +288,7 @@ export default class EditLanguageComponent extends Component {
         var problemStatusObject = {};
         var db1;
         getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
 
@@ -334,7 +336,7 @@ export default class EditLanguageComponent extends Component {
         var db1;
         const lan = 'en';
         getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
 
@@ -400,7 +402,7 @@ export default class EditLanguageComponent extends Component {
     componentDidMount() {
         // var bfList = AuthenticationService.getLoggedInUserRoleBusinessFunctionArray();
         // console.log("bfList#####====>", bfList);
-        
+
         // AuthenticationService.setupAxiosInterceptors();
         this.getProblemStatus();
         let problemReportId = this.props.match.params.problemReportId;
@@ -426,7 +428,7 @@ export default class EditLanguageComponent extends Component {
             const lan = 'en';
             var db1;
             getDatabase();
-            var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
             openRequest.onsuccess = function (e) {
                 db1 = e.target.result;
 
@@ -476,32 +478,28 @@ export default class EditLanguageComponent extends Component {
                     };
                     problemStatusRequest.onsuccess = function (e) {
                         var myResult = [];
-                        // myResult = problemStatusRequest.result;
+                        myResult = problemStatusRequest.result;
+                        myResult = myResult.filter(c => c.userManaged == true);
+                        // let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+                        // let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+                        // console.log("decryptedUser=====>", decryptedUser);
 
-                        let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-                        let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+                        // var roleList = decryptedUser.roleList;
+                        // var roleArray = []
+                        // for (var r = 0; r < roleList.length; r++) {
+                        //     roleArray.push(roleList[r].roleId)
+                        // }
 
-                        console.log("decryptedUser=====>",decryptedUser);
+                        // if (roleArray.includes("ROLE_PROGRAM_ADMIN") || roleArray.includes("ROLE_REALM_ADMIN")) {
+                        //     myResult = problemStatusRequest.result;
+                        // } else {
+                        //     var filterList = problemStatusRequest.result;
+                        //     for (var l = 0; l < 2; l++) {
+                        //         var filterList = problemStatusRequest.result;
+                        //         myResult.push(filterList[l]);
+                        //     }
+                        // }
 
-
-                        var roleList=decryptedUser.roleList;
-                        // console.log("user Role====>",roleList);
-                        var roleArray=[]
-                        for(var r=0 ;r<roleList.length;r++){
-                            roleArray.push(roleList[r].roleId)
-                        }
-                        // console.log("user Role array====>",roleArray);
-                        if(roleArray.includes("ROLE_PROGRAM_ADMIN") || roleArray.includes("ROLE_REALM_ADMIN")){
-                            // console.log("in if=======>");
-                            myResult=problemStatusRequest.result;
-                        }else{
-                            var filterList=problemStatusRequest.result;
-                            // console.log("in else======>");
-                            for(var l =0 ; l< 2;l++){
-                            var filterList=problemStatusRequest.result;
-                                myResult.push(filterList[l]);
-                            }
-                        }
                         var proList = []
                         for (var i = 0; i < myResult.length; i++) {
                             var Json = {
@@ -574,7 +572,7 @@ export default class EditLanguageComponent extends Component {
             },
             {
                 dataField: 'createdBy.username',
-                text: i18n.t('static.report.createdBy'),
+                text: i18n.t('static.report.lastmodifiedby'),
                 sort: true,
                 align: 'center',
                 style: { width: '80px' },
@@ -582,7 +580,7 @@ export default class EditLanguageComponent extends Component {
             },
             {
                 dataField: 'createdDate',
-                text: i18n.t('static.report.createdDate'),
+                text: i18n.t('static.report.lastmodifieddate'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -643,7 +641,7 @@ export default class EditLanguageComponent extends Component {
                                     var db1;
                                     var storeOS;
                                     getDatabase();
-                                    var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
+                                    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                                     openRequest.onerror = function (event) {
                                         this.setState({
                                             message: i18n.t('static.program.errortext'),
@@ -736,7 +734,10 @@ export default class EditLanguageComponent extends Component {
                                                 })
 
                                                 // this.props.history.push(`/report/problemList/` + i18n.t('static.message.consumptionSuccess'));
-                                                this.props.history.push(`/report/problemList/` + 'green/' + i18n.t('static.problem.updatedSuccessFully'));
+                                                let programId = this.props.match.params.programId;
+                                                console.log("Program Id", programId)
+                                                console.log("URL------->", `/report/problemList/` + programId + '/green/' + i18n.t('static.problem.updatedSuccessFully'));
+                                                this.props.history.push(`/report/problemList/` + programId + '/green/' + i18n.t('static.problem.updatedSuccessFully'));
                                             }.bind(this)
 
                                             // }.bind(this);
@@ -750,7 +751,7 @@ export default class EditLanguageComponent extends Component {
                                         errors,
                                         touched,
                                         handleChange,
-                                        handleBlur, 
+                                        handleBlur,
                                         handleSubmit,
                                         isSubmitting,
                                         isValid,
@@ -759,7 +760,7 @@ export default class EditLanguageComponent extends Component {
                                             <Form onSubmit={handleSubmit} noValidate name='languageForm'>
                                                 <CardBody className="pb-0">
                                                     <div className="col-md-12 bg-white pb-1  mb-2">
-                                                        <ul class="navbar-nav"><li class="nav-item pl-0"><a aria-current="page" class="nav-link active" ><b >Problem Details</b></a></li></ul>
+                                                        <ul class="navbar-nav"><li class="nav-item pl-0"><a aria-current="page" class="nav-link active" ><b >{i18n.t('static.report.problemDescription')}</b></a></li></ul>
                                                         <div className="row">
                                                             <FormGroup className="col-md-6 ">
                                                                 <Label for="program">{i18n.t('static.program.program')}</Label>
@@ -792,7 +793,7 @@ export default class EditLanguageComponent extends Component {
                                                                     required />
                                                                 <FormFeedback className="red">{errors.program}</FormFeedback>
                                                             </FormGroup>
-                                                            <FormGroup className="col-md-6 ">
+                                                            {/* <FormGroup className="col-md-6 ">
                                                                 <Label for="month">{i18n.t('static.report.month')}</Label>
                                                                 <Input type="text"
                                                                     name="month"
@@ -807,7 +808,7 @@ export default class EditLanguageComponent extends Component {
                                                                     className="form-control-sm form-control date-color"
                                                                 />
                                                                 <FormFeedback className="red">{errors.month}</FormFeedback>
-                                                            </FormGroup>
+                                                            </FormGroup> */}
 
 
                                                             <FormGroup className="col-md-6 ">
@@ -843,10 +844,10 @@ export default class EditLanguageComponent extends Component {
                                                                 />
                                                                 <FormFeedback className="red">{errors.createdDate}</FormFeedback>
                                                             </FormGroup>
-
-                                                            {/* <FormGroup className="col-md-6 ">
+                                                            <FormGroup className="col-md-6 ">
                                                                 <Label for="problemDescription">{i18n.t('static.report.problemDescription')}</Label>
-                                                                <Input type="hidden"
+                                                                <Input
+                                                                    // type="hidden"
                                                                     name="problemDescription"
                                                                     id="problemDescription"
                                                                     bsSize="sm"
@@ -855,10 +856,28 @@ export default class EditLanguageComponent extends Component {
                                                                     invalid={(touched.problemDescription && !!errors.problemDescription)}
                                                                     onChange={(e) => { handleChange(e); }}
                                                                     onBlur={handleBlur}
-                                                                    value={getLabelText(this.state.problemReport.realmProblem.problem.label, this.state.lang)}
+                                                                    value={getProblemDesc(this.state.problemReport, this.state.lang)}
                                                                     required />
                                                                 <FormFeedback className="red">{errors.problemDescription}</FormFeedback>
-                                                            </FormGroup> */}
+                                                            </FormGroup>
+
+                                                            <FormGroup className="col-md-6 ">
+                                                                <Label for="problemDescription">Suggestion</Label>
+                                                                <Input
+                                                                    type="textarea"
+                                                                    name="problemSuggestion"
+                                                                    id="problemSuggestion"
+                                                                    bsSize="sm"
+                                                                    readOnly
+                                                                    valid={!errors.problemSuggestion}
+                                                                    invalid={(touched.problemSuggestion && !!errors.problemSuggestion)}
+                                                                    onChange={(e) => { handleChange(e); }}
+                                                                    onBlur={handleBlur}
+                                                                    value={getSuggestion(this.state.problemReport, this.state.lang)}
+                                                                    required />
+                                                                <FormFeedback className="red">{errors.problemSuggestion}</FormFeedback>
+                                                            </FormGroup>
+                                                            {/* actionLabel */}
 
                                                             <FormGroup className="col-md-6 ">
                                                                 <Label for="problemDescription">{i18n.t('static.report.problemStatus')}</Label>
@@ -876,7 +895,6 @@ export default class EditLanguageComponent extends Component {
                                                                     required />
                                                                 <FormFeedback className="red">{errors.problemDescription}</FormFeedback>
                                                             </FormGroup>
-
                                                             <FormGroup className="col-md-6 ">
                                                                 <Label for="problemType">{i18n.t('static.report.problemType')}</Label>
                                                                 <Input type="text"
@@ -938,7 +956,7 @@ export default class EditLanguageComponent extends Component {
                                                         {
                                                             props => (
                                                                 <div className="col-md-12 bg-white pb-1 mb-2">
-                                                                    <ul class="navbar-nav"><li class="nav-item pl-0"><a aria-current="page" class="nav-link active" ><b>Problem Trans Details</b></a></li></ul>
+                                                                    <ul class="navbar-nav"><li class="nav-item pl-0"><a aria-current="page" class="nav-link active" ><b>{i18n.t('static.report.problemTransDetails')}</b></a></li></ul>
                                                                     <div className="TableCust">
                                                                         <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
 
@@ -964,7 +982,7 @@ export default class EditLanguageComponent extends Component {
 
 
                                                     <div className="col-md-12 bg-white pb-1">
-                                                        <ul class="navbar-nav"><li class="nav-item pl-0"><a aria-current="page" class="nav-link active"><b>Update Status</b></a></li></ul>
+                                                        <ul class="navbar-nav"><li class="nav-item pl-0"><a aria-current="page" class="nav-link active"><b>{i18n.t('static.report.updateStatus')}</b></a></li></ul>
 
                                                         <div className="row">
                                                             <FormGroup className="col-md-3 ">
@@ -997,7 +1015,7 @@ export default class EditLanguageComponent extends Component {
                                                                     valid={!errors.notes && this.state.notes != ''}
                                                                     invalid={(touched.notes && !!errors.notes)}
                                                                     onBlur={handleBlur}
-                                                                    onChange={(e) => { handleChange(e); this.dataChange(e);this.Capitalize(e.target.value) }}
+                                                                    onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                                     onBlur={handleBlur}
                                                                     required
                                                                     value={this.state.notes}
@@ -1030,7 +1048,10 @@ export default class EditLanguageComponent extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/report/problemList/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
+        let programId = this.props.match.params.programId;
+        console.log("Program Id", programId)
+        console.log("URL------->", `/report/problemList/` + programId + '/red/' + i18n.t('static.message.cancelled', { entityname }));
+        this.props.history.push(`/report/problemList/` + programId + '/red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
     resetClicked() {
