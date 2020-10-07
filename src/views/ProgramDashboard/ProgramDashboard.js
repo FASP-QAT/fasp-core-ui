@@ -1,6 +1,7 @@
 import React, { Component, lazy, Suspense } from 'react';
 import { Bar, Line,Pie} from 'react-chartjs-2';
 import { Link } from 'react-router-dom';
+import i18n from '../../i18n';
 import {
   Badge,
   Button,
@@ -114,7 +115,7 @@ class ProgramDashboard extends Component {
     });
   }
 
-  loading = () => <div className="animated fadeIn pt-1 text-center">Loading...</div>
+  loading = () => <div className="animated fadeIn pt-1 text-center">{i18n.t('static.common.loading')}</div>
 
   render() {
 

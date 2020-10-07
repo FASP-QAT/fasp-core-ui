@@ -987,7 +987,7 @@
     "static.report.shelfLife": "Shelf Life (months)",
     "static.report.procurementAgentName": "Procurement Agent",
     "static.report.planningUnit/ForecastingUnit": "Planning Unit/Forecasting Unit",
-    "static.report.id": "ID",
+    "static.report.id": "QAT Shipment Id",
     "static.report.expectedReceiveddate": "Expected Receive Date",
     "static.report.orders": "Orders",
     "static.report.qtyBaseUnit": "Quantity (base units)",
@@ -1093,8 +1093,8 @@
     "static.supplyPlan.projectedInventory": " Projected Inventory",
     "static.supplyPlan.autoAdjustment": " Auto adjustment",
     "static.supplyPlan.finalInventory": " Final Inventory",
-    "static.supplyPlan.alternatePlanningUnit": " Alternate Reporting Unit",
-    "static.supplyPlan.quantityCountryProduct": " Quantity (Alternate Reporting Unit)",
+    "static.supplyPlan.alternatePlanningUnit": " Alternate Reporting Unit (ARU)",
+    "static.supplyPlan.quantityCountryProduct": " Quantity (ARU)",
     "static.supplyPlan.quantityQATProduct": " Quantity (QAT Planning Unit)",
     "static.whatIf.supplyPlanSaved": " Supply plan saved successfully.",
     "static.supplyPlan.saveShipmentDates": "Save shipments dates",
@@ -1276,5 +1276,8 @@
     "static.supplyplan.shipmentDataEntry":"Shipment data entry",
     "static.supplyPlan.noteBelowGraph":"Note: If you remove an element it doesn't actually adjust the numbers",
     "static.common.max26digittext":"Maximum 26 characters only",
-    "static.message.alphaspeccharnumtext": "Only letters, numbers and special characters like /,- are allowed"
+    "static.message.alphaspeccharnumtext": "Only letters, numbers and special characters like /,- are allowed",
+    "static.unit.multiplierFromARUTOPU": "Multiplier (From ARU to PU)",
+    "static.supplyPlan.quantityPU": " Quantity (PU)",
+    "static.common.max30digittext": "Maximum 30 characters only"
 }
