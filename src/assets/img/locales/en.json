@@ -1264,5 +1264,6 @@
     "static.procurementAgent.AddProcurementAgent": "Add Procurement Agent",
     "static.budget.redRow": "*Rows in red indicate that Budget has either lapsed or has no money in it",
     "static.program.deleteLocalProgram" : "Delete Local Program",
-    "static.program.deleteLocalProgramSuccess" : "Local Program(s) deleted successfully"
+    "static.program.deleteLocalProgramSuccess" : "Local Program(s) deleted successfully",
+    "static.problemAction.criticality":"Criticality"
 }
