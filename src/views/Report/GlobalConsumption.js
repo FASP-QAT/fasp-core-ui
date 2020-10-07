@@ -81,13 +81,26 @@ const options = {
     yAxes: [{
       scaleLabel: {
         display: true,
-        labelString: 'Consumption Qty ( Million )',
+        labelString: i18n.t('static.report.consupmtionqty')+i18n.t('static.report.inmillions'),
         fontColor: 'black'
       },
       stacked: true,
       ticks: {
         beginAtZero: true,
-        fontColor: 'black'
+        fontColor: 'black',
+        callback: function (value) {
+          var cell1 = value
+          cell1 += '';
+          var x = cell1.split('.');
+          var x1 = x[0];
+          var x2 = x.length > 1 ? '.' + x[1] : '';
+          var rgx = /(\d+)(\d{3})/;
+          while (rgx.test(x1)) {
+            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+          }
+          return x1 + x2;
+
+        }
       }
     }],
     xAxes: [{
@@ -111,7 +124,24 @@ const options = {
   },
   tooltips: {
     enabled: false,
-    custom: CustomTooltips
+    custom: CustomTooltips,
+    callbacks: {
+      label: function (tooltipItem, data) {
+
+        let label = data.labels[tooltipItem.index];
+        let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+
+        var cell1 = value
+        cell1 += '';
+        var x = cell1.split('.');
+        var x1 = x[0];
+        var x2 = x.length > 1 ? '.' + x[1] : '';
+        var rgx = /(\d+)(\d{3})/;
+        while (rgx.test(x1)) {
+          x1 = x1.replace(rgx, '$1' + ',' + '$2');
+        }
+        return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
+      }}
   },
   maintainAspectRatio: false
   ,
@@ -531,81 +561,6 @@ class GlobalConsumption extends Component {
           console.log("consumptions--->", consumptions);
 
           this.setState({
-            // consumptions: [
-
-            //   {
-            //     "realmCountry": {
-            //       "id": 2,
-            //       "label": {
-            //         "active": false,
-            //         "labelId": 343,
-            //         "label_en": "Kenya",
-            //         "label_sp": "",
-            //         "label_fr": "",
-            //         "label_pr": ""
-            //       },
-            //       "code": "KEN"
-            //     },
-            //     "consumptionDate": "2019-07-01",
-            //     "planningUnitQty": 40,
-            //     "forecastingUnitQty": 10,
-            //     "consumptionDateString": "Jul-2019"
-            //   },
-            //   {
-            //     "realmCountry": {
-            //       "id": 2,
-            //       "label": {
-            //         "active": false,
-            //         "labelId": 343,
-            //         "label_en": "Kenya",
-            //         "label_sp": "",
-            //         "label_fr": "",
-            //         "label_pr": ""
-            //       },
-            //       "code": "KEN"
-            //     },
-            //     "consumptionDate": "2019-08-01",
-            //     "planningUnitQty": 50,
-            //     "forecastingUnitQty": 0,
-            //     "consumptionDateString": "Aug-2019"
-            //   },
-            //   {
-            //     "realmCountry": {
-            //       "id": 2,
-            //       "label": {
-            //         "active": false,
-            //         "labelId": 343,
-            //         "label_en": "Malawi",
-            //         "label_sp": "",
-            //         "label_fr": "",
-            //         "label_pr": ""
-            //       },
-            //       "code": "MWI"
-            //     },
-            //     "consumptionDate": "2019-07-01",
-            //     "planningUnitQty": 10,
-            //     "forecastingUnitQty": 0,
-            //     "consumptionDateString": "Jul-2019"
-            //   },
-            //   {
-            //     "realmCountry": {
-            //       "id": 2,
-            //       "label": {
-            //         "active": false,
-            //         "labelId": 343,
-            //         "label_en": "Malawi",
-            //         "label_sp": "",
-            //         "label_fr": "",
-            //         "label_pr": ""
-            //       },
-            //       "code": "MWI"
-            //     },
-            //     "consumptionDate": "2019-08-01",
-            //     "planningUnitQty": 20,
-            //     "forecastingUnitQty": 0,
-            //     "consumptionDateString": "Aug-2019"
-            //   },
-            // ],
             consumptions: consumptions,
             message: '',
             loading: false
@@ -757,41 +712,7 @@ class GlobalConsumption extends Component {
       );
   }
 
-  // getProductCategories() {
-
-  //   let realmId = AuthenticationService.getRealmId();
-  //   ProductService.getProductCategoryList(realmId)
-  //     .then(response => {
-  //       console.log(response.data)
-  //       this.setState({
-  //         productCategories: response.data
-  //       })
-  //     }).catch(
-  //       error => {
-  //         this.setState({
-  //           productCategories: []
-  //         })
-  //         if (error.message === "Network Error") {
-  //           this.setState({ message: error.message });
-  //         } else {
-  //           switch (error.response ? error.response.status : "") {
-  //             case 500:
-  //             case 401:
-  //             case 404:
-  //             case 406:
-  //             case 412:
-  //               this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
-  //               break;
-  //             default:
-  //               this.setState({ message: 'static.unkownError' });
-  //               break;
-  //           }
-  //         }
-  //       }
-  //     );
-  //   this.getPlanningUnit();
-  // }
-
+  
   componentDidMount() {
 
     this.getPrograms()
@@ -904,15 +825,7 @@ class GlobalConsumption extends Component {
         )
       }, this);
 
-    // const { productCategories } = this.state;
-    // let productCategoryList = productCategories.length > 0
-    //   && productCategories.map((item, i) => {
-    //     return (
-    //       <option key={i} value={item.payload.productCategoryId}>
-    //         {getLabelText(item.payload.label, this.state.lang)}
-    //       </option>
-    //     )
-    //   }, this);
+   
 
     const backgroundColor = [
       '#002f6c',
@@ -920,38 +833,14 @@ class GlobalConsumption extends Component {
       '#EDB944',
       '#20a8d8',
       '#d1e3f5',
+      '#212721',
+      '#4dbd74',
+      '#f86c6b',
+      '#F48521',
+      '#ED5626',
+      '#cfcdc9',
+      '#004876', '#0063a0', '#007ecc', '#0093ee', '#82caf8', '#c8e6f4'
     ]
-
-    // let country = [...new Set(this.state.consumptions.map(ele => (getLabelText(ele.realmCountry.label, this.state.lang))))];
-    // let localConsumptionList = this.state.consumptions;
-    // let localCountryList = [];
-    // for (var i = 0; i < country.length; i++) {
-    //   let countSum = 0;
-    //   for (var j = 0; j < localConsumptionList.length; j++) {
-    //     if (country[i].localeCompare(getLabelText(localConsumptionList[j].realmCountry.label, this.state.lang))) {
-    //       countSum = countSum + localConsumptionList[j].planningUnitQty;
-    //     }
-    //   }
-    //   let json = {
-    //     country: country[i],
-    //     sum: countSum
-    //   }
-    //   localCountryList.push(json);
-    // }
-    // // console.log("localCountryList BEFORE------", localCountryList);
-
-    // // localCountryList = localCountryList.sort((a, b) => parseFloat(b.sum) - parseFloat(a.sum));
-    // localCountryList = localCountryList.sort((a, b) => parseFloat(a.sum) - parseFloat(b.sum));
-    // // console.log("localCountryList AFTER------", localCountryList);
-
-    // let consumptiondata = [];
-    // let data = [];
-    // let dateArray = [...new Set(this.state.consumptions.map(ele => (ele.consumptionDateString)))]
-    // for (var i = 0; i < localCountryList.length; i++) {
-    //   data = this.state.consumptions.filter(c => localCountryList[i].country.localeCompare(getLabelText(c.realmCountry.label, this.state.lang)) == 0).map(ele => (ele.planningUnitQty))
-    //   console.log("CONSUMPTIONLIST(i)----->", i, "-------", data);
-    //   consumptiondata.push(data)
-    // }
 
     let localCountryList = [...new Set(this.state.consumptions.map(ele => (getLabelText(ele.realmCountry.label, this.state.lang))))];
 
@@ -990,12 +879,7 @@ class GlobalConsumption extends Component {
       datasets: consumptionSummerydata.map((item, index) => ({ stack: 1, label: localCountryList[index], data: item, backgroundColor: backgroundColor[index] })),
     };
 
-    // const bar = {
-
-    //   labels: [...new Set(this.state.consumptions.map(ele => (ele.consumptionDateString)))],
-    //   datasets: consumptiondata.map((item, index) => ({ stack: 1, label: country[index], data: item, backgroundColor: backgroundColor[index] }))
-
-    // };
+   
     const pickerLang = {
       months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
       from: 'From', to: 'To',

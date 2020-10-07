@@ -12,7 +12,7 @@ import DatePicker from 'react-datepicker';
 import '../../../node_modules/react-datepicker/dist/react-datepicker.css';
 import { Formik } from 'formik';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, MONTHS_IN_PAST_FOR_SUPPLY_PLAN, TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN, CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, NO_OF_MONTHS_ON_LEFT_CLICKED, ON_HOLD_SHIPMENT_STATUS, NO_OF_MONTHS_ON_RIGHT_CLICKED, DATE_FORMAT_CAP, INDEXED_DB_NAME, INDEXED_DB_VERSION, DATE_FORMAT_SM, DATE_PLACEHOLDER_TEXT, TBD_FUNDING_SOURCE, TBD_PROCUREMENT_AGENT_ID } from '../../Constants.js'
+import { SECRET_KEY, MONTHS_IN_PAST_FOR_SUPPLY_PLAN, TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN, CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, NO_OF_MONTHS_ON_LEFT_CLICKED, ON_HOLD_SHIPMENT_STATUS, NO_OF_MONTHS_ON_RIGHT_CLICKED, DATE_FORMAT_CAP, INDEXED_DB_NAME, INDEXED_DB_VERSION, DATE_FORMAT_SM, DATE_PLACEHOLDER_TEXT, TBD_FUNDING_SOURCE, TBD_PROCUREMENT_AGENT_ID, NONE_SELECTED_DATA_SOURCE_ID } from '../../Constants.js'
 import getLabelText from '../../CommonComponent/getLabelText'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
@@ -629,7 +629,7 @@ export default class WhatIfReportComponent extends React.Component {
                         var arrivedDate = shipmentUnFundedList[i].arrivedDate;
                         var receivedDate = shipmentUnFundedList[i].receivedDate;
                         var expectedDeliveryDate = shipmentUnFundedList[i].expectedDeliveryDate;
-                        if (papuResult.localProcurementAgent) {
+                        if (shipmentUnFundedList[i].localProcurement) {
                             var addLeadTimes = this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
                             var leadTimesPerStatus = addLeadTimes / 5;
                             arrivedDate = moment(expectedDeliveryDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
@@ -711,7 +711,7 @@ export default class WhatIfReportComponent extends React.Component {
                         var arrivedDate = shipmentUnFundedList[i].arrivedDate;
                         var receivedDate = shipmentUnFundedList[i].receivedDate;
                         var expectedDeliveryDate = shipmentUnFundedList[i].expectedDeliveryDate;
-                        if (papuResult.localProcurementAgent) {
+                        if (shipmentUnFundedList[i].localProcurement) {
                             var addLeadTimes = this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
                             var leadTimesPerStatus = addLeadTimes / 5;
                             arrivedDate = moment(expectedDeliveryDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
@@ -795,7 +795,7 @@ export default class WhatIfReportComponent extends React.Component {
                         var arrivedDate = shipmentUnFundedList[i].arrivedDate;
                         var receivedDate = shipmentUnFundedList[i].receivedDate;
                         var expectedDeliveryDate = shipmentUnFundedList[i].expectedDeliveryDate;
-                        if (papuResult.localProcurementAgent) {
+                        if (shipmentUnFundedList[i].localProcurement) {
                             var addLeadTimes = this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
                             var leadTimesPerStatus = addLeadTimes / 5;
                             arrivedDate = moment(expectedDeliveryDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
@@ -2545,7 +2545,7 @@ export default class WhatIfReportComponent extends React.Component {
                         id: ""
                     },
                     dataSource: {
-                        id: ""
+                        id: NONE_SELECTED_DATA_SOURCE_ID
                     },
                     currency: {
                         currencyId: ""
@@ -3243,7 +3243,9 @@ export default class WhatIfReportComponent extends React.Component {
                                     <div className="chart-wrapper chart-graph-report">
                                         <Bar id="cool-canvas" data={bar} options={chartOptions} />
                                     </div>
-                                </div>   </div>}
+                                    <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span>
+                                </div>   
+                                </div>}
 
                     </div>
                 </div>
@@ -3257,6 +3259,12 @@ export default class WhatIfReportComponent extends React.Component {
                             <li><span className="purplelegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.forecastedConsumption')}</span></li>
                             <li><span className=" blacklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.actualConsumption')} </span></li>
                         </ul>
+                        <div className="card-header-actions">
+                            <a className="card-header-action">
+                                {/* <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggle() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span> */}
+                                <Link to={`/consumptionDetails/` + this.state.programId + `/0/` + this.state.planningUnitId} target="_blank"><small className="dataEntryLink">{i18n.t('static.supplyplan.consumptionDataEntry')}</small></Link>
+                            </a>
+                        </div>
                     </ModalHeader>
                     <div style={{ display: this.state.loading ? "none" : "block" }}>
                         <ModalBody>
@@ -3272,7 +3280,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         {
                                             this.state.monthsArray.map((item, count) => {
                                                 if (count < 7) {
-                                                    return (<th className="supplyplanTdWidthForMonths">{item.monthName.concat(" ").concat(item.monthYear)}</th>)
+                                                    return (<th className={count==2 ? "supplyplan-Thead supplyplanTdWidthForMonths" : "supplyplanTdWidthForMonths"}>{item.monthName.concat(" ").concat(item.monthYear)}</th>)
                                                 }
                                             })
                                         }
@@ -3352,7 +3360,14 @@ export default class WhatIfReportComponent extends React.Component {
                 {/* Adjustments modal */}
                 <Modal isOpen={this.state.adjustments}
                     className={'modal-lg ' + this.props.className, "modalWidth"}>
-                    <ModalHeader toggle={() => this.toggleLarge('Adjustments')} className="modalHeaderSupplyPlan">{i18n.t('static.supplyPlan.adjustmentsDetails')}</ModalHeader>
+                    <ModalHeader toggle={() => this.toggleLarge('Adjustments')} className="modalHeaderSupplyPlan">{i18n.t('static.supplyPlan.adjustmentsDetails')}
+                        <div className="card-header-actions">
+                            <a className="card-header-action">
+                                {/* <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggle() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span> */}
+                                <Link to={`/inventory/addInventory/` + this.state.programId + `/0/` + this.state.planningUnitId} target="_blank"><small className="dataEntryLink">{i18n.t('static.supplyplan.adjustmentDataEntry')}</small></Link>
+                            </a>
+                        </div>
+                    </ModalHeader>
                     <div style={{ display: this.state.loading ? "none" : "block" }}>
                         <ModalBody>
                             <h6 className="red" id="div2">{this.state.inventoryDuplicateError || this.state.inventoryNoStockError || this.state.inventoryError}</h6>
@@ -3367,7 +3382,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         {
                                             this.state.monthsArray.map((item, count) => {
                                                 if (count < 7) {
-                                                    return (<th colSpan="2">{item.monthName.concat(" ").concat(item.monthYear)}</th>)
+                                                    return (<th colSpan="2" className={count==2 ? "supplyplan-Thead" : ""}>{item.monthName.concat(" ").concat(item.monthYear)}</th>)
                                                 }
                                             })
                                         }
@@ -3532,6 +3547,12 @@ export default class WhatIfReportComponent extends React.Component {
                             <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyOrder')}</span></li>
                             <li><span className=" greylegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.doNotIncludeInProjectedShipment')} </span></li>
                         </ul>
+                        <div className="card-header-actions">
+                            <a className="card-header-action">
+                                {/* <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggle() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span> */}
+                                <Link to={`/shipment/shipmentDetails/` + this.state.programId + `/0/` + this.state.planningUnitId} target="_blank"><small className="dataEntryLink">{i18n.t('static.supplyplan.shipmentDataEntry')}</small></Link>
+                            </a>
+                        </div>
                     </ModalHeader>
                     <div style={{ display: this.state.loading ? "none" : "block" }}>
                         <ModalBody>
