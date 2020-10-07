@@ -987,7 +987,7 @@
     "static.report.shelfLife": "Shelf Life (months)",
     "static.report.procurementAgentName": "Procurement Agent",
     "static.report.planningUnit/ForecastingUnit": "Planning Unit/Forecasting Unit",
-    "static.report.id": "ID",
+    "static.report.id": "QAT Shipment Id",
     "static.report.expectedReceiveddate": "Expected Receive Date",
     "static.report.orders": "Orders",
     "static.report.qtyBaseUnit": "Quantity (base units)",
