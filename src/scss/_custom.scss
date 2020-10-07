@@ -2584,6 +2584,7 @@ input::placeholder {
     min-width: 280px!important;
     word-wrap: break-word!important;
     border:none!important;
+    z-index: 999;
   }
 
   .regionTdWidthAdjustments{
@@ -3458,33 +3459,36 @@ margin-left: -45px;
   color: #20a8d8;
   }
 
-  .view {
-    margin: auto;
-    width: 100%;
-    overflow-x: scroll;
-    overflow-y: visible;
-    padding: 0;
-    // width: 600px;
-}
+//   .view {
+//     margin: auto;
+//     width: 100%;
+//     overflow-x: scroll;
+//     overflow-y: visible;
+//     padding: 0;
+  
+// }
 
-.wrapper {
-    position: relative;
-    overflow: auto;
-    border: 1px solid black;
-    white-space: nowrap;
-}
+// .wrapper {
+//     position: relative;
+//     overflow: auto;
+//     white-space: nowrap;
+// }
 
 .sticky-col {
     position: sticky;
     position: -webkit-sticky;
-    background-color: white;
+    // background-color: white;
 }
 
 .first-col {
-    width: 100px;
-    min-width: 100px;
-    max-width: 100px;
-    left: 0px;
+    // width: 100px;
+    // min-width: 100px;
+    // max-width: 100px;
+    // left: 0px;
+    // border:1px solid #000;
+	// background:#eee;
+  visibility:visible;
+  background: #fff;
 }
 
 .second-col {
@@ -3492,4 +3496,36 @@ margin-left: -45px;
     min-width: 150px;
     max-width: 150px;
     left: 100px;
+}
+.table-scroll {
+	position:relative;
+	width:100%;
+	margin:auto;
+	overflow:hidden;
+	border:none!important;
+}
+.table-wrap {
+	width:100%;
+	overflow:auto;
+}
+.table-scroll table {
+	width:100%;
+	margin:auto;
+	border-collapse:separate;
+	border-spacing:0;
+}
+.table-scroll th, .table-scroll td {
+	padding:5px 10px;
+	white-space:nowrap;
+	vertical-align:top;
+}
+.clone {
+	// position:absolute;
+	top:0;
+	left:0;
+	pointer-events:none;
+}
+
+.clone tbody th {
+	visibility:visible;
 }
