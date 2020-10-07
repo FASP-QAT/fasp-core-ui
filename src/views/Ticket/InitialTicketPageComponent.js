@@ -530,7 +530,7 @@ export default class InitialTicketPageComponent extends Component {
     return (
       <Dropdown nav  >
 
-        <img src={imageHelp} className="HelpIcon" title="Help" onClick={this.togglehelp} />
+        <img src={imageHelp} className="HelpIcon" title={i18n.t('static.ticket.help')} onClick={this.togglehelp} />
 
         {/* <Modal isOpen={this.state.small} toggle={this.toggleSmall}
           className={'modal-sm modal-dialog-center'} aria-labelledby="contained-modal-title-vcenter"
@@ -580,7 +580,7 @@ export default class InitialTicketPageComponent extends Component {
                 {this.state.showOnlyMaster == 1 && <div className="mt-2 mb-2">
                   <div><h4>{i18n.t('static.ticket.requestTo')}</h4></div><br></br>
                   <ListGroup>
-                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleSubMaster(1) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.dashboard.applicationmaster')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
+                    {/* <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleSubMaster(1) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.dashboard.applicationmaster')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem> */}
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleSubMaster(3) }} action><i className="icon-note  icons helpclickicon mr-2"></i> {i18n.t('static.dashboard.programmaster')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleSubMaster(2) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.dashboard.realmlevelmaster')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                   </ListGroup>
