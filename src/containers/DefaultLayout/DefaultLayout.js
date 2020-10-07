@@ -594,7 +594,7 @@ class DefaultLayout extends Component {
       businessFunctions: [],
       name: "",
       //Timer
-      timeout: 1000 * 3600 * 1,
+      timeout: 1000 * 900 * 1,
       showModal: false,
       userLoggedIn: false,
       isTimedOut: false
