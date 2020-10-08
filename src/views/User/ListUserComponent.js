@@ -421,7 +421,7 @@ import RealmService from "../../api/RealmService";
 import UserService from "../../api/UserService";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import moment from 'moment';
-import { DATE_FORMAT_CAP } from '../../Constants.js';
+import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION,JEXCEL_DEFAULT_PAGINATION } from '../../Constants.js';
 import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
@@ -610,7 +610,7 @@ class ListUserComponent extends Component {
                 entries: '',
             },
             onload: this.loaded,
-            pagination: 10,
+            pagination:JEXCEL_DEFAULT_PAGINATION,
             search: true,
             columnSorting: true,
             tableOverflow: true,
@@ -624,7 +624,7 @@ class ListUserComponent extends Component {
             oneditionend: this.onedit,
             copyCompatibility: true,
             allowExport: false,
-            paginationOptions: [10, 25, 50],
+            paginationOptions:JEXCEL_PAGINATION_OPTION,
             position: 'top',
             contextMenu: function (obj, x, y, e) {
                 var items = [];

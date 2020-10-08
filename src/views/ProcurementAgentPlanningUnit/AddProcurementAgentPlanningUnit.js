@@ -21,7 +21,7 @@ import CryptoJS from 'crypto-js';
 import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
 import moment from "moment";
-import { DECIMAL_NO_REGEX, INTEGER_NO_REGEX } from '../../Constants.js';
+import { DECIMAL_NO_REGEX, INTEGER_NO_REGEX, JEXCEL_PAGINATION_OPTION ,JEXCEL_DEFAULT_PAGINATION} from '../../Constants.js';
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 
 
@@ -1011,12 +1011,12 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                             }
 
                                                         ],
-                                                        pagination: 10,
+                                                        pagination: JEXCEL_DEFAULT_PAGINATION,
                                                         search: true,
                                                         columnSorting: true,
                                                         tableOverflow: true,
                                                         wordWrap: true,
-                                                        paginationOptions: [10, 25, 50],
+                                                        paginationOptions: JEXCEL_PAGINATION_OPTION,
                                                         position: 'top',
                                                         allowInsertColumn: false,
                                                         allowManualInsertColumn: false,
@@ -1026,7 +1026,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                         copyCompatibility: true,
                                                         text: {
                                                             // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                                                            showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
+                                                            showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
                                                             show: '',
                                                             entries: '',
                                                         },

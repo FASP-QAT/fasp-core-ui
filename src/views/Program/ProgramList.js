@@ -363,6 +363,7 @@ import jexcel from 'jexcel';
 import RealmCountryService from '../../api/RealmCountryService';
 import "../../../node_modules/jexcel/dist/jexcel.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js';
+import { JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from "../../Constants";
 
 const entityname = i18n.t('static.program.programMaster');
 export default class ProgramList extends Component {
@@ -507,12 +508,12 @@ export default class ProgramList extends Component {
 
       ],
       text: {
-        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
+        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
         show: '',
         entries: '',
       },
       onload: this.loaded,
-      pagination: 10,
+      pagination: JEXCEL_DEFAULT_PAGINATION,
       search: true,
       columnSorting: true,
       tableOverflow: true,
@@ -526,7 +527,7 @@ export default class ProgramList extends Component {
       oneditionend: this.onedit,
       copyCompatibility: true,
       allowExport: false,
-      paginationOptions: [10, 25, 50],
+      paginationOptions: JEXCEL_PAGINATION_OPTION,
       position: 'top',
       contextMenu: function (obj, x, y, e) {
         var items = [];
