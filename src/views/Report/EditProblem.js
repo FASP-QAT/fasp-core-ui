@@ -605,9 +605,9 @@ export default class EditLanguageComponent extends Component {
             paginationTotalRenderer: customTotal,
             disablePageTitle: true,
             sizePerPageList: [{
-                text: '10', value: 10
+                text: '15', value: 15
             }, {
-                text: '30', value: 30
+                text: '25', value: 25
             }
                 ,
             {

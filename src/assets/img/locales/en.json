@@ -268,7 +268,7 @@
     "static.budget.budgetdesctext": "Enter Budget description",
     "static.message.listFailed": "{{entityname}} list failed",
     "static.common.update": "Update",
-    "static.common.result": "Showing {{from}} to {{to}} of {{size}}",
+    "static.common.result": "Showing {{from}} of {{size}} Pages",
     "static.common.first": "First",
     "static.common.back": "Back",
     "static.common.next": "Next",
