@@ -1885,7 +1885,7 @@ class EditSupplyPlanStatus extends Component {
             let bar = {}
             if (this.state.jsonArrForGraph.length > 0)
                 bar = {
-    
+   
                     labels: [...new Set(this.state.jsonArrForGraph.map(ele => (ele.month)))],
                     datasets: [
                         {
@@ -2025,7 +2025,7 @@ class EditSupplyPlanStatus extends Component {
                             data: this.state.jsonArrForGraph.map((item, index) => (item.maxMos))
                         }
                     ]
-    
+   
                  };
 
         return (
@@ -2968,7 +2968,7 @@ class EditSupplyPlanStatus extends Component {
         // AuthenticationService.setupAxiosInterceptors();
         ProgramService.getProgramData({ "programId": this.props.match.params.programId, "versionId": this.props.match.params.versionId })
             .then(response => {
-                console.log(response.data) 
+                console.log(response.data)
                 let { program } = this.state
                 program.label = response.data.label
                 this.setState({

@@ -703,7 +703,7 @@ export default class ConsumptionDetails extends React.Component {
         this.hideFirstComponent();
         let problemStatusId = document.getElementById('problemStatusId').value;
         console.log("problemStatusId ---------> ", problemStatusId);
-        const lan = 'en';
+        const lan = localStorage.getItem("lang");
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
