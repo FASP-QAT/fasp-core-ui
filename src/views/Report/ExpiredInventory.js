@@ -371,7 +371,7 @@ export default class ExpiredInventory extends Component {
     }
     dateformatter = value => {
         var dt = new Date(value)
-        return moment(dt).format('MMM-DD-YYYY');
+        return moment(dt).format('DD-MMM-YY');
     }
     formatter = value => {
 
