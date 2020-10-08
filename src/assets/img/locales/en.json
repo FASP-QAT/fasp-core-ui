@@ -1279,5 +1279,9 @@
     "static.message.alphaspeccharnumtext": "Only letters, numbers and special characters like /,- are allowed",
     "static.unit.multiplierFromARUTOPU": "Multiplier (From ARU to PU)",
     "static.supplyPlan.quantityPU": " Quantity (PU)",
-    "static.common.max30digittext": "Maximum 30 characters only"
+    "static.common.max30digittext": "Maximum 30 characters only",
+    "static.reports.forecastMetrics.noConsumptionAcrossPeriod":"No months in period contain both forecast and actual consumption",
+    "static.reports.forecastMetrics.noConsumption":"Current month does not contain actual consumption and/or* forecasted consumption",
+    "static.reports.forecastMetrics.totalConsumptionIs0":"Total actual consumption for last 6 months = 0",
+    "static.report.qatPID":"QAT Product Id"
 }
