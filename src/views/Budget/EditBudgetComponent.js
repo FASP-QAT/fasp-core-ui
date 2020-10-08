@@ -40,7 +40,7 @@ const validationSchema = function (values) {
         budgetCode: Yup.string()
             // .matches(ALPHABET_NUMBER_REGEX, i18n.t('static.message.alphabetnumerallowed'))
             .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly'))
-            .max(10, i18n.t('static.common.max10digittext'))
+            .max(30, i18n.t('static.common.max30digittext'))
             .required(i18n.t('static.budget.budgetCodeText')),
     })
 }
@@ -492,6 +492,7 @@ class EditBudgetComponent extends Component {
                                                             invalid={touched.budgetCode && !!errors.budgetCode || this.state.budget.budgetCode == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
+                                                            maxLength={30}
                                                             value={this.state.budget.budgetCode}
                                                             required />
                                                         <FormFeedback className="red">{errors.budgetCode}</FormFeedback>
