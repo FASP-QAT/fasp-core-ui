@@ -1276,5 +1276,9 @@
     "static.supplyplan.shipmentDataEntry":"Shipment data entry",
     "static.supplyPlan.noteBelowGraph":"Note: If you remove an element it doesn't actually adjust the numbers",
     "static.common.max26digittext":"Maximum 26 characters only",
-    "static.message.alphaspeccharnumtext": "Only letters, numbers and special characters like /,- are allowed"
+    "static.message.alphaspeccharnumtext": "Only letters, numbers and special characters like /,- are allowed",
+    "static.reports.forecastMetrics.noConsumptionAcrossPeriod":"No months in period contain both forecast and actual consumption",
+    "static.reports.forecastMetrics.noConsumption":"Current month does not contain actual consumption and/or* forecasted consumption",
+    "static.reports.forecastMetrics.totalConsumptionIs0":"Total actual consumption for last 6 months = 0",
+    "static.report.qatPID":"QAT Product Id"
 }
