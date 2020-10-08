@@ -20,6 +20,7 @@ import "../../../node_modules/jexcel/dist/jexcel.css";
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import StatusUpdateButtonFeature from "../../CommonComponent/StatusUpdateButtonFeature";
 import UpdateButtonFeature from '../../CommonComponent/UpdateButtonFeature'
+import { JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from "../../Constants";
 let initialValues = {
 
     planningUnit: {
@@ -268,12 +269,12 @@ class PlanningUnitCountry extends Component {
                                                     }
 
                                                 },
-                                                pagination: 10,
+                                                pagination: JEXCEL_DEFAULT_PAGINATION,
                                                 search: true,
                                                 columnSorting: true,
                                                 tableOverflow: true,
                                                 wordWrap: true,
-                                                paginationOptions: [10, 25, 50],
+                                                paginationOptions: JEXCEL_PAGINATION_OPTION,
                                                 position: 'top',
                                                 allowInsertColumn: false,
                                                 allowManualInsertColumn: false,
@@ -286,7 +287,7 @@ class PlanningUnitCountry extends Component {
                                                 allowManualInsertRow: false,
                                                 text: {
                                                     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                                                    showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
+                                                    showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
                                                     show: '',
                                                     entries: '',
                                                 },

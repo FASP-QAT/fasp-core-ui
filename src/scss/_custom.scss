@@ -642,7 +642,9 @@ label.arrow_label:after {
 
 .jexcel_content {
   overflow-y: auto !important;
-  max-height: 540px !important;
+  max-height: 100% !important;
+  height: 100%;
+  // max-height: 540px !important;
   min-height: 70px !important;
 }
 .jexcel > tbody > tr > td.readonly {
@@ -1015,6 +1017,9 @@ font-size: 14px;
   max-width: 300px;
   margin-top: 1% !important;
   margin-left: 0%;
+}
+.logo-MarginTop{
+  margin-top: -2%!important;
 }
 
 .card-marginTop
@@ -2595,7 +2600,7 @@ input::placeholder {
     min-width: 280px!important;
     word-wrap: break-word!important;
     border:none!important;
-    z-index: 999;
+    z-index: 1;
   }
 
   .regionTdWidthAdjustments{
@@ -2808,7 +2813,7 @@ input::placeholder {
     font-weight: 700;
 }
 .CardHeight{
-  height: 137px;
+  height: 144px;
 }
 .box-p{
   padding-bottom: 0.25rem !important;
@@ -3539,4 +3544,14 @@ margin-left: -45px;
 
 .clone tbody th {
 	visibility:visible;
+}
+.en-btnlogin{
+    color: #002f6c !important;
+    background-color: transparent !important;
+    border-color: transparent !important;
+  }
+  .modal-title {
+    margin-bottom: 0;
+    line-height: 1.5;
+    width: 100%;
 }

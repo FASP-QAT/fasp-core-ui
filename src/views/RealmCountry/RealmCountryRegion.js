@@ -18,6 +18,7 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import RegionService from "../../api/RegionService";
 import StatusUpdateButtonFeature from "../../CommonComponent/StatusUpdateButtonFeature";
 import UpdateButtonFeature from '../../CommonComponent/UpdateButtonFeature'
+import { JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from "../../Constants";
 let initialValues = {
     region: '',
     capacityCBM: '',
@@ -182,12 +183,12 @@ class RealmCountryRegion extends Component {
                                 }
 
                             ],
-                            pagination: 10,
+                            pagination: JEXCEL_DEFAULT_PAGINATION,
                             search: true,
                             columnSorting: true,
                             tableOverflow: true,
                             wordWrap: true,
-                            paginationOptions: [10, 25, 50],
+                            paginationOptions: JEXCEL_PAGINATION_OPTION,
                             position: 'top',
                             allowInsertColumn: false,
                             allowManualInsertColumn: false,
@@ -198,7 +199,7 @@ class RealmCountryRegion extends Component {
                             allowManualInsertRow: false,
                             text: {
                                 // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
+                                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
                                 show: '',
                                 entries: '',
                             },

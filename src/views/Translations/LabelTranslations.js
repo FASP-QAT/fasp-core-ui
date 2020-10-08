@@ -13,6 +13,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import LabelsService from '../../api/LabelService.js';
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from "../../Constants";
 
 const entityname = i18n.t('static.label.labelTranslations');
 export default class DatabaseTranslations extends React.Component {
@@ -75,16 +76,16 @@ export default class DatabaseTranslations extends React.Component {
                     ],
                     text: {
                         // showingPage: 'Showing {0} to {1} of {1}',
-                        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
+                        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
                         show: '',
                         entries: '',
                     },
-                    pagination: 10,
+                    pagination: JEXCEL_DEFAULT_PAGINATION,
                     search: true,
                     columnSorting: true,
                     tableOverflow: true,
                     wordWrap: true,
-                    paginationOptions: [10, 30, 50],
+                    paginationOptions: JEXCEL_PAGINATION_OPTION,
                     allowInsertColumn: false,
                     allowManualInsertColumn: false,
                     onchange: this.changed,

@@ -7,7 +7,7 @@ import React, { Component } from 'react';
 import i18n from '../../../i18n';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
-import { Button, CardBody, CardGroup, Col, Container, Form, FormFeedback, Input, InputGroup, InputGroupAddon, InputGroupText, Row } from 'reactstrap';
+import { Button, CardBody, CardGroup, Col, Container, Form, FormFeedback, Input, InputGroup, InputGroupAddon, InputGroupText,  DropdownItem, DropdownMenu, DropdownToggle,ButtonDropdown,Row } from 'reactstrap';
 import * as Yup from 'yup';
 import InnerBgImg from '../../../../src/assets/img/bg-image/bg-login.jpg';
 import LoginService from '../../../api/LoginService';
@@ -74,6 +74,10 @@ class Login extends Component {
     this.forgotPassword = this.forgotPassword.bind(this);
     this.incorrectPassmessageHide = this.incorrectPassmessageHide.bind(this);
     this.logoutMessagehide = this.logoutMessagehide.bind(this);
+    this.toggle = this.toggle.bind(this);
+    this.state = {
+      dropdownOpen: new Array(19).fill(false),
+    };
   }
 
   touchAll(setTouched, errors) {
@@ -184,18 +188,41 @@ class Login extends Component {
       });
   }
 
+  toggle(i) {
+    const newArray = this.state.dropdownOpen.map((element, index) => { return (index === i ? !element : false); });
+    this.setState({
+      dropdownOpen: newArray,
+    });
+  }
   render() {
     return (
       <div className="main-content flex-row align-items-center">
 
         <div className="Login-component" style={{ backgroundImage: "url(" + InnerBgImg + ")" }}>
           <Container className="container-login">
-
+          
             <Row className="justify-content-center">
+            <Col className="float-right pr-5" style={{width:'100%'}}>
+            <div className="float-right">
+          <ButtonDropdown isOpen={this.state.dropdownOpen[0]} toggle={() => { this.toggle(0); }}>
+                  <DropdownToggle caret className="en-btnlogin">
+                  <i className="flag-icon flag-icon-us"></i>  &nbsp;English
+                  </DropdownToggle>
+                  <DropdownMenu right>
+                  {/* <DropdownItem ><i className="flag-icon flag-icon-us"></i>English</DropdownItem> */}
+          <DropdownItem ><i className="flag-icon flag-icon-wf "></i>  French</DropdownItem>
+          <DropdownItem ><i className="flag-icon flag-icon-es"></i>  Spanish </DropdownItem>
+          <DropdownItem ><i className="flag-icon flag-icon-pt"></i>  Portuguese</DropdownItem>
+                  </DropdownMenu>
+                </ButtonDropdown>
+                </div>
+               
+              </Col>
               <Col md="12">
-                <div className="upper-logo mt-1">
+                <div className="upper-logo logo-MarginTop">
                   <img src={image1} className="img-fluid " />
                 </div>
+               
               </Col>
               <Col lg="5" md="7" xl="4">
                 <CardGroup>
