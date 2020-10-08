@@ -506,7 +506,7 @@ import paginationFactory from 'react-bootstrap-table2-paginator';
 import FundingSourceService from '../../api/FundingSourceService';
 import moment from 'moment';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { DATE_FORMAT_CAP } from '../../Constants.js';
+import { DATE_FORMAT_CAP, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
 import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
 import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
@@ -710,7 +710,7 @@ class ListBudgetComponent extends Component {
       ],
       editable: false,
       text: {
-        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
+        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
         show: '',
         entries: '',
       },
@@ -741,7 +741,7 @@ class ListBudgetComponent extends Component {
       }.bind(this),
 
       onload: this.loaded,
-      pagination: 10,
+      pagination: JEXCEL_DEFAULT_PAGINATION,
       search: true,
       columnSorting: true,
       tableOverflow: true,
@@ -755,7 +755,7 @@ class ListBudgetComponent extends Component {
       oneditionend: this.onedit,
       copyCompatibility: true,
       allowExport: false,
-      paginationOptions: [10, 25, 50],
+      paginationOptions: JEXCEL_PAGINATION_OPTION,
       position: 'top',
       contextMenu: false,
     };

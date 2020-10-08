@@ -390,7 +390,7 @@ import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'reac
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import { DATE_FORMAT_CAP } from '../../Constants.js';
+import { DATE_FORMAT_CAP, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
 import moment from 'moment';
 
 import i18n from '../../i18n';
@@ -581,12 +581,12 @@ export default class ShipmentDelinking extends Component {
             ],
             text: {
                 // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
+                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
                 show: '',
                 entries: '',
             },
             onload: this.loaded,
-            pagination: 10,
+            pagination: JEXCEL_DEFAULT_PAGINATION,
             search: true,
             columnSorting: true,
             tableOverflow: true,
@@ -600,7 +600,7 @@ export default class ShipmentDelinking extends Component {
             oneditionend: this.onedit,
             copyCompatibility: true,
             allowExport: false,
-            paginationOptions: [10, 25, 50],
+            paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             contextMenu: function (obj, x, y, e) {
                 var items = [];

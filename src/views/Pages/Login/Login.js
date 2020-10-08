@@ -215,7 +215,7 @@ class Login extends Component {
 
         <div className="Login-component" style={{ backgroundImage: "url(" + InnerBgImg + ")" }}>
           <Container className="container-login">
-
+          
             <Row className="justify-content-center">
               <Col className="float-right pr-5" style={{ width: '100%' }}>
                 <div className="float-right">
@@ -239,6 +239,7 @@ class Login extends Component {
                 <div className="upper-logo logo-MarginTop">
                   <img src={image1} className="img-fluid " />
                 </div>
+               
               </Col>
               <Col lg="5" md="7" xl="4">
                 <CardGroup>

@@ -13,7 +13,7 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import ProcurementUnitService from "../../api/ProcurementUnitService";
 import i18n from '../../i18n';
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions';
-import { DECIMAL_NO_REGEX, INTEGER_NO_REGEX } from '../../Constants.js';
+import { DECIMAL_NO_REGEX, INTEGER_NO_REGEX, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
 const entityname = i18n.t('static.dashboard.procurementAgentProcurementUnit')
 
 
@@ -557,12 +557,12 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                             },
 
                                         ],
-                                        pagination: 10,
+                                        pagination: JEXCEL_DEFAULT_PAGINATION,
                                         search: true,
                                         columnSorting: true,
                                         tableOverflow: true,
                                         wordWrap: true,
-                                        paginationOptions: [10, 25, 50,],
+                                        paginationOptions: JEXCEL_PAGINATION_OPTION,
                                         position: 'top',
                                         allowInsertColumn: false,
                                         allowManualInsertColumn: false,
@@ -572,7 +572,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                         copyCompatibility: true,
                                         text: {
                                             // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                                            showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
+                                            showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
                                             show: '',
                                             entries: '',
                                         },

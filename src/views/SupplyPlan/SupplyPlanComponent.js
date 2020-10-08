@@ -1448,7 +1448,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                 <Bar id="cool-canvas" data={bar} options={chartOptions} />
                                             </div>
                                         </div>
-                                        <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span>
+                                       <div className="offset-6 col-md-6"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
                                     </div>
                                 }
 
@@ -1491,17 +1491,20 @@ export default class SupplyPlanComponent extends React.Component {
                     <Modal isOpen={this.state.consumption}
                         className={'modal-lg ' + this.props.className, "modalWidth"} >
                         <ModalHeader toggle={() => this.toggleLarge('Consumption')} className="modalHeaderSupplyPlan">
-                            <strong>{i18n.t('static.dashboard.consumptiondetails')}</strong>
+                          <strong>{i18n.t('static.dashboard.consumptiondetails')}</strong>
+                    
                             <ul className="legendcommitversion" style={{ display: 'inline-flex' }}>
                                 <li><span className="purplelegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.forecastedConsumption')}</span></li>
                                 <li><span className=" blacklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.actualConsumption')} </span></li>
                             </ul>
-                            <div className="card-header-actions">
+                             
+                            <div className=" card-header-actions" style={{marginTop:'-5px'}}>
                                 <a className="card-header-action">
                                     {/* <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggle() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span> */}
                                     <Link to={`/consumptionDetails/` + this.state.programId + `/0/` + this.state.planningUnitId} target="_blank"><small className="dataEntryLink">{i18n.t('static.supplyplan.consumptionDataEntry')}</small></Link>
                                 </a>
                             </div>
+                            
                         </ModalHeader>
                         <div style={{ display: this.state.loading ? "none" : "block" }}>
                             <ModalBody>

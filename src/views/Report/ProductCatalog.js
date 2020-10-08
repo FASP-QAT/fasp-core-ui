@@ -1474,7 +1474,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { Online } from 'react-detect-offline';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, ON_HOLD_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, DRAFT_SHIPMENT_STATUS, INDEXED_DB_VERSION, INDEXED_DB_NAME } from '../../Constants.js';
+import { SECRET_KEY, ON_HOLD_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, DRAFT_SHIPMENT_STATUS, INDEXED_DB_VERSION, INDEXED_DB_NAME, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import ProcurementAgentService from "../../api/ProcurementAgentService";
 import TracerCategoryService from '../../api/TracerCategoryService';
@@ -1935,12 +1935,12 @@ class ProductCatalog extends Component {
                 },
             ],
             text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
+                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
                 show: '',
                 entries: '',
             },
             onload: this.loaded,
-            pagination: 10,
+            pagination: JEXCEL_DEFAULT_PAGINATION,
             search: true,
             columnSorting: true,
             tableOverflow: true,
@@ -1952,7 +1952,7 @@ class ProductCatalog extends Component {
             oneditionend: this.onedit,
             copyCompatibility: true,
             allowExport: false,
-            paginationOptions: [10, 25, 50],
+            paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             contextMenu: false
         };
