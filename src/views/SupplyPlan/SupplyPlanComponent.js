@@ -590,9 +590,9 @@ export default class SupplyPlanComponent extends React.Component {
             doc.setFont('helvetica', 'normal')
             var cnt = 0
             this.state.inList.map(ele => {
-             
+
                 if (ele.notes != null && ele.notes != '') {
-                     cnt = cnt + 1
+                    cnt = cnt + 1
                     if (cnt == 1) {
                         y = y + 30
                         doc.setFontSize(10)
@@ -607,20 +607,20 @@ export default class SupplyPlanComponent extends React.Component {
                         y = 80;
 
                     }
-                    doc.text(moment(ele.inventoryDate).format('DD-MMM-YY') , doc.internal.pageSize.width / 7, y, {
+                    doc.text(moment(ele.inventoryDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 7, y, {
                         align: 'left'
                     })
-                    doc.text( ele.notes, doc.internal.pageSize.width / 5, y, {
+                    doc.text(ele.notes, doc.internal.pageSize.width / 5, y, {
                         align: 'left'
                     })
                 }
             })
-        
+
             cnt = 0
 
             this.state.coList.map(ele => {
                 if (ele.notes != null && ele.notes != '') {
-                     cnt = cnt + 1
+                    cnt = cnt + 1
                     if (cnt == 1) {
                         y = y + 30
                         doc.setFontSize(8)
@@ -638,17 +638,17 @@ export default class SupplyPlanComponent extends React.Component {
                     doc.text(moment(ele.consumptionDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 7, y, {
                         align: 'left'
                     })
-                    doc.text( ele.notes, doc.internal.pageSize.width / 5, y, {
+                    doc.text(ele.notes, doc.internal.pageSize.width / 5, y, {
                         align: 'left'
                     })
                 }
             })
-           
+
             cnt = 0
-           
+
             this.state.shList.map(ele => {
                 if (ele.notes != null && ele.notes != '') {
-                     cnt = cnt + 1
+                    cnt = cnt + 1
                     if (cnt == 1) {
                         y = y + 30
                         doc.setFontSize(10)
@@ -663,14 +663,15 @@ export default class SupplyPlanComponent extends React.Component {
                         y = 80;
 
                     }
-                    doc.text(moment(ele.receivedDate == null || ele.receivedDate == '' ? ele.expectedDeliveryDate : ele.receivedDate).format('DD-MMM-YY') , doc.internal.pageSize.width / 7, y, {
+                    doc.text(moment(ele.receivedDate == null || ele.receivedDate == '' ? ele.expectedDeliveryDate : ele.receivedDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 7, y, {
                         align: 'left'
                     })
-                    doc.text( ele.notes, doc.internal.pageSize.width / 5, y, {
+                    doc.text(ele.notes, doc.internal.pageSize.width / 5, y, {
                         align: 'left'
                     })
 
-                }}
+                }
+            }
             )
             addHeaders(doc)
             addFooters(doc)
@@ -1217,7 +1218,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             {
                                                 this.state.monthsArray.map((item, count) => {
                                                     if (count < 7) {
-                                                        return (<th className={count==2 ? "supplyplan-Thead supplyplanTdWidthForMonths" : "supplyplanTdWidthForMonths"}>{item.monthName.concat(" ").concat(item.monthYear)}</th>)
+                                                        return (<th className={count == 2 ? "supplyplan-Thead supplyplanTdWidthForMonths" : "supplyplanTdWidthForMonths"}>{item.monthName.concat(" ").concat(item.monthYear)}</th>)
                                                     }
                                                 })
                                             }
@@ -1322,7 +1323,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             {
                                                 this.state.monthsArray.map((item, count) => {
                                                     if (count < 7) {
-                                                        return (<th colSpan="2" className={count==2 ? "supplyplan-Thead" : ""}>{item.monthName.concat(" ").concat(item.monthYear)}</th>)
+                                                        return (<th colSpan="2" className={count == 2 ? "supplyplan-Thead" : ""}>{item.monthName.concat(" ").concat(item.monthYear)}</th>)
                                                     }
                                                 })
                                             }
@@ -2490,6 +2491,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     }
                                     console.log("Json----------->", json);
                                     console.log("plannedShipmentsTotalData[n]------------>", plannedShipmentsTotalData[n])
+                                    console.log("jsonList[0].consumptionQty", jsonList[0].consumptionQty)
                                     jsonArrForGraph.push(json);
                                 } else {
                                     openingBalanceArray.push(lastClosingBalance);
@@ -2524,7 +2526,7 @@ export default class SupplyPlanComponent extends React.Component {
 
                                     var json = {
                                         month: m[n].month,
-                                        consumption: 0,
+                                        consumption: null,
                                         stock: lastClosingBalance,
                                         planned: 0,
                                         delivered: 0,
@@ -2539,6 +2541,7 @@ export default class SupplyPlanComponent extends React.Component {
                             }
                             // console.log("supplyPlan", supplyPlan);
                             console.log("consumptionTotalData", consumptionTotalData);
+                            console.log("Json array for grpah", jsonArrForGraph);
                             this.setState({
                                 openingBalanceArray: openingBalanceArray,
                                 consumptionTotalData: consumptionTotalData,
@@ -2626,7 +2629,8 @@ export default class SupplyPlanComponent extends React.Component {
             showConsumption: 0
         })
         if (supplyPlanType == 'Consumption') {
-            var monthCountConsumption = this.state.monthCount + count - 2;
+            console.log("count--------->", count);
+            var monthCountConsumption = count != undefined ? this.state.monthCount + count - 2 : this.state.monthCount;
             this.setState({
                 consumption: !this.state.consumption,
                 monthCountConsumption: monthCountConsumption,
@@ -2643,7 +2647,7 @@ export default class SupplyPlanComponent extends React.Component {
             });
             this.shipmentsDetailsClicked(shipmentType, startDate, endDate);
         } else if (supplyPlanType == 'Adjustments') {
-            var monthCountAdjustments = this.state.monthCount + count - 2;
+            var monthCountAdjustments = count != undefined ? this.state.monthCount + count - 2 : this.state.monthCount;
             this.setState({
                 adjustments: !this.state.adjustments,
                 monthCountAdjustments: monthCountAdjustments

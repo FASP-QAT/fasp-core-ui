@@ -1216,7 +1216,7 @@ export default class SupplyPlanComponent extends React.Component {
 
                                     var json = {
                                         month: m[n].month,
-                                        consumption: 0,
+                                        consumption: null,
                                         stock: lastClosingBalance,
                                         planned: 0,
                                         delivered: 0,

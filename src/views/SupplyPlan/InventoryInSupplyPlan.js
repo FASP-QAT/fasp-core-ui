@@ -5,7 +5,7 @@ import i18n from '../../i18n';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunctionOnlyHideRow, checkValidtion, inValid, positiveValidation, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { SECRET_KEY, INTEGER_NO_REGEX, INVENTORY_DATA_SOURCE_TYPE, NEGATIVE_INTEGER_NO_REGEX, QAT_DATA_SOURCE_ID, NOTES_FOR_QAT_ADJUSTMENTS, INDEXED_DB_VERSION, INDEXED_DB_NAME, DATE_FORMAT_CAP, JEXCEL_DATE_FORMAT_WITHOUT_DATE } from "../../Constants";
+import { SECRET_KEY, JEXCEL_INTEGER_REGEX, INVENTORY_DATA_SOURCE_TYPE, JEXCEL_NEGATIVE_INTEGER_NO_REGEX, QAT_DATA_SOURCE_ID, NOTES_FOR_QAT_ADJUSTMENTS, INDEXED_DB_VERSION, INDEXED_DB_NAME, DATE_FORMAT_CAP, JEXCEL_DATE_FORMAT_WITHOUT_DATE } from "../../Constants";
 import moment from "moment";
 import CryptoJS from 'crypto-js'
 import { calculateSupplyPlan } from "./SupplyPlanCalculations";
@@ -173,6 +173,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     }
 
                     console.log("Inventory list", inventoryList);
+                    inventoryList=inventoryList.sort(function (a, b) { return ((new Date(a.inventoryDate) - new Date(b.inventoryDate)) || (a.region.id - b.region.id) || (a.realmCountryPlanningUnit.id - b.realmCountryPlanningUnit.id)) })
                     for (var j = 0; j < inventoryList.length; j++) {
                         data = [];
                         data[0] = inventoryList[j].inventoryDate; //A
@@ -666,7 +667,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         }
         if (x == 5) {
             if (rowData[4] == 2) {
-                var valid = checkValidtion("number", "F", y, rowData[5], elInstance, NEGATIVE_INTEGER_NO_REGEX, 0, 0);
+                var valid = checkValidtion("number", "F", y, rowData[5], elInstance, JEXCEL_NEGATIVE_INTEGER_NO_REGEX, 0, 0);
                 if (valid == false) {
                     elInstance.setValueFromCoords(16, y, 1, true);
                 }
@@ -675,7 +676,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
 
         if (x == 6) {
             if (rowData[4] == 1) {
-                var valid = checkValidtion("number", "G", y, rowData[6], elInstance, INTEGER_NO_REGEX, 1, 1);
+                var valid = checkValidtion("number", "G", y, rowData[6], elInstance, JEXCEL_INTEGER_REGEX, 1, 1);
                 if (valid == false) {
                     elInstance.setValueFromCoords(16, y, 1, true);
                 }
@@ -732,13 +733,13 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         }
         if (x == 3) {
             if (rowData[2] == 2) {
-                checkValidtion("number", "D", y, rowData[3], elInstance, NEGATIVE_INTEGER_NO_REGEX, 0, 0);
+                checkValidtion("number", "D", y, rowData[3], elInstance, JEXCEL_NEGATIVE_INTEGER_NO_REGEX, 0, 0);
             }
         }
 
         if (x == 4) {
             if (rowData[2] == 1) {
-                checkValidtion("number", "E", y, rowData[4], elInstance, INTEGER_NO_REGEX, 1, 0);
+                checkValidtion("number", "E", y, rowData[4], elInstance, JEXCEL_INTEGER_REGEX, 1, 0);
             }
         }
 
@@ -866,14 +867,14 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 }
 
                 if (rowData[2] == 2) {
-                    validation = checkValidtion("number", "D", y, rowData[3], elInstance, NEGATIVE_INTEGER_NO_REGEX, 0, 0);
+                    validation = checkValidtion("number", "D", y, rowData[3], elInstance, JEXCEL_NEGATIVE_INTEGER_NO_REGEX, 0, 0);
                     if (validation == false) {
                         valid = false;
                     }
                 }
 
                 if (rowData[2] == 1) {
-                    validation = checkValidtion("number", "E", y, rowData[4], elInstance, INTEGER_NO_REGEX, 1, 1);
+                    validation = checkValidtion("number", "E", y, rowData[4], elInstance, JEXCEL_INTEGER_REGEX, 1, 1);
                     if (validation == false) {
                         valid = false;
                     }
@@ -1110,7 +1111,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 }
 
                 if (rowData[4] == 2) {
-                    var validation = checkValidtion("number", "F", y, rowData[5], elInstance, NEGATIVE_INTEGER_NO_REGEX, 0, 0);
+                    var validation = checkValidtion("number", "F", y, rowData[5], elInstance, JEXCEL_NEGATIVE_INTEGER_NO_REGEX, 0, 0);
                     if (validation == false) {
                         valid = false;
                         elInstance.setValueFromCoords(16, y, 1, true);
@@ -1118,7 +1119,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 }
 
                 if (rowData[4] == 1) {
-                    var validation = checkValidtion("number", "G", y, rowData[6], elInstance, INTEGER_NO_REGEX, 1, 1);
+                    var validation = checkValidtion("number", "G", y, rowData[6], elInstance, JEXCEL_INTEGER_REGEX, 1, 1);
                     if (validation == false) {
                         valid = false;
                         elInstance.setValueFromCoords(16, y, 1, true);
