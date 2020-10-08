@@ -1018,9 +1018,6 @@ font-size: 14px;
   margin-top: 1% !important;
   margin-left: 0%;
 }
-.logo-MarginTop{
-  margin-top: -2%!important;
-}
 
 .card-marginTop
 {
@@ -3338,8 +3335,8 @@ margin-left: -45px;
 
 .versionColor{
   color:#cb3828;
-  font-weight: 600;
-  font-size: 13px;
+  font-weight: 500;
+  font-size: 12px !important;
 }
 ///sidebar css
 @media (min-width: 992px){
@@ -3545,13 +3542,32 @@ margin-left: -45px;
 .clone tbody th {
 	visibility:visible;
 }
-.en-btnlogin{
-    color: #002f6c !important;
-    background-color: transparent !important;
-    border-color: transparent !important;
-  }
-  .modal-title {
-    margin-bottom: 0;
-    line-height: 1.5;
-    width: 100%;
+
+.quantimedProgressbartext1 {
+  // left: 7px;
+  left: -2%;
+  transform: translateX(18%) scale(1);
 }
+.quantimedProgressbartext2 {
+  // left: 16%;
+  left: 28%;
+  transform: translateX(18%) scale(1);
+}
+.quantimedProgressbartext3 {
+  // left: 16%;
+  left: 62%;
+  // transform: translateX(18%) scale(1);
+}
+.quantimedProgressbartext4 {
+  // left: 16%;
+  left: 92.5%;
+  transform: translateX(18%) scale(1);
+}
+.en-btnlogin{
+  color: #002f6c !important;
+  background-color: transparent !important;
+  border-color: transparent !important;
+  }
+  .logo-MarginTop{
+  margin-top: -2%!important;
+  }

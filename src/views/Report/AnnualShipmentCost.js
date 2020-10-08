@@ -1238,7 +1238,7 @@ class AnnualShipmentCost extends Component {
                                                             bsSize="sm"
                                                             onChange={this.fetchData}
                                                         >
-                                                            <option value="1">{i18n.t('static.common.shippingdate')}</option>
+                                                            <option value="1">{i18n.t('static.supplyPlan.submittedDate')}</option>
                                                             <option value="2">{i18n.t('static.common.receivedate')}</option>
 
                                                         </Input>

@@ -500,7 +500,7 @@ class RealmCountryRegion extends Component {
                             label_en: map1.get("1"),
                         },
                         capacityCbm: map1.get("2").replace(",", ""),
-                        gln: map1.get("3"),
+                        gln: (map1.get("3") === '' ? null : map1.get("3")),
                         active: map1.get("4"),
                         realmCountry: {
                             realmCountryId: parseInt(map1.get("5"))
@@ -547,7 +547,8 @@ class RealmCountryRegion extends Component {
                                 case 404:
                                 case 406:
                                     this.setState({
-                                        message: error.response.data.messageCode,
+                                        // message: error.response.data.messageCode,
+                                        message: i18n.t('static.region.duplicateGLN'),
                                         loading: false
                                     });
                                     break;
@@ -585,7 +586,7 @@ class RealmCountryRegion extends Component {
         console.log('hasDuplicate', hasDuplicate);
         if (hasDuplicate) {
             this.setState({
-                message: 'Duplicate Region Found',
+                message: i18n.t('static.region.duplicateRegion'),
                 changedFlag: 0,
 
             },
@@ -624,12 +625,14 @@ class RealmCountryRegion extends Component {
         //Capacity
         if (x == 2) {
             var col = ("C").concat(parseInt(y) + 1);
+            var reg = /^\s*(?=.*[1-9])\d{1,9}(?:\.\d{1,2})?\s*$/;
+            value = value.replace(/,/g, "");
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                if (isNaN(Number.parseInt(value)) || value < 0) {
+                if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -703,11 +706,13 @@ class RealmCountryRegion extends Component {
                 //Capacity
                 var col = ("C").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(2, y);
+                var reg = /^\s*(?=.*[1-9])\d{1,9}(?:\.\d{1,2})?\s*$/;
+                value = value.replace(/,/g, "");
                 if (value == "" || isNaN(Number.parseFloat(value)) || value < 0) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     valid = false;
-                    if (isNaN(Number.parseInt(value)) || value < 0) {
+                    if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
                         this.el.setComments(col, i18n.t('static.message.invalidnumber'));
                     } else {
                         this.el.setComments(col, i18n.t('static.label.fieldRequired'));
