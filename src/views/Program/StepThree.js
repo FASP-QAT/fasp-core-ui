@@ -140,7 +140,8 @@ export default class StepThree extends Component {
             && healthAreaList.map((item, i) => {
                 return (
                     <option key={i} value={item.healthAreaId}>
-                        {getLabelText(item.label, this.state.lang)}
+                        {item.healthAreaCode}
+                        {/* {getLabelText(item.label, this.state.lang)} */}
                     </option>
                 )
             }, this);

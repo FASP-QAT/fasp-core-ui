@@ -142,7 +142,8 @@ export default class StepFour extends Component {
             && organisationList.map((item, i) => {
                 return (
                     <option key={i} value={item.organisationId}>
-                        {getLabelText(item.label, this.state.lang)}
+                        {item.organisationCode}
+                        {/* {getLabelText(item.label, this.state.lang)} */}
                     </option>
                 )
             }, this);

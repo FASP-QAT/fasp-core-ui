@@ -1278,5 +1278,8 @@
     "static.common.max26digittext":"Maximum 26 characters only",
     "static.message.alphaspeccharnumtext": "Only letters, numbers and special characters like /,- are allowed",
     "static.supplyPlanReview.review":"Review",
-    "static.supplyPlanReview.reviewNotes":"Review Notes"
+    "static.supplyPlanReview.reviewNotes":"Review Notes",
+    "static.programOnboarding.programDisplayName":"Program Display Name",
+    "static.programOnboarding.programCode":"Program Code",
+    "static.programOnboarding.validprogramCode":"Enter valid program code"
 }
