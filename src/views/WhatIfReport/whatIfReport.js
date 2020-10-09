@@ -3326,7 +3326,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         </tr>
                                         <tr>
                                             <td className="BorderNoneSupplyPlan"></td>
-                                            <td align="left" className="sticky-col first-col clone">{i18n.t('static.supplyPlan.amc')}</td>
+                                            <td align="left" className="sticky-col first-col clone" title={i18n.t('static.supplyplan.amcmessage')}>{i18n.t('static.supplyPlan.amc')}</td>
                                             {
                                                 this.state.amcTotalData.map(item1 => (
                                                     <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>

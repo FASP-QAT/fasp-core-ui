@@ -1001,7 +1001,7 @@ class PlanningUnitCountry extends Component {
                 var col = ("F").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(5, y);
                 // var reg = /^[0-9\b]+$/;
-                var reg = /^\s*(?=.*[1-9])\d{1,9}(?:\.\d{1,2})?\s*$/;
+                var reg = /^\s*(?=.*[1-9])\d{1,10}(?:\.\d{1,2})?\s*$/;
                 // console.log("---------VAL----------", value);
                 if (value == "" || isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
@@ -1066,7 +1066,7 @@ class PlanningUnitCountry extends Component {
         )
     }
     cancelClicked() {
-        this.props.history.push(`/realmCountry/listRealmCountry/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/realmCountry/listRealmCountryPlanningUnit/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 }
 

@@ -479,7 +479,8 @@ const routes = [
   { path: '/procurementUnit/editProcurementUnit', exact: true, name: 'static.breadcrum.edit', entityname: 'static.dashboard.procurementUnitheader', component: EditProcurementUnit },
   { path: '/procurementUnit/editProcurementUnit/:procurementUnitId', name: 'static.breadcrum.edit', entityname: 'static.dashboard.procurementUnitheader', component: EditProcurementUnit },
   { path: '/planningUnit/editPlanningUnit/:planningUnitId', exact: true, name: 'static.breadcrum.edit', entityname: 'static.dashboard.planningunitheader', component: EditPlanningUnit },
-  { path: '/realmCountry/listRealmCountryPlanningUnit', name: 'static.dashboad.planningunitcountry', component: PlanningUnitCountryList },
+  { path: '/realmCountry/listRealmCountryPlanningUnit', exact: true, name: 'static.dashboad.planningunitcountry', component: PlanningUnitCountryList },
+  { path: '/realmCountry/listRealmCountryPlanningUnit/:color/:message', name: 'static.dashboad.planningunitcountry', component: PlanningUnitCountryList },
   { path: '/planningUnitCapacity/planningUnitCapacity/:planningUnitId', name: 'static.dashboad.planningunitcapacity', component: PlanningUnitCapacity },
   { path: '/realmCountry/realmCountryPlanningUnit/:realmCountryId', name: 'static.dashboad.planningunitcountry', component: PlanningUnitCountry },
   { path: '/planningUnitCapacity/listPlanningUnitCapacity', name: 'static.planningUnitVolumeHead.planningUnitVolume', component: PlanningUnitCapacityList },
@@ -596,7 +597,7 @@ class DefaultLayout extends Component {
       businessFunctions: [],
       name: "",
       //Timer
-      timeout: 1000 * 150 * 1,
+      timeout: 1000 * 450 * 1,
       // timeout: 1000 * 3600 * 1,
       showModal: false,
       userLoggedIn: false,

@@ -37,6 +37,7 @@ const validationSchema = function (values, t) {
     return Yup.object().shape({
         budget: Yup.string()
             // .matches(BUDGET_NAME_REGEX, i18n.t('static.message.budgetNameRegex'))
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.budget.budgetamountdesc')),
         programId: Yup.string()
             .required(i18n.t('static.budget.programtext')),
@@ -58,7 +59,7 @@ const validationSchema = function (values, t) {
             // .matches(ALPHABET_NUMBER_REGEX, i18n.t('static.message.alphabetnumerallowed'))
             .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly'))
             .max(30, i18n.t('static.common.max30digittext'))
-            .required(i18n.t('static.budget.budgetCodeText')),
+            .required(i18n.t('static.budget.budgetDisplayNameText')),
     })
 }
 const validate = (getValidationSchema) => {
@@ -214,8 +215,9 @@ class AddBudgetComponent extends Component {
             budget.fundingSource.fundingSourceId = event.target.value;
         }
         if (event.target.name === "budgetAmt") {
-            var chnageValue = this.CommaFormatted(event.target.value);
-            budget.budgetAmt = chnageValue;
+            // var chnageValue = this.CommaFormatted(event.target.value);
+            // budget.budgetAmt = chnageValue;
+            budget.budgetAmt = event.target.value;
         }
         if (event.target.name === "budgetCode") {
             budget.budgetCode = event.target.value.toUpperCase();
@@ -633,7 +635,7 @@ class AddBudgetComponent extends Component {
                                                     </FormGroup>
 
                                                     <FormGroup>
-                                                        <Label for="budget">{i18n.t('static.budget.budgetCode')}<span className="red Reqasterisk">*</span></Label>
+                                                        <Label for="budget">{i18n.t('static.budget.budgetDisplayName')}<span className="red Reqasterisk">*</span></Label>
                                                         <Input type="text"
                                                             name="budgetCode"
                                                             id="budgetCode"
