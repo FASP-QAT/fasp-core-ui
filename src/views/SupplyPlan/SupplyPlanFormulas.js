@@ -165,7 +165,7 @@ Ending balance = 22,000</p><br></br>
                     <ListGroupItemHeading className="formulasheading">Average Monthly Consumption (AMC)</ListGroupItemHeading>
                     <ListGroupItemText className="formulastext">
                     <img className="formula-img-mr img-fluid" src={amc}/><br></br>
-                    <p>* Consider only non zero values. Also future months include current month</p>
+                    <p>* Consider only non zero values. Also current month is included in the months in future for AMC</p>
                     <p><span className="formulastext-p">Example :</span><br></br>
                     Months in past = 3(Based on program planning unit)<br></br>
                     Months in future = 3(Based on program planning unit)<br></br>
@@ -359,7 +359,7 @@ Months Of Stock = 3.54</p>
                     <ListGroupItemHeading className="formulasheading">Average Monthly Consumption (AMC)</ListGroupItemHeading>
                     <ListGroupItemText className="formulastext">
                     <img className="formula-img-mr img-fluid" src={amc}/><br></br>
-                    <p>* Consider only non zero values. Also future months include current month</p>
+                    <p>* Consider only non zero values. Also current month is included in the months in future for AMC</p>
                     <p><span className="formulastext-p">Example :</span><br></br>
                     Months in past = 3(Based on program planning unit)<br></br>
                     Months in future = 3(Based on program planning unit)<br></br>
@@ -405,7 +405,7 @@ Months Of Stock = 3.54</p>
                     <ListGroupItemHeading className="formulasheading">Average Monthly Consumption (AMC)</ListGroupItemHeading>
                     <ListGroupItemText className="formulastext">
                     <img className="formula-img-mr img-fluid" src={amc}/><br></br>
-                    <p>* Consider only non zero values. Also future months include current month</p>
+                    <p>* Consider only non zero values. Also current month is included in the months in future for AMC</p>
                     <p><span className="formulastext-p">Example :</span><br></br>
                     Months in past = 3(Based on program planning unit)<br></br>
                     Months in future = 3(Based on program planning unit)<br></br>
@@ -473,7 +473,7 @@ Max = 44,744</p>
                     <ListGroupItemHeading className="formulasheading">Average Monthly Consumption (AMC)</ListGroupItemHeading>
                     <ListGroupItemText className="formulastext">
                     <img className="formula-img-mr img-fluid" src={amc}/><br></br>
-                    <p>* Consider only non zero values. Also future months include current month</p>
+                    <p>* Consider only non zero values. Also current month is included in the months in future for AMC</p>
                     <p><span className="formulastext-p">Example :</span><br></br>
                     Months in past = 3(Based on program planning unit)<br></br>
                     Months in future = 3(Based on program planning unit)<br></br>

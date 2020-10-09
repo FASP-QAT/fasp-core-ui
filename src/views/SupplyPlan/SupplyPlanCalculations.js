@@ -625,10 +625,13 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                         var maxForMonths = 0;
                         var realm = programJsonForStoringTheResult.realmCountry.realm;
                         var DEFAULT_MIN_MONTHS_OF_STOCK = realm.minMosMinGaurdrail;
+                        var DEFAULT_MIN_MAX_MONTHS_OF_STOCK = realm.minMosMaxGaurdrail;
                         if (DEFAULT_MIN_MONTHS_OF_STOCK > programPlanningUnitList[ppL].minMonthsOfStock) {
                             maxForMonths = DEFAULT_MIN_MONTHS_OF_STOCK
-                        } else {
+                        } else if (programPlanningUnitList[ppL].minMonthsOfStock < DEFAULT_MIN_MAX_MONTHS_OF_STOCK) {
                             maxForMonths = programPlanningUnitList[ppL].minMonthsOfStock
+                        }else{
+                            maxForMonths = DEFAULT_MIN_MAX_MONTHS_OF_STOCK
                         }
                         var minStockMoSQty = parseInt(maxForMonths);
 

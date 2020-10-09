@@ -844,7 +844,7 @@ import paginationFactory from 'react-bootstrap-table2-paginator'
 import BootstrapTable from 'react-bootstrap-table-next';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { SECRET_KEY, DATE_FORMAT_CAP } from '../../Constants.js';
+import { SECRET_KEY, DATE_FORMAT_CAP, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
 import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
@@ -1041,12 +1041,12 @@ class SupplyPlanVersionAndReview extends Component {
                 }
             ],
             text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
+                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
                 show: '',
                 entries: '',
             },
             onload: this.loaded,
-            pagination: 10,
+            pagination: JEXCEL_DEFAULT_PAGINATION,
             search: true,
             columnSorting: true,
             tableOverflow: true,
@@ -1058,7 +1058,7 @@ class SupplyPlanVersionAndReview extends Component {
             oneditionend: this.onedit,
             copyCompatibility: true,
             allowExport: false,
-            paginationOptions: [10, 25, 50],
+            paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             contextMenu: false
         };

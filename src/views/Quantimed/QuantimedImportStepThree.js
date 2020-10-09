@@ -105,8 +105,7 @@ class QuantimedImportStepThree extends Component {
     }
 
     handleRangeChange(value, text, listIndex) {
-        console.log("value=======================",value);
-        console.log("text=======================",text);
+        
     }
     handleRangeDissmis(value) {
         this.setState({ rangeValue: value }, () => {
@@ -116,7 +115,7 @@ class QuantimedImportStepThree extends Component {
     }
 
     _handleClickRangeBox(e) {
-        console.log("Thuis.refs", this);
+        
         this.pickRange.current.show()
     }
 
@@ -139,7 +138,12 @@ class QuantimedImportStepThree extends Component {
                     initialValues={initialValuesThree}
                     validate={validateThree(validationSchemaThree)}
                     onSubmit={(values, { setSubmitting, setErrors }) => {
-
+                        
+                        let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
+                        let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
+                        // alert(startDate)
+                        // alert(endDate)                        
+                        this.props.items.program.rangeValue = this.state.rangeValue;
                         this.props.finishedStepThree && this.props.finishedStepThree();
                         this.props.triggerStepFour();
 
@@ -183,7 +187,7 @@ class QuantimedImportStepThree extends Component {
                                     <CardFooter className="pb-0 pr-0">
                                         <FormGroup>
 
-                                            <Button color="info" size="md" className="float-right mr-1" type="submit" name="healthAreaSub" id="healthAreaSub" onClick={this.props.finishedStepThree}>{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
+                                            <Button color="info" size="md" className="float-right mr-1" type="submit" name="healthAreaSub" id="healthAreaSub" onClick={() => this.touchAll(setTouched, errors)}>{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
                                         &nbsp;
                                         <Button color="info" size="md" className="float-right mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.props.previousToStepTwo} ><i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>                                        
                                         &nbsp;

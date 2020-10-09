@@ -33,7 +33,7 @@ export default class AuthenticationServiceComponent extends Component {
     componentDidMount = () => {
         console.log("Common component component did mount called-------------");
         var result = AuthenticationService.validateRequest();
-        console.log("result----"+result);
+        console.log("result----" + result);
         if (result != "") {
             this.props.history.push(result)
         } else {
@@ -47,8 +47,10 @@ export default class AuthenticationServiceComponent extends Component {
                 console.log("common request axios interceptors--->", config);
                 // Do something before request is sent
                 var result1 = AuthenticationService.validateRequest();
-                console.log("result1----"+result1);
-                if(result1 != ""){
+                console.log("result1----" + result1);
+                let url = config.url;
+                console.log("url---", url);
+                if (result1 != null && result1 != "" && !url.includes("/actuator/info/") && !url.includes("/authenticate") && !url.includes("/api/updateExpiredPassword/") && !url.includes("/api/forgotPassword/") && !url.includes("/api/confirmForgotPasswordToken/") && !url.includes("/api/updatePassword/")) {
                     this.props.history.push(result1)
                 }
                 return config;

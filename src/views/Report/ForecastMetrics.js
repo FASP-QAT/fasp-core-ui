@@ -1018,7 +1018,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import RealmCountryService from '../../api/RealmCountryService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
@@ -1184,23 +1184,22 @@ class ForecastMetrics extends Component {
   exportCSV() {
 
     var csvRow = [];
-    csvRow.push((i18n.t('static.report.month') + ' , ' + this.makeText(this.state.singleValue2)).replaceAll(' ', '%20'))
-    csvRow.push((i18n.t('static.report.timeWindow')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("viewById").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+    csvRow.push('"' +(i18n.t('static.report.month') + ' : ' + this.makeText(this.state.singleValue2)).replaceAll(' ', '%20')+'"')
+    csvRow.push('"' +(i18n.t('static.report.timeWindow') + ' , ' + (document.getElementById("viewById").selectedOptions[0].text)).replaceAll(' ', '%20')+'"')
 
     this.state.countryLabels.map(ele =>
-      csvRow.push(i18n.t('static.dashboard.country') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
+      csvRow.push('"' +(i18n.t('static.dashboard.country') + ' : ' + (ele.toString())).replaceAll(' ', '%20')+'"'))
     this.state.programLabels.map(ele =>
-      csvRow.push(i18n.t('static.program.program') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
-    // csvRow.push((i18n.t('static.dashboard.productcategory')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("productCategoryId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+      csvRow.push('"' +(i18n.t('static.program.program') + ' : ' + (ele.toString())).replaceAll(' ', '%20')+'"'))
     this.state.planningUnitLabels.map(ele =>
-      csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
+      csvRow.push('"' +(i18n.t('static.planningunit.planningunit') + ' : ' + (ele.toString())).replaceAll(' ', '%20')+'"'))
     csvRow.push('')
     csvRow.push('')
-    csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
+    csvRow.push('"' +(i18n.t('static.common.youdatastart')).replaceAll(' ', '%20')+'"')
     csvRow.push('')
     var re;
 
-    var A = [this.addDoubleQuoteToRowContent([(i18n.t('static.program.program')).replaceAll(' ', '%20'), (i18n.t('static.dashboard.planningunit')).replaceAll(' ', '%20'),
+    var A = [this.addDoubleQuoteToRowContent([(i18n.t('static.program.program')).replaceAll(' ', '%20'),(i18n.t('static.report.qatPID')).replaceAll(' ', '%20'), (i18n.t('static.dashboard.planningunit')).replaceAll(' ', '%20'),
     //(i18n.t('static.report.historicalConsumptionDiff')).replaceAll(' ','%20'),(i18n.t('static.report.historicalConsumptionActual')).replaceAll(' ','%20'),
     (i18n.t('static.report.error')).replaceAll(' ', '%20'), (i18n.t('static.report.noofmonth')).replaceAll(' ', '%20')])]
 
@@ -1208,9 +1207,9 @@ class ForecastMetrics extends Component {
 
     for (var item = 0; item < re.length; item++) {
       console.log(re[item].planningUnit)
-      A.push([this.addDoubleQuoteToRowContent([(getLabelText(re[item].program.label).replaceAll(',', '%20')).replaceAll(' ', '%20'), re[item].planningUnit.id == 0 ? '' : (getLabelText(re[item].planningUnit.label).replaceAll(',', '%20')).replaceAll(' ', '%20'),
+      A.push([this.addDoubleQuoteToRowContent([(getLabelText(re[item].program.label).replaceAll(',', '%20')).replaceAll(' ', '%20'),re[item].planningUnit.id, re[item].planningUnit.id == 0 ? '' : (getLabelText(re[item].planningUnit.label)).replaceAll(' ', '%20'),
       // re[item].historicalConsumptionDiff,re[item].historicalConsumptionActual,
-      re[item].monthCount == 0 ? ("No data points containing both actual and forecast consumption").replaceAll(' ', '%20') : this.roundN(re[item].forecastError) + '%', re[item].monthCount])])
+      re[item].message !=null  ? (i18n.t(re[item].message)).replaceAll(' ', '%20') : this.roundN(re[item].forecastError) + '%', re[item].monthCount])])
     }
     for (var i = 0; i < A.length; i++) {
       csvRow.push(A[i].join(","))
@@ -1342,12 +1341,12 @@ class ForecastMetrics extends Component {
       doc.addPage()
     }
     let startYtable = startY - ((height - h1) * (pages - 1))
-    const headers = [[i18n.t('static.program.program'), i18n.t('static.dashboard.planningunit'),
+    const headers = [[i18n.t('static.program.program'), i18n.t('static.report.qatPID'),i18n.t('static.dashboard.planningunit'),
     //i18n.t('static.report.historicalConsumptionDiff'),i18n.t('static.report.historicalConsumptionActual'),
     i18n.t('static.report.error'), i18n.t('static.report.noofmonth')]]
-    const data = this.state.consumptions.map(elt => [getLabelText(elt.program.label), getLabelText(elt.planningUnit.label),
+    const data = this.state.consumptions.map(elt => [getLabelText(elt.program.label),elt.planningUnit.id, getLabelText(elt.planningUnit.label),
     //elt.historicalConsumptionDiff,elt.historicalConsumptionActual,
-    elt.monthCount == 0 ? "No data points containing both actual and forecast consumption" : this.roundN(elt.forecastError) + '%', elt.monthCount]);
+    elt.message !=null ? i18n.t(elt.message) : this.roundN(elt.forecastError) + '%', elt.monthCount]);
     let content = {
       margin: { top: 80, bottom: 50 },
       startY: startYtable,
@@ -1355,10 +1354,12 @@ class ForecastMetrics extends Component {
       body: data,
       styles: { lineWidth: 1, fontSize: 8, halign: 'center' },
       columnStyles: {
-        0: { cellWidth: 219.0 },
-        1: { cellWidth: 218.89 },
-        2: { cellWidth: 162 },
-        3: { cellWidth: 162 }
+        0: { cellWidth: 169.0 },
+        1: { cellWidth: 141 },
+        2: { cellWidth: 169.89 },
+        3: { cellWidth: 141 },
+        4: { cellWidth: 141 }
+        
       }
 
     };
@@ -1438,9 +1439,9 @@ class ForecastMetrics extends Component {
       data = [];
       data[0] = getLabelText(consumptions[j].program.label, this.state.lang)
       data[1] = getLabelText(consumptions[j].planningUnit.label, this.state.lang)
-      data[2] = this.formatValue(consumptions[j].forecastError, consumptions[j]);
+      data[2] = consumptions[j].message!=null?i18n.t(consumptions[j].message):this.roundN(consumptions[j].forecastError)+"%";
       data[3] = consumptions[j].monthCount;
-      data[4] = consumptions[j].forecastError;
+      data[4] = this.roundN(consumptions[j].forecastError);
 
       consumptionArray[count] = data;
       count++;
@@ -1484,7 +1485,7 @@ class ForecastMetrics extends Component {
       ],
       editable: false,
       text: {
-        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
+        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
         show: '',
         entries: '',
       },
@@ -1513,7 +1514,7 @@ class ForecastMetrics extends Component {
       }.bind(this),
 
       onload: this.loaded,
-      pagination: 10,
+      pagination: JEXCEL_DEFAULT_PAGINATION,
       search: true,
       columnSorting: true,
       tableOverflow: true,
@@ -1527,7 +1528,7 @@ class ForecastMetrics extends Component {
       oneditionend: this.onedit,
       copyCompatibility: true,
       allowExport: false,
-      paginationOptions: [10, 25, 50],
+      paginationOptions: JEXCEL_PAGINATION_OPTION,
       position: 'top',
       contextMenu: false,
     };

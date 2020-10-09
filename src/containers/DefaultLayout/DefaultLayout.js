@@ -244,6 +244,7 @@ const StockAdjustment = React.lazy(() => import('../../views/Report/StockAdjustm
 const StockStatusReportAcrossPlanningUnits = React.lazy(() => import('../../views/Report/StockStatusAcrossPlanningUnits'));
 const ExpiredInventory = React.lazy(() => import('../../views/Report/ExpiredInventory'));
 const Budgets = React.lazy(() => import('../../views/Report/Budgets'));
+const QuantimedImport = React.lazy(() => import('../../views/Quantimed/QuantimedImportOnboarding'));
 // const EditProblem = React.lazy(() => import('../../views/Problem/EditProblem'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
@@ -585,6 +586,7 @@ const routes = [
   { path: '/report/stockAdjustment', name: 'static.report.stockAdjustment', component: StockAdjustment },
   // { path: '/report/expiredInventory', name:static.report.expiredInventory' ,component: ExpiredInventory },
   { path: '/report/expiredInventory', name: 'static.report.expiredInventory', component: ExpiredInventory },
+  { path: '/quantimed/quantimedImport', name: 'Quantimed Import', component: QuantimedImport }
 ];
 
 class DefaultLayout extends Component {
@@ -1549,6 +1551,13 @@ class DefaultLayout extends Component {
                         icon: 'fa fa-sitemap',
                         attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PIPELINE_PROGRAM_IMPORT') ? false : true) }
                       },
+
+                      // {
+                      //   name: 'Quantimed Import',                        
+                      //   url: '/quantimed/quantimedImport',
+                      //   icon: 'fa fa-file-text-o',
+                      //   attributes: { hidden: false }
+                      // }
 
                     ]
 

@@ -475,7 +475,15 @@ class AnnualShipmentCost extends Component {
                     var splittext = doc.splitTextToSize(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8);
 
                     doc.text(doc.internal.pageSize.width / 8, 80, splittext)
-                    splittext = doc.splitTextToSize(i18n.t('static.common.runDate')+':' + moment(new Date()).format(`${DATE_FORMAT_CAP}`) + '\n'+i18n.t('static.common.runDate') +':' + moment(new Date()).format('hh:mm A'), doc.internal.pageSize.width / 8);
+                   var y=80+splittext.length*10
+                     splittext = doc.splitTextToSize(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8);
+
+                    doc.text(doc.internal.pageSize.width / 8, y, splittext)
+                    y=y+splittext.length*10
+                    splittext = doc.splitTextToSize(i18n.t('static.common.reportbase') + ' : ' + document.getElementById("view").selectedOptions[0].text, doc.internal.pageSize.width / 8);
+
+                    doc.text(doc.internal.pageSize.width / 8, y, splittext)
+                    splittext = doc.splitTextToSize(i18n.t('static.common.runDate') + moment(new Date()).format(`${DATE_FORMAT_CAP}`) + ' ' + moment(new Date()).format('hh:mm A'), doc.internal.pageSize.width / 8);
 
                     doc.text(doc.internal.pageSize.width * 3 / 4, 80, splittext)
                     doc.setFontSize(8)
@@ -516,12 +524,14 @@ class AnnualShipmentCost extends Component {
         doc.text(i18n.t('static.procurementagent.procurementagent'), 50, 180, {
             align: 'left'
         })
-        doc.text(i18n.t(i18n.t('static.fundingsource.fundingsource')), 50, 190, {
+        doc.text(i18n.t(i18n.t('static.fundingsource.fundingsource')), 60, 190, {
             align: 'left'
         })
-        doc.text(i18n.t('static.planningunit.planningunit'), 50, 200, {
+        doc.setFont('helvetica', 'normal')
+        doc.text(i18n.t('static.planningunit.planningunit'), 70, 200, {
             align: 'left'
         })
+        doc.setFont('helvetica', 'bold')
         doc.line(50, 210, doc.internal.pageSize.width - 50, 210);
         var year = [];
         for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++) {
@@ -560,18 +570,49 @@ class AnnualShipmentCost extends Component {
             var values = Object.entries(record).map(([key, value]) => (value)
             )
 
-            var splittext = doc.splitTextToSize(record.procurementAgent + '\n' + record.fundingsource + '\n' + record.planningUnit + '\n' + '\n', index);
-
-            //doc.text(doc.internal.pageSize.width / 8, yindex, splittext)
-            //  yindex = yindex + 10;
+            var splittext = doc.splitTextToSize(record.procurementAgent , index);
             for (var i = 0; i < splittext.length; i++) {
                 yindex = yindex + 10;
+               
+                    doc.setFont('helvetica', 'bold')
+              
                 if (yindex > doc.internal.pageSize.height - 100) {
                     doc.addPage();
                     yindex = 80;
 
                 }
                 doc.text(50, yindex, splittext[i]);
+
+            }
+            splittext = doc.splitTextToSize(record.fundingsource , index);
+            for (var i = 0; i < splittext.length; i++) {
+                yindex = yindex + 10;
+                
+                    doc.setFont('helvetica', 'bold')
+                
+                if (yindex > doc.internal.pageSize.height - 100) {
+                    doc.addPage();
+                    yindex = 80;
+
+                }
+                doc.text(60, yindex, splittext[i]);
+
+            }
+            splittext = doc.splitTextToSize(record.planningUnit + '\n', index);
+
+            //doc.text(doc.internal.pageSize.width / 8, yindex, splittext)
+            //  yindex = yindex + 10;
+            for (var i = 0; i < splittext.length; i++) {
+                yindex = yindex + 10;
+               
+                    doc.setFont('helvetica', 'normal')
+               
+                if (yindex > doc.internal.pageSize.height - 100) {
+                    doc.addPage();
+                    yindex = 80;
+
+                }
+                doc.text(70, yindex, splittext[i]);
 
             }
             initalvalue = initalvalue + index
@@ -1204,9 +1245,7 @@ class AnnualShipmentCost extends Component {
         return (
             <div className="animated fadeIn" >
                 {/* <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6> */}
-                {/* <AuthenticationServiceComponent history={this.props.history} message={(message) => {
-                    this.setState({ message: message })
-                }} />*/}
+             <AuthenticationServiceComponent history={this.props.history} />
                 {/* <h5>{i18n.t(this.props.match.params.message)}</h5> */}
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
 

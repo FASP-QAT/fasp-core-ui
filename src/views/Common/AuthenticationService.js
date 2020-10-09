@@ -1151,6 +1151,11 @@ class AuthenticationService {
                         return true;
                     }
                     break;
+                case "/quantimed/quantimedImport":
+                    // if (bfunction.includes("ROLE_BF_ADD_PROBLEM")) {
+                        return true;
+                    // }
+                    break;    
                 default:
                     console.log("default case");
                     return false;
@@ -1223,6 +1228,8 @@ class AuthenticationService {
             } else {
                 return "/logout/static.message.sessionChange";
             }
+        } else {
+            return "/accessDenied";
         }
     }
     clearUserDetails() {
@@ -1233,6 +1240,47 @@ class AuthenticationService {
             keysToRemove = ["curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken"];
         }
         keysToRemove.forEach(k => localStorage.removeItem(k));
+    }
+    getDefaultUserLanguage() {
+        let lang = localStorage.getItem('lastLoggedInUsersLanguage');
+        if (lang != null && lang != "") {
+            return lang;
+        } else {
+            return "en";
+        }
+    }
+
+    getIconAndStaticLabel(val) {
+        let lang = this.getDefaultUserLanguage();
+        if (val == "icon") {
+            switch (lang) {
+                case "en":
+                    return "flag-icon flag-icon-us";
+                case "fr":
+                    return "flag-icon flag-icon-wf";
+                case "sp":
+                    return "flag-icon flag-icon-es";
+                case "pr":
+                    return "flag-icon flag-icon-pt";
+                default:
+                    return "flag-icon flag-icon-us";
+            }
+        }
+        else if (val == "label") {
+            switch (lang) {
+                case "en":
+                    return "static.language.english";
+                case "fr":
+                    return "static.language.french";
+                case "sp":
+                    return "static.language.spanish";
+                case "pr":
+                    return "static.language.portuguese";
+                default:
+                    return "static.language.english";
+            }
+        }
+
     }
 
 }
