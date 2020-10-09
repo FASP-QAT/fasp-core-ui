@@ -27,8 +27,11 @@ export default class QuantimedImportOnboarding extends Component {
             progressPer: 0,
             importData: '',
             program: {
-                programId: ''
-            }
+                programId: '',
+                rangeValue: '',
+                filename: ''
+            },
+            qatPlanningList: []
         }
         this.Capitalize = this.Capitalize.bind(this);
         this.dataChange = this.dataChange.bind(this);
@@ -206,10 +209,10 @@ export default class QuantimedImportOnboarding extends Component {
 
                                 <div className="d-sm-down-none  progressbar">
                                     <ul>
-                                        <li className="quantimedProgressbartext1">Import Quantimed Data</li>
-                                        <li className="quantimedProgressbartext2">Program Planning Unit</li>
-                                        <li className="quantimedProgressbartext3">Apply for Period </li>
-                                        <li className="quantimedProgressbartext4">Add Qunatimed Data</li>
+                                        <li className="quantimedProgressbartext1">Import Quantimed Data File</li>
+                                        <li className="quantimedProgressbartext2">Map Planning Unit</li>
+                                        <li className="quantimedProgressbartext3">Consumption Period </li>
+                                        <li className="quantimedProgressbartext4">Final Data Submission</li>
                                     </ul>
                                 </div>
 

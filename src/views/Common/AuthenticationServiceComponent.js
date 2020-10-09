@@ -49,8 +49,8 @@ export default class AuthenticationServiceComponent extends Component {
                 var result1 = AuthenticationService.validateRequest();
                 console.log("result1----" + result1);
                 let url = config.url;
-                console.log("url---",url);
-                if (result1 != null && result1 != "" && !url.includes("/actuator/info/") && !url.includes("/authenticate")) {
+                console.log("url---", url);
+                if (result1 != null && result1 != "" && !url.includes("/actuator/info/") && !url.includes("/authenticate") && !url.includes("/api/updateExpiredPassword/") && !url.includes("/api/forgotPassword/") && !url.includes("/api/confirmForgotPasswordToken/") && !url.includes("/api/updatePassword/")) {
                     this.props.history.push(result1)
                 }
                 return config;

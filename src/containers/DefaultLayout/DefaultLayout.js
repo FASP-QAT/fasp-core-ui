@@ -244,6 +244,7 @@ const StockAdjustment = React.lazy(() => import('../../views/Report/StockAdjustm
 const StockStatusReportAcrossPlanningUnits = React.lazy(() => import('../../views/Report/StockStatusAcrossPlanningUnits'));
 const ExpiredInventory = React.lazy(() => import('../../views/Report/ExpiredInventory'));
 const Budgets = React.lazy(() => import('../../views/Report/Budgets'));
+const QuantimedImport = React.lazy(() => import('../../views/Quantimed/QuantimedImportOnboarding'));
 // const EditProblem = React.lazy(() => import('../../views/Problem/EditProblem'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
@@ -478,7 +479,8 @@ const routes = [
   { path: '/procurementUnit/editProcurementUnit', exact: true, name: 'static.breadcrum.edit', entityname: 'static.dashboard.procurementUnitheader', component: EditProcurementUnit },
   { path: '/procurementUnit/editProcurementUnit/:procurementUnitId', name: 'static.breadcrum.edit', entityname: 'static.dashboard.procurementUnitheader', component: EditProcurementUnit },
   { path: '/planningUnit/editPlanningUnit/:planningUnitId', exact: true, name: 'static.breadcrum.edit', entityname: 'static.dashboard.planningunitheader', component: EditPlanningUnit },
-  { path: '/realmCountry/listRealmCountryPlanningUnit', name: 'static.dashboad.planningunitcountry', component: PlanningUnitCountryList },
+  { path: '/realmCountry/listRealmCountryPlanningUnit', exact: true, name: 'static.dashboad.planningunitcountry', component: PlanningUnitCountryList },
+  { path: '/realmCountry/listRealmCountryPlanningUnit/:color/:message', name: 'static.dashboad.planningunitcountry', component: PlanningUnitCountryList },
   { path: '/planningUnitCapacity/planningUnitCapacity/:planningUnitId', name: 'static.dashboad.planningunitcapacity', component: PlanningUnitCapacity },
   { path: '/realmCountry/realmCountryPlanningUnit/:realmCountryId', name: 'static.dashboad.planningunitcountry', component: PlanningUnitCountry },
   { path: '/planningUnitCapacity/listPlanningUnitCapacity', name: 'static.planningUnitVolumeHead.planningUnitVolume', component: PlanningUnitCapacityList },
@@ -584,6 +586,7 @@ const routes = [
   { path: '/report/stockAdjustment', name: 'static.report.stockAdjustment', component: StockAdjustment },
   // { path: '/report/expiredInventory', name:static.report.expiredInventory' ,component: ExpiredInventory },
   { path: '/report/expiredInventory', name: 'static.report.expiredInventory', component: ExpiredInventory },
+  { path: '/quantimed/quantimedImport', name: 'Quantimed Import', component: QuantimedImport }
 ];
 
 class DefaultLayout extends Component {
@@ -594,7 +597,7 @@ class DefaultLayout extends Component {
       businessFunctions: [],
       name: "",
       //Timer
-      timeout: 1000 * 150 * 1,
+      timeout: 1000 * 450 * 1,
       // timeout: 1000 * 3600 * 1,
       showModal: false,
       userLoggedIn: false,
@@ -1548,6 +1551,13 @@ class DefaultLayout extends Component {
                         icon: 'fa fa-sitemap',
                         attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PIPELINE_PROGRAM_IMPORT') ? false : true) }
                       },
+
+                      // {
+                      //   name: 'Quantimed Import',                        
+                      //   url: '/quantimed/quantimedImport',
+                      //   icon: 'fa fa-file-text-o',
+                      //   attributes: { hidden: false }
+                      // }
 
                     ]
 

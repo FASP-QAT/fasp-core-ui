@@ -88,7 +88,19 @@ console.log("Going to change online")
           console.log("Going to change language api success---", lang)
           i18n.changeLanguage(lang)
           console.log("Going to change language reload location reload---")
-          window.location.reload();
+         
+          var url = window.location.href;
+          if ((url.indexOf("green/") > -1) || (url.indexOf("red/") > -1)) {
+            // "The specific word exists";
+            var getSplit = ((url.indexOf("green/") > -1 ? url.split("green/") : url.split("red/")))
+            window.location.href = getSplit[0] + '%20/' + '%20';
+            window.location.reload();
+          } else {
+            // "The specific word doesn't exist";
+            window.location.reload();
+          }
+
+          // window.location.reload();
         }).catch(
           error => {
             console.log("Going to change language api error---", error)

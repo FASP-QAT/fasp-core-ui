@@ -592,6 +592,7 @@ class AuthenticationService {
                     }
                     break;
                 case "/realmCountry/listRealmCountryPlanningUnit":
+                case "/realmCountry/listRealmCountryPlanningUnit/:color/:message":
                     if (bfunction.includes("ROLE_BF_MANAGE_REALM_COUNTRY_PLANNING_UNIT")) {
                         return true;
                     }
@@ -1150,6 +1151,11 @@ class AuthenticationService {
                         return true;
                     }
                     break;
+                case "/quantimed/quantimedImport":
+                    // if (bfunction.includes("ROLE_BF_ADD_PROBLEM")) {
+                        return true;
+                    // }
+                    break;    
                 default:
                     console.log("default case");
                     return false;

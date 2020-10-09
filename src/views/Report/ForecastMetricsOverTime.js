@@ -100,7 +100,7 @@ const options = {
             while (rgx.test(x1)) {
               x1 = x1.replace(rgx, '$1' + ',' + '$2');
             }
-            return x1 + x2+"%";
+            return x1 + x2 + "%";
           }
         }
       }
@@ -149,16 +149,16 @@ const options = {
         let label = data.labels[tooltipItem.index];
         let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
 
-var cell1 = value
-cell1 += '';
-var x = cell1.split('.');
-var x1 = x[0];
-var x2 = x.length > 1 ? '.' + x[1] : '';
-var rgx = /(\d+)(\d{3})/;
-while (rgx.test(x1)) {
-x1 = x1.replace(rgx, '$1' + ',' + '$2');
-}
-return data.datasets[tooltipItem.datasetIndex].label+' : ' +  x1 + x2;
+        var cell1 = value
+        cell1 += '';
+        var x = cell1.split('.');
+        var x1 = x[0];
+        var x2 = x.length > 1 ? '.' + x[1] : '';
+        var rgx = /(\d+)(\d{3})/;
+        while (rgx.test(x1)) {
+          x1 = x1.replace(rgx, '$1' + ',' + '$2');
+        }
+        return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
       }
     },
     enabled: true,
@@ -221,8 +221,8 @@ class ForcastMatrixOverTime extends Component {
       show: false,
       singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
       rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-      minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth()+2 },
-      maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth()  },
+      minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
+      maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
 
 
     };
@@ -244,20 +244,20 @@ class ForcastMatrixOverTime extends Component {
   }
 
   formatter = value => {
-if(value!=null){
-    var cell1 = value
-    cell1 += '';
-    var x = cell1.split('.');
-    var x1 = x[0];
-    var x2 = x.length > 1 ? '.' + x[1] : '';
-    var rgx = /(\d+)(\d{3})/;
-    while (rgx.test(x1)) {
-      x1 = x1.replace(rgx, '$1' + ',' + '$2');
+    if (value != null) {
+      var cell1 = value
+      cell1 += '';
+      var x = cell1.split('.');
+      var x1 = x[0];
+      var x2 = x.length > 1 ? '.' + x[1] : '';
+      var rgx = /(\d+)(\d{3})/;
+      while (rgx.test(x1)) {
+        x1 = x1.replace(rgx, '$1' + ',' + '$2');
+      }
+      return x1 + x2;
+    } else {
+      return '';
     }
-    return x1 + x2;
-  }else{
-    return '';
-  }
   }
   dateFormatter = value => {
     return moment(value).format('MMM YY')
@@ -289,20 +289,20 @@ if(value!=null){
     }
   }
   toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
-  addDoubleQuoteToRowContent=(arr)=>{
-    return arr.map(ele=>'"'+ele+'"')
- }
+  addDoubleQuoteToRowContent = (arr) => {
+    return arr.map(ele => '"' + ele + '"')
+  }
   exportCSV() {
 
     var csvRow = [];
-    csvRow.push((i18n.t('static.report.dateRange') + ' , ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20'))
-    csvRow.push((i18n.t('static.report.timeWindow')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("viewById").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
-    csvRow.push(i18n.t('static.program.program') + ' , ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20'))
-    csvRow.push((i18n.t('static.report.version')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("versionId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
-    csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+    csvRow.push( '"' +(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20')+'"')
+    csvRow.push( '"' +(i18n.t('static.report.timeWindow')+ ' : ' + (document.getElementById("viewById").selectedOptions[0].text)).replaceAll(' ', '%20')+'"')
+    csvRow.push( '"' +(i18n.t('static.program.program') + ': ' + (document.getElementById("programId").selectedOptions[0].text)).replaceAll(' ', '%20')+'"')
+    csvRow.push( '"' +(i18n.t('static.report.version') + ' : ' + (document.getElementById("versionId").selectedOptions[0].text)).replaceAll(' ', '%20')+'"')
+    csvRow.push( '"' +(i18n.t('static.planningunit.planningunit') + ' : ' + (document.getElementById("planningUnitId").selectedOptions[0].text)).replaceAll(' ', '%20')+'"')
     csvRow.push('')
     csvRow.push('')
-    csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
+    csvRow.push(( '"' +i18n.t('static.common.youdatastart')).replaceAll(' ', '%20')+'"')
     csvRow.push('')
     var re;
     var A = [this.addDoubleQuoteToRowContent([(i18n.t('static.report.month')).replaceAll(' ', '%20'), (i18n.t('static.report.forecastConsumption')).replaceAll(' ', '%20'), (i18n.t('static.report.actualConsumption')).replaceAll(' ', '%20'), ((i18n.t('static.report.error')).replaceAll(' ', '%20')).replaceAll(' ', '%20')])]
@@ -311,7 +311,7 @@ if(value!=null){
 
 
     for (var item = 0; item < re.length; item++) {
-      A.push(this.addDoubleQuoteToRowContent([this.dateFormatter(re[item].month).replaceAll(' ', '%20'), re[item].forecastedConsumption==null?'': re[item].forecastedConsumption, re[item].actualConsumption==null?'':re[item].actualConsumption, this.PercentageFormatter(re[item].forecastError)]))
+      A.push(this.addDoubleQuoteToRowContent([this.dateFormatter(re[item].month).replaceAll(' ', '%20'), re[item].forecastedConsumption == null ? '' : re[item].forecastedConsumption, re[item].actualConsumption == null ? '' : re[item].actualConsumption, re[item].message == null ? this.PercentageFormatter(re[item].forecastError) :( i18n.t(re[item].message)).replaceAll(' ','%20')]))
     }
     for (var i = 0; i < A.length; i++) {
       csvRow.push(A[i].join(","))
@@ -406,7 +406,7 @@ if(value!=null){
     doc.addImage(canvasImg, 'png', 50, 220, 750, 210, 'CANVAS');
     const headers = [[i18n.t('static.report.month'),
     i18n.t('static.report.forecastConsumption'), i18n.t('static.report.actualConsumption'), i18n.t('static.report.error')]];
-    const data = this.state.matricsList.map(elt => [this.dateFormatter(elt.month), this.formatter(elt.forecastedConsumption), this.formatter(elt.actualConsumption), this.PercentageFormatter(elt.forecastError)]);
+    const data = this.state.matricsList.map(elt => [this.dateFormatter(elt.month), this.formatter(elt.forecastedConsumption), this.formatter(elt.actualConsumption), elt.message == null ? this.PercentageFormatter(elt.forecastError) : i18n.t(elt.message)]);
 
     let content = {
       margin: { top: 80, bottom: 50 },
@@ -718,8 +718,8 @@ if(value!=null){
 
   }
   rowtextFormatClassName(row) {
-        return (row.forecastError > 50) ? 'textcolor-red' : '';
-      }
+    return (row.forecastError > 50) ? 'textcolor-red' : '';
+  }
 
   fetchData() {
     let programId = document.getElementById("programId").value;
@@ -769,7 +769,7 @@ if(value!=null){
                 var montcnt = 0
                 var absvalue = 0;
                 var currentActualconsumption = null;
-                var currentForcastConsumption = 0;
+                var currentForcastConsumption = null;
                 for (var i = month, j = 0; j <= monthInCalc; i-- , j++) {
                   if (i == 0) {
                     i = 12;
@@ -777,10 +777,12 @@ if(value!=null){
                   }
                   var dt = year + "-" + String(i).padStart(2, '0') + "-01"
                   var conlist = consumptionList.filter(c => c.consumptionDate === dt)
-
+                  console.log(dt, conlist)
                   var actconsumption = 0;
                   var forConsumption = 0;
-
+                  if (conlist.length ==2) {
+                    montcnt = montcnt + 1
+                  }
                   for (var l = 0; l < conlist.length; l++) {
                     if (conlist[l].actualFlag.toString() == 'true') {
                       actconsumption = actconsumption + parseInt(conlist[l].consumptionQty)
@@ -791,13 +793,12 @@ if(value!=null){
                   actualconsumption = actualconsumption + actconsumption
                   forcastConsumption = forcastConsumption + forConsumption
                   if (j == 0) {
-                    console.log(currentActualconsumption,' ',actconsumption)
-                    if(currentActualconsumption==null && actconsumption>0)
-                    {
-                      currentActualconsumption=0
+                    console.log(currentActualconsumption, ' ', actconsumption)
+                    if (currentActualconsumption == null && actconsumption > 0) {
+                      currentActualconsumption = actconsumption
                     }
-                    if(currentActualconsumption!=null){
-                    currentActualconsumption = currentActualconsumption + actconsumption
+                    if (currentActualconsumption != null) {
+                      currentActualconsumption = currentActualconsumption + actconsumption
                     }
                     currentForcastConsumption = currentForcastConsumption + forConsumption
                   }
@@ -814,8 +815,8 @@ if(value!=null){
                   month: new Date(from, month - 1),
                   actualConsumption: currentActualconsumption,
                   forecastedConsumption: currentForcastConsumption,
-                  forecastError: currentActualconsumption>0 && actualconsumption > 0 ? (((absvalue * 100) / actualconsumption)) : ''
-
+                  forecastError: currentActualconsumption > 0 && actualconsumption > 0 ? (((absvalue * 100) / actualconsumption)) : '',
+                  message: montcnt == 0 ? "static.reports.forecastMetrics.noConsumptionAcrossPeriod" : currentActualconsumption == null || currentForcastConsumption == null ? "static.reports.forecastMetrics.noConsumption" : (actualconsumption == null || actualconsumption == 0) ? "static.reports.forecastMetrics.totalConsumptionIs0" : null
                 }
                 data.push(json)
 
@@ -1235,7 +1236,7 @@ if(value!=null){
                                         {this.formatter(this.state.matricsList[idx].actualConsumption)}
                                       </td>
                                       <td>
-                                        {this.PercentageFormatter(this.state.matricsList[idx].forecastError)}
+                                        {this.state.matricsList[idx].message == null ? this.PercentageFormatter(this.state.matricsList[idx].forecastError) : i18n.t(this.state.matricsList[idx].message)}
                                       </td>
                                     </tr>)
 
