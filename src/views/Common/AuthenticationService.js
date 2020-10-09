@@ -1150,6 +1150,11 @@ class AuthenticationService {
                         return true;
                     }
                     break;
+                case "/quantimed/quantimedImport":
+                    // if (bfunction.includes("ROLE_BF_ADD_PROBLEM")) {
+                        return true;
+                    // }
+                    break;    
                 default:
                     console.log("default case");
                     return false;

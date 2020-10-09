@@ -74,3 +74,4 @@ export const JEXCEL_PAGINATION_OPTION= [15, 25, 50]
 export const JEXCEL_DEFAULT_PAGINATION= 15
 export const JEXCEL_INTEGER_REGEX=/^[0-9]{0,10}$/
 export const JEXCEL_NEGATIVE_INTEGER_NO_REGEX=/^[-+]?\d{0,10}$/
+export const QUANTIMED_DATA_SOURCE_ID=18

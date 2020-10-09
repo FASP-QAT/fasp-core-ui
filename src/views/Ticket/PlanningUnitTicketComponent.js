@@ -290,7 +290,7 @@ export default class PlanningUnitTicketComponent extends Component {
                                         <FormFeedback className="red">{errors.summary}</FormFeedback>
                                     </FormGroup>
                                     < FormGroup >
-                                        <Label for="forecastingUnitDesc">{i18n.t('static.forecastingUnit.forecastingUnitName')}<span class="red Reqasterisk">*</span></Label>
+                                        <Label for="forecastingUnitDesc">{i18n.t('static.forecastingunit.forecastingunit')}<span class="red Reqasterisk">*</span></Label>
                                         <Input type="select" name="forecastingUnitDesc" id="forecastingUnitDesc"
                                         bsSize="sm"
                                         valid={!errors.forecastingUnitDesc && this.state.planningUnit.forecastingUnitDesc != ''}

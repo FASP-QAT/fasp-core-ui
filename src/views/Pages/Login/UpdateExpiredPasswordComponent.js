@@ -80,8 +80,8 @@ class UpdateExpiredPasswordComponent extends Component {
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
     }
 
-    componentDidMount(){
-        console.log("Update expired password email id--->"+this.props.location.state.emailId)
+    componentDidMount() {
+        console.log("Update expired password email id--->" + this.props.location.state.emailId)
     }
     hideFirstComponent() {
         setTimeout(function () {
@@ -96,7 +96,7 @@ class UpdateExpiredPasswordComponent extends Component {
         //         document.getElementById('div1').style.display = 'block';
         //     });
         // }, 8000);
-        
+
     }
 
     logoutClicked() {
@@ -155,11 +155,11 @@ class UpdateExpiredPasswordComponent extends Component {
                                         validate={validate(validationSchema)}
                                         onSubmit={(values, { setSubmitting, setErrors }) => {
                                             if (navigator.onLine) {
-                                                console.log("Update expired password email id on submit method--->"+values.emailId)
+                                                console.log("Update expired password email id on submit method--->" + values.emailId)
                                                 UserService.updateExpiredPassword(values.emailId, values.oldPassword, values.newPassword)
                                                     .then(response => {
                                                         var decoded = jwt_decode(response.data.token);
-                                                        let keysToRemove = ["token-" + decoded.userId, "user-" + decoded.userId, "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken"];
+                                                        let keysToRemove = ["token-" + decoded.userId, "user-" + decoded.userId, "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "lastLoggedInUsersLanguage"];
                                                         keysToRemove.forEach(k => localStorage.removeItem(k))
 
                                                         decoded.user.syncExpiresOn = moment().format("YYYY-MM-DD HH:mm:ss");
@@ -170,6 +170,9 @@ class UpdateExpiredPasswordComponent extends Component {
                                                         localStorage.setItem('lastActionTaken', CryptoJS.AES.encrypt((moment(new Date()).format("YYYY-MM-DD HH:mm:ss")).toString(), `${SECRET_KEY}`));
                                                         localStorage.setItem('curUser', CryptoJS.AES.encrypt((decoded.userId).toString(), `${SECRET_KEY}`));
                                                         localStorage.setItem('lang', decoded.user.language.languageCode);
+                                                        localStorage.setItem('i18nextLng', decoded.user.language.languageCode);
+                                                        localStorage.setItem('lastLoggedInUsersLanguage', decoded.user.language.languageCode);
+                                                        i18n.changeLanguage(decoded.user.language.languageCode);
                                                         this.props.history.push(`/masterDataSync/`)
                                                     })
                                                     .catch(
@@ -188,7 +191,7 @@ class UpdateExpiredPasswordComponent extends Component {
                                                                     case 404:
                                                                     case 406:
                                                                     case 412:
-                                                                      
+
                                                                         this.setState({ message: error.response.data.messageCode },
                                                                             () => {
                                                                                 console.log("inside412");
@@ -197,8 +200,8 @@ class UpdateExpiredPasswordComponent extends Component {
                                                                             });
                                                                         break;
                                                                     default:
-                                                                      
-                                                                        this.setState({  message: 'static.unkownError'},
+
+                                                                        this.setState({ message: 'static.unkownError' },
                                                                             () => {
                                                                                 console.log("inside412");
                                                                                 document.getElementById('div1').style.display = 'block';
@@ -211,8 +214,8 @@ class UpdateExpiredPasswordComponent extends Component {
                                                     );
 
                                             } else {
-                                               
-                                                this.setState({message: 'static.common.onlinepasswordtext' },
+
+                                                this.setState({ message: 'static.common.onlinepasswordtext' },
                                                     () => {
                                                         console.log("inside412");
                                                         document.getElementById('div1').style.display = 'block';
