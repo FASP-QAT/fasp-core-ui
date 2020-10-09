@@ -10,11 +10,12 @@ import jexcel from 'jexcel';
 import "../ProductCategory/style.css"
 import "../../../node_modules/jexcel/dist/jexcel.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination } from '../../CommonComponent/JExcelCommonFunctions.js';
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import AuthenticationService from '../Common/AuthenticationService';
-import LabelsService from '../../api/LabelService.js';
-import ProgramService from '../../api/ProgramService';
 import QuantimedImportService from '../../api/QuantimedImportService';
+import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
+import { INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY } from '../../Constants';
+import CryptoJS from 'crypto-js'
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 
 const initialValuesTwo = {
 
@@ -49,6 +50,7 @@ const getErrorsFromValidationErrorTwo = (validationError) => {
     }, {})
 }
 
+const entityname = 'Quantimed Import'
 
 export default class QunatimedImportStepTwo extends Component {
 
@@ -56,9 +58,11 @@ export default class QunatimedImportStepTwo extends Component {
         super(props);
         this.state = {
             programPlanningUnits: [],
+            qatPlanningList: [],
             loading: false,
             quantimedEl: "",
-            programId: ''
+            programId: '',
+            filename: ''
         }
 
         this.loadTableData = this.loadTableData.bind(this);
@@ -67,6 +71,14 @@ export default class QunatimedImportStepTwo extends Component {
         this.formSubmit = this.formSubmit.bind(this);
         this.checkDuplicateCountry = this.checkDuplicateCountry.bind(this);
         this.loaded = this.loaded.bind(this);
+        this.hideFirstComponent = this.hideFirstComponent.bind(this);
+    }
+
+    hideFirstComponent() {
+        document.getElementById('div1').style.display = 'block';
+        this.state.timeout = setTimeout(function () {
+            document.getElementById('div1').style.display = 'none';
+        }, 8000);
     }
 
     touchAllTwo(setTouched, errors) {
@@ -143,18 +155,18 @@ export default class QunatimedImportStepTwo extends Component {
 
             var col_D = ("D").concat(parseInt(y) + 1);
             var value_D = this.el.getValueFromCoords(3, y);
-            console.log(col_D, "==================================", value_D)
+
             if (value_D !== "" && value_D !== "-1") {
                 for (var z = 0; z < tableJson.length; z++) {
                     var col_D_2 = ("D").concat(parseInt(z) + 1);
                     var col_C_3 = ("C").concat(parseInt(z) + 1);
                     var value_D_2 = this.el.getValueFromCoords(3, z);
-                    console.log(col_D_2, "==================", value_D_2)
+
                     if (col_D !== col_D_2 && value_D_2 !== "-1" && value_D === value_D_2) {
-                        console.log("col_D_2 ==================================", col_D_2)
+
                         this.el.setStyle(col_C_3, "background-color", "transparent");
                         this.el.setComments(col_C_3, "");
-                        console.log("==========================close")
+
                         break;
                     }
                 }
@@ -196,7 +208,7 @@ export default class QunatimedImportStepTwo extends Component {
         let tempArray = tableJson;
         var hasDuplicate = false;
         tempArray.map(v => v[Object.keys(v)[2]]).sort().sort((a, b) => {
-            console.log(a, "===========", count++, "==========", b);
+
             if (a !== "" && b !== "")
                 if (a !== '-1' && b !== '-1')
                     if (a === b)
@@ -204,9 +216,9 @@ export default class QunatimedImportStepTwo extends Component {
         })
 
         if (hasDuplicate) {
-            alert('Duplicate Program Planning Unit Found');
+            alert('Duplicate QAT Planning Unit Found');
             this.setState({
-                message: 'Duplicate Program Planning Unit Found',
+                message: 'Duplicate QAT Planning Unit Found',
                 changedFlag: 0,
 
             },
@@ -230,10 +242,10 @@ export default class QunatimedImportStepTwo extends Component {
                 this.props.items.importData.products[i].programPlanningUnitId = map1.get("2");
             }
 
-            for(var i = 0; i < this.props.items.importData.records.length; i++) {
-                for(var j = 0; j < this.props.items.importData.products.length; j++) {                    
-                    if(this.props.items.importData.records[i].productId === this.props.items.importData.products[j].productId) {
-                        this.props.items.importData.records[i].product = this.props.items.importData.products[j];                        
+            for (var i = 0; i < this.props.items.importData.records.length; i++) {
+                for (var j = 0; j < this.props.items.importData.products.length; j++) {
+                    if (this.props.items.importData.records[i].productId === this.props.items.importData.products[j].productId) {
+                        this.props.items.importData.records[i].product = this.props.items.importData.products[j];
                     }
                 }
             }
@@ -260,16 +272,78 @@ export default class QunatimedImportStepTwo extends Component {
     }
 
     loadTableData() {
+        this.setState({
+            loading: true
+        })
+        var value = this.props.items.program.programId;
+        var programFile = this.props.items.program.filename;
 
-        if (this.state.programId !== this.props.items.program.programId) {
-            AuthenticationService.setupAxiosInterceptors();
-            ProgramService.getProgramPlaningUnitListByProgramId(this.props.items.program.programId).then(response => {
+        var db1;
+        var storeOS;
+        getDatabase();
+        var regionList = [];
+        var dataSourceList = [];
+        var dataSourceListAll = [];
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onerror = function (event) {
+            this.setState({
+                supplyPlanError: i18n.t('static.program.errortext'),
+                loading: false,
+                color: "red"
+            })
+            this.hideFirstComponent()
+        }.bind(this);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
 
-                if (response.status == 200) {
+            var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+            var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
+            var planningunitRequest = planningunitOs.getAll();
+            var planningList = []
+            planningunitRequest.onerror = function (event) {
+                this.setState({
+                    supplyPlanError: i18n.t('static.program.errortext'),
+                    loading: false,
+                    color: "red"
+                })
+                this.hideFirstComponent()
+            }.bind(this);
+            planningunitRequest.onsuccess = function (e) {
+                var myResult = [];
+                myResult = planningunitRequest.result;
 
-                    this.setState({
-                        programPlanningUnits: response.data
-                    })
+                var programId = (value != "" && value != undefined ? value : 0).split("_")[0];
+                var proList = []
+                for (var i = 0; i < myResult.length; i++) {
+
+                    if (myResult[i].program.id == parseInt(programId) && myResult[i].active == true) {
+                        var productJson = {
+                            label: getLabelText(myResult[i].planningUnit.label, this.state.lang),
+                            value: myResult[i].planningUnit.id
+                        }
+
+                        proList.push(productJson);
+                        planningList.push(myResult[i]);
+                    }
+                }
+
+
+
+                this.setState({
+                    programPlanningUnits: proList,
+                    qatPlanningList: planningList
+                })
+                this.props.items.qatPlanningList = proList;
+
+                if (this.state.programId !== this.props.items.program.programId || this.state.filename !== this.props.items.program.filename) {
+                    //     AuthenticationService.setupAxiosInterceptors();
+                    //     ProgramService.getProgramPlaningUnitListByProgramId(this.props.items.program.programId).then(response => {
+
+                    //         if (response.status == 200) {
+
+                    //             this.setState({
+                    //                 programPlanningUnits: response.data
+                    //             })
 
                     const { programPlanningUnits } = this.state;
 
@@ -285,9 +359,9 @@ export default class QunatimedImportStepTwo extends Component {
                         programPlanningUnitsArr[0] = paJson
                         for (var i = 0; i < programPlanningUnits.length; i++) {
                             var paJson = {
-                                name: getLabelText(programPlanningUnits[i].planningUnit.label, this.props.items.lang),
-                                id: parseInt(programPlanningUnits[i].planningUnit.id),
-                                active: programPlanningUnits[i].active
+                                name: programPlanningUnits[i].label,
+                                id: parseInt(programPlanningUnits[i].value),
+                                active: true
                             }
                             programPlanningUnitsArr[i + 1] = paJson
                         }
@@ -313,7 +387,7 @@ export default class QunatimedImportStepTwo extends Component {
                         colHeaders: [
                             'Product ID',
                             'Qunatimed Planning Unit',
-                            'Porgram Planning Unit',
+                            'QAT Planning Unit',
                             'Previous Program Planning Unit',
                         ],
                         colWidths: [80, 80, 80, 80],
@@ -347,25 +421,31 @@ export default class QunatimedImportStepTwo extends Component {
                     myVar = jexcel(document.getElementById("paputableDiv"), options);
                     this.el = myVar;
                     this.setState({
-                        programId: this.props.items.program.programId
+                        programId: this.props.items.program.programId,
+                        filename: this.props.items.program.filename,
+                        loading: false
                     })
 
+                    //     }
+                    //     else {
+
+                    //         this.setState({
+                    //             message: response.data.messageCode
+                    //         },
+                    //             () => {
+
+                    //             })
+                    //     }
+
+
+                    // })
+
+
+
+
                 }
-                else {
-
-                    this.setState({
-                        message: response.data.messageCode
-                    },
-                        () => {
-
-                        })
-                }
-
-
-            })
-
-        }
-
+            }.bind(this)
+        }.bind(this)        
 
     }
 
@@ -377,13 +457,8 @@ export default class QunatimedImportStepTwo extends Component {
 
         return (
             <div className="animated fadeIn">
-                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
-                    this.setState({ message: message })
-                }} loading={(loading) => {
-                    this.setState({ loading: loading })
-                }} />
-                {/* <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5> */}
-                {/* <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5> */}
+                <AuthenticationServiceComponent history={this.props.history} />
+                <h5 className={this.state.color} id="div1">{i18n.t(this.state.message, { entityname }) || this.state.supplyPlanError}</h5>
                 <br></br>
                 <div style={{ display: this.state.loading ? "none" : "block" }}>
                     {/* <Card> */}
@@ -398,7 +473,7 @@ export default class QunatimedImportStepTwo extends Component {
                     </CardBody>
                     <CardFooter>
                         <FormGroup>
-                            <Button color="info" size="md" className="float-right mr-1" type="submit" name="healthAreaSub" id="healthAreaSub" onClick={this.props.finishedStepTwo}>{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
+                            {/* <Button color="info" size="md" className="float-right mr-1" type="submit" name="healthAreaSub" id="healthAreaSub" onClick={this.props.finishedStepTwo}>{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button> */}
                             <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>Proceed</Button>
                             <Button color="info" size="md" className="float-right mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.props.previousToStepOne} > <i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
                                 &nbsp;

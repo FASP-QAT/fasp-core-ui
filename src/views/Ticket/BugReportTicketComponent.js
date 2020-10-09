@@ -10,7 +10,7 @@ import JiraTikcetService from '../../api/JiraTikcetService';
 import { SPACE_REGEX } from '../../Constants';
 
 const initialValues = {
-    summary: "Report a bug",
+    summary: i18n.t('static.common.bugreport'),
     description: ""
 }
 const entityname = i18n.t('static.program.realmcountry');
@@ -54,7 +54,7 @@ export default class BugReportTicketComponent extends Component {
         super(props);
         this.state = {
             bugReport: {
-                summary: 'Report a bug',
+                summary: i18n.t('static.common.bugreport'),
                 description: '',
                 file: '',
                 attachFile: ''
@@ -148,6 +148,7 @@ export default class BugReportTicketComponent extends Component {
                         this.setState({
                             loading: true
                         })
+                        this.state.bugReport.summary = "Report a bug";
                         JiraTikcetService.addBugReportIssue(this.state.bugReport).then(response => {                             
                             console.log("Response :",response.status, ":" ,JSON.stringify(response.data));
                             if (response.status == 200 || response.status == 201) {

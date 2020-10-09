@@ -70,12 +70,26 @@ class Login extends Component {
       message: '',
       loading: false,
       apiVersion: '',
-      dropdownOpen: new Array(19).fill(false)
+      dropdownOpen: new Array(19).fill(false),
+      icon: AuthenticationService.getIconAndStaticLabel("icon"),
+      staticLabel: AuthenticationService.getIconAndStaticLabel("label"),
+
     }
     this.forgotPassword = this.forgotPassword.bind(this);
     this.incorrectPassmessageHide = this.incorrectPassmessageHide.bind(this);
     this.logoutMessagehide = this.logoutMessagehide.bind(this);
     this.toggle = this.toggle.bind(this);
+    this.changeLanguage = this.changeLanguage.bind(this);
+  }
+
+
+
+  changeLanguage(lang, icon, staticLabel) {
+    // localStorage.setItem('lang', lang);
+    localStorage.setItem('lastLoggedInUsersLanguage', lang);
+    this.setState({ icon, staticLabel })
+    i18n.changeLanguage(lang)
+    window.location.reload();
   }
 
   touchAll(setTouched, errors) {
@@ -124,6 +138,7 @@ class Login extends Component {
     } else {
       console.log("############## Offline so can't fetch version #####################");
     }
+    i18n.changeLanguage(AuthenticationService.getDefaultUserLanguage())
   }
 
   forgotPassword() {
@@ -187,6 +202,9 @@ class Login extends Component {
   }
   toggle(i) {
     const newArray = this.state.dropdownOpen.map((element, index) => { return (index === i ? !element : false); });
+    console.log("new array-------", newArray)
+    console.log("this.state.dropdownOpen-------", this.state.dropdownOpen)
+    console.log("index-------", i)
     this.setState({
       dropdownOpen: newArray,
     });
@@ -203,13 +221,15 @@ class Login extends Component {
                 <div className="float-right">
                   <ButtonDropdown isOpen={this.state.dropdownOpen[0]} toggle={() => { this.toggle(0); }}>
                     <DropdownToggle caret className="en-btnlogin">
-                      <i className="flag-icon flag-icon-us"></i>  &nbsp;English
-                  </DropdownToggle>
+                      {this.state.languageLabel}
+                      <i className={this.state.icon}></i>  &nbsp;{i18n.t(this.state.staticLabel)}
+                    </DropdownToggle>
                     <DropdownMenu right>
                       {/* <DropdownItem ><i className="flag-icon flag-icon-us"></i>English</DropdownItem> */}
-                      <DropdownItem ><i className="flag-icon flag-icon-wf "></i>  French</DropdownItem>
-                      <DropdownItem ><i className="flag-icon flag-icon-es"></i>  Spanish </DropdownItem>
-                      <DropdownItem ><i className="flag-icon flag-icon-pt"></i>  Portuguese</DropdownItem>
+                      <DropdownItem onClick={this.changeLanguage.bind(this, 'en', "flag-icon flag-icon-us", "static.language.english")}><i className="flag-icon flag-icon-us"></i>  {i18n.t('static.language.english')}</DropdownItem>
+                      <DropdownItem onClick={this.changeLanguage.bind(this, 'fr', "flag-icon flag-icon-wf", "static.language.french")}><i className="flag-icon flag-icon-wf "></i>  {i18n.t('static.language.french')}</DropdownItem>
+                      <DropdownItem onClick={this.changeLanguage.bind(this, 'sp', "flag-icon flag-icon-es", "static.language.spanish")}><i className="flag-icon flag-icon-es"></i>  {i18n.t('static.language.spanish')} </DropdownItem>
+                      <DropdownItem onClick={this.changeLanguage.bind(this, 'pr', "flag-icon flag-icon-pt", "static.language.portuguese")}><i className="flag-icon flag-icon-pt"></i>  {i18n.t('static.language.portuguese')}</DropdownItem>
                     </DropdownMenu>
                   </ButtonDropdown>
                 </div>
@@ -237,7 +257,7 @@ class Login extends Component {
                                 var decoded = jwt_decode(response.data.token);
                                 console.log("decoded token---", decoded);
 
-                                let keysToRemove = ["token-" + decoded.userId, "user-" + decoded.userId, "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken"];
+                                let keysToRemove = ["token-" + decoded.userId, "user-" + decoded.userId, "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken","lastLoggedInUsersLanguage"];
                                 keysToRemove.forEach(k => localStorage.removeItem(k))
                                 decoded.user.syncExpiresOn = moment().format("YYYY-MM-DD HH:mm:ss");
                                 decoded.user.apiVersion = this.state.apiVersion;
@@ -249,6 +269,7 @@ class Login extends Component {
                                 localStorage.setItem('curUser', CryptoJS.AES.encrypt((decoded.userId).toString(), `${SECRET_KEY}`));
                                 localStorage.setItem('lang', decoded.user.language.languageCode);
                                 localStorage.setItem('i18nextLng', decoded.user.language.languageCode);
+                                localStorage.setItem('lastLoggedInUsersLanguage', decoded.user.language.languageCode);
                                 i18n.changeLanguage(decoded.user.language.languageCode);
 
 
@@ -306,13 +327,14 @@ class Login extends Component {
                                   console.log("offline tempuser---", tempUser)
                                   let user = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + tempUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
                                   console.log("offline user next---", user)
-                                  let keysToRemove = ["curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken"];
+                                  let keysToRemove = ["curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "lastLoggedInUsersLanguage"];
                                   keysToRemove.forEach(k => localStorage.removeItem(k))
 
                                   localStorage.setItem('typeOfSession', "Offline");
                                   localStorage.setItem('curUser', CryptoJS.AES.encrypt((user.userId).toString(), `${SECRET_KEY}`));
                                   localStorage.setItem('lang', user.language.languageCode);
                                   localStorage.setItem('i18nextLng', user.language.languageCode);
+                                  localStorage.setItem('lastLoggedInUsersLanguage', user.language.languageCode);
                                   i18n.changeLanguage(user.language.languageCode);
                                   localStorage.removeItem("tempUser");
                                   if (AuthenticationService.syncExpiresOn() == true) {
@@ -410,7 +432,6 @@ class Login extends Component {
 
                 </CardGroup>
                 <h5 className="text-right versionColor">{i18n.t('static.common.version')}{APP_VERSION_REACT} | <Online>{this.state.apiVersion}</Online><Offline>Offline</Offline></h5>
-                {/* <h5 className="text-right versionColor">{i18n.t('static.common.version')}{APP_VERSION_REACT}</h5> */}
               </Col>
 
 
@@ -425,8 +446,8 @@ class Login extends Component {
                   and delivers health commodities, offers comprehensive technical assistance to strengthen
                   national supply chain systems, and provides global supply chain leadership. For more
                   information, visit <a href="https://www.ghsupplychain.org/" target="_blank">ghsupplychain.org</a>. The information provided in this tool is not
-                                                                                            official U.S. government information and does not represent the views or positions of the
-                                                                                            Agency for International Development or the U.S. government.
+                                                                                                                                                              official U.S. government information and does not represent the views or positions of the
+                                                                                                                                                              Agency for International Development or the U.S. government.
               </p>
                 </CardBody>
                 <Row className="text-center Login-bttom-logo">
