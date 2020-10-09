@@ -656,7 +656,7 @@ class ListBudgetComponent extends Component {
           // readOnly: true
         },
         {
-          title: i18n.t('static.budget.budgetCode'),
+          title: i18n.t('static.budget.budgetDisplayName'),
           type: 'text',
           // readOnly: true
         },
