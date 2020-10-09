@@ -1980,78 +1980,6 @@ export default class SupplyPlanComponent extends React.Component {
                                                     } else {
                                                         return (<td align="right" >{item1}</td>)
                                                     }
-<<<<<<< HEAD
-                                                } else {
-                                                    return (<td align="right">{item1}</td>)
-                                                }
-                                            })
-                                        }
-                                    </tr>
-                                    <tr bgcolor='#d9d9d9'>
-                                        <td className="BorderNoneSupplyPlan"></td>
-                                        <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.supplyPlan.endingBalance')}</b></td>
-                                        {
-                                            this.state.closingBalanceArray.map((item1, count) => {
-                                                return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}><b><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></b></td>)
-                                            })
-                                        }
-                                    </tr>
-                                    <tr>
-                                        <td className="BorderNoneSupplyPlan"></td>
-                                        <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.supplyPlan.monthsOfStock')}</b></td>
-                                        {
-                                            this.state.monthsOfStockArray.map(item1 => (
-                                                <td align="right"><b><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></b></td>
-                                            ))
-                                        }
-                                    </tr>
-                                    <tr>
-                                        <td className="BorderNoneSupplyPlan"></td>
-                                        <td align="left" className="sticky-col first-col clone" title={i18n.t('static.supplyplan.amcmessage')}>{i18n.t('static.supplyPlan.amc')}</td>
-                                        {
-                                            this.state.amcTotalData.map(item1 => (
-                                                <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
-                                            ))
-                                        }
-                                    </tr>
-                                    <tr>
-                                        <td className="BorderNoneSupplyPlan"></td>
-                                        <td align="left" className="sticky-col first-col clone">{i18n.t('static.supplyPlan.minStockMos')}</td>
-                                        {
-                                            this.state.minStockMoS.map(item1 => (
-                                                <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
-                                            ))
-                                        }
-                                    </tr>
-                                    <tr>
-                                        <td className="BorderNoneSupplyPlan"></td>
-                                        <td align="left" className="sticky-col first-col clone">{i18n.t('static.supplyPlan.maxStockMos')}</td>
-                                        {
-                                            this.state.maxStockMoS.map(item1 => (
-                                                <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
-                                            ))
-                                        }
-                                    </tr>
-                                    <tr>
-                                        <td className="BorderNoneSupplyPlan"></td>
-                                        <td align="left" className="sticky-col first-col clone">{i18n.t('static.supplyPlan.unmetDemandStr')}</td>
-                                        {
-                                            this.state.unmetDemand.map(item1 => (
-                                                <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
-                                            ))
-                                        }
-                                    </tr>
-                                </tbody>
-                            </Table>
-                            {
-                                this.state.jsonArrForGraph.length > 0
-                                &&
-                                <div className="" >
-
-                                    <div className="graphwidth">
-                                        <div className="chart-wrapper chart-graph-report">
-                                            <Bar id="cool-canvas1" data={bar1} options={chartOptions1} />
-=======
                                                 })
                                             }
                                         </tr>
@@ -2192,7 +2120,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         </tr>
                                         <tr>
                                             <td className="BorderNoneSupplyPlan"></td>
-                                            <td align="left" className="sticky-col first-col clone">{i18n.t('static.supplyPlan.amc')}</td>
+                                            <td align="left" className="sticky-col first-col clone" title={i18n.t('static.supplyplan.amcmessage')}>{i18n.t('static.supplyPlan.amc')}</td>
                                             {
                                                 this.state.amcTotalData.map(item1 => (
                                                     <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
@@ -2237,7 +2165,6 @@ export default class SupplyPlanComponent extends React.Component {
                                             <div className="chart-wrapper chart-graph-report">
                                                 <Bar id="cool-canvas1" data={bar1} options={chartOptions1} />
                                             </div>
->>>>>>> dev
                                         </div>
                                         <div className="offset-6 col-md-6"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
                                     </div>}
