@@ -170,6 +170,7 @@ export default class WhatIfReportComponent extends React.Component {
             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() },
+            showScenarioList: false
         }
         this.getMonthArray = this.getMonthArray.bind(this);
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this)
@@ -215,6 +216,8 @@ export default class WhatIfReportComponent extends React.Component {
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
         this.handleRangeChange = this.handleRangeChange.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
+
+        this.toggleAccordionScenarioList = this.toggleAccordionScenarioList.bind(this);
     }
 
     show() {
@@ -954,6 +957,20 @@ export default class WhatIfReportComponent extends React.Component {
         }
     }
 
+    toggleAccordionScenarioList(){
+        this.setState({
+            showScenarioList: !this.state.showScenarioList
+        })
+        var fields = document.getElementsByClassName("scenarioListDiv");
+        for (var i = 0; i < fields.length; i++) {
+            if (!this.state.showScenarioList == true) {
+                fields[i].style.display = "";
+            } else {
+                fields[i].style.display = "none";
+            }
+        }
+    }
+
     toggleAccordionTotalShipments() {
         this.setState({
             showTotalShipment: !this.state.showTotalShipment
@@ -1234,6 +1251,11 @@ export default class WhatIfReportComponent extends React.Component {
         }
 
         fields = document.getElementsByClassName("erpShipments");
+        for (var i = 0; i < fields.length; i++) {
+            fields[i].style.display = "none";
+        }
+
+        fields = document.getElementsByClassName("scenarioListDiv");
         for (var i = 0; i < fields.length; i++) {
             fields[i].style.display = "none";
         }
@@ -2998,8 +3020,37 @@ export default class WhatIfReportComponent extends React.Component {
 
                                     </Form>
                                 )} />
-                    <div className="animated fadeIn">
+                    <span onClick={() => this.toggleAccordionScenarioList()}>{this.state.showScenarioList ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}</span><span>{i18n.t('static.whatIf.scenarioList')}</span>
+                    <Row className="pt-3 pb-3 scenarioListDiv" >
+                        <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
+                            <Col md="12 pl-0" id="realmDiv">
+                                <Table responsive>
+                                    <thead>
+                                        <tr>
+                                            <th className="text-left">{i18n.t('static.whatIf.scenario')}</th>
+                                            <th className="text-left">{i18n.t('static.common.startdate')}</th>
+                                            <th className="text-left">{i18n.t('static.common.stopdate')}</th>
+                                            <th className="text-left">{i18n.t('static.whatIf.percentage')}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {
+                                            this.state.rows.map((item, idx) => (
+                                                <tr id="addr0" key={idx}>
+                                                    <td>{this.state.rows[idx].scenarioName}</td>
+                                                    <td>{this.state.rows[idx].startDate}</td>
+                                                    <td>{this.state.rows[idx].stopDate}</td>
+                                                    <td>{this.state.rows[idx].percentage}</td>
 
+                                                </tr>
+                                            ))
+                                        }
+                                    </tbody>
+                                </Table>
+                            </Col>
+                        </Col>
+                    </Row>
+                    <div className="animated fadeIn">
                         <Row className="float-right">
                             <div className="col-md-12">
                                 <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />
@@ -3458,7 +3509,7 @@ export default class WhatIfReportComponent extends React.Component {
                 <Modal isOpen={this.state.adjustments}
                     className={'modal-lg ' + this.props.className, "modalWidth"}>
                     <ModalHeader toggle={() => this.toggleLarge('Adjustments')} className="modalHeaderSupplyPlan">{i18n.t('static.supplyPlan.adjustmentsDetails')}
-                        <div className="card-header-actions"  style={{marginTop:'-5px'}}>
+                        <div className="card-header-actions" style={{ marginTop: '-5px' }}>
                             <a className="card-header-action">
                                 {/* <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggle() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span> */}
                                 <Link to={`/inventory/addInventory/` + this.state.programId + `/0/` + this.state.planningUnitId} target="_blank"><small className="dataEntryLink">{i18n.t('static.supplyplan.adjustmentDataEntry')}</small></Link>
@@ -3644,7 +3695,7 @@ export default class WhatIfReportComponent extends React.Component {
                             <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyOrder')}</span></li>
                             <li><span className=" greylegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.doNotIncludeInProjectedShipment')} </span></li>
                         </ul>
-                        <div className="card-header-actions"  style={{marginTop:'-5px'}}>
+                        <div className="card-header-actions" style={{ marginTop: '-5px' }}>
                             <a className="card-header-action">
                                 {/* <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggle() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span> */}
                                 <Link to={`/shipment/shipmentDetails/` + this.state.programId + `/0/` + this.state.planningUnitId} target="_blank"><small className="dataEntryLink">{i18n.t('static.supplyplan.shipmentDataEntry')}</small></Link>
@@ -3768,35 +3819,6 @@ export default class WhatIfReportComponent extends React.Component {
                 {/* Expired stock modal */}
                 {/* </TabPane> */}
                 {/* <TabPane tabId="2"> */}
-                <Row className="pt-3 pb-3">
-                    <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
-                        <Col md="12 pl-0" id="realmDiv">
-                            <Table responsive>
-                                <thead>
-                                    <tr>
-                                        <th className="text-left">{i18n.t('static.whatIf.scenario')}</th>
-                                        <th className="text-left">{i18n.t('static.common.startdate')}</th>
-                                        <th className="text-left">{i18n.t('static.common.stopdate')}</th>
-                                        <th className="text-left">{i18n.t('static.whatIf.percentage')}</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {
-                                        this.state.rows.map((item, idx) => (
-                                            <tr id="addr0" key={idx}>
-                                                <td>{this.state.rows[idx].scenarioName}</td>
-                                                <td>{this.state.rows[idx].startDate}</td>
-                                                <td>{this.state.rows[idx].stopDate}</td>
-                                                <td>{this.state.rows[idx].percentage}</td>
-
-                                            </tr>
-                                        ))
-                                    }
-                                </tbody>
-                            </Table>
-                        </Col>
-                    </Col>
-                </Row>
                 {/* </TabPane> */}
             </>
         );
