@@ -2786,7 +2786,7 @@ export default class WhatIfReportComponent extends React.Component {
                         stack: 3,
                         yAxisID: 'A',
                         backgroundColor: 'transparent',
-                        borderColor: '#f45c45',
+                        borderColor: '#ba0c2f',
                         borderStyle: 'dotted',
                         ticks: {
                             fontSize: 2,
@@ -2803,7 +2803,7 @@ export default class WhatIfReportComponent extends React.Component {
                         stack: 4,
                         yAxisID: 'B',
                         backgroundColor: 'transparent',
-                        borderColor: '#8be665',
+                        borderColor: '#118b70',
                         borderStyle: 'dotted',
                         ticks: {
                             fontSize: 2,

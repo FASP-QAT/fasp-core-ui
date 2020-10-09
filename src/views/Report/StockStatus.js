@@ -1103,7 +1103,7 @@ console.log(list)
           type: "line",
           yAxisID: 'B',
           label: i18n.t('static.report.mos'),
-          borderColor: '#205493',
+          borderColor: '#118b70',
           backgroundColor: 'transparent',
           ticks: {
             fontSize: 2,
@@ -1120,7 +1120,7 @@ console.log(list)
           yAxisID: 'A',
           label: i18n.t('static.supplyPlan.consumption'),
           backgroundColor: 'transparent',
-          borderColor: '#f45c45',
+          borderColor: '#ba0c2f',
           ticks: {
             fontSize: 2,
             fontColor: 'transparent',

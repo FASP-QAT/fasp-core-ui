@@ -1186,4 +1186,5 @@
     "static.program.deleteLocalProgramSuccess" : "Programme (s) local (s) supprimé (s) avec succès",
     "static.common.delete": "Effacer",
     "static.program.deleteLocalProgram" : "Supprimer le programme local"
+   
 }
