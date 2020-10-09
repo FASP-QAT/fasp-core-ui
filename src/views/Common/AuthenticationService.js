@@ -25,7 +25,7 @@ class AuthenticationService {
                     localStorage.setItem("tempUser", user.userId);
                     console.log("offline user id---", localStorage.getItem("tempUser"));
                     decryptedPassword = user.password;
-                    console.log("offline decryptedPassword---",decryptedPassword);
+                    console.log("offline decryptedPassword---", decryptedPassword);
                 }
             }
 
@@ -171,13 +171,13 @@ class AuthenticationService {
         return decryptedUser.sessionExpiresOn;
     }
     updateUserLanguage(languageCode) {
-        console.log("Going to change language code---",languageCode)
+        console.log("Going to change language code---", languageCode)
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-        console.log("Going to change language decryptedCurUser---",decryptedCurUser)
+        console.log("Going to change language decryptedCurUser---", decryptedCurUser)
         let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem('user-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8))
-        console.log("Going to change language decryptedUser---",decryptedUser)
+        console.log("Going to change language decryptedUser---", decryptedUser)
         decryptedUser.language.languageCode = languageCode;
-        console.log("Going to change language decryptedUser after change---",decryptedUser)
+        console.log("Going to change language decryptedUser after change---", decryptedUser)
         localStorage.removeItem('user-' + decryptedCurUser);
         localStorage.setItem('user-' + decryptedCurUser, CryptoJS.AES.encrypt(JSON.stringify(decryptedUser), `${SECRET_KEY}`));
     }
@@ -592,6 +592,7 @@ class AuthenticationService {
                     }
                     break;
                 case "/realmCountry/listRealmCountryPlanningUnit":
+                case "/realmCountry/listRealmCountryPlanningUnit/:color/:message":
                     if (bfunction.includes("ROLE_BF_MANAGE_REALM_COUNTRY_PLANNING_UNIT")) {
                         return true;
                     }

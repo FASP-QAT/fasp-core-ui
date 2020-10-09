@@ -308,13 +308,25 @@ export default class RealmCountryPlanningUnitList extends Component {
             realmCountryPlanningUnitList: [],
             message: '',
             selSource: [],
-            loading: true
+            loading: true,
+            allowAdd: false
 
         }
         this.filterData = this.filterData.bind(this);
         this.formatLabel = this.formatLabel.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
+        this.addNewEntity = this.addNewEntity.bind(this);
     }
+
+    addNewEntity() {
+        let realmCountryId = document.getElementById("realmCountryId").value;
+        if (realmCountryId != 0) {
+            this.props.history.push({
+                pathname: `/realmCountry/realmCountryPlanningUnit/${realmCountryId}`,
+            })
+        }
+    }
+
     buildJexcel() {
         let realmCountryList = this.state.selSource;
         // console.log("realmCountryList---->", realmCountryList);
@@ -434,6 +446,11 @@ export default class RealmCountryPlanningUnitList extends Component {
     filterData() {
         this.setState({ loading: true })
         let realmCountryId = document.getElementById("realmCountryId").value;
+        if (realmCountryId == 0) {
+            this.setState({ allowAdd: false })
+        } else {
+            this.setState({ allowAdd: true })
+        }
         // AuthenticationService.setupAxiosInterceptors();
         RealmCountryService.getRealmCountryPlanningUnitAllByrealmCountryId(realmCountryId).then(response => {
             console.log(response.data)
@@ -629,7 +646,7 @@ export default class RealmCountryPlanningUnitList extends Component {
         return (
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} />
-                <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
+                <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
                     {/* <CardHeader className="mb-md-3 pb-lg-1">
@@ -639,6 +656,17 @@ export default class RealmCountryPlanningUnitList extends Component {
                         </div>
 
                     </CardHeader> */}
+                    {
+                        this.state.allowAdd &&
+                        < div className="Card-header-addicon">
+                            <div className="card-header-actions">
+                                <div className="card-header-action">
+                                    {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_REALM_COUNTRY_PLANNING_UNIT') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewEntity}><i className="fa fa-plus-square"></i></a>}
+                                </div>
+                            </div>
+                        </div>
+                    }
+
                     <CardBody className="">
                         <Col md="3 pl-0">
 
@@ -680,7 +708,7 @@ export default class RealmCountryPlanningUnitList extends Component {
                         </div>
                     </div>
                 </div>
-            </div>
+            </div >
         );
     }
 
