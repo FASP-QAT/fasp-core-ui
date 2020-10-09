@@ -1267,7 +1267,7 @@
     "static.report.problemAction.manual":"Manual",
     "static.shipmentDataEntry.shipmentStatus":"Status",
     "static.procurementAgent.AddProcurementAgent": "Add Procurement Agent",
-    "static.budget.redRow": "*Rows in red indicate that Budget has either lapsed or has no money in it",
+    "static.budget.redRow": "* Rows in red indicate that Budget has either lapsed or has no money in it",
     "static.program.deleteLocalProgram" : "Delete Local Program",
     "static.program.deleteLocalProgramSuccess" : "Local Program(s) deleted successfully",
     "static.problemAction.criticality":"Criticality",
@@ -1279,5 +1279,6 @@
     "static.message.alphaspeccharnumtext": "Only letters, numbers and special characters like /,- are allowed",
     "static.unit.multiplierFromARUTOPU": "Multiplier (From ARU to PU)",
     "static.supplyPlan.quantityPU": " Quantity (PU)",
-    "static.common.max30digittext": "Maximum 30 characters only"
+    "static.common.max30digittext": "Maximum 30 characters only",
+    "static.supplyplan.amcmessage": " Current month is included in the months in future for AMC"
 }
