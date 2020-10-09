@@ -14,12 +14,18 @@ class AuthenticationService {
         var decryptedPassword = "";
         for (var i = 0; i < localStorage.length; i++) {
             var value = localStorage.getItem(localStorage.key(i));
+            console.log("offline value---", value);
             if (localStorage.key(i).includes("user-")) {
                 let user = JSON.parse(CryptoJS.AES.decrypt(value.toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+                console.log("offline user---", user);
                 let decryptedEmailId = user.emailId;
-                if (decryptedEmailId == emailId) {
+                console.log("offline decryptedEmailId---", decryptedEmailId);
+                if (decryptedEmailId.toUpperCase() == emailId.toUpperCase()) {
+                    console.log("offline equals---");
                     localStorage.setItem("tempUser", user.userId);
+                    console.log("offline user id---", localStorage.getItem("tempUser"));
                     decryptedPassword = user.password;
+                    console.log("offline decryptedPassword---", decryptedPassword);
                 }
             }
 
@@ -165,9 +171,13 @@ class AuthenticationService {
         return decryptedUser.sessionExpiresOn;
     }
     updateUserLanguage(languageCode) {
+        console.log("Going to change language code---", languageCode)
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+        console.log("Going to change language decryptedCurUser---", decryptedCurUser)
         let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem('user-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8))
+        console.log("Going to change language decryptedUser---", decryptedUser)
         decryptedUser.language.languageCode = languageCode;
+        console.log("Going to change language decryptedUser after change---", decryptedUser)
         localStorage.removeItem('user-' + decryptedCurUser);
         localStorage.setItem('user-' + decryptedCurUser, CryptoJS.AES.encrypt(JSON.stringify(decryptedUser), `${SECRET_KEY}`));
     }
@@ -437,7 +447,7 @@ class AuthenticationService {
             }
             console.log("going to check bf functions");
             var bfunction = this.getLoggedInUserRoleBusinessFunctionArray();
-            console.log("route bfunction--->",bfunction);
+            console.log("route bfunction--->", bfunction);
             console.log("includes---" + bfunction.includes("ROLE_BF_DELETE_LOCAL_PROGARM"))
             switch (route) {
                 case "/user/addUser":
@@ -1212,6 +1222,8 @@ class AuthenticationService {
             } else {
                 return "/logout/static.message.sessionChange";
             }
+        } else {
+            return "/accessDenied";
         }
     }
     clearUserDetails() {
@@ -1222,6 +1234,47 @@ class AuthenticationService {
             keysToRemove = ["curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken"];
         }
         keysToRemove.forEach(k => localStorage.removeItem(k));
+    }
+    getDefaultUserLanguage() {
+        let lang = localStorage.getItem('lastLoggedInUsersLanguage');
+        if (lang != null && lang != "") {
+            return lang;
+        } else {
+            return "en";
+        }
+    }
+
+    getIconAndStaticLabel(val) {
+        let lang = this.getDefaultUserLanguage();
+        if (val == "icon") {
+            switch (lang) {
+                case "en":
+                    return "flag-icon flag-icon-us";
+                case "fr":
+                    return "flag-icon flag-icon-wf";
+                case "sp":
+                    return "flag-icon flag-icon-es";
+                case "pr":
+                    return "flag-icon flag-icon-pt";
+                default:
+                    return "flag-icon flag-icon-us";
+            }
+        }
+        else if (val == "label") {
+            switch (lang) {
+                case "en":
+                    return "static.language.english";
+                case "fr":
+                    return "static.language.french";
+                case "sp":
+                    return "static.language.spanish";
+                case "pr":
+                    return "static.language.portuguese";
+                default:
+                    return "static.language.english";
+            }
+        }
+
     }
 
 }

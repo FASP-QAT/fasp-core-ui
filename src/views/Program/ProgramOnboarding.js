@@ -1017,7 +1017,7 @@ export default class ProgramOnboarding extends Component {
                                         &nbsp;
                                         <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.addRowInJexcel}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>
                                         &nbsp;
-                                        <Button color="info" size="md" className="float-left mr-1 px-4" type="button" name="regionPrevious" id="regionPrevious" onClick={this.previousToStepSix} > <i className="fa fa-angle-double-left "></i>{i18n.t('static.common.back')}</Button>
+                                        <Button color="info" size="md" className="float-left mr-1 px-4" type="button" name="regionPrevious" id="regionPrevious" onClick={this.previousToStepSix} > <i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
                                         &nbsp;
                                     </FormGroup>
                                 </div>

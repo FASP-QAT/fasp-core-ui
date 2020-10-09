@@ -43,9 +43,11 @@ const validationSchema = function (values, t) {
         fundingSourceId: Yup.string()
             .required(i18n.t('static.budget.fundingtext')),
         budgetAmt: Yup.string()
+            // .transform((o, v) => parseFloat(v.replace(/,/g, '')))
             // .typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .required(i18n.t('static.budget.budgetamounttext')).min(0, i18n.t('static.program.validvaluetext'))
-            .matches(/^[0-9]+([,\.][0-9]+)?/, i18n.t('static.program.validBudgetAmount')),
+            // .matches(/^[0-9]+([,\.][0-9]+)?/, i18n.t('static.program.validBudgetAmount'))
+            .matches(/^\s*(?=.*[1-9])\d{1,10}(?:\.\d{1,2})?\s*$/, i18n.t('static.program.validBudgetAmount'))
+            .required(i18n.t('static.budget.budgetamounttext')).min(0, i18n.t('static.program.validvaluetext')),
         // startDate: Yup.string()
         //     .required(i18n.t('static.budget.startdatetext')),
         // stopDate: Yup.string()
@@ -54,7 +56,8 @@ const validationSchema = function (values, t) {
             .required(i18n.t('static.country.currencytext')),
         budgetCode: Yup.string()
             // .matches(ALPHABET_NUMBER_REGEX, i18n.t('static.message.alphabetnumerallowed'))
-            .max(10, i18n.t('static.common.max10digittext'))
+            .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly'))
+            .max(30, i18n.t('static.common.max30digittext'))
             .required(i18n.t('static.budget.budgetCodeText')),
     })
 }
@@ -639,6 +642,7 @@ class AddBudgetComponent extends Component {
                                                             invalid={touched.budgetCode && !!errors.budgetCode}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
+                                                            maxLength={30}
                                                             value={this.state.budget.budgetCode}
                                                             required />
                                                         <FormFeedback className="red">{errors.budgetCode}</FormFeedback>

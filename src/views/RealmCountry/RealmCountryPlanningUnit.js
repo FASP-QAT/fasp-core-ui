@@ -20,6 +20,7 @@ import "../../../node_modules/jexcel/dist/jexcel.css";
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import StatusUpdateButtonFeature from "../../CommonComponent/StatusUpdateButtonFeature";
 import UpdateButtonFeature from '../../CommonComponent/UpdateButtonFeature'
+import { JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from "../../Constants";
 let initialValues = {
 
     planningUnit: {
@@ -268,12 +269,12 @@ class PlanningUnitCountry extends Component {
                                                     }
 
                                                 },
-                                                pagination: 10,
+                                                pagination: JEXCEL_DEFAULT_PAGINATION,
                                                 search: true,
                                                 columnSorting: true,
                                                 tableOverflow: true,
                                                 wordWrap: true,
-                                                paginationOptions: [10, 25, 50],
+                                                paginationOptions: JEXCEL_PAGINATION_OPTION,
                                                 position: 'top',
                                                 allowInsertColumn: false,
                                                 allowManualInsertColumn: false,
@@ -286,7 +287,7 @@ class PlanningUnitCountry extends Component {
                                                 allowManualInsertRow: false,
                                                 text: {
                                                     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                                                    showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
+                                                    showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
                                                     show: '',
                                                     entries: '',
                                                 },
@@ -894,11 +895,12 @@ class PlanningUnitCountry extends Component {
 
         if (x == 5) {
             var col = ("F").concat(parseInt(y) + 1);
-            var reg = /^[0-9\b]+$/;
-            if (value == "" || isNaN(Number.parseInt(value)) || value < 0) {
+            // var reg = /^[0-9\b]+$/;
+            var reg = /^\s*(?=.*[1-9])\d{1,9}(?:\.\d{1,2})?\s*$/;
+            if (value == "" || isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
-                if (isNaN(Number.parseInt(value)) || value < 0) {
+                if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
                 }
                 else {
@@ -998,13 +1000,14 @@ class PlanningUnitCountry extends Component {
                 //Multiplier
                 var col = ("F").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(5, y);
-                var reg = /^[0-9\b]+$/;
+                // var reg = /^[0-9\b]+$/;
+                var reg = /^\s*(?=.*[1-9])\d{1,9}(?:\.\d{1,2})?\s*$/;
                 // console.log("---------VAL----------", value);
-                if (value == "" || isNaN(Number.parseInt(value)) || value < 0) {
+                if (value == "" || isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     valid = false;
-                    if (isNaN(Number.parseInt(value)) || value < 0) {
+                    if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
                         this.el.setComments(col, i18n.t('static.message.invalidnumber'));
                     }
                     else {

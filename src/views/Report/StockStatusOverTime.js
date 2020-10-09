@@ -922,10 +922,10 @@ addDoubleQuoteToRowContent=(arr)=>{
         csvRow.push('')
         var re;
 
-        var A = [this.addDoubleQuoteToRowContent([i18n.t('static.report.month'), i18n.t('static.program.program'), ((i18n.t('static.planningunit.planningunit')).replaceAll(',', '%20')).replaceAll(' ', '%20'), i18n.t('static.report.stock'), ((i18n.t('static.report.consupmtionqty')).replaceAll(',', '%20')).replaceAll(' ', '%20'), i18n.t('static.report.amc'), ((i18n.t('static.report.noofmonth')).replaceAll(',', '%20')).replaceAll(' ', '%20'), i18n.t('static.report.mos')])]
+        var A = [this.addDoubleQuoteToRowContent([i18n.t('static.report.month'),  ((i18n.t('static.planningunit.planningunit')).replaceAll(',', '%20')).replaceAll(' ', '%20'), i18n.t('static.report.stock'), ((i18n.t('static.report.consupmtionqty')).replaceAll(',', '%20')).replaceAll(' ', '%20'), i18n.t('static.report.amc'), ((i18n.t('static.report.noofmonth')).replaceAll(',', '%20')).replaceAll(' ', '%20'), i18n.t('static.report.mos')])]
 
 
-        this.state.matricsList.map(elt => A.push(this.addDoubleQuoteToRowContent([this.dateFormatter(elt.dt).replaceAll(' ', '%20'), ((getLabelText(elt.program.label, this.state.lang)).replaceAll(',', '%20')).replaceAll(' ', '%20'), ((getLabelText(elt.planningUnit.label, this.state.lang)).replaceAll(',', '%20')).replaceAll(' ', '%20'), elt.stock, elt.consumptionQty, this.formatAmc(elt.amc), elt.amcMonthCount, this.roundN(elt.mos)])));
+        this.state.matricsList.map(elt => A.push(this.addDoubleQuoteToRowContent([this.dateFormatter(elt.dt).replaceAll(' ', '%20'), ((getLabelText(elt.planningUnit.label, this.state.lang)).replaceAll(',', '%20')).replaceAll(' ', '%20'), elt.stock, elt.consumptionQty, this.formatAmc(elt.amc), elt.amcMonthCount, this.roundN(elt.mos)])));
 
 
         for (var i = 0; i < A.length; i++) {
@@ -1052,10 +1052,10 @@ addDoubleQuoteToRowContent=(arr)=>{
         // doc.addImage(canvasImg, 'png', 50, 130, aspectwidth1, height * 2 / 3);
         doc.addImage(canvasImg, 'png', 50, startYtable, 750, 230, 'CANVAS');
 
-        const headers = [[i18n.t('static.report.month'), i18n.t('static.program.program'), i18n.t('static.planningunit.planningunit'), i18n.t('static.report.stock'), i18n.t('static.report.consupmtionqty'), i18n.t('static.report.amc'), i18n.t('static.report.noofmonth'), i18n.t('static.report.mos')]];
+        const headers = [[i18n.t('static.report.month'), i18n.t('static.planningunit.planningunit'), i18n.t('static.report.stock'), i18n.t('static.report.consupmtionqty'), i18n.t('static.report.amc'), i18n.t('static.report.noofmonth'), i18n.t('static.report.mos')]];
 
         const data = [];
-        this.state.matricsList.map(elt => data.push([this.dateFormatter(elt.dt), getLabelText(elt.program.label, this.state.lang), getLabelText(elt.planningUnit.label, this.state.lang), this.formatter(elt.stock), this.formatter(elt.consumptionQty), this.formatter(this.formatAmc(elt.amc)), elt.amcMonthCount, this.roundN(elt.mos)]));
+        this.state.matricsList.map(elt => data.push([this.dateFormatter(elt.dt),  getLabelText(elt.planningUnit.label, this.state.lang), this.formatter(elt.stock), this.formatter(elt.consumptionQty), this.formatter(this.formatAmc(elt.amc)), elt.amcMonthCount, this.roundN(elt.mos)]));
         doc.addPage()
         startYtable = 80
         let content = {
@@ -1418,7 +1418,6 @@ addDoubleQuoteToRowContent=(arr)=>{
                                         <thead>
                                             <tr>
                                                 <th className="text-center" style={{ width: '10%' }}> {i18n.t('static.report.month')} </th>
-                                                <th className="text-center" style={{ width: '20%' }}> {i18n.t('static.dashboard.program')} </th>
                                                 <th className="text-center" style={{ width: '20%' }}>{i18n.t('static.planningunit.planningunit')}</th>
                                                 <th className="text-center" style={{ width: '10%' }}>{i18n.t('static.report.stock')}</th>
                                                 <th className="text-center" style={{ width: '10%' }}>{i18n.t('static.report.consupmtionqty')}</th>
@@ -1436,10 +1435,7 @@ addDoubleQuoteToRowContent=(arr)=>{
                                                     <tr id="addr0" >
 
                                                         <td>{this.dateFormatter(item.dt)}</td>
-                                                        <td>
-                                                            {getLabelText(item.program.label, this.state.lang)}
-                                                        </td>
-                                                        <td>
+                                                         <td>
                                                             {getLabelText(item.planningUnit.label, this.state.lang)}
                                                         </td>
                                                         <td>
@@ -1470,7 +1466,7 @@ addDoubleQuoteToRowContent=(arr)=>{
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
-                            <div ><h4> <strong>Loading...</strong></h4></div>
+                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
                             <div class="spinner-border blue ml-4" role="status">
 

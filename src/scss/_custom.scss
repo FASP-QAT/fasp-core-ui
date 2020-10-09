@@ -642,7 +642,9 @@ label.arrow_label:after {
 
 .jexcel_content {
   overflow-y: auto !important;
-  max-height: 540px !important;
+  max-height: 100% !important;
+  height: 100%;
+  // max-height: 540px !important;
   min-height: 70px !important;
 }
 .jexcel > tbody > tr > td.readonly {
@@ -2595,6 +2597,7 @@ input::placeholder {
     min-width: 280px!important;
     word-wrap: break-word!important;
     border:none!important;
+    z-index: 1;
   }
 
   .regionTdWidthAdjustments{
@@ -2807,7 +2810,7 @@ input::placeholder {
     font-weight: 700;
 }
 .CardHeight{
-  height: 137px;
+  height: 144px;
 }
 .box-p{
   padding-bottom: 0.25rem !important;
@@ -3332,8 +3335,8 @@ margin-left: -45px;
 
 .versionColor{
   color:#cb3828;
-  font-weight: 600;
-  font-size: 13px;
+  font-weight: 500;
+  font-size: 12px !important;
 }
 ///sidebar css
 @media (min-width: 992px){
@@ -3468,3 +3471,108 @@ margin-left: -45px;
   background-color: #e4e5e6!important;
   color: #20a8d8;
   }
+
+//   .view {
+//     margin: auto;
+//     width: 100%;
+//     overflow-x: scroll;
+//     overflow-y: visible;
+//     padding: 0;
+  
+// }
+
+// .wrapper {
+//     position: relative;
+//     overflow: auto;
+//     white-space: nowrap;
+// }
+
+.sticky-col {
+    position: sticky;
+    position: -webkit-sticky;
+    // background-color: white;
+}
+
+.first-col {
+    // width: 100px;
+    // min-width: 100px;
+    // max-width: 100px;
+    // left: 0px;
+    // border:1px solid #000;
+	// background:#eee;
+  visibility:visible;
+  background: #fff;
+}
+
+.second-col {
+    width: 150px;
+    min-width: 150px;
+    max-width: 150px;
+    left: 100px;
+}
+.table-scroll {
+	position:relative;
+	width:100%;
+	margin:auto;
+	overflow:hidden;
+	border:none!important;
+}
+.table-wrap {
+	width:100%;
+	overflow:auto;
+}
+.table-scroll table {
+	width:100%;
+	margin:auto;
+	border-collapse:separate;
+	border-spacing:0;
+}
+.table-scroll th, .table-scroll td {
+	padding:5px 10px;
+	white-space:nowrap;
+	vertical-align:top;
+}
+.clone {
+	// position:absolute;
+	top:0;
+	left:0;
+	pointer-events:none;
+}
+
+.clone tbody th {
+	visibility:visible;
+}
+
+.quantimedProgressbartext1 {
+  // left: 7px;
+  left: -2%;
+  transform: translateX(18%) scale(1);
+}
+.quantimedProgressbartext2 {
+  // left: 16%;
+  left: 28%;
+  transform: translateX(18%) scale(1);
+}
+.quantimedProgressbartext3 {
+  // left: 16%;
+  left: 62%;
+  // transform: translateX(18%) scale(1);
+}
+.quantimedProgressbartext4 {
+  // left: 16%;
+  left: 92.5%;
+  transform: translateX(18%) scale(1);
+}
+.en-btnlogin{
+  color: #002f6c !important;
+  background-color: transparent !important;
+  border-color: transparent !important;
+  }
+  .logo-MarginTop{
+  margin-top: -2%!important;
+  }
+  .modal-title {
+    margin-bottom: 0;
+    line-height: 1.5;
+    width: 100%;
+}
