@@ -597,18 +597,18 @@ class ListRealmCountryComponent extends Component {
                 var items = [];
                 if (y != null) {
                     if (obj.options.allowInsertRow == true) {
-                        items.push({
-                            title: i18n.t('static.planningunit.planningunitupdate'),
-                            onclick: function () {
-                                // console.log("onclick------>", this.el.getValueFromCoords(0, y));
-                                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_REALM_COUNTRY_PLANNING_UNIT')) {
-                                    this.props.history.push({
-                                        pathname: `/realmCountry/realmCountryPlanningUnit/${this.el.getValueFromCoords(0, y)}`,
-                                    })
-                                }
+                        // items.push({
+                        //     title: i18n.t('static.planningunit.planningunitupdate'),
+                        //     onclick: function () {
+                        //         // console.log("onclick------>", this.el.getValueFromCoords(0, y));
+                        //         if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_REALM_COUNTRY_PLANNING_UNIT')) {
+                        //             this.props.history.push({
+                        //                 pathname: `/realmCountry/realmCountryPlanningUnit/${this.el.getValueFromCoords(0, y)}`,
+                        //             })
+                        //         }
 
-                            }.bind(this)
-                        });
+                        //     }.bind(this)
+                        // });
 
                         items.push({
                             title: i18n.t('static.realmcountry.regionupdate'),
