@@ -423,27 +423,25 @@ class ShipmentGlobalView extends Component {
     exportCSV() {
 
         var csvRow = [];
-        csvRow.push((i18n.t('static.report.dateRange') + ' , ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20'))
-        // this.state.countryLabels.map(ele =>
-        //     csvRow.push(i18n.t('static.dashboard.country') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
+        csvRow.push('"' +(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20')+'"')
         this.state.countryLabels.map(ele =>
-            csvRow.push((i18n.t('static.dashboard.country')).replaceAll(' ', '%20') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
-        csvRow.push((i18n.t('static.dashboard.productcategory')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("productCategoryId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
-        csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+            csvRow.push('"' +(i18n.t('static.dashboard.country') + ' : ' + (ele.toString())).replaceAll(' ', '%20')+'"'))
+        csvRow.push('"' +(i18n.t('static.dashboard.productcategory') + ' : ' + (document.getElementById("productCategoryId").selectedOptions[0].text)).replaceAll(' ', '%20')+'"')
+        csvRow.push('"' +(i18n.t('static.planningunit.planningunit') + ' : ' + (document.getElementById("planningUnitId").selectedOptions[0].text)).replaceAll(' ', '%20')+'"')
         var viewby = document.getElementById("viewById").value;
-        csvRow.push((i18n.t('static.common.display')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("viewById").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+        csvRow.push('"' +(i18n.t('static.common.display') + ' : ' + (document.getElementById("viewById").selectedOptions[0].text)).replaceAll(' ', '%20')+'"')
 
         if (viewby == 1) {
             this.state.fundingSourceLabels.map(ele =>
-                csvRow.push((i18n.t('static.budget.fundingsource')).replaceAll(' ', '%20') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
+                csvRow.push('"' +(i18n.t('static.budget.fundingsource') + ' : ' + (ele.toString())).replaceAll(' ', '%20')+'"'))
         } else {
             this.state.procurementAgentLabels.map(ele =>
-                csvRow.push((i18n.t('static.procurementagent.procurementagent')).replaceAll(' ', '%20') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
+                csvRow.push('"' +(i18n.t('static.procurementagent.procurementagent') + ' : ' + (ele.toString())).replaceAll(' ', '%20')+'"'))
         }
 
         csvRow.push('')
         csvRow.push('')
-        csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
+        csvRow.push('"' +(i18n.t('static.common.youdatastart')).replaceAll(' ', '%20')+'"')
         csvRow.push('')
         var re;
 
@@ -459,7 +457,7 @@ class ShipmentGlobalView extends Component {
             A[0] = this.addDoubleQuoteToRowContent(tableHeadTemp);
             re = this.state.table1Body
             for (var item = 0; item < re.length; item++) {
-                A.push([this.addDoubleQuoteToRowContent([(getLabelText(re[item].country.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), re[item].amount])])
+                A.push([[('"'+getLabelText(re[item].country.label, this.state.lang)).replaceAll(' ', '%20')+'"', this.addDoubleQuoteToRowContent(re[item].amount)]])
             }
             for (var i = 0; i < A.length; i++) {
                 csvRow.push(A[i].join(","))
@@ -1065,7 +1063,7 @@ class ShipmentGlobalView extends Component {
     _handleClickRangeBox(e) {
         this.refs.pickRange.show()
     }
-    loading = () => <div className="animated fadeIn pt-1 text-center">Loading...</div>
+    loading = () => <div className="animated fadeIn pt-1 text-center">{i18n.t('static.common.loading')}</div>
 
     getRandomColor() {
         var letters = '0123456789ABCDEF'.split('');
@@ -1360,7 +1358,7 @@ class ShipmentGlobalView extends Component {
             && procurementAgents.map((item, i) => {
                 return (
 
-                    { label: getLabelText(item.label, this.state.lang), value: item.procurementAgentId }
+                    { label: item.procurementAgentCode, value: item.procurementAgentId }
 
                 )
             }, this);
@@ -1371,7 +1369,7 @@ class ShipmentGlobalView extends Component {
             && fundingSources.map((item, i) => {
                 return (
 
-                    { label: getLabelText(item.label, this.state.lang), value: item.fundingSourceId }
+                    { label: item.fundingSourceCode, value: item.fundingSourceId }
 
                 )
             }, this);
@@ -1431,10 +1429,14 @@ class ShipmentGlobalView extends Component {
 
         // let displaylabel = Object.keys(this.state.dateSplitList[0].amount);
         let displaylabel = [];
-        displaylabel = this.state.dateSplitList.filter((i, index) => (index < 1)).map(ele => (Object.keys(ele.amount)));
-        if (displaylabel.length > 0) {
-            displaylabel = displaylabel[0];
+        if(this.state.viewby==1){
+        displaylabel = this.state.fundingSourceValues.map(ele=>ele.label)
         }
+        else{
+            displaylabel = this.state.procurementAgentValues.map(ele=>ele.label)}//this.state.dateSplitList.filter((i, index) => (index < 1 && i)).map(ele => (Object.keys(ele.amount)));
+        // if (displaylabel.length > 0) {
+        //     displaylabel = displaylabel[0];
+        // }
         // displaylabel = displaylabel[0];
 
         console.log("displaylabel------->>>>", displaylabel);
@@ -1806,7 +1808,7 @@ class ShipmentGlobalView extends Component {
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
-                            <div ><h4> <strong>Loading...</strong></h4></div>
+                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
                             <div class="spinner-border blue ml-4" role="status">
 
