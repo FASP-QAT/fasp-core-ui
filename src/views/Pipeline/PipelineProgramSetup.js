@@ -23,6 +23,7 @@ import PipelineProgramShipment from './PipelineProgramShipment';
 export default class PipelineProgramSetup extends Component {
     constructor(props) {
         super(props);
+        var realmId=AuthenticationService.getRealmId();
         this.state = {
             progressPer: 0,
             pipelineProgramSetupPer: 0,
@@ -38,7 +39,7 @@ export default class PipelineProgramSetup extends Component {
                 realmCountry: {
                     realmCountryId: '',
                     realm: {
-                        realmId: 1
+                        realmId:realmId
                     }
 
                 },

@@ -76,7 +76,7 @@ const validationSchemaSix = function (values) {
             .matches(/^\s*(?=.*[1-9])\d{1,2}(?:\.\d{1,2})?\s*$/, i18n.t('static.message.2digitDecimal'))
             .required(i18n.t('static.program.validapprovetoshiptext'))
             .min(0, i18n.t('static.program.validvaluetext')),
-        programCode: Yup.string()
+        uniqueCode: Yup.string()
             .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly'))
             .required(i18n.t('static.programOnboarding.validprogramCode')),
 
@@ -130,7 +130,7 @@ export default class StepSix extends Component {
             shippedToArrivedByAirLeadTime: true,
             shippedToArrivedBySeaLeadTime: true,
             arrivedToDeliveredLeadTime: true,
-            programCode:true
+            uniqueCode:true
 
         }
         )
@@ -236,30 +236,30 @@ export default class StepSix extends Component {
                                         <Label htmlFor="company">{i18n.t('static.programOnboarding.programDisplayName')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
                                             type="text"
-                                            name="displayName"
+                                            name="programCode"
                                             bsSize="sm"
                                             disabled
-                                            value={this.props.items.program.displayName}
-                                            id="displayName" />
-                                        <FormFeedback className="red">{errors.displayName}</FormFeedback>
+                                            value={this.props.items.program.programCode}
+                                            id="programCode" />
+                                        <FormFeedback className="red">{errors.programCode}</FormFeedback>
                                     </FormGroup>
 
                                     <FormGroup className="col-md-6">
                                         <Label htmlFor="company">{i18n.t('static.programOnboarding.programCode')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
                                             type="text"
-                                            name="programCode"
+                                            name="uniqueCode"
                                             bsSize="sm"
                                             onBlur={handleBlur}
-                                            valid={!errors.programCode && this.props.items.program.programCode != ''}
-                                            invalid={touched.programCode && !!errors.programCode}
+                                            valid={!errors.uniqueCode && this.props.items.program.uniqueCode != ''}
+                                            invalid={touched.uniqueCode && !!errors.uniqueCode}
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
-                                            id="programCode"
-                                            value={this.props.items.program.programCode}
+                                            id="uniqueCode"
+                                            value={this.props.items.program.uniqueCode}
                                             required
                                             maxLength={6}
                                         />
-                                        <FormFeedback className="red">{errors.programCode}</FormFeedback>
+                                        <FormFeedback className="red">{errors.uniqueCode}</FormFeedback>
                                     </FormGroup>
 
                                     <FormGroup className="col-md-6">

@@ -29,10 +29,10 @@ export default class ProgramOnboarding extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            loading: true,
+            loading: true, 
             program: {
-                programCode:'',
-                displayName: '<%RC%>-<%TA%>-<%OR%>-',
+                uniqueCode:'',
+                programCode: '<%RC%>-<%TA%>-<%OR%>-',
                 label: {
                     label_en: '',
                     label_sp: '',
@@ -420,19 +420,19 @@ export default class ProgramOnboarding extends Component {
         } if (event.target.name == 'realmCountryId') {
 
             var index = event.nativeEvent.target.selectedIndex;
-            var dname = this.state.program.displayName;
+            var dname = this.state.program.programCode;
             var email_array = dname.split('-');
             var new_string = email_array[0];
-            program.displayName = dname.replace(new_string,event.nativeEvent.target[index].text);
+            program.programCode = dname.replace(new_string,event.nativeEvent.target[index].text);
 
             program.realmCountry.realmCountryId = event.target.value;
             this.refs.regionChild.getRegionList();
         } if (event.target.name == 'organisationId') {
             var index = event.nativeEvent.target.selectedIndex;
-            var dname = this.state.program.displayName;
+            var dname = this.state.program.programCode;
             var email_array = dname.split('-');
             var new_string = email_array[2];
-            program.displayName = dname.replace(new_string,event.nativeEvent.target[index].text);
+            program.programCode = dname.replace(new_string,event.nativeEvent.target[index].text);
 
             program.organisation.id = event.target.value;
         } if (event.target.name == 'airFreightPerc') {
@@ -440,12 +440,12 @@ export default class ProgramOnboarding extends Component {
         } if (event.target.name == 'seaFreightPerc') {
             program.seaFreightPerc = event.target.value;
         }
-        if (event.target.name == 'programCode') {
-            var dname = this.state.program.displayName;
+        if (event.target.name == 'uniqueCode') {
+            var dname = this.state.program.programCode;
             var email_array = dname.split('-');
             var new_string = email_array[3];
-            program.displayName = dname.replace(new_string,"").concat(event.target.value.toUpperCase());
-            program.programCode=event.target.value.toUpperCase()
+            program.programCode = dname.replace(new_string,"").concat(event.target.value.toUpperCase());
+            program.uniqueCode=event.target.value.toUpperCase()
         } 
         // if (event.target.name == 'draftToSubmittedLeadTime') {
         //     program.draftToSubmittedLeadTime = event.target.value;
@@ -463,10 +463,10 @@ export default class ProgramOnboarding extends Component {
             program.monthsInPastForAmc = event.target.value;
         } if (event.target.name == 'healthAreaId') {
             var index = event.nativeEvent.target.selectedIndex;
-            var dname = this.state.program.displayName;
+            var dname = this.state.program.programCode;
             var email_array = dname.split('-');
             var new_string = email_array[1];
-            program.displayName = dname.replace(new_string,event.nativeEvent.target[index].text);
+            program.programCode = dname.replace(new_string,event.nativeEvent.target[index].text);
 
             program.healthArea.id = event.target.value;
         } if (event.target.name == 'userId') {
@@ -1042,7 +1042,7 @@ export default class ProgramOnboarding extends Component {
                                         &nbsp;
                                         <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.addRowInJexcel}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>
                                         &nbsp;
-                                        <Button color="info" size="md" className="float-left mr-1 px-4" type="button" name="regionPrevious" id="regionPrevious" onClick={this.previousToStepSix} > <i className="fa fa-angle-double-left "></i>{i18n.t('static.common.back')}</Button>
+                                        <Button color="info" size="md" className="float-left mr-1 px-4" type="button" name="regionPrevious" id="regionPrevious" onClick={this.previousToStepSix} > <i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
                                         &nbsp;
                                     </FormGroup>
                                 </div>

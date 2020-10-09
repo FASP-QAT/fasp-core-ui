@@ -218,13 +218,11 @@ export default class StockStatusMatrix extends React.Component {
                       monthlydata.push(list[0].mos)
                     }
                     else {
-                      var mos = 0
-                      if (list[0].amc > 0) { mos = list[0].closingBalanceWps / list[0].amc }
-
-                      monthlydata.push(mos)
+                     
+                      monthlydata.push(list[0].mosWps)
                     }
                   } else {
-                    monthlydata.push('0')
+                    monthlydata.push('')
                   }
 
                 }
@@ -235,18 +233,18 @@ export default class StockStatusMatrix extends React.Component {
                   reorderFrequency: pu.reorderFrequencyInMonths,
                   year: from,
                   minMonthsOfStock: pu.minMonthsOfStock,
-                  jan: monthlydata[0] == 'NaN' || monthlydata[0] == '0' ? '' : monthlydata[0],
-                  feb: monthlydata[1] == 'NaN' || monthlydata[1] == '0' ? '' : monthlydata[1],
-                  mar: monthlydata[2] == 'NaN' || monthlydata[2] == '0' ? '' : monthlydata[2],
-                  apr: monthlydata[3] == 'NaN' || monthlydata[3] == '0' ? '' : monthlydata[3],
-                  may: monthlydata[4] == 'NaN' || monthlydata[4] == '0' ? '' : monthlydata[4],
-                  jun: monthlydata[5] == 'NaN' || monthlydata[5] == '0' ? '' : monthlydata[5],
-                  jul: monthlydata[6] == 'NaN' || monthlydata[6] == '0' ? '' : monthlydata[6],
-                  aug: monthlydata[7] == 'NaN' || monthlydata[7] == '0' ? '' : monthlydata[7],
-                  sep: monthlydata[8] == 'NaN' || monthlydata[8] == '0' ? '' : monthlydata[8],
-                  oct: monthlydata[9] == 'NaN' || monthlydata[9] == '0' ? '' : monthlydata[9],
-                  nov: monthlydata[10] == 'NaN' || monthlydata[10] == '0' ? '' : monthlydata[10],
-                  dec: monthlydata[11] == 'NaN' || monthlydata[11] == '0' ? '' : monthlydata[11],
+                  jan: monthlydata[0] ,
+                  feb: monthlydata[1],
+                  mar: monthlydata[2] ,
+                  apr: monthlydata[3],
+                  may: monthlydata[4],
+                  jun: monthlydata[5],
+                  jul: monthlydata[6],
+                  aug: monthlydata[7],
+                  sep: monthlydata[8],
+                  oct: monthlydata[9] ,
+                  nov: monthlydata[10],
+                  dec: monthlydata[11],
                 }
                 data.push(json)
 
@@ -730,7 +728,7 @@ export default class StockStatusMatrix extends React.Component {
   }
 
   formatter = value => {
-    if (value != '') {
+    if (value != null) {
       var cell1 = this.roundN(value)
       cell1 += '';
       var x = cell1.split('.');
@@ -899,14 +897,15 @@ export default class StockStatusMatrix extends React.Component {
     return getLabelText(cell, this.state.lang);
   }
   roundN = num => {
-    if (num == '') {
+    console.log(num)
+    if (num == null) {
       return ''
     } else {
       return parseFloat(Math.round(num * Math.pow(10, 1)) / Math.pow(10, 1)).toFixed(1);
     }
   }
   cellStyle = (min, value) => {
-    if (value != '')
+    if (value != null)
       if (min > value) {
         return { backgroundColor: legendcolor[0].color }
       } else {
@@ -1331,7 +1330,7 @@ export default class StockStatusMatrix extends React.Component {
         <div style={{ display: this.state.loading ? "block" : "none" }}>
           <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
             <div class="align-items-center">
-              <div ><h4> <strong>Loading...</strong></h4></div>
+              <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
               <div class="spinner-border blue ml-4" role="status">
 

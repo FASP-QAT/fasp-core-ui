@@ -940,7 +940,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import { Link } from "react-router-dom";
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
@@ -1461,12 +1461,12 @@ export default class InventoryTurns extends Component {
                 },
             ],
             text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
+                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
                 show: '',
                 entries: '',
             },
             onload: this.loaded,
-            pagination: 10,
+            pagination: JEXCEL_DEFAULT_PAGINATION,
             search: true,
             columnSorting: true,
             tableOverflow: true,
@@ -1480,7 +1480,7 @@ export default class InventoryTurns extends Component {
             oneditionend: this.onedit,
             copyCompatibility: true,
             allowExport: false,
-            paginationOptions: [10, 25, 50],
+            paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             contextMenu: false,
         };
@@ -1906,7 +1906,7 @@ var inputJson={
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
-                            <div ><h4> <strong>Loading...</strong></h4></div>
+                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
                             <div class="spinner-border blue ml-4" role="status">
 

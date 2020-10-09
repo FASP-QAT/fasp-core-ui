@@ -18,12 +18,13 @@ import { SPACE_REGEX } from '../../Constants';
 const initialValues = {
     summary: "Add / Update Program",
     programName: '',
+    programCode: '',
     realmId: '',
     realmCountryId: '',
     regionId: '',
     organisationId: '',
     healthAreaId: '',
-    userId: '',
+    programManager: '',
     airFreightPerc: '',
     seaFreightPerc: '',
     plannedToSubmittedLeadTime: '',
@@ -52,7 +53,7 @@ const validationSchema = function (values) {
             .required(i18n.t('static.program.validorganisationtext')),
         healthAreaId: Yup.string()
             .required(i18n.t('static.program.validhealthareatext')),
-        userId: Yup.string()
+        programManager: Yup.string()
             .required(i18n.t('static.program.validmanagertext')),
         airFreightPerc: Yup.string()
             .required(i18n.t('static.program.validairfreighttext'))
@@ -121,12 +122,13 @@ export default class ProgramTicketComponent extends Component {
             program: {
                 summary: "Add / Update Program",
                 programName: '',
+                programCode: '',
                 realmId: '',
                 realmCountryId: '',
                 regionId: [],
                 organisationId: '',
                 healthAreaId: '',
-                userId: '',
+                programManager: '',
                 airFreightPerc: '',
                 seaFreightPerc: '',
                 plannedToSubmittedLeadTime: '',
@@ -158,6 +160,7 @@ export default class ProgramTicketComponent extends Component {
         this.getDependentLists = this.getDependentLists.bind(this);
         this.getRegionList = this.getRegionList.bind(this);
         this.updateFieldData = this.updateFieldData.bind(this);
+        this.getProgramDisplayCode = this.getProgramDisplayCode.bind(this);
     }
 
     dataChange(event) {
@@ -168,35 +171,38 @@ export default class ProgramTicketComponent extends Component {
         if (event.target.name == "programName") {
             program.programName = event.target.value;
         }
+        if (event.target.name == "programCode") {
+            program.programCode = event.target.value;
+        }
         if (event.target.name == "realmId") {            
             program.realmId = event.target.options[event.target.selectedIndex].innerHTML;
-            this.setState({
-                realmId : event.target.value
-            })            
+            // this.setState({
+                this.state.realmId = event.target.value
+            // })            
         }
         if (event.target.name == "realmCountryId") {
             program.realmCountryId = event.target.options[event.target.selectedIndex].innerHTML;
-            this.setState({
-                realmCountryId : event.target.value
-            })            
+            // this.setState({
+                this.state.realmCountryId = event.target.value
+            // })            
         }
         if (event.target.name == "regionId") {
             program.regionId = event.target.value;
         }
         if (event.target.name == "organisationId") {
             program.organisationId = event.target.options[event.target.selectedIndex].innerHTML;
-            this.setState({
-                organisationId : event.target.value
-            })            
+            // this.setState({
+                this.state.organisationId = event.target.value
+            // })            
         }
         if (event.target.name == "healthAreaId") {
             program.healthAreaId = event.target.options[event.target.selectedIndex].innerHTML;
-            this.setState({
-                healthAreaId : event.target.value
-            })            
+            // this.setState({
+                this.state.healthAreaId = event.target.value
+            // })            
         }
-        if (event.target.name == "userId") {
-            program.userId = event.target.options[event.target.selectedIndex].innerHTML;
+        if (event.target.name == "programManager") {
+            program.programManager = event.target.options[event.target.selectedIndex].innerHTML;
             this.setState({
                 programManagerId : event.target.value
             })            
@@ -325,12 +331,13 @@ export default class ProgramTicketComponent extends Component {
         setTouched({
             summary: true,
             programName: true,
+            programCode: true,
             realmId: true,
             realmCountryId: true,
             regionId: true,
             organisationId: true,
             healthAreaId: true,
-            userId: true,
+            programManager: true,
             airFreightPerc: true,
             seaFreightPerc: true,
             plannedToSubmittedLeadTime: true,
@@ -390,12 +397,13 @@ export default class ProgramTicketComponent extends Component {
         let { program } = this.state;
         // program.summary = '';
         program.programName = '';
+        program.programCode = '';
         program.realmId = '';
         program.realmCountryId = '';
         program.regionId = '';
         program.organisationId = '';
         program.healthAreaId = '';
-        program.userId = '';
+        program.programManager = '';
         program.airFreightPerc = '';
         program.seaFreightPerc = '';
         program.plannedToSubmittedLeadTime = '';
@@ -409,6 +417,28 @@ export default class ProgramTicketComponent extends Component {
             program
         },
             () => { });
+    }
+
+    getProgramDisplayCode() {
+        let items = this.state;
+        var country = items.realmCountryId;
+        var technicalArea = items.healthAreaId;
+        var organisation = items.organisationId;
+        console.log(country,"===",technicalArea,"===",organisation)
+        if((country != "" && country != undefined) && (technicalArea != "" && technicalArea != undefined) && (organisation != "" && organisation != undefined)) {
+            var countryCode = this.state.realmCountryList.filter(c => c.realmCountryId == country)[0].country.countryCode;
+            var technicalAreaCode = this.state.healthAreaList.filter(c => c.healthAreaId == technicalArea)[0].healthAreaCode;
+            var organisationCode = this.state.organisationList.filter(c => c.organisationId == organisation)[0].organisationCode;
+            var programDisplayCode = countryCode + "-" + technicalAreaCode + "-" + organisationCode;
+            console.log("programDisplayCode",programDisplayCode);
+
+            let { program } = this.state;
+            program.programCode = programDisplayCode;
+            this.setState({
+                program
+            })
+        }
+        
     }
 
     render() {
@@ -459,7 +489,7 @@ export default class ProgramTicketComponent extends Component {
         let programManagers = programManagerList.length > 0
             && programManagerList.map((item, i) => {
                 return (
-                    <option key={i} value={item.userId}>
+                    <option key={i} value={item.programManager}>
                         {item.username}
                     </option>
                 )
@@ -538,19 +568,7 @@ export default class ProgramTicketComponent extends Component {
                                             value={this.state.program.summary}
                                             required />
                                         <FormFeedback className="red">{errors.summary}</FormFeedback>
-                                    </FormGroup>
-                                    <FormGroup>
-                                        <Label for="programName">{i18n.t('static.program.programName')}<span class="red Reqasterisk">*</span></Label>
-                                        <Input type="text" name="programName" id="programName"
-                                            bsSize="sm"
-                                            valid={!errors.programName && this.state.program.programName != ''}
-                                            invalid={touched.programName && !!errors.programName}
-                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                            onBlur={handleBlur}
-                                            value={this.state.program.programName}
-                                            required />
-                                        <FormFeedback className="red">{errors.programName}</FormFeedback>
-                                    </FormGroup>
+                                    </FormGroup>                                    
                                     < FormGroup >
                                         <Label for="realmId">{i18n.t('static.program.realm')}<span class="red Reqasterisk">*</span></Label>
                                         <Input type="select" name="realmId" id="realmId"
@@ -572,7 +590,7 @@ export default class ProgramTicketComponent extends Component {
                                             bsSize="sm"
                                             valid={!errors.realmCountryId && this.state.program.realmCountryId != ''}
                                             invalid={touched.realmCountryId && !!errors.realmCountryId}
-                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.getRegionList(e)}}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.getRegionList(e); this.getProgramDisplayCode()}}
                                             onBlur={handleBlur}
                                             value={this.state.realmCountryId}
                                             required >
@@ -581,6 +599,36 @@ export default class ProgramTicketComponent extends Component {
                                             </Input>
                                         <FormFeedback className="red">{errors.realmCountryId}</FormFeedback>
                                     </FormGroup>
+                                    < FormGroup >
+                                        <Label for="healthAreaId">{i18n.t('static.program.healtharea')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="select" name="healthAreaId" id="healthAreaId"
+                                            bsSize="sm"
+                                            valid={!errors.healthAreaId && this.state.program.healthAreaId != ''}
+                                            invalid={touched.healthAreaId && !!errors.healthAreaId}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.getProgramDisplayCode()}}
+                                            onBlur={handleBlur}
+                                            value={this.state.healthAreaId}
+                                            required >
+                                                <option value="">{i18n.t('static.common.select')}</option>
+                                                {realmHealthArea}
+                                            </Input>
+                                        <FormFeedback className="red">{errors.healthAreaId}</FormFeedback>
+                                    </FormGroup>
+                                    < FormGroup >
+                                        <Label for="organisationId">{i18n.t('static.program.organisation')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="select" name="organisationId" id="organisationId"
+                                            bsSize="sm"
+                                            valid={!errors.organisationId && this.state.program.organisationId != ''}
+                                            invalid={touched.organisationId && !!errors.organisationId}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.getProgramDisplayCode()}}
+                                            onBlur={handleBlur}
+                                            value={this.state.organisationId}
+                                            required >
+                                                <option value="">{i18n.t('static.common.select')}</option>
+                                                {realmOrganisation}
+                                            </Input>
+                                        <FormFeedback className="red">{errors.organisationId}</FormFeedback>
+                                    </FormGroup>                                    
                                     < FormGroup className="Selectcontrol-bdrNone">
                                         <Label for="regionId">{i18n.t('static.program.region')}<span class="red Reqasterisk">*</span></Label>
                                         <Select 
@@ -598,42 +646,37 @@ export default class ProgramTicketComponent extends Component {
                                             required />
                                         <FormFeedback className="red">{errors.regionId}</FormFeedback>
                                     </FormGroup>
-                                    < FormGroup >
-                                        <Label for="organisationId">{i18n.t('static.program.organisation')}<span class="red Reqasterisk">*</span></Label>
-                                        <Input type="select" name="organisationId" id="organisationId"
+                                    <FormGroup>
+                                        <Label for="programName">{i18n.t('static.program.programName')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="text" name="programName" id="programName"
                                             bsSize="sm"
-                                            valid={!errors.organisationId && this.state.program.organisationId != ''}
-                                            invalid={touched.organisationId && !!errors.organisationId}
+                                            valid={!errors.programName && this.state.program.programName != ''}
+                                            invalid={touched.programName && !!errors.programName}
                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                             onBlur={handleBlur}
-                                            value={this.state.organisationId}
-                                            required >
-                                                <option value="">{i18n.t('static.common.select')}</option>
-                                                {realmOrganisation}
-                                            </Input>
-                                        <FormFeedback className="red">{errors.organisationId}</FormFeedback>
+                                            value={this.state.program.programName}
+                                            required />
+                                        <FormFeedback className="red">{errors.programName}</FormFeedback>
                                     </FormGroup>
-                                    < FormGroup >
-                                        <Label for="healthAreaId">{i18n.t('static.program.healtharea')}<span class="red Reqasterisk">*</span></Label>
-                                        <Input type="select" name="healthAreaId" id="healthAreaId"
+                                    <FormGroup>
+                                        <Label htmlFor="company">{i18n.t('static.program.programDisplayName')}</Label>
+                                        <Input
+                                            type="text" name="programCode" 
+                                            // valid={!errors.programCode}
                                             bsSize="sm"
-                                            valid={!errors.healthAreaId && this.state.program.healthAreaId != ''}
-                                            invalid={touched.healthAreaId && !!errors.healthAreaId}
-                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                            // invalid={touched.programCode && !!errors.programCode || this.state.program.programCode == ''}
+                                            readOnly
                                             onBlur={handleBlur}
-                                            value={this.state.healthAreaId}
-                                            required >
-                                                <option value="">{i18n.t('static.common.select')}</option>
-                                                {realmHealthArea}
-                                            </Input>
-                                        <FormFeedback className="red">{errors.healthAreaId}</FormFeedback>
-                                    </FormGroup>
+                                            value={this.state.program.programCode}
+                                            id="programCode" />
+                                        <FormFeedback>{errors.programCode}</FormFeedback>
+                                    </FormGroup>                                    
                                     < FormGroup >
-                                        <Label for="userId">{i18n.t('static.program.programmanager')}<span class="red Reqasterisk">*</span></Label>
-                                        <Input type="select" name="userId" id="userId"
+                                        <Label for="programManager">{i18n.t('static.program.programmanager')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="select" name="programManager" id="programManager"
                                             bsSize="sm"
-                                            valid={!errors.userId && this.state.program.userId != ''}
-                                            invalid={touched.userId && !!errors.userId}
+                                            valid={!errors.programManager && this.state.program.programManager != ''}
+                                            invalid={touched.programManager && !!errors.programManager}
                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                             onBlur={handleBlur}
                                             value={this.state.programManagerId}
@@ -641,7 +684,7 @@ export default class ProgramTicketComponent extends Component {
                                                 <option value="">{i18n.t('static.common.select')}</option>
                                                 {programManagers}
                                             </Input>
-                                        <FormFeedback className="red">{errors.userId}</FormFeedback>
+                                        <FormFeedback className="red">{errors.programManager}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup>
                                         <Label htmlFor="company">{i18n.t('static.program.airfreightperc')} (%) <span class="red ">*</span></Label>
@@ -783,7 +826,7 @@ export default class ProgramTicketComponent extends Component {
                             <div style={{ display: this.state.loading ? "block" : "none" }}>
                                 <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                     <div class="align-items-center">
-                                        <div ><h4> <strong>Loading...</strong></h4></div>
+                                        <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
                                         <div class="spinner-border blue ml-4" role="status"></div>
                                     </div>
                                 </div> 

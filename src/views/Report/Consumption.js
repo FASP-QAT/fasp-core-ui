@@ -315,17 +315,18 @@ class Consumption extends Component {
     }
   }
   addDoubleQuoteToRowContent = (arr) => {
+    console.log(arr)
     return arr.map(ele => '"' + ele + '"')
   }
 
   exportCSV() {
 
     var csvRow = [];
-    csvRow.push((i18n.t('static.report.dateRange') + ' , ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20'))
-    csvRow.push(i18n.t('static.program.program') + ' , ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20'))
-    csvRow.push(i18n.t('static.report.version') + ' , ' + (document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20'))
-    csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
-    csvRow.push((i18n.t('static.common.display')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("viewById").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+    csvRow.push('"' +(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20')+'"')
+    csvRow.push('"' +(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20')+'"')
+    csvRow.push('"' +(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20')+'"')
+    csvRow.push('"' +(i18n.t('static.planningunit.planningunit') + ' : ' + (document.getElementById("planningUnitId").selectedOptions[0].text)).replaceAll(' ', '%20')+'"')
+    csvRow.push('"' +(i18n.t('static.common.display') + ' : ' + (document.getElementById("viewById").selectedOptions[0].text)).replaceAll(' ', '%20')+'"')
     csvRow.push('')
     csvRow.push('')
     var re;
@@ -349,7 +350,7 @@ class Consumption extends Component {
       for (let i = 0; i < consumptionArray.length; i++) {
         head.push((moment(consumptionArray[i].transDate, 'yyyy-MM-dd').format('MMM YYYY')).replaceAll(' ', '%20'));
         row1.push(consumptionArray[i].forecastedConsumption == null ? '' : consumptionArray[i].forecastedConsumption);
-        row2.push(consumptionArray[i].actualConsumption == null ? '' : consumptionArray[i].actualConsumption, consumptionArray[i].actualConsumption);
+        row2.push(consumptionArray[i].actualConsumption == null ? '' : consumptionArray[i].actualConsumption);
       }
     } else {
       let consumptionArray = this.state.offlineConsumptionList;
@@ -1495,7 +1496,7 @@ class Consumption extends Component {
         <div style={{ display: this.state.loading ? "block" : "none" }}>
           <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
             <div class="align-items-center">
-              <div ><h4> <strong>Loading...</strong></h4></div>
+              <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
               <div class="spinner-border blue ml-4" role="status">
 

@@ -290,7 +290,7 @@ export default class PlanningUnitTicketComponent extends Component {
                                         <FormFeedback className="red">{errors.summary}</FormFeedback>
                                     </FormGroup>
                                     < FormGroup >
-                                        <Label for="forecastingUnitDesc">{i18n.t('static.forecastingUnit.forecastingUnitName')}<span class="red Reqasterisk">*</span></Label>
+                                        <Label for="forecastingUnitDesc">{i18n.t('static.forecastingunit.forecastingunit')}<span class="red Reqasterisk">*</span></Label>
                                         <Input type="select" name="forecastingUnitDesc" id="forecastingUnitDesc"
                                         bsSize="sm"
                                         valid={!errors.forecastingUnitDesc && this.state.planningUnit.forecastingUnitDesc != ''}
@@ -371,7 +371,7 @@ export default class PlanningUnitTicketComponent extends Component {
                             <div style={{ display: this.state.loading ? "block" : "none" }}>
                                 <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                     <div class="align-items-center">
-                                        <div ><h4> <strong>Loading...</strong></h4></div>
+                                        <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
                                         <div class="spinner-border blue ml-4" role="status"></div>
                                     </div>
                                 </div> 

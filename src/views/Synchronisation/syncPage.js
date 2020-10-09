@@ -7,7 +7,7 @@ import {
   Nav, NavItem, NavLink, TabContent, TabPane, CardFooter, Modal, ModalBody, ModalFooter, ModalHeader
 } from 'reactstrap';
 import CryptoJS from 'crypto-js';
-import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, LOCAL_VERSION_COLOUR, LATEST_VERSION_COLOUR, PENDING_APPROVAL_VERSION_STATUS, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, CANCELLED_SHIPMENT_STATUS } from '../../Constants.js';
+import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, LOCAL_VERSION_COLOUR, LATEST_VERSION_COLOUR, PENDING_APPROVAL_VERSION_STATUS, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, CANCELLED_SHIPMENT_STATUS, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import getLabelText from '../../CommonComponent/getLabelText';
 import i18n from '../../i18n';
@@ -151,7 +151,7 @@ export default class syncPage extends Component {
         { type: 'hidden', title: 'result of compare' },
       ],
       text: {
-        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
+        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
         show: '',
         entries: '',
       },
@@ -314,7 +314,7 @@ export default class syncPage extends Component {
         { type: 'hidden', title: 'result of compare' },
       ],
       text: {
-        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
+        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
         show: '',
         entries: '',
       },
@@ -489,7 +489,7 @@ export default class syncPage extends Component {
         { type: 'hidden', title: 'result of compare' },
       ],
       text: {
-        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
+        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
         show: '',
         entries: '',
       },
@@ -1115,8 +1115,8 @@ export default class syncPage extends Component {
                                       { type: 'hidden', title: 'downloaded data' },
                                       { type: 'hidden', title: 'result of compare' },
                                     ],
-                                    pagination: 10,
-                                    paginationOptions: [10, 25, 50],
+                                    pagination: JEXCEL_DEFAULT_PAGINATION,
+                                    paginationOptions: JEXCEL_PAGINATION_OPTION,
                                     search: true,
                                     columnSorting: true,
                                     tableOverflow: true,
@@ -1127,7 +1127,7 @@ export default class syncPage extends Component {
                                     editable: false,
                                     onload: this.loadedFunctionForMerge,
                                     text: {
-                                      showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
+                                      showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
                                       show: '',
                                       entries: '',
                                     },
@@ -1276,8 +1276,8 @@ export default class syncPage extends Component {
                                       { type: 'hidden', title: 'downloaded data' },
                                       { type: 'hidden', title: 'result of compare' },
                                     ],
-                                    pagination: 10,
-                                    paginationOptions: [10, 25, 50],
+                                    pagination: JEXCEL_DEFAULT_PAGINATION,
+                                    paginationOptions: JEXCEL_PAGINATION_OPTION,
                                     search: true,
                                     columnSorting: true,
                                     tableOverflow: true,
@@ -1288,7 +1288,7 @@ export default class syncPage extends Component {
                                     editable: false,
                                     onload: this.loadedFunctionForMergeInventory,
                                     text: {
-                                      showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
+                                      showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
                                       show: '',
                                       entries: '',
                                     },
@@ -1438,8 +1438,8 @@ export default class syncPage extends Component {
                                       { type: 'hidden', title: 'downloaded data' },
                                       { type: 'hidden', title: 'result of compare' },
                                     ],
-                                    pagination: 10,
-                                    paginationOptions: [10, 25, 50],
+                                    pagination: JEXCEL_DEFAULT_PAGINATION,
+                                    paginationOptions: JEXCEL_PAGINATION_OPTION,
                                     search: true,
                                     columnSorting: true,
                                     tableOverflow: true,
@@ -1450,7 +1450,7 @@ export default class syncPage extends Component {
                                     editable: false,
                                     onload: this.loadedFunctionForMergeShipment,
                                     text: {
-                                      showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
+                                      showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
                                       show: '',
                                       entries: '',
                                     },
@@ -1656,8 +1656,8 @@ export default class syncPage extends Component {
                                       { type: 'hidden', title: 'downloaded data' },
                                       { type: 'hidden', title: 'result of compare' },
                                     ],
-                                    pagination: 10,
-                                    paginationOptions: [10, 25, 50],
+                                    pagination: JEXCEL_DEFAULT_PAGINATION,
+                                    paginationOptions: JEXCEL_PAGINATION_OPTION,
                                     search: true,
                                     columnSorting: true,
                                     tableOverflow: true,
@@ -1668,7 +1668,7 @@ export default class syncPage extends Component {
                                     editable: false,
                                     onload: this.loadedFunctionForMergeProblemList,
                                     text: {
-                                      showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
+                                      showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
                                       show: '',
                                       entries: '',
                                     },
@@ -2352,7 +2352,7 @@ export default class syncPage extends Component {
         <div style={{ display: this.state.loading ? "block" : "none" }}>
           <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
             <div class="align-items-center">
-              <div ><h4> <strong>Loading...</strong></h4></div>
+              <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
               <div class="spinner-border blue ml-4" role="status">
 
