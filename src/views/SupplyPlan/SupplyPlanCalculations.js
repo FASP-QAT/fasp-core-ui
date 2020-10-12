@@ -62,10 +62,13 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                     programPlanningUnitList = programPlanningUnitList.filter(c => c.planningUnit.id == planningUnitId);
                 }
                 // Filtering planning unit for planning unit list in case of master data sync and sync page
-                if (planningUnitList != undefined && planningUnitList != []) {
-                    for (var pp = 0; pp < planningUnitList.length; pp++) {
-                        programPlanningUnitList = programPlanningUnitList.filter(c => c.planningUnit.id == planningUnitList[pp]);
+                if (planningUnitList != undefined && planningUnitList != []) {                    
+                    var ppList = [];
+                    for (var pp = 0; pp < planningUnitList.length; pp++) {                        
+                        var p = programPlanningUnitList.filter(c => c.planningUnit.id == planningUnitList[pp]);
+                        ppList.push(p[0]);
                     }
+                    programPlanningUnitList = ppList;
                 }
                 if ((page == 'masterDataSync' || page == 'syncPage') && planningUnitList.length == 0) {
                     console.log("in if");
@@ -881,6 +884,9 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                         //             }
                         //         }
                         //     );
+                    } else if (page == 'quantimedImport') {
+                        props.updateState("loading",false);
+                        props.redirectToDashbaord();
                     }
                 }
             }
