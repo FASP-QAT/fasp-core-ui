@@ -251,23 +251,23 @@ export default class QunatimedImportStepTwo extends Component {
             }
 
 
-            AuthenticationService.setupAxiosInterceptors();
-            QuantimedImportService.addImportedForecastData(this.props.items.importData).then(response => {
+            // AuthenticationService.setupAxiosInterceptors();
+            // QuantimedImportService.addImportedForecastData(this.props.items.importData).then(response => {
 
-                if (response.status == 200) {
+            //     if (response.status == 200) {
                     this.props.finishedStepTwo();
-                }
-                else {
+            //     }
+            //     else {
 
-                    this.setState({
-                        message: response.data.messageCode
-                    },
-                        () => {
+            //         this.setState({
+            //             message: response.data.messageCode
+            //         },
+            //             () => {
 
-                        })
-                }
+            //             })
+            //     }
 
-            })
+            // })
         }
     }
 
