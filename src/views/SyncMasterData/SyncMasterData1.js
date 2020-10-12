@@ -37,9 +37,9 @@ export default class SyncMasterData extends Component {
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
     hideSecondComponent() {
-        // setTimeout(function () {
-        //     document.getElementById('div2').style.display = 'none';
-        // }, 8000);
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
     }
 
     componentDidMount() {
@@ -344,100 +344,455 @@ export default class SyncMasterData extends Component {
                     pGetRequest.onsuccess = function (event) {
                         var myResult = [];
                         myResult = pGetRequest.result;
-                        var validation = this.syncProgramData(lastSyncDate, myResult);
-                        console.log("Validation", validation);
-                        if (validation) {
-                            // AuthenticationService.setupAxiosInterceptors();
-                            if (navigator.onLine && window.getComputedStyle(document.getElementById("retryButtonDiv")).display == "none") {
-                                //Code to Sync Language list
-                                MasterSyncService.getLanguageListForSync(lastSyncDate)
-                                    .then(response => {
-                                        if (response.status == 200) {
-                                            console.log("Response", response.data)
-                                            var json = response.data;
-                                            var languageTransaction = db1.transaction(['language'], 'readwrite');
-                                            var languageObjectStore = languageTransaction.objectStore('language');
+                        // var validation = this.syncProgramData(lastSyncDate, myResult);
+                        // console.log("Validation", validation);
+                        // if (validation) {
+                        // AuthenticationService.setupAxiosInterceptors();
+                        if (navigator.onLine && window.getComputedStyle(document.getElementById("retryButtonDiv")).display == "none") {
+                            //Code to Sync Language list
+                            MasterSyncService.getSyncAllMasters(lastSyncDateRealm)
+                                .then(response => {
+                                    if (response.status == 200) {
+                                        console.log("Response", response.data)
+                                        var response = response.data;
+
+                                        // country
+                                        var countryTransaction = db1.transaction(['country'], 'readwrite');
+                                        var countryObjectStore = countryTransaction.objectStore('country');
+                                        var json = (response.countryList);
+                                        for (var i = 0; i < json.length; i++) {
+                                            countryObjectStore.put(json[i]);
+                                        }
+                                        console.log("after country set statue 1", this.state.syncedMasters);
+                                        this.setState({
+                                            syncedMasters: this.state.syncedMasters + 1,
+                                            syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
+                                        }, () => {
+                                            // currency
+                                            var currencyTransaction = db1.transaction(['currency'], 'readwrite');
+                                            var currencyObjectStore = currencyTransaction.objectStore('currency');
+                                            json = (response.currencyList)
                                             for (var i = 0; i < json.length; i++) {
-                                                languageObjectStore.put(json[i]);
+                                                currencyObjectStore.put(json[i]);
                                             }
+                                            console.log("after country set statue 2", this.state.syncedMasters);
                                             this.setState({
                                                 syncedMasters: this.state.syncedMasters + 1,
                                                 syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
-                                            })
-                                            if (this.state.syncedMasters === this.state.totalMasters) {
-                                                var transaction = db1.transaction(['lastSyncDate'], 'readwrite');
-                                                var lastSyncDateTransaction = transaction.objectStore('lastSyncDate');
-                                                var updatedLastSyncDateJson = {
-                                                    lastSyncDate: updatedSyncDate,
-                                                    id: 0
+                                            }, () => {
+                                                // dimension
+                                                var dimensionTransaction = db1.transaction(['dimension'], 'readwrite');
+                                                var dimensionObjectStore = dimensionTransaction.objectStore('dimension');
+                                                json = (response.dimensionList)
+                                                for (var i = 0; i < json.length; i++) {
+                                                    dimensionObjectStore.put(json[i]);
                                                 }
-                                                var updateLastSyncDate = lastSyncDateTransaction.put(updatedLastSyncDateJson)
-                                                var updatedLastSyncDateJson1 = {
-                                                    lastSyncDate: updatedSyncDate,
-                                                    id: realmId
-                                                }
-                                                var updateLastSyncDate = lastSyncDateTransaction.put(updatedLastSyncDateJson1)
-                                                updateLastSyncDate.onsuccess = function (event) {
-                                                    document.getElementById("retryButtonDiv").style.display = "none";
-                                                    let id = AuthenticationService.displayDashboardBasedOnRole();
-                                                    console.log("End date", Date.now());
-                                                    this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.masterDataSync.success'))
-                                                }.bind(this)
-                                            } else {
-                                                document.getElementById("retryButtonDiv").style.display = "block";
                                                 this.setState({
-                                                    message: '',
-                                                    message: `static.masterDataSync.syncFailed`
-                                                },
+                                                    syncedMasters: this.state.syncedMasters + 1,
+                                                    syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
+                                                }, () => {
+                                                    // language
+                                                    var languageTransaction = db1.transaction(['language'], 'readwrite');
+                                                    var languageObjectStore = languageTransaction.objectStore('language');
+                                                    json = (response.languageList);
+                                                    for (var i = 0; i < json.length; i++) {
+                                                        languageObjectStore.put(json[i]);
+                                                    }
+                                                    this.setState({
+                                                        syncedMasters: this.state.syncedMasters + 1,
+                                                        syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
+                                                    }, () => {
+                                                        // shipmentStatus
+                                                        var shipmentStatusTransaction = db1.transaction(['shipmentStatus'], 'readwrite');
+                                                        var shipmentStatusObjectStore = shipmentStatusTransaction.objectStore('shipmentStatus');
+                                                        json = (response.shipmentStatusList);
+                                                        for (var i = 0; i < json.length; i++) {
+                                                            shipmentStatusObjectStore.put(json[i]);
+                                                        }
+                                                        this.setState({
+                                                            syncedMasters: this.state.syncedMasters + 1,
+                                                            syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
+                                                        }, () => {
+                                                            // unit
+                                                            var unitTransaction = db1.transaction(['unit'], 'readwrite');
+                                                            var unitObjectStore = unitTransaction.objectStore('unit');
+                                                            json = (response.unitList)
+                                                            for (var i = 0; i < json.length; i++) {
+                                                                unitObjectStore.put(json[i]);
+                                                            }
+                                                            this.setState({
+                                                                syncedMasters: this.state.syncedMasters + 1,
+                                                                syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
+                                                            }, () => {
+                                                                // dataSourceType
+                                                                var dataSourceTypeTransaction = db1.transaction(['dataSourceType'], 'readwrite');
+                                                                var dataSourceTypeObjectStore = dataSourceTypeTransaction.objectStore('dataSourceType');
+                                                                json = (response.dataSourceTypeList)
+                                                                for (var i = 0; i < json.length; i++) {
+                                                                    dataSourceTypeObjectStore.put(json[i]);
+                                                                }
+                                                                this.setState({
+                                                                    syncedMasters: this.state.syncedMasters + 1,
+                                                                    syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
+                                                                }, () => {
+                                                                    // dataSource
+                                                                    var dataSourceTransaction = db1.transaction(['dataSource'], 'readwrite');
+                                                                    var dataSourceObjectStore = dataSourceTransaction.objectStore('dataSource');
+                                                                    json = (response.dataSourceList);
+                                                                    for (var i = 0; i < json.length; i++) {
+                                                                        dataSourceObjectStore.put(json[i]);
+                                                                    }
+                                                                    this.setState({
+                                                                        syncedMasters: this.state.syncedMasters + 1,
+                                                                        syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
+                                                                    }, () => {
+                                                                        // tracerCategory
+                                                                        var tracerCategoryTransaction = db1.transaction(['tracerCategory'], 'readwrite');
+                                                                        var tracerCategoryObjectStore = tracerCategoryTransaction.objectStore('tracerCategory');
+                                                                        json = (response.tracerCategoryList);
+                                                                        for (var i = 0; i < json.length; i++) {
+                                                                            tracerCategoryObjectStore.put(json[i]);
+                                                                        }
+                                                                        this.setState({
+                                                                            syncedMasters: this.state.syncedMasters + 1,
+                                                                            syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
+                                                                        }, () => {
+                                                                            // productCategory
+                                                                            var productCategoryTransaction = db1.transaction(['productCategory'], 'readwrite');
+                                                                            var productCategoryObjectStore = productCategoryTransaction.objectStore('productCategory');
+                                                                            json = (response.productCategoryList)
+                                                                            for (var i = 0; i < json.length; i++) {
+                                                                                productCategoryObjectStore.put(json[i]);
+                                                                            }
+                                                                            this.setState({
+                                                                                syncedMasters: this.state.syncedMasters + 1,
+                                                                                syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
+                                                                            }, () => {
+                                                                                // realm
+                                                                                var realmTransaction = db1.transaction(['realm'], 'readwrite');
+                                                                                var realmObjectStore = realmTransaction.objectStore('realm');
+                                                                                json = (response.realmList);
+                                                                                for (var i = 0; i < json.length; i++) {
+                                                                                    realmObjectStore.put(json[i]);
+                                                                                }
+                                                                                this.setState({
+                                                                                    syncedMasters: this.state.syncedMasters + 1,
+                                                                                    syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
+                                                                                }, () => {
+                                                                                    // healthArea
+                                                                                    var healthAreaTransaction = db1.transaction(['healthArea'], 'readwrite');
+                                                                                    var healthAreaObjectStore = healthAreaTransaction.objectStore('healthArea');
+                                                                                    json = (response.healthAreaList)
+                                                                                    for (var i = 0; i < json.length; i++) {
+                                                                                        healthAreaObjectStore.put(json[i]);
+                                                                                    }
+                                                                                    this.setState({
+                                                                                        syncedMasters: this.state.syncedMasters + 1,
+                                                                                        syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
+                                                                                    }, () => {
+                                                                                        // organisation
+                                                                                        var organisationTransaction = db1.transaction(['organisation'], 'readwrite');
+                                                                                        var organisationObjectStore = organisationTransaction.objectStore('organisation');
+                                                                                        json = (response.organisationList);
+                                                                                        for (var i = 0; i < json.length; i++) {
+                                                                                            organisationObjectStore.put(json[i]);
+                                                                                        }
+                                                                                        this.setState({
+                                                                                            syncedMasters: this.state.syncedMasters + 1,
+                                                                                            syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
+                                                                                        }, () => {
+                                                                                            // fundingSource
+                                                                                            var fundingSourceTransaction = db1.transaction(['fundingSource'], 'readwrite');
+                                                                                            var fundingSourceObjectStore = fundingSourceTransaction.objectStore('fundingSource');
+                                                                                            json = (response.fundingSourceList)
+                                                                                            for (var i = 0; i < json.length; i++) {
+                                                                                                fundingSourceObjectStore.put(json[i]);
+                                                                                            }
+                                                                                            this.setState({
+                                                                                                syncedMasters: this.state.syncedMasters + 1,
+                                                                                                syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
+                                                                                            }, () => {
+                                                                                                // procurementAgent
+                                                                                                var procurementAgentTransaction = db1.transaction(['procurementAgent'], 'readwrite');
+                                                                                                var procurementAgentObjectStore = procurementAgentTransaction.objectStore('procurementAgent');
+                                                                                                json = (response.procurementAgentList)
+                                                                                                for (var i = 0; i < json.length; i++) {
+                                                                                                    procurementAgentObjectStore.put(json[i]);
+                                                                                                }
+                                                                                                this.setState({
+                                                                                                    syncedMasters: this.state.syncedMasters + 1,
+                                                                                                    syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
+                                                                                                }, () => {
+                                                                                                    // supplier
+                                                                                                    var supplierTransaction = db1.transaction(['supplier'], 'readwrite');
+                                                                                                    var supplierObjectStore = supplierTransaction.objectStore('supplier');
+                                                                                                    json = (response.supplierList);
+                                                                                                    for (var i = 0; i < json.length; i++) {
+                                                                                                        supplierObjectStore.put(json[i]);
+                                                                                                    }
+                                                                                                    this.setState({
+                                                                                                        syncedMasters: this.state.syncedMasters + 1,
+                                                                                                        syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
+                                                                                                    }, () => {
+                                                                                                        // forecastingUnit
+                                                                                                        var forecastingUnitTransaction = db1.transaction(['forecastingUnit'], 'readwrite');
+                                                                                                        var forecastingUnitObjectStore = forecastingUnitTransaction.objectStore('forecastingUnit');
+                                                                                                        json = (response.forecastingUnitList);
+                                                                                                        for (var i = 0; i < json.length; i++) {
+                                                                                                            forecastingUnitObjectStore.put(json[i]);
+                                                                                                        }
+                                                                                                        this.setState({
+                                                                                                            syncedMasters: this.state.syncedMasters + 1,
+                                                                                                            syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
+                                                                                                        }, () => {
+                                                                                                            // planningUnit
+                                                                                                            var planningUnitTransaction = db1.transaction(['planningUnit'], 'readwrite');
+                                                                                                            var planningUnitObjectStore = planningUnitTransaction.objectStore('planningUnit');
+                                                                                                            json = (response.planningUnitList);
+                                                                                                            for (var i = 0; i < json.length; i++) {
+                                                                                                                planningUnitObjectStore.put(json[i]);
+                                                                                                            }
+                                                                                                            this.setState({
+                                                                                                                syncedMasters: this.state.syncedMasters + 1,
+                                                                                                                syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
+                                                                                                            }, () => {
+                                                                                                                // procurementUnit
+                                                                                                                var procurementUnitTransaction = db1.transaction(['procurementUnit'], 'readwrite');
+                                                                                                                var procurementUnitObjectStore = procurementUnitTransaction.objectStore('procurementUnit');
+                                                                                                                json = (response.procurementUnitList);
+                                                                                                                for (var i = 0; i < json.length; i++) {
+                                                                                                                    procurementUnitObjectStore.put(json[i]);
+                                                                                                                }
+                                                                                                                this.setState({
+                                                                                                                    syncedMasters: this.state.syncedMasters + 1,
+                                                                                                                    syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
+                                                                                                                }, () => {
+                                                                                                                    // realmCountry
+                                                                                                                    var realmCountryTransaction = db1.transaction(['realmCountry'], 'readwrite');
+                                                                                                                    var realmCountryObjectStore = realmCountryTransaction.objectStore('realmCountry');
+                                                                                                                    json = (response.realmCountryList);
+                                                                                                                    for (var i = 0; i < json.length; i++) {
+                                                                                                                        realmCountryObjectStore.put(json[i]);
+                                                                                                                    }
+                                                                                                                    this.setState({
+                                                                                                                        syncedMasters: this.state.syncedMasters + 1,
+                                                                                                                        syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
+                                                                                                                    }, () => {
+                                                                                                                        // realmCountryPlanningUnit
+                                                                                                                        var realmCountryPlanningUnitTransaction = db1.transaction(['realmCountryPlanningUnit'], 'readwrite');
+                                                                                                                        var realmCountryPlanningUnitObjectStore = realmCountryPlanningUnitTransaction.objectStore('realmCountryPlanningUnit');
+                                                                                                                        json = (response.realmCountryPlanningUnitList);
+                                                                                                                        for (var i = 0; i < json.length; i++) {
+                                                                                                                            realmCountryPlanningUnitObjectStore.put(json[i]);
+                                                                                                                        }
+                                                                                                                        this.setState({
+                                                                                                                            syncedMasters: this.state.syncedMasters + 1,
+                                                                                                                            syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
+                                                                                                                        }, () => {
+                                                                                                                            // procurementAgentPlanningUnit
+                                                                                                                            var procurementAgentPlanningUnitTransaction = db1.transaction(['procurementAgentPlanningUnit'], 'readwrite');
+                                                                                                                            var procurementAgentPlanningUnitObjectStore = procurementAgentPlanningUnitTransaction.objectStore('procurementAgentPlanningUnit');
+                                                                                                                            json = (response.procurementAgentPlanningUnitList)
+                                                                                                                            for (var i = 0; i < json.length; i++) {
+                                                                                                                                procurementAgentPlanningUnitObjectStore.put(json[i]);
+                                                                                                                            }
+                                                                                                                            this.setState({
+                                                                                                                                syncedMasters: this.state.syncedMasters + 1,
+                                                                                                                                syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
+                                                                                                                            }, () => {
+                                                                                                                                // procurementAgentProcurementUnit
+                                                                                                                                var procurementAgentProcurementUnitTransaction = db1.transaction(['procurementAgentProcurementUnit'], 'readwrite');
+                                                                                                                                var procurementAgentProcurementUnitObjectStore = procurementAgentProcurementUnitTransaction.objectStore('procurementAgentProcurementUnit');
+                                                                                                                                json = (response.procurementAgentProcurementUnitList);
+                                                                                                                                for (var i = 0; i < json.length; i++) {
+                                                                                                                                    procurementAgentProcurementUnitObjectStore.put(json[i]);
+                                                                                                                                }
+                                                                                                                                this.setState({
+                                                                                                                                    syncedMasters: this.state.syncedMasters + 1,
+                                                                                                                                    syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
+                                                                                                                                }, () => {
+                                                                                                                                    // program
+                                                                                                                                    var programTransaction = db1.transaction(['program'], 'readwrite');
+                                                                                                                                    var programObjectStore = programTransaction.objectStore('program');
+                                                                                                                                    json = (response.programList);
+                                                                                                                                    for (var i = 0; i < json.length; i++) {
+                                                                                                                                        programObjectStore.put(json[i]);
+                                                                                                                                    }
+                                                                                                                                    this.setState({
+                                                                                                                                        syncedMasters: this.state.syncedMasters + 1,
+                                                                                                                                        syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
+                                                                                                                                    }, () => {
+                                                                                                                                        // programPlanningUnit
+                                                                                                                                        var programPlanningUnitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+                                                                                                                                        var programPlanningUnitObjectStore = programPlanningUnitTransaction.objectStore('programPlanningUnit');
+                                                                                                                                        json = (response.programPlanningUnitList);
+                                                                                                                                        for (var i = 0; i < json.length; i++) {
+                                                                                                                                            programPlanningUnitObjectStore.put(json[i]);
+                                                                                                                                        }
+                                                                                                                                        this.setState({
+                                                                                                                                            syncedMasters: this.state.syncedMasters + 1,
+                                                                                                                                            syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
+                                                                                                                                        }, () => {
+                                                                                                                                            // region
+                                                                                                                                            var regionTransaction = db1.transaction(['region'], 'readwrite');
+                                                                                                                                            var regionObjectStore = regionTransaction.objectStore('region');
+                                                                                                                                            json = (response.regionList)
+                                                                                                                                            for (var i = 0; i < json.length; i++) {
+                                                                                                                                                regionObjectStore.put(json[i]);
+                                                                                                                                            }
+                                                                                                                                            this.setState({
+                                                                                                                                                syncedMasters: this.state.syncedMasters + 1,
+                                                                                                                                                syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
+                                                                                                                                            }, () => {
+
+                                                                                                                                                // budget
+                                                                                                                                                var budgetTransaction = db1.transaction(['budget'], 'readwrite');
+                                                                                                                                                var budgetObjectStore = budgetTransaction.objectStore('budget');
+                                                                                                                                                json = (response.budgetList);
+                                                                                                                                                for (var i = 0; i < json.length; i++) {
+                                                                                                                                                    budgetObjectStore.put(json[i]);
+                                                                                                                                                }
+                                                                                                                                                this.setState({
+                                                                                                                                                    syncedMasters: this.state.syncedMasters + 1,
+                                                                                                                                                    syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
+                                                                                                                                                }, () => {
+                                                                                                                                                    // problemStatus
+                                                                                                                                                    var problemStatusTransaction = db1.transaction(['problemStatus'], 'readwrite');
+                                                                                                                                                    var problemStatusObjectStore = problemStatusTransaction.objectStore('problemStatus');
+                                                                                                                                                    json = (response.problemStatusList);
+                                                                                                                                                    for (var i = 0; i < json.length; i++) {
+                                                                                                                                                        problemStatusObjectStore.put(json[i]);
+                                                                                                                                                    }
+                                                                                                                                                    this.setState({
+                                                                                                                                                        syncedMasters: this.state.syncedMasters + 1,
+                                                                                                                                                        syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
+                                                                                                                                                    }, () => {
+                                                                                                                                                        // problemCriticality
+                                                                                                                                                        var problemCriticalityTransaction = db1.transaction(['problemCriticality'], 'readwrite');
+                                                                                                                                                        var problemCriticalityObjectStore = problemCriticalityTransaction.objectStore('problemCriticality');
+                                                                                                                                                        json = (response.problemCriticalityList);
+                                                                                                                                                        for (var i = 0; i < json.length; i++) {
+                                                                                                                                                            problemCriticalityObjectStore.put(json[i]);
+                                                                                                                                                        }
+                                                                                                                                                        this.setState({
+                                                                                                                                                            syncedMasters: this.state.syncedMasters + 1,
+                                                                                                                                                            syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
+                                                                                                                                                        }, () => {
+                                                                                                                                                            // problem
+                                                                                                                                                            var problemTransaction = db1.transaction(['problem'], 'readwrite');
+                                                                                                                                                            var problemObjectStore = problemTransaction.objectStore('problem');
+                                                                                                                                                            json = (response.realmProblemList)
+                                                                                                                                                            for (var i = 0; i < json.length; i++) {
+                                                                                                                                                                problemObjectStore.put(json[i]);
+                                                                                                                                                            }
+                                                                                                                                                            this.setState({
+                                                                                                                                                                syncedMasters: this.state.syncedMasters + 1,
+                                                                                                                                                                syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
+                                                                                                                                                            }, () => {
+                                                                                                                                                                if (this.state.syncedMasters === this.state.totalMasters) {
+                                                                                                                                                                    var transaction = db1.transaction(['lastSyncDate'], 'readwrite');
+                                                                                                                                                                    var lastSyncDateTransaction = transaction.objectStore('lastSyncDate');
+                                                                                                                                                                    var updatedLastSyncDateJson = {
+                                                                                                                                                                        lastSyncDate: updatedSyncDate,
+                                                                                                                                                                        id: 0
+                                                                                                                                                                    }
+                                                                                                                                                                    var updateLastSyncDate = lastSyncDateTransaction.put(updatedLastSyncDateJson)
+                                                                                                                                                                    var updatedLastSyncDateJson1 = {
+                                                                                                                                                                        lastSyncDate: updatedSyncDate,
+                                                                                                                                                                        id: realmId
+                                                                                                                                                                    }
+                                                                                                                                                                    var updateLastSyncDate = lastSyncDateTransaction.put(updatedLastSyncDateJson1)
+                                                                                                                                                                    updateLastSyncDate.onsuccess = function (event) {
+                                                                                                                                                                        document.getElementById("retryButtonDiv").style.display = "none";
+                                                                                                                                                                        let id = AuthenticationService.displayDashboardBasedOnRole();
+                                                                                                                                                                        console.log("End date", Date.now());
+                                                                                                                                                                        this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.masterDataSync.success'))
+                                                                                                                                                                    }.bind(this)
+                                                                                                                                                                } else {
+                                                                                                                                                                    document.getElementById("retryButtonDiv").style.display = "block";
+                                                                                                                                                                    this.setState({
+                                                                                                                                                                        message: '',
+                                                                                                                                                                        message: `static.masterDataSync.syncFailed`
+                                                                                                                                                                    },
+                                                                                                                                                                        () => {
+                                                                                                                                                                            this.hideSecondComponent();
+                                                                                                                                                                        })
+                                                                                                                                                                }
+                                                                                                                                                            })
+                                                                                                                                                        })
+                                                                                                                                                    })
+                                                                                                                                                })
+                                                                                                                                            })
+                                                                                                                                        })
+                                                                                                                                    })
+                                                                                                                                })
+                                                                                                                            })
+                                                                                                                        })
+                                                                                                                    })
+                                                                                                                })
+                                                                                                            })
+                                                                                                        })
+                                                                                                    })
+                                                                                                })
+                                                                                            })
+                                                                                        })
+                                                                                    })
+                                                                                })
+                                                                            })
+                                                                        })
+                                                                    })
+                                                                })
+                                                            })
+                                                        })
+                                                    })
+                                                })
+                                            })
+                                        })
+                                    } else {
+                                        this.setState({
+                                            message: response.data.messageCode
+                                        },
+                                            () => {
+                                                this.hideSecondComponent();
+                                            })
+                                    }
+                                }).catch(error => {
+                                    if (error.message === "Network Error") {
+                                        this.setState({ message: error.message },
+                                            () => {
+                                                this.hideSecondComponent();
+                                            });
+                                    } else {
+                                        switch (error.response ? error.response.status : "") {
+                                            case 500:
+                                            case 401:
+                                            case 404:
+                                            case 406:
+                                            case 412:
+                                                this.setState({ message: error.response.data.messageCode },
                                                     () => {
                                                         this.hideSecondComponent();
-                                                    })
-                                            }
-                                        } else {
-                                            this.setState({
-                                                message: response.data.messageCode
-                                            },
-                                                () => {
-                                                    this.hideSecondComponent();
-                                                })
+                                                    });
+                                                break;
+                                            default:
+                                                this.setState({ message: 'static.unkownError' },
+                                                    () => {
+                                                        this.hideSecondComponent();
+                                                    });
+                                                break;
                                         }
-                                    }).catch(error => {
-                                        if (error.message === "Network Error") {
-                                            this.setState({ message: error.message },
-                                                () => {
-                                                    this.hideSecondComponent();
-                                                });
-                                        } else {
-                                            switch (error.response ? error.response.status : "") {
-                                                case 500:
-                                                case 401:
-                                                case 404:
-                                                case 406:
-                                                case 412:
-                                                    this.setState({ message: error.response.data.messageCode },
-                                                        () => {
-                                                            this.hideSecondComponent();
-                                                        });
-                                                    break;
-                                                default:
-                                                    this.setState({ message: 'static.unkownError' },
-                                                        () => {
-                                                            this.hideSecondComponent();
-                                                        });
-                                                    break;
-                                            }
-                                        }
-                                        document.getElementById("retryButtonDiv").style.display = "block";
-                                    });
-                            } else {
-                                this.setState({
-                                    message: 'static.common.onlinealerttext'
-                                },
-                                    () => {
-                                        this.hideSecondComponent();
-                                    })
-                            }
+                                    }
+                                    document.getElementById("retryButtonDiv").style.display = "block";
+                                });
+                        } else {
+                            this.setState({
+                                message: 'static.common.onlinealerttext'
+                            },
+                                () => {
+                                    this.hideSecondComponent();
+                                })
                         }
+                        // }
 
                     }.bind(this)
                 }.bind(this)
@@ -446,46 +801,46 @@ export default class SyncMasterData extends Component {
     }
 
 
-        retryClicked() {
-            this.setState({
-                totalMasters: TOTAL_NO_OF_MASTERS_IN_SYNC,
-                syncedMasters: 0,
-                syncedPercentage: 0,
-                errorMessage: "",
-                successMessage: ""
-            })
-            document.getElementById("retryButtonDiv").style.display = "none";
-            this.syncMasters();
-            // confirmAlert({
-            //     // title: i18n.t('static.masterDataSync.masterDataSync'),
-            //     message: i18n.t('static.masterDataSync.confirmRetrySyncMessage'),
-            //     buttons: [
-            //         {
-            //             label: i18n.t('static.program.yes'),
-            //             onClick: () => {
-            //                 this.setState({
-            //                     totalMasters: 27,
-            //                     syncedMasters: 0,
-            //                     syncedPercentage: 0,
-            //                     errorMessage: "",
-            //                     successMessage: ""
-            //                 })
-            //                 this.syncMasters();
-            //             }
-            //         },
-            //         {
-            //             label: i18n.t('static.program.no'),
-            //             onClick: () => {
-            //                 // document.getElementById("retryButtonDiv").style.display = "block";
-            //                 this.setState({
-            //                     message: i18n.t('static.actionCancelled')
-            //                 })
-            //             }
-            //         }
-            //     ]
-            // });
+    retryClicked() {
+        this.setState({
+            totalMasters: TOTAL_NO_OF_MASTERS_IN_SYNC,
+            syncedMasters: 0,
+            syncedPercentage: 0,
+            errorMessage: "",
+            successMessage: ""
+        })
+        document.getElementById("retryButtonDiv").style.display = "none";
+        this.syncMasters();
+        // confirmAlert({
+        //     // title: i18n.t('static.masterDataSync.masterDataSync'),
+        //     message: i18n.t('static.masterDataSync.confirmRetrySyncMessage'),
+        //     buttons: [
+        //         {
+        //             label: i18n.t('static.program.yes'),
+        //             onClick: () => {
+        //                 this.setState({
+        //                     totalMasters: 27,
+        //                     syncedMasters: 0,
+        //                     syncedPercentage: 0,
+        //                     errorMessage: "",
+        //                     successMessage: ""
+        //                 })
+        //                 this.syncMasters();
+        //             }
+        //         },
+        //         {
+        //             label: i18n.t('static.program.no'),
+        //             onClick: () => {
+        //                 // document.getElementById("retryButtonDiv").style.display = "block";
+        //                 this.setState({
+        //                     message: i18n.t('static.actionCancelled')
+        //                 })
+        //             }
+        //         }
+        //     ]
+        // });
 
 
 
-        }
     }
+}

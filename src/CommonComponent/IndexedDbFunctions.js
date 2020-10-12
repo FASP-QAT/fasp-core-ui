@@ -136,6 +136,9 @@ export function getDatabase() {
         if (!db1.objectStoreNames.contains('problemStatus')) {
             storeOS = db1.createObjectStore('problemStatus', { keyPath: 'id', autoIncrement: true });
         }
+        if (!db1.objectStoreNames.contains('problemCriticality')) {
+            storeOS = db1.createObjectStore('problemCriticality', { keyPath: 'id', autoIncrement: true });
+        }
         console.log("indexed db completed----------------------")
     };
 }

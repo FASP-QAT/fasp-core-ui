@@ -59,12 +59,16 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                 programPlanningUnitList = (programPlanningUnitList).filter(c => c.program.id == programJsonForStoringTheResult.programId && c.active == true);
                 // Filter planning unit list for single planning unit
                 if (planningUnitId != 0) {
+                    console.log("Planning unit id ", planningUnitId);
                     programPlanningUnitList = programPlanningUnitList.filter(c => c.planningUnit.id == planningUnitId);
+                    console.log("programPlanningUnitList for planning unit id not 0", programPlanningUnitList);
                 }
                 // Filtering planning unit for planning unit list in case of master data sync and sync page
-                if (planningUnitList != undefined && planningUnitList != []) {                    
+                console.log("planningUnitList", planningUnitList);
+                if (planningUnitList != undefined && planningUnitList != [] && planningUnitList.length != 0) {
+                    console.log("In planning unit list if", planningUnitList);
                     var ppList = [];
-                    for (var pp = 0; pp < planningUnitList.length; pp++) {                        
+                    for (var pp = 0; pp < planningUnitList.length; pp++) {
                         var p = programPlanningUnitList.filter(c => c.planningUnit.id == planningUnitList[pp]);
                         ppList.push(p[0]);
                     }
@@ -107,6 +111,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                         createdDate = moment(firstDataEntryDate).add(i, 'months').format("YYYY-MM-DD");
                         var startDate = moment(createdDate).startOf('month').format('YYYY-MM-DD');
                         var endDate = moment(createdDate).endOf('month').format('YYYY-MM-DD');
+                        console.log("--------------------------------------", startDate);
                         // Getting prev month date
                         var prevMonthDate = moment(createdDate).subtract(1, 'months').startOf('month').format("YYYY-MM-DD");
                         // Getting prev month supply plan
@@ -410,7 +415,9 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                         var regionList = regionListFiltered;
                         for (var c = 0; c < consumptionList.length; c++) {
                             // Calculating actual consumption qty
+                            console.log("consumptionList[c].actualFlag",consumptionList[c].actualFlag.toString())
                             if (consumptionList[c].actualFlag.toString() == "true") {
+                                console.log("In if for actual true");
                                 actualConsumptionQty += Math.round(consumptionList[c].consumptionQty);
                                 // Adding regions reporting actual consumption
                                 var index = regionsReportingActualConsumption.findIndex(f => f == consumptionList[c].region.id);
@@ -422,13 +429,16 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                 forecastedConsumptionQty += Math.round(consumptionList[c].consumptionQty);
                             }
                         }
+                        console.log("regionsReportingActualConsumption", regionsReportingActualConsumption);
                         // Getting no of regions reporting actual consumption
                         noOfRegionsReportingActualConsumption = regionsReportingActualConsumption.length;
                         // Check if there are consumption details avaliable
                         if (consumptionList.length == 0) {
+                            console.log("In if for length 0");
                             consumptionQty = "";
                             consumptionType = "";
-                        } else if ((totalNoOfRegions == noOfRegionsReportingActualConsumption) || (actualConsumptionQty >= forecastedConsumptionQty)) {
+                        } else if (((totalNoOfRegions == noOfRegionsReportingActualConsumption) || (actualConsumptionQty >= forecastedConsumptionQty)) && (noOfRegionsReportingActualConsumption>0)) {
+                            console.log("In if for considering actual consumption", actualConsumptionQty);
                             // Considering actual consumption if consumption for all regions is given or if actual consumption qty is greater than forecasted consumption qty
                             consumptionQty = actualConsumptionQty;
                             consumptionType = 1;
@@ -469,6 +479,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                 }
                             }
                         } else {
+                            console.log("In else for considering forecasted consumption", forecastedConsumptionQty);
                             // Consider forecasted consumption since that is greater
                             consumptionQty = forecastedConsumptionQty;
                             consumptionType = 0;
@@ -633,7 +644,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                             maxForMonths = DEFAULT_MIN_MONTHS_OF_STOCK
                         } else if (programPlanningUnitList[ppL].minMonthsOfStock < DEFAULT_MIN_MAX_MONTHS_OF_STOCK) {
                             maxForMonths = programPlanningUnitList[ppL].minMonthsOfStock
-                        }else{
+                        } else {
                             maxForMonths = DEFAULT_MIN_MAX_MONTHS_OF_STOCK
                         }
                         var minStockMoSQty = parseInt(maxForMonths);
@@ -699,16 +710,17 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                         } else {
                             mos = 0;
                         }
-
+                        console.log("Consumption QTy", consumptionQty);
+                        console.log("Conditipn print", consumptionQty === "" ? null : consumptionQty);
                         var json = {
                             programId: programJsonForStoringTheResult.programId,
                             versionId: programJsonForStoringTheResult.currentVersion.versionId,
                             planningUnitId: programPlanningUnitList[ppL].planningUnit.id,
                             transDate: startDate,
-                            stockQty: actualStockCount == "" ? null : actualStockCount,
-                            adjustmentQty: adjustmentQty == "" ? null : adjustmentQty,
+                            stockQty: actualStockCount === "" ? null : actualStockCount,
+                            adjustmentQty: adjustmentQty === "" ? null : adjustmentQty,
                             actualFlag: consumptionType == "" ? null : consumptionType,
-                            consumptionQty: consumptionQty == "" ? null : consumptionQty,
+                            consumptionQty: consumptionQty === "" ? null : consumptionQty,
                             shipmentTotalQty: shipmentTotalQty,
                             shipmentTotalQtyWps: shipmentTotalQtyWps,
                             manualTotalQty: manualTotalQty,
@@ -738,14 +750,15 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                             openingBalanceWps: openingBalanceWps,
                             closingBalance: closingBalance,
                             closingBalanceWps: closingBalanceWps,
-                            unmetDemand: unmetDemandQty == "" ? null : unmetDemandQty,
-                            unmetDemandWps: unmetDemandQtyWps == "" ? null : unmetDemandQtyWps,
+                            unmetDemand: unmetDemandQty === "" ? null : unmetDemandQty,
+                            unmetDemandWps: unmetDemandQtyWps === "" ? null : unmetDemandQtyWps,
                             mos: mos,
                             nationalAdjustment: nationalAdjustment,
                             nationalAdjustmentWps: nationalAdjustmentWps,
                             expectedStock: expectedStock,
                             expectedStockWps: expectedStockWps
                         }
+                        console.log("Json", json);
                         supplyPlanData.push(json);
                     }
                 }
@@ -879,7 +892,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                         //         }
                         //     );
                     } else if (page == 'quantimedImport') {
-                        props.updateState("loading",false);
+                        props.updateState("loading", false);
                         props.redirectToDashbaord();
                     }
                 }
