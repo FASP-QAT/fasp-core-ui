@@ -24,7 +24,7 @@ const validationSchema = function (values) {
             .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.common.summarytext')),
         realmName: Yup.string()
-            .required(i18n.t('static.common.realmtext')),
+            .required(i18n.t('static.common.realmtext').concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?',i18n.t('static.realm.realmName')))),
         tracerCategoryName: Yup.string()
             .matches(BUDGET_NAME_REGEX, i18n.t('static.message.budgetNameRegex'))
             .required(i18n.t('static.tracerCategory.tracercategorytext')),
@@ -290,10 +290,10 @@ export default class TracerCategoryTicketComponent extends Component {
                                         <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>                                        
                                         <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                     </ModalFooter>
-                                    <br></br><br></br>
+                                    {/* <br></br><br></br>
                                     <div className={this.props.className}>
                                         <p>{i18n.t('static.ticket.drodownvaluenotfound')}</p>
-                                    </div>
+                                    </div> */}
                                 </Form>
                             )} />
                             </div>

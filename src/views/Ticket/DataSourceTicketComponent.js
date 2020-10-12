@@ -28,9 +28,9 @@ const validationSchema = function (values) {
             .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.common.summarytext')),
         realmName: Yup.string()
-            .required(i18n.t('static.common.realmtext')),
+            .required(i18n.t('static.common.realmtext').concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?',i18n.t('static.realm.realmName')))),
         programName: Yup.string()
-            .required(i18n.t('static.budget.programtext')),
+            .required(i18n.t('static.budget.programtext').concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?',i18n.t('static.program.programMaster')))),
         dataSourceType: Yup.string()
             .required(i18n.t('static.datasource.datasourcetypetext')),
         dataSourceName: Yup.string()
@@ -387,10 +387,10 @@ export default class DataSourceTicketComponent extends Component {
                                         <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>                                        
                                         <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                     </ModalFooter>
-                                    <br></br><br></br>
+                                    {/* <br></br><br></br>
                                     <div className={this.props.className}>
                                         <p>{i18n.t('static.ticket.drodownvaluenotfound')}</p>
-                                    </div>
+                                    </div> */}
                                 </Form>
                             )} />
                             </div>

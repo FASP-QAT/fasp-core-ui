@@ -146,7 +146,7 @@ export default class QunatimedImportStepTwo extends Component {
             else if (hasDuplicate) {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, 'Duplicate Program Planning Unit');
+                this.el.setComments(col, i18n.t('static.quantimed.duplicateQATPlanningUnit'));
             }
             else {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -216,9 +216,9 @@ export default class QunatimedImportStepTwo extends Component {
         })
 
         if (hasDuplicate) {
-            alert('Duplicate QAT Planning Unit Found');
+            alert(i18n.t('static.quantimed.duplicateQATPlanningUnitFound'));
             this.setState({
-                message: 'Duplicate QAT Planning Unit Found',
+                message: i18n.t('static.quantimed.duplicateQATPlanningUnitFound'),
                 changedFlag: 0,
 
             },
@@ -385,9 +385,9 @@ export default class QunatimedImportStepTwo extends Component {
                         data: products,
                         contextMenu: function () { return false; },
                         colHeaders: [
-                            'Product ID',
-                            'Qunatimed Planning Unit',
-                            'QAT Planning Unit',
+                            i18n.t('static.quantimed.quantimedProductIdLabel'),
+                            i18n.t('static.quantimed.quantimedPlanningUnitLabel'),
+                            i18n.t('static.supplyPlan.qatProduct'),
                             'Previous Program Planning Unit',
                         ],
                         colWidths: [80, 80, 80, 80],
@@ -403,8 +403,8 @@ export default class QunatimedImportStepTwo extends Component {
                             show: '',
                             entries: '',
                         },
-                        pagination: 0,
-                        search: false,
+                        pagination: false,
+                        search: true,
                         columnSorting: false,
                         tableOverflow: true,
                         wordWrap: true,
@@ -422,8 +422,7 @@ export default class QunatimedImportStepTwo extends Component {
                     this.el = myVar;
                     this.setState({
                         programId: this.props.items.program.programId,
-                        filename: this.props.items.program.filename,
-                        loading: false
+                        filename: this.props.items.program.filename
                     })
 
                     //     }
@@ -444,6 +443,10 @@ export default class QunatimedImportStepTwo extends Component {
 
 
                 }
+
+                this.setState({                    
+                    loading: false
+                })
             }.bind(this)
         }.bind(this)        
 
@@ -470,21 +473,23 @@ export default class QunatimedImportStepTwo extends Component {
                             </div>
 
                         </Col>
-                    </CardBody>
-                    <CardFooter>
+                    {/* </CardBody>
+                    <CardFooter> */}
+                    <br></br>
                         <FormGroup>
                             {/* <Button color="info" size="md" className="float-right mr-1" type="submit" name="healthAreaSub" id="healthAreaSub" onClick={this.props.finishedStepTwo}>{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button> */}
-                            <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>Proceed</Button>
+                            <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" >{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
                             <Button color="info" size="md" className="float-right mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.props.previousToStepOne} > <i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
                                 &nbsp;
                         </FormGroup>
-                    </CardFooter>
+                    {/* </CardFooter> */}
+                    </CardBody>
                     {/* </Card> */}
                 </div>
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
-                            <div ><h4> <strong>Loading...</strong></h4></div>
+                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
                             <div class="spinner-border blue ml-4" role="status">
 

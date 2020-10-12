@@ -27,7 +27,7 @@ const validationSchema = function (values) {
             .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.common.summarytext')),
         realmId: Yup.string()
-            .required(i18n.t('static.common.realmtext')),
+            .required(i18n.t('static.common.realmtext').concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?',i18n.t('static.realm.realmName')))),
         countryId: Yup.string()
             .required(i18n.t('static.healtharea.countrytext')),
         currencyId: Yup.string()
@@ -359,7 +359,7 @@ export default class RealmCountryTicketComponent extends Component {
                                         onBlur={handleBlur}
                                         value={this.state.realm}
                                         required>
-                                            <option value="">Please select</option>
+                                            <option value="">{i18n.t('static.common.select')}</option>
                                             {realmList}
                                         </Input>
                                         <FormFeedback className="red">{errors.realmId}</FormFeedback>
@@ -374,7 +374,7 @@ export default class RealmCountryTicketComponent extends Component {
                                         onBlur={handleBlur}
                                         value={this.state.country}
                                         required>
-                                            <option value="">Please select</option>
+                                            <option value="">{i18n.t('static.common.select')}</option>
                                             {countryList}
                                         </Input>
                                         <FormFeedback className="red">{errors.countryId}</FormFeedback>
@@ -389,7 +389,7 @@ export default class RealmCountryTicketComponent extends Component {
                                         onBlur={handleBlur}
                                         value={this.state.currency}
                                         required >
-                                            <option value="">Please select</option>
+                                            <option value="">{i18n.t('static.common.select')}</option>
                                             {currencyList}
                                         </Input>
                                         <FormFeedback className="red">{errors.currencyId}</FormFeedback>
@@ -412,10 +412,10 @@ export default class RealmCountryTicketComponent extends Component {
                                         <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>                                        
                                         <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                     </ModalFooter>
-                                    <br></br><br></br>
+                                    {/* <br></br><br></br>
                                     <div className={this.props.className}>
                                         <p>{i18n.t('static.ticket.drodownvaluenotfound')}</p>
-                                    </div>
+                                    </div> */}
                                 </Form>
                             )} />
                             </div>

@@ -34,9 +34,9 @@ const validationSchema = function (values) {
             .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.common.summarytext')),
         programName: Yup.string()
-            .required(i18n.t('static.budget.programtext')),
+            .required(i18n.t('static.budget.programtext').concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?',i18n.t('static.budget.program')))),
         fundingSourceName: Yup.string()
-            .required(i18n.t('static.fundingSource.selectFundingSource')),
+            .required(i18n.t('static.fundingSource.selectFundingSource').concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?',i18n.t('static.budget.fundingsource')))),
         budgetName: Yup.string()
             .required(i18n.t('static.budget.budgetamountdesc')),
         // budgetCode: Yup.string()
@@ -532,10 +532,10 @@ export default class BudgetTicketComponent extends Component {
                                         <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>
                                     
                                     </ModalFooter>
-                                    <br></br><br></br>
-                                    <div className={this.props.className}>
+                                    {/* <br></br><br></br> */}
+                                    {/* <div className={this.props.className}>
                                         <p>{i18n.t('static.ticket.drodownvaluenotfound')}</p>
-                                    </div>
+                                    </div> */}
                                 </Form>
                             )} />
                             </div>
