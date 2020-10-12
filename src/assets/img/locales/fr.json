@@ -1132,7 +1132,7 @@
     "static.dashboard.programs": "Programmes",
     "static.jexcel.search":"chercher",
     "static.jexcel.clear":"Clair",
-    "static.common.version":"Ver.:",
+    "static.common.version":"VER.:",
     "static.common.showData":"Afficher les données",
     "static.common.hideData":"Masquer les données",
     "static.period.selectPeriod":"Sélectionnez la période",
@@ -1185,5 +1185,8 @@
     "static.program.confirmDelete": "Voulez-vous vraiment supprimer les programmes locaux?",
     "static.program.deleteLocalProgramSuccess" : "Programme (s) local (s) supprimé (s) avec succès",
     "static.common.delete": "Effacer",
-    "static.program.deleteLocalProgram" : "Supprimer le programme local"
+    "static.program.deleteLocalProgram" : "Supprimer le programme local",
+    "static.ticket.unavailableDropdownValidationText": " - si vous ne voyez pas le ? vous voulez, veuillez soumettre un ticket pour cet article.",
+    "static.message.alreadyTagged":"Cette commande no. et la ligne principale no. sont déjà balisés. Pour modifier le balisage, veuillez d'abord supprimer le lien puis essayer.",
+    "static.shipment.linkingsuccess": "Envoi lié avec succès"
 }

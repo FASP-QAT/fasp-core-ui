@@ -46,8 +46,15 @@ export default class QuantimedImportOnboarding extends Component {
         this.removeMessageText = this.removeMessageText.bind(this);
         this.triggerChildAlert = this.triggerChildAlert.bind(this);
         this.triggerStepFour = this.triggerStepFour.bind(this);
+        this.redirectToDashboard = this.redirectToDashboard.bind(this);
 
     }
+
+    redirectToDashboard(){
+        let id = AuthenticationService.displayDashboardBasedOnRole();        
+        this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.quantimed.quantimedImportSuccess'))
+    }
+
     componentDidMount() {
 
         document.getElementById('stepOne').style.display = 'block';
@@ -209,10 +216,10 @@ export default class QuantimedImportOnboarding extends Component {
 
                                 <div className="d-sm-down-none  progressbar">
                                     <ul>
-                                        <li className="quantimedProgressbartext1">Import Quantimed Data File</li>
-                                        <li className="quantimedProgressbartext2">Map Planning Unit</li>
-                                        <li className="quantimedProgressbartext3">Consumption Period </li>
-                                        <li className="quantimedProgressbartext4">Final Data Submission</li>
+                                        <li className="quantimedProgressbartext1">{i18n.t('static.quantimed.quantimedImportScreenOne')}</li>
+                                        <li className="quantimedProgressbartext2">{i18n.t('static.quantimed.quantimedImportScreenSecond')}</li>
+                                        <li className="quantimedProgressbartext3">{i18n.t('static.quantimed.quantimedImportScreenThird')}</li>
+                                        <li className="quantimedProgressbartext4">{i18n.t('static.quantimed.quantimedImportScreenFourth')}</li>
                                     </ul>
                                 </div>
 
@@ -227,14 +234,14 @@ export default class QuantimedImportOnboarding extends Component {
                                     <QuantimedImportStepThree finishedStepThree={this.finishedStepThree} previousToStepTwo={this.previousToStepTwo} dataChange={this.dataChange} items={this.state} triggerStepFour={this.triggerStepFour}></QuantimedImportStepThree>
                                 </div>
                                 <div id="stepFour">
-                                    <QunatimedImportStepFour ref="child_2" previousToStepThree={this.previousToStepThree} dataChange={this.dataChange} items={this.state}></QunatimedImportStepFour>
+                                    <QunatimedImportStepFour ref="child_2" previousToStepThree={this.previousToStepThree} dataChange={this.dataChange} items={this.state} redirectToDashboard={this.redirectToDashboard}></QunatimedImportStepFour>
                                 </div>
 
                             </CardBody></Card>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
                             <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                 <div class="align-items-center">
-                                    <div ><h4> <strong>Loading...</strong></h4></div>
+                                    <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
                                     <div class="spinner-border blue ml-4" role="status">
 

@@ -586,7 +586,7 @@ const routes = [
   { path: '/report/stockAdjustment', name: 'static.report.stockAdjustment', component: StockAdjustment },
   // { path: '/report/expiredInventory', name:static.report.expiredInventory' ,component: ExpiredInventory },
   { path: '/report/expiredInventory', name: 'static.report.expiredInventory', component: ExpiredInventory },
-  { path: '/quantimed/quantimedImport', name: 'Quantimed Import', component: QuantimedImport }
+  { path: '/quantimed/quantimedImport', name: 'static.quantimed.quantimedImport', component: QuantimedImport }
 ];
 
 class DefaultLayout extends Component {
@@ -597,7 +597,7 @@ class DefaultLayout extends Component {
       businessFunctions: [],
       name: "",
       //Timer
-      timeout: 1000 * 150 * 1,
+      timeout: 1000 * 450 * 1,
       // timeout: 1000 * 3600 * 1,
       showModal: false,
       userLoggedIn: false,
@@ -1552,12 +1552,12 @@ class DefaultLayout extends Component {
                         attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PIPELINE_PROGRAM_IMPORT') ? false : true) }
                       },
 
-                      // {
-                      //   name: 'Quantimed Import',                        
-                      //   url: '/quantimed/quantimedImport',
-                      //   icon: 'fa fa-file-text-o',
-                      //   attributes: { hidden: false }
-                      // }
+                      {
+                        name: i18n.t('static.quantimed.quantimedImport'),                        
+                        url: '/quantimed/quantimedImport',
+                        icon: 'fa fa-file-text-o',
+                        attributes: { hidden: false }
+                      }
 
                     ]
 

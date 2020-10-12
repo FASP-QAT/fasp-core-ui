@@ -32,7 +32,7 @@ const validationSchema = function (values) {
     return Yup.object().shape({
 
         programId: Yup.string()
-            .required('Select Program'),
+            .required(i18n.t('static.program.validselectprogramtext')),
 
 
     })
@@ -60,9 +60,9 @@ const getErrorsFromValidationError = (validationError) => {
     }, {})
 }
 
-const entityname = 'Quantimed Import'
+const entityname = i18n.t('static.quantimed.quantimedImport')
 
-export default class QuantimedImportStepOne extends Component {
+class QuantimedImportStepOne extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -125,25 +125,6 @@ export default class QuantimedImportStepOne extends Component {
     componentDidMount() {
         bsCustomFileInput.init();
         AuthenticationService.setupAxiosInterceptors();
-        // ProgramService.getProgramList()
-        //     .then(response => {
-        //         if (response.status == 200) {
-        //             this.setState({
-        //                 programs: response.data
-        //             })
-        //         }
-        //         else {
-
-        //             this.setState({
-        //                 message: response.data.messageCode
-        //             },
-        //                 () => {
-        //                     this.hideSecondComponent();
-        //                 })
-        //         }
-
-        //     })
-
 
         var db1;
         getDatabase();
@@ -177,8 +158,7 @@ export default class QuantimedImportStepOne extends Component {
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId) {
-                        // var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-                        // var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+
                         var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         var programJson1 = JSON.parse(programData);
@@ -194,15 +174,7 @@ export default class QuantimedImportStepOne extends Component {
                     programs: proList,
                     loading: false
                 })
-                // var programIdd = this.props.match.params.programId;                
-                // if (programIdd != '' && programIdd != undefined) {
-                //     var programSelect = { value: programIdd, label: proList.filter(c => c.value == programIdd)[0].label };
-                //     this.setState({
-                //         programSelect: programSelect,
-                //         programId: programIdd
-                //     })
-                //     this.getPlanningUnitList(programSelect);
-                // }
+
 
             }.bind(this);
         }.bind(this);
@@ -270,7 +242,7 @@ export default class QuantimedImportStepOne extends Component {
                                     if (response.status == 200 || response.status == 201) {
 
                                         this.setState({
-                                            message: "File import", loading: false
+                                            message: "", color: "green", loading: false
                                         },
                                             () => {
                                                 this.props.items.importData = response.data;
@@ -279,10 +251,10 @@ export default class QuantimedImportStepOne extends Component {
                                             })
                                     } else {
                                         this.setState({
-                                            message: i18n.t('static.unkownError'), loading: false
+                                            message: i18n.t('static.unkownError'), color: "red", loading: false
                                         },
                                             () => {
-
+                                                this.hideFirstComponent()
                                             })
                                     }
 
@@ -290,10 +262,10 @@ export default class QuantimedImportStepOne extends Component {
                                     .catch(
                                         error => {
                                             this.setState({
-                                                message: i18n.t('static.unkownError'), loading: false
+                                                message: i18n.t('static.unkownError'), color: "red", loading: false
                                             },
                                                 () => {
-
+                                                    this.hideFirstComponent()
                                                 });
                                         }
                                     );
@@ -327,7 +299,7 @@ export default class QuantimedImportStepOne extends Component {
 
                                                 <FormGroup id="fileImportDiv">
                                                     <Col md="3">
-                                                        <Label className="uploadfilelable" htmlFor="file-input">Please select the Quantimed file you want to import<span class="red Reqasterisk">*</span></Label>
+                                                        <Label className="uploadfilelable" htmlFor="file-input">{i18n.t('static.quantimed.quantimedImportSelectFileLabel')}<span class="red Reqasterisk">*</span></Label>
                                                     </Col>
                                                     <Col xs="12" md="4" className="custom-file">
                                                         {/* <Input type="file" id="file-input" name="file-input" /> */}
@@ -336,7 +308,7 @@ export default class QuantimedImportStepOne extends Component {
                                                     </Col>
                                                 </FormGroup>
                                                 <FormGroup>
-                                                    <Label htmlFor="select">Select the program that you want to import it into<span class="red Reqasterisk">*</span></Label>
+                                                    <Label htmlFor="select">{i18n.t('static.quantimed.quantimedImportSelectProgramLabel')}<span class="red Reqasterisk">*</span></Label>
                                                     <Input
                                                         valid={!errors.programId}
                                                         invalid={touched.programId && !!errors.programId}
@@ -354,20 +326,21 @@ export default class QuantimedImportStepOne extends Component {
                                                     {/* <Button color="info" size="md" className="float-right mr-1" type="button" name="planningPrevious" id="planningPrevious" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}>Next <i className="fa fa-angle-double-right"></i></Button> */}
 
                                                 </FormGroup>
-                                            </CardBody>
-                                            <CardFooter className="pb-0 pr-0">
+                                            {/* </CardBody>
+                                            <CardFooter className="pb-0 pr-0"> */}
+                                            <br></br>
                                                 <FormGroup className="pb-3">
                                                     <Button color="info" size="md" className="float-right mr-1" type="submit" disabled={!isValid} onClick={() => this.touchAll(setTouched, errors)}>Import </Button>
                                                 </FormGroup>
                                         &nbsp;
-                                    </CardFooter>
-
+                                    {/* </CardFooter> */}
+                                    </CardBody>
                                         </Form>
                                     </div>
                                     <div style={{ display: this.state.loading ? "block" : "none" }}>
                                         <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                             <div class="align-items-center">
-                                                <div ><h4> <strong>Loading...</strong></h4></div>
+                                                <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
                                                 <div class="spinner-border blue ml-4" role="status">
 
@@ -382,3 +355,4 @@ export default class QuantimedImportStepOne extends Component {
         );
     }
 }
+export default QuantimedImportStepOne;

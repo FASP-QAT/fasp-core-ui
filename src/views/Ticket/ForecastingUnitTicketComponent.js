@@ -31,11 +31,11 @@ const validationSchema = function (values) {
             .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.common.summarytext')),
         realm: Yup.string()
-            .required(i18n.t('static.common.realmtext')),
+            .required(i18n.t('static.common.realmtext').concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?', i18n.t('static.realm.realmName')))),
         tracerCategory: Yup.string()
-            .required(i18n.t('static.tracercategory.tracercategoryText')),
+            .required(i18n.t('static.tracercategory.tracercategoryText').concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?', i18n.t('static.tracercategory.tracercategory')))),
         productCategory: Yup.string()
-            .required(i18n.t('static.common.selectProductCategory')),
+            .required(i18n.t('static.common.selectProductCategory').concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?', i18n.t('static.productcategory.productcategory')))),
         forecastingUnitDesc: Yup.string()
             .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.forecastingunit.forecastingunittext')),
@@ -455,7 +455,6 @@ export default class ForecastingUnitTicketComponent extends Component {
                                                 onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                 onBlur={handleBlur}
                                                 value={this.state.forecastingUnit.notes}
-                                                maxLength={600}
                                             // required 
                                             />
                                             <FormFeedback className="red">{errors.notes}</FormFeedback>
@@ -465,10 +464,10 @@ export default class ForecastingUnitTicketComponent extends Component {
                                             <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                             <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                         </ModalFooter>
-                                        <br></br><br></br>
-                                        <div className={this.props.className}>
-                                            <p>{i18n.t('static.ticket.drodownvaluenotfound')}</p>
-                                        </div>
+                                        {/* <br></br><br></br>
+                                    <div className={this.props.className}>
+                                        <p>{i18n.t('static.ticket.drodownvaluenotfound')}</p>
+                                    </div> */}
                                     </Form>
                                 )} />
                 </div>

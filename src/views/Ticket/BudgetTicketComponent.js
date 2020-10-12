@@ -34,9 +34,9 @@ const validationSchema = function (values) {
             .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.common.summarytext')),
         programName: Yup.string()
-            .required(i18n.t('static.budget.programtext')),
+            .required(i18n.t('static.budget.programtext').concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?', i18n.t('static.budget.program')))),
         fundingSourceName: Yup.string()
-            .required(i18n.t('static.fundingSource.selectFundingSource')),
+            .required(i18n.t('static.fundingSource.selectFundingSource').concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?', i18n.t('static.budget.fundingsource')))),
         budgetName: Yup.string()
             .required(i18n.t('static.budget.budgetamountdesc')),
         // budgetCode: Yup.string()
@@ -516,7 +516,6 @@ export default class BudgetTicketComponent extends Component {
                                             <Label for="notes">{i18n.t('static.common.notes')}</Label>
                                             <Input type="textarea" name="notes" id="notes"
                                                 bsSize="sm"
-                                                maxLength={600}
                                                 valid={!errors.notes && this.state.budget.notes != ''}
                                                 invalid={touched.notes && !!errors.notes}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e); }}
@@ -533,10 +532,10 @@ export default class BudgetTicketComponent extends Component {
                                             <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>
 
                                         </ModalFooter>
-                                        <br></br><br></br>
-                                        <div className={this.props.className}>
-                                            <p>{i18n.t('static.ticket.drodownvaluenotfound')}</p>
-                                        </div>
+                                        {/* <br></br><br></br> */}
+                                        {/* <div className={this.props.className}>
+                                        <p>{i18n.t('static.ticket.drodownvaluenotfound')}</p>
+                                    </div> */}
                                     </Form>
                                 )} />
                 </div>

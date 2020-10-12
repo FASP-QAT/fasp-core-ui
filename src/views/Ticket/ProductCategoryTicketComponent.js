@@ -19,12 +19,12 @@ const initialValues = {
 }
 
 const validationSchema = function (values) {
-    return Yup.object().shape({
+    return Yup.object().shape({        
         summary: Yup.string()
             .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.common.summarytext')),
         realmName: Yup.string()
-            .required(i18n.t('static.common.realmtext')),
+            .required(i18n.t('static.common.realmtext').concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?',i18n.t('static.realm.realmName')))),
         productCategoryName: Yup.string()
             .required(i18n.t('static.technicalArea.productcategorynametext')),
         // notes: Yup.string()
@@ -62,46 +62,46 @@ export default class ProductCategoryTicketComponent extends Component {
             productCategory: {
                 summary: "Add / Update Product Category",
                 realmName: "",
-                productCategoryName: "",
+                productCategoryName: "",                
                 notes: ""
             },
-            message: '',
+            message : '',
             realms: [],
             realmId: '',
             loading: false
-        }
-        this.dataChange = this.dataChange.bind(this);
+        }        
+        this.dataChange = this.dataChange.bind(this);        
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
-    }
+    }  
 
-    dataChange(event) {
+    dataChange(event) {        
         let { productCategory } = this.state
-        if (event.target.name == "summary") {
+        if(event.target.name == "summary") {
             productCategory.summary = event.target.value;
         }
-        if (event.target.name == "realmName") {
+        if(event.target.name == "realmName") {        
             productCategory.realmName = event.target.options[event.target.selectedIndex].innerHTML;
             this.setState({
-                realmId: event.target.value
+                realmId : event.target.value
             })
         }
-        if (event.target.name == "productCategoryName") {
+        if(event.target.name == "productCategoryName") {
             productCategory.productCategoryName = event.target.value;
-        }
-        if (event.target.name == "notes") {
+        }        
+        if(event.target.name == "notes") {
             productCategory.notes = event.target.value;
         }
-        this.setState({
+        this.setState({       
             productCategory
-        }, () => { })
+        }, () => {})
     };
 
     touchAll(setTouched, errors) {
-        setTouched({
+        setTouched({            
             summary: true,
             realmName: true,
-            productCategoryName: true,
+            productCategoryName: true,                               
             notes: true
         })
         this.validateForm(errors)
@@ -139,7 +139,7 @@ export default class ProductCategoryTicketComponent extends Component {
 
     hideSecondComponent() {
         setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
+            document.getElementById('div2').style.display = 'none';            
         }, 8000);
     }
 
@@ -148,12 +148,12 @@ export default class ProductCategoryTicketComponent extends Component {
         event.target.className += " was-validated";
     }
 
-    resetClicked() {
+    resetClicked() {        
         let { productCategory } = this.state;
         // productCategory.summary = '';
         productCategory.realmName = '';
-        productCategory.productCategoryName = '';
-        productCategory.notes = '';
+        productCategory.productCategoryName = '';        
+        productCategory.notes = '';   
         this.setState({
             productCategory
         },
@@ -174,137 +174,136 @@ export default class ProductCategoryTicketComponent extends Component {
 
         return (
             <div className="col-md-12">
-                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>                
                 <h4>{i18n.t('static.product.productcategory')}</h4>
                 <br></br>
                 <div style={{ display: this.state.loading ? "none" : "block" }}>
-                    <Formik
-                        initialValues={initialValues}
-                        validate={validate(validationSchema)}
-                        onSubmit={(values, { setSubmitting, setErrors }) => {
-                            this.setState({
-                                loading: true
-                            })
-                            JiraTikcetService.addEmailRequestIssue(this.state.productCategory).then(response => {
-                                console.log("Response :", response.status, ":", JSON.stringify(response.data));
-                                if (response.status == 200 || response.status == 201) {
-                                    var msg = response.data.key;
-                                    this.setState({
-                                        message: msg, loading: false
-                                    },
-                                        () => {
-                                            this.resetClicked();
-                                            this.hideSecondComponent();
-                                        })
-                                } else {
-                                    this.setState({
-                                        message: i18n.t('static.unkownError'), loading: false
-                                    },
-                                        () => {
-                                            this.hideSecondComponent();
-                                        })
-                                }
-                                this.props.togglehelp();
-                                this.props.toggleSmall(this.state.message);
-                            })
-                                .catch(
-                                    error => {
-                                        this.setState({
-                                            message: i18n.t('static.unkownError'), loading: false
-                                        },
-                                            () => {
-                                                this.hideSecondComponent();
-                                            });
-                                    }
-                                );
-                        }}
-                        render={
-                            ({
-                                values,
-                                errors,
-                                touched,
-                                handleChange,
-                                handleBlur,
-                                handleSubmit,
-                                isSubmitting,
-                                isValid,
-                                setTouched,
-                                handleReset
-                            }) => (
-                                    <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm' autocomplete="off">
-                                        < FormGroup >
-                                            <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text" name="summary" id="summary" readOnly={true}
-                                                bsSize="sm"
-                                                valid={!errors.summary && this.state.productCategory.summary != ''}
-                                                invalid={touched.summary && !!errors.summary}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                value={this.state.productCategory.summary}
-                                                required />
-                                            <FormFeedback className="red">{errors.summary}</FormFeedback>
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <Label for="realmName">{i18n.t('static.realm.realmName')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="select" name="realmName" id="realmName"
-                                                bsSize="sm"
-                                                valid={!errors.realmName && this.state.productCategory.realmName != ''}
-                                                invalid={touched.realmName && !!errors.realmName}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                value={this.state.realmId}
-                                                required >
-                                                <option value="">{i18n.t('static.common.select')}</option>
-                                                {realmList}
-                                            </Input>
-                                            <FormFeedback className="red">{errors.realmName}</FormFeedback>
-                                        </FormGroup>
-                                        < FormGroup >
-                                            <Label for="productCategoryName">{i18n.t('static.productCategory.productCategoryName')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text" name="productCategoryName" id="productCategoryName"
-                                                bsSize="sm"
-                                                valid={!errors.productCategoryName && this.state.productCategory.productCategoryName != ''}
-                                                invalid={touched.productCategoryName && !!errors.productCategoryName}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                value={this.state.productCategory.productCategoryName}
-                                                required />
-                                            <FormFeedback className="red">{errors.productCategoryName}</FormFeedback>
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <Label for="notes">{i18n.t('static.common.notes')}</Label>
-                                            <Input type="textarea" name="notes" id="notes"
-                                                bsSize="sm"
-                                                valid={!errors.notes && this.state.productCategory.notes != ''}
-                                                invalid={touched.notes && !!errors.notes}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                value={this.state.productCategory.notes}
-                                                maxLength={600}
-                                            // required 
-                                            />
-                                            <FormFeedback className="red">{errors.notes}</FormFeedback>
-                                        </FormGroup>
-                                        <ModalFooter className="pb-0 pr-0">
-                                            <Button type="button" size="md" color="info" className="mr-1" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
-                                            <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                            <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                        </ModalFooter>
-                                        <br></br><br></br>
-                                        <div className={this.props.className}>
-                                            <p>{i18n.t('static.ticket.drodownvaluenotfound')}</p>
-                                        </div>
-                                    </Form>
-                                )} />
-                </div>
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-                            <div class="spinner-border blue ml-4" role="status"></div>
-                        </div>
-                    </div>
-                </div>
+                <Formik
+                    initialValues={initialValues}
+                    validate={validate(validationSchema)}
+                    onSubmit={(values, { setSubmitting, setErrors }) => {   
+                        this.setState({
+                            loading: true
+                        })
+                        JiraTikcetService.addEmailRequestIssue(this.state.productCategory).then(response => {                                         
+                            console.log("Response :",response.status, ":" ,JSON.stringify(response.data));
+                            if (response.status == 200 || response.status == 201) {
+                                var msg = response.data.key;
+                                this.setState({
+                                    message: msg, loading: false
+                                },
+                                    () => {
+                                        this.resetClicked();
+                                        this.hideSecondComponent();
+                                    })                                
+                            } else {
+                                this.setState({                                    
+                                    message: i18n.t('static.unkownError'), loading: false
+                                },
+                                    () => {                                        
+                                        this.hideSecondComponent();
+                                    })                                
+                            }                            
+                            this.props.togglehelp();
+                            this.props.toggleSmall(this.state.message);
+                        })
+                        .catch(
+                            error => {
+                                this.setState({                                        
+                                    message: i18n.t('static.unkownError'), loading: false
+                                },
+                                () => {                                        
+                                    this.hideSecondComponent();                                     
+                                });                                    
+                            }
+                        );   
+                    }}
+                    render={
+                        ({
+                            values,
+                            errors,
+                            touched,
+                            handleChange,
+                            handleBlur,
+                            handleSubmit,
+                            isSubmitting,
+                            isValid,
+                            setTouched,
+                            handleReset
+                        }) => (
+                                <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm' autocomplete="off">
+                                    < FormGroup >
+                                        <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="text" name="summary" id="summary" readOnly = {true}
+                                        bsSize="sm"
+                                        valid={!errors.summary && this.state.productCategory.summary != ''}
+                                        invalid={touched.summary && !!errors.summary}
+                                        onChange={(e) => { handleChange(e); this.dataChange(e);}}
+                                        onBlur={handleBlur}
+                                        value={this.state.productCategory.summary}
+                                        required />
+                                        <FormFeedback className="red">{errors.summary}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label for="realmName">{i18n.t('static.realm.realmName')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="select" name="realmName" id="realmName"
+                                        bsSize="sm"
+                                        valid={!errors.realmName && this.state.productCategory.realmName != ''}
+                                        invalid={touched.realmName && !!errors.realmName}
+                                        onChange={(e) => { handleChange(e); this.dataChange(e);}}
+                                        onBlur={handleBlur}
+                                        value={this.state.realmId}
+                                        required >
+                                            <option value="">{i18n.t('static.common.select')}</option>
+                                            {realmList}
+                                        </Input>
+                                        <FormFeedback className="red">{errors.realmName}</FormFeedback>
+                                    </FormGroup>
+                                    < FormGroup >
+                                        <Label for="productCategoryName">{i18n.t('static.productCategory.productCategoryName')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="text" name="productCategoryName" id="productCategoryName"
+                                        bsSize="sm"
+                                        valid={!errors.productCategoryName && this.state.productCategory.productCategoryName != ''}
+                                        invalid={touched.productCategoryName && !!errors.productCategoryName}
+                                        onChange={(e) => { handleChange(e); this.dataChange(e);}}
+                                        onBlur={handleBlur}
+                                        value={this.state.productCategory.productCategoryName}
+                                        required />
+                                        <FormFeedback className="red">{errors.productCategoryName}</FormFeedback>
+                                    </FormGroup>                                                                                                                                                                           
+                                    <FormGroup>
+                                        <Label for="notes">{i18n.t('static.common.notes')}</Label>
+                                        <Input type="textarea" name="notes" id="notes"
+                                        bsSize="sm"
+                                        valid={!errors.notes && this.state.productCategory.notes != ''}
+                                        invalid={touched.notes && !!errors.notes}
+                                        onChange={(e) => { handleChange(e); this.dataChange(e);}}
+                                        onBlur={handleBlur}
+                                        value={this.state.productCategory.notes}
+                                        // required 
+                                        />
+                                        <FormFeedback className="red">{errors.notes}</FormFeedback>
+                                    </FormGroup>
+                                    <ModalFooter className="pb-0 pr-0">
+                                    <Button type="button" size="md" color="info" className="mr-1" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
+                                        <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>                                        
+                                        <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                    </ModalFooter>
+                                    {/* <br></br><br></br>
+                                    <div className={this.props.className}>
+                                        <p>{i18n.t('static.ticket.drodownvaluenotfound')}</p>
+                                    </div> */}
+                                </Form>
+                            )} />
+                            </div>
+                            <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                    <div class="align-items-center">
+                                        <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+                                        <div class="spinner-border blue ml-4" role="status"></div>
+                                    </div>
+                                </div> 
+                            </div>
             </div>
         );
     }

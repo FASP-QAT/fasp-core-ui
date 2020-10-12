@@ -7,7 +7,7 @@ import {
 } from 'reactstrap';
 import { Formik } from 'formik';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, DELIVERED_SHIPMENT_STATUS } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, DELIVERED_SHIPMENT_STATUS, ACTUAL_CONSUMPTION_TYPE, FORCASTED_CONSUMPTION_TYPE } from '../../Constants.js'
 import getLabelText from '../../CommonComponent/getLabelText'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import i18n from '../../i18n';
@@ -40,6 +40,8 @@ export default class ConsumptionDetails extends React.Component {
             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() },
+            regionList: [],
+            showActive: false
         }
 
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
@@ -149,7 +151,9 @@ export default class ConsumptionDetails extends React.Component {
                 this.setState({
                     programList: proList, loading: false
                 })
-
+                if (document.getElementById("addRowButtonId") != null) {
+                    document.getElementById("addRowButtonId").style.display = "none";
+                }
                 var programIdd = this.props.match.params.programId;
                 if (programIdd != '' && programIdd != undefined) {
                     var programSelect = { value: programIdd, label: proList.filter(c => c.value == programIdd)[0].label };
@@ -171,6 +175,9 @@ export default class ConsumptionDetails extends React.Component {
         document.getElementById("planningUnitId").value = 0;
         document.getElementById("planningUnit").value = "";
         document.getElementById("consumptionTableDiv").style.display = "none";
+        if (document.getElementById("addRowButtonId") != null) {
+            document.getElementById("addRowButtonId").style.display = "none";
+        }
         this.setState({
             programSelect: value,
             programId: value != "" && value != undefined ? value.value : 0,
@@ -239,6 +246,7 @@ export default class ConsumptionDetails extends React.Component {
                                 proList.push(productJson)
                             }
                         }
+                        console.log("RegionList", regionList)
                         this.setState({
                             planningUnitList: proList,
                             planningUnitListAll: myResult,
@@ -275,8 +283,14 @@ export default class ConsumptionDetails extends React.Component {
         this.setState({ programId: programId, planningUnitId: value != "" && value != undefined ? value.value : 0, planningUnit: value });
         var planningUnitId = value != "" && value != undefined ? value.value : 0;
         var programId = document.getElementById("programId").value;
+        var regionId = document.getElementById("regionId").value;
+        var consumptionType = document.getElementById("consumptionType").value;
+        var showActive = document.getElementById("showActive").value;
         if (planningUnitId != 0) {
             document.getElementById("consumptionTableDiv").style.display = "block";
+            if (document.getElementById("addRowButtonId") != null) {
+                document.getElementById("addRowButtonId").style.display = "block";
+            }
             var db1;
             getDatabase();
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -323,6 +337,21 @@ export default class ConsumptionDetails extends React.Component {
                         c.planningUnit.id == planningUnitId &&
                         c.region != null && c.region.id != 0 &&
                         moment(c.consumptionDate).format("YYYY-MM-DD") >= moment(startDate).format("YYYY-MM-DD") && moment(c.consumptionDate).format("YYYY-MM-DD") <= moment(stopDate).format("YYYY-MM-DD"));
+                    if (regionId != "") {
+                        console.log("consumptionList", consumptionList)
+                        console.log("regionId", regionId);
+                        consumptionList = consumptionList.filter(c => c.region.id == regionId);
+                    }
+                    if (consumptionType != "") {
+                        if (consumptionType == 1) {
+                            consumptionList = consumptionList.filter(c => c.actualFlag.toString() == "true");
+                        } else {
+                            consumptionList = consumptionList.filter(c => c.actualFlag.toString() == "false");
+                        }
+                    }
+                    if (showActive == true) {
+                        consumptionList = consumptionList.filter(c => c.active.toString() == "false");
+                    }
                     this.setState({
                         batchInfoList: batchList,
                         programJson: programJson,
@@ -340,6 +369,9 @@ export default class ConsumptionDetails extends React.Component {
             }.bind(this)
         } else {
             document.getElementById("consumptionTableDiv").style.display = "none";
+            if (document.getElementById("addRowButtonId") != null) {
+                document.getElementById("addRowButtonId").style.display = "none";
+            }
             this.setState({ loading: false });
         }
     }
@@ -376,6 +408,15 @@ export default class ConsumptionDetails extends React.Component {
             if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
             return '?'
         }
+
+        const { regionList } = this.state;
+        let regions = regionList.length > 0 && regionList.map((item, i) => {
+            return (
+                <option key={i} value={item.id}>
+                    {item.name}
+                </option>
+            )
+        }, this);
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
@@ -390,7 +431,7 @@ export default class ConsumptionDetails extends React.Component {
                                         <Form name='simpleForm'>
                                             <div className=" pl-0">
                                                 <div className="row">
-                                                    <FormGroup className="col-md-3">
+                                                    <FormGroup className="col-md-2">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                                                         <div className="controls edit">
 
@@ -407,7 +448,7 @@ export default class ConsumptionDetails extends React.Component {
                                                             </Picker>
                                                         </div>
                                                     </FormGroup>
-                                                    <FormGroup className="col-md-3">
+                                                    <FormGroup className="col-md-2">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                                         <div className="controls ">
                                                             <Select
@@ -433,6 +474,41 @@ export default class ConsumptionDetails extends React.Component {
                                                             />
                                                         </div>
                                                     </FormGroup>
+                                                    <FormGroup className="col-md-2 ">
+                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.region.region')}</Label>
+                                                        <div className="controls ">
+                                                            <Input
+                                                                type="select"
+                                                                name="regionId"
+                                                                id="regionId"
+                                                                bsSize="sm"
+                                                                onChange={(e) => { this.formSubmit(this.state.planningUnit, this.state.rangeValue); }}
+                                                            >
+                                                                <option value="">{i18n.t('static.common.all')}</option>
+                                                                {regions}
+                                                            </Input>
+                                                        </div>
+                                                    </FormGroup>
+                                                    <FormGroup className="col-md-2 ">
+                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.consumption.consumptionType')}</Label>
+                                                        <div className="controls ">
+                                                            <Input
+                                                                type="select"
+                                                                name="consumptionType"
+                                                                id="consumptionType"
+                                                                bsSize="sm"
+                                                                onChange={(e) => { this.formSubmit(this.state.planningUnit, this.state.rangeValue); }}
+                                                            >
+                                                                <option value="">{i18n.t('static.common.all')}</option>
+                                                                <option value={ACTUAL_CONSUMPTION_TYPE}>{i18n.t('static.consumption.actual')}</option>
+                                                                <option value={FORCASTED_CONSUMPTION_TYPE}>{i18n.t('static.consumption.forcast')}</option>
+                                                            </Input>
+                                                        </div>
+                                                    </FormGroup>
+                                                    <FormGroup check inline>
+                                                        <Input className="form-check-input removeMarginLeftCheckbox" type="checkbox" id="showActive" name="showActive" value="true" onClick={() => this.formSubmit(this.state.planningUnit, this.state.rangeValue)} />
+                                                        <Label className="form-check-label" check htmlFor="inline-checkbox1">{i18n.t("static.inventory.active")}</Label>
+                                                    </FormGroup>
                                                     {/* {this.state.consumptionChangedFlag == 1 && <FormGroup check inline>
                                                         <Input className="form-check-input removeMarginLeftCheckbox" type="checkbox" id="showErrors" name="showErrors" value="true" onClick={this.refs.consumptionChild.showOnlyErrors} />
                                                         <Label className="form-check-label" check htmlFor="inline-checkbox1">{i18n.t("static.dataEntry.showOnlyErrors")}</Label>
@@ -444,7 +520,7 @@ export default class ConsumptionDetails extends React.Component {
                                         </Form>
                                     )} />
 
-                        <div className="shipmentconsumptionSearchMarginTop">
+                        <div>
                             <ConsumptionInSupplyPlanComponent ref="consumptionChild" items={this.state} toggleLarge={this.toggleLarge} updateState={this.updateState} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} consumptionPage="consumptionDataEntry" />
                             <div className="table-responsive" id="consumptionTableDiv">
                                 <div id="consumptionTable" />
@@ -457,8 +533,8 @@ export default class ConsumptionDetails extends React.Component {
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 {this.state.consumptionChangedFlag == 1 && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.refs.consumptionChild.saveConsumption}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>}
                                 &nbsp;
-                                {this.refs.consumptionChild != undefined && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.refs.consumptionChild.addRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}&nbsp;
-                        </FormGroup>
+                                {this.refs.consumptionChild != undefined && <Button color="info" id="addRowButtonId" size="md" className="float-right mr-1" type="button" onClick={this.refs.consumptionChild.addRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}&nbsp;
+                            </FormGroup>
                         </FormGroup>
                     </CardFooter>
                 </Card>
