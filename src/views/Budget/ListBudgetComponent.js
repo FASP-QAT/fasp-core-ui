@@ -656,7 +656,7 @@ class ListBudgetComponent extends Component {
           // readOnly: true
         },
         {
-          title: i18n.t('static.budget.budgetCode'),
+          title: i18n.t('static.budget.budgetDisplayName'),
           type: 'text',
           // readOnly: true
         },
@@ -1150,7 +1150,7 @@ class ListBudgetComponent extends Component {
 
             {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground">
             </div>
-            <h5>{i18n.t('static.budget.redRow')}</h5>
+            <h5 style={{color:'red'}}>{i18n.t('static.budget.redRow')}</h5>
 
 
           </CardBody>

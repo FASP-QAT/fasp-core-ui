@@ -1400,7 +1400,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     </tr>
                                     <tr>
                                         <td className="BorderNoneSupplyPlan"></td>
-                                        <td align="left" className="sticky-col first-col clone">{i18n.t('static.supplyPlan.amc')}</td>
+                                        <td align="left" className="sticky-col first-col clone" title={i18n.t('static.supplyplan.amcmessage')}>{i18n.t('static.supplyPlan.amc')}</td>
                                         {
                                             this.state.amcTotalData.map(item1 => (
                                                 <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
@@ -1520,7 +1520,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             {
                                                 this.state.monthsArray.map((item, count) => {
                                                     if (count < 7) {
-                                                        return (<th className={count==2 ? "supplyplan-Thead supplyplanTdWidthForMonths" : "supplyplanTdWidthForMonths"}>{item.monthName.concat(" ").concat(item.monthYear)}</th>)
+                                                        return (<th className={count == 2 ? "supplyplan-Thead supplyplanTdWidthForMonths" : "supplyplanTdWidthForMonths"}>{item.monthName.concat(" ").concat(item.monthYear)}</th>)
                                                     }
                                                 })
                                             }
@@ -1604,7 +1604,7 @@ export default class SupplyPlanComponent extends React.Component {
                         className={'modal-lg ' + this.props.className, "modalWidth"}>
                         <ModalHeader toggle={() => this.toggleLarge('Adjustments')} className="modalHeaderSupplyPlan">
                             {i18n.t('static.supplyPlan.adjustmentsDetails')}
-                            <div className="card-header-actions">
+                            <div className="card-header-actions"  style={{marginTop:'-5px'}}>
                                 <a className="card-header-action">
                                     {/* <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggle() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span> */}
                                     <Link to={`/inventory/addInventory/` + this.state.programId + `/0/` + this.state.planningUnitId} target="_blank"><small className="dataEntryLink">{i18n.t('static.supplyplan.adjustmentDataEntry')}</small></Link>
@@ -1625,7 +1625,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             {
                                                 this.state.monthsArray.map((item, count) => {
                                                     if (count < 7) {
-                                                        return (<th colSpan="2" className={count==2 ? "supplyplan-Thead" : ""}>{item.monthName.concat(" ").concat(item.monthYear)}</th>)
+                                                        return (<th colSpan="2" className={count == 2 ? "supplyplan-Thead" : ""}>{item.monthName.concat(" ").concat(item.monthYear)}</th>)
                                                     }
                                                 })
                                             }
@@ -1792,7 +1792,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyOrder')}</span></li>
                                 <li><span className=" greylegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.doNotIncludeInProjectedShipment')} </span></li>
                             </ul>
-                            <div className="card-header-actions">
+                            <div className="card-header-actions"  style={{marginTop:'-5px'}}>
                                 <a className="card-header-action">
                                     {/* <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggle() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span> */}
                                     <Link to={`/shipment/shipmentDetails/` + this.state.programId + `/0/` + this.state.planningUnitId} target="_blank"><small className="dataEntryLink">{i18n.t('static.supplyplan.shipmentDataEntry')}</small></Link>
@@ -2793,6 +2793,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     }
                                     console.log("Json----------->", json);
                                     console.log("plannedShipmentsTotalData[n]------------>", plannedShipmentsTotalData[n])
+                                    console.log("jsonList[0].consumptionQty", jsonList[0].consumptionQty)
                                     jsonArrForGraph.push(json);
                                 } else {
                                     openingBalanceArray.push(lastClosingBalance);
@@ -2827,7 +2828,7 @@ export default class SupplyPlanComponent extends React.Component {
 
                                     var json = {
                                         month: m[n].month,
-                                        consumption: 0,
+                                        consumption: null,
                                         stock: lastClosingBalance,
                                         planned: 0,
                                         delivered: 0,
@@ -2842,6 +2843,7 @@ export default class SupplyPlanComponent extends React.Component {
                             }
                             // console.log("supplyPlan", supplyPlan);
                             console.log("consumptionTotalData", consumptionTotalData);
+                            console.log("Json array for grpah", jsonArrForGraph);
                             this.setState({
                                 openingBalanceArray: openingBalanceArray,
                                 consumptionTotalData: consumptionTotalData,
@@ -2929,7 +2931,8 @@ export default class SupplyPlanComponent extends React.Component {
             showConsumption: 0
         })
         if (supplyPlanType == 'Consumption') {
-            var monthCountConsumption = this.state.monthCount + count - 2;
+            console.log("count--------->", count);
+            var monthCountConsumption = count != undefined ? this.state.monthCount + count - 2 : this.state.monthCount;
             this.setState({
                 consumption: !this.state.consumption,
                 monthCountConsumption: monthCountConsumption,
@@ -2946,7 +2949,7 @@ export default class SupplyPlanComponent extends React.Component {
             });
             this.shipmentsDetailsClicked(shipmentType, startDate, endDate);
         } else if (supplyPlanType == 'Adjustments') {
-            var monthCountAdjustments = this.state.monthCount + count - 2;
+            var monthCountAdjustments = count != undefined ? this.state.monthCount + count - 2 : this.state.monthCount;
             this.setState({
                 adjustments: !this.state.adjustments,
                 monthCountAdjustments: monthCountAdjustments

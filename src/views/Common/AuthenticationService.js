@@ -592,6 +592,7 @@ class AuthenticationService {
                     }
                     break;
                 case "/realmCountry/listRealmCountryPlanningUnit":
+                case "/realmCountry/listRealmCountryPlanningUnit/:color/:message":
                     if (bfunction.includes("ROLE_BF_MANAGE_REALM_COUNTRY_PLANNING_UNIT")) {
                         return true;
                     }
