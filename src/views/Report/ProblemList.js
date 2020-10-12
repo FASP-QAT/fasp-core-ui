@@ -1682,9 +1682,9 @@ export default class ConsumptionDetails extends React.Component {
                         </Col>
                         {this.state.data.length > 0 && <FormGroup className="col-md-6 mt-5 pl-0" >
                             <ul className="legendcommitversion list-group">
-                                <li><span className="problemList-red legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.tbd')}</span></li>
-                                <li><span className="problemList-orange legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.multipleShipments')}</span></li>
-                                <li><span className="problemList-yellow legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyShipments')} </span></li>
+                                <li><span className="problemList-red legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.problemList.high')}</span></li>
+                                <li><span className="problemList-orange legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.problemList.medium')}</span></li>
+                                <li><span className="problemList-yellow legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.problemList.low')} </span></li>
                             </ul>
                         </FormGroup>}
 

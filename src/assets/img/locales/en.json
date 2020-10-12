@@ -1293,5 +1293,10 @@
     "static.reports.forecastMetrics.noConsumption":"Current month does not contain actual consumption and/or* forecasted consumption",
     "static.reports.forecastMetrics.totalConsumptionIs0":"Total actual consumption for last 6 months = 0",
     "static.report.qatPID":"QAT Product Id",
-    "static.problemContext.editProblem":"Edit problem"
+    "static.problemContext.editProblem":"Edit problem",
+    "static.problemList.high":"Criticality High",
+    "static.problemList.medium":"Criticality Medium",
+    "static.problemList.low":"Criticality Low",
+    "static.problemOnboarding.duplicateProgramDisplayName":"Duplicate program display name",
+    "static.problemContext.viewTrans":"View transaction"
 }

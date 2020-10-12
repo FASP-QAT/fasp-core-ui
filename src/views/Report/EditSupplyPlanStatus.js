@@ -2491,6 +2491,7 @@ class EditSupplyPlanStatus extends Component {
         let reviewedStatusId = document.getElementById('reviewedStatusId').value;
         var problemReportList = this.state.data;
         var problemReportFilterList = problemReportList;
+        console.log("problemReportList====>",problemReportList);
         if (problemStatusId != 0) {
 
             if (problemStatusId == -1 && reviewedStatusId == 0) {
@@ -2729,6 +2730,19 @@ class EditSupplyPlanStatus extends Component {
             allowExport: false,
             paginationOptions: [10, 25, 50],
             position: 'top',
+            contextMenu: function (obj, x, y, e) {
+                var items = [];
+                if (y != null) {
+                        items.push({
+                            title: i18n.t('static.problemContext.viewTrans'), 
+                            onclick: function () {
+                                
+                            }.bind(this)
+                        });
+                    
+                }
+                return items;
+            }.bind(this)
         };
         var problemEl = jexcel(document.getElementById("problemListDiv"), options);
         this.el = problemEl;
@@ -3276,34 +3290,45 @@ class EditSupplyPlanStatus extends Component {
                             onSubmit={(values, { setSubmitting, setErrors }) => {
                                 var elInstance = this.state.problemEl;
                                 var json = elInstance.getJson();
-                                console.log("problemList===>", json);
-                                console.log("program===>", this.state.program);
-
-                                // ProgramService.updateProgramStatus(this.state.program)
-                                //     .then(response => {
-                                //         console.log("messageCode", response)
-                                //         this.props.history.push(`/report/supplyPlanVersionAndReview/` + 'green/' + i18n.t("static.message.supplyplanversionapprovedsuccess"))
-                                //     })
-                                //     .catch(
-                                //         error => {
-                                //             if (error.message === "Network Error") {
-                                //                 this.setState({ message: error.message });
-                                //             } else {
-                                //                 switch (error.response ? error.response.status : "") {
-                                //                     case 500:
-                                //                     case 401:
-                                //                     case 404:
-                                //                     case 406:
-                                //                     case 412:
-                                //                         this.setState({ message: error.response.data.messageCode });
-                                //                         break;
-                                //                     default:
-                                //                         this.setState({ message: 'static.unkownError' });
-                                //                         break;
-                                //                 }
-                                //             }
-                                //         }
-                                //     );
+                                // console.log("problemList===>", json);
+                                // console.log("program===>", this.state.program);
+                                var reviewedProblemList=[];
+                                for (var i = 0; i < json.length; i++) {
+                                   var map = new Map(Object.entries(json[i]));
+                                   if(map.get("20")==1){
+                                    reviewedProblemList.push({
+                                        problemReportId:map.get("0"),
+                                        reviewed:map.get("18"),
+                                        notes:map.get("19")
+                                    });
+                                   }
+                                }
+                                console.log("reviewedProblemList===>",reviewedProblemList);
+                                ProgramService.updateProgramStatus(this.state.program,reviewedProblemList)
+                                    .then(response => {
+                                        console.log("messageCode", response)
+                                        this.props.history.push(`/report/supplyPlanVersionAndReview/` + 'green/' + i18n.t("static.message.supplyplanversionapprovedsuccess"))
+                                    })
+                                    .catch(
+                                        error => {
+                                            if (error.message === "Network Error") {
+                                                this.setState({ message: error.message });
+                                            } else {
+                                                switch (error.response ? error.response.status : "") {
+                                                    case 500:
+                                                    case 401:
+                                                    case 404:
+                                                    case 406:
+                                                    case 412:
+                                                        this.setState({ message: error.response.data.messageCode });
+                                                        break;
+                                                    default:
+                                                        this.setState({ message: 'static.unkownError' });
+                                                        break;
+                                                }
+                                            }
+                                        }
+                                    );
 
 
                             }}
