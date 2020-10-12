@@ -1011,8 +1011,12 @@ export default class EditProgram extends Component {
     resetClicked() {
         // AuthenticationService.setupAxiosInterceptors();
         ProgramService.getProgramById(this.props.match.params.programId).then(response => {
+            var programCode = response.data.programCode;
+            var splitCode = programCode.split("-");
+            var uniqueCode = splitCode[3];
             this.setState({
-                program: response.data
+                program: response.data,
+                uniqueCode:uniqueCode
             })
             initialValues = {
                 programName: getLabelText(this.state.program.label, lang),
@@ -1031,7 +1035,8 @@ export default class EditProgram extends Component {
                 arrivedToDeliveredLeadTime: this.state.program.arrivedToDeliveredLeadTime,
                 healthAreaId: this.state.program.healthArea.id,
                 programNotes: this.state.program.programNotes,
-                regionArray: this.state.program.regionArray
+                regionArray: this.state.program.regionArray,
+                uniqueCode:this.state.uniqueCode
             }
             // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramManagerList(response.data.realmCountry.realm.realmId)

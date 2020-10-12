@@ -1292,5 +1292,6 @@
     "static.reports.forecastMetrics.noConsumptionAcrossPeriod":"No months in period contain both forecast and actual consumption",
     "static.reports.forecastMetrics.noConsumption":"Current month does not contain actual consumption and/or* forecasted consumption",
     "static.reports.forecastMetrics.totalConsumptionIs0":"Total actual consumption for last 6 months = 0",
-    "static.report.qatPID":"QAT Product Id"
+    "static.report.qatPID":"QAT Product Id",
+    "static.problemContext.editProblem":"Edit problem"
 }
