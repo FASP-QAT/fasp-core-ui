@@ -903,7 +903,7 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.dashboard.Productmenu'),
                             icon: 'fa fa-cubes',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_VIEW_REALM_LEVEL_MASTERS') ? false : true) },
+                            // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_VIEW_REALM_LEVEL_MASTERS') ? false : true) },
                             children: [
                               {
                                 name: i18n.t('static.dashboad.planningunitcountry'),
@@ -1135,7 +1135,7 @@ class DefaultLayout extends Component {
                         {
                           name: i18n.t('static.dashboard.supplyPlandata'),
                           icon: 'fa fa-list',
-                          attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN')) || (this.state.businessFunctions.includes('ROLE_BF_COMMIT_VERSION')) || (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_VERSION_AND_REVIEW')) ? false : true) },
+                          // attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN')) || (this.state.businessFunctions.includes('ROLE_BF_COMMIT_VERSION')) || (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_VERSION_AND_REVIEW')) ? false : true) },
                           children: [
                             {
                               name: i18n.t('static.consumptionDetailHead.consumptionDetail'),
@@ -1815,7 +1815,7 @@ class DefaultLayout extends Component {
                        {
                         name: i18n.t('static.dashboard.supplyPlandata'),
                         icon: 'fa fa-list',
-                        attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN')) || (this.state.businessFunctions.includes('ROLE_BF_COMMIT_VERSION')) || (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_VERSION_AND_REVIEW')) ? false : true) },
+                        // attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN')) || (this.state.businessFunctions.includes('ROLE_BF_COMMIT_VERSION')) || (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_VERSION_AND_REVIEW')) ? false : true) },
                         children: [
                           {
                             name: i18n.t('static.consumptionDetailHead.consumptionDetail'),
