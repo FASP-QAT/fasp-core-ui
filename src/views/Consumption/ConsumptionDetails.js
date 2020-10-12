@@ -41,7 +41,9 @@ export default class ConsumptionDetails extends React.Component {
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() },
             regionList: [],
-            showActive: false
+            showActive: false,
+            regionId: "",
+            consumptionType:""
         }
 
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
@@ -64,8 +66,21 @@ export default class ConsumptionDetails extends React.Component {
         //
     }
     handleRangeDissmis(value) {
-        this.setState({ rangeValue: value })
-        this.formSubmit(this.state.planningUnit, value);
+        var cont = false;
+        if (this.state.consumptionChangedFlag == 1) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
+
+            }
+        } else {
+            cont = true;
+        }
+        if (cont == true) {
+            this.setState({ rangeValue: value, consumptionChangedFlag: 0 })
+            this.formSubmit(this.state.planningUnit, value);
+        }
     }
 
     hideFirstComponent() {
@@ -168,211 +183,238 @@ export default class ConsumptionDetails extends React.Component {
     };
 
     getPlanningUnitList(value) {
-        this.setState({
-            loading: true
-        })
-        var programId = value != "" && value != undefined ? value.value : 0;
-        document.getElementById("planningUnitId").value = 0;
-        document.getElementById("planningUnit").value = "";
-        document.getElementById("consumptionTableDiv").style.display = "none";
-        if (document.getElementById("addRowButtonId") != null) {
-            document.getElementById("addRowButtonId").style.display = "none";
+        var cont = false;
+        if (this.state.consumptionChangedFlag == 1) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
+
+            }
+        } else {
+            cont = true;
         }
-        this.setState({
-            programSelect: value,
-            programId: value != "" && value != undefined ? value.value : 0,
-            planningUnit: "",
-        })
-        if (programId != 0) {
-            var db1;
-            var storeOS;
-            var regionList = [];
-            getDatabase();
-            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-            openRequest.onerror = function (event) {
-                this.setState({
-                    message: i18n.t('static.program.errortext'),
-                    color: 'red'
-                })
-                this.hideFirstComponent()
-            }.bind(this);
-            openRequest.onsuccess = function (e) {
-                db1 = e.target.result;
-                var programDataTransaction = db1.transaction(['programData'], 'readwrite');
-                var programDataOs = programDataTransaction.objectStore('programData');
-                var programRequest = programDataOs.get(value != "" && value != undefined ? value.value : 0);
-                programRequest.onerror = function (event) {
+        if (cont == true) {
+            this.setState({
+                loading: true,
+                consumptionChangedFlag: 0
+            })
+            var programId = value != "" && value != undefined ? value.value : 0;
+            document.getElementById("planningUnitId").value = 0;
+            document.getElementById("planningUnit").value = "";
+            document.getElementById("consumptionTableDiv").style.display = "none";
+            if (document.getElementById("addRowButtonId") != null) {
+                document.getElementById("addRowButtonId").style.display = "none";
+            }
+            this.setState({
+                programSelect: value,
+                programId: value != "" && value != undefined ? value.value : 0,
+                planningUnit: "",
+            })
+            if (programId != 0) {
+                var db1;
+                var storeOS;
+                var regionList = [];
+                getDatabase();
+                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                openRequest.onerror = function (event) {
                     this.setState({
                         message: i18n.t('static.program.errortext'),
                         color: 'red'
                     })
                     this.hideFirstComponent()
                 }.bind(this);
-                programRequest.onsuccess = function (e) {
-                    var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                    var programJson = JSON.parse(programData);
-                    for (var i = 0; i < programJson.regionList.length; i++) {
-                        var regionJson = {
-                            name: getLabelText(programJson.regionList[i].label, this.state.lang),
-                            id: programJson.regionList[i].regionId
-                        }
-                        regionList.push(regionJson)
-
-                    }
-
-                    var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
-                    var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
-                    var planningunitRequest = planningunitOs.getAll();
-                    var planningList = []
-                    planningunitRequest.onerror = function (event) {
+                openRequest.onsuccess = function (e) {
+                    db1 = e.target.result;
+                    var programDataTransaction = db1.transaction(['programData'], 'readwrite');
+                    var programDataOs = programDataTransaction.objectStore('programData');
+                    var programRequest = programDataOs.get(value != "" && value != undefined ? value.value : 0);
+                    programRequest.onerror = function (event) {
                         this.setState({
                             message: i18n.t('static.program.errortext'),
                             color: 'red'
                         })
                         this.hideFirstComponent()
                     }.bind(this);
-                    planningunitRequest.onsuccess = function (e) {
-                        var myResult = [];
-                        myResult = planningunitRequest.result;
-                        var programId = (value != "" && value != undefined ? value.value : 0).split("_")[0];
-                        var proList = []
-                        for (var i = 0; i < myResult.length; i++) {
-                            if (myResult[i].program.id == programId && myResult[i].active == true) {
-                                var productJson = {
-                                    label: getLabelText(myResult[i].planningUnit.label, this.state.lang),
-                                    value: myResult[i].planningUnit.id
-                                }
-                                proList.push(productJson)
+                    programRequest.onsuccess = function (e) {
+                        var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                        var programJson = JSON.parse(programData);
+                        for (var i = 0; i < programJson.regionList.length; i++) {
+                            var regionJson = {
+                                name: getLabelText(programJson.regionList[i].label, this.state.lang),
+                                id: programJson.regionList[i].regionId
                             }
-                        }
-                        console.log("RegionList", regionList)
-                        this.setState({
-                            planningUnitList: proList,
-                            planningUnitListAll: myResult,
-                            regionList: regionList, loading: false
-                        })
+                            regionList.push(regionJson)
 
-                        var planningUnitIdProp = this.props.match.params.planningUnitId;
-                        if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
-                            var planningUnit = { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label };
-                            this.setState({
-                                planningUnit: planningUnit,
-                                planningUnitId: planningUnitIdProp
-                            })
-                            this.formSubmit(planningUnit, this.state.rangeValue);
                         }
-                    }.bind(this);
+
+                        var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+                        var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
+                        var planningunitRequest = planningunitOs.getAll();
+                        var planningList = []
+                        planningunitRequest.onerror = function (event) {
+                            this.setState({
+                                message: i18n.t('static.program.errortext'),
+                                color: 'red'
+                            })
+                            this.hideFirstComponent()
+                        }.bind(this);
+                        planningunitRequest.onsuccess = function (e) {
+                            var myResult = [];
+                            myResult = planningunitRequest.result;
+                            var programId = (value != "" && value != undefined ? value.value : 0).split("_")[0];
+                            var proList = []
+                            for (var i = 0; i < myResult.length; i++) {
+                                if (myResult[i].program.id == programId && myResult[i].active == true) {
+                                    var productJson = {
+                                        label: getLabelText(myResult[i].planningUnit.label, this.state.lang),
+                                        value: myResult[i].planningUnit.id
+                                    }
+                                    proList.push(productJson)
+                                }
+                            }
+                            console.log("RegionList", regionList)
+                            this.setState({
+                                planningUnitList: proList,
+                                planningUnitListAll: myResult,
+                                regionList: regionList, loading: false
+                            })
+
+                            var planningUnitIdProp = this.props.match.params.planningUnitId;
+                            if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
+                                var planningUnit = { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label };
+                                this.setState({
+                                    planningUnit: planningUnit,
+                                    planningUnitId: planningUnitIdProp
+                                })
+                                this.formSubmit(planningUnit, this.state.rangeValue);
+                            }
+                        }.bind(this);
+                    }.bind(this)
                 }.bind(this)
-            }.bind(this)
-        } else {
-            this.setState({
-                planningUnitList: [],
-                loading: false
-            })
+            } else {
+                this.setState({
+                    planningUnitList: [],
+                    loading: false
+                })
+            }
         }
     }
 
     formSubmit(value, rangeValue) {
-        this.setState({ loading: true })
-        let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
-        let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
-        console.log("startDate", startDate);
-        console.log("Stop Date", stopDate);
-        var programId = document.getElementById('programId').value;
-        this.setState({ programId: programId, planningUnitId: value != "" && value != undefined ? value.value : 0, planningUnit: value });
-        var planningUnitId = value != "" && value != undefined ? value.value : 0;
-        var programId = document.getElementById("programId").value;
-        var regionId = document.getElementById("regionId").value;
-        var consumptionType = document.getElementById("consumptionType").value;
-        var showActive = document.getElementById("showActive").value;
-        if (planningUnitId != 0) {
-            document.getElementById("consumptionTableDiv").style.display = "block";
-            if (document.getElementById("addRowButtonId") != null) {
-                document.getElementById("addRowButtonId").style.display = "block";
+        var cont = false;
+        if (this.state.consumptionChangedFlag == 1) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
+
             }
-            var db1;
-            getDatabase();
-            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-            openRequest.onerror = function (event) {
-                this.setState({
-                    message: i18n.t('static.program.errortext'),
-                    color: 'red'
-                })
-                this.hideFirstComponent()
-            }.bind(this);
-            openRequest.onsuccess = function (e) {
-                db1 = e.target.result;
-                var transaction = db1.transaction(['programData'], 'readwrite');
-                var programTransaction = transaction.objectStore('programData');
-                var programRequest = programTransaction.get(programId);
-                programRequest.onerror = function (event) {
+        } else {
+            cont = true;
+        }
+        if (cont == true) {
+            this.setState({ loading: true, consumptionChangedFlag: 0, regionId: document.getElementById("regionId").value,consumptionType:document.getElementById("consumptionType").value,showActive:document.getElementById("showActive").value })
+            let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
+            let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
+            console.log("startDate", startDate);
+            console.log("Stop Date", stopDate);
+            var programId = document.getElementById('programId').value;
+            this.setState({ programId: programId, planningUnitId: value != "" && value != undefined ? value.value : 0, planningUnit: value });
+            var planningUnitId = value != "" && value != undefined ? value.value : 0;
+            var programId = document.getElementById("programId").value;
+            var regionId = document.getElementById("regionId").value;
+            var consumptionType = document.getElementById("consumptionType").value;
+            var showActive = document.getElementById("showActive").value;
+            if (planningUnitId != 0) {
+                document.getElementById("consumptionTableDiv").style.display = "block";
+                if (document.getElementById("addRowButtonId") != null) {
+                    document.getElementById("addRowButtonId").style.display = "block";
+                }
+                var db1;
+                getDatabase();
+                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                openRequest.onerror = function (event) {
                     this.setState({
                         message: i18n.t('static.program.errortext'),
                         color: 'red'
                     })
                     this.hideFirstComponent()
                 }.bind(this);
-                programRequest.onsuccess = function (event) {
-                    var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                    var programJson = JSON.parse(programData);
-                    var batchInfoList = programJson.batchInfoList;
-                    var batchList = [];
-                    var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == planningUnitId && c.active.toString() == "true" && c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS);
+                openRequest.onsuccess = function (e) {
+                    db1 = e.target.result;
+                    var transaction = db1.transaction(['programData'], 'readwrite');
+                    var programTransaction = transaction.objectStore('programData');
+                    var programRequest = programTransaction.get(programId);
+                    programRequest.onerror = function (event) {
+                        this.setState({
+                            message: i18n.t('static.program.errortext'),
+                            color: 'red'
+                        })
+                        this.hideFirstComponent()
+                    }.bind(this);
+                    programRequest.onsuccess = function (event) {
+                        var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                        var programJson = JSON.parse(programData);
+                        var batchInfoList = programJson.batchInfoList;
+                        var batchList = [];
+                        var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == planningUnitId && c.active.toString() == "true" && c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS);
 
-                    for (var sl = 0; sl < shipmentList.length; sl++) {
-                        var bdl = shipmentList[sl].batchInfoList;
-                        for (var bd = 0; bd < bdl.length; bd++) {
-                            var index = batchList.findIndex(c => c.batchNo == bdl[bd].batch.batchNo);
-                            if (index == -1) {
-                                var batchDetailsToPush = batchInfoList.filter(c => c.batchNo == bdl[bd].batch.batchNo && c.planningUnitId == planningUnitId)[0];
-                                batchList.push(batchDetailsToPush);
+                        for (var sl = 0; sl < shipmentList.length; sl++) {
+                            var bdl = shipmentList[sl].batchInfoList;
+                            for (var bd = 0; bd < bdl.length; bd++) {
+                                var index = batchList.findIndex(c => c.batchNo == bdl[bd].batch.batchNo);
+                                if (index == -1) {
+                                    var batchDetailsToPush = batchInfoList.filter(c => c.batchNo == bdl[bd].batch.batchNo && c.planningUnitId == planningUnitId)[0];
+                                    batchList.push(batchDetailsToPush);
+                                }
                             }
                         }
-                    }
 
-                    var consumptionListUnFiltered = (programJson.consumptionList);
-                    var consumptionList = (programJson.consumptionList).filter(c =>
-                        c.planningUnit.id == planningUnitId &&
-                        c.region != null && c.region.id != 0 &&
-                        moment(c.consumptionDate).format("YYYY-MM-DD") >= moment(startDate).format("YYYY-MM-DD") && moment(c.consumptionDate).format("YYYY-MM-DD") <= moment(stopDate).format("YYYY-MM-DD"));
-                    if (regionId != "") {
-                        console.log("consumptionList", consumptionList)
-                        console.log("regionId", regionId);
-                        consumptionList = consumptionList.filter(c => c.region.id == regionId);
-                    }
-                    if (consumptionType != "") {
-                        if (consumptionType == 1) {
-                            consumptionList = consumptionList.filter(c => c.actualFlag.toString() == "true");
-                        } else {
-                            consumptionList = consumptionList.filter(c => c.actualFlag.toString() == "false");
+                        var consumptionListUnFiltered = (programJson.consumptionList);
+                        var consumptionList = (programJson.consumptionList).filter(c =>
+                            c.planningUnit.id == planningUnitId &&
+                            c.region != null && c.region.id != 0 &&
+                            moment(c.consumptionDate).format("YYYY-MM-DD") >= moment(startDate).format("YYYY-MM-DD") && moment(c.consumptionDate).format("YYYY-MM-DD") <= moment(stopDate).format("YYYY-MM-DD"));
+                        if (regionId != "") {
+                            console.log("consumptionList", consumptionList)
+                            console.log("regionId", regionId);
+                            consumptionList = consumptionList.filter(c => c.region.id == regionId);
                         }
-                    }
-                    if (showActive == true) {
-                        consumptionList = consumptionList.filter(c => c.active.toString() == "false");
-                    }
-                    this.setState({
-                        batchInfoList: batchList,
-                        programJson: programJson,
-                        consumptionListUnFiltered: consumptionListUnFiltered,
-                        consumptionList: consumptionList,
-                        showConsumption: 1,
-                        consumptionMonth: "",
-                        consumptionStartDate: "",
-                        consumptionRegion: "",
-                        startDate: startDate,
-                        stopDate: stopDate
-                    })
-                    this.refs.consumptionChild.showConsumptionData();
+                        if (consumptionType != "") {
+                            if (consumptionType == 1) {
+                                consumptionList = consumptionList.filter(c => c.actualFlag.toString() == "true");
+                            } else {
+                                consumptionList = consumptionList.filter(c => c.actualFlag.toString() == "false");
+                            }
+                        }
+                        if (showActive == true) {
+                            consumptionList = consumptionList.filter(c => c.active.toString() == "false");
+                        }
+                        this.setState({
+                            batchInfoList: batchList,
+                            programJson: programJson,
+                            consumptionListUnFiltered: consumptionListUnFiltered,
+                            consumptionList: consumptionList,
+                            showConsumption: 1,
+                            consumptionMonth: "",
+                            consumptionStartDate: "",
+                            consumptionRegion: "",
+                            startDate: startDate,
+                            stopDate: stopDate
+                        })
+                        this.refs.consumptionChild.showConsumptionData();
+                    }.bind(this)
                 }.bind(this)
-            }.bind(this)
-        } else {
-            document.getElementById("consumptionTableDiv").style.display = "none";
-            if (document.getElementById("addRowButtonId") != null) {
-                document.getElementById("addRowButtonId").style.display = "none";
+            } else {
+                document.getElementById("consumptionTableDiv").style.display = "none";
+                if (document.getElementById("addRowButtonId") != null) {
+                    document.getElementById("addRowButtonId").style.display = "none";
+                }
+                this.setState({ loading: false });
             }
-            this.setState({ loading: false });
         }
     }
 
@@ -384,8 +426,21 @@ export default class ConsumptionDetails extends React.Component {
     }
 
     cancelClicked() {
-        let id = AuthenticationService.displayDashboardBasedOnRole();
-        this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
+        var cont = false;
+        if (this.state.consumptionChangedFlag == 1) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
+
+            }
+        } else {
+            cont = true;
+        }
+        if (cont == true) {
+            let id = AuthenticationService.displayDashboardBasedOnRole();
+            this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
+        }
     }
 
     actionCanceled() {
@@ -482,6 +537,7 @@ export default class ConsumptionDetails extends React.Component {
                                                                 name="regionId"
                                                                 id="regionId"
                                                                 bsSize="sm"
+                                                                value={this.state.regionId}
                                                                 onChange={(e) => { this.formSubmit(this.state.planningUnit, this.state.rangeValue); }}
                                                             >
                                                                 <option value="">{i18n.t('static.common.all')}</option>
@@ -496,6 +552,7 @@ export default class ConsumptionDetails extends React.Component {
                                                                 type="select"
                                                                 name="consumptionType"
                                                                 id="consumptionType"
+                                                                value={this.state.consumptionType}
                                                                 bsSize="sm"
                                                                 onChange={(e) => { this.formSubmit(this.state.planningUnit, this.state.rangeValue); }}
                                                             >
@@ -506,7 +563,7 @@ export default class ConsumptionDetails extends React.Component {
                                                         </div>
                                                     </FormGroup>
                                                     <FormGroup check inline>
-                                                        <Input className="form-check-input removeMarginLeftCheckbox" type="checkbox" id="showActive" name="showActive" value="true" onClick={() => this.formSubmit(this.state.planningUnit, this.state.rangeValue)} />
+                                                        <Input className="form-check-input removeMarginLeftCheckbox" type="checkbox" id="showActive" name="showActive" value={this.state.showActive} onClick={() => this.formSubmit(this.state.planningUnit, this.state.rangeValue)} />
                                                         <Label className="form-check-label" check htmlFor="inline-checkbox1">{i18n.t("static.inventory.active")}</Label>
                                                     </FormGroup>
                                                     {/* {this.state.consumptionChangedFlag == 1 && <FormGroup check inline>

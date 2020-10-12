@@ -1311,5 +1311,6 @@
     "static.quantimed.quantimedPlanningUnitLabel": "Quantimed Planning Unit",
     "static.quantimed.duplicateQATPlanningUnitFound": "Duplicate QAT Planning Unit Found",
     "static.quantimed.duplicateQATPlanningUnit": "Duplicate QAT Planning Unit",
-    "static.quantimed.consumptionDate": "Consumption Date"
+    "static.quantimed.consumptionDate": "Consumption Date",
+    "static.dataentry.confirmmsg":"You are about leave with un-submitted changes"
 }

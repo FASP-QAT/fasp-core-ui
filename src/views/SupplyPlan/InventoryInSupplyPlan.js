@@ -9,6 +9,7 @@ import { SECRET_KEY, JEXCEL_INTEGER_REGEX, INVENTORY_DATA_SOURCE_TYPE, JEXCEL_NE
 import moment from "moment";
 import CryptoJS from 'crypto-js'
 import { calculateSupplyPlan } from "./SupplyPlanCalculations";
+import AuthenticationService from "../Common/AuthenticationService";
 
 
 export default class InventoryInSupplyPlanComponent extends React.Component {
@@ -201,7 +202,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                             console.log("inventoryListUnFiltered", inventoryListUnFiltered);
                             console.log("Adjustment Type", adjustmentType);
                             console.log("planningUnitId", planningUnitId)
-                            index = inventoryListUnFiltered.findIndex(c => c.planningUnit.id == planningUnitId && c.region != null && c.region.id != 0 && c.region.id == inventoryList[j].region.id && moment(c.inventoryDate).format("MMM YY") == moment(inventoryList[j].inventoryDate).format("MMM YY") && c.realmCountryPlanningUnit.id == inventoryList[j].realmCountryPlanningUnit.id && (adjustmentType == 1 ? c.actualQty != null && c.actualQty != "" && c.actualQty != undefined : c.adjustmentQty != null && c.adjustmentQty != "" && c.adjustmentQty != undefined));
+                            index = inventoryListUnFiltered[j].index;
                         }
                         data[14] = index;
                         data[15] = 0;
@@ -896,7 +897,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     } else {
                         if (rowData[3].length > 10) {
                             inValid("D", y, i18n.t('static.common.max10digittext'), elInstance);
-                            valid=false;
+                            valid = false;
                         } else {
                             positiveValidation("D", y, elInstance);
                         }
@@ -1062,6 +1063,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 c.region.id == map.get("1"));
             console.log("Check Duplicate overall", checkDuplicateOverAll);
             var index = 0;
+
             if (checkDuplicateOverAll.length > 0) {
                 console.log("In if");
                 if (checkDuplicateOverAll[0].inventoryId > 0) {
@@ -1070,11 +1072,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     console.log("Index", index);
                 } else {
                     console.log("In ekse where consumption id is 0");
-                    index = inventoryListUnFiltered.findIndex(c =>
-                        c.realmCountryPlanningUnit.id == checkDuplicateOverAll[0].realmCountryPlanningUnit.id &&
-                        moment(c.inventoryDate).format("YYYY-MM") == moment(checkDuplicateOverAll[0].inventoryDate).format("YYYY-MM") &&
-                        c.region.id == checkDuplicateOverAll[0].region.id &&
-                        (adjustmentType == 1 ? c.actualQty != null && c.actualQty != "" && c.actualQty != undefined : c.adjustmentQty != null && c.adjustmentQty != "" && c.adjustmentQty != undefined));
+                    index = checkDuplicateOverAll[0].index;
                     console.log("Index", index);
                 }
             }
@@ -1087,7 +1085,9 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             console.log("Check duplicate in map", checkDuplicateInMap);
             console.log("Condition", checkDuplicateInMap.length > 1 || (checkDuplicateOverAll > 0 && index != map.get("12")));
             console.log("checkDuplicateInMap.length > 1", checkDuplicateInMap.length > 1);
-            if (checkDuplicateInMap.length > 1 || (checkDuplicateOverAll.length > 0 && index != map.get("14"))) {
+            console.log("adjustmentType", adjustmentType);
+            if (adjustmentType == 1 && (checkDuplicateInMap.length > 1 || (checkDuplicateOverAll.length > 0 && index != map.get("14")))) {
+                console.log("In if");
                 var colArr = ['D'];
                 for (var c = 0; c < colArr.length; c++) {
                     var col = (colArr[c]).concat(parseInt(y) + 1);
@@ -1145,10 +1145,10 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     if (validation == false) {
                         valid = false;
                         elInstance.setValueFromCoords(16, y, 1, true);
-                    }else{
+                    } else {
                         if (rowData[5].length > 10) {
                             inValid("F", y, i18n.t('static.common.max10digittext'), elInstance);
-                            valid=false;
+                            valid = false;
                         } else {
                             positiveValidation("F", y, elInstance);
                         }
@@ -1224,6 +1224,8 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     var inventoryDataList = (programJson.inventoryList);
                     console.log("Json.length", json.length);
                     var minDate = moment(Date.now()).startOf('month').format("YYYY-MM-DD");
+                    var curDate = ((moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD HH:mm:ss')));
+                    var curUser = AuthenticationService.getLoggedInUserId();
                     for (var i = 0; i < json.length; i++) {
                         var map = new Map(Object.entries(json[i]));
                         if (map.get("15") == 1) {
@@ -1250,6 +1252,10 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                             } else {
                                 inventoryDataList[parseInt(map.get("14"))].batchInfoList = [];
                             }
+                            if (map.get("15") == 1) {
+                                inventoryDataList[parseInt(map.get("14"))].lastModifiedBy.userId = curUser;
+                                inventoryDataList[parseInt(map.get("14"))].lastModifiedDate = curDate;
+                            }
                         } else {
                             var batchInfoList = [];
                             if (map.get("13") != "") {
@@ -1275,7 +1281,16 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                     id: planningUnitId
                                 },
                                 notes: map.get("10"),
-                                batchInfoList: batchInfoList
+                                batchInfoList: batchInfoList,
+                                index: inventoryDataList.length,
+                                createdBy: {
+                                    userId: curUser
+                                },
+                                createdDate: curDate,
+                                lastModifiedBy: {
+                                    userId: curUser
+                                },
+                                lastModifiedDate: curDate
                             }
                             console.log("inventioryJson", inventoryJson);
                             inventoryDataList.push(inventoryJson);

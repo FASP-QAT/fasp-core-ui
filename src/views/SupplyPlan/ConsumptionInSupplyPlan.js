@@ -12,6 +12,7 @@ import { SECRET_KEY, JEXCEL_INTEGER_REGEX, INDEXED_DB_VERSION, INDEXED_DB_NAME, 
 import moment from "moment";
 import CryptoJS from 'crypto-js'
 import { calculateSupplyPlan } from "./SupplyPlanCalculations";
+import AuthenticationService from "../Common/AuthenticationService";
 
 
 export default class ConsumptionInSupplyPlanComponent extends React.Component {
@@ -1071,6 +1072,8 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                     var programJson = JSON.parse(programData);
                     var consumptionDataList = (programJson.consumptionList);
                     var minDate = moment(Date.now()).startOf('month').format("YYYY-MM-DD");
+                    var curDate = ((moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD HH:mm:ss')));
+                    var curUser = AuthenticationService.getLoggedInUserId();
                     for (var i = 0; i < json.length; i++) {
                         var map = new Map(Object.entries(json[i]));
                         if (map.get("13") == 1) {
@@ -1094,6 +1097,10 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                             consumptionDataList[parseInt(map.get("12"))].notes = map.get("9");
                             consumptionDataList[parseInt(map.get("12"))].actualFlag = actualFlag;
                             consumptionDataList[parseInt(map.get("12"))].active = map.get("10");
+                            if (map.get("13") == 1) {
+                                consumptionDataList[parseInt(map.get("12"))].lastModifiedBy.userId = curUser;
+                                consumptionDataList[parseInt(map.get("12"))].lastModifiedDate = curDate;
+                            }
                             if (map.get("11") != "") {
                                 consumptionDataList[parseInt(map.get("12"))].batchInfoList = map.get("11");
                             } else {
@@ -1126,11 +1133,20 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                                 },
                                 notes: map.get("9"),
                                 batchInfoList: batchInfoList,
-                                actualFlag: actualFlag
+                                actualFlag: actualFlag,
+                                createdBy: {
+                                    userId: curUser
+                                },
+                                createdDate: curDate,
+                                lastModifiedBy: {
+                                    userId: curUser
+                                },
+                                lastModifiedDate: curDate
                             }
                             consumptionDataList.push(consumptionJson);
                         }
                     }
+                    console.log("Consumption data list", consumptionDataList);
                     programJson.consumptionList = consumptionDataList;
                     this.setState({
                         programJson: programJson
