@@ -20,6 +20,10 @@ import InventoryInSupplyPlanComponent from "../SupplyPlan/InventoryInSupplyPlan"
 import ShipmentsInSupplyPlanComponent from "../SupplyPlan/ShipmentsInSupplyPlan";
 import getProblemDesc from '../../CommonComponent/getProblemDesc';
 import getSuggestion from '../../CommonComponent/getSuggestion';
+import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
+import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
+import BootstrapTable from 'react-bootstrap-table-next';
+import paginationFactory from 'react-bootstrap-table2-paginator';
 // import { NavLink } from 'react-router-dom';
 
 const entityname = i18n.t('static.program.program');
@@ -140,6 +144,8 @@ class EditSupplyPlanStatus extends Component {
         super(props);
 
         this.state = {
+            problemTransList: [],
+            transView: false,
             data: [],
             problemStatusList: [],
             problemEl: '',
@@ -258,6 +264,7 @@ class EditSupplyPlanStatus extends Component {
         this.getNote = this.getNote.bind(this);
         this.fetchData = this.fetchData.bind(this);
         this.rowChanged = this.rowChanged.bind(this);
+        this.toggleTransView = this.toggleTransView.bind(this);
     }
 
     rowChanged = function (instance, cell, x, y, value) {
@@ -385,6 +392,13 @@ class EditSupplyPlanStatus extends Component {
         }
     }
 
+    toggleTransView(problemTransList) {
+        console.log("====>", problemTransList);
+        this.setState({ transView: !this.state.transView, problemTransList: problemTransList })
+    }
+    toggleTransModal(){
+        this.setState({ transView: !this.state.transView})
+    }
     leftClicked = () => {
         var monthCount = (this.state.monthCount) - NO_OF_MONTHS_ON_LEFT_CLICKED;
         this.setState({
@@ -2491,7 +2505,7 @@ class EditSupplyPlanStatus extends Component {
         let reviewedStatusId = document.getElementById('reviewedStatusId').value;
         var problemReportList = this.state.data;
         var problemReportFilterList = problemReportList;
-        console.log("problemReportList====>",problemReportList);
+        console.log("problemReportList====>", problemReportList);
         if (problemStatusId != 0) {
 
             if (problemStatusId == -1 && reviewedStatusId == 0) {
@@ -2588,6 +2602,7 @@ class EditSupplyPlanStatus extends Component {
             data[18] = problemList[j].reviewed
             data[19] = ''
             data[20] = 0
+            data[21] = problemList[j].problemTransList
             problemArray[count] = data;
             count++;
         }
@@ -2700,6 +2715,10 @@ class EditSupplyPlanStatus extends Component {
                     title: 'isChanged',
                     type: 'hidden',
                 },
+                {
+                    title: 'transList',
+                    type: 'hidden',
+                },
 
 
             ],
@@ -2731,17 +2750,19 @@ class EditSupplyPlanStatus extends Component {
             paginationOptions: [10, 25, 50],
             position: 'top',
             contextMenu: function (obj, x, y, e) {
-                var items = [];
+                var items1 = [];
+                // console.log("y====",y);
                 if (y != null) {
-                        items.push({
-                            title: i18n.t('static.problemContext.viewTrans'), 
-                            onclick: function () {
-                                
-                            }.bind(this)
-                        });
-                    
+                    items1.push({
+                        title: i18n.t('static.problemContext.viewTrans'),
+                        onclick: function () {
+                            var myObj = obj.getRowData(y);
+                            this.toggleTransView(myObj[21]);
+                        }.bind(this)
+                    });
+
                 }
-                return items;
+                return items1;
             }.bind(this)
         };
         var problemEl = jexcel(document.getElementById("problemListDiv"), options);
@@ -2800,6 +2821,82 @@ class EditSupplyPlanStatus extends Component {
                     </option >
                 )
             }, this);
+
+        const { SearchBar, ClearSearchButton } = Search;
+        const customTotal = (from, to, size) => (
+            <span className="react-bootstrap-table-pagination-total">
+                {i18n.t('static.common.result', { from, to, size })}
+            </span>
+        );
+
+        const columns = [
+            {
+                dataField: 'problemStatus.label',
+                text: i18n.t('static.report.problemStatus'),
+                sort: true,
+                align: 'center',
+                style: { width: '80px' },
+                headerAlign: 'center',
+                formatter: (cell, row) => {
+                    return getLabelText(cell, this.state.lang);
+                }
+            },
+            {
+                dataField: 'notes',
+                text: i18n.t('static.program.notes'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                style: { width: '170px' },
+            },
+            {
+                dataField: 'createdBy.username',
+                text: i18n.t('static.report.lastmodifiedby'),
+                sort: true,
+                align: 'center',
+                style: { width: '80px' },
+                headerAlign: 'center',
+            },
+            {
+                dataField: 'createdDate',
+                text: i18n.t('static.report.lastmodifieddate'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                style: { width: '80px' },
+                formatter: (cell, row) => {
+                    return new moment(cell).format(DATE_FORMAT_CAP);
+                }
+            },
+
+        ];
+        const options = {
+            hidePageListOnlyOnePage: true,
+            firstPageText: i18n.t('static.common.first'),
+            prePageText: i18n.t('static.common.back'),
+            nextPageText: i18n.t('static.common.next'),
+            lastPageText: i18n.t('static.common.last'),
+            nextPageTitle: i18n.t('static.common.firstPage'),
+            prePageTitle: i18n.t('static.common.prevPage'),
+            firstPageTitle: i18n.t('static.common.nextPage'),
+            lastPageTitle: i18n.t('static.common.lastPage'),
+            showTotal: true,
+            paginationTotalRenderer: customTotal,
+            disablePageTitle: true,
+            sizePerPageList: [{
+                text: '15', value: 15
+            }, {
+                text: '25', value: 25
+            }
+                ,
+            {
+                text: '50', value: 50
+            },
+            {
+                text: 'All', value: this.state.data.length
+            }]
+        }
+
         return (
             <div className="animated fadeIn">
                 <h5 className="red" id="div2">{i18n.t(this.state.message, { entityname })}</h5>
@@ -3278,6 +3375,53 @@ class EditSupplyPlanStatus extends Component {
                         </div> */}
                         </Modal>
                         {/* Expired stock modal */}
+                        {/* problem trans modal */}
+                        <Modal isOpen={this.state.transView}
+                            className={'modal-lg ' + this.props.className, "modalWidth"}>
+                            <ModalHeader toggle={() => this.toggleTransModal()} className="modalHeaderSupplyPlan">
+                                <strong>{i18n.t('static.problemContext.transDetails')}</strong>
+                            </ModalHeader>
+                            <ModalBody>
+                                <ToolkitProvider
+                                    keyField="problemReportId"
+                                    data={this.state.problemTransList}
+                                    columns={columns}
+                                    search={{ searchFormatted: true }}
+                                    hover
+                                    filter={filterFactory()}
+                                >
+                                    {
+                                        props => (
+                                            <div className="col-md-12 bg-white pb-1 mb-2">
+                                                <ul class="navbar-nav"><li class="nav-item pl-0"><a aria-current="page" class="nav-link active" ><b>{i18n.t('static.report.problemTransDetails')}</b></a></li></ul>
+                                                <div className="TableCust">
+                                                    <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
+
+                                                        <SearchBar {...props.searchProps} />
+                                                        <ClearSearchButton {...props.searchProps} />
+                                                    </div>
+                                                    <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                                        pagination={paginationFactory(options)}
+                                                        rowEvents={{
+                                                            onClick: (e, row, rowIndex) => {
+                                                                this.editProblem(row);
+                                                            }
+                                                        }}
+                                                        {...props.baseProps}
+                                                    />
+
+
+                                                </div>
+                                            </div>
+                                        )
+                                    }
+                                </ToolkitProvider>
+                            </ModalBody>
+                            <ModalFooter>
+                            </ModalFooter>
+                        </Modal>
+                        {/* problem trans modal */}
+
                         <Formik
                             enableReinitialize={true}
                             initialValues={{
@@ -3292,19 +3436,19 @@ class EditSupplyPlanStatus extends Component {
                                 var json = elInstance.getJson();
                                 // console.log("problemList===>", json);
                                 // console.log("program===>", this.state.program);
-                                var reviewedProblemList=[];
+                                var reviewedProblemList = [];
                                 for (var i = 0; i < json.length; i++) {
-                                   var map = new Map(Object.entries(json[i]));
-                                   if(map.get("20")==1){
-                                    reviewedProblemList.push({
-                                        problemReportId:map.get("0"),
-                                        reviewed:map.get("18"),
-                                        notes:map.get("19")
-                                    });
-                                   }
+                                    var map = new Map(Object.entries(json[i]));
+                                    if (map.get("20") == 1) {
+                                        reviewedProblemList.push({
+                                            problemReportId: map.get("0"),
+                                            reviewed: map.get("18"),
+                                            notes: map.get("19")
+                                        });
+                                    }
                                 }
-                                console.log("reviewedProblemList===>",reviewedProblemList);
-                                ProgramService.updateProgramStatus(this.state.program,reviewedProblemList)
+                                console.log("reviewedProblemList===>", reviewedProblemList);
+                                ProgramService.updateProgramStatus(this.state.program, reviewedProblemList)
                                     .then(response => {
                                         console.log("messageCode", response)
                                         this.props.history.push(`/report/supplyPlanVersionAndReview/` + 'green/' + i18n.t("static.message.supplyplanversionapprovedsuccess"))

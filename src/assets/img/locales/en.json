@@ -1298,5 +1298,6 @@
     "static.problemList.medium":"Criticality Medium",
     "static.problemList.low":"Criticality Low",
     "static.problemOnboarding.duplicateProgramDisplayName":"Duplicate program display name",
-    "static.problemContext.viewTrans":"View transaction"
+    "static.problemContext.viewTrans":"View transaction",
+    "static.problemContext.transDetails":"Transaction Details"
 }
