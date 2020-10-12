@@ -1032,7 +1032,7 @@
     "static.supplyPlan.shipmentsDateObject": "Shipment Dates",
     "static.supplyPlan.consumption": "Consumption",
     "static.dashboard.manualTagging": "Manual Tagging",
-    "static.dashboard.delinking": "Shipment De-linking",
+    "static.dashboard.delinking": "Shipment Delinking",
     "static.supplyPlan.qtyCalculator": "Quantity Calculator",
     "static.supplyPlan.manualOrderQty": "Manual Order Quantity",
     "static.supplyPlan.none": "None",
@@ -1138,6 +1138,8 @@
     "static.commit.shipmentTransId": " Shipment trans id",
     "static.supplyPlan.addNewInventory": "Add New Inventory",
     "static.manualtagging.result": "Please enter order no. and prime line no.",
+    "static.manualtagging.resultOrderNoBlank": "Please enter order no. ",
+    "static.manualtagging.resultPrimeLineNoBlank": "Please enter prime line no.",
     "static.message.pipeline.programExists": "File with same program name is already imported .",
     "static.dashboard.programimport": "Pipeline Program Import",
     "static.dashboard.setupprogram": "Setup Program",
@@ -1205,7 +1207,7 @@
     "static.status.status": "Status",
     "static.chooseFile.chooseFile": "Choose File",
     "static.shipmentDetails.warningBudget": "No funds available for budget. Do you want to continue?",
-    "static.common.version": "Ver.:",
+    "static.common.version": "VER.:",
     "static.common.showData": "Show Data",
     "static.common.hideData": "Hide Data",
     "static.period.selectPeriod": "Select Period",
@@ -1309,5 +1311,6 @@
     "static.quantimed.quantimedPlanningUnitLabel": "Quantimed Planning Unit",
     "static.quantimed.duplicateQATPlanningUnitFound": "Duplicate QAT Planning Unit Found",
     "static.quantimed.duplicateQATPlanningUnit": "Duplicate QAT Planning Unit",
-    "static.quantimed.consumptionDate": "Consumption Date"
+    "static.quantimed.consumptionDate": "Consumption Date",
+    "static.message.alreadyTagged":"This order no. and prime line no. are already tagged. To change the tagging please delink first and then try."
 }
