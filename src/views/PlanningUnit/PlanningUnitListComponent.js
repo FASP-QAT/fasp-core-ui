@@ -399,7 +399,8 @@ import "../../../node_modules/jexcel/dist/jexcel.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import TracerCategoryService from '../../api/TracerCategoryService';
 import ProductService from '../../api/ProductService';
-import { JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from '../../Constants';
+import moment from 'moment';
+import { DATE_FORMAT_CAP, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from '../../Constants';
 
 
 const entityname = i18n.t('static.planningunit.planningunit');
@@ -733,7 +734,9 @@ export default class PlanningUnitListComponent extends Component {
             data[2] = getLabelText(planningUnitList[j].forecastingUnit.label, this.state.lang)
             data[3] = getLabelText(planningUnitList[j].unit.label, this.state.lang)
             data[4] = planningUnitList[j].multiplier;
-            data[5] = planningUnitList[j].active;
+            data[5] = planningUnitList[j].lastModifiedBy.username;
+            data[6] = (planningUnitList[j].lastModifiedDate ? moment(planningUnitList[j].lastModifiedDate).format(`${DATE_FORMAT_CAP}`) : null)
+            data[7] = planningUnitList[j].active;
 
 
             planningUnitArray[count] = data;
@@ -776,6 +779,16 @@ export default class PlanningUnitListComponent extends Component {
                 },
                 {
                     title: i18n.t('static.unit.multiplier'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.common.lastModifiedBy'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.common.lastModifiedDate'),
                     type: 'text',
                     readOnly: true
                 },

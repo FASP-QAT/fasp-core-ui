@@ -268,7 +268,8 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
-import { JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
+import { DATE_FORMAT_CAP, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
+import moment from 'moment';
 
 // import { HashRouter, Route, Switch } from 'react-router-dom';
 const entityname = i18n.t('static.language.language');
@@ -344,7 +345,7 @@ export default class LanguageListComponent extends Component {
         this.hideFirstComponent();
         LanguageService.getLanguageList()
             .then(response => {
-                console.log(response.data)
+                console.log("response.data---->", response.data)
                 if (response.status == 200) {
                     this.setState({
                         langaugeList: response.data, selSource: response.data
@@ -361,7 +362,9 @@ export default class LanguageListComponent extends Component {
                                 data[0] = langaugeList[j].languageId
                                 data[1] = langaugeList[j].languageName;
                                 data[2] = langaugeList[j].languageCode;
-                                data[3] = langaugeList[j].active;
+                                data[3] = langaugeList[j].lastModifiedBy.username;
+                                data[4] = (langaugeList[j].lastModifiedDate ? moment(langaugeList[j].lastModifiedDate).format(`${DATE_FORMAT_CAP}`) : null)
+                                data[5] = langaugeList[j].active;
 
                                 languageArray[count] = data;
                                 count++;
@@ -394,6 +397,16 @@ export default class LanguageListComponent extends Component {
                                     },
                                     {
                                         title: i18n.t('static.language.languageCode'),
+                                        type: 'text',
+                                        readOnly: true
+                                    },
+                                    {
+                                        title: i18n.t('static.common.lastModifiedBy'),
+                                        type: 'text',
+                                        readOnly: true
+                                    },
+                                    {
+                                        title: i18n.t('static.common.lastModifiedDate'),
                                         type: 'text',
                                         readOnly: true
                                     },

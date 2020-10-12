@@ -297,7 +297,7 @@ export default class UpdateDataSourceTypeComponent extends Component {
                                         isValid,
                                         setTouched
                                     }) => (
-                                            <Form onSubmit={handleSubmit} noValidate name='dataSourceTypeForm'>
+                                            <Form onSubmit={handleSubmit} noValidate name='dataSourceTypeForm' autocomplete="off">
                                                 <CardBody className="pb-0">
                                                     <FormGroup>
                                                         <Label htmlFor="realmId">{i18n.t('static.realm.realm')}<span class="red Reqasterisk">*</span></Label>

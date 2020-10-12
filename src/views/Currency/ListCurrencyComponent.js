@@ -309,8 +309,9 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 
 import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
+import moment from 'moment';
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
-import { JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
+import { DATE_FORMAT_CAP, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
 const entityname = i18n.t('static.currency.currencyMaster');
 export default class CurrencyListComponent extends Component {
 
@@ -385,6 +386,8 @@ export default class CurrencyListComponent extends Component {
                             data[1] = getLabelText(currencyList[j].label, this.state.lang)
                             data[2] = currencyList[j].currencyCode;
                             data[3] = currencyList[j].conversionRateToUsd;
+                            data[4] = currencyList[j].lastModifiedBy.username;
+                            data[5] = (currencyList[j].lastModifiedDate ? moment(currencyList[j].lastModifiedDate).format(`${DATE_FORMAT_CAP}`) : null)
 
                             currencyArray[count] = data;
                             count++;
@@ -424,7 +427,17 @@ export default class CurrencyListComponent extends Component {
                                     title: i18n.t('static.currency.conversionrateusd'),
                                     type: 'text',
                                     readOnly: true
-                                }
+                                },
+                                {
+                                    title: i18n.t('static.common.lastModifiedBy'),
+                                    type: 'text',
+                                    readOnly: true
+                                },
+                                {
+                                    title: i18n.t('static.common.lastModifiedDate'),
+                                    type: 'text',
+                                    readOnly: true
+                                },
                             ],
                             text: {
                                 // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,

@@ -70,7 +70,7 @@ export default class PipelineProgramPlanningUnits extends Component {
             } else {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, (list[y].pipelineProductName).concat(" Does not exist."));
+                this.el.setComments(col, (list[y].pipelineProductName).concat(i18n.t('static.message.notExist')));
             }
             var col = ("K").concat(parseInt(y) + 1);
             var value = (this.el.getRowData(y)[10]).toString();
@@ -129,7 +129,7 @@ export default class PipelineProgramPlanningUnits extends Component {
                     if (planningUnitValue == value && y != i) {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, "Planning Unit aready exist");
+                        this.el.setComments(col, i18n.t('static.message.planningUnitAlreadyExists'));
                         i = json.length;
                     } else {
                         this.el.setStyle(col, "background-color", "transparent");
@@ -326,7 +326,7 @@ export default class PipelineProgramPlanningUnits extends Component {
                     if (planningUnitValue == currentPlanningUnit && y != i) {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, "Planning Unit aready exist");
+                        this.el.setComments(col, i18n.t('static.message.planningUnitAlreadyExists'));
                         i = json.length;
                         valid = false;
                     } else {

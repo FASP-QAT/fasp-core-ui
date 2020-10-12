@@ -568,7 +568,7 @@ class AddBudgetComponent extends Component {
                                         setTouched,
                                         handleReset
                                     }) => (
-                                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='budgetForm'>
+                                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='budgetForm' autocomplete="off">
                                                 <CardBody>
                                                     <FormGroup>
                                                         <Label htmlFor="programId">{i18n.t('static.budget.program')}<span className="red Reqasterisk">*</span></Label>
@@ -807,6 +807,7 @@ class AddBudgetComponent extends Component {
                                                             bsSize="sm"
                                                             onChange={(e) => { this.dataChange(e) }}
                                                             type="textarea"
+                                                            maxLength={600}
                                                         />
                                                         <FormFeedback className="red"></FormFeedback>
                                                     </FormGroup>
