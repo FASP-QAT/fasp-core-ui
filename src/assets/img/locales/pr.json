@@ -909,5 +909,6 @@
     "static.program.deleteLocalProgramSuccess": "Programa (s) local (is) excluído (s) com sucesso",
     "static.common.delete": "Excluir",
     "static.program.deleteLocalProgram": "Excluir programa local",
-    "static.login.login": "Conecte-se"
+    "static.login.login": "Conecte-se",
+    "static.ticket.unavailableDropdownValidationText": " - se você não vê o ? você quer, por favor, envie um ticket para esse item."
 }

@@ -5,8 +5,8 @@ import i18n from '../../i18n';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunctionOnlyHideRow, checkValidtion, inValid, positiveValidation, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { SECRET_KEY, SHIPMENT_DATA_SOURCE_TYPE, DELIVERED_SHIPMENT_STATUS, TBD_PROCUREMENT_AGENT_ID, TBD_FUNDING_SOURCE, SUBMITTED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, DECIMAL_NO_REGEX, INTEGER_NO_REGEX, CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, INDEXED_DB_VERSION, INDEXED_DB_NAME, ALPHABET_NUMBER_REGEX, JEXCEL_DATE_FORMAT, BATCH_PREFIX, NONE_SELECTED_DATA_SOURCE_ID, LABEL_WITH_SPECIAL_SYMBOL_REGEX, BATCH_NO_REGEX, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from "../../Constants";
-import moment from "moment";
+import { SECRET_KEY, SHIPMENT_DATA_SOURCE_TYPE, DELIVERED_SHIPMENT_STATUS, TBD_PROCUREMENT_AGENT_ID, TBD_FUNDING_SOURCE, SUBMITTED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, JEXCEL_DECIMAL_NO_REGEX, JEXCEL_INTEGER_REGEX, CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, INDEXED_DB_VERSION, INDEXED_DB_NAME, ALPHABET_NUMBER_REGEX, JEXCEL_DATE_FORMAT, BATCH_PREFIX, NONE_SELECTED_DATA_SOURCE_ID, LABEL_WITH_SPECIAL_SYMBOL_REGEX, BATCH_NO_REGEX, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from "../../Constants";
+import moment, { invalid } from "moment";
 import { paddingZero, generateRandomAplhaNumericCode, contrast } from "../../CommonComponent/JavascriptCommonFunctions";
 import CryptoJS from 'crypto-js'
 import { calculateSupplyPlan } from "./SupplyPlanCalculations";
@@ -41,44 +41,12 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         this.saveShipments = this.saveShipments.bind(this);
         this.checkValidationForShipments = this.checkValidationForShipments.bind(this);
         this.showShipmentData = this.showShipmentData.bind(this);
-        this.showOnlyErrors = this.showOnlyErrors.bind(this);
         this.shipmentEditStart = this.shipmentEditStart.bind(this);
         this.addRowInJexcel = this.addRowInJexcel.bind(this);
         this.addBatchRowInJexcel = this.addBatchRowInJexcel.bind(this);
         this.calculateEmergencyOrder = this.calculateEmergencyOrder.bind(this);
     }
 
-    showOnlyErrors() {
-        var checkBoxValue = document.getElementById("showErrors");
-        var elInstance = this.state.shipmentsEl;
-        var json = elInstance.getJson();
-        var showOption = (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
-        if (json.length < showOption) {
-            showOption = json.length;
-        }
-        if (checkBoxValue.checked == true) {
-            console.log("in ncheck box true");
-            for (var j = 0; j < parseInt(showOption); j++) {
-                var rowData = elInstance.getRowData(j);
-                console.log("in for loop", rowData[25]);
-                var asterisk = document.getElementsByClassName("jexcel_content")[0];
-                console.log("asterisk", asterisk);
-                var tr = (asterisk.childNodes[0]).childNodes[2];
-                if (rowData[25].toString() == 1) {
-                    tr.childNodes[j].style.display = "";
-                } else {
-                    tr.childNodes[j].style.display = "none";
-                }
-            }
-        } else {
-            for (var j = 0; j < parseInt(showOption); j++) {
-                var asterisk = document.getElementsByClassName("jexcel_content")[0];
-                console.log("asterisk", asterisk);
-                var tr = (asterisk.childNodes[0]).childNodes[2];
-                tr.childNodes[j].style.display = "";
-            }
-        }
-    }
 
     componentDidMount() {
 
@@ -526,6 +494,14 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                             var tableEditable = true;
                                                             if (rowData[14].toString() == "true" || this.props.shipmentPage == "supplyPlanCompare") {
                                                                 tableEditable = false;
+                                                            }
+                                                            if (this.props.shipmentPage!="shipmentDataEntry" && document.getElementById("addRowBatchId") != null) {
+                                                                console.log("rowData[14]",rowData[14])
+                                                                if (rowData[14].toString() == "false") {
+                                                                    document.getElementById("addRowBatchId").style.display = "block";
+                                                                } else {
+                                                                    document.getElementById("addRowBatchId").style.display = "none";
+                                                                }
                                                             }
                                                             for (var sb = 0; sb < batchInfo.length; sb++) {
                                                                 var data = [];
@@ -1123,7 +1099,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         tr.children[1].classList.add('AsteriskTheadtrTd');
         tr.children[2].classList.add('AsteriskTheadtrTd');
         tr.children[3].classList.add('AsteriskTheadtrTd');
-        tr.children[4].classList.add('AsteriskTheadtrTd');
         tr.children[6].classList.add('AsteriskTheadtrTd');
         tr.children[7].classList.add('AsteriskTheadtrTd');
         tr.children[8].classList.add('AsteriskTheadtrTd');
@@ -1144,8 +1119,20 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 if (rowData[20].toString() == "false") {
                     shipmentInstance.setStyle(col, "background-color", "transparent");
                     shipmentInstance.setStyle(col, "background-color", "#D3D3D3");
+                    var cell = shipmentInstance.getCell(`L${parseInt(i) + 1}`)
+                    cell.classList.add('shipmentEntryDoNotInclude');
+                    var cell = shipmentInstance.getCell(`I${parseInt(i) + 1}`)
+                    cell.classList.add('shipmentEntryDoNotInclude');
+                    var element = document.getElementById("shipmentsDetailsTable");
+                    element.classList.remove("jexcelremoveReadonlybackground");
                 } else {
                     shipmentInstance.setStyle(col, "background-color", "transparent");
+                    var cell = shipmentInstance.getCell(`L${parseInt(i) + 1}`)
+                    cell.classList.remove('shipmentEntryDoNotInclude');
+                    var cell = shipmentInstance.getCell(`I${parseInt(i) + 1}`)
+                    cell.classList.remove('shipmentEntryDoNotInclude');
+                    var element = document.getElementById("shipmentsDetailsTable");
+                    element.classList.add("jexcelremoveReadonlybackground");
                 }
 
                 if (rowData[19].toString() == "true") {
@@ -1153,12 +1140,16 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     shipmentInstance.setStyle(col, "color", "#000");
                     shipmentInstance.setStyle(col, "color", "red");
                     var cell = shipmentInstance.getCell(`L${parseInt(i) + 1}`)
-                    cell.classList.add('shipmentEntry');
+                    cell.classList.add('shipmentEntryEmergency');
+                    var cell = shipmentInstance.getCell(`I${parseInt(i) + 1}`)
+                    cell.classList.add('shipmentEntryEmergency');
                 } else {
                     console.log("In else")
                     shipmentInstance.setStyle(col, "color", "#000");
                     var cell = shipmentInstance.getCell(`L${parseInt(i) + 1}`)
-                    cell.classList.remove('shipmentEntry');
+                    cell.classList.remove('shipmentEntryEmergency');
+                    var cell = shipmentInstance.getCell(`I${parseInt(i) + 1}`)
+                    cell.classList.remove('shipmentEntryEmergency');
                 }
             }
         }
@@ -1171,6 +1162,13 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         tr.children[1].classList.add('AsteriskTheadtrTd');
         tr.children[4].classList.add('AsteriskTheadtrTd');
         tr.children[6].classList.add('AsteriskTheadtrTd');
+        var elInstance = instance.jexcel;
+        console.log("Y", y, "x", x)
+        var y = 0;
+        var validation = checkValidtion("number", "F", y, ((elInstance.getCell(`F${parseInt(0) + 1}`)).innerHTML).toString().replaceAll("\,", ""), elInstance, JEXCEL_INTEGER_REGEX, 1, 0);
+        console.log("Validation", validation);
+        validation = checkValidtion("number", "C", y, elInstance.getRowData(0)[2], elInstance, JEXCEL_INTEGER_REGEX, 1, 0);
+
     }
 
     loadedQtyCalculator1 = function (instance, cell, x, y, value) {
@@ -1317,6 +1315,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             if (shipmentStatus == DELIVERED_SHIPMENT_STATUS) {
                 if (value != "" && value != null && value != "Invalid date") {
                     shipmentDatesJson.receivedDate = moment(value).format("YYYY-MM-DD");
+                    if (shipmentDatesJson.expectedDeliveryDate == "" || shipmentDatesJson.expectedDeliveryDate == null || shipmentDatesJson.expectedDeliveryDate == "Invalid date") {
+                        shipmentDatesJson.expectedDeliveryDate = moment(value).format("YYYY-MM-DD");
+                    }
                 } else {
                     shipmentDatesJson.receivedDate = "";
                 }
@@ -1338,8 +1339,20 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 if (rowData[20].toString() == "false") {
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setStyle(col, "background-color", "#D3D3D3");
+                    var cell = elInstance.getCell(`L${parseInt(y) + 1}`)
+                    cell.classList.add('shipmentEntryDoNotInclude');
+                    var cell = elInstance.getCell(`I${parseInt(y) + 1}`)
+                    cell.classList.add('shipmentEntryDoNotInclude');
+                    var element = document.getElementById("shipmentsDetailsTable");
+                    element.classList.remove("jexcelremoveReadonlybackground");
                 } else {
                     elInstance.setStyle(col, "background-color", "transparent");
+                    var cell = elInstance.getCell(`L${parseInt(y) + 1}`)
+                    cell.classList.remove('shipmentEntryDoNotInclude');
+                    var cell = elInstance.getCell(`I${parseInt(y) + 1}`)
+                    cell.classList.remove('shipmentEntryDoNotInclude');
+                    var element = document.getElementById("shipmentsDetailsTable");
+                    element.classList.add("jexcelremoveReadonlybackground");
                 }
 
                 if (rowData[19].toString() == "true") {
@@ -1347,12 +1360,16 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     elInstance.setStyle(col, "color", "#000");
                     elInstance.setStyle(col, "color", "red");
                     var cell = elInstance.getCell(`L${parseInt(y) + 1}`)
-                    cell.classList.add('shipmentEntry');
+                    cell.classList.add('shipmentEntryEmergency');
+                    var cell = elInstance.getCell(`I${parseInt(y) + 1}`)
+                    cell.classList.add('shipmentEntryEmergency');
                 } else {
                     console.log("In else")
                     elInstance.setStyle(col, "color", "#000");
                     var cell = elInstance.getCell(`L${parseInt(y) + 1}`)
-                    cell.classList.remove('shipmentEntry');
+                    cell.classList.remove('shipmentEntryEmergency');
+                    var cell = elInstance.getCell(`I${parseInt(y) + 1}`)
+                    cell.classList.remove('shipmentEntryEmergency');
                 }
 
                 if (rowData[24].toString() == "false") {
@@ -1360,24 +1377,46 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     elInstance.setStyle(col, "color", "#808080");
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setStyle(col, "background-color", "#808080");
+                    var element = document.getElementById("shipmentsDetailsTable");
+                    element.classList.remove("jexcelremoveReadonlybackground");
+                    var cell = elInstance.getCell(`L${parseInt(y) + 1}`)
+                    cell.classList.add('shipmentEntryDelete');
+                    var cell = elInstance.getCell(`I${parseInt(y) + 1}`)
+                    cell.classList.add('shipmentEntryDelete');
                 } else {
                     if (rowData[20].toString() == "false") {
                         elInstance.setStyle(col, "background-color", "transparent");
                         elInstance.setStyle(col, "background-color", "#D3D3D3");
+                        var cell = elInstance.getCell(`L${parseInt(y) + 1}`)
+                        cell.classList.add('shipmentEntryDoNotInclude');
+                        var cell = elInstance.getCell(`I${parseInt(y) + 1}`)
+                        cell.classList.add('shipmentEntryDoNotInclude');
+                        var element = document.getElementById("shipmentsDetailsTable");
+                        element.classList.remove("jexcelremoveReadonlybackground");
                     } else {
                         elInstance.setStyle(col, "background-color", "transparent");
+                        var cell = elInstance.getCell(`L${parseInt(y) + 1}`)
+                        cell.classList.remove('shipmentEntryDoNotInclude');
+                        var cell = elInstance.getCell(`I${parseInt(y) + 1}`)
+                        cell.classList.remove('shipmentEntryDoNotInclude');
+                        var element = document.getElementById("shipmentsDetailsTable");
+                        element.classList.add("jexcelremoveReadonlybackground");
                     }
                     if (rowData[19].toString() == "true") {
                         console.log("In if");
                         elInstance.setStyle(col, "color", "#000");
                         elInstance.setStyle(col, "color", "red");
                         var cell = elInstance.getCell(`L${parseInt(y) + 1}`)
-                        cell.classList.add('shipmentEntry');
+                        cell.classList.add('shipmentEntryEmergency');
+                        var cell = elInstance.getCell(`I${parseInt(y) + 1}`)
+                        cell.classList.add('shipmentEntryEmergency');
                     } else {
                         console.log("In else")
                         elInstance.setStyle(col, "color", "#000");
                         var cell = elInstance.getCell(`L${parseInt(y) + 1}`)
-                        cell.classList.remove('shipmentEntry');
+                        cell.classList.remove('shipmentEntryEmergency');
+                        var cell = elInstance.getCell(`I${parseInt(y) + 1}`)
+                        cell.classList.remove('shipmentEntryEmergency');
                     }
                 }
             }
@@ -1597,8 +1636,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         }
 
         if (x == 8) {
-            var valid = checkValidtion("number", "I", y, rowData[8], elInstance, INTEGER_NO_REGEX, 1, 0);
-            if (valid = false) {
+            var valid = checkValidtion("number", "I", y, rowData[8], elInstance, JEXCEL_INTEGER_REGEX, 1, 0);
+            console.log("Valida", valid);
+            if (valid == false) {
                 elInstance.setValueFromCoords(25, y, 1, true);
             } else {
                 var batchDetails = rowData[17];
@@ -1613,15 +1653,15 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         }
 
         if (x == 10) {
-            var valid = checkValidtion("number", "K", y, rowData[10], elInstance, DECIMAL_NO_REGEX, 1, 1);
-            if (valid = false) {
+            var valid = checkValidtion("number", "K", y, rowData[10], elInstance, JEXCEL_DECIMAL_NO_REGEX, 1, 1);
+            if (valid == false) {
                 elInstance.setValueFromCoords(25, y, 1, true);
             }
         }
 
         if (x == 12) {
-            var valid = checkValidtion("number", "M", y, rowData[12], elInstance, DECIMAL_NO_REGEX, 1, 1);
-            if (valid = false) {
+            var valid = checkValidtion("number", "M", y, rowData[12], elInstance, JEXCEL_DECIMAL_NO_REGEX, 1, 1);
+            if (valid == false) {
                 elInstance.setValueFromCoords(25, y, 1, true);
             }
         }
@@ -1636,6 +1676,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     this.props.updateState("shipmentBatchError", i18n.t('static.supplyPlan.batchNumberMissing'));
                     this.props.hideSecondComponent()
                 } else {
+                    console.log("In eklse");
                     positiveValidation("I", y, elInstance);
                     this.props.updateState("shipmentBatchError", "");
                 }
@@ -1667,7 +1708,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             if (elInstance1 != undefined && elInstance1 != "") {
                 elInstance1.setValueFromCoords(9, 0, value, true);
             }
-            checkValidtion("number", "C", y, elInstance.getRowData(0)[2], elInstance, INTEGER_NO_REGEX, 1, 0);
+            checkValidtion("number", "C", y, elInstance.getRowData(0)[2], elInstance, JEXCEL_INTEGER_REGEX, 1, 0);
         }
 
         if (x == 4) {
@@ -1678,7 +1719,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
 
         if (x == 5) {
             console.log("In x==5")
-            var valid = checkValidtion("number", "F", y, ((elInstance.getCell(`F${parseInt(0) + 1}`)).innerHTML).toString().replaceAll("\,", ""), elInstance, INTEGER_NO_REGEX, 1, 0);
+            var valid = checkValidtion("number", "F", y, ((elInstance.getCell(`F${parseInt(0) + 1}`)).innerHTML).toString().replaceAll("\,", ""), elInstance, JEXCEL_INTEGER_REGEX, 1, 0);
             if (valid == true) {
                 if (elInstance1 != undefined && elInstance1 != "") {
                     console.log("In instance is not defined");
@@ -1739,11 +1780,11 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         var elInstance = this.state.qtyCalculatorTableEl;
         var y = 0;
         var valid = true;
-        var validation = checkValidtion("number", "F", y, ((elInstance.getCell(`F${parseInt(0) + 1}`)).innerHTML).toString().replaceAll("\,", ""), elInstance, INTEGER_NO_REGEX, 1, 0);
+        var validation = checkValidtion("number", "F", y, ((elInstance.getCell(`F${parseInt(0) + 1}`)).innerHTML).toString().replaceAll("\,", ""), elInstance, JEXCEL_INTEGER_REGEX, 1, 0);
         if (validation == false) {
             valid = false;
         }
-        validation = checkValidtion("number", "C", y, elInstance.getRowData(0)[2], elInstance, INTEGER_NO_REGEX, 1, 0);
+        validation = checkValidtion("number", "C", y, elInstance.getRowData(0)[2], elInstance, JEXCEL_INTEGER_REGEX, 1, 0);
         if (validation == false) {
             valid = false;
         }
@@ -1785,7 +1826,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             checkValidtion("text", "B", y, rowData[1], elInstance);
         }
         if (x == 2) {
-            checkValidtion("number", "C", y, rowData[2], elInstance, INTEGER_NO_REGEX, 1, 0);
+            checkValidtion("number", "C", y, rowData[2], elInstance, JEXCEL_INTEGER_REGEX, 1, 0);
         }
         this.props.updateState("shipmentBatchInfoChangedFlag", 1);
     }.bind(this)
@@ -1847,7 +1888,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 if (validation.toString() == "false") {
                     valid = false;
                 }
-                var validation = checkValidtion("number", "C", y, rowData[2], elInstance, INTEGER_NO_REGEX, 1, 0);
+                var validation = checkValidtion("number", "C", y, rowData[2], elInstance, JEXCEL_INTEGER_REGEX, 1, 0);
                 if (validation.toString() == "false") {
                     valid = false;
                 }
@@ -2505,6 +2546,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         }
                         var procurementAgent = rowData[2];
                         var fundingSource = rowData[3];
+                        console.log("fundingSource", fundingSource);
                         if (procurementAgent == TBD_PROCUREMENT_AGENT_ID) {
                             inValid("C", y, i18n.t('static.supplyPlan.procurementAgentCannotBeTBD'), elInstance);
                             valid = false;
@@ -2583,11 +2625,26 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             positiveValidation("D", y, elInstance);
                         }
                     }
+                } else {
+                    valid = false;
                 }
 
                 var validation = checkValidtion("date", "B", y, rowData[1], elInstance);
                 if (validation == false) {
                     valid = false;
+                } else {
+                    if (rowData[0] == DELIVERED_SHIPMENT_STATUS) {
+                        var curDate = moment(Date.now()).format("YYYY-MM-DD");
+                        var selectedDate = moment(rowData[1]).format("YYYY-MM-DD");
+                        if (selectedDate > curDate) {
+                            inValid("B", y, i18n.t('static.supplyPlan.dateustBeLessThanCurDate'), elInstance);
+                            valid = false;
+                        } else {
+                            positiveValidation("B", y, elInstance);
+                        }
+                    } else {
+                        positiveValidation("B", y, elInstance);
+                    }
                 }
 
                 var validation = checkValidtion("text", "G", y, rowData[6], elInstance);
@@ -2602,7 +2659,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     elInstance.setValueFromCoords(25, y, 1, true);
                 }
 
-                var validation = checkValidtion("number", "I", y, rowData[8], elInstance, INTEGER_NO_REGEX, 1, 0);
+                var validation = checkValidtion("number", "I", y, rowData[8], elInstance, JEXCEL_INTEGER_REGEX, 1, 0);
                 if (validation == false) {
                     valid = false;
                     elInstance.setValueFromCoords(25, y, 1, true);
@@ -2614,13 +2671,13 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     elInstance.setValueFromCoords(25, y, 1, true);
                 }
 
-                var validation = checkValidtion("number", "K", y, rowData[10], elInstance, DECIMAL_NO_REGEX, 1, 1);
+                var validation = checkValidtion("number", "K", y, rowData[10], elInstance, JEXCEL_DECIMAL_NO_REGEX, 1, 1);
                 if (validation == false) {
                     valid = false;
                     elInstance.setValueFromCoords(25, y, 1, true);
                 }
 
-                var validation = checkValidtion("number", "M", y, rowData[12], elInstance, DECIMAL_NO_REGEX, 1, 1);
+                var validation = checkValidtion("number", "M", y, rowData[12], elInstance, JEXCEL_DECIMAL_NO_REGEX, 1, 1);
                 if (validation == false) {
                     valid = false;
                     elInstance.setValueFromCoords(25, y, 1, true);

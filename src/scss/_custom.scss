@@ -651,8 +651,17 @@ label.arrow_label:after {
   color: #212721 !important;
 }
 
-.jexcel > tbody > tr > td.readonly.shipmentEntry {
+.jexcel > tbody > tr > td.readonly.shipmentEntryEmergency {
   color: red !important;
+}
+
+.jexcel > tbody > tr > td.readonly.shipmentEntryDoNotInclude {
+  background-color: #D3D3D3 !important;
+}
+
+.jexcel > tbody > tr > td.readonly.shipmentEntryDelete {
+  color: #808080 !important;
+  background-color: #808080 !important;
 }
 
 .whitebtnColor .btn-info {

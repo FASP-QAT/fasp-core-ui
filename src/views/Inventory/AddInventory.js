@@ -147,7 +147,9 @@ export default class AddInventory extends Component {
                 this.setState({
                     programList: proList, loading: false
                 })
-
+                if (document.getElementById("addRowButtonId") != null) {
+                document.getElementById("addRowButtonId").style.display = "none";
+                }
                 var programIdd = this.props.match.params.programId;
                 console.log("programIdd", programIdd);
                 if (programIdd != '' && programIdd != undefined) {
@@ -167,6 +169,9 @@ export default class AddInventory extends Component {
         document.getElementById("planningUnitId").value = 0;
         document.getElementById("planningUnit").value = "";
         document.getElementById("adjustmentsTableDiv").style.display = "none";
+        if (document.getElementById("addRowButtonId") != null) {
+        document.getElementById("addRowButtonId").style.display = "none";
+        }
         this.setState({
             programSelect: value,
             programId: value != "" && value != undefined ? value.value : 0,
@@ -281,6 +286,9 @@ export default class AddInventory extends Component {
         var programId = document.getElementById("programId").value;
         if (planningUnitId != 0) {
             document.getElementById("adjustmentsTableDiv").style.display = "block";
+            if (document.getElementById("addRowButtonId") != null) {
+            document.getElementById("addRowButtonId").style.display = "block";
+            }
             var db1;
             getDatabase();
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -351,6 +359,9 @@ export default class AddInventory extends Component {
             }.bind(this)
         } else {
             document.getElementById("adjustmentsTableDiv").style.display = "none";
+            if (document.getElementById("addRowButtonId") != null) {
+                document.getElementById("addRowButtonId").style.display = "none";
+            }
             this.setState({ loading: false });
         }
     }
@@ -369,6 +380,9 @@ export default class AddInventory extends Component {
             inventoryDataType: value
         })
         document.getElementById("adjustmentsTableDiv").style.display = "none";
+        if (document.getElementById("addRowButtonId") != null) {
+        document.getElementById("addRowButtonId").style.display = "none";
+        }
         if (this.state.planningUnit != 0 && (value != "" && value != undefined ? value.value : 0) != 0) {
             this.formSubmit(this.state.planningUnit, this.state.rangeValue);
         }
@@ -479,7 +493,7 @@ export default class AddInventory extends Component {
                             <FormGroup>
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 {this.state.inventoryChangedFlag == 1 && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.refs.inventoryChild.saveInventory}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>}&nbsp;
-                                {this.refs.inventoryChild != undefined && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.refs.inventoryChild.addRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
+                                {this.refs.inventoryChild != undefined && <Button id="addRowButtonId" color="info" size="md" className="float-right mr-1" type="button" onClick={this.refs.inventoryChild.addRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
                                 &nbsp;
                         </FormGroup>
                         </FormGroup>

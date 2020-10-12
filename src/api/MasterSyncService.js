@@ -157,5 +157,10 @@ class MasterSyncService {
         });
     }
 
+    getSyncAllMasters(lastSyncDate){
+        return axios.get(`${API_URL}/api/sync/allMasters/${lastSyncDate}`, {
+        });
+    }
+
 }
 export default new MasterSyncService()
