@@ -3020,7 +3020,7 @@ export default class WhatIfReportComponent extends React.Component {
 
                                     </Form>
                                 )} />
-                    <span onClick={() => this.toggleAccordionScenarioList()}>{this.state.showScenarioList ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}</span><span>{i18n.t('static.whatIf.scenarioList')}</span>
+                    <span onClick={() => this.toggleAccordionScenarioList()}>{this.state.showScenarioList ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}</span>&nbsp;&nbsp;<span>{i18n.t('static.whatIf.scenarioList')}</span>
                     <Row className="pt-3 pb-3 scenarioListDiv" >
                         <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                             <Col md="12 pl-0" id="realmDiv">
