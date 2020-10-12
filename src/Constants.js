@@ -53,6 +53,7 @@ export const ALPHABET_NUMBER_REGEX = /^([a-zA-Z0-9])*[a-zA-Z0-9]+$/
 export const BUDGET_NAME_REGEX = /^([a-zA-Z0-9,-]+\s)*[a-zA-Z0-9,-]+$/
 export const SPACE_REGEX = /^[^\s]+(\s+[^\s]+)*$/
 export const PERCENTAGE_REGEX = /^0?[0-9]?[0-9]$|^(100)$/
+export const NO_DECIMAL_PERCENTAGE_REGEX = /^[0-9\b]+$/
 export const INDEXED_DB_NAME = "fasp"
 export const INDEXED_DB_VERSION = 1
 export const ACTUAL_CONSUMPTION_TYPE = 1;

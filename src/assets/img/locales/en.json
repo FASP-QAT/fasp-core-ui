@@ -347,6 +347,7 @@
     "static.procurementagent.procurementagentapprovetoshippedtime": "Enter 'Approved to Shipped' lead time for this procurement agent (in months)",
     "static.currency.currencyMaster": "Currency",
     "static.currency.conversionrateNumber": "Enter positive integer or decimal number",
+    "static.common.onlyIntegers":"Enter only positive integer",
     "static.currency.conversionrateNumberDecimalPlaces": " Please enter decimal numbers upto 4 decimal places.",
     "static.currency.conversionrateNumberTwoDecimalPlaces": " Please enter decimal numbers upto 2 decimal places.",
     "static.currency.conversionrateMin": "Enter number greater then 0",
