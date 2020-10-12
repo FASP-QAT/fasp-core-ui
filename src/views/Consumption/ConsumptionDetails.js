@@ -563,7 +563,7 @@ export default class ConsumptionDetails extends React.Component {
                                                         </div>
                                                     </FormGroup>
                                                     <FormGroup check inline>
-                                                        <Input className="form-check-input removeMarginLeftCheckbox" type="checkbox" id="showActive" name="showActive" value={this.state.showActive} onClick={() => this.formSubmit(this.state.planningUnit, this.state.rangeValue)} />
+                                                        <Input className="form-check-input removeMarginLeftCheckbox" type="checkbox" id="showActive" name="showActive" value={this.state.showActive} checked={this.state.showActive} onClick={() => this.formSubmit(this.state.planningUnit, this.state.rangeValue)} />
                                                         <Label className="form-check-label" check htmlFor="inline-checkbox1">{i18n.t("static.inventory.active")}</Label>
                                                     </FormGroup>
                                                     {/* {this.state.consumptionChangedFlag == 1 && <FormGroup check inline>
