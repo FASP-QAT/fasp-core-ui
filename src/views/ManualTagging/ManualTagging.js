@@ -1075,6 +1075,11 @@ export default class ManualTagging extends Component {
                 {
                     title: i18n.t('static.report.procurementAgentName'),
                     type: 'text',
+                }
+                ,
+                {
+                    title: i18n.t('static.budget.fundingsource'),
+                    type: 'text',
                 },
                 {
                     title: i18n.t('static.dashboard.budget'),
@@ -1082,10 +1087,6 @@ export default class ManualTagging extends Component {
                 },
                 {
                     title: i18n.t('static.supplyPlan.shipmentQty'),
-                    type: 'text',
-                },
-                {
-                    title: i18n.t('static.budget.fundingsource'),
                     type: 'text',
                 },
             ],
@@ -1361,6 +1362,12 @@ export default class ManualTagging extends Component {
                 align: 'center',
                 headerAlign: 'center',
                 // formatter: this.formatLabel
+            }, {
+                dataField: 'fundingSource.code',
+                text: i18n.t('static.fundingSourceHead.fundingSource'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
             },
             {
                 dataField: 'budget.label.label_en',
@@ -1377,14 +1384,8 @@ export default class ManualTagging extends Component {
                 align: 'center',
                 headerAlign: 'center',
                 formatter: this.addCommas
-            },
-            {
-                dataField: 'fundingSource.code',
-                text: i18n.t('static.fundingSourceHead.fundingSource'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
             }
+
         ];
 
         const columns1 = [
@@ -1550,6 +1551,7 @@ export default class ManualTagging extends Component {
                                                 id="planningUnitId"
                                                 bsSize="sm"
                                                 autocomplete="off"
+                                                onChange={this.filterData}
                                             >
                                                 <option value="0">{i18n.t('static.common.select')}</option>
                                                 {planningUnitList}

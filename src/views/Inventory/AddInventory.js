@@ -60,8 +60,21 @@ export default class AddInventory extends Component {
         //
     }
     handleRangeDissmis(value) {
-        this.setState({ rangeValue: value })
-        this.formSubmit(this.state.planningUnit, value);
+        var cont = false;
+        if (this.state.inventoryChangedFlag == 1) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
+
+            }
+        } else {
+            cont = true;
+        }
+        if (cont == true) {
+            this.setState({ rangeValue: value, inventoryChangedFlag: 0 })
+            this.formSubmit(this.state.planningUnit, value);
+        }
     }
 
     hideFirstComponent() {
@@ -89,16 +102,29 @@ export default class AddInventory extends Component {
         clearTimeout(this.timeout);
     }
 
-    toggleLarge() {
-        this.setState({
-            inventoryBatchInfoChangedFlag: 0,
-            inventoryBatchInfoDuplicateError: '',
-            inventoryBatchInfoNoStockError: '',
-            inventoryBatchError: ""
-        })
-        this.setState({
-            inventoryBatchInfo: !this.state.inventoryBatchInfo,
-        });
+    toggleLarge(method) {
+        var cont = false;
+        if (method != "submit" && this.state.inventoryBatchInfoChangedFlag == 1) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
+
+            }
+        } else {
+            cont = true;
+        }
+        if (cont == true) {
+            this.setState({
+                inventoryBatchInfoChangedFlag: 0,
+                inventoryBatchInfoDuplicateError: '',
+                inventoryBatchInfoNoStockError: '',
+                inventoryBatchError: ""
+            })
+            this.setState({
+                inventoryBatchInfo: !this.state.inventoryBatchInfo,
+            });
+        }
     }
 
     componentDidMount() {
@@ -148,7 +174,7 @@ export default class AddInventory extends Component {
                     programList: proList, loading: false
                 })
                 if (document.getElementById("addRowButtonId") != null) {
-                document.getElementById("addRowButtonId").style.display = "none";
+                    document.getElementById("addRowButtonId").style.display = "none";
                 }
                 var programIdd = this.props.match.params.programId;
                 console.log("programIdd", programIdd);
@@ -166,203 +192,230 @@ export default class AddInventory extends Component {
     }
 
     getPlanningUnitList(value) {
-        document.getElementById("planningUnitId").value = 0;
-        document.getElementById("planningUnit").value = "";
-        document.getElementById("adjustmentsTableDiv").style.display = "none";
-        if (document.getElementById("addRowButtonId") != null) {
-        document.getElementById("addRowButtonId").style.display = "none";
+        var cont = false;
+        if (this.state.inventoryChangedFlag == 1) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
+
+            }
+        } else {
+            cont = true;
         }
-        this.setState({
-            programSelect: value,
-            programId: value != "" && value != undefined ? value.value : 0,
-            loading: true,
-            planningUnit: "",
-            planningUnitId: 0
-        })
-        var programId = value != "" && value != undefined ? value.value : 0;
-        if (programId != 0) {
-            var db1;
-            var storeOS;
-            var regionList = [];
-            getDatabase();
-            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-            openRequest.onerror = function (event) {
-                this.setState({
-                    message: i18n.t('static.program.errortext'),
-                    color: 'red'
-                })
-                this.hideFirstComponent()
-            }.bind(this);
-            openRequest.onsuccess = function (e) {
-                db1 = e.target.result;
-                var programDataTransaction = db1.transaction(['programData'], 'readwrite');
-                var programDataOs = programDataTransaction.objectStore('programData');
-                var programRequest = programDataOs.get(value != "" && value != undefined ? value.value : 0);
-                programRequest.onerror = function (event) {
+        if (cont == true) {
+            document.getElementById("planningUnitId").value = 0;
+            document.getElementById("planningUnit").value = "";
+            document.getElementById("adjustmentsTableDiv").style.display = "none";
+            if (document.getElementById("addRowButtonId") != null) {
+                document.getElementById("addRowButtonId").style.display = "none";
+            }
+            this.setState({
+                programSelect: value,
+                programId: value != "" && value != undefined ? value.value : 0,
+                loading: true,
+                planningUnit: "",
+                planningUnitId: 0,
+                inventoryChangedFlag: 0
+            })
+            var programId = value != "" && value != undefined ? value.value : 0;
+            if (programId != 0) {
+                var db1;
+                var storeOS;
+                var regionList = [];
+                getDatabase();
+                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                openRequest.onerror = function (event) {
                     this.setState({
                         message: i18n.t('static.program.errortext'),
                         color: 'red'
                     })
                     this.hideFirstComponent()
                 }.bind(this);
-                programRequest.onsuccess = function (e) {
-                    var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                    var programJson = JSON.parse(programData);
-                    for (var i = 0; i < programJson.regionList.length; i++) {
-                        var regionJson = {
-                            name: getLabelText(programJson.regionList[i].label, this.state.lang),
-                            id: programJson.regionList[i].regionId
-                        }
-                        regionList.push(regionJson)
-
-                    }
-
-                    var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
-                    var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
-                    var planningunitRequest = planningunitOs.getAll();
-                    var planningList = []
-                    planningunitRequest.onerror = function (event) {
+                openRequest.onsuccess = function (e) {
+                    db1 = e.target.result;
+                    var programDataTransaction = db1.transaction(['programData'], 'readwrite');
+                    var programDataOs = programDataTransaction.objectStore('programData');
+                    var programRequest = programDataOs.get(value != "" && value != undefined ? value.value : 0);
+                    programRequest.onerror = function (event) {
                         this.setState({
                             message: i18n.t('static.program.errortext'),
                             color: 'red'
                         })
                         this.hideFirstComponent()
                     }.bind(this);
-                    planningunitRequest.onsuccess = function (e) {
-                        var myResult = [];
-                        myResult = planningunitRequest.result;
-                        console.log("myResult", myResult);
-                        var programId = (value != "" && value != undefined ? value.value : 0).split("_")[0];
-                        console.log('programId----->>>', programId)
-                        console.log(myResult);
-                        var proList = []
-                        for (var i = 0; i < myResult.length; i++) {
-                            if (myResult[i].program.id == programId && myResult[i].active == true) {
-                                var productJson = {
-                                    label: getLabelText(myResult[i].planningUnit.label, this.state.lang),
-                                    value: myResult[i].planningUnit.id
-                                }
-                                proList.push(productJson)
+                    programRequest.onsuccess = function (e) {
+                        var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                        var programJson = JSON.parse(programData);
+                        for (var i = 0; i < programJson.regionList.length; i++) {
+                            var regionJson = {
+                                name: getLabelText(programJson.regionList[i].label, this.state.lang),
+                                id: programJson.regionList[i].regionId
                             }
-                        }
-                        console.log("proList---" + proList);
-                        this.setState({
-                            planningUnitList: proList,
-                            planningUnitListAll: myResult,
-                            regionList: regionList,
-                            loading: false
-                        })
+                            regionList.push(regionJson)
 
-                        var planningUnitIdProp = this.props.match.params.planningUnitId;
-                        console.log("planningUnitIdProp===>", planningUnitIdProp);
-                        if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
-                            var planningUnit = { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label };
-                            this.setState({
-                                planningUnit: planningUnit,
-                                planningUnitId: planningUnitIdProp
-                            })
-                            this.formSubmit(planningUnit, this.state.rangeValue);
                         }
-                    }.bind(this);
+
+                        var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+                        var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
+                        var planningunitRequest = planningunitOs.getAll();
+                        var planningList = []
+                        planningunitRequest.onerror = function (event) {
+                            this.setState({
+                                message: i18n.t('static.program.errortext'),
+                                color: 'red'
+                            })
+                            this.hideFirstComponent()
+                        }.bind(this);
+                        planningunitRequest.onsuccess = function (e) {
+                            var myResult = [];
+                            myResult = planningunitRequest.result;
+                            console.log("myResult", myResult);
+                            var programId = (value != "" && value != undefined ? value.value : 0).split("_")[0];
+                            console.log('programId----->>>', programId)
+                            console.log(myResult);
+                            var proList = []
+                            for (var i = 0; i < myResult.length; i++) {
+                                if (myResult[i].program.id == programId && myResult[i].active == true) {
+                                    var productJson = {
+                                        label: getLabelText(myResult[i].planningUnit.label, this.state.lang),
+                                        value: myResult[i].planningUnit.id
+                                    }
+                                    proList.push(productJson)
+                                }
+                            }
+                            console.log("proList---" + proList);
+                            this.setState({
+                                planningUnitList: proList,
+                                planningUnitListAll: myResult,
+                                regionList: regionList,
+                                loading: false
+                            })
+
+                            var planningUnitIdProp = this.props.match.params.planningUnitId;
+                            console.log("planningUnitIdProp===>", planningUnitIdProp);
+                            if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
+                                var planningUnit = { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label };
+                                this.setState({
+                                    planningUnit: planningUnit,
+                                    planningUnitId: planningUnitIdProp
+                                })
+                                this.formSubmit(planningUnit, this.state.rangeValue);
+                            }
+                        }.bind(this);
+                    }.bind(this)
                 }.bind(this)
-            }.bind(this)
-        } else {
-            this.setState({
-                loading: false,
-                planningUnitList: []
-            })
+            } else {
+                this.setState({
+                    loading: false,
+                    planningUnitList: []
+                })
+            }
         }
     }
 
     formSubmit(value, rangeValue) {
-        let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
-        let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
-        console.log("In form submit");
-        this.setState({ loading: true })
-        var programId = document.getElementById('programId').value;
-        this.setState({ programId: programId, planningUnitId: value != "" && value != undefined ? value.value : 0, planningUnit: value });
-        var planningUnitId = value != "" && value != undefined ? value.value : 0;
-        var programId = document.getElementById("programId").value;
-        if (planningUnitId != 0) {
-            document.getElementById("adjustmentsTableDiv").style.display = "block";
-            if (document.getElementById("addRowButtonId") != null) {
-            document.getElementById("addRowButtonId").style.display = "block";
+        var cont = false;
+        if (this.state.inventoryChangedFlag == 1) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
+
             }
-            var db1;
-            getDatabase();
-            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-            openRequest.onerror = function (event) {
-                this.setState({
-                    message: i18n.t('static.program.errortext'),
-                    color: 'red'
-                })
-                this.hideFirstComponent()
-            }.bind(this);
-            openRequest.onsuccess = function (e) {
-                db1 = e.target.result;
-                var transaction = db1.transaction(['programData'], 'readwrite');
-                var programTransaction = transaction.objectStore('programData');
-                var programRequest = programTransaction.get(programId);
-                programRequest.onerror = function (event) {
+        } else {
+            cont = true;
+        }
+        if (cont == true) {
+            let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
+            let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
+            console.log("In form submit");
+            this.setState({ loading: true, inventoryChangedFlag: 0 })
+            var programId = document.getElementById('programId').value;
+            this.setState({ programId: programId, planningUnitId: value != "" && value != undefined ? value.value : 0, planningUnit: value });
+            var planningUnitId = value != "" && value != undefined ? value.value : 0;
+            var programId = document.getElementById("programId").value;
+            if (planningUnitId != 0) {
+                document.getElementById("adjustmentsTableDiv").style.display = "block";
+                if (document.getElementById("addRowButtonId") != null) {
+                    document.getElementById("addRowButtonId").style.display = "block";
+                }
+                var db1;
+                getDatabase();
+                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                openRequest.onerror = function (event) {
                     this.setState({
                         message: i18n.t('static.program.errortext'),
                         color: 'red'
                     })
                     this.hideFirstComponent()
                 }.bind(this);
-                programRequest.onsuccess = function (event) {
-                    var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                    var programJson = JSON.parse(programData);
-                    var batchList = []
-                    var batchInfoList = programJson.batchInfoList;
-                    console.log("Batch info list from program json", batchInfoList);
+                openRequest.onsuccess = function (e) {
+                    db1 = e.target.result;
+                    var transaction = db1.transaction(['programData'], 'readwrite');
+                    var programTransaction = transaction.objectStore('programData');
+                    var programRequest = programTransaction.get(programId);
+                    programRequest.onerror = function (event) {
+                        this.setState({
+                            message: i18n.t('static.program.errortext'),
+                            color: 'red'
+                        })
+                        this.hideFirstComponent()
+                    }.bind(this);
+                    programRequest.onsuccess = function (event) {
+                        var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                        var programJson = JSON.parse(programData);
+                        var batchList = []
+                        var batchInfoList = programJson.batchInfoList;
+                        console.log("Batch info list from program json", batchInfoList);
 
-                    var batchList = [];
-                    var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == planningUnitId && c.active.toString() == "true" && c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS);
+                        var batchList = [];
+                        var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == planningUnitId && c.active.toString() == "true" && c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS);
 
-                    for (var sl = 0; sl < shipmentList.length; sl++) {
-                        var bdl = shipmentList[sl].batchInfoList;
-                        for (var bd = 0; bd < bdl.length; bd++) {
-                            var index = batchList.findIndex(c => c.batchNo == bdl[bd].batch.batchNo);
-                            if (index == -1) {
-                                var batchDetailsToPush = batchInfoList.filter(c => c.batchNo == bdl[bd].batch.batchNo && c.planningUnitId == planningUnitId)[0];
-                                batchList.push(batchDetailsToPush);
+                        for (var sl = 0; sl < shipmentList.length; sl++) {
+                            var bdl = shipmentList[sl].batchInfoList;
+                            for (var bd = 0; bd < bdl.length; bd++) {
+                                var index = batchList.findIndex(c => c.batchNo == bdl[bd].batch.batchNo);
+                                if (index == -1) {
+                                    var batchDetailsToPush = batchInfoList.filter(c => c.batchNo == bdl[bd].batch.batchNo && c.planningUnitId == planningUnitId)[0];
+                                    batchList.push(batchDetailsToPush);
+                                }
                             }
                         }
-                    }
 
-                    var inventoryListUnFiltered = (programJson.inventoryList);
-                    var inventoryList = (programJson.inventoryList).filter(c =>
-                        c.planningUnit.id == planningUnitId &&
-                        c.region != null && c.region.id != 0);
-                    if (this.state.inventoryType == 1) {
-                        inventoryList = inventoryList.filter(c => c.actualQty != "" && c.actualQty != undefined && c.actualQty != null);
-                    } else {
-                        inventoryList = inventoryList.filter(c => c.adjustmentQty != "" && c.adjustmentQty != undefined && c.adjustmentQty != null);
-                    }
-                    inventoryList = inventoryList.filter(c => moment(c.inventoryDate).format("YYYY-MM-DD") >= moment(startDate).format("YYYY-MM-DD") && moment(c.inventoryDate).format("YYYY-MM-DD") <= moment(stopDate).format("YYYY-MM-DD"))
-                    this.setState({
-                        batchInfoList: batchList,
-                        programJson: programJson,
-                        inventoryListUnFiltered: inventoryListUnFiltered,
-                        inventoryList: inventoryList,
-                        showInventory: 1,
-                        inventoryType: this.state.inventoryType,
-                        inventoryMonth: "",
-                        inventoryEndDate: "",
-                        inventoryRegion: ""
-                    })
-                    this.refs.inventoryChild.showInventoryData();
+                        var inventoryListUnFiltered = (programJson.inventoryList);
+                        var inventoryList = (programJson.inventoryList).filter(c =>
+                            c.planningUnit.id == planningUnitId &&
+                            c.region != null && c.region.id != 0);
+                        if (this.state.inventoryType == 1) {
+                            inventoryList = inventoryList.filter(c => c.actualQty != "" && c.actualQty != undefined && c.actualQty != null);
+                        } else {
+                            inventoryList = inventoryList.filter(c => c.adjustmentQty != "" && c.adjustmentQty != undefined && c.adjustmentQty != null);
+                        }
+                        inventoryList = inventoryList.filter(c => moment(c.inventoryDate).format("YYYY-MM-DD") >= moment(startDate).format("YYYY-MM-DD") && moment(c.inventoryDate).format("YYYY-MM-DD") <= moment(stopDate).format("YYYY-MM-DD"))
+                        this.setState({
+                            batchInfoList: batchList,
+                            programJson: programJson,
+                            inventoryListUnFiltered: inventoryListUnFiltered,
+                            inventoryList: inventoryList,
+                            showInventory: 1,
+                            inventoryType: this.state.inventoryType,
+                            inventoryMonth: "",
+                            inventoryEndDate: "",
+                            inventoryRegion: ""
+                        })
+                        this.refs.inventoryChild.showInventoryData();
+                    }.bind(this)
                 }.bind(this)
-            }.bind(this)
-        } else {
-            document.getElementById("adjustmentsTableDiv").style.display = "none";
-            if (document.getElementById("addRowButtonId") != null) {
-                document.getElementById("addRowButtonId").style.display = "none";
+            } else {
+                document.getElementById("adjustmentsTableDiv").style.display = "none";
+                if (document.getElementById("addRowButtonId") != null) {
+                    document.getElementById("addRowButtonId").style.display = "none";
+                }
+                this.setState({ loading: false });
             }
-            this.setState({ loading: false });
         }
     }
 
@@ -375,16 +428,30 @@ export default class AddInventory extends Component {
     }
 
     updateDataType(value) {
-        this.setState({
-            inventoryType: value != "" && value != undefined ? value.value : 0,
-            inventoryDataType: value
-        })
-        document.getElementById("adjustmentsTableDiv").style.display = "none";
-        if (document.getElementById("addRowButtonId") != null) {
-        document.getElementById("addRowButtonId").style.display = "none";
+        var cont = false;
+        if (this.state.inventoryChangedFlag == 1) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
+
+            }
+        } else {
+            cont = true;
         }
-        if (this.state.planningUnit != 0 && (value != "" && value != undefined ? value.value : 0) != 0) {
-            this.formSubmit(this.state.planningUnit, this.state.rangeValue);
+        if (cont == true) {
+            this.setState({
+                inventoryType: value != "" && value != undefined ? value.value : 0,
+                inventoryDataType: value,
+                inventoryChangedFlag: 0
+            })
+            document.getElementById("adjustmentsTableDiv").style.display = "none";
+            if (document.getElementById("addRowButtonId") != null) {
+                document.getElementById("addRowButtonId").style.display = "none";
+            }
+            if (this.state.planningUnit != 0 && (value != "" && value != undefined ? value.value : 0) != 0) {
+                this.formSubmit(this.state.planningUnit, this.state.rangeValue);
+            }
         }
     }
 
@@ -512,8 +579,8 @@ export default class AddInventory extends Component {
                         </div>
                     </ModalBody>
                     <ModalFooter>
-                        <div id="showInventoryBatchInfoButtonsDiv" style={{ display: 'none' }}>
-                            {this.state.inventoryBatchInfoChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.inventoryChild.saveInventoryBatchInfo()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBatchInfo')}</Button>}
+                        <div id="showInventoryBatchInfoButtonsDiv" style={{ display: 'none' }} className="mr-0">
+                            {this.state.inventoryBatchInfoChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right" onClick={() => this.refs.inventoryChild.saveInventoryBatchInfo()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBatchInfo')}</Button>}
                             {this.refs.inventoryChild != undefined && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.refs.inventoryChild.addBatchRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
                         </div>
                         <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceled()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
@@ -535,17 +602,46 @@ export default class AddInventory extends Component {
     }
 
     cancelClicked() {
-        let id = AuthenticationService.displayDashboardBasedOnRole();
-        this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
+        var cont = false;
+        if (this.state.inventoryChangedFlag == 1) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
+
+            }
+        } else {
+            cont = true;
+        }
+        if (cont == true) {
+            let id = AuthenticationService.displayDashboardBasedOnRole();
+            this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
+        }
     }
 
     actionCanceled() {
-        this.setState({
-            message: i18n.t('static.actionCancelled'),
-            color: "red"
-        })
-        this.hideFirstComponent();
-        this.toggleLarge();
+        var cont = false;
+        if (this.state.inventoryBatchInfoChangedFlag == 1) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
+
+            }
+        } else {
+            cont = true;
+        }
+        if (cont == true) {
+            this.setState({
+                message: i18n.t('static.actionCancelled'),
+                color: "red",
+                inventoryBatchInfoChangedFlag: 0
+            }, () => {
+                this.hideFirstComponent();
+                this.toggleLarge();
+            })
+
+        }
     }
 
     _handleClickRangeBox(e) {

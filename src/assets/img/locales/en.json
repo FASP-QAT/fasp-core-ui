@@ -961,7 +961,7 @@
     "static.supplyPlan.qatAdjustment": "QAT Adjustment",
     "static.dashboard.stockstatusacrossplanningunit": "Stock Status (Across Planning Units)",
     "static.supplyPlan.lastinventorydt": "Last Inventory Date",
-    "static.report.withinstock": "Within Stock?",
+    "static.report.withinstock": "Stock Status",
     "static.report.low": "Low Stock",
     "static.report.excess": "Excess Stock",
     "static.report.ok": "Okay",
@@ -997,7 +997,7 @@
     "static.report.timeWindow": "Time window",
     "static.report.validShipmentStatusText": "Select Shipment Status",
     "static.report.plannedBudgetAmt": "Budget allocated to Planned Shipment",
-    "static.report.orderedBudgetAmt": "Budget allocated to Ordered Shipment",
+    "static.report.orderedBudgetAmt": "Budget Allocated to Shipment (Submitted or later)",
     "static.report.remainingBudgetAmt": "Budget remaining",
     "static.report.inmillions": "(in millions)",
     "static.supplyPlan.procurementAgentCannotBeTBD": "Procurement Agent cannot be 'TBD'",
@@ -1349,5 +1349,13 @@
     "static.quantimed.duplicateQATPlanningUnitFound": "Duplicate QAT Planning Unit Found",
     "static.quantimed.duplicateQATPlanningUnit": "Duplicate QAT Planning Unit",
     "static.quantimed.consumptionDate": "Consumption Date",
-    "static.message.alreadyTagged":"This order no. and prime line no. are already tagged. To change the tagging please delink first and then try."
+    "static.dataentry.confirmmsg":"You are about leave with un-submitted changes",
+    "static.message.alreadyTagged":"This order no. and prime line no. are already tagged. To change the tagging please delink first and then try.",
+    "static.dataentry.inactive":"Inactive",
+    "static.report.qatPIDFID":"QAT Product Id/Forecast Product Id",
+    "static.report.includeapproved":"Use Approved Supply Plan Only",
+    "static.report.stockout":"Stocked Out",
+    "static.report.lowstock":"Under Stocked",
+    "static.report.okaystock":"Stocked to Plan",
+    "static.report.overstock":"Over Stocked"
 }
