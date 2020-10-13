@@ -767,7 +767,10 @@ export default class ManualTagging extends Component {
                 .then(response => {
                     console.log("artmis response===", response.data);
                     var artmisList = [];
-                    artmisList.push(response.data);
+                    if (response.data.reason == "") {
+                        artmisList.push(response.data);
+                    }
+
                     console.log("--------->>", response.data);
                     // console.log("--------->",response.data[0].reason);
                     this.setState({
@@ -1032,10 +1035,10 @@ export default class ManualTagging extends Component {
             data[2] = this.formatDate(manualTaggingList[j].expectedDeliveryDate);
             data[3] = getLabelText(manualTaggingList[j].shipmentStatus.label, this.state.lang)
             data[4] = manualTaggingList[j].procurementAgent.code;
-            data[5] = getLabelText(manualTaggingList[j].budget.label, this.state.lang)
-            data[6] = this.addCommas(manualTaggingList[j].shipmentQty);
+            data[5] = manualTaggingList[j].fundingSource.code
+            data[6] = getLabelText(manualTaggingList[j].budget.label, this.state.lang)
             // data[7] = getLabelText(manualTaggingList[j].fundingSource.label, this.state.lang)
-            data[7] = manualTaggingList[j].fundingSource.code
+            data[7] = this.addCommas(manualTaggingList[j].shipmentQty);
 
             manualTaggingArray[count] = data;
             count++;
@@ -1053,11 +1056,11 @@ export default class ManualTagging extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [30, 30, 50],
+            colWidths: [20, 25, 20, 20, 40, 40, 40, 25],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: i18n.t('static.commit.shipmentId'),
+                    title: i18n.t('static.commit.qatshipmentId'),
                     type: 'text',
                 },
                 {
@@ -1065,11 +1068,11 @@ export default class ManualTagging extends Component {
                     type: 'hidden',
                 },
                 {
-                    title: i18n.t('static.supplyPlan.expectedDeliveryDate'),
+                    title: i18n.t('static.supplyPlan.mtexpectedDeliveryDate'),
                     type: 'text',
                 },
                 {
-                    title: i18n.t('static.supplyPlan.shipmentStatus'),
+                    title: i18n.t('static.supplyPlan.mtshipmentStatus'),
                     type: 'text',
                 },
                 {
@@ -1331,10 +1334,11 @@ export default class ManualTagging extends Component {
         const columns = [
             {
                 dataField: 'shipmentId',
-                text: i18n.t('static.commit.shipmentId'),
+                text: i18n.t('static.commit.qatshipmentId'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
+                style: { width: '20px' }
             },
             {
                 dataField: 'shipmentTransId',
@@ -1342,18 +1346,20 @@ export default class ManualTagging extends Component {
             },
             {
                 dataField: 'expectedDeliveryDate',
-                text: i18n.t('static.supplyPlan.expectedDeliveryDate'),
+                text: i18n.t('static.supplyPlan.mtexpectedDeliveryDate'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                formatter: this.formatDate
+                formatter: this.formatDate,
+                style: { width: '20px' }
             },
             {
                 dataField: 'shipmentStatus.label.label_en',
-                text: i18n.t('static.supplyPlan.shipmentStatus'),
+                text: i18n.t('static.supplyPlan.mtshipmentStatus'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
+                style: { width: '20px' }
                 // formatter: this.formatLabel
             }, {
                 dataField: 'procurementAgent.code',
@@ -1361,13 +1367,15 @@ export default class ManualTagging extends Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
+                style: { width: '40px' }
                 // formatter: this.formatLabel
             }, {
                 dataField: 'fundingSource.code',
                 text: i18n.t('static.fundingSourceHead.fundingSource'),
                 sort: true,
                 align: 'center',
-                headerAlign: 'center'
+                headerAlign: 'center',
+                style: { width: '40px' }
             },
             {
                 dataField: 'budget.label.label_en',
@@ -1375,6 +1383,7 @@ export default class ManualTagging extends Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
+                style: { width: '40px' }
                 // formatter: this.formatLabel
             },
             {
@@ -1383,7 +1392,8 @@ export default class ManualTagging extends Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                formatter: this.addCommas
+                formatter: this.addCommas,
+                style: { width: '25px' }
             }
 
         ];
@@ -1412,12 +1422,19 @@ export default class ManualTagging extends Component {
                 // formatter: this.formatLabel
             },
             {
-                dataField: 'planningUnitLabel',
-                text: i18n.t('static.planningUnit.planningUnitName'),
+                dataField: 'currentEstimatedDeliveryDate',
+                text: i18n.t('static.supplyPlan.mtexpectedDeliveryDate'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                formatter: this.formatLabel
+                formatter: this.formatDate
+            },
+            {
+                dataField: 'status',
+                text: i18n.t('static.status.status'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
             },
             {
                 dataField: 'planningUnitSkuCode',
@@ -1428,41 +1445,45 @@ export default class ManualTagging extends Component {
                 // formatter: this.formatLabel
             },
             {
-                dataField: 'procurementUnitSkuCode',
-                text: i18n.t('static.manualTagging.procurementUnitSKUCode'),
+                dataField: 'planningUnitLabel',
+                text: i18n.t('static.planningUnit.planningUnitName'),
                 sort: true,
                 align: 'center',
-                headerAlign: 'center'
+                headerAlign: 'center',
+                formatter: this.formatLabel
             },
+
+            // {
+            //     dataField: 'procurementUnitSkuCode',
+            //     text: i18n.t('static.manualTagging.procurementUnitSKUCode'),
+            //     sort: true,
+            //     align: 'center',
+            //     headerAlign: 'center'
+            // },
+
+
+            // {
+            //     dataField: 'supplierName',
+            //     text: i18n.t('static.supplier.supplierName'),
+            //     sort: true,
+            //     align: 'center',
+            //     headerAlign: 'center'
+            // },
+            // {
+            //     dataField: 'recipentCountry',
+            //     text: i18n.t('static.manualTagging.receipentCountry'),
+            //     sort: true,
+            //     align: 'center',
+            //     headerAlign: 'center'
+            // },
             {
                 dataField: 'quantity',
-                text: i18n.t('static.shipment.qty'),
+                // text: i18n.t('static.shipment.qty'),
+                text: i18n.t('static.supplyPlan.shipmentQty'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
                 formatter: this.addCommas
-            },
-            {
-                dataField: 'currentEstimatedDeliveryDate',
-                text: i18n.t('static.supplyPlan.expectedDeliveryDate'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.formatDate
-            },
-            {
-                dataField: 'supplierName',
-                text: i18n.t('static.supplier.supplierName'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            },
-            {
-                dataField: 'recipentCountry',
-                text: i18n.t('static.manualTagging.receipentCountry'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
             },
             {
                 dataField: 'price',
@@ -1479,13 +1500,6 @@ export default class ManualTagging extends Component {
                 align: 'center',
                 headerAlign: 'center',
                 formatter: this.addCommas
-            },
-            {
-                dataField: 'status',
-                text: i18n.t('static.status.status'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
             }
         ];
         const options = {

@@ -402,7 +402,8 @@ import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../Com
 import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
 import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
-
+import { confirmAlert } from 'react-confirm-alert'; // Import
+import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 
 
 const entityname = i18n.t('static.dashboard.delinking');
@@ -514,9 +515,9 @@ export default class ShipmentDelinking extends Component {
             data[2] = this.formatDate(outputList[j].expectedDeliveryDate);
             data[3] = getLabelText(outputList[j].shipmentStatus.label, this.state.lang);
             data[4] = outputList[j].procurementAgent.code;
-            data[5] = getLabelText(outputList[j].budget.label, this.state.lang);
-            data[6] = this.addCommas(outputList[j].shipmentQty);
-            data[7] = outputList[j].fundingSource.code;
+            data[5] = outputList[j].fundingSource.code;
+            data[6] = getLabelText(outputList[j].budget.label, this.state.lang);
+            data[7] = this.addCommas(outputList[j].shipmentQty);
 
             outputArray[count] = data;
             count++;
@@ -534,11 +535,11 @@ export default class ShipmentDelinking extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [150, 150, 100],
+            colWidths: [20, 25, 20, 20, 40, 40, 40, 25],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: i18n.t('static.commit.shipmentId'),
+                    title: i18n.t('static.commit.qatshipmentId'),
                     type: 'text',
                     readOnly: true
                 },
@@ -548,17 +549,23 @@ export default class ShipmentDelinking extends Component {
                     readOnly: true
                 },
                 {
-                    title: i18n.t('static.supplyPlan.expectedDeliveryDate'),
+                    title: i18n.t('static.supplyPlan.mtexpectedDeliveryDate'),
                     type: 'text',
                     readOnly: true
                 },
                 {
-                    title: i18n.t('static.supplyPlan.shipmentStatus'),
+                    title: i18n.t('static.supplyPlan.mtshipmentStatus'),
                     type: 'text',
                     readOnly: true
                 },
                 {
                     title: i18n.t('static.report.procurementagentcode'),
+                    type: 'text',
+                    readOnly: true
+                },
+                
+                {
+                    title: i18n.t('static.fundingsource.fundingsourceCode'),
                     type: 'text',
                     readOnly: true
                 },
@@ -571,12 +578,7 @@ export default class ShipmentDelinking extends Component {
                     title: i18n.t('static.supplyPlan.shipmentQty'),
                     type: 'text',
                     readOnly: true
-                },
-                {
-                    title: i18n.t('static.fundingsource.fundingsourceCode'),
-                    type: 'text',
-                    readOnly: true
-                },
+                }
 
             ],
             text: {
@@ -684,6 +686,92 @@ export default class ShipmentDelinking extends Component {
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
     }
+
+    selected = function (instance, cell, x, y, value) {
+        if ((x == 0 && value != 0) || (y == 0)) {
+            console.log("HEADER SELECTION--------------------------");
+        } else {
+            confirmAlert({
+                message: i18n.t('static.mt.confirmDelink'),
+                buttons: [
+                    {
+                        label: i18n.t('static.program.yes'),
+                        onClick: () => {
+                            this.setState({ loading: true })
+                            ManualTaggingService.delinkShipment(`${this.el.getValueFromCoords(0, x)}`)
+                                .then(response => {
+                                    console.log("link response===", response);
+                                    this.setState({
+                                        message: i18n.t('static.shipment.delinkingsuccess'),
+                                        color: 'green',
+                                        haslink: true,
+                                        loading: false
+
+                                    }, () => {
+                                        this.hideSecondComponent();
+                                        document.getElementById('div2').style.display = 'block';
+                                        this.filterData();
+                                    });
+
+                                }).catch(
+                                    error => {
+                                        if (error.message === "Network Error") {
+                                            this.setState({
+                                                message: 'static.unkownError',
+                                                loading: false
+                                            });
+                                        } else {
+                                            switch (error.response ? error.response.status : "") {
+
+                                                case 401:
+                                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                                    break;
+                                                case 403:
+                                                    this.props.history.push(`/accessDenied`)
+                                                    break;
+                                                case 500:
+                                                case 404:
+                                                case 406:
+                                                    this.setState({
+                                                        message: error.response.data.messageCode,
+                                                        loading: false
+                                                    });
+                                                    break;
+                                                case 412:
+                                                    this.setState({
+                                                        message: error.response.data.messageCode,
+                                                        loading: false
+                                                    });
+                                                    break;
+                                                default:
+                                                    this.setState({
+                                                        message: 'static.unkownError',
+                                                        loading: false
+                                                    });
+                                                    break;
+                                            }
+                                        }
+                                    }
+                                );
+
+                        }
+                    },
+                    {
+                        label: i18n.t('static.program.no')
+                    }
+                ]
+            });
+            // var outputListAfterSearch = [];
+            // let row = this.state.outputList.filter(c => (c.shipmentId == this.el.getValueFromCoords(0, x)))[0];
+            // outputListAfterSearch.push(row);
+
+            // this.setState({
+            //     shipmentId: this.el.getValueFromCoords(0, x),
+            //     outputListAfterSearch
+            // })
+            // this.toggleLarge();
+        }
+    }.bind(this);
 
     filterData() {
         document.getElementById('div2').style.display = 'block';
