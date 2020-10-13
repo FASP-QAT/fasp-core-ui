@@ -1357,5 +1357,6 @@
     "static.report.stockout":"Stocked Out",
     "static.report.lowstock":"Under Stocked",
     "static.report.okaystock":"Stocked to Plan",
-    "static.report.overstock":"Over Stocked"
+    "static.report.overstock":"Over Stocked",
+    "static.consumption.missingBatch":"Total batch qty is greater than actual quantity"
 }
