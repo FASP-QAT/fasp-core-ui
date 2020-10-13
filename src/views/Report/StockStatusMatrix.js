@@ -35,8 +35,10 @@ const pickerLang = {
   months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
   from: 'From', to: 'To',
 }
-const legendcolor = [
-  { text: "Low stock", color: '#edb944' }];
+const legendcolor = [{ text: i18n.t('static.report.stockout'), color: "#ed5626" },
+{ text: i18n.t('static.report.lowstock'), color: "#f48521" },
+{ text: i18n.t('static.report.okaystock'), color: "#118b70" },
+{ text: i18n.t('static.report.overstock'), color: "#edb944" }];
 const { ExportCSVButton } = CSVExport;
 const entityname = i18n.t('static.dashboard.productCatalog');
 export default class StockStatusMatrix extends React.Component {
@@ -198,7 +200,7 @@ export default class StockStatusMatrix extends React.Component {
             var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
             var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
             var programJson = JSON.parse(programData);
-            
+
             planningUnitIds.map(planningUnitId => {
 
               var pu = (this.state.planningUnits.filter(c => c.planningUnit.id == planningUnitId))[0]
@@ -218,11 +220,11 @@ export default class StockStatusMatrix extends React.Component {
                       monthlydata.push(list[0].mos)
                     }
                     else {
-                     
+
                       monthlydata.push(list[0].mosWps)
                     }
                   } else {
-                    monthlydata.push('')
+                    monthlydata.push(null)
                   }
 
                 }
@@ -233,16 +235,16 @@ export default class StockStatusMatrix extends React.Component {
                   reorderFrequency: pu.reorderFrequencyInMonths,
                   year: from,
                   minMonthsOfStock: pu.minMonthsOfStock,
-                  jan: monthlydata[0] ,
+                  jan: monthlydata[0],
                   feb: monthlydata[1],
-                  mar: monthlydata[2] ,
+                  mar: monthlydata[2],
                   apr: monthlydata[3],
                   may: monthlydata[4],
                   jun: monthlydata[5],
                   jul: monthlydata[6],
                   aug: monthlydata[7],
                   sep: monthlydata[8],
-                  oct: monthlydata[9] ,
+                  oct: monthlydata[9],
                   nov: monthlydata[10],
                   dec: monthlydata[11],
                 }
@@ -739,13 +741,13 @@ export default class StockStatusMatrix extends React.Component {
         x1 = x1.replace(rgx, '$1' + ',' + '$2');
       }
       return x1 + x2;
-    } else {  
+    } else {
       return ''
     }
   }
-  addDoubleQuoteToRowContent=(arr)=>{
-    return arr.map(ele=>'"'+ele+'"')
- }
+  addDoubleQuoteToRowContent = (arr) => {
+    return arr.map(ele => '"' + ele + '"')
+  }
   exportCSV(columns) {
 
     var csvRow = [];
@@ -765,7 +767,7 @@ export default class StockStatusMatrix extends React.Component {
     columns.map((item, idx) => { headers[idx] = ((item.text).replaceAll(' ', '%20')) });
     var A = [this.addDoubleQuoteToRowContent(headers)]
     var re = this.state.data
-    this.state.data.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.unit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.minMonthsOfStock, ele.reorderFrequency, ele.year, this.roundN(ele.jan), this.roundN(ele.feb), this.roundN(ele.mar), this.roundN(ele.apr), this.roundN(ele.may), this.roundN(ele.jun), this.roundN(ele.jul), this.roundN(ele.aug), this.roundN(ele.sep), this.roundN(ele.oct), this.roundN(ele.nov), this.roundN(ele.dec)])));
+    this.state.data.map(ele => A.push(this.addDoubleQuoteToRowContent([ele.planningUnit.id,(getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.unit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.minMonthsOfStock, ele.reorderFrequency, ele.year, this.roundN(ele.jan), this.roundN(ele.feb), this.roundN(ele.mar), this.roundN(ele.apr), this.roundN(ele.may), this.roundN(ele.jun), this.roundN(ele.jul), this.roundN(ele.aug), this.roundN(ele.sep), this.roundN(ele.oct), this.roundN(ele.nov), this.roundN(ele.dec)])));
     for (var i = 0; i < A.length; i++) {
       console.log(A[i])
       csvRow.push(A[i].join(","))
@@ -850,7 +852,7 @@ export default class StockStatusMatrix extends React.Component {
     // const title = i18n.t('static.dashboard.stockstatusmatrix');
     let header = []
 
-    header = [[{ content: i18n.t('static.planningunit.planningunit'), rowSpan: 2, styles: { halign: 'center' } },
+    header = [[{ content: i18n.t('static.report.qatPID'), rowSpan: 2, styles: { halign: 'center' } },{ content: i18n.t('static.planningunit.planningunit'), rowSpan: 2, styles: { halign: 'center' } },
     { content: i18n.t('static.dashboard.unit'), rowSpan: 2, styles: { halign: 'center' } },
     { content: i18n.t('static.common.min'), rowSpan: 2, styles: { halign: 'center' } },
     { content: i18n.t('static.program.reorderFrequencyInMonths'), rowSpan: 2, styles: { halign: 'center' } },
@@ -871,7 +873,7 @@ export default class StockStatusMatrix extends React.Component {
       { content: i18n.t('static.month.dec'), styles: { halign: 'center' } },]
     ]
     let data;
-    data = this.state.data.map(ele => [getLabelText(ele.planningUnit.label, this.state.lang), getLabelText(ele.unit.label, this.state.lang), ele.minMonthsOfStock, ele.reorderFrequency, ele.year, this.formatter(ele.jan), this.formatter(ele.feb), this.formatter(ele.mar), this.formatter(ele.apr), this.formatter(ele.may), this.formatter(ele.jun), this.formatter(ele.jul), this.formatter(ele.aug), this.formatter(ele.sep), this.formatter(ele.oct), this.formatter(ele.nov), this.formatter(ele.dec)]);
+    data = this.state.data.map(ele => [ele.planningUnit.id,getLabelText(ele.planningUnit.label, this.state.lang), getLabelText(ele.unit.label, this.state.lang), ele.minMonthsOfStock, ele.reorderFrequency, ele.year, this.formatter(ele.jan), this.formatter(ele.feb), this.formatter(ele.mar), this.formatter(ele.apr), this.formatter(ele.may), this.formatter(ele.jun), this.formatter(ele.jul), this.formatter(ele.aug), this.formatter(ele.sep), this.formatter(ele.oct), this.formatter(ele.nov), this.formatter(ele.dec)]);
 
     var startY = 170 + (this.state.planningUnitValues.length * 3)
     let content = {
@@ -881,8 +883,8 @@ export default class StockStatusMatrix extends React.Component {
       body: data,
       styles: { lineWidth: 1, fontSize: 8, cellWidth: 38, halign: 'center' },
       columnStyles: {
-        0: { cellWidth: 141.89 },
-        1: { cellWidth: 50 },
+        1: { cellWidth: 99.89 },
+        2: { cellWidth: 54 },
       }
     };
 
@@ -897,22 +899,31 @@ export default class StockStatusMatrix extends React.Component {
     return getLabelText(cell, this.state.lang);
   }
   roundN = num => {
-    console.log(num)
-    if (num == null) {
+   
+    if (num == null ) {
       return ''
     } else {
       return parseFloat(Math.round(num * Math.pow(10, 1)) / Math.pow(10, 1)).toFixed(1);
     }
   }
-  cellStyle = (min, value) => {
-    if (value != null)
-      if (min > value) {
+  cellStyle = (min, reorderFrequency, value) => {
+    console.log(value)
+    if (value != null) {
+      value = this.roundN(value)
+      if (value==0) {
         return { backgroundColor: legendcolor[0].color }
+      } else if (min > value) {
+        return { backgroundColor: legendcolor[1].color }
+      } else if ((min + reorderFrequency) < value) {
+
+        return { backgroundColor: legendcolor[3].color }
       } else {
-        return {}
+        return {backgroundColor: legendcolor[2].color}
+
       }
+    }
     else {
-      return { backgroundColor: legendcolor[0].color }
+      return {}
     }
   }
   render() {
@@ -951,7 +962,7 @@ export default class StockStatusMatrix extends React.Component {
       if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
       return '?'
     }
-    
+
 
     const { SearchBar, ClearSearchButton } = Search;
     const customTotal = (from, to, size) => (
@@ -981,6 +992,14 @@ export default class StockStatusMatrix extends React.Component {
 
 
     let columns = [
+      {
+        dataField: 'planningUnit.id',
+        text: i18n.t('static.report.qatPID'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
+        style: { align: 'center' }
+    },
       {
         dataField: 'planningUnit.label',
         text: i18n.t('static.planningunit.planningunit'),
@@ -1304,18 +1323,18 @@ export default class StockStatusMatrix extends React.Component {
                         <td className="text-center">{ele.minMonthsOfStock}</td>
                         <td className="text-center">{ele.reorderFrequency}</td>
                         <td className="text-center">{ele.year}</td>
-                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.jan)}>{this.formatter(ele.jan)}</td>
-                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.feb)} > {this.formatter(ele.feb)}</td>
-                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.mar)} > {this.formatter(ele.mar)}</td>
-                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.apr)}> {this.formatter(ele.apr)}</td>
-                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.may)}> {this.formatter(ele.may)}</td>
-                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.jun)}> {this.formatter(ele.jun)}</td>
-                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.jul)}> {this.formatter(ele.jul)}</td>
-                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.aug)}> {this.formatter(ele.aug)}</td>
-                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.sep)}> {this.formatter(ele.sep)}</td>
-                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.oct)}> {this.formatter(ele.oct)}</td>
-                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.nov)}> {this.formatter(ele.nov)}</td>
-                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.dec)}> {this.formatter(ele.dec)}</td></tr>)
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.jan)}>{this.formatter(ele.jan)}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.feb)} > {this.formatter(ele.feb)}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.mar)} > {this.formatter(ele.mar)}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.apr)}> {this.formatter(ele.apr)}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.may)}> {this.formatter(ele.may)}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.jun)}> {this.formatter(ele.jun)}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.jul)}> {this.formatter(ele.jul)}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.aug)}> {this.formatter(ele.aug)}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.sep)}> {this.formatter(ele.sep)}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.oct)}> {this.formatter(ele.oct)}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.nov)}> {this.formatter(ele.nov)}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.dec)}> {this.formatter(ele.dec)}</td></tr>)
                     })}
 
                   </tbody>
