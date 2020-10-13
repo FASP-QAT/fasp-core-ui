@@ -1056,7 +1056,8 @@ export default class SupplyPlanComponent extends React.Component {
                                     var compare = (m[n].startDate >= currentMonth);
                                     var stockInHand = jsonList[0].closingBalance;
                                     if (compare && parseInt(stockInHand) <= parseInt(jsonList[0].minStock)) {
-                                        var suggestedOrd = parseInt(jsonList[0].maxStock - jsonList[0].minStock);
+                                        // var suggestedOrd = parseInt(jsonList[0].maxStock - jsonList[0].minStock);
+                                        var suggestedOrd = parseInt(jsonList[0].maxStock - jsonList[0].closingBalance);
                                         if (suggestedOrd == 0) {
                                             var addLeadTimes = parseFloat(programJson.plannedToSubmittedLeadTime) + parseFloat(programJson.submittedToApprovedLeadTime) +
                                                 parseFloat(programJson.approvedToShippedLeadTime) + parseFloat(programJson.shippedToArrivedBySeaLeadTime) +
@@ -1650,8 +1651,7 @@ export default class SupplyPlanComponent extends React.Component {
                         }
                     },
                     gridLines: {
-                        color: 'rgba(171,171,171,171)',
-                        borderDash: [8, 4],
+                        display: false
                     },
                     position: 'left',
                 },
@@ -1668,8 +1668,7 @@ export default class SupplyPlanComponent extends React.Component {
                         fontColor: 'black'
                     },
                     gridLines: {
-                        color: 'rgba(171,171,171,1)',
-                        lineWidth: 0.5
+                        display: false
                     },
                     position: 'right',
                 }
@@ -1678,6 +1677,9 @@ export default class SupplyPlanComponent extends React.Component {
                     ticks: {
                         fontColor: 'black'
                     },
+                    gridLines: {
+                        display: false
+                    }
                 }]
             },
             tooltips: {
@@ -1712,7 +1714,7 @@ export default class SupplyPlanComponent extends React.Component {
                         label: i18n.t('static.supplyPlan.planned'),
                         stack: 1,
                         yAxisID: 'A',
-                        backgroundColor: '#a5c5ec',
+                        backgroundColor: '#a7c6ed',
                         borderColor: 'rgba(179,181,198,1)',
                         pointBackgroundColor: 'rgba(179,181,198,1)',
                         pointBorderColor: '#fff',
@@ -1724,7 +1726,7 @@ export default class SupplyPlanComponent extends React.Component {
                         label: i18n.t('static.supplyPlan.ordered'),
                         stack: 1,
                         yAxisID: 'A',
-                        backgroundColor: '#20a8d8',
+                        backgroundColor: '#205493',
                         borderColor: 'rgba(179,181,198,1)',
                         pointBackgroundColor: 'rgba(179,181,198,1)',
                         pointBorderColor: '#fff',
@@ -1736,7 +1738,7 @@ export default class SupplyPlanComponent extends React.Component {
                         label: i18n.t('static.supplyPlan.shipped'),
                         stack: 1,
                         yAxisID: 'A',
-                        backgroundColor: '#7372cb',
+                        backgroundColor: '#006789',
                         borderColor: 'rgba(179,181,198,1)',
                         pointBackgroundColor: 'rgba(179,181,198,1)',
                         pointBorderColor: '#fff',
@@ -1748,7 +1750,7 @@ export default class SupplyPlanComponent extends React.Component {
                         label: i18n.t('static.supplyPlan.delivered'),
                         stack: 1,
                         yAxisID: 'A',
-                        backgroundColor: '#042e6a',
+                        backgroundColor: '#002f6c',
                         borderColor: 'rgba(179,181,198,1)',
                         pointBackgroundColor: 'rgba(179,181,198,1)',
                         pointBorderColor: '#fff',
@@ -1760,7 +1762,7 @@ export default class SupplyPlanComponent extends React.Component {
                         stack: 2,
                         type: 'line',
                         yAxisID: 'A',
-                        borderColor: '#d0cece',
+                        borderColor: '#cfcdc9',
                         borderStyle: 'dotted',
                         ticks: {
                             fontSize: 2,
@@ -1931,7 +1933,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                 this.state.suggestedShipmentsTotalData.map(item1 => {
                                                     if (item1.suggestedOrderQty.toString() != "") {
                                                         if (item1.isEmergencyOrder == 1) {
-                                                            return (<td align="right" bgcolor='red' style={{ color: "#FFF" }}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.suggestedOrderQty} /></td>)
+                                                            return (<td align="right" style={{ color: "red" }}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.suggestedOrderQty} /></td>)
                                                         } else {
                                                             return (<td align="right" ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.suggestedOrderQty} /></td>)
                                                         }
@@ -2105,7 +2107,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.supplyPlan.endingBalance')}</b></td>
                                             {
                                                 this.state.closingBalanceArray.map((item1, count) => {
-                                                    return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}><b><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></b></td>)
+                                                    return (<td align="right" bgcolor={item1 == 0 ? 'red' : ''} className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}>{item1 == 0 ? <b><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></b> : <NumberFormat displayType={'text'} thousandSeparator={true} value={item1} />}</td>)
                                                 })
                                             }
                                         </tr>
@@ -2114,7 +2116,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.supplyPlan.monthsOfStock')}</b></td>
                                             {
                                                 this.state.monthsOfStockArray.map(item1 => (
-                                                    <td align="right"><b><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></b></td>
+                                                    <td align="right" style={{ color: item1 == 0 ? "red" : "" }}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
                                                 ))
                                             }
                                         </tr>
@@ -2306,7 +2308,7 @@ export default class SupplyPlanComponent extends React.Component {
                 <Modal isOpen={this.state.adjustments}
                     className={'modal-lg ' + this.props.className, "modalWidth"}>
                     <ModalHeader toggle={() => this.toggleLarge('Adjustments')} className="modalHeaderSupplyPlan">{i18n.t('static.supplyPlan.adjustmentsDetails')}
-                        <div className="card-header-actions"  style={{marginTop:'-5px'}}>
+                        <div className="card-header-actions" style={{ marginTop: '-5px' }}>
                             <a className="card-header-action">
                                 {/* <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggle() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span> */}
                                 <Link to={`/inventory/addInventory/` + this.props.items.programId + `/0/` + this.props.items.planningUnitId} target="_blank"><small className="dataEntryLink">{i18n.t('static.supplyplan.adjustmentDataEntry')}</small></Link>
@@ -2490,7 +2492,7 @@ export default class SupplyPlanComponent extends React.Component {
                             <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyOrder')}</span></li>
                             <li><span className=" greylegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.doNotIncludeInProjectedShipment')} </span></li>
                         </ul>
-                        <div className="card-header-actions"  style={{marginTop:'-5px'}}>
+                        <div className="card-header-actions" style={{ marginTop: '-5px' }}>
                             <a className="card-header-action">
                                 {/* <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggle() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span> */}
                                 <Link to={`/shipment/shipmentDetails/` + this.props.items.programId + `/0/` + this.props.items.planningUnitId} target="_blank"><small className="dataEntryLink">{i18n.t('static.supplyplan.shipmentDataEntry')}</small></Link>
@@ -2506,11 +2508,11 @@ export default class SupplyPlanComponent extends React.Component {
                             </div>
 
                             <h6 className="red" id="div3">{this.state.qtyCalculatorValidationError}</h6>
-                            <div className="table-responsive">
+                            <div className="table-responsive RemoveStriped">
                                 <div id="qtyCalculatorTable"></div>
                             </div>
 
-                            <div className="table-responsive">
+                            <div className="table-responsive RemoveStriped">
                                 <div id="qtyCalculatorTable1"></div>
                             </div>
 

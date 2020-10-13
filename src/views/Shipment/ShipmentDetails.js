@@ -75,13 +75,19 @@ export default class ShipmentDetails extends React.Component {
     }
 
     updateDataType(value) {
+        console.log("In update", value);
         this.setState({
             shipmentType: value
+        }, () => {
+            document.getElementById("shipmentsDetailsTableDiv").style.display = "none";
+            if (document.getElementById("addRowButtonId") != null) {
+                console.log("In if");
+                document.getElementById("addRowButtonId").style.display = "none";
+            }
+            if (this.state.planningUnit != 0 && (value != "" && value != undefined ? value.value : 0) != 0) {
+                this.formSubmit(this.state.planningUnit, this.state.rangeValue);
+            }
         })
-        document.getElementById("shipmentsDetailsTableDiv").style.display = "none";
-        if (this.state.planningUnit != 0 && (value != "" && value != undefined ? value.value : 0) != 0) {
-            this.formSubmit(this.state.planningUnit, this.state.rangeValue);
-        }
     }
 
     hideFirstComponent() {
@@ -170,7 +176,9 @@ export default class ShipmentDetails extends React.Component {
                     programList: proList,
                     loading: false
                 })
-
+                if (document.getElementById("addRowButtonId") != null) {
+                    document.getElementById("addRowButtonId").style.display = "none";
+                }
                 var programIdd = this.props.match.params.programId;
                 console.log("programIdd", programIdd);
                 if (programIdd != '' && programIdd != undefined) {
@@ -189,6 +197,9 @@ export default class ShipmentDetails extends React.Component {
         document.getElementById("planningUnitId").value = 0;
         document.getElementById("planningUnit").value = "";
         document.getElementById("shipmentsDetailsTableDiv").style.display = "none";
+        if (document.getElementById("addRowButtonId") != null) {
+            document.getElementById("addRowButtonId").style.display = "none";
+        }
         this.setState({
             programSelect: value,
             programId: value != "" && value != undefined ? value != "" && value != undefined ? value.value : 0 : 0,
@@ -275,6 +286,17 @@ export default class ShipmentDetails extends React.Component {
         var programId = document.getElementById("programId").value;
         if (planningUnitId != 0) {
             document.getElementById("shipmentsDetailsTableDiv").style.display = "block";
+            console.log("(this.state.shipmentType).value", (this.state.shipmentType).value);
+            if (document.getElementById("addRowButtonId") != null) {
+                console.log("In if");
+                if ((this.state.shipmentType).value == 1) {
+                    console.log("in if 1")
+                    document.getElementById("addRowButtonId").style.display = "block";
+                } else {
+                    console.log("in else")
+                    document.getElementById("addRowButtonId").style.display = "none";
+                }
+            }
             var db1;
             getDatabase();
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -329,6 +351,9 @@ export default class ShipmentDetails extends React.Component {
             }.bind(this)
         } else {
             document.getElementById("shipmentsDetailsTableDiv").style.display = "none";
+            if (document.getElementById("addRowButtonId") != null) {
+                document.getElementById("addRowButtonId").style.display = "none";
+            }
             this.setState({ loading: false });
         }
     }
@@ -480,7 +505,7 @@ export default class ShipmentDetails extends React.Component {
                         <FormGroup>
                             <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                             {this.state.shipmentChangedFlag == 1 && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipments()}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>}&nbsp;
-                            {this.refs.shipmentChild != undefined && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.refs.shipmentChild.addRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
+                            {this.refs.shipmentChild != undefined && <Button id="addRowButtonId" color="info" size="md" className="float-right mr-1" type="button" onClick={this.refs.shipmentChild.addRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
                             &nbsp;
                         </FormGroup>
                     </CardFooter>
@@ -493,11 +518,11 @@ export default class ShipmentDetails extends React.Component {
                     </ModalHeader>
                     <ModalBody>
                         <h6 className="red" id="div3">{this.state.qtyCalculatorValidationError}</h6>
-                        <div className="table-responsive">
+                        <div className="table-responsive RemoveStriped">
                             <div id="qtyCalculatorTable"></div>
                         </div>
 
-                        <div className="table-responsive">
+                        <div className="table-responsive RemoveStriped">
                             <div id="qtyCalculatorTable1"></div>
                         </div>
                         <h6 className="red" id="div4">{this.state.shipmentDatesError}</h6>

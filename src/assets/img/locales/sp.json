@@ -1183,6 +1183,6 @@
     "static.program.confirmDelete": "¿Está seguro de que desea eliminar los programas locales?",
     "static.program.deleteLocalProgramSuccess" : "Programa (s) local (s) eliminado correctamente",
     "static.common.delete": "Eliminar",
-    "static.program.deleteLocalProgram" : "Eliminar programa local"
-    
+    "static.program.deleteLocalProgram" : "Eliminar programa local",
+    "static.ticket.unavailableDropdownValidationText": " - si no ves el ? desea, envíe un ticket para ese artículo."
 }

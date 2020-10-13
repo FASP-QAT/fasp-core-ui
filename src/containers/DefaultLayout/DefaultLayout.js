@@ -586,7 +586,7 @@ const routes = [
   { path: '/report/stockAdjustment', name: 'static.report.stockAdjustment', component: StockAdjustment },
   // { path: '/report/expiredInventory', name:static.report.expiredInventory' ,component: ExpiredInventory },
   { path: '/report/expiredInventory', name: 'static.report.expiredInventory', component: ExpiredInventory },
-  { path: '/quantimed/quantimedImport', name: 'Quantimed Import', component: QuantimedImport }
+  { path: '/quantimed/quantimedImport', name: 'static.quantimed.quantimedImport', component: QuantimedImport }
 ];
 
 class DefaultLayout extends Component {
@@ -1006,6 +1006,13 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-trash',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DELETE_LOCAL_PROGARM') ? false : true) }
                             // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DOWNLOAD_PROGARM') ? false : true) }
+                          },
+                          {
+                            name: i18n.t('static.Update.PlanningUnits'),
+                            url: '/program/listProgram',
+                            icon: 'fa fa-list-alt',
+                            // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_PROGRAM') ? false : true) }
+                      
                           },
                           {
                             name: i18n.t('static.dashboard.importprogram'),
@@ -1724,12 +1731,12 @@ class DefaultLayout extends Component {
                         attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PIPELINE_PROGRAM_IMPORT') ? false : true) }
                       },
 
-                      // {
-                      //   name: 'Quantimed Import',                        
-                      //   url: '/quantimed/quantimedImport',
-                      //   icon: 'fa fa-file-text-o',
-                      //   attributes: { hidden: false }
-                      // }
+                      {
+                        name: i18n.t('static.quantimed.quantimedImport'),                        
+                        url: '/quantimed/quantimedImport',
+                        icon: 'fa fa-file-text-o',
+                        attributes: { hidden: false }
+                      }
 
                     ]
 

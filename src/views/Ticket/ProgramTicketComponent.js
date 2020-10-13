@@ -44,15 +44,15 @@ const validationSchema = function (values) {
         programName: Yup.string()
             .required(i18n.t('static.program.validprogramtext')),
         realmId: Yup.string()
-            .required(i18n.t('static.common.realmtext')),
+            .required(i18n.t('static.common.realmtext').concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?',i18n.t('static.realm.realmName')))),
         realmCountryId: Yup.string()
             .required(i18n.t('static.healtharea.countrytext')),
         regionId: Yup.string()
-            .required(i18n.t('static.common.regiontext')),
+            .required(i18n.t('static.common.regiontext').concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?',i18n.t('static.program.region')))),
         organisationId: Yup.string()
-            .required(i18n.t('static.program.validorganisationtext')),
+            .required(i18n.t('static.program.validorganisationtext').concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?',i18n.t('static.program.organisation')))),
         healthAreaId: Yup.string()
-            .required(i18n.t('static.program.validhealthareatext')),
+            .required(i18n.t('static.program.validhealthareatext').concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?',i18n.t('static.program.healtharea')))),
         programManager: Yup.string()
             .required(i18n.t('static.program.validmanagertext')),
         airFreightPerc: Yup.string()
@@ -816,10 +816,10 @@ export default class ProgramTicketComponent extends Component {
                                         <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                         <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                     </ModalFooter>
-                                    <br></br><br></br>
+                                    {/* <br></br><br></br>
                                     <div className={this.props.className}>
                                         <p>{i18n.t('static.ticket.drodownvaluenotfound')}</p>
-                                    </div>
+                                    </div> */}
                                 </Form>
                             )} />
                             </div>

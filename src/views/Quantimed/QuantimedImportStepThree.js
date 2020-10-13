@@ -11,7 +11,8 @@ import MonthBox from '../../CommonComponent/MonthBox.js'
 import "jspdf-autotable";
 import 'chartjs-plugin-annotation';
 import { Formik } from 'formik';
-import * as Yup from 'yup'
+import * as Yup from 'yup';
+import moment from "moment";
 
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -57,9 +58,9 @@ class QuantimedImportStepThree extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
-            maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
+            rangeValue: { from: { year: new Date().getFullYear(), month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear() + 1, month: new Date().getMonth() + 1 } },
+            minDate: { year: new Date().getFullYear(), month: new Date().getMonth() + 2 },
+            maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() + 1 },
         }
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
         this.handleRangeChange = this.handleRangeChange.bind(this);
@@ -105,7 +106,7 @@ class QuantimedImportStepThree extends Component {
     }
 
     handleRangeChange(value, text, listIndex) {
-        
+
     }
     handleRangeDissmis(value) {
         this.setState({ rangeValue: value }, () => {
@@ -115,7 +116,7 @@ class QuantimedImportStepThree extends Component {
     }
 
     _handleClickRangeBox(e) {
-        
+
         this.pickRange.current.show()
     }
 
@@ -138,9 +139,9 @@ class QuantimedImportStepThree extends Component {
                     initialValues={initialValuesThree}
                     validate={validateThree(validationSchemaThree)}
                     onSubmit={(values, { setSubmitting, setErrors }) => {
-                        
-                        let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
-                        let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
+
+                        let startDate = moment(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01').format("YYYY-MM-DD");
+                        let endDate = moment(this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate()).format("YYYY-MM-DD");
                         // alert(startDate)
                         // alert(endDate)                        
                         this.props.items.program.rangeValue = this.state.rangeValue;
@@ -165,7 +166,7 @@ class QuantimedImportStepThree extends Component {
                                         <div className="pl-0">
                                             <div className="row">
                                                 <FormGroup className="col-md-3">
-                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon fa fa-sort-desc ml-1"></span></Label>
+                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.quantimed.quantimedImportScreenThird')}<span className="stock-box-icon fa fa-sort-desc ml-1"></span></Label>
                                                     <div className="controls edit">
 
                                                         <Picker
@@ -183,17 +184,19 @@ class QuantimedImportStepThree extends Component {
                                                 </FormGroup>
                                             </div>
                                         </div>
-                                    </CardBody>
-                                    <CardFooter className="pb-0 pr-0">
+                                    {/* </CardBody>
+                                    <CardFooter className="pb-0 pr-0"> */}
+                                    <br></br>
                                         <FormGroup>
 
-                                            <Button color="info" size="md" className="float-right mr-1" type="submit" name="healthAreaSub" id="healthAreaSub" onClick={() => this.touchAll(setTouched, errors)}>{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
+                                            <Button color="success" size="md" className="float-right mr-1" type="submit" name="healthAreaSub" id="healthAreaSub" onClick={() => this.touchAll(setTouched, errors)}>{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
                                         &nbsp;
-                                        <Button color="info" size="md" className="float-right mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.props.previousToStepTwo} ><i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>                                        
+                                        <Button color="info" size="md" className="float-right mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.props.previousToStepTwo} ><i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
                                         &nbsp;
                                         </FormGroup>
                                         &nbsp;
-                                    </CardFooter>
+                                    {/* </CardFooter> */}
+                                    </CardBody>
                                 </Form>
                             )} />
 
