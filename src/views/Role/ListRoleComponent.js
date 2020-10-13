@@ -375,7 +375,7 @@ class ListRoleComponent extends Component {
             .then(response => {
                 if (response.status == 200) {
                     // this.setState({ roleList: response.data, selSource: response.data, loading: false })
-
+                    console.log("response.data--->", response.data);
                     this.setState({
                         roleList: response.data, selSource: response.data
                     },

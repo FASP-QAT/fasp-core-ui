@@ -675,7 +675,8 @@ export default class ManualTagging extends Component {
             artmisList: [],
             shipmentId: '',
             reason: "1",
-            haslinked: false
+            haslinked: false,
+            alreadyLinkedmessage: ""
         }
         this.addNewCountry = this.addNewCountry.bind(this);
         this.editCountry = this.editCountry.bind(this);
@@ -695,18 +696,22 @@ export default class ManualTagging extends Component {
         this.setState({ loading: true })
         ManualTaggingService.linkShipmentWithARTMIS(orderNo, primeLineNo, this.state.shipmentId)
             .then(response => {
+                console.log("response m tagging---", response)
                 this.setState({
                     message: i18n.t('static.shipment.linkingsuccess'),
                     color: 'green',
                     haslinked: true,
-                    loading: false
+                    loading: false,
+                    alreadyLinkedmessage: i18n.t('static.message.alreadyTagged'),
                 },
                     () => {
-                        console.log(this.state.message, "success 1")
-                        this.hideSecondComponent();
-                        document.getElementById('div2').style.display = 'block';
-                        this.toggleLarge();
-                        this.filterData();
+                        if (response.data != -1) {
+                            console.log(this.state.message, "success 1")
+                            this.hideSecondComponent();
+                            document.getElementById('div2').style.display = 'block';
+                            this.toggleLarge();
+                            this.filterData();
+                        }
                     })
 
             }).catch(
@@ -754,7 +759,9 @@ export default class ManualTagging extends Component {
         var programId = document.getElementById("programId").value;
         var planningUnitId = document.getElementById("planningUnitId").value;
         var orderNo = document.getElementById("orderNo").value;
+        console.log("orderNo---", orderNo);
         var primeLineNo = document.getElementById("primeLineNo").value;
+        console.log("primeLineNo---", primeLineNo);
         if (orderNo != "" && primeLineNo != "") {
             ManualTaggingService.getOrderDetailsByOrderNoAndPrimeLineNo(programId, planningUnitId, orderNo, primeLineNo)
                 .then(response => {
@@ -808,10 +815,22 @@ export default class ManualTagging extends Component {
                         }
                     }
                 );
-        } else {
+        } else if (orderNo == "" && primeLineNo == "") {
             this.setState({
                 artmisList: [],
                 result: i18n.t('static.manualtagging.result')
+            })
+        }
+        else if (orderNo == "") {
+            this.setState({
+                artmisList: [],
+                result: i18n.t('static.manualtagging.resultOrderNoBlank')
+            })
+        }
+        else if (primeLineNo == "") {
+            this.setState({
+                artmisList: [],
+                result: i18n.t('static.manualtagging.resultPrimeLineNoBlank')
             })
         }
     }
@@ -1056,6 +1075,11 @@ export default class ManualTagging extends Component {
                 {
                     title: i18n.t('static.report.procurementAgentName'),
                     type: 'text',
+                }
+                ,
+                {
+                    title: i18n.t('static.budget.fundingsource'),
+                    type: 'text',
                 },
                 {
                     title: i18n.t('static.dashboard.budget'),
@@ -1063,10 +1087,6 @@ export default class ManualTagging extends Component {
                 },
                 {
                     title: i18n.t('static.supplyPlan.shipmentQty'),
-                    type: 'text',
-                },
-                {
-                    title: i18n.t('static.budget.fundingsource'),
                     type: 'text',
                 },
             ],
@@ -1255,6 +1275,7 @@ export default class ManualTagging extends Component {
             artmisList: [],
             reason: "1",
             result: '',
+            alreadyLinkedmessage: '',
             manualTag: !this.state.manualTag,
         })
     }
@@ -1341,6 +1362,12 @@ export default class ManualTagging extends Component {
                 align: 'center',
                 headerAlign: 'center',
                 // formatter: this.formatLabel
+            }, {
+                dataField: 'fundingSource.code',
+                text: i18n.t('static.fundingSourceHead.fundingSource'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
             },
             {
                 dataField: 'budget.label.label_en',
@@ -1357,14 +1384,8 @@ export default class ManualTagging extends Component {
                 align: 'center',
                 headerAlign: 'center',
                 formatter: this.addCommas
-            },
-            {
-                dataField: 'fundingSource.code',
-                text: i18n.t('static.fundingSourceHead.fundingSource'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
             }
+
         ];
 
         const columns1 = [
@@ -1391,6 +1412,14 @@ export default class ManualTagging extends Component {
                 // formatter: this.formatLabel
             },
             {
+                dataField: 'planningUnitLabel',
+                text: i18n.t('static.planningUnit.planningUnitName'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.formatLabel
+            },
+            {
                 dataField: 'planningUnitSkuCode',
                 text: i18n.t('static.manualTagging.planningUnitSKUCode'),
                 sort: true,
@@ -1415,7 +1444,7 @@ export default class ManualTagging extends Component {
             },
             {
                 dataField: 'currentEstimatedDeliveryDate',
-                text: i18n.t('static.manualTagging.currentEstimetedDeliveryDate'),
+                text: i18n.t('static.supplyPlan.expectedDeliveryDate'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -1521,6 +1550,7 @@ export default class ManualTagging extends Component {
                                                 name="planningUnitId"
                                                 id="planningUnitId"
                                                 bsSize="sm"
+                                                autocomplete="off"
                                                 onChange={this.filterData}
                                             >
                                                 <option value="0">{i18n.t('static.common.select')}</option>
@@ -1587,7 +1617,7 @@ export default class ManualTagging extends Component {
                                 <Col md="12 pl-0">
                                     <div className="d-md-flex">
                                         <FormGroup className="col-md-3 pl-0">
-                                            <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.orderNo')}</Label>
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.manualTagging.OrderNo')}</Label>
                                             <div className="controls ">
                                                 <InputGroup>
                                                     <Input
@@ -1595,6 +1625,8 @@ export default class ManualTagging extends Component {
                                                         name="orderNo"
                                                         id="orderNo"
                                                         bsSize="sm"
+                                                        autocomplete="off"
+                                                        onChange={this.getOrderDetails}
                                                     >
                                                     </Input>
                                                 </InputGroup>
@@ -1609,6 +1641,7 @@ export default class ManualTagging extends Component {
                                                         name="primeLineNo"
                                                         id="primeLineNo"
                                                         bsSize="sm"
+                                                        autocomplete="off"
                                                         onChange={this.getOrderDetails}
                                                     >
                                                     </Input>
@@ -1671,9 +1704,10 @@ export default class ManualTagging extends Component {
                                         }
                                     </ToolkitProvider>
                                 </div>
-                                {this.state.reason != "" && this.state.reason != 1 && <div style={{ color: 'red' }}>Note : {this.state.reason}</div>}
-                                <div style={{ color: 'red' }} >
-                                    {this.state.result}</div>
+                                <h5> {this.state.reason != "" && this.state.reason != 1 && <div style={{ color: 'red' }}>Note : {this.state.reason}</div>}</h5>
+                                <h5><div style={{ color: 'red' }} >
+                                    {this.state.result}</div></h5>
+                                <h5 style={{ color: 'red' }}>{i18n.t(this.state.alreadyLinkedmessage)}</h5>
                             </ModalBody>
                             <ModalFooter>
 

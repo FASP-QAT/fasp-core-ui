@@ -286,7 +286,7 @@ export default class EditLanguageComponent extends Component {
                                         isValid,
                                         setTouched
                                     }) => (
-                                            <Form onSubmit={handleSubmit} noValidate name='languageForm'>
+                                            <Form onSubmit={handleSubmit} noValidate name='languageForm' autocomplete="off">
                                                 <CardBody className="pb-0">
                                                     <FormGroup>
                                                         <Label for="languageName">{i18n.t('static.language.language')}<span class="red Reqasterisk">*</span></Label>

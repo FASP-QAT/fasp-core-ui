@@ -524,9 +524,10 @@ import ProductService from '../../api/ProductService';
 import TracerCategoryService from '../../api/TracerCategoryService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import jexcel from 'jexcel';
+import moment from 'moment';
 import "../../../node_modules/jexcel/dist/jexcel.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
-import { JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from '../../Constants';
+import { DATE_FORMAT_CAP, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from '../../Constants';
 
 
 const entityname = i18n.t('static.forecastingunit.forecastingunit');
@@ -572,7 +573,9 @@ export default class ForecastingUnitListComponent extends Component {
             data[4] = getLabelText(forecastingUnitList[j].unit.label, this.state.lang)
             data[5] = getLabelText(forecastingUnitList[j].genericLabel, this.state.lang)
             data[6] = getLabelText(forecastingUnitList[j].label, this.state.lang)
-            data[7] = forecastingUnitList[j].active;
+            data[7] = forecastingUnitList[j].lastModifiedBy.username;
+            data[8] = (forecastingUnitList[j].lastModifiedDate ? moment(forecastingUnitList[j].lastModifiedDate).format(`${DATE_FORMAT_CAP}`) : null)
+            data[9] = forecastingUnitList[j].active;
 
             forecastingUnitListArray[count] = data;
             count++;
@@ -627,6 +630,16 @@ export default class ForecastingUnitListComponent extends Component {
                 },
                 {
                     title: i18n.t('static.forecastingunit.forecastingunit'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.common.lastModifiedBy'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.common.lastModifiedDate'),
                     type: 'text',
                     readOnly: true
                 },

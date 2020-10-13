@@ -28,11 +28,13 @@ const validationSchema = function (values) {
     return Yup.object().shape({
         budgetName: Yup.string()
             // .matches(BUDGET_NAME_REGEX, i18n.t('static.message.budgetNameRegex'))
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.budget.budgetamountdesc')),
         budgetAmt: Yup.string()
             // .typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .required(i18n.t('static.budget.budgetamounttext')).min(0, i18n.t('static.program.validvaluetext'))
-            .matches(/^[0-9]+([,\.][0-9]+)?/, i18n.t('static.program.validBudgetAmount')),
+            .matches(/^\s*(?=.*[1-9])\d{1,10}(?:\.\d{1,2})?\s*$/, i18n.t('static.program.validBudgetAmount'))
+            .required(i18n.t('static.budget.budgetamounttext')).min(0, i18n.t('static.program.validvaluetext')),
+        // .matches(/^[0-9]+([,\.][0-9]+)?/, i18n.t('static.program.validBudgetAmount')),
         // startDate: Yup.string()
         //     .required(i18n.t('static.budget.startdatetext')),
         // stopDate: Yup.string()
@@ -41,7 +43,7 @@ const validationSchema = function (values) {
             // .matches(ALPHABET_NUMBER_REGEX, i18n.t('static.message.alphabetnumerallowed'))
             .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly'))
             .max(30, i18n.t('static.common.max30digittext'))
-            .required(i18n.t('static.budget.budgetCodeText')),
+            .required(i18n.t('static.budget.budgetDisplayNameText')),
     })
 }
 
@@ -189,8 +191,8 @@ class EditBudgetComponent extends Component {
                     if (response.data.stopDate != null && response.data.stopDate != "") {
                         response.data.stopDate = new Date(response.data.stopDate);
                     }
-                    var getBudgetAmount = this.CommaFormatted(response.data.budgetAmt);
-                    response.data.budgetAmt = getBudgetAmount;
+                    // var getBudgetAmount = this.CommaFormatted(response.data.budgetAmt);
+                    // response.data.budgetAmt = getBudgetAmount;
 
                     this.setState({
                         budget: response.data, loading: false
@@ -274,8 +276,10 @@ class EditBudgetComponent extends Component {
             budget.label.label_en = event.target.value;
         }
         if (event.target.name === "budgetAmt") {
-            var chnageValue = this.CommaFormatted(event.target.value);
-            budget.budgetAmt = chnageValue;
+            // var chnageValue = this.CommaFormatted(event.target.value);
+            // budget.budgetAmt = chnageValue;
+
+            budget.budgetAmt = event.target.value;
         }
         // if (event.target.name === "startDate") {
         //     budget.startDate = event.target.value;
@@ -349,8 +353,9 @@ class EditBudgetComponent extends Component {
                                     })
                                     let { budget } = this.state;
 
-                                    var amount = this.state.budget.budgetAmt.replace(/,/g, '');
-                                    budget.budgetAmt = amount;
+                                    // var amount = this.state.budget.budgetAmt.replace(/,/g, '');
+                                    // budget.budgetAmt = amount;
+                                    budget.budgetAmt = this.state.budget.budgetAmt;
 
                                     var startDate = moment(this.state.budget.startDate).format("YYYY-MM-DD");
                                     budget.startDate = startDate;
@@ -424,7 +429,7 @@ class EditBudgetComponent extends Component {
                                         isValid,
                                         setTouched
                                     }) => (
-                                            <Form onSubmit={handleSubmit} noValidate name='budgetForm'>
+                                            <Form onSubmit={handleSubmit} noValidate name='budgetForm' autocomplete="off">
                                                 <CardBody>
 
                                                     <FormGroup>
@@ -483,7 +488,7 @@ class EditBudgetComponent extends Component {
                                                         <FormFeedback className="red">{errors.budgetName}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="budget">{i18n.t('static.budget.budgetCode')}<span className="red Reqasterisk">*</span></Label>
+                                                        <Label for="budget">{i18n.t('static.budget.budgetDisplayName')}<span className="red Reqasterisk">*</span></Label>
                                                         <Input type="text"
                                                             name="budgetCode"
                                                             id="budgetCode"
@@ -539,9 +544,15 @@ class EditBudgetComponent extends Component {
                                                             name="budgetAmt"
                                                             id="budgetAmt"
                                                             bsSize="sm"
+                                                            // valid={!errors.budgetAmt}
+                                                            // invalid={touched.budgetAmt && !!errors.budgetAmt || this.state.budget.budgetAmt == ''}
+
                                                             valid={!errors.budgetAmt}
-                                                            invalid={touched.budgetAmt && !!errors.budgetAmt || this.state.budget.budgetAmt == ''}
-                                                            onChange={(e) => { this.dataChange(e) }}
+                                                            invalid={(touched.budgetAmt && !!errors.budgetAmt) || !!errors.budgetAmt}
+
+                                                            // valid={!errors.budgetAmt}
+                                                            // invalid={(touched.budgetAmt && !!errors.budgetAmt || !!errors.budgetAmt)}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             type="text"
                                                             // placeholder={i18n.t('static.budget.budgetamountdesc')}
@@ -673,7 +684,7 @@ class EditBudgetComponent extends Component {
                                                             id="notes"
                                                             bsSize="sm"
                                                             onChange={(e) => { this.dataChange(e) }}
-
+                                                            maxLength={600}
                                                             type="textarea"
                                                         />
                                                         <FormFeedback className="red"></FormFeedback>
@@ -684,7 +695,7 @@ class EditBudgetComponent extends Component {
 
                                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
                                                         <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>Update</Button>
+                                                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                                         &nbsp;
                                                     </FormGroup>
                                                 </CardFooter>

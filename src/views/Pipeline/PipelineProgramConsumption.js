@@ -159,7 +159,7 @@ export default class PipelineProgramConsumption extends Component {
                 //valid = false;
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, (list[y].dataSourceId).concat(" Does not exist."));
+                this.el.setComments(col, (list[y].dataSourceId).concat(i18n.t('static.message.notExist')));
             }
             var map = new Map(Object.entries(json[y]));
             var col = ("C").concat(parseInt(y) + 1);
@@ -170,7 +170,7 @@ export default class PipelineProgramConsumption extends Component {
             } else {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, (list[map.get("2")].regionId).concat(" Does not exist."));
+                this.el.setComments(col, (list[map.get("2")].regionId).concat(i18n.t('static.message.notExist')));
             }
             var col = ("D").concat(parseInt(y) + 1);
             var value = map.get("3");

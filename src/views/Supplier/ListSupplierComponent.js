@@ -321,9 +321,10 @@ import RealmService from '../../api/RealmService';
 import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import jexcel from 'jexcel';
+import moment from 'moment';
 import "../../../node_modules/jexcel/dist/jexcel.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
-import { JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from '../../Constants';
+import { DATE_FORMAT_CAP, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from '../../Constants';
 const entityname = i18n.t('static.supplier.supplier');
 class SupplierListComponent extends Component {
     constructor(props) {
@@ -413,7 +414,9 @@ class SupplierListComponent extends Component {
             data[0] = supplierList[j].supplierId
             data[1] = getLabelText(supplierList[j].realm.label, this.state.lang)
             data[2] = getLabelText(supplierList[j].label, this.state.lang)
-            data[3] = supplierList[j].active;
+            data[3] = supplierList[j].lastModifiedBy.username;
+            data[4] = (supplierList[j].lastModifiedDate ? moment(supplierList[j].lastModifiedDate).format(`${DATE_FORMAT_CAP}`) : null)
+            data[5] = supplierList[j].active;
             supplierArray[count] = data;
             count++;
         }
@@ -448,6 +451,16 @@ class SupplierListComponent extends Component {
                     readOnly: true
                 },
                 {
+                    title: i18n.t('static.common.lastModifiedBy'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.common.lastModifiedDate'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
                     type: 'dropdown',
                     title: i18n.t('static.common.status'),
                     readOnly: true,
@@ -464,7 +477,7 @@ class SupplierListComponent extends Component {
                 entries: '',
             },
             onload: this.loaded,
-            pagination:  JEXCEL_DEFAULT_PAGINATION,
+            pagination: JEXCEL_DEFAULT_PAGINATION,
             search: true,
             columnSorting: true,
             tableOverflow: true,

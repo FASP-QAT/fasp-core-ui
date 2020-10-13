@@ -1130,7 +1130,7 @@
     "static.supplyPlan.quantityCountryProduct": " Cantidad (unidad de informe alternativa)",
     "static.supplyPlan.quantityQATProduct": " Cantidad (Unidad de planificación QAT)",
     "static.dashboard.programs": "Programas",
-    "static.common.version":"Ver.:",
+    "static.common.version":"VER.:",
     "static.common.showData":"Mostrar datos",
     "static.common.hideData":"Ocultar datos",
     "static.period.selectPeriod":"Seleccionar período",
@@ -1183,5 +1183,8 @@
     "static.program.confirmDelete": "¿Está seguro de que desea eliminar los programas locales?",
     "static.program.deleteLocalProgramSuccess" : "Programa (s) local (s) eliminado correctamente",
     "static.common.delete": "Eliminar",
-    "static.program.deleteLocalProgram" : "Eliminar programa local"
+    "static.program.deleteLocalProgram" : "Eliminar programa local",
+    "static.ticket.unavailableDropdownValidationText": " - si no ves el ? desea, envíe un ticket para ese artículo.",
+    "static.message.alreadyTagged":"Esta orden no. y primera línea no. ya están etiquetados. Para cambiar el etiquetado, primero desvincule y luego intente.",
+    "static.shipment.linkingsuccess": "Envío vinculado correctamente"
 }

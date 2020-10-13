@@ -505,6 +505,7 @@ import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import FundingSourceService from '../../api/FundingSourceService';
 import moment from 'moment';
+import ProgramService from "../../api/ProgramService";
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { DATE_FORMAT_CAP, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
 import jexcel from 'jexcel';
@@ -523,7 +524,8 @@ class ListBudgetComponent extends Component {
       message: '',
       selBudget: [],
       fundingSourceList: [],
-      loading: true
+      loading: true,
+      programs: [],
     }
 
     this.editBudget = this.editBudget.bind(this);
@@ -558,8 +560,23 @@ class ListBudgetComponent extends Component {
 
   filterData() {
     let fundingSourceId = document.getElementById("fundingSourceId").value;
-    if (fundingSourceId != 0) {
+    let programId = document.getElementById("programId").value;
+    if (fundingSourceId != 0 && programId != 0) {
+      const selBudget = this.state.budgetList.filter(c => c.fundingSource.fundingSourceId == fundingSourceId && c.program.id == programId)
+      this.setState({
+        selBudget: selBudget
+      }, () => {
+        this.buildJExcel();
+      });
+    } else if (fundingSourceId != 0) {
       const selBudget = this.state.budgetList.filter(c => c.fundingSource.fundingSourceId == fundingSourceId)
+      this.setState({
+        selBudget: selBudget
+      }, () => {
+        this.buildJExcel();
+      });
+    } else if (programId != 0) {
+      const selBudget = this.state.budgetList.filter(c => c.program.id == programId)
       this.setState({
         selBudget: selBudget
       }, () => {
@@ -615,10 +632,18 @@ class ListBudgetComponent extends Component {
       data[6] = budgetList[j].currency.currencyCode + " " + (budgetList[j].budgetAmt - budgetList[j].usedUsdAmt).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
       data[7] = (budgetList[j].startDate ? moment(budgetList[j].startDate).format(`${DATE_FORMAT_CAP}`) : null);
       data[8] = (budgetList[j].stopDate ? moment(budgetList[j].stopDate).format(`${DATE_FORMAT_CAP}`) : null);
-      data[9] = (budgetList[j].active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'));
-      data[10] = budgetList[j].budgetAmt;
-      data[11] = budgetList[j].usedUsdAmt;
-      data[12] = budgetList[j].stopDate;
+      data[9] = budgetList[j].lastModifiedBy.username;
+      data[10] = (budgetList[j].lastModifiedDate ? moment(budgetList[j].lastModifiedDate).format(`${DATE_FORMAT_CAP}`) : null)
+      // data[9] = (budgetList[j].active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'));
+      // data[10] = budgetList[j].budgetAmt;
+      // data[11] = budgetList[j].usedUsdAmt;
+      // data[12] = budgetList[j].stopDate;
+
+      data[11] = (budgetList[j].active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'));
+      data[12] = budgetList[j].budgetAmt;
+      data[13] = budgetList[j].usedUsdAmt;
+      data[14] = budgetList[j].stopDate;
+
 
 
 
@@ -656,7 +681,7 @@ class ListBudgetComponent extends Component {
           // readOnly: true
         },
         {
-          title: i18n.t('static.budget.budgetCode'),
+          title: i18n.t('static.budget.budgetDisplayName'),
           type: 'text',
           // readOnly: true
         },
@@ -682,6 +707,16 @@ class ListBudgetComponent extends Component {
         },
         {
           title: i18n.t('static.common.stopdate'),
+          type: 'text',
+          // readOnly: true
+        },
+        {
+          title: i18n.t('static.common.lastModifiedBy'),
+          type: 'text',
+          // readOnly: true
+        },
+        {
+          title: i18n.t('static.common.lastModifiedDate'),
           type: 'text',
           // readOnly: true
         },
@@ -788,15 +823,19 @@ class ListBudgetComponent extends Component {
     var elInstance = instance.jexcel;
     var json = elInstance.getJson();
 
-    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
+    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L']
     for (var j = 0; j < json.length; j++) {
 
 
       var rowData = elInstance.getRowData(j);
       // console.log("elInstance---->", elInstance);
-      var stopDate = rowData[12];
-      var budgetAmt = rowData[10];
-      var usedUsdAmt = rowData[11];
+      // var stopDate = rowData[12];
+      // var budgetAmt = rowData[10];
+      // var usedUsdAmt = rowData[11];
+
+      var stopDate = rowData[14];
+      var budgetAmt = rowData[12];
+      var usedUsdAmt = rowData[13];
 
       if (((moment(stopDate)).isBefore(moment(Date.now())) || ((budgetAmt - usedUsdAmt) <= 0))) {
         for (var i = 0; i < colArr.length; i++) {
@@ -816,6 +855,68 @@ class ListBudgetComponent extends Component {
 
   componentDidMount() {
     this.hideFirstComponent();
+
+    ProgramService.getProgramList()
+      .then(response => {
+        if (response.status == 200) {
+          this.setState({
+            programs: response.data, loading: false
+          })
+        }
+
+        else {
+
+          this.setState({
+            message: response.data.messageCode, loading: false
+          },
+            () => {
+              this.hideSecondComponent();
+            })
+        }
+
+      })
+      .catch(
+        error => {
+          if (error.message === "Network Error") {
+            this.setState({
+              message: 'static.unkownError',
+              loading: false
+            });
+          } else {
+            switch (error.response ? error.response.status : "") {
+
+              case 401:
+                this.props.history.push(`/login/static.message.sessionExpired`)
+                break;
+              case 403:
+                this.props.history.push(`/accessDenied`)
+                break;
+              case 500:
+              case 404:
+              case 406:
+                this.setState({
+                  message: error.response.data.messageCode,
+                  loading: false
+                });
+                break;
+              case 412:
+                this.setState({
+                  message: error.response.data.messageCode,
+                  loading: false
+                });
+                break;
+              default:
+                this.setState({
+                  message: 'static.unkownError',
+                  loading: false
+                });
+                break;
+            }
+          }
+        }
+      );
+
+
     BudgetServcie.getBudgetList()
       .then(response => {
         console.log(response)
@@ -880,8 +981,11 @@ class ListBudgetComponent extends Component {
       .then(response => {
         if (response.status == 200) {
           console.log("funding source after status 200--->" + response.data)
+          // this.setState({
+          //   fundingSourceList: response.data
+          // })
           this.setState({
-            fundingSourceList: response.data
+            fundingSourceList: response.data.filter(c => (c.allowedInBudget == true || c.allowedInBudget == "true"))
           })
         } else {
           this.setState({ message: response.data.messageCode, loading: false })
@@ -973,6 +1077,16 @@ class ListBudgetComponent extends Component {
         </option>
       )
     }, this);
+
+    const { programs } = this.state;
+    let programList = programs.length > 0
+      && programs.map((item, i) => {
+        return (
+          <option key={i} value={item.programId}>
+            {getLabelText(item.label, this.state.lang)}
+          </option>
+        )
+      }, this);
 
     const columns = [
 
@@ -1125,7 +1239,50 @@ class ListBudgetComponent extends Component {
             </div>
           </div>
           <CardBody className="pb-lg-0 ">
-            <Col md="3 pl-0" >
+            <Col md="6 pl-0">
+              <div className="d-md-flex Selectdiv2">
+
+                <FormGroup className="mt-md-2 mb-md-0 ">
+                  <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
+                  <div className="controls SelectGo">
+                    <InputGroup>
+                      <Input
+                        type="select"
+                        name="programId"
+                        id="programId"
+                        bsSize="sm"
+                        onChange={this.filterData}
+                      >
+                        <option value="0">{i18n.t('static.common.all')}</option>
+                        {programList}
+                      </Input>
+                    </InputGroup>
+                  </div>
+                </FormGroup>
+
+                <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
+                  <Label htmlFor="appendedInputButton">{i18n.t('static.budget.fundingsource')}</Label>
+                  <div className="controls SelectGo">
+                    <InputGroup>
+                      <Input
+                        type="select"
+                        name="fundingSourceId"
+                        id="fundingSourceId"
+                        bsSize="sm"
+                        onChange={this.filterData}
+                      >
+                        <option value="0">{i18n.t('static.common.all')}</option>
+                        {fundingSources}
+                      </Input>
+                    </InputGroup>
+                  </div>
+                </FormGroup>
+
+              </div>
+            </Col>
+
+
+            {/* <Col md="3 pl-0" >
               <FormGroup className="Selectdiv mt-md-2 mb-md-0">
                 <Label htmlFor="appendedInputButton">{i18n.t('static.budget.fundingsource')}</Label>
                 <div className="controls SelectGo">
@@ -1140,17 +1297,14 @@ class ListBudgetComponent extends Component {
                       <option value="0">{i18n.t('static.common.all')}</option>
                       {fundingSources}
                     </Input>
-                    {/* <InputGroupAddon addonType="append">
-                      <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
-                    </InputGroupAddon> */}
                   </InputGroup>
                 </div>
               </FormGroup>
-            </Col>
+            </Col> */}
 
             {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground">
             </div>
-            <h5>{i18n.t('static.budget.redRow')}</h5>
+            <h5 style={{ color: 'red' }}>{i18n.t('static.budget.redRow')}</h5>
 
 
           </CardBody>

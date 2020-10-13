@@ -764,7 +764,7 @@ export default class AddProgram extends Component {
                                         setFieldTouched
                                     }) => (
 
-                                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='programForm'>
+                                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='programForm' autocomplete="off">
                                                 {/* <CardHeader>
                                                     <strong>{i18n.t('static.program.programadd')}</strong>
                                                 </CardHeader> */}
@@ -907,6 +907,7 @@ export default class AddProgram extends Component {
                                                             // invalid={touched.programNotes && !!errors.programNotes}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
+                                                            maxLength={600}
                                                             type="textarea" name="programNotes" id="programNotes" />
                                                         <FormFeedback>{errors.programNotes}</FormFeedback>
                                                     </FormGroup>

@@ -1680,14 +1680,14 @@ export default class ConsumptionDetails extends React.Component {
                                 </FormGroup>
                             </div>
                         </Col>
-                        {this.state.data.length > 0 && <FormGroup className="col-md-6 mt-5 pl-0" >
+                        {/* {this.state.data.length > 0 &&  */}
+                        <FormGroup className="col-md-6 mt-5 pl-0" >
                             <ul className="legendcommitversion list-group">
                                 <li><span className="problemList-red legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.problemList.high')}</span></li>
                                 <li><span className="problemList-orange legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.problemList.medium')}</span></li>
                                 <li><span className="problemList-yellow legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.problemList.low')} </span></li>
                             </ul>
-                        </FormGroup>}
-
+                        </FormGroup>
                         {/* <div className="ProgramListSearch"> */}
                         <div id="tableDiv"  style={{ display: this.state.loading ? "none" : "block" }} className="jexcelremoveReadonlybackground qat-problemListSearch">
                         </div>

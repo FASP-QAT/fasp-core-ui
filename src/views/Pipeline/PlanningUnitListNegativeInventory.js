@@ -38,12 +38,12 @@ export default class PlanningUnitListNegativeInventory extends Component {
                     colWidths: [300, 70],
                     columns: [
                         {
-                            title: 'Planning Unit',
+                            title: i18n.t('static.report.planningUnit'),
                             type: 'text',
                             readOnly: true
                         },
                         {
-                            title: 'Total Inventory',
+                            title: i18n.t('static.inventory.totalInvontory'),
                             type: 'number',
                             readOnly: true
 

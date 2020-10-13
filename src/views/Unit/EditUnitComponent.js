@@ -297,7 +297,7 @@ export default class EditUnitComponent extends Component {
                                         isValid,
                                         setTouched
                                     }) => (
-                                            <Form onSubmit={handleSubmit} noValidate name='unitForm'>
+                                            <Form onSubmit={handleSubmit} noValidate name='unitForm' autocomplete="off">
                                                 <CardBody className="pb-0">
                                                     <FormGroup>
                                                         <Label htmlFor="dimensionId">{i18n.t('static.dimension.dimension')}<span class="red Reqasterisk">*</span></Label>

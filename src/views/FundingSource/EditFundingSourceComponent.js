@@ -167,6 +167,9 @@ class EditFundingSourceComponent extends Component {
         if (event.target.name == "fundingSourceCode") {
             fundingSource.fundingSourceCode = event.target.value.toUpperCase();;
         }
+        if (event.target.name == "allowedInBudget") {
+            fundingSource.allowedInBudget = event.target.id === "allowedInBudget2" ? false : true;
+        }
         this.setState({
             fundingSource
         },
@@ -292,7 +295,7 @@ class EditFundingSourceComponent extends Component {
                                         isValid,
                                         setTouched
                                     }) => (
-                                            <Form onSubmit={handleSubmit} noValidate name='fundingSourceForm'>
+                                            <Form onSubmit={handleSubmit} noValidate name='fundingSourceForm' autocomplete="off">
                                                 <CardBody className="pb-0">
                                                     <FormGroup>
                                                         <Label htmlFor="realmId">{i18n.t('static.fundingsource.realm')}<span class="red Reqasterisk">*</span></Label>
@@ -340,6 +343,41 @@ class EditFundingSourceComponent extends Component {
                                                         <FormFeedback className="red">{errors.fundingSourceCode}</FormFeedback>
                                                     </FormGroup>
 
+                                                    <FormGroup>
+                                                        <Label className="P-absltRadio">{i18n.t('static.fundingSource.allowInBudget')}&nbsp;&nbsp;</Label>
+                                                        <FormGroup check inline>
+                                                            <Input
+                                                                className="form-check-input"
+                                                                type="radio"
+                                                                id="allowedInBudget1"
+                                                                name="allowedInBudget"
+                                                                value={true}
+                                                                checked={this.state.fundingSource.allowedInBudget === true}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            />
+                                                            <Label
+                                                                className="form-check-label"
+                                                                check htmlFor="inline-active1">
+                                                                {i18n.t('static.program.yes')}
+                                                            </Label>
+                                                        </FormGroup>
+                                                        <FormGroup check inline>
+                                                            <Input
+                                                                className="form-check-input"
+                                                                type="radio"
+                                                                id="allowedInBudget2"
+                                                                name="allowedInBudget"
+                                                                value={false}
+                                                                checked={this.state.fundingSource.allowedInBudget === false}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            />
+                                                            <Label
+                                                                className="form-check-label"
+                                                                check htmlFor="inline-active2">
+                                                                {i18n.t('static.program.no')}
+                                                            </Label>
+                                                        </FormGroup>
+                                                    </FormGroup>
 
                                                     <FormGroup>
                                                         <Label className="P-absltRadio">{i18n.t('static.common.status')}&nbsp;&nbsp;</Label>

@@ -757,7 +757,7 @@ export default class EditLanguageComponent extends Component {
                                         isValid,
                                         setTouched
                                     }) => (
-                                            <Form onSubmit={handleSubmit} noValidate name='languageForm'>
+                                            <Form onSubmit={handleSubmit} noValidate name='languageForm' autocomplete="off">
                                                 <CardBody className="pb-0">
                                                     <div className="col-md-12 bg-white pb-1  mb-2">
                                                         <ul class="navbar-nav"><li class="nav-item pl-0"><a aria-current="page" class="nav-link active" ><b >{i18n.t('static.report.problemDescription')}</b></a></li></ul>
@@ -865,6 +865,7 @@ export default class EditLanguageComponent extends Component {
                                                                 <Label for="problemDescription">Suggestion</Label>
                                                                 <Input
                                                                     type="textarea"
+                                                                    maxLength={600}
                                                                     name="problemSuggestion"
                                                                     id="problemSuggestion"
                                                                     bsSize="sm"
@@ -1012,6 +1013,8 @@ export default class EditLanguageComponent extends Component {
                                                                     name="notes"
                                                                     id="notes"
                                                                     bsSize="sm"
+                                                                    maxLength={600}
+                                                                    autocomplete="off"
                                                                     valid={!errors.notes && this.state.notes != ''}
                                                                     invalid={(touched.notes && !!errors.notes)}
                                                                     onBlur={handleBlur}

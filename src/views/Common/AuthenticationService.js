@@ -592,6 +592,7 @@ class AuthenticationService {
                     }
                     break;
                 case "/realmCountry/listRealmCountryPlanningUnit":
+                case "/realmCountry/listRealmCountryPlanningUnit/:color/:message":
                     if (bfunction.includes("ROLE_BF_MANAGE_REALM_COUNTRY_PLANNING_UNIT")) {
                         return true;
                     }
@@ -1043,7 +1044,7 @@ class AuthenticationService {
                     break;
                 case "/program/deleteLocalProgram":
                     console.log("Going to check if condition")
-                    if (bfunction.includes("ROLE_BF_DELETE_LOCAL_PROGARM")) {
+                    if (bfunction.includes("ROLE_BF_DELETE_LOCAL_PROGRAM")) {
                         console.log("Going to check if condition")
                         return true;
                     }
@@ -1152,9 +1153,9 @@ class AuthenticationService {
                     break;
                 case "/quantimed/quantimedImport":
                     // if (bfunction.includes("ROLE_BF_ADD_PROBLEM")) {
-                        return true;
+                    return true;
                     // }
-                    break;    
+                    break;
                 default:
                     console.log("default case");
                     return false;
@@ -1213,6 +1214,8 @@ class AuthenticationService {
                         console.log("common component token error");
                         return "/logout/static.message.tokenError";
                     }
+                } else {
+                    return "";
                 }
                 // else {
                 //     console.log("common component user is offline");

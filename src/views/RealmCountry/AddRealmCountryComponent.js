@@ -366,7 +366,7 @@ class AddRealmCountryComponent extends Component {
                                                             onBlur={handleBlur}
                                                             required
                                                         >
-                                                            <option value="">Please select</option>
+                                                            <option value="">{i18n.t('static.common.pleaseSelect')}</option>
                                                             {realmList}
                                                         </Input>
                                                         <FormFeedback>{errors.realmId}</FormFeedback>
@@ -384,7 +384,7 @@ class AddRealmCountryComponent extends Component {
                                                             onBlur={handleBlur}
                                                             required
                                                         >
-                                                            <option value="">Please select</option>
+                                                            <option value="">{i18n.t('static.common.pleaseSelect')}</option>
                                                             {realmList}
                                                         </Input>
                                                         <FormFeedback>{errors.countryId}</FormFeedback>
@@ -435,7 +435,7 @@ class AddRealmCountryComponent extends Component {
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
-                                                        <Button type="submit" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}>{i18n.t('static.common.submit')}Submit</Button>
+                                                        <Button type="submit" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}>{i18n.t('static.common.submit')}</Button>
                                                         <Button type="reset" color="danger" className="mr-1" onClick={this.cancelClicked}>{i18n.t('static.common.cancel')}</Button>
                                                     </FormGroup>
                                                 </CardFooter>

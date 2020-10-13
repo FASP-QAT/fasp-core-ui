@@ -28,7 +28,7 @@ const validationSchema = function (values, t) {
     console.log("made by us schema--->", values)
     return Yup.object().shape({
         productCategory: Yup.string()
-            .required("Product Category Name Is Required.")
+            .required(i18n.t('static.productCategoryName.productCategoryNameRequired'))
 
     })
 }
@@ -325,7 +325,7 @@ export default class ProductCategoryTree extends Component {
             this.setState({ treeData: newNode.treeData, maxId: currentMaxId, nodename: '' });
         } else {//duplicate found
             this.setState({
-                message: 'Duplicate Product Category Name Found',
+                message: i18n.t('static.productCategoryTree.duplicateProductCategoryTree'),
                 color: 'red'
             })
             this.hideSecondComponent();
@@ -461,7 +461,7 @@ export default class ProductCategoryTree extends Component {
             });
             this.setState({ treeData: enabledNode, message: '' });
         } else {
-            this.setState({ message: 'Sorry The Parent Is Disabled !' });
+            this.setState({ message: i18n.t('static.productCategory.parentIsDisabled') });
             this.hideSecondComponent();
         }
 

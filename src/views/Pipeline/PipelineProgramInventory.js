@@ -131,7 +131,7 @@ export default class PipelineProgramInventory extends Component {
             } else {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, (list[y].dataSourceId).concat(" Does not exist."));
+                this.el.setComments(col, (list[y].dataSourceId).concat(i18n.t('static.message.notExist')));
             }
 
             var col = ("D").concat(parseInt(y) + 1);
@@ -279,7 +279,7 @@ export default class PipelineProgramInventory extends Component {
                                     columns: [
 
                                         {
-                                            title: 'Planning Unit',
+                                            title: i18n.t('static.dashboard.product'),
                                             type: 'dropdown',
                                             source: planningUnitListQat,
                                             readOnly: true

@@ -396,8 +396,8 @@ class EditSupplyPlanStatus extends Component {
         console.log("====>", problemTransList);
         this.setState({ transView: !this.state.transView, problemTransList: problemTransList })
     }
-    toggleTransModal(){
-        this.setState({ transView: !this.state.transView})
+    toggleTransModal() {
+        this.setState({ transView: !this.state.transView })
     }
     leftClicked = () => {
         var monthCount = (this.state.monthCount) - NO_OF_MONTHS_ON_LEFT_CLICKED;
@@ -2080,6 +2080,49 @@ class EditSupplyPlanStatus extends Component {
                         <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                             <Col md="12 pl-0" id="realmDiv">
                                 <div className="table-responsive RemoveStriped">
+                                    {/* <FormGroup className="col-md-3">
+                                        <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
+                                        <div className="controls">
+                                            <InputGroup>
+                                                <Input
+                                                    type="select"
+                                                    name="planningUnitId"
+                                                    id="planningUnitId"
+                                                    bsSize="sm"
+                                                    value={this.state.planningUnitId}
+                                                    onChange={() => { this.formSubmit(this.state.monthCount); }}
+                                                >
+                                                    <option value="0">{i18n.t('static.common.select')}</option>
+                                                    {planningUnitList}
+                                                </Input>
+                                            </InputGroup>
+                                        </div>
+                                    </FormGroup>
+                                    <FormGroup className="col-md-12 mt-2 pl-0" style={{ display: this.state.display }}>
+                                        <ul className="legendcommitversion list-group">
+                                            {
+                                                this.state.paColors.map(item1 => (
+                                                    <li><span className="legendcolor" style={{ backgroundColor: item1.color }}></span> <span className="legendcommitversionText">{item1.text}</span></li>
+                                                ))
+                                            }
+                                            <li><span className="lightgreylegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.tbd')}</span></li>
+                                            <li><span className="lightgreenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.multipleShipments')}</span></li>
+                                            <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyShipments')} </span></li>
+                                            <li><span className="purplelegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.forecastedConsumption')}</span></li>
+                                            <li><span className=" blacklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.actualConsumption')} </span></li>
+
+                                        </ul>
+                                    </FormGroup>
+                                    <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px' }} style={{ display: this.state.display }}>
+                                        <ul className="legendcommitversion list-group">
+                                            <li><span className="lightgreylegend "></span> <span className="legendcommitversionText"> {i18n.t("static.supplyPlan.minMonthsOfStock")} : {this.state.minMonthsOfStock}</span></li>
+                                            <li><span className="lightgreenlegend "></span> <span className="legendcommitversionText">{i18n.t("static.report.reorderFrequencyInMonths")} : {this.state.reorderFrequency}</span></li>
+                                            <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.report.mospast")} : {this.state.monthsInPastForAMC}</span></li>
+                                            <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.report.mosfuture")} : {this.state.monthsInFutureForAMC}</span></li>
+                                            <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.shelfLife")} : {this.state.shelfLife}</span></li>
+                                        </ul>
+                                    </FormGroup> */}
+
                                     <FormGroup className="col-md-3">
                                         <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
                                         <div className="controls">
@@ -3395,7 +3438,7 @@ class EditSupplyPlanStatus extends Component {
                                             <div className="col-md-12 bg-white pb-1 mb-2">
                                                 <ul class="navbar-nav"><li class="nav-item pl-0"><a aria-current="page" class="nav-link active" >
                                                     {/* <b>{i18n.t('static.report.problemTransDetails')}</b> */}
-                                                    </a></li></ul>
+                                                </a></li></ul>
                                                 <div className="TableCust">
                                                     <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
 
@@ -3516,6 +3559,7 @@ class EditSupplyPlanStatus extends Component {
 
                                                             <Input
                                                                 type="textarea"
+                                                                maxLength={600}
                                                                 name="versionNotes"
                                                                 id="versionNotes"
                                                                 value={this.state.program.currentVersion.notes}

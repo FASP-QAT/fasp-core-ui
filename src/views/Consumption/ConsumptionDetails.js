@@ -7,7 +7,7 @@ import {
 } from 'reactstrap';
 import { Formik } from 'formik';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, DELIVERED_SHIPMENT_STATUS } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, DELIVERED_SHIPMENT_STATUS, ACTUAL_CONSUMPTION_TYPE, FORCASTED_CONSUMPTION_TYPE } from '../../Constants.js'
 import getLabelText from '../../CommonComponent/getLabelText'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import i18n from '../../i18n';
@@ -40,6 +40,10 @@ export default class ConsumptionDetails extends React.Component {
             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() },
+            regionList: [],
+            showActive: "",
+            regionId: "",
+            consumptionType: ""
         }
 
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
@@ -62,8 +66,21 @@ export default class ConsumptionDetails extends React.Component {
         //
     }
     handleRangeDissmis(value) {
-        this.setState({ rangeValue: value })
-        this.formSubmit(this.state.planningUnit, value);
+        var cont = false;
+        if (this.state.consumptionChangedFlag == 1) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
+
+            }
+        } else {
+            cont = true;
+        }
+        if (cont == true) {
+            this.setState({ rangeValue: value, consumptionChangedFlag: 0 })
+            this.formSubmit(this.state.planningUnit, value);
+        }
     }
 
     hideFirstComponent() {
@@ -91,16 +108,30 @@ export default class ConsumptionDetails extends React.Component {
         clearTimeout(this.timeout);
     }
 
-    toggleLarge() {
-        this.setState({
-            consumptionBatchInfoChangedFlag: 0,
-            consumptionBatchInfoDuplicateError: '',
-            consumptionBatchInfoNoStockError: '',
-            consumptionBatchError: ""
-        })
-        this.setState({
-            consumptionBatchInfo: !this.state.consumptionBatchInfo,
-        });
+    toggleLarge(method) {
+        var cont = false;
+        console.log("this.state.consumptionBatchInfoChangedFlag", this.state.consumptionBatchInfoChangedFlag);
+        if (method != "submit" && this.state.consumptionBatchInfoChangedFlag == 1) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
+
+            }
+        } else {
+            cont = true;
+        }
+        if (cont == true) {
+            this.setState({
+                consumptionBatchInfoChangedFlag: 0,
+                consumptionBatchInfoDuplicateError: '',
+                consumptionBatchInfoNoStockError: '',
+                consumptionBatchError: ""
+            })
+            this.setState({
+                consumptionBatchInfo: !this.state.consumptionBatchInfo,
+            });
+        }
     }
 
     componentDidMount = function () {
@@ -149,7 +180,9 @@ export default class ConsumptionDetails extends React.Component {
                 this.setState({
                     programList: proList, loading: false
                 })
-
+                if (document.getElementById("addRowButtonId") != null) {
+                    document.getElementById("addRowButtonId").style.display = "none";
+                }
                 var programIdd = this.props.match.params.programId;
                 if (programIdd != '' && programIdd != undefined) {
                     var programSelect = { value: programIdd, label: proList.filter(c => c.value == programIdd)[0].label };
@@ -164,205 +197,290 @@ export default class ConsumptionDetails extends React.Component {
     };
 
     getPlanningUnitList(value) {
-        this.setState({
-            loading: true
-        })
-        var programId = value != "" && value != undefined ? value.value : 0;
-        document.getElementById("planningUnitId").value = 0;
-        document.getElementById("planningUnit").value = "";
-        document.getElementById("consumptionTableDiv").style.display = "none";
-        this.setState({
-            programSelect: value,
-            programId: value != "" && value != undefined ? value.value : 0,
-            planningUnit: "",
-        })
-        if (programId != 0) {
-            var db1;
-            var storeOS;
-            var regionList = [];
-            getDatabase();
-            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-            openRequest.onerror = function (event) {
-                this.setState({
-                    message: i18n.t('static.program.errortext'),
-                    color: 'red'
-                })
-                this.hideFirstComponent()
-            }.bind(this);
-            openRequest.onsuccess = function (e) {
-                db1 = e.target.result;
-                var programDataTransaction = db1.transaction(['programData'], 'readwrite');
-                var programDataOs = programDataTransaction.objectStore('programData');
-                var programRequest = programDataOs.get(value != "" && value != undefined ? value.value : 0);
-                programRequest.onerror = function (event) {
+        var cont = false;
+        if (this.state.consumptionChangedFlag == 1) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
+
+            }
+        } else {
+            cont = true;
+        }
+        if (cont == true) {
+            this.setState({
+                loading: true,
+                consumptionChangedFlag: 0
+            })
+            var programId = value != "" && value != undefined ? value.value : 0;
+            document.getElementById("planningUnitId").value = 0;
+            document.getElementById("planningUnit").value = "";
+            document.getElementById("consumptionTableDiv").style.display = "none";
+            if (document.getElementById("addRowButtonId") != null) {
+                document.getElementById("addRowButtonId").style.display = "none";
+            }
+            this.setState({
+                programSelect: value,
+                programId: value != "" && value != undefined ? value.value : 0,
+                planningUnit: "",
+            })
+            if (programId != 0) {
+                var db1;
+                var storeOS;
+                var regionList = [];
+                getDatabase();
+                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                openRequest.onerror = function (event) {
                     this.setState({
                         message: i18n.t('static.program.errortext'),
                         color: 'red'
                     })
                     this.hideFirstComponent()
                 }.bind(this);
-                programRequest.onsuccess = function (e) {
-                    var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                    var programJson = JSON.parse(programData);
-                    for (var i = 0; i < programJson.regionList.length; i++) {
-                        var regionJson = {
-                            name: getLabelText(programJson.regionList[i].label, this.state.lang),
-                            id: programJson.regionList[i].regionId
-                        }
-                        regionList.push(regionJson)
-
-                    }
-
-                    var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
-                    var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
-                    var planningunitRequest = planningunitOs.getAll();
-                    var planningList = []
-                    planningunitRequest.onerror = function (event) {
+                openRequest.onsuccess = function (e) {
+                    db1 = e.target.result;
+                    var programDataTransaction = db1.transaction(['programData'], 'readwrite');
+                    var programDataOs = programDataTransaction.objectStore('programData');
+                    var programRequest = programDataOs.get(value != "" && value != undefined ? value.value : 0);
+                    programRequest.onerror = function (event) {
                         this.setState({
                             message: i18n.t('static.program.errortext'),
                             color: 'red'
                         })
                         this.hideFirstComponent()
                     }.bind(this);
-                    planningunitRequest.onsuccess = function (e) {
-                        var myResult = [];
-                        myResult = planningunitRequest.result;
-                        var programId = (value != "" && value != undefined ? value.value : 0).split("_")[0];
-                        var proList = []
-                        for (var i = 0; i < myResult.length; i++) {
-                            if (myResult[i].program.id == programId && myResult[i].active == true) {
-                                var productJson = {
-                                    label: getLabelText(myResult[i].planningUnit.label, this.state.lang),
-                                    value: myResult[i].planningUnit.id
-                                }
-                                proList.push(productJson)
+                    programRequest.onsuccess = function (e) {
+                        var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                        var programJson = JSON.parse(programData);
+                        for (var i = 0; i < programJson.regionList.length; i++) {
+                            var regionJson = {
+                                name: getLabelText(programJson.regionList[i].label, this.state.lang),
+                                id: programJson.regionList[i].regionId
                             }
-                        }
-                        this.setState({
-                            planningUnitList: proList,
-                            planningUnitListAll: myResult,
-                            regionList: regionList, loading: false
-                        })
+                            regionList.push(regionJson)
 
-                        var planningUnitIdProp = this.props.match.params.planningUnitId;
-                        if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
-                            var planningUnit = { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label };
-                            this.setState({
-                                planningUnit: planningUnit,
-                                planningUnitId: planningUnitIdProp
-                            })
-                            this.formSubmit(planningUnit, this.state.rangeValue);
                         }
-                    }.bind(this);
+
+                        var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+                        var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
+                        var planningunitRequest = planningunitOs.getAll();
+                        var planningList = []
+                        planningunitRequest.onerror = function (event) {
+                            this.setState({
+                                message: i18n.t('static.program.errortext'),
+                                color: 'red'
+                            })
+                            this.hideFirstComponent()
+                        }.bind(this);
+                        planningunitRequest.onsuccess = function (e) {
+                            var myResult = [];
+                            myResult = planningunitRequest.result;
+                            var programId = (value != "" && value != undefined ? value.value : 0).split("_")[0];
+                            var proList = []
+                            for (var i = 0; i < myResult.length; i++) {
+                                if (myResult[i].program.id == programId && myResult[i].active == true) {
+                                    var productJson = {
+                                        label: getLabelText(myResult[i].planningUnit.label, this.state.lang),
+                                        value: myResult[i].planningUnit.id
+                                    }
+                                    proList.push(productJson)
+                                }
+                            }
+                            console.log("RegionList", regionList)
+                            this.setState({
+                                planningUnitList: proList,
+                                planningUnitListAll: myResult,
+                                regionList: regionList, loading: false
+                            })
+
+                            var planningUnitIdProp = this.props.match.params.planningUnitId;
+                            if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
+                                var planningUnit = { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label };
+                                this.setState({
+                                    planningUnit: planningUnit,
+                                    planningUnitId: planningUnitIdProp
+                                })
+                                this.formSubmit(planningUnit, this.state.rangeValue);
+                            }
+                        }.bind(this);
+                    }.bind(this)
                 }.bind(this)
-            }.bind(this)
-        } else {
-            this.setState({
-                planningUnitList: [],
-                loading: false
-            })
+            } else {
+                this.setState({
+                    planningUnitList: [],
+                    loading: false
+                })
+            }
         }
     }
 
     formSubmit(value, rangeValue) {
-        this.setState({ loading: true })
-        let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
-        let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
-        console.log("startDate", startDate);
-        console.log("Stop Date", stopDate);
-        var programId = document.getElementById('programId').value;
-        this.setState({ programId: programId, planningUnitId: value != "" && value != undefined ? value.value : 0, planningUnit: value });
-        var planningUnitId = value != "" && value != undefined ? value.value : 0;
-        var programId = document.getElementById("programId").value;
-        if (planningUnitId != 0) {
-            document.getElementById("consumptionTableDiv").style.display = "block";
-            var db1;
-            getDatabase();
-            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-            openRequest.onerror = function (event) {
-                this.setState({
-                    message: i18n.t('static.program.errortext'),
-                    color: 'red'
-                })
-                this.hideFirstComponent()
-            }.bind(this);
-            openRequest.onsuccess = function (e) {
-                db1 = e.target.result;
-                var transaction = db1.transaction(['programData'], 'readwrite');
-                var programTransaction = transaction.objectStore('programData');
-                var programRequest = programTransaction.get(programId);
-                programRequest.onerror = function (event) {
+        var cont = false;
+        if (this.state.consumptionChangedFlag == 1) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
+
+            }
+        } else {
+            cont = true;
+        }
+        if (cont == true) {
+            this.setState({ loading: true, consumptionChangedFlag: 0, regionId: document.getElementById("regionId").value, consumptionType: document.getElementById("consumptionType").value, showActive: document.getElementById("showActive").value })
+            let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
+            let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
+            console.log("startDate", startDate);
+            console.log("Stop Date", stopDate);
+            var programId = document.getElementById('programId').value;
+            this.setState({ programId: programId, planningUnitId: value != "" && value != undefined ? value.value : 0, planningUnit: value });
+            var planningUnitId = value != "" && value != undefined ? value.value : 0;
+            var programId = document.getElementById("programId").value;
+            var regionId = document.getElementById("regionId").value;
+            var consumptionType = document.getElementById("consumptionType").value;
+            var showActive = document.getElementById("showActive").value;
+            if (planningUnitId != 0) {
+                document.getElementById("consumptionTableDiv").style.display = "block";
+                if (document.getElementById("addRowButtonId") != null) {
+                    document.getElementById("addRowButtonId").style.display = "block";
+                }
+                var db1;
+                getDatabase();
+                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                openRequest.onerror = function (event) {
                     this.setState({
                         message: i18n.t('static.program.errortext'),
                         color: 'red'
                     })
                     this.hideFirstComponent()
                 }.bind(this);
-                programRequest.onsuccess = function (event) {
-                    var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                    var programJson = JSON.parse(programData);
-                    var batchInfoList = programJson.batchInfoList;
-                    var batchList = [];
-                    var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == planningUnitId && c.active.toString() == "true" && c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS);
+                openRequest.onsuccess = function (e) {
+                    db1 = e.target.result;
+                    var transaction = db1.transaction(['programData'], 'readwrite');
+                    var programTransaction = transaction.objectStore('programData');
+                    var programRequest = programTransaction.get(programId);
+                    programRequest.onerror = function (event) {
+                        this.setState({
+                            message: i18n.t('static.program.errortext'),
+                            color: 'red'
+                        })
+                        this.hideFirstComponent()
+                    }.bind(this);
+                    programRequest.onsuccess = function (event) {
+                        var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                        var programJson = JSON.parse(programData);
+                        var batchInfoList = programJson.batchInfoList;
+                        var batchList = [];
+                        var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == planningUnitId && c.active.toString() == "true" && c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS);
 
-                    for (var sl = 0; sl < shipmentList.length; sl++) {
-                        var bdl = shipmentList[sl].batchInfoList;
-                        for (var bd = 0; bd < bdl.length; bd++) {
-                            var index = batchList.findIndex(c => c.batchNo == bdl[bd].batch.batchNo);
-                            if (index == -1) {
-                                var batchDetailsToPush = batchInfoList.filter(c => c.batchNo == bdl[bd].batch.batchNo && c.planningUnitId == planningUnitId)[0];
-                                batchList.push(batchDetailsToPush);
+                        for (var sl = 0; sl < shipmentList.length; sl++) {
+                            var bdl = shipmentList[sl].batchInfoList;
+                            for (var bd = 0; bd < bdl.length; bd++) {
+                                var index = batchList.findIndex(c => c.batchNo == bdl[bd].batch.batchNo);
+                                if (index == -1) {
+                                    var batchDetailsToPush = batchInfoList.filter(c => c.batchNo == bdl[bd].batch.batchNo && c.planningUnitId == planningUnitId)[0];
+                                    batchList.push(batchDetailsToPush);
+                                }
                             }
                         }
-                    }
 
-                    var consumptionListUnFiltered = (programJson.consumptionList);
-                    var consumptionList = (programJson.consumptionList).filter(c =>
-                        c.planningUnit.id == planningUnitId &&
-                        c.region != null && c.region.id != 0 &&
-                        moment(c.consumptionDate).format("YYYY-MM-DD") >= moment(startDate).format("YYYY-MM-DD") && moment(c.consumptionDate).format("YYYY-MM-DD") <= moment(stopDate).format("YYYY-MM-DD"));
-                    this.setState({
-                        batchInfoList: batchList,
-                        programJson: programJson,
-                        consumptionListUnFiltered: consumptionListUnFiltered,
-                        consumptionList: consumptionList,
-                        showConsumption: 1,
-                        consumptionMonth: "",
-                        consumptionStartDate: "",
-                        consumptionRegion: "",
-                        startDate: startDate,
-                        stopDate: stopDate
-                    })
-                    this.refs.consumptionChild.showConsumptionData();
+                        var consumptionListUnFiltered = (programJson.consumptionList);
+                        var consumptionList = (programJson.consumptionList).filter(c =>
+                            c.planningUnit.id == planningUnitId &&
+                            c.region != null && c.region.id != 0 &&
+                            moment(c.consumptionDate).format("YYYY-MM-DD") >= moment(startDate).format("YYYY-MM-DD") && moment(c.consumptionDate).format("YYYY-MM-DD") <= moment(stopDate).format("YYYY-MM-DD"));
+                        if (regionId != "") {
+                            console.log("consumptionList", consumptionList)
+                            console.log("regionId", regionId);
+                            consumptionList = consumptionList.filter(c => c.region.id == regionId);
+                        }
+                        if (consumptionType != "") {
+                            if (consumptionType == 1) {
+                                consumptionList = consumptionList.filter(c => c.actualFlag.toString() == "true");
+                            } else {
+                                consumptionList = consumptionList.filter(c => c.actualFlag.toString() == "false");
+                            }
+                        }
+                        if (showActive == 1) {
+                            consumptionList = consumptionList.filter(c => c.active.toString() == "true");
+                        } else if (showActive == 2) {
+                            consumptionList = consumptionList.filter(c => c.active.toString() == "false");
+                        }
+                        this.setState({
+                            batchInfoList: batchList,
+                            programJson: programJson,
+                            consumptionListUnFiltered: consumptionListUnFiltered,
+                            consumptionList: consumptionList,
+                            showConsumption: 1,
+                            consumptionMonth: "",
+                            consumptionStartDate: "",
+                            consumptionRegion: "",
+                            startDate: startDate,
+                            stopDate: stopDate
+                        })
+                        this.refs.consumptionChild.showConsumptionData();
+                    }.bind(this)
                 }.bind(this)
-            }.bind(this)
-        } else {
-            document.getElementById("consumptionTableDiv").style.display = "none";
-            this.setState({ loading: false });
+            } else {
+                document.getElementById("consumptionTableDiv").style.display = "none";
+                if (document.getElementById("addRowButtonId") != null) {
+                    document.getElementById("addRowButtonId").style.display = "none";
+                }
+                this.setState({ loading: false });
+            }
         }
     }
 
     updateState(parameterName, value) {
+        console.log("Updated state", parameterName, "Value------->", value);
         this.setState({
             [parameterName]: value
         })
-
     }
 
     cancelClicked() {
-        let id = AuthenticationService.displayDashboardBasedOnRole();
-        this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
+        var cont = false;
+        if (this.state.consumptionChangedFlag == 1) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
+
+            }
+        } else {
+            cont = true;
+        }
+        if (cont == true) {
+            let id = AuthenticationService.displayDashboardBasedOnRole();
+            this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
+        }
     }
 
     actionCanceled() {
-        this.setState({
-            message: i18n.t('static.actionCancelled'),
-            color: "red"
-        })
-        this.hideFirstComponent();
-        this.toggleLarge();
+        var cont = false;
+        if (this.state.consumptionBatchInfoChangedFlag == 1) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
+
+            }
+        } else {
+            cont = true;
+        }
+        if (cont == true) {
+            this.setState({
+                message: i18n.t('static.actionCancelled'),
+                color: "red",
+                consumptionBatchInfoChangedFlag: 0
+            }, () => {
+                this.hideFirstComponent();
+                this.toggleLarge();
+            })
+        }
     }
 
     render() {
@@ -376,6 +494,15 @@ export default class ConsumptionDetails extends React.Component {
             if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
             return '?'
         }
+
+        const { regionList } = this.state;
+        let regions = regionList.length > 0 && regionList.map((item, i) => {
+            return (
+                <option key={i} value={item.id}>
+                    {item.name}
+                </option>
+            )
+        }, this);
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
@@ -433,6 +560,56 @@ export default class ConsumptionDetails extends React.Component {
                                                             />
                                                         </div>
                                                     </FormGroup>
+                                                    <FormGroup className="col-md-3 ">
+                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.region.region')}</Label>
+                                                        <div className="controls ">
+                                                            <Input
+                                                                type="select"
+                                                                name="regionId"
+                                                                id="regionId"
+                                                                bsSize="sm"
+                                                                value={this.state.regionId}
+                                                                onChange={(e) => { this.formSubmit(this.state.planningUnit, this.state.rangeValue); }}
+                                                            >
+                                                                <option value="">{i18n.t('static.common.all')}</option>
+                                                                {regions}
+                                                            </Input>
+                                                        </div>
+                                                    </FormGroup>
+                                                    <FormGroup className="col-md-3 ">
+                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.consumption.consumptionType')}</Label>
+                                                        <div className="controls ">
+                                                            <Input
+                                                                type="select"
+                                                                name="consumptionType"
+                                                                id="consumptionType"
+                                                                value={this.state.consumptionType}
+                                                                bsSize="sm"
+                                                                onChange={(e) => { this.formSubmit(this.state.planningUnit, this.state.rangeValue); }}
+                                                            >
+                                                                <option value="">{i18n.t('static.common.all')}</option>
+                                                                <option value={ACTUAL_CONSUMPTION_TYPE}>{i18n.t('static.consumption.actual')}</option>
+                                                                <option value={FORCASTED_CONSUMPTION_TYPE}>{i18n.t('static.consumption.forcast')}</option>
+                                                            </Input>
+                                                        </div>
+                                                    </FormGroup>
+                                                    <FormGroup className="col-md-3 ">
+                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.common.active')}</Label>
+                                                        <div className="controls ">
+                                                            <Input
+                                                                type="select"
+                                                                name="showActive"
+                                                                id="showActive"
+                                                                value={this.state.showActive}
+                                                                bsSize="sm"
+                                                                onChange={(e) => { this.formSubmit(this.state.planningUnit, this.state.rangeValue); }}
+                                                            >
+                                                                <option value="">{i18n.t('static.common.all')}</option>
+                                                                <option value="1">{i18n.t('static.common.active')}</option>
+                                                                <option value="2">{i18n.t('static.dataentry.inactive')}</option>
+                                                            </Input>
+                                                        </div>
+                                                    </FormGroup>
                                                     {/* {this.state.consumptionChangedFlag == 1 && <FormGroup check inline>
                                                         <Input className="form-check-input removeMarginLeftCheckbox" type="checkbox" id="showErrors" name="showErrors" value="true" onClick={this.refs.consumptionChild.showOnlyErrors} />
                                                         <Label className="form-check-label" check htmlFor="inline-checkbox1">{i18n.t("static.dataEntry.showOnlyErrors")}</Label>
@@ -457,8 +634,8 @@ export default class ConsumptionDetails extends React.Component {
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 {this.state.consumptionChangedFlag == 1 && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.refs.consumptionChild.saveConsumption}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>}
                                 &nbsp;
-                                {this.refs.consumptionChild != undefined && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.refs.consumptionChild.addRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}&nbsp;
-                        </FormGroup>
+                                {this.refs.consumptionChild != undefined && <Button color="info" id="addRowButtonId" size="md" className="float-right mr-1" type="button" onClick={this.refs.consumptionChild.addRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}&nbsp;
+                            </FormGroup>
                         </FormGroup>
                     </CardFooter>
                 </Card>
@@ -475,8 +652,8 @@ export default class ConsumptionDetails extends React.Component {
                         </div>
                     </ModalBody>
                     <ModalFooter>
-                        <div id="showConsumptionBatchInfoButtonsDiv" style={{ display: 'none' }}>
-                            {this.state.consumptionBatchInfoChangedFlag == 1 && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.refs.consumptionChild.saveConsumptionBatchInfo}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>}
+                        <div id="showConsumptionBatchInfoButtonsDiv" style={{ display: 'none' }} className="mr-0">
+                            {this.state.consumptionBatchInfoChangedFlag == 1 && <Button type="submit" size="md" color="success" className="submitBtn float-right" onClick={this.refs.consumptionChild.saveConsumptionBatchInfo}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>}
                             {this.refs.consumptionChild != undefined && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.refs.consumptionChild.addBatchRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
                         </div>
                         <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceled()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>

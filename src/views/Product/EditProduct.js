@@ -20,7 +20,7 @@ let initialValues = {
     productCategoryId: '',
     unitId: ''
 }
-const entityname=i18n.t('static.product.product')
+const entityname = i18n.t('static.product.product')
 const validationSchema = function (values) {
     return Yup.object().shape({
         productName: Yup.string()
@@ -357,7 +357,7 @@ export default class EditProduct extends Component {
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity',{entityname})}</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 initialValues={initialValues}
@@ -502,7 +502,7 @@ export default class EditProduct extends Component {
 
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="unitId">Forcasting Unit</Label>
+                                                        <Label htmlFor="unitId">{i18n.t('static.product.unit1')}</Label>
                                                         <InputGroupAddon addonType="prepend">
                                                             <InputGroupText><i className="fa fa-pencil-square-o"></i></InputGroupText>
                                                             <Input
@@ -565,7 +565,7 @@ export default class EditProduct extends Component {
 
                                                         {/* <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> Reset</Button> */}
                                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>Update</Button>
+                                                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                                         &nbsp;
                                                 </FormGroup>
                                                 </CardFooter>
@@ -582,7 +582,7 @@ export default class EditProduct extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/product/listProduct/` + "Action Canceled")
+        this.props.history.push(`/product/listProduct/` + i18n.t('static.message.cancelled', { entityname }))
     }
 
 }

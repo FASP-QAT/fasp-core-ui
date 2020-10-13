@@ -268,7 +268,7 @@ export default class UpdateDimensionComponent extends Component {
                                         isValid,
                                         setTouched
                                     }) => (
-                                            <Form onSubmit={handleSubmit} noValidate name='diamensionForm'>
+                                            <Form onSubmit={handleSubmit} noValidate name='diamensionForm' autocomplete="off">
                                                 <CardBody>
                                                     <FormGroup>
                                                         <Label for="label">{i18n.t('static.dimension.dimension')}<span class="red Reqasterisk">*</span></Label>

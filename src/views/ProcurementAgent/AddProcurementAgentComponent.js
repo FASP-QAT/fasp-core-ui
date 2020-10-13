@@ -403,7 +403,7 @@ class AddProcurementAgentComponent extends Component {
                                         setTouched,
                                         handleReset
                                     }) => (
-                                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='procurementAgentForm'>
+                                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='procurementAgentForm' autocomplete="off">
                                                 <CardBody className="pb-0">
                                                     <FormGroup>
                                                         <Label htmlFor="realmId">{i18n.t('static.realm.realmName')}<span className="red Reqasterisk">*</span></Label>

@@ -651,8 +651,17 @@ label.arrow_label:after {
   color: #212721 !important;
 }
 
-.jexcel > tbody > tr > td.readonly.shipmentEntry {
+.jexcel > tbody > tr > td.readonly.shipmentEntryEmergency {
   color: red !important;
+}
+
+.jexcel > tbody > tr > td.readonly.shipmentEntryDoNotInclude {
+  background-color: #D3D3D3 !important;
+}
+
+.jexcel > tbody > tr > td.readonly.shipmentEntryDelete {
+  color: #808080 !important;
+  background-color: #808080 !important;
 }
 
 .whitebtnColor .btn-info {
@@ -2096,6 +2105,7 @@ input::placeholder {
 }.textcolor-purple {
   // background-color: red;
   color:  rgb(170, 85, 161);
+  font-style: italic;
 }
 
 .background-red-problemList td:not(:last-child){
@@ -3536,7 +3546,7 @@ margin-left: -45px;
 	// position:absolute;
 	top:0;
 	left:0;
-	pointer-events:none;
+	// pointer-events:none;
 }
 
 .clone tbody th {

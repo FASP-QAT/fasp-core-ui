@@ -423,8 +423,8 @@ class AddRoleComponent extends Component {
                     label: {
                       label_en: 'Manual'
                     }
-                  }, 
-                  reviewed:false,
+                  },
+                  reviewed: false,
                   createdBy: {
                     userId: userId,
                     username: username
@@ -638,14 +638,15 @@ class AddRoleComponent extends Component {
                           <FormGroup>
                             <Label>{i18n.t('static.common.notes')}</Label>
                             <Input type="textarea"
+                              maxLength={600}
                               bsSize="sm"
                               name="notes"
                               id="notes"
-                              // valid={!errors.problemId}
-                              // invalid={touched.problemId && !!errors.problemId}
-                              // onChange={(e) => { handleChange(e) }}
-                              // onBlur={handleBlur}
-                              // required
+                            // valid={!errors.problemId}
+                            // invalid={touched.problemId && !!errors.problemId}
+                            // onChange={(e) => { handleChange(e) }}
+                            // onBlur={handleBlur}
+                            // required
                             >
                             </Input>
                           </FormGroup>
