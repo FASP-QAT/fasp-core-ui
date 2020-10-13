@@ -41,9 +41,9 @@ export default class ConsumptionDetails extends React.Component {
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() },
             regionList: [],
-            showActive: false,
+            showActive: "",
             regionId: "",
-            consumptionType:""
+            consumptionType: ""
         }
 
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
@@ -108,16 +108,30 @@ export default class ConsumptionDetails extends React.Component {
         clearTimeout(this.timeout);
     }
 
-    toggleLarge() {
-        this.setState({
-            consumptionBatchInfoChangedFlag: 0,
-            consumptionBatchInfoDuplicateError: '',
-            consumptionBatchInfoNoStockError: '',
-            consumptionBatchError: ""
-        })
-        this.setState({
-            consumptionBatchInfo: !this.state.consumptionBatchInfo,
-        });
+    toggleLarge(method) {
+        var cont = false;
+        console.log("this.state.consumptionBatchInfoChangedFlag", this.state.consumptionBatchInfoChangedFlag);
+        if (method != "submit" && this.state.consumptionBatchInfoChangedFlag == 1) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
+
+            }
+        } else {
+            cont = true;
+        }
+        if (cont == true) {
+            this.setState({
+                consumptionBatchInfoChangedFlag: 0,
+                consumptionBatchInfoDuplicateError: '',
+                consumptionBatchInfoNoStockError: '',
+                consumptionBatchError: ""
+            })
+            this.setState({
+                consumptionBatchInfo: !this.state.consumptionBatchInfo,
+            });
+        }
     }
 
     componentDidMount = function () {
@@ -315,7 +329,7 @@ export default class ConsumptionDetails extends React.Component {
             cont = true;
         }
         if (cont == true) {
-            this.setState({ loading: true, consumptionChangedFlag: 0, regionId: document.getElementById("regionId").value,consumptionType:document.getElementById("consumptionType").value,showActive:document.getElementById("showActive").value })
+            this.setState({ loading: true, consumptionChangedFlag: 0, regionId: document.getElementById("regionId").value, consumptionType: document.getElementById("consumptionType").value, showActive: document.getElementById("showActive").value })
             let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
             let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
             console.log("startDate", startDate);
@@ -390,7 +404,9 @@ export default class ConsumptionDetails extends React.Component {
                                 consumptionList = consumptionList.filter(c => c.actualFlag.toString() == "false");
                             }
                         }
-                        if (showActive == true) {
+                        if (showActive == 1) {
+                            consumptionList = consumptionList.filter(c => c.active.toString() == "true");
+                        } else if (showActive == 2) {
                             consumptionList = consumptionList.filter(c => c.active.toString() == "false");
                         }
                         this.setState({
@@ -419,10 +435,10 @@ export default class ConsumptionDetails extends React.Component {
     }
 
     updateState(parameterName, value) {
+        console.log("Updated state", parameterName, "Value------->", value);
         this.setState({
             [parameterName]: value
         })
-
     }
 
     cancelClicked() {
@@ -444,12 +460,27 @@ export default class ConsumptionDetails extends React.Component {
     }
 
     actionCanceled() {
-        this.setState({
-            message: i18n.t('static.actionCancelled'),
-            color: "red"
-        })
-        this.hideFirstComponent();
-        this.toggleLarge();
+        var cont = false;
+        if (this.state.consumptionBatchInfoChangedFlag == 1) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
+
+            }
+        } else {
+            cont = true;
+        }
+        if (cont == true) {
+            this.setState({
+                message: i18n.t('static.actionCancelled'),
+                color: "red",
+                consumptionBatchInfoChangedFlag: 0
+            }, () => {
+                this.hideFirstComponent();
+                this.toggleLarge();
+            })
+        }
     }
 
     render() {
@@ -486,7 +517,7 @@ export default class ConsumptionDetails extends React.Component {
                                         <Form name='simpleForm'>
                                             <div className=" pl-0">
                                                 <div className="row">
-                                                    <FormGroup className="col-md-2">
+                                                    <FormGroup className="col-md-3">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                                                         <div className="controls edit">
 
@@ -503,7 +534,7 @@ export default class ConsumptionDetails extends React.Component {
                                                             </Picker>
                                                         </div>
                                                     </FormGroup>
-                                                    <FormGroup className="col-md-2">
+                                                    <FormGroup className="col-md-3">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                                         <div className="controls ">
                                                             <Select
@@ -529,7 +560,7 @@ export default class ConsumptionDetails extends React.Component {
                                                             />
                                                         </div>
                                                     </FormGroup>
-                                                    <FormGroup className="col-md-2 ">
+                                                    <FormGroup className="col-md-3 ">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.region.region')}</Label>
                                                         <div className="controls ">
                                                             <Input
@@ -545,7 +576,7 @@ export default class ConsumptionDetails extends React.Component {
                                                             </Input>
                                                         </div>
                                                     </FormGroup>
-                                                    <FormGroup className="col-md-2 ">
+                                                    <FormGroup className="col-md-3 ">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.consumption.consumptionType')}</Label>
                                                         <div className="controls ">
                                                             <Input
@@ -562,9 +593,22 @@ export default class ConsumptionDetails extends React.Component {
                                                             </Input>
                                                         </div>
                                                     </FormGroup>
-                                                    <FormGroup check inline>
-                                                        <Input className="form-check-input removeMarginLeftCheckbox" type="checkbox" id="showActive" name="showActive" value={this.state.showActive} checked={this.state.showActive} onClick={() => this.formSubmit(this.state.planningUnit, this.state.rangeValue)} />
-                                                        <Label className="form-check-label" check htmlFor="inline-checkbox1">{i18n.t("static.inventory.active")}</Label>
+                                                    <FormGroup className="col-md-3 ">
+                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.common.active')}</Label>
+                                                        <div className="controls ">
+                                                            <Input
+                                                                type="select"
+                                                                name="showActive"
+                                                                id="showActive"
+                                                                value={this.state.showActive}
+                                                                bsSize="sm"
+                                                                onChange={(e) => { this.formSubmit(this.state.planningUnit, this.state.rangeValue); }}
+                                                            >
+                                                                <option value="">{i18n.t('static.common.all')}</option>
+                                                                <option value="1">{i18n.t('static.common.active')}</option>
+                                                                <option value="2">{i18n.t('static.dataentry.inactive')}</option>
+                                                            </Input>
+                                                        </div>
                                                     </FormGroup>
                                                     {/* {this.state.consumptionChangedFlag == 1 && <FormGroup check inline>
                                                         <Input className="form-check-input removeMarginLeftCheckbox" type="checkbox" id="showErrors" name="showErrors" value="true" onClick={this.refs.consumptionChild.showOnlyErrors} />
@@ -577,7 +621,7 @@ export default class ConsumptionDetails extends React.Component {
                                         </Form>
                                     )} />
 
-                        <div>
+                        <div className="shipmentconsumptionSearchMarginTop">
                             <ConsumptionInSupplyPlanComponent ref="consumptionChild" items={this.state} toggleLarge={this.toggleLarge} updateState={this.updateState} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} consumptionPage="consumptionDataEntry" />
                             <div className="table-responsive" id="consumptionTableDiv">
                                 <div id="consumptionTable" />
@@ -608,8 +652,8 @@ export default class ConsumptionDetails extends React.Component {
                         </div>
                     </ModalBody>
                     <ModalFooter>
-                        <div id="showConsumptionBatchInfoButtonsDiv" style={{ display: 'none' }}>
-                            {this.state.consumptionBatchInfoChangedFlag == 1 && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.refs.consumptionChild.saveConsumptionBatchInfo}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>}
+                        <div id="showConsumptionBatchInfoButtonsDiv" style={{ display: 'none' }} className="mr-0">
+                            {this.state.consumptionBatchInfoChangedFlag == 1 && <Button type="submit" size="md" color="success" className="submitBtn float-right" onClick={this.refs.consumptionChild.saveConsumptionBatchInfo}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>}
                             {this.refs.consumptionChild != undefined && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.refs.consumptionChild.addBatchRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
                         </div>
                         <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceled()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>

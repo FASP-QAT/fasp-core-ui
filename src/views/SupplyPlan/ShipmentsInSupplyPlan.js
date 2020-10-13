@@ -1763,7 +1763,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             document.getElementById("showSaveQtyButtonDiv").style.display = 'none';
             this.props.updateState("qtyCalculatorValidationError", "");
             if (this.props.shipmentPage == "shipmentDataEntry") {
-                this.props.toggleLarge();
+                this.props.toggleLarge("submit");
             }
             this.props.updateState("loading", false);
             if (elInstance != undefined && elInstance != "") {
@@ -1961,7 +1961,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             })
             document.getElementById("showShipmentBatchInfoButtonsDiv").style.display = 'none';
             if (this.props.shipmentPage == "shipmentDataEntry") {
-                this.props.toggleLarge();
+                this.props.toggleLarge("submit");
             }
             this.props.updateState("loading", false);
             elInstance.destroy();
@@ -2523,7 +2523,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             document.getElementById("showSaveShipmentsDatesButtonsDiv").style.display = 'none';
             this.props.updateState("shipmentDatesError", "");
             if (this.props.shipmentPage == "shipmentDataEntry") {
-                this.props.toggleLarge();
+                this.props.toggleLarge("submit");
             }
             this.props.updateState("loading", false);
             elInstance.destroy();

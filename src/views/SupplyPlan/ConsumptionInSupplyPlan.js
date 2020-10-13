@@ -874,7 +874,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                 })
                 document.getElementById("showConsumptionBatchInfoButtonsDiv").style.display = 'none';
                 if (this.props.consumptionPage == "consumptionDataEntry") {
-                    this.props.toggleLarge();
+                    this.props.toggleLarge("submit");
                 }
                 elInstance.destroy();
             }

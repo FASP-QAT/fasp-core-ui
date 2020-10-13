@@ -1315,5 +1315,6 @@
     "static.quantimed.duplicateQATPlanningUnit": "Duplicate QAT Planning Unit",
     "static.quantimed.consumptionDate": "Consumption Date",
     "static.dataentry.confirmmsg":"You are about leave with un-submitted changes",
-    "static.message.alreadyTagged":"This order no. and prime line no. are already tagged. To change the tagging please delink first and then try."
+    "static.message.alreadyTagged":"This order no. and prime line no. are already tagged. To change the tagging please delink first and then try.",
+    "static.dataentry.inactive":"Inactive"
 }

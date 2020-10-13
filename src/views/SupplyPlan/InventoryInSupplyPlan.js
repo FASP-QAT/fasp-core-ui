@@ -1021,7 +1021,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 })
                 document.getElementById("showInventoryBatchInfoButtonsDiv").style.display = 'none';
                 if (this.props.inventoryPage == "inventoryDataEntry") {
-                    this.props.toggleLarge();
+                    this.props.toggleLarge("submit");
                 }
                 elInstance.destroy();
             }
