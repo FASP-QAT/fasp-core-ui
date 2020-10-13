@@ -94,9 +94,9 @@ const validationSchema = function (values) {
         //     .required(i18n.t('static.program.validnotestext'))
         regionId: Yup.string()
             .required(i18n.t('static.common.regiontext')),
-        uniqueCode: Yup.string()
-            .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly'))
-            .required(i18n.t('static.programOnboarding.validprogramCode')),
+        // uniqueCode: Yup.string()
+        //     .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly'))
+        //     .required(i18n.t('static.programOnboarding.validprogramCode')),
     })
 }
 
@@ -511,7 +511,7 @@ export default class EditProgram extends Component {
             arrivedToDeliveredLeadTime: true,
             healthAreaId: true,
             regionId: true,
-            uniqueCode:''
+            // uniqueCode:''
         }
         )
         this.validateForm(errors)
@@ -683,7 +683,7 @@ export default class EditProgram extends Component {
                                                         <FormFeedback>{errors.programCode}</FormFeedback>
                                                     </FormGroup>
 
-                                                    <FormGroup>
+                                                    {/* <FormGroup>
                                                         <Label htmlFor="company">{i18n.t('static.programOnboarding.programCode')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             type="text"
@@ -699,7 +699,7 @@ export default class EditProgram extends Component {
                                                             maxLength={6}
                                                         />
                                                         <FormFeedback className="red">{errors.uniqueCode}</FormFeedback>
-                                                    </FormGroup>
+                                                    </FormGroup> */}
 
                                                     <FormGroup>
 

@@ -76,9 +76,9 @@ const validationSchemaSix = function (values) {
             .matches(/^\s*(?=.*[1-9])\d{1,2}(?:\.\d{1,2})?\s*$/, i18n.t('static.message.2digitDecimal'))
             .required(i18n.t('static.program.validapprovetoshiptext'))
             .min(0, i18n.t('static.program.validvaluetext')),
-        uniqueCode: Yup.string()
-            .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly'))
-            .required(i18n.t('static.programOnboarding.validprogramCode')),
+        // uniqueCode: Yup.string()
+        //     .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly'))
+        //     .required(i18n.t('static.programOnboarding.validprogramCode')),
 
     })
 }
@@ -130,7 +130,7 @@ export default class StepSix extends Component {
             shippedToArrivedByAirLeadTime: true,
             shippedToArrivedBySeaLeadTime: true,
             arrivedToDeliveredLeadTime: true,
-            uniqueCode: true,
+            // uniqueCode: true,
             message: ''
 
         }
@@ -189,37 +189,35 @@ export default class StepSix extends Component {
                     initialValues={initialValuesSix}
                     validate={validateSix(validationSchemaSix)}
                     onSubmit={(values, { setSubmitting, setErrors }) => {
-
-                        ProgramService.getProgramDisplayNameUniqueStatus(this.props.items.program.realm.realmId, 0, this.props.items.program.programCode)
-                            .then(response => {
-                                // console.log(")))))))))))))===========>", response)
-                                if (response.data == true) {
+                        // ProgramService.getProgramDisplayNameUniqueStatus(this.props.items.program.realm.realmId, 0, this.props.items.program.programCode)
+                        //     .then(response => {
+                        //         if (response.data == true) {
                                     this.props.finishedStepSix && this.props.finishedStepSix();
-                                } else {
-                                    this.setState({ message: i18n.t('static.problemOnboarding.duplicateProgramDisplayName') });
-                                }
+                            //     } else {
+                            //         this.setState({ message: i18n.t('static.problemOnboarding.duplicateProgramDisplayName') });
+                            //     }
 
-                            })
-                            .catch(
-                                error => {
-                                    if (error.message === "Network Error") {
-                                        this.setState({ message: error.message });
-                                    } else {
-                                        switch (error.response ? error.response.status : "") {
-                                            case 500:
-                                            case 401:
-                                            case 404:
-                                            case 406:
-                                            case 412:
-                                                this.setState({ message: error.response.data.messageCode });
-                                                break;
-                                            default:
-                                                this.setState({ message: 'static.unkownError' });
-                                                break;
-                                        }
-                                    }
-                                }
-                            );
+                            // })
+                            // .catch(
+                            //     error => {
+                            //         if (error.message === "Network Error") {
+                            //             this.setState({ message: error.message });
+                            //         } else {
+                            //             switch (error.response ? error.response.status : "") {
+                            //                 case 500:
+                            //                 case 401:
+                            //                 case 404:
+                            //                 case 406:
+                            //                 case 412:
+                            //                     this.setState({ message: error.response.data.messageCode });
+                            //                     break;
+                            //                 default:
+                            //                     this.setState({ message: 'static.unkownError' });
+                            //                     break;
+                            //             }
+                            //         }
+                            //     }
+                            // );
 
                         // this.props.finishedStepSix && this.props.finishedStepSix();
 
@@ -268,7 +266,7 @@ export default class StepSix extends Component {
                                             <FormFeedback className="red">{errors.userId}</FormFeedback>
                                         </FormGroup>
 
-                                        <FormGroup className="col-md-6">
+                                        {/* <FormGroup className="col-md-6">
                                             <Label htmlFor="company">{i18n.t('static.programOnboarding.programDisplayName')}<span class="red Reqasterisk">*</span></Label>
                                             <Input
                                                 type="text"
@@ -278,9 +276,9 @@ export default class StepSix extends Component {
                                                 value={this.props.items.program.programCode}
                                                 id="programCode" />
                                             <FormFeedback className="red">{errors.programCode}</FormFeedback>
-                                        </FormGroup>
+                                        </FormGroup> */}
 
-                                        <FormGroup className="col-md-6">
+                                        {/* <FormGroup className="col-md-6">
                                             <Label htmlFor="company">{i18n.t('static.programOnboarding.programCode')}<span class="red Reqasterisk">*</span></Label>
                                             <Input
                                                 type="text"
@@ -296,7 +294,7 @@ export default class StepSix extends Component {
                                                 maxLength={6}
                                             />
                                             <FormFeedback className="red">{errors.uniqueCode}</FormFeedback>
-                                        </FormGroup>
+                                        </FormGroup> */}
 
                                         <FormGroup className="col-md-6">
                                             <Label htmlFor="company">{i18n.t('static.program.airfreightperc')} (%)<span class="red ">*</span></Label>
@@ -395,7 +393,7 @@ export default class StepSix extends Component {
 
 
                                         <FormGroup className="col-md-6">
-                                            <Label htmlFor="company"> Arrived to Received Lead Time<span class="red Reqasterisk">*</span></Label>
+                                            <Label htmlFor="company">{i18n.t('static.realmcountry.arrivedToDeliveredLeadTime')} <span class="red Reqasterisk">*</span></Label>
                                             <Input
                                                 onBlur={handleBlur}
                                                 valid={!errors.arrivedToDeliveredLeadTime && this.props.items.program.arrivedToDeliveredLeadTime != ''}

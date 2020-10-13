@@ -60,6 +60,18 @@ export default class PipelineProgramInventory extends Component {
                 this.el.setComments(col, "");
             }
 
+            var col = ("D").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(3, y);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+            
             /* var col = ("H").concat(parseInt(y) + 1);
              var value = this.el.getValueFromCoords(7, y);
              if (value == "") {
@@ -179,7 +191,7 @@ export default class PipelineProgramInventory extends Component {
             var realmCountryPlanningUnitList = [];
 
             this.setState({ realmCountryPlanningUnitList: response.data });
-            console.log("realmCountryPlanningUnitId====>", response.data);
+            console.log("realmCountryPlanningUnitId Inventory====>", response.data);
 
             for (var i = 0; i < response.data.length; i++) {
                 var rcpJson = {
@@ -228,7 +240,7 @@ export default class PipelineProgramInventory extends Component {
 
                             // AuthenticationService.setupAxiosInterceptors();
                             PipelineService.getPipelineProgramInventory(this.props.pipelineId).then(response => {
-                                // console.log("inventory List iiiiiiiiiiii----->", response.data);
+                                console.log("inventory List iiiiiiiiiiii----->", response.data);
 
                                 var data = [];
                                 var inventoryDataArr = [];
@@ -287,7 +299,7 @@ export default class PipelineProgramInventory extends Component {
                                             title: i18n.t('static.planningunit.countrysku'),
                                             type: 'dropdown',
                                             source: realmCountryPlanningUnitList,
-                                            filter: this.dropdownFilter
+                                            // filter: this.dropdownFilter
 
                                         },
                                         {
@@ -315,7 +327,7 @@ export default class PipelineProgramInventory extends Component {
                                             title: 'Note',
                                             type: 'text'
                                         }
-                                    ],
+                                    ], 
                                     pagination: 10,
                                     search: true,
                                     columnSorting: true,
