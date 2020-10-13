@@ -7,14 +7,14 @@ import ProductService from '../../api/ProductService'
 import AuthenticationService from '../Common/AuthenticationService.js';
 import getLabelText from '../../CommonComponent/getLabelText'
 import i18n from '../../i18n'
-const entityname=i18n.t('static.product.product')
+const entityname = i18n.t('static.product.product')
 class ProductList extends Component {
   constructor(props) {
     super(props);
     this.state = {
       table: [],
       lang: localStorage.getItem('lang'),
-      message:''
+      message: ''
     }
 
     this.options = {
@@ -41,7 +41,7 @@ class ProductList extends Component {
 
   editProduct(product) {
     console.log(product);
-    var productId=product.productId;
+    var productId = product.productId;
     this.props.history.push({
       pathname: `/product/editProduct/${productId}`,
       // state: { product }
@@ -52,7 +52,7 @@ class ProductList extends Component {
     this.props.history.push({
       pathname: "/product/addProduct"
     });
-  } 
+  }
 
   componentDidMount() {
     // AuthenticationService.setupAxiosInterceptors();
@@ -123,10 +123,10 @@ class ProductList extends Component {
     return (
       <div className="animated">
         <h5>{i18n.t(this.props.match.params.message)}</h5>
-        <h5>{i18n.t(this.state.message,{entityname})}</h5>
+        <h5>{i18n.t(this.state.message, { entityname })}</h5>
         <Card>
           <CardHeader>
-            <i className="icon-menu"></i>{i18n.t('static.common.listEntity',{entityname})}{' '}
+            <i className="icon-menu"></i>{i18n.t('static.common.listEntity', { entityname })}{' '}
             <div className="card-header-actions">
               <div className="card-header-action">
                 <a href="javascript:void();" title="Add product" onClick={this.addProduct}><i className="fa fa-plus-square"></i></a>
@@ -142,7 +142,7 @@ class ProductList extends Component {
               <TableHeaderColumn filterFormatted dataField="productCategory" dataFormat={this.showProductCategoryLabel} dataSort>{i18n.t('static.product.productcategory')}</TableHeaderColumn>
               <TableHeaderColumn filterFormatted dataField="forecastingUnit" dataFormat={this.showForcastingUnitLabel} dataSort>{i18n.t('static.product.unit')}</TableHeaderColumn>
               {/* <TableHeaderColumn dataField="stopDate" dataSort>Stop date</TableHeaderColumn> */}
-              <TableHeaderColumn dataFormat={this.showStatus} dataField="active">Active</TableHeaderColumn>
+              <TableHeaderColumn dataFormat={this.showStatus} dataField="active">{i18n.t('static.inventory.active')}</TableHeaderColumn>
             </BootstrapTable>
           </CardBody>
         </Card>

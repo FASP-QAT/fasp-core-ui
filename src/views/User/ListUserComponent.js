@@ -421,7 +421,7 @@ import RealmService from "../../api/RealmService";
 import UserService from "../../api/UserService";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import moment from 'moment';
-import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION,JEXCEL_DEFAULT_PAGINATION } from '../../Constants.js';
+import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DEFAULT_PAGINATION } from '../../Constants.js';
 import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
@@ -537,7 +537,9 @@ class ListUserComponent extends Component {
             data[4] = userList[j].emailId;
             data[5] = userList[j].faildAttempts;
             data[6] = (userList[j].lastLoginDate ? moment(userList[j].lastLoginDate).format(`${DATE_FORMAT_CAP}`) : null)
-            data[7] = userList[j].active;
+            data[7] = userList[j].lastModifiedBy.username;
+            data[8] = (userList[j].lastModifiedDate ? moment(userList[j].lastModifiedDate).format(`${DATE_FORMAT_CAP}`) : null)
+            data[9] = userList[j].active;
 
 
             userArray[count] = data;
@@ -594,6 +596,16 @@ class ListUserComponent extends Component {
                     readOnly: true
                 },
                 {
+                    title: i18n.t('static.common.lastModifiedBy'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.common.lastModifiedDate'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
                     type: 'dropdown',
                     title: i18n.t('static.common.status'),
                     readOnly: true,
@@ -610,7 +622,7 @@ class ListUserComponent extends Component {
                 entries: '',
             },
             onload: this.loaded,
-            pagination:JEXCEL_DEFAULT_PAGINATION,
+            pagination: JEXCEL_DEFAULT_PAGINATION,
             search: true,
             columnSorting: true,
             tableOverflow: true,
@@ -624,7 +636,7 @@ class ListUserComponent extends Component {
             oneditionend: this.onedit,
             copyCompatibility: true,
             allowExport: false,
-            paginationOptions:JEXCEL_PAGINATION_OPTION,
+            paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             contextMenu: function (obj, x, y, e) {
                 var items = [];
@@ -737,7 +749,7 @@ class ListUserComponent extends Component {
         UserService.getUserList()
             .then(response => {
                 if (response.status == 200) {
-                    console.log(response.data)
+                    console.log("response.data---->", response.data)
                     this.setState({
                         userList: response.data,
                         selUserList: response.data

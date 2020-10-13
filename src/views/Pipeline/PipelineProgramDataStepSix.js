@@ -479,6 +479,7 @@ export default class PipelineProgramDataStepSix extends Component {
                                             bsSize="sm"
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
                                             type="textarea"
+                                            maxLength={600}
                                             name="programNotes"
                                             id="programNotes"
                                             value={this.props.items.program.programNotes} />

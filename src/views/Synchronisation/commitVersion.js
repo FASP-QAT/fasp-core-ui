@@ -266,6 +266,7 @@ export default class commitVersion extends Component {
                         <div className="controls SelectGo">
                           <InputGroup>
                             <Input type="textarea"
+                              maxLength={600}
                               bsSize="sm"
                               name="notes" id="notes"
                             >

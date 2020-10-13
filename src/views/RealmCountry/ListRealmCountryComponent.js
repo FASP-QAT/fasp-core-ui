@@ -433,8 +433,9 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import getLabelText from '../../CommonComponent/getLabelText';
 import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
+import moment from 'moment';
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
-import { JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from '../../Constants';
+import { DATE_FORMAT_CAP, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from '../../Constants';
 
 const entityname = i18n.t('static.dashboard.realmcountry');
 class ListRealmCountryComponent extends Component {
@@ -519,7 +520,9 @@ class ListRealmCountryComponent extends Component {
             data[1] = getLabelText(realmCountryList[j].realm.label, this.state.lang)
             data[2] = getLabelText(realmCountryList[j].country.label, this.state.lang)
             data[3] = getLabelText(realmCountryList[j].defaultCurrency.label, this.state.lang)
-            data[4] = realmCountryList[j].active;
+            data[4] = realmCountryList[j].lastModifiedBy.username;
+            data[5] = (realmCountryList[j].lastModifiedDate ? moment(realmCountryList[j].lastModifiedDate).format(`${DATE_FORMAT_CAP}`) : null)
+            data[6] = realmCountryList[j].active;
 
 
             realmCountryArray[count] = data;
@@ -557,6 +560,16 @@ class ListRealmCountryComponent extends Component {
                 },
                 {
                     title: i18n.t('static.dashboard.currency'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.common.lastModifiedBy'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.common.lastModifiedDate'),
                     type: 'text',
                     readOnly: true
                 },

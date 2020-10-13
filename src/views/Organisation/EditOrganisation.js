@@ -479,7 +479,7 @@ export default class EditOrganisationComponent extends Component {
                                         setFieldValue,
                                         setFieldTouched
                                     }) => (
-                                            <Form onSubmit={handleSubmit} noValidate name='organisationForm'>
+                                            <Form onSubmit={handleSubmit} noValidate name='organisationForm' autocomplete="off">
                                                 <CardBody className="pb-0">
 
                                                     <FormGroup>

@@ -271,6 +271,10 @@ if(value!=null){
     return arr.map(ele=>'"'+ele+'"')
  }
 
+ rowtextFormatClassName=(row)=> {
+  return (!row.actualConsumption) ? 'textcolor-purple' : '';
+}
+
   exportCSV() {
 
     var csvRow = [];
@@ -1297,9 +1301,9 @@ console.log(list)
                   {this.state.show && this.state.stockStatusList.length > 0 && <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
 
                     <thead>
-                      <tr><th rowSpan="2" style={{ width: "200px" }}>{i18n.t('static.report.month')}</th> <th className="text-center" colSpan="2"> {i18n.t('static.dashboard.consumption')} </th> <th className="text-center" colSpan="2"> {i18n.t('static.shipment.shipment')} </th> <th className="text-center" colSpan="5"> {i18n.t('static.report.stock')} </th> </tr><tr>
+                      <tr><th rowSpan="2" style={{ width: "200px" }}>{i18n.t('static.report.month')}</th> <th className="text-center" colSpan="2"> {i18n.t('static.supplyPlan.consumption')} </th> <th className="text-center" colSpan="2"> {i18n.t('static.shipment.shipment')} </th> <th className="text-center" colSpan="5"> {i18n.t('static.report.stock')} </th> </tr><tr>
 
-                        <th className="text-center" style={{ width: "200px" }}> {i18n.t('static.dashboard.consumption')} </th>
+                        <th className="text-center" style={{ width: "200px" }}> {i18n.t('static.supplyPlan.consumption')} </th>
                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.consumption.actual')}</th>
                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyPlan.shipmentQty')}</th>
                         <th className="text-center" style={{ width: "200px" }}>{(i18n.t('static.budget.fundingsource') + " : " + i18n.t('static.supplyPlan.shipmentStatus'))}</th>
@@ -1320,7 +1324,7 @@ console.log(list)
                             <td>
                               {this.dateFormatter(this.state.stockStatusList[idx].dt)}
                             </td>
-                            <td>
+                            <td className={this.rowtextFormatClassName(this.state.stockStatusList[idx])}>
 
                               {this.formatter(this.state.stockStatusList[idx].consumptionQty)}
                             </td>

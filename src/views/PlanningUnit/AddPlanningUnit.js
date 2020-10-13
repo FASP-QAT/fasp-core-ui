@@ -22,16 +22,16 @@ const entityname = i18n.t('static.planningunit.planningunit');
 const validationSchema = function (values) {
     return Yup.object().shape({
         unitId: Yup.string()
-            .required(i18n.t('static.planningunit.unittext')),
+            .required(i18n.t('static.planningUnit.plannignUnitMeasure')),
         label: Yup.string()
             // .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
-            .required(i18n.t('static.planningunit.planningunittext')),
+            .required(i18n.t('static.planningUnit.plannignUnitName')),
         forecastingUnitId: Yup.string()
-            .required(i18n.t('static.planningunit.forcastingunittext')),
+            .required(i18n.t('static.planningUnit.enterAssociatedForecastingUnit')),
         multiplier: Yup.string()
             .matches(/^\s*(?=.*[1-9])\d*(?:\.\d{1,2})?\s*$/, i18n.t('static.currency.conversionrateNumberTwoDecimalPlaces'))
-            .required(i18n.t('static.planningunit.multipliertext'))
+            .required(i18n.t('static.planningUnit.multiplier'))
             .min(0, i18n.t('static.program.validvaluetext'))
     })
 }
@@ -89,7 +89,29 @@ export default class AddPlanningUnit extends Component {
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.changePlanningUnit = this.changePlanningUnit.bind(this);
     }
+
+    changePlanningUnit() {
+        // alert("HI forecastingUnitId");
+        let forecastingUnitId = document.getElementById("forecastingUnitId").value;
+
+        if (forecastingUnitId != '') {
+            // alert("if";
+            let forecastingUnitText = document.getElementById("forecastingUnitId")
+            var selectedText = forecastingUnitText.options[forecastingUnitText.selectedIndex].text;
+            let { planningUnit } = this.state;
+            planningUnit.label.label_en = selectedText;
+            this.setState({ planningUnit }, () => { })
+        } else {
+            // alert("else")
+            var selectedText = '';
+            let { planningUnit } = this.state;
+            planningUnit.label.label_en = selectedText;
+            this.setState({ planningUnit }, () => { })
+        }
+    }
+
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
@@ -293,7 +315,14 @@ export default class AddPlanningUnit extends Component {
                                 <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
                             </CardHeader> */}
                             <Formik
-                                initialValues={initialValues}
+                                // initialValues={initialValues}
+                                enableReinitialize={true}
+                                initialValues={{
+                                    label: this.state.planningUnit.label.label_en,
+                                    unitId: this.state.planningUnit.unit.id,
+                                    forecastingUnitId: this.state.planningUnit.forecastingUnit.forecastingUnitId,
+                                    multiplier: this.state.planningUnit.multiplier
+                                }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     this.setState({
@@ -369,10 +398,10 @@ export default class AddPlanningUnit extends Component {
                                         setTouched,
                                         handleReset
                                     }) => (
-                                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='planningUnitForm'>
+                                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='planningUnitForm' autocomplete="off">
                                                 <CardBody>
                                                     <FormGroup>
-                                                        <Label htmlFor="forecastingUnitId">{i18n.t('static.forecastingunit.forecastingunit')}<span className="red Reqasterisk">*</span></Label>
+                                                        <Label htmlFor="forecastingUnitId">{i18n.t('static.planningUnit.associatedForecastingUnit')}<span className="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             type="select"
                                                             name="forecastingUnitId"
@@ -380,7 +409,7 @@ export default class AddPlanningUnit extends Component {
                                                             bsSize="sm"
                                                             valid={!errors.forecastingUnitId && this.state.planningUnit.forecastingUnit.forecastingUnitId != ''}
                                                             invalid={touched.forecastingUnitId && !!errors.forecastingUnitId}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.changePlanningUnit(e); }}
                                                             onBlur={handleBlur}
                                                             required
                                                             value={this.state.planningUnit.forecastingUnit.forecastingUnitId}
@@ -391,7 +420,35 @@ export default class AddPlanningUnit extends Component {
                                                         <FormFeedback className="red">{errors.forecastingUnitId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="unitId">{i18n.t('static.unit.unit')}<span className="red Reqasterisk">*</span></Label>
+                                                        <Label for="multiplier">{i18n.t('static.planningUnit.multiplier')}<span className="red Reqasterisk">*</span></Label>
+                                                        <Input type="number"
+                                                            name="multiplier"
+                                                            id="multiplier"
+                                                            bsSize="sm"
+                                                            valid={!errors.multiplier && this.state.planningUnit.multiplier != ''}
+                                                            invalid={touched.multiplier && !!errors.multiplier}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.planningUnit.multiplier}
+                                                            required />
+                                                        <FormFeedback className="red">{errors.multiplier}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label for="label">{i18n.t('static.planningUnit.plannignUnitName')}<span className="red Reqasterisk">*</span></Label>
+                                                        <Input type="text"
+                                                            name="label"
+                                                            id="label"
+                                                            bsSize="sm"
+                                                            valid={!errors.label && this.state.planningUnit.label.label_en != ''}
+                                                            invalid={touched.label && !!errors.label}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.planningUnit.label.label_en}
+                                                            required />
+                                                        <FormFeedback className="red">{errors.label}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label htmlFor="unitId">{i18n.t('static.planningUnit.plannignUnitMeasure')}<span className="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             type="select"
                                                             name="unitId"
@@ -408,34 +465,11 @@ export default class AddPlanningUnit extends Component {
                                                         </Input>
                                                         <FormFeedback className="red">{errors.unitId}</FormFeedback>
                                                     </FormGroup>
+
                                                     <FormGroup>
-                                                        <Label for="label">{i18n.t('static.planningunit.planningunit')}<span className="red Reqasterisk">*</span></Label>
-                                                        <Input type="text"
-                                                            name="label"
-                                                            id="label"
-                                                            bsSize="sm"
-                                                            valid={!errors.label && this.state.planningUnit.label.label_en != ''}
-                                                            invalid={touched.label && !!errors.label}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.planningUnit.label.label_en}
-                                                            required />
-                                                        <FormFeedback className="red">{errors.label}</FormFeedback>
+                                                        <Label htmlFor="unitId">{i18n.t('static.planningUnit.plannignUniteg')}</Label>
                                                     </FormGroup>
-                                                    <FormGroup>
-                                                        <Label for="multiplier">{i18n.t('static.unit.multiplier')}<span className="red Reqasterisk">*</span></Label>
-                                                        <Input type="number"
-                                                            name="multiplier"
-                                                            id="multiplier"
-                                                            bsSize="sm"
-                                                            valid={!errors.multiplier && this.state.planningUnit.multiplier != ''}
-                                                            invalid={touched.multiplier && !!errors.multiplier}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.planningUnit.multiplier}
-                                                            required />
-                                                        <FormFeedback className="red">{errors.multiplier}</FormFeedback>
-                                                    </FormGroup>
+
 
                                                 </CardBody>
 

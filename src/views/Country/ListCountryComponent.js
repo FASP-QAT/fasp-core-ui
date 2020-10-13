@@ -327,12 +327,13 @@ import paginationFactory from 'react-bootstrap-table2-paginator'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
+import moment from 'moment';
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 
 
 import i18n from '../../i18n';
 import { boolean } from 'yup';
-import { JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
+import { DATE_FORMAT_CAP, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
 
 
 
@@ -430,7 +431,9 @@ export default class CountryListComponent extends Component {
             data[1] = getLabelText(countryList[j].label, this.state.lang)
             data[2] = countryList[j].countryCode;
             data[3] = countryList[j].countryCode2;
-            data[4] = countryList[j].active;
+            data[4] = countryList[j].lastModifiedBy.username;
+            data[5] = (countryList[j].lastModifiedDate ? moment(countryList[j].lastModifiedDate).format(`${DATE_FORMAT_CAP}`) : null)
+            data[6] = countryList[j].active;
 
             countryArray[count] = data;
             count++;
@@ -468,6 +471,16 @@ export default class CountryListComponent extends Component {
                 },
                 {
                     title: i18n.t('static.country.countrycode2'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.common.lastModifiedBy'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.common.lastModifiedDate'),
                     type: 'text',
                     readOnly: true
                 },
@@ -515,7 +528,7 @@ export default class CountryListComponent extends Component {
         this.hideFirstComponent();
         CountryService.getCountryListAll().then(response => {
             if (response.status == 200) {
-                console.log("response--->", response.data);
+                console.log("response.data---->", response.data)
                 // this.setState({
                 //     countryList: response.data,
                 //     selCountry: response.data, loading: false

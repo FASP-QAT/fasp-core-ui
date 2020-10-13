@@ -960,7 +960,7 @@ export default class ShipmentDelinking extends Component {
         const columns = [
             {
                 dataField: 'shipmentId',
-                text: 'Shipment Id',
+                text: i18n.t('static.commit.shipmentId'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center'
@@ -971,7 +971,7 @@ export default class ShipmentDelinking extends Component {
             },
             {
                 dataField: 'expectedDeliveryDate',
-                text: 'Expected Delivery Date',
+                text: i18n.t('static.shipment.edd'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -979,14 +979,14 @@ export default class ShipmentDelinking extends Component {
             },
             {
                 dataField: 'shipmentStatus.label',
-                text: 'Shipment Status',
+                text: i18n.t('static.supplyPlan.shipmentStatus'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
                 formatter: this.formatLabel
             }, {
                 dataField: 'procurementAgent.code',
-                text: 'Planning Unit',
+                text: i18n.t('static.common.product'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -994,7 +994,7 @@ export default class ShipmentDelinking extends Component {
             },
             {
                 dataField: 'budget.label',
-                text: 'Budget',
+                text: i18n.t('static.budgetHead.budget'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -1002,7 +1002,7 @@ export default class ShipmentDelinking extends Component {
             },
             {
                 dataField: 'shipmentQty',
-                text: 'Shipment Quantity',
+                text: i18n.t('static.supplyPlan.shipmentQty'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -1010,7 +1010,7 @@ export default class ShipmentDelinking extends Component {
             },
             {
                 dataField: 'fundingSource.code',
-                text: 'Funding Source',
+                text: i18n.t('static.fundingSourceHead.fundingSource'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center'
@@ -1021,7 +1021,8 @@ export default class ShipmentDelinking extends Component {
                 align: 'center',
                 headerAlign: 'center',
                 formatter: (cellContent, row) => {
-                    return (<Button type="button" size="sm" color="success" title="Delink Shipment" onClick={(event) => this.delinkShipment(event, row)} ><i className="fa fa-check"></i>{i18n.t('static.common.dlink')}</Button>
+                    return (<Button type="button" size="sm" color="success" title={i18n.t('static.common.dlink')} onClick={(event) => this.delinkShipment(event, row)
+                    } > <i className="fa fa-check"></i>{i18n.t('static.common.dlink')}</Button >
                     )
                 }
             }
@@ -1080,7 +1081,7 @@ export default class ShipmentDelinking extends Component {
                                     </div>
                                 </FormGroup>
                                 <FormGroup className="col-md-4">
-                                    <Label htmlFor="appendedInputButton">Planning Unit</Label>
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
                                     <div className="controls ">
                                         <InputGroup>
                                             <Input

@@ -1266,7 +1266,7 @@ export default class CostOfInventory extends Component {
         columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ', '%20') });
 
         var A = [this.addDoubleQuoteToRowContent(headers)]
-        this.state.costOfInventory.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.stock, ele.catalogPrice, ele.cost])));
+        this.state.costOfInventory.map(ele => A.push(this.addDoubleQuoteToRowContent([ele.planningUnit.id,(getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.stock, ele.catalogPrice, ele.cost])));
 
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
@@ -1353,7 +1353,7 @@ export default class CostOfInventory extends Component {
         // doc.addImage(canvasImg, 'png', 50, 200, 750, 290, 'CANVAS');
 
         const headers = columns.map((item, idx) => (item.text));
-        const data = this.state.costOfInventory.map(ele => [getLabelText(ele.planningUnit.label), this.formatter(ele.stock), this.formatter(ele.catalogPrice), this.formatter(ele.cost)]);
+        const data = this.state.costOfInventory.map(ele => [ele.planningUnit.id,getLabelText(ele.planningUnit.label), this.formatter(ele.stock), this.formatter(ele.catalogPrice), this.formatter(ele.cost)]);
 
         let content = {
             margin: { top: 80, bottom: 50 },
@@ -1660,7 +1660,14 @@ export default class CostOfInventory extends Component {
         );
 
         const columns = [
-
+            {
+                dataField: 'planningUnit.id',
+                text: i18n.t('static.report.qatPID'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                style: { align: 'center' }
+            },
             {
                 dataField: 'planningUnit.label',
                 text: i18n.t('static.planningunit.planningunit'),

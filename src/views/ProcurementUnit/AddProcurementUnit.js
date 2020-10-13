@@ -850,7 +850,29 @@ export default class AddProcurementUnit extends Component {
         this.Capitalize = this.Capitalize.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.changePlanningUnit = this.changePlanningUnit.bind(this);
     }
+
+    changePlanningUnit() {
+        // alert("HI planningUnitId");
+        let planningUnitId = document.getElementById("planningUnitId").value;
+
+        if (planningUnitId != '') {
+            // alert("if";
+            let planningUnitText = document.getElementById("planningUnitId")
+            var selectedText = planningUnitText.options[planningUnitText.selectedIndex].text;
+            let { procurementUnit } = this.state;
+            procurementUnit.label.label_en = selectedText;
+            this.setState({ procurementUnit }, () => { })
+        } else {
+            // alert("else")
+            var selectedText = '';
+            let { procurementUnit } = this.state;
+            procurementUnit.label.label_en = selectedText;
+            this.setState({ procurementUnit }, () => { })
+        }
+    }
+
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
@@ -1176,7 +1198,30 @@ export default class AddProcurementUnit extends Component {
                     <Col sm={12} md={8} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <Formik
-                                initialValues={initialValues}
+                                // initialValues={initialValues}
+                                enableReinitialize={true}
+                                initialValues={{
+                                    procurementUnitName: this.state.procurementUnit.label.label_en,
+                                    planningUnitId: this.state.procurementUnit.planningUnit.planningUnitId,
+                                    multiplier: this.state.procurementUnit.multiplier,
+                                    unitId: this.state.procurementUnit.unit.id,
+                                    supplierId: this.state.procurementUnit.supplier.id,
+                                    // heightUnitId: this.state.procurementUnit.heightUnit.id,
+                                    heightQty: this.state.procurementUnit.heightQty,
+                                    lengthUnitId: this.state.procurementUnit.lengthUnit.id,
+                                    lengthQty: this.state.procurementUnit.lengthQty,
+                                    // widthUnitId: this.state.procurementUnit.widthUnit.id,
+                                    widthQty: this.state.procurementUnit.widthQty,
+                                    weightUnitId: this.state.procurementUnit.weightUnit.id,
+                                    weightQty: this.state.procurementUnit.weightQty,
+                                    volumeUnitId: this.state.procurementUnit.volumeUnit.id,
+                                    volumeQty: this.state.procurementUnit.volumeQty,
+                                    labeling: this.state.procurementUnit.labeling,
+                                    unitsPerCase: this.state.procurementUnit.unitsPerCase,
+                                    unitsPerPalletEuro1: this.state.procurementUnit.unitsPerPalletEuro1,
+                                    unitsPerPalletEuro2: this.state.procurementUnit.unitsPerPalletEuro2,
+                                    unitsPerContainer: this.state.procurementUnit.unitsPerContainer
+                                }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     this.setState({
@@ -1250,30 +1295,20 @@ export default class AddProcurementUnit extends Component {
                                         handleReset
                                     }) => (
 
-                                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='procurementUnitForm'>
+                                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='procurementUnitForm' autocomplete="off">
                                                 {/* <CardHeader>
                                                     <strong>{i18n.t('static.procurementUnit.procurementUnit')}</strong>
                                                 </CardHeader> */}
                                                 <CardBody>
                                                     <FormGroup>
-                                                        <Label htmlFor="procurementUnit">{i18n.t('static.procurementUnit.procurementUnit')}<span class="red Reqasterisk">*</span></Label>
-                                                        <Input
-                                                            type="text" name="procurementUnitName" valid={!errors.procurementUnitName && this.state.procurementUnit.label.label_en != ''}
-                                                            bsSize="sm"
-                                                            invalid={touched.procurementUnitName && !!errors.procurementUnitName}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.procurementUnit.label.label_en}
-                                                            id="procurementUnitName" />
-                                                        <FormFeedback className="red">{errors.procurementUnitName}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
                                                         <Label htmlFor="select">{i18n.t('static.procurementUnit.planningUnit')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             bsSize="sm"
+                                                            // valid={!errors.planningUnitId && this.state.procurementUnit.planningUnit.planningUnitId != ''}
+                                                            // invalid={touched.planningUnitId && !!errors.planningUnitId}
                                                             valid={!errors.planningUnitId && this.state.procurementUnit.planningUnit.planningUnitId != ''}
-                                                            invalid={touched.planningUnitId && !!errors.planningUnitId}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                            invalid={(touched.planningUnitId && !!errors.planningUnitId) || (touched.planningUnitId && this.state.procurementUnit.planningUnit.planningUnitId == '')}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.changePlanningUnit(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.procurementUnit.planningUnit.planningUnitId}
                                                             type="select" name="planningUnitId" id="planningUnitId">
@@ -1283,11 +1318,30 @@ export default class AddProcurementUnit extends Component {
                                                         <FormFeedback>{errors.planningUnitId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
+                                                        <Label htmlFor="procurementUnit">{i18n.t('static.procurementUnit.procurementUnit')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Input
+                                                            type="text" name="procurementUnitName"
+                                                            bsSize="sm"
+                                                            // valid={!errors.procurementUnitName && this.state.procurementUnit.label.label_en != ''}
+                                                            // invalid={touched.procurementUnitName && !!errors.procurementUnitName}
+                                                            valid={!errors.procurementUnitName && this.state.procurementUnit.label.label_en != ''}
+                                                            invalid={(touched.procurementUnitName && !!errors.procurementUnitName) || (touched.procurementUnitName && this.state.procurementUnit.label.label_en == '')}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.procurementUnit.label.label_en}
+                                                            id="procurementUnitName" />
+                                                        <FormFeedback className="red">{errors.procurementUnitName}</FormFeedback>
+                                                    </FormGroup>
+
+                                                    <FormGroup>
                                                         <Label htmlFor="multiplier">{i18n.t('static.procurementUnit.multiplier')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
-                                                            type="number" name="multiplier" valid={!errors.multiplier && this.state.procurementUnit.multiplier != ''}
+                                                            type="number" name="multiplier"
                                                             bsSize="sm"
-                                                            invalid={touched.multiplier && !!errors.multiplier}
+                                                            // valid={!errors.multiplier && this.state.procurementUnit.multiplier != ''}
+                                                            // invalid={touched.multiplier && !!errors.multiplier}
+                                                            valid={!errors.multiplier && this.state.procurementUnit.multiplier != ''}
+                                                            invalid={(touched.multiplier && !!errors.multiplier) || (touched.multiplier && this.state.procurementUnit.multiplier == '')}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             pattern="[1-9]{1}[0-9]{9}"
@@ -1299,8 +1353,10 @@ export default class AddProcurementUnit extends Component {
                                                         <Label htmlFor="select">{i18n.t('static.procurementUnit.unit')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             bsSize="sm"
+                                                            // valid={!errors.unitId && this.state.procurementUnit.unit.id != ''}
+                                                            // invalid={touched.unitId && !!errors.unitId}
                                                             valid={!errors.unitId && this.state.procurementUnit.unit.id != ''}
-                                                            invalid={touched.unitId && !!errors.unitId}
+                                                            invalid={(touched.unitId && !!errors.unitId) || (touched.unitId && this.state.procurementUnit.unit.id == '')}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.procurementUnit.unit.id}
@@ -1314,8 +1370,10 @@ export default class AddProcurementUnit extends Component {
                                                         <Label htmlFor="select">{i18n.t('static.procurementUnit.supplier')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             bsSize="sm"
+                                                            // valid={!errors.supplierId && this.state.procurementUnit.supplier.id != ''}
+                                                            // invalid={touched.supplierId && !!errors.supplierId}
                                                             valid={!errors.supplierId && this.state.procurementUnit.supplier.id != ''}
-                                                            invalid={touched.supplierId && !!errors.supplierId}
+                                                            invalid={(touched.supplierId && !!errors.supplierId) || (touched.supplierId && this.state.procurementUnit.supplier.id == '')}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.procurementUnit.supplier.id}
@@ -1528,7 +1586,8 @@ export default class AddProcurementUnit extends Component {
                                                     <FormGroup>
                                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                         <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')} </Button>
+                                                        {/* <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')} </Button> */}
+                                                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')} </Button>
                                                         &nbsp;
                                         </FormGroup>
                                                 </CardFooter>

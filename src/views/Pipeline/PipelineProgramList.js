@@ -475,14 +475,14 @@ export default class PipelineProgramList extends Component {
         const columns = [
             {
                 dataField: 'PIPELINE_ID',
-                text: 'Program Id',
+                text: i18n.t('static.pipelineProgram.programId'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center'
             },
             {
                 dataField: 'USERNAME',
-                text: 'User',
+                text: i18n.t('static.pipelineProgram.user'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -491,7 +491,7 @@ export default class PipelineProgramList extends Component {
 
             {
                 dataField: 'FILE_NAME',
-                text: 'File Name',
+                text: i18n.t('static.pipelineProgram.fileName'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -499,7 +499,7 @@ export default class PipelineProgramList extends Component {
             },
             {
                 dataField: 'CREATED_DATE',
-                text: 'Import Date',
+                text: i18n.t('static.pipelineProgram.importDate'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -552,7 +552,7 @@ export default class PipelineProgramList extends Component {
 
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                <a href="javascript:void();" title="Import New program" onClick={this.importNewProgram}><i className="fa fa-plus-square"></i></a>
+                                <a href="javascript:void();" title={i18n.t('static.importProgram.importNewProgram')} onClick={this.importNewProgram}><i className="fa fa-plus-square"></i></a>
                             </div>
                         </div>
                     </div>

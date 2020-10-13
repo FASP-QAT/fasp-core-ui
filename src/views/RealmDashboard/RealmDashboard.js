@@ -55,13 +55,13 @@ const options = {
     yAxes: [{
       scaleLabel: {
         display: true,
-        labelString: 'Program Count'
+        labelString: i18n.t('static.dashboard.programCount')
       }
     }],
     xAxes: [{
       scaleLabel: {
         display: true,
-        labelString: 'Country'
+        labelString: i18n.t('static.report.country')
       }
     }],
   },
@@ -79,7 +79,7 @@ const bar = {
   labels: ['Malawi', 'Kenya', 'Zimbabwe', 'USA'],
   datasets: [
     {
-      label: 'Active Programs',
+      label: i18n.t('static.graph.activeProgram'),
       backgroundColor: '#118B70',
       borderColor: 'rgba(179,181,198,1)',
       pointBackgroundColor: 'rgba(179,181,198,1)',
@@ -351,8 +351,8 @@ class RealmDashboard extends Component {
                           {/* <i className="icon-settings"></i> */}
                         </DropdownToggle>
                         <DropdownMenu right>
-                          <DropdownItem onClick={() => this.redirectToCrud("/user/listUser")}>List Users</DropdownItem>
-                          <DropdownItem onClick={() => this.redirectToCrud("/user/addUser")}>Add User</DropdownItem>
+                          <DropdownItem onClick={() => this.redirectToCrud("/user/listUser")}>{i18n.t('static.list.listUser')}</DropdownItem>
+                          <DropdownItem onClick={() => this.redirectToCrud("/user/addUser")}>{i18n.t('static.add.addUser')}</DropdownItem>
 
                         </DropdownMenu>
                       </Dropdown>
@@ -381,8 +381,8 @@ class RealmDashboard extends Component {
                           {/* <i className="icon-settings"></i> */}
                         </DropdownToggle>
                         <DropdownMenu right>
-                          <DropdownItem onClick={() => this.redirectToCrud("/country/listCountry")}>List Countries</DropdownItem>
-                          <DropdownItem onClick={() => this.redirectToCrud("/country/addCountry")}>Add Country</DropdownItem>
+                          <DropdownItem onClick={() => this.redirectToCrud("/country/listCountry")}>{i18n.t('static.list.listCountryRealm')}</DropdownItem>
+                          <DropdownItem onClick={() => this.redirectToCrud("/country/addCountry")}>{i18n.t('static.add.addCountryRealm')}</DropdownItem>
 
                         </DropdownMenu>
                       </Dropdown>
@@ -409,15 +409,15 @@ class RealmDashboard extends Component {
                           {/* <i className="icon-settings"></i> */}
                         </DropdownToggle>
                         <DropdownMenu right>
-                          <DropdownItem onClick={() => this.redirectToCrud("/healthArea/listHealthArea")}>List Technical Areas</DropdownItem>
-                          <DropdownItem onClick={() => this.redirectToCrud("/healthArea/addHealthArea")}>Add Technical Area</DropdownItem>
+                          <DropdownItem onClick={() => this.redirectToCrud("/healthArea/listHealthArea")}>{i18n.t('static.list.listTechnicalArea')}</DropdownItem>
+                          <DropdownItem onClick={() => this.redirectToCrud("/healthArea/addHealthArea")}>{i18n.t('static.dashboard.addhealtharea')}</DropdownItem>
 
                         </DropdownMenu>
                       </Dropdown>
                     </ButtonGroup>
                   </div>
 
-                  <div className="TextTittle ">Technical Area </div>
+                  <div className="TextTittle ">{i18n.t('static.program.healtharea')} </div>
                   <div className="text-count">{this.state.dashboard.TECHNICAL_AREA_COUNT}</div>
                   <div className="chart-wrapper mt-4 pb-2" >
                     {/* <Line data={cardChartData3} options={cardChartOpts3} height={70} /> */}
@@ -437,15 +437,15 @@ class RealmDashboard extends Component {
                           {/* <i className="icon-settings"></i> */}
                         </DropdownToggle>
                         <DropdownMenu right>
-                          <DropdownItem onClick={() => this.redirectToCrud("/realmCountry/listRealmCountry")}>List Regions</DropdownItem>
-                          <DropdownItem onClick={() => this.redirectToCrud("/realmCountry/listRealmCountry")}>Add Region</DropdownItem>
+                          <DropdownItem onClick={() => this.redirectToCrud("/realmCountry/listRealmCountry")}>{i18n.t('static.list.listRegion')}</DropdownItem>
+                          <DropdownItem onClick={() => this.redirectToCrud("/realmCountry/listRealmCountry")}>{i18n.t('static.add.addRegion')}</DropdownItem>
 
                         </DropdownMenu>
                       </Dropdown>
                     </ButtonGroup>
                   </div>
 
-                  <div className="TextTittle ">Region </div>
+                  <div className="TextTittle ">{i18n.t('static.region.region')} </div>
                   <div className="text-count">{this.state.dashboard.REGION_COUNT}</div>
                   <div className="chart-wrapper mt-4 pb-2" >
                     {/* <Line data={cardChartData3} options={cardChartOpts3} height={70} /> */}
@@ -463,15 +463,15 @@ class RealmDashboard extends Component {
                         <DropdownToggle caret className="p-0" color="transparent">
                         </DropdownToggle>
                         <DropdownMenu right>
-                          <DropdownItem onClick={() => this.redirectToCrud("/organisation/listOrganisation")}>List Organisations</DropdownItem>
-                          <DropdownItem onClick={() => this.redirectToCrud("/organisation/addOrganisation")}>Add Organisation</DropdownItem>
+                          <DropdownItem onClick={() => this.redirectToCrud("/organisation/listOrganisation")}>{i18n.t('static.list.listOrganisation')}</DropdownItem>
+                          <DropdownItem onClick={() => this.redirectToCrud("/organisation/addOrganisation")}>{i18n.t('static.add.addOrganisation')}</DropdownItem>
 
                         </DropdownMenu>
                       </Dropdown>
                     </ButtonGroup>
                   </div>
 
-                  <div className="TextTittle ">Organisation </div>
+                  <div className="TextTittle ">{i18n.t('static.program.organisation')} </div>
                   <div className="text-count">{this.state.dashboard.ORGANIZATION_COUNT}</div>
                   <div className="chart-wrapper mt-4 pb-2" >
 
@@ -492,7 +492,7 @@ class RealmDashboard extends Component {
 
                         </DropdownToggle>
                         <DropdownMenu right>
-                          <DropdownItem onClick={() => this.redirectToCrud("/program/listProgram")}>List Programs</DropdownItem>
+                          <DropdownItem onClick={() => this.redirectToCrud("/program/listProgram")}>{i18n.t('static.list.listProgram')}</DropdownItem>
 
 
                         </DropdownMenu>
@@ -500,7 +500,7 @@ class RealmDashboard extends Component {
                     </ButtonGroup>
                   </div>
 
-                  <div className="TextTittle ">Total Programs </div>
+                  <div className="TextTittle ">{i18n.t('static.add.totalProgram')} </div>
                   <div className="text-count">{this.state.dashboard.PROGRAM_COUNT}</div>
                   <div className="chart-wrapper mt-4 pb-2" >
 
@@ -518,13 +518,13 @@ class RealmDashboard extends Component {
                         <DropdownToggle caret className="p-0" color="transparent">
                         </DropdownToggle>
                         <DropdownMenu right>
-                          <DropdownItem onClick={() => this.redirectToCrud("/program/programOnboarding")}>Setup Program</DropdownItem>
+                          <DropdownItem onClick={() => this.redirectToCrud("/program/programOnboarding")}>{i18n.t('static.dashboard.setupprogram')}</DropdownItem>
                         </DropdownMenu>
                       </Dropdown>
                     </ButtonGroup>
                   </div>
 
-                  <div className="TextTittle ">Setup Program </div>
+                  <div className="TextTittle ">{i18n.t('static.dashboard.setupprogram')} </div>
                   <div className="chart-wrapper mt-4 pb-2" >
                   </div>
                 </CardBody>
@@ -540,13 +540,13 @@ class RealmDashboard extends Component {
                         <DropdownToggle caret className="p-0" color="transparent">
                         </DropdownToggle>
                         <DropdownMenu right>
-                          <DropdownItem onClick={() => this.redirectToCrud("/supplyPlan")}>View Supply Plans Waiting for Approval</DropdownItem>
+                          <DropdownItem onClick={() => this.redirectToCrud("/supplyPlan")}>{i18n.t('static.dashboard.viewSupplyPlan')}</DropdownItem>
                         </DropdownMenu>
                       </Dropdown>
                     </ButtonGroup>
                   </div>
 
-                  <div className="TextTittle ">Supply Plans waiting for Approval </div>
+                  <div className="TextTittle ">{i18n.t('static.dashboard.supplyPlanWaiting')} </div>
                   <div className="text-count">{this.state.dashboard.SUPPLY_PLAN_COUNT}</div>
                   <div className="chart-wrapper mt-4 pb-2" >
                   </div>

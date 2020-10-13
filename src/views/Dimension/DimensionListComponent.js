@@ -247,7 +247,8 @@ import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import i18n from '../../i18n';
-import { JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
+import moment from 'moment';
+import { DATE_FORMAT_CAP, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
 const entityname = i18n.t('static.dimension.dimension');
 export default class DimensionListComponent extends Component {
 
@@ -290,6 +291,8 @@ export default class DimensionListComponent extends Component {
             data = [];
             data[0] = dimensionList[j].dimensionId
             data[1] = getLabelText(dimensionList[j].label, this.state.lang)
+            data[2] = dimensionList[j].lastModifiedBy.username;
+            data[3] = (dimensionList[j].lastModifiedDate ? moment(dimensionList[j].lastModifiedDate).format(`${DATE_FORMAT_CAP}`) : null)
             dimensionArray[count] = data;
             count++;
         }
@@ -318,7 +321,17 @@ export default class DimensionListComponent extends Component {
                     title: i18n.t('static.dimension.dimension'),
                     type: 'text',
                     readOnly: true
-                }
+                },
+                {
+                    title: i18n.t('static.common.lastModifiedBy'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.common.lastModifiedDate'),
+                    type: 'text',
+                    readOnly: true
+                },
             ],
             text: {
                 // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
@@ -367,7 +380,7 @@ export default class DimensionListComponent extends Component {
         // AuthenticationService.setupAxiosInterceptors();
         DimensionService.getDimensionListAll().then(response => {
             if (response.status == 200) {
-                console.log(response.data)
+                console.log("response.data---->", response.data)
                 // this.setState({
                 //     dimensionList: response.data,
                 //     selSource: response.data, loading: false

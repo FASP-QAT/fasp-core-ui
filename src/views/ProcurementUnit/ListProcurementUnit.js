@@ -323,9 +323,10 @@ import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import jexcel from 'jexcel';
+import moment from 'moment';
 import "../../../node_modules/jexcel/dist/jexcel.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
-import { JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from "../../Constants";
+import { DATE_FORMAT_CAP, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from "../../Constants";
 
 const entityname = i18n.t('static.procurementUnit.procurementUnit');
 export default class ListProcurementUnit extends Component {
@@ -407,7 +408,9 @@ export default class ListProcurementUnit extends Component {
       data[4] = getLabelText(procurementUnitList[j].unit.label, this.state.lang)
       data[5] = getLabelText(procurementUnitList[j].supplier.label, this.state.lang)
       data[6] = procurementUnitList[j].labeling;
-      data[7] = procurementUnitList[j].active;
+      data[7] = procurementUnitList[j].lastModifiedBy.username;
+      data[8] = (procurementUnitList[j].lastModifiedDate ? moment(procurementUnitList[j].lastModifiedDate).format(`${DATE_FORMAT_CAP}`) : null)
+      data[9] = procurementUnitList[j].active;
 
 
       procurementUnitArray[count] = data;
@@ -460,6 +463,16 @@ export default class ListProcurementUnit extends Component {
         },
         {
           title: i18n.t('static.procurementUnit.labeling'),
+          type: 'text',
+          readOnly: true
+        },
+        {
+          title: i18n.t('static.common.lastModifiedBy'),
+          type: 'text',
+          readOnly: true
+        },
+        {
+          title: i18n.t('static.common.lastModifiedDate'),
           type: 'text',
           readOnly: true
         },
