@@ -1058,7 +1058,7 @@ export default class UpdateCountryComponent extends Component {
                                         isValid,
                                         setTouched
                                     }) => (
-                                            <Form onSubmit={handleSubmit} noValidate name='countryForm'>
+                                            <Form onSubmit={handleSubmit} noValidate name='countryForm' autocomplete="off">
                                                 <CardBody className="pt-2 pb-0">
                                                     <FormGroup>
                                                         <Label for="label">{i18n.t('static.country.countryName')}<span class="red Reqasterisk">*</span></Label>

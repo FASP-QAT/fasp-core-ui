@@ -197,7 +197,7 @@ export default class StepSix extends Component {
                         isValid,
                         setTouched
                     }) => (
-                            <Form className="needs-validation" onSubmit={handleSubmit} noValidate name='programDataForm'>
+                            <Form className="needs-validation" onSubmit={handleSubmit} noValidate name='programDataForm' autocomplete="off">
                                 <Row>
                                     <FormGroup className="col-md-6">
                                         <Label htmlFor="company">{i18n.t('static.program.program')}<span class="red Reqasterisk">*</span></Label>
@@ -324,7 +324,7 @@ export default class StepSix extends Component {
 
 
                                     <FormGroup className="col-md-6">
-                                        <Label htmlFor="company"> Arrived to Received Lead Time<span class="red Reqasterisk">*</span></Label>
+                                        <Label htmlFor="company"> {i18n.t('static.shipment.arrivedToreceivedLeadTime')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
                                             onBlur={handleBlur}
                                             valid={!errors.arrivedToDeliveredLeadTime && this.props.items.program.arrivedToDeliveredLeadTime != ''}
@@ -346,6 +346,7 @@ export default class StepSix extends Component {
                                             invalid={touched.programNotes && !!errors.programNotes}
                                             bsSize="sm"
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
+                                            maxLength={600}
                                             type="textarea" name="programNotes" id="programNotes" />
                                         <FormFeedback className="red">{errors.programNotes}</FormFeedback>
                                     </FormGroup>

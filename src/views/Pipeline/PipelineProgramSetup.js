@@ -274,7 +274,7 @@ export default class PipelineProgramSetup extends Component {
                         document.getElementById('stepEight').style.display = 'none';
                     }
                     else {
-                        alert("Saved rows with vaild data. To proceed further validated all rows and continue.");
+                        alert(i18n.t('static.message.saveValidData'));
                     }
 
                     // } else {
@@ -322,7 +322,7 @@ export default class PipelineProgramSetup extends Component {
                         document.getElementById('stepEight').style.display = 'none';
                     }
                     else {
-                        alert("Saved rows with vaild data. To proceed further validated all rows and continue.");
+                        alert(i18n.t('static.message.saveValidData'));
                     }
                 } else {
                     this.setState({
@@ -360,7 +360,7 @@ export default class PipelineProgramSetup extends Component {
 
                     }
                     else {
-                        alert("Saved rows with vaild data. To proceed further validated all rows and continue.");
+                        alert(i18n.t('static.message.saveValidData'));
                         // this.setState({ pipelineProgramSetupPer: 75, inventoryStatus: true });
                         // document.getElementById('stepOne').style.display = 'none';
                         // document.getElementById('stepTwo').style.display = 'none';
@@ -404,7 +404,7 @@ export default class PipelineProgramSetup extends Component {
                         document.getElementById('stepSeven').style.display = 'none';
                         document.getElementById('stepEight').style.display = 'none';
                     } else {
-                        alert("Saved rows with vaild data. To proceed further validated all rows and continue.");
+                        alert(i18n.t('static.message.saveValidData'));
                     }
 
                 } else {
@@ -441,7 +441,7 @@ export default class PipelineProgramSetup extends Component {
                         document.getElementById('stepSeven').style.display = 'block';
                         document.getElementById('stepEight').style.display = 'none';
                     } else {
-                        alert("Saved rows with vaild data. To proceed further validated all rows and continue.");
+                        alert(i18n.t('static.message.saveValidData'));
                     }
 
                 } else {
@@ -478,7 +478,7 @@ export default class PipelineProgramSetup extends Component {
                         document.getElementById('stepSeven').style.display = 'none';
                         document.getElementById('stepEight').style.display = 'block';
                     } else {
-                        alert("Saved rows with vaild data. To proceed further validated all rows and continue.");
+                        alert(i18n.t('static.message.saveValidData'));
                         // this.setState({ pipelineProgramSetupPer: 100, shipmentStatus: true });
                         // document.getElementById('stepOne').style.display = 'none';
                         // document.getElementById('stepTwo').style.display = 'none';
@@ -841,7 +841,7 @@ export default class PipelineProgramSetup extends Component {
                                         });
                                     } else {
                                         switch (error.response ? error.response.status : "") {
-                
+
                                             case 401:
                                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                                 break;
@@ -911,7 +911,7 @@ export default class PipelineProgramSetup extends Component {
                                                         });
                                                     } else {
                                                         switch (error.response ? error.response.status : "") {
-                                
+
                                                             case 401:
                                                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                                                 break;
@@ -962,7 +962,7 @@ export default class PipelineProgramSetup extends Component {
                                         });
                                     } else {
                                         switch (error.response ? error.response.status : "") {
-                
+
                                             case 401:
                                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                                 break;
@@ -1354,9 +1354,9 @@ export default class PipelineProgramSetup extends Component {
                                             </CardFooter>
                                         </Card>
 
-                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepOne} > <i className="fa fa-angle-double-left"></i> Back</Button>
+                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepOne} > <i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
                                         &nbsp;
-                                        <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.finishedStepTwo}>Save <i className="fa fa-angle-double-right"></i></Button>
+                                        <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.finishedStepTwo}>{i18n.t('static.pipeline.save')} <i className="fa fa-angle-double-right"></i></Button>
                                         &nbsp;
                                     </Col>
                                 </div>
@@ -1380,9 +1380,9 @@ export default class PipelineProgramSetup extends Component {
                                             </CardFooter>*/}
                                         </Card>
 
-                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepTwo} > <i className="fa fa-angle-double-left"></i> Back</Button>
+                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepTwo} > <i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
                                         &nbsp;
-                                        <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.finishedStepThree}>Save <i className="fa fa-angle-double-right"></i></Button>
+                                        <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.finishedStepThree}>{i18n.t('static.pipeline.save')} <i className="fa fa-angle-double-right"></i></Button>
                                         &nbsp;
                                     </Col>
                                 </div>
@@ -1406,9 +1406,9 @@ export default class PipelineProgramSetup extends Component {
 
                                             </CardFooter>*/}
                                         </Card>
-                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepThree} > <i className="fa fa-angle-double-left"></i> Back</Button>
+                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepThree} > <i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
                                         &nbsp;
-                                        <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.finishedStepFour}>Save <i className="fa fa-angle-double-right"></i></Button>
+                                        <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.finishedStepFour}>{i18n.t('static.pipeline.save')} <i className="fa fa-angle-double-right"></i></Button>
                                         &nbsp;
                                     </Col>
                                 </div>
@@ -1432,9 +1432,9 @@ export default class PipelineProgramSetup extends Component {
 
                                             </CardFooter> */}
                                         </Card>
-                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepFour} > <i className="fa fa-angle-double-left"></i> Back</Button>
+                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepFour} > <i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
                                         &nbsp;
-                                        <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.finishedStepFive}>Save <i className="fa fa-angle-double-right"></i></Button>
+                                        <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.finishedStepFive}>{i18n.t('static.pipeline.save')} <i className="fa fa-angle-double-right"></i></Button>
                                         &nbsp;
                                     </Col>
                                 </div>
@@ -1458,9 +1458,9 @@ export default class PipelineProgramSetup extends Component {
 
                                             </CardFooter> */}
                                         </Card>
-                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepFive} > <i className="fa fa-angle-double-left"></i> Back</Button>
+                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepFive} > <i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
                                         &nbsp;
-                                        <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.finishedStepSix}>Save <i className="fa fa-angle-double-right"></i></Button>
+                                        <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.finishedStepSix}>{i18n.t('static.pipeline.save')} <i className="fa fa-angle-double-right"></i></Button>
                                         &nbsp;
                                     </Col>
                                 </div>
@@ -1482,9 +1482,9 @@ export default class PipelineProgramSetup extends Component {
 
                                             </CardFooter> */}
                                         </Card>
-                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepSix} > <i className="fa fa-angle-double-left"></i> Back</Button>
+                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepSix} > <i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
                                         &nbsp;
-                                        <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.finishedStepSeven}>Save <i className="fa fa-angle-double-right"></i></Button>
+                                        <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.finishedStepSeven}>{i18n.t('static.pipeline.save')} <i className="fa fa-angle-double-right"></i></Button>
                                         &nbsp;
                                     </Col>
                                 </div>

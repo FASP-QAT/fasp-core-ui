@@ -218,7 +218,7 @@ export default class AddDimensionComponent extends Component {
                                         setTouched,
                                         handleReset
                                     }) => (
-                                            <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm'>
+                                            <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm' autocomplete="off">
                                                 <CardBody>
 
                                                     <FormGroup>

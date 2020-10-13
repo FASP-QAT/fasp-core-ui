@@ -2294,7 +2294,7 @@ export default class syncPage extends Component {
                           <div className="controls ">
                             <InputGroup>
                               <Input type="textarea"
-                                name="notes" id="notes">
+                                name="notes" maxLength={600} id="notes">
                               </Input>
                             </InputGroup>
                           </div>

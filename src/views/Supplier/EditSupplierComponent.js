@@ -272,7 +272,7 @@ class EditSupplierComponent extends Component {
                                         isValid,
                                         setTouched
                                     }) => (
-                                            <Form onSubmit={handleSubmit} noValidate name='supplierForm'>
+                                            <Form onSubmit={handleSubmit} noValidate name='supplierForm' autocomplete="off">
                                                 <CardBody className="pb-0">
                                                     <FormGroup>
                                                         <Label htmlFor="realmId">{i18n.t('static.supplier.realm')}<span class="red Reqasterisk">*</span></Label>

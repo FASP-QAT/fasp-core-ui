@@ -381,7 +381,7 @@ export default class AddProduct extends Component {
                                                                 required
                                                                 value={this.state.realmId}
                                                             >
-                                                                <option value="">Please select</option>
+                                                                <option value="">{i18n.t('static.common.pleaseSelect')}</option>
                                                                 {realms}
                                                             </Input>
                                                             <FormFeedback className="red">{errors.realmId}</FormFeedback>
@@ -405,7 +405,7 @@ export default class AddProduct extends Component {
                                                                 required
                                                                 value={this.state.productCategoryId}
                                                             >
-                                                                <option value="">Please select</option>
+                                                                <option value="">{i18n.t('static.common.pleaseSelect')}</option>
                                                                 {/* <option value="1">Product Category One</option>
                                                             <option value="2">Product Category Two</option>
                                                             <option value="3">Product Category Three</option> */}
@@ -431,7 +431,7 @@ export default class AddProduct extends Component {
                                                                 required
                                                                 value={this.state.unitId}
                                                             >
-                                                                <option value="">Please select</option>
+                                                                <option value="">{i18n.t('static.common.pleaseSelect')}</option>
                                                                 {units}
                                                             </Input>
                                                             <FormFeedback className="red">{errors.unitId}</FormFeedback>

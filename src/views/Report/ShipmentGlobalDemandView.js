@@ -296,6 +296,7 @@ class ShipmentGlobalDemandView extends Component {
 
             let tableHead = this.state.table1Headers;
             let tableHeadTemp = [];
+            tableHeadTemp.push(i18n.t('static.report.qatPID'));
             tableHeadTemp.push(i18n.t('static.dashboard.product'));
             for (var i = 0; i < tableHead.length; i++) {
                 console.log(tableHead[i])
@@ -308,7 +309,7 @@ class ShipmentGlobalDemandView extends Component {
             for (var item = 0; item < re.length; item++) {
                 let item1 = Object.values(re[item].procurementAgentQty);
                 console.log(item1)
-                A.push([this.addDoubleQuoteToRowContent([(getLabelText(re[item].planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),...item1, re[item].total])])
+                A.push([this.addDoubleQuoteToRowContent([re[item].planningUnit.id,(getLabelText(re[item].planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),...item1, re[item].total])])
             }
             for (var i = 0; i < A.length; i++) {
                 csvRow.push(A[i].join(","))
@@ -404,15 +405,7 @@ class ShipmentGlobalDemandView extends Component {
                 align: 'left'
             })
 
-            // var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-            // doc.text(doc.internal.pageSize.width / 8, 140, planningText)
-
-            // var fundingSourceText = doc.splitTextToSize((i18n.t('static.budget.fundingsource') + ' : ' + this.state.fundingSourceLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-            // doc.text(doc.internal.pageSize.width / 8, 170, fundingSourceText)
-
-            // var statusText = doc.splitTextToSize((i18n.t('static.common.status') + ' : ' + this.state.shipmentStatusLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-            // doc.text(doc.internal.pageSize.width / 8, 200, statusText)
-
+         
         } else {
             doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
                 align: 'left'
@@ -423,47 +416,7 @@ class ShipmentGlobalDemandView extends Component {
             })
 
             var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-            //     doc.text(doc.internal.pageSize.width / 8, 150, planningText)
-            /* let y = 150
-             console.log(doc.internal.pageSize.height)
-             var fundingSourceText = doc.splitTextToSize((i18n.t('static.budget.fundingsource') + ' : ' + this.state.fundingSourceLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-             // doc.text(doc.internal.pageSize.width / 8, 150+(this.state.planningUnitLabels.length*3), fundingSourceText)
-             for (var i = 0; i < fundingSourceText.length; i++) {
-                 if (y > doc.internal.pageSize.height - 100) {
-                     doc.addPage();
-                     y = 80;
- 
-                 }
-                 doc.text(doc.internal.pageSize.width / 8, y, fundingSourceText[i]);
-                 y = y + 10;
-                 console.log(y)
-             }
-             var statusText = doc.splitTextToSize((i18n.t('static.common.status') + ' : ' + this.state.shipmentStatusLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-             //     doc.text(doc.internal.pageSize.width / 8, 150+(this.state.planningUnitLabels.length*3)+(this.state.fundingSourceLabels.lenght*2), statusText)
-             // 
-             y = y + 10;
-             for (var i = 0; i < statusText.length; i++) {
-                 if (y > doc.internal.pageSize.height - 100) {
-                     doc.addPage();
-                     y = 80;
- 
-                 }
-                 doc.text(doc.internal.pageSize.width / 8, y, statusText[i]);
-                 y = y + 10;
-                 console.log(y)
-             }
-             y = y + 10;
-             for (var i = 0; i < planningText.length; i++) {
-                 if (y > doc.internal.pageSize.height - 100) {
-                     doc.addPage();
-                     y = 80;
- 
-                 }
-                 doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
-                 y = y + 10;
-                 console.log(y)
-             }
- */
+         
         }
         doc.setFontSize(8);
         doc.setTextColor("#002f6c");

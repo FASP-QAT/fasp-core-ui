@@ -341,9 +341,10 @@ import RealmService from '../../api/RealmService';
 import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import jexcel from 'jexcel';
+import moment from 'moment';
 import "../../../node_modules/jexcel/dist/jexcel.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from '../../Constants';
+import { DATE_FORMAT_CAP, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from '../../Constants';
 
 const entityname = i18n.t('static.datasourcetype.datasourcetype');
 export default class DataSourceTypeListComponent extends Component {
@@ -412,7 +413,9 @@ export default class DataSourceTypeListComponent extends Component {
             data[0] = dataSourceTypeList[j].dataSourceTypeId
             data[1] = getLabelText(dataSourceTypeList[j].realm.label, this.state.lang)
             data[2] = getLabelText(dataSourceTypeList[j].label, this.state.lang)
-            data[3] = dataSourceTypeList[j].active;
+            data[3] = dataSourceTypeList[j].lastModifiedBy.username;
+            data[4] = (dataSourceTypeList[j].lastModifiedDate ? moment(dataSourceTypeList[j].lastModifiedDate).format(`${DATE_FORMAT_CAP}`) : null)
+            data[5] = dataSourceTypeList[j].active;
 
             dataSourceTypeArray[count] = data;
             count++;
@@ -445,6 +448,16 @@ export default class DataSourceTypeListComponent extends Component {
                 },
                 {
                     title: i18n.t('static.datasourcetype.datasourcetype'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.common.lastModifiedBy'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.common.lastModifiedDate'),
                     type: 'text',
                     readOnly: true
                 },
