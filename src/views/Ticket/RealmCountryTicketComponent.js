@@ -14,7 +14,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import { SPACE_REGEX } from '../../Constants';
 
 const initialValues = {
-    summary: "Add / Update Realm Country",
+    summary: "Add Realm Country",
     realmId: "",
     countryId: "",
     currencyId: "",    
@@ -65,7 +65,7 @@ export default class RealmCountryTicketComponent extends Component {
         super(props);
         this.state = {
             realmCountry: {
-                summary: "Add / Update Realm Country",
+                summary: "Add Realm Country",
                 realmId: "",
                 countryId: "",
                 currencyId: "",                

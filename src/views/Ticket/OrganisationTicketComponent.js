@@ -16,7 +16,7 @@ import classNames from 'classnames';
 import { SPACE_REGEX, ALPHABET_NUMBER_REGEX } from '../../Constants';
 
 const initialValues = {
-    summary: 'Add / Update Organization',
+    summary: 'Add Organization',
     realmId: '',
     realmCountryId: '',
     organisationCode: '',
@@ -73,7 +73,7 @@ export default class OrganisationTicketComponent extends Component {
         super(props);
         this.state = {
             organisation: {
-                summary: "Add / Update Organization",
+                summary: "Add Organization",
                 realmId: "",
                 realmCountryId: [],
                 organisationCode: "",

@@ -12,7 +12,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import { BUDGET_NAME_REGEX, SPACE_REGEX } from '../../Constants';
 
 const initialValues = {
-    summary: "Add / Update Tracer Category",
+    summary: "Add Tracer Category",
     realmName: "",
     tracerCategoryName: "",
     notes: ""
@@ -61,7 +61,7 @@ export default class TracerCategoryTicketComponent extends Component {
         super(props);
         this.state = {
             tracerCategory: {
-                summary: "Add / Update Tracer Category",
+                summary: "Add Tracer Category",
                 realmName: "",
                 tracerCategoryName: "",                
                 notes: ""

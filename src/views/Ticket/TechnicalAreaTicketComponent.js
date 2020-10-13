@@ -17,7 +17,7 @@ import classNames from 'classnames';
 import { SPACE_REGEX, ALPHABET_NUMBER_REGEX } from '../../Constants';
 
 const initialValues = {
-    summary: "Add / Update Technical Area",
+    summary: "Add Technical Area",
     realmName: "",
     countryName: "",
     technicalAreaName: "",
@@ -74,7 +74,7 @@ export default class TechnicalAreaTicketComponent extends Component {
         super(props);
         this.state = {
             technicalArea: {
-                summary: "Add / Update Technical Area",
+                summary: "Add Technical Area",
                 realmName: "",
                 countryName: [],
                 technicalAreaName: "",

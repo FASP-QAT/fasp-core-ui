@@ -11,7 +11,7 @@ import RealmService from '../../api/RealmService';
 import { LABEL_REGEX, SPACE_REGEX } from '../../Constants';
 
 const initialValues = {
-    summary: "Add / Update Funding Source",
+    summary: "Add Funding Source",
     realmName: "",
     fundingSourceName: "",
     fundingSourceCode: "",    
@@ -64,7 +64,7 @@ export default class FundingSourceTicketComponent extends Component {
         super(props);
         this.state = {
             fundingSource: {
-                summary: "Add / Update Funding Source",
+                summary: "Add Funding Source",
                 realmName: "",
                 fundingSourceName: "",
                 fundingSourceCode: "",                

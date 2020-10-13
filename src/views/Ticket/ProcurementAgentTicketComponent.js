@@ -11,7 +11,7 @@ import RealmService from '../../api/RealmService';
 import { SPACE_REGEX } from '../../Constants';
 
 const initialValues = {
-    summary: "Add / Update Procurement Agent",
+    summary: "Add Procurement Agent",
     realmName: "",
     procurementAgentName: '',
     procurementAgentCode: '',
@@ -73,7 +73,7 @@ export default class ProcurementAgentTicketComponent extends Component {
         super(props);
         this.state = {
             procurementAgent: {
-                summary: "Add / Update Procurement Agent",
+                summary: "Add Procurement Agent",
                 realmName: "",
                 procurementAgentName: "",
                 procurementAgentCode: "",

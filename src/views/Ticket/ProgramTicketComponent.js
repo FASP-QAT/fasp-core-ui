@@ -16,7 +16,7 @@ import classNames from 'classnames';
 import { SPACE_REGEX } from '../../Constants';
 
 const initialValues = {
-    summary: "Add / Update Program",
+    summary: "Add Program",
     programName: '',
     programCode: '',
     realmId: '',
@@ -120,7 +120,7 @@ export default class ProgramTicketComponent extends Component {
         super(props);
         this.state = {
             program: {
-                summary: "Add / Update Program",
+                summary: "Add Program",
                 programName: '',
                 programCode: '',
                 realmId: '',

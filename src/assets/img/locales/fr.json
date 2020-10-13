@@ -1152,7 +1152,7 @@
     "static.ticket.subheader": "NOUS SOMMES ICI POUR VOUS AIDER AVEC VOTRE QUESTION",
     "static.ticket.addUpdateMasterData": "Ajouter / mettre à jour les données de base",
     "static.common.bugreport": "Signaler un bug",
-    "static.ticket.requestTo": "Demander une nouvelle / mise à jour de...",
+    "static.ticket.requestTo": "Demande à...",
     "static.ticket.uploadScreenshot": "Téléchargez une capture d'écran",
     "static.common.description": "La description",
     "static.common.notes": "Remarques",
@@ -1186,5 +1186,9 @@
     "static.program.deleteLocalProgramSuccess" : "Programme (s) local (s) supprimé (s) avec succès",
     "static.common.delete": "Effacer",
     "static.program.deleteLocalProgram" : "Supprimer le programme local",
-    "static.ticket.unavailableDropdownValidationText": " - si vous ne voyez pas le ? vous voulez, veuillez soumettre un ticket pour cet article."
+    "static.ticket.unavailableDropdownValidationText": " - si vous ne voyez pas le ? vous voulez, veuillez soumettre un ticket pour cet article.",
+    "static.ticket.requestNewTo": "Demander un nouveau à...",
+    "static.ticket.requestUpdateTo": "Demander une mise à jour de...",
+    "static.ticket.addMasters": "Ajouter des maîtres",
+    "static.ticket.editMasters": "Modifier les maîtres"
 }

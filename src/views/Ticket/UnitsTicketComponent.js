@@ -12,7 +12,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import { UNIT_LABEL_REGEX, SPACE_REGEX } from '../../Constants';
 
 const initialValues = {
-    summary: "Add / Update Units",
+    summary: "Add Unit",
     dimension: "",
     unit: "",
     unitCode: "",        
@@ -65,7 +65,7 @@ export default class UnitsTicketComponent extends Component {
         super(props);
         this.state = {
             units: {
-                summary: 'Add / Update Units',
+                summary: 'Add Unit',
                 dimension: "",
                 unit: "",
                 unitCode: "",

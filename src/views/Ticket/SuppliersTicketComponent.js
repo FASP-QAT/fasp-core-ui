@@ -11,7 +11,7 @@ import RealmService from '../../api/RealmService';
 import { SPACE_REGEX } from '../../Constants';
 
 const initialValues = {
-    summary: "Add / Update Manufacturer",
+    summary: "Add Manufacturer",
     realmName: "",
     supplierName: "",    
     notes: ""
@@ -59,7 +59,7 @@ export default class SuppliersTicketComponent extends Component {
         super(props);
         this.state = {
             suppliers: {
-                summary: "Add / Update Manufacturer",
+                summary: "Add Manufacturer",
                 realmName: "",
                 supplierName: "",                
                 notes: ""

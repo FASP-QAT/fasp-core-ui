@@ -10,9 +10,12 @@ import JiraTikcetService from '../../api/JiraTikcetService';
 import RealmCountryService from '../../api/RealmCountryService';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { SPACE_REGEX } from '../../Constants';
+import ProgramService from '../../api/ProgramService';
+import HealthAreaService from '../../api/HealthAreaService';
 
 const initialValues = {
-    summary: "Add / Update Realm Country Region",
+    summary: "Add Realm Country Region",
+    realmId: '',
     realmCountryId: "",
     regionId: "",
     capacity: "",
@@ -25,6 +28,8 @@ const validationSchema = function (values) {
         summary: Yup.string()
             .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.common.summarytext')),
+        realmId: Yup.string()
+            .required(i18n.t('static.common.realmtext').concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?',i18n.t('static.realm.realmName')))),
         realmCountryId: Yup.string()
             .required(i18n.t('static.healtharea.countrytext')),
         regionId: Yup.string()
@@ -68,7 +73,8 @@ export default class RealmCountryRegionTicketComponent extends Component {
         super(props);
         this.state = {
             realmCountryRegion: {
-                summary: "Add / Update Realm Country Region",
+                summary: "Add Realm Country Region",
+                realmId: '',
                 realmCountryId: "",
                 regionId: "",
                 capacity: "",
@@ -78,17 +84,26 @@ export default class RealmCountryRegionTicketComponent extends Component {
             message: '',
             realmCountries: [],
             realmCountryId: '',
-            loading: false
+            loading: false,
+            realmId: '',
+            realmList: []
         }
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.getDependentLists = this.getDependentLists.bind(this);
     }
 
     dataChange(event) {
         let { realmCountryRegion } = this.state
         if (event.target.name == "summary") {
             realmCountryRegion.summary = event.target.value;
+        }
+        if (event.target.name == "realmId") {            
+            realmCountryRegion.realmId = event.target.options[event.target.selectedIndex].innerHTML;
+            // this.setState({
+                this.state.realmId = event.target.value
+            // })            
         }
         if (event.target.name == "realmCountryId") {
             realmCountryRegion.realmCountryId = event.target.options[event.target.selectedIndex].innerHTML;
@@ -113,9 +128,29 @@ export default class RealmCountryRegionTicketComponent extends Component {
         }, () => { })
     };
 
+
+    getDependentLists(e) {        
+        AuthenticationService.setupAxiosInterceptors();        
+
+        ProgramService.getRealmCountryList(e.target.value)
+            .then(response => {                
+                if (response.status == 200) {
+                    this.setState({
+                        realmCountries: response.data
+                    })
+                } else {
+                    this.setState({
+                        message: response.data.messageCode
+                    })
+                }
+            })
+        
+    }
+
     touchAll(setTouched, errors) {
         setTouched({
             summary: true,
+            realmId: true,
             realmCountryId: true,
             regionId: true,
             capacity: true,
@@ -141,11 +176,11 @@ export default class RealmCountryRegionTicketComponent extends Component {
 
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
-        RealmCountryService.getRealmCountryListAll()
+        HealthAreaService.getRealmList()
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        realmCountries: response.data
+                        realmList: response.data
                     })
                 } else {
                     this.setState({
@@ -171,6 +206,7 @@ export default class RealmCountryRegionTicketComponent extends Component {
         // realmCountryRegion.summary = '';
         realmCountryRegion.realmCountryId = '';
         realmCountryRegion.regionId = '';
+        realmCountryRegion.realmId = '';
         realmCountryRegion.capacity = '';
         realmCountryRegion.glnCode = '';
         realmCountryRegion.notes = '';
@@ -181,8 +217,18 @@ export default class RealmCountryRegionTicketComponent extends Component {
     }
 
     render() {
-
+        const { realmList } = this.state;
         const { realmCountries } = this.state;
+
+        let realms = realmList.length > 0
+            && realmList.map((item, i) => {
+                return (
+                    <option key={i} value={item.realmId}>
+                        {getLabelText(item.label, this.state.lang)}
+                    </option>
+                )
+            }, this);
+
         let realmCountryList = realmCountries.length > 0
             && realmCountries.map((item, i) => {
                 return (
@@ -263,6 +309,21 @@ export default class RealmCountryRegionTicketComponent extends Component {
                                             value={this.state.realmCountryRegion.summary}
                                             required />
                                         <FormFeedback className="red">{errors.summary}</FormFeedback>
+                                    </FormGroup>
+                                    < FormGroup >
+                                        <Label for="realmId">{i18n.t('static.program.realm')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="select" name="realmId" id="realmId"
+                                            bsSize="sm"
+                                            valid={!errors.realmId && this.state.realmCountryRegion.realmId != ''}
+                                            invalid={touched.realmId && !!errors.realmId}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.getDependentLists(e)}}
+                                            onBlur={handleBlur}
+                                            value={this.state.realmId}
+                                            required >
+                                                <option value="">{i18n.t('static.common.select')}</option>
+                                                {realms}
+                                            </Input>
+                                        <FormFeedback className="red">{errors.realmId}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup>
                                         <Label for="realmCountryId">{i18n.t('static.dashboard.realmcountry')}<span class="red Reqasterisk">*</span></Label>

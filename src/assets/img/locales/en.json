@@ -1228,7 +1228,7 @@
     "static.common.preview": "Preview",
     "static.report.problemTransDetails": "Problem Trans Details",
     "static.report.updateStatus": "Update Details",
-    "static.ticket.requestTo": "Request a new / update to...",
+    "static.ticket.requestTo": "Request to...",
     "static.ticket.drodownvaluenotfound": "Note: If you don't see the desired XYZ you want, submit a ticket for this item",
     "static.logoutError": "Logged out error",
     "static.realm.mapRealmCountry": "Map Realm Country",
@@ -1311,5 +1311,9 @@
     "static.quantimed.quantimedPlanningUnitLabel": "Quantimed Planning Unit",
     "static.quantimed.duplicateQATPlanningUnitFound": "Duplicate QAT Planning Unit Found",
     "static.quantimed.duplicateQATPlanningUnit": "Duplicate QAT Planning Unit",
-    "static.quantimed.consumptionDate": "Consumption Date"
+    "static.quantimed.consumptionDate": "Consumption Date",
+    "static.ticket.requestNewTo": "Request a new to...",
+    "static.ticket.requestUpdateTo": "Request a update to...",
+    "static.ticket.addMasters": "Add Masters",
+    "static.ticket.editMasters": "Edit Masters"
 }

@@ -12,7 +12,7 @@ import ForecastingUnitService from '../../api/ForecastingUnitService';
 import { SPACE_REGEX } from '../../Constants';
 
 const initialValues = {
-    summary: "Add / Update Planning Unit",
+    summary: "Add Planning Unit",
     planningUnitDesc: "",
     forecastingUnitDesc: "",
     unit: "",
@@ -68,7 +68,7 @@ export default class PlanningUnitTicketComponent extends Component {
         super(props);
         this.state = {
             planningUnit: {
-                summary: 'Add / Update Planning Unit',
+                summary: 'Add Planning Unit',
                 planningUnitDesc: '',
                 forecastingUnitDesc: '',
                 unit: '',

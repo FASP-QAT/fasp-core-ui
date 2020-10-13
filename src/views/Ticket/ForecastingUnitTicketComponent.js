@@ -15,7 +15,7 @@ import RealmService from '../../api/RealmService';
 import { SPACE_REGEX } from '../../Constants';
 
 const initialValues = {
-    summary: "Add / Update Forecasting Unit",
+    summary: "Add Forecasting Unit",
     realm: "",
     tracerCategory: "",
     productCategory: "",
@@ -76,7 +76,7 @@ export default class ForecastingUnitTicketComponent extends Component {
         super(props);
         this.state = {
             forecastingUnit: {
-                summary: 'Add / Update Forecasting Unit',
+                summary: 'Add Forecasting Unit',
                 realm: "",
                 tracerCategory: "",
                 productCategory: "",

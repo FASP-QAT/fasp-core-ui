@@ -10,7 +10,7 @@ import JiraTikcetService from '../../api/JiraTikcetService';
 import { SPACE_REGEX } from '../../Constants';
 
 const initialValues = {
-    summary: "Add / Update Realm",
+    summary: "Add Realm",
     realmName: "",
     realmCode: "",
     minMosMinGaurdrail: "",
@@ -76,7 +76,7 @@ export default class RealmTicketComponent extends Component {
         super(props);
         this.state = {
             realm: {
-                summary: "Add / Update Realm",
+                summary: "Add Realm",
                 realmName: "",
                 realmCode: "",
                 minMosMinGaurdrail: "",

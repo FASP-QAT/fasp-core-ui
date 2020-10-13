@@ -880,7 +880,7 @@
     "static.ticket.help": "Socorro",
     "static.ticket.header": "QAT Central de Ajuda",
     "static.ticket.subheader": "ESTAMOS AQUI PARA AJUDÁ-LO COM SUA PERGUNTA",
-    "static.ticket.requestTo": "Solicite uma nova / atualização para...",
+    "static.ticket.requestTo": "Pedido para...",
     "static.ticket.uploadScreenshot": "Faça upload de uma captura de tela",
     "static.ticket.drodownvaluenotfound": "Nota: Se você não vir o XYZ desejado que deseja, envie um tíquete para este item",
     "static.procurementAgent.UnitPerContainer": "Unidade por contêiner",
@@ -910,5 +910,9 @@
     "static.common.delete": "Excluir",
     "static.program.deleteLocalProgram": "Excluir programa local",
     "static.login.login": "Conecte-se",
-    "static.ticket.unavailableDropdownValidationText": " - se você não vê o ? você quer, por favor, envie um ticket para esse item."
+    "static.ticket.unavailableDropdownValidationText": " - se você não vê o ? você quer, por favor, envie um ticket para esse item.",
+    "static.ticket.requestNewTo": "Solicite um novo para...",
+    "static.ticket.requestUpdateTo": "Solicite uma atualização para...",
+    "static.ticket.addMasters": "Adicionar Masters",
+    "static.ticket.editMasters": "Editar Masters"
 }

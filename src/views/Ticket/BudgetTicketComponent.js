@@ -18,7 +18,7 @@ import CurrencyService from '../../api/CurrencyService';
 import getLabelText from '../../CommonComponent/getLabelText';
 
 const initialValues = {
-    summary: "Add / Update Budget",
+    summary: "static.common.add",
     programName: "",
     fundingSourceName: "",
     budgetName: "",
@@ -80,7 +80,7 @@ export default class BudgetTicketComponent extends Component {
         super(props);
         this.state = {
             budget: {
-                summary: "Add / Update Budget",
+                summary: "Add Budget",
                 programName: "",
                 fundingSourceName: "",
                 budgetName: "",

@@ -12,7 +12,7 @@ import CurrencyService from '../../api/CurrencyService';
 import { LABEL_REGEX, ALPHABETS_REGEX, SPACE_REGEX } from '../../Constants';
 
 const initialValues = {
-    summary: "Add / Update Country",
+    summary: "Add Country",
     countryName: "",
     countryCode: "",
     countryCode2: "",
@@ -69,7 +69,7 @@ export default class CountryTicketComponent extends Component {
         super(props);
         this.state = {
             country: {
-                summary: 'Add / Update Country',
+                summary: 'Add Country',
                 countryName: "",
                 countryCode: "",
                 countryCode2: "",

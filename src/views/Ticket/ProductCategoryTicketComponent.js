@@ -12,7 +12,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import { SPACE_REGEX } from '../../Constants';
 
 const initialValues = {
-    summary: "Add / Update Product Category",
+    summary: "Add Product Category",
     realmName: "",
     productCategoryName: "",
     notes: ""
@@ -60,7 +60,7 @@ export default class ProductCategoryTicketComponent extends Component {
         super(props);
         this.state = {
             productCategory: {
-                summary: "Add / Update Product Category",
+                summary: "Add Product Category",
                 realmName: "",
                 productCategoryName: "",                
                 notes: ""

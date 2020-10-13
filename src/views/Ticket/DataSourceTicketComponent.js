@@ -14,7 +14,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import { SPACE_REGEX } from '../../Constants';
 
 const initialValues = {
-    summary: "Add / Update Data Source",
+    summary: "Add Data Source",
     realmName: "",
     programName: "",
     dataSourceType: "",
@@ -69,7 +69,7 @@ export default class DataSourceTicketComponent extends Component {
         super(props);
         this.state = {
             dataSource: {
-                summary: "Add / Update Data Source",
+                summary: "Add Data Source",
                 realmName: "",
                 programName: "",
                 dataSourceType: "",
