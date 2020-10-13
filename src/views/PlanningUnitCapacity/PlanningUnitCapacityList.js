@@ -303,7 +303,9 @@ export default class PlanningUnitCapacityList extends Component {
             data[3] = (planningUnitCapacityList[j].startDate ? moment(planningUnitCapacityList[j].startDate).format(`${DATE_FORMAT_CAP}`) : null)
             data[4] = (planningUnitCapacityList[j].stopDate ? moment(planningUnitCapacityList[j].stopDate).format(`${DATE_FORMAT_CAP}`) : null)
             data[5] = planningUnitCapacityList[j].capacity
-            data[6] = planningUnitCapacityList[j].active;
+            data[6] = planningUnitCapacityList[j].lastModifiedBy.username;
+            data[7] = (planningUnitCapacityList[j].lastModifiedDate ? moment(planningUnitCapacityList[j].lastModifiedDate).format(`${DATE_FORMAT_CAP}`) : null)
+            data[8] = planningUnitCapacityList[j].active;
             planningUnitCapacityArray[count] = data;
             count++;
         }
@@ -350,6 +352,16 @@ export default class PlanningUnitCapacityList extends Component {
                 },
                 {
                     title: i18n.t('static.planningunit.capacity'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.common.lastModifiedBy'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.common.lastModifiedDate'),
                     type: 'text',
                     readOnly: true
                 },

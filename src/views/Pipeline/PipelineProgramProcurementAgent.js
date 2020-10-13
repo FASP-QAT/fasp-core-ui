@@ -40,7 +40,7 @@ export default class PipelineProgramProcurementAgent extends Component {
             } else {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, (list[y].pipelineProcurementAgent).concat(" Does not exist."));
+                this.el.setComments(col, (list[y].pipelineProcurementAgent).concat(i18n.t('static.message.notExist')));
             }
         }
 

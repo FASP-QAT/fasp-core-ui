@@ -21,7 +21,7 @@ const initialValues = {
 }
 
 const validationSchema = function (values) {
-    return Yup.object().shape({        
+    return Yup.object().shape({
         summary: Yup.string()
             .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.common.summarytext')),
@@ -29,7 +29,7 @@ const validationSchema = function (values) {
             .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.product.productnametext')),
         forecastingUnitDesc: Yup.string()
-            .required(i18n.t('static.planningunit.forcastingunittext').concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?',i18n.t('static.forecastingunit.forecastingunit')))),
+            .required(i18n.t('static.planningunit.forcastingunittext').concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?', i18n.t('static.forecastingunit.forecastingunit')))),
         unit: Yup.string()
             .required(i18n.t('static.procurementUnit.validUnitIdText')),
         multiplier: Yup.number()
@@ -75,51 +75,51 @@ export default class PlanningUnitTicketComponent extends Component {
                 multiplier: '',
                 notes: ''
             },
-            message : '',
+            message: '',
             units: [],
             forecastingUnits: [],
             unitId: '',
             forecastingUnitId: '',
             loading: false
-        }        
-        this.dataChange = this.dataChange.bind(this);        
+        }
+        this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
-    }  
+    }
 
-    dataChange(event) {        
+    dataChange(event) {
         let { planningUnit } = this.state
-        if(event.target.name == "summary") {
+        if (event.target.name == "summary") {
             planningUnit.summary = event.target.value;
         }
-        if(event.target.name == "planningUnitDesc") {
+        if (event.target.name == "planningUnitDesc") {
             planningUnit.planningUnitDesc = event.target.value;
         }
-        if(event.target.name == "forecastingUnitDesc") {
+        if (event.target.name == "forecastingUnitDesc") {
             planningUnit.forecastingUnitDesc = event.target.options[event.target.selectedIndex].innerHTML;
             this.setState({
-                forecastingUnitId : event.target.value
+                forecastingUnitId: event.target.value
             })
         }
-        if(event.target.name == "unit") {            
+        if (event.target.name == "unit") {
             planningUnit.unit = event.target.options[event.target.selectedIndex].innerHTML;
             this.setState({
-                unitId : event.target.value
+                unitId: event.target.value
             })
         }
-        if(event.target.name == "multiplier") {
+        if (event.target.name == "multiplier") {
             planningUnit.multiplier = event.target.value;
         }
-        if(event.target.name == "notes") {
+        if (event.target.name == "notes") {
             planningUnit.notes = event.target.value;
         }
-        this.setState({       
+        this.setState({
             planningUnit
-        }, () => {})
+        }, () => { })
     };
 
     touchAll(setTouched, errors) {
-        setTouched({            
+        setTouched({
             summary: true,
             planningUnitDesc: true,
             forecastingUnitDesc: true,
@@ -153,7 +153,7 @@ export default class PlanningUnitTicketComponent extends Component {
                         units: response.data
                     })
                     AuthenticationService.setupAxiosInterceptors();
-                    ForecastingUnitService.getForecastingUnitList().then(response => {                        
+                    ForecastingUnitService.getForecastingUnitList().then(response => {
                         this.setState({
                             forecastingUnits: response.data
                         })
@@ -167,13 +167,13 @@ export default class PlanningUnitTicketComponent extends Component {
                             this.hideSecondComponent();
                         })
                 }
-                
+
             })
     }
 
     hideSecondComponent() {
         setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';            
+            document.getElementById('div2').style.display = 'none';
         }, 8000);
     }
 
@@ -182,14 +182,14 @@ export default class PlanningUnitTicketComponent extends Component {
         event.target.className += " was-validated";
     }
 
-    resetClicked() {        
+    resetClicked() {
         let { planningUnit } = this.state;
         // planningUnit.summary = '';
         planningUnit.planningUnitDesc = '';
         planningUnit.forecastingUnitDesc = '';
         planningUnit.unit = '';
         planningUnit.multiplier = '';
-        planningUnit.notes = '';   
+        planningUnit.notes = '';
         this.setState({
             planningUnit
         },
@@ -219,163 +219,163 @@ export default class PlanningUnitTicketComponent extends Component {
 
         return (
             <div className="col-md-12">
-                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>                
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
                 <h4>{i18n.t('static.planningunit.planningunit')}</h4>
                 <br></br>
                 <div style={{ display: this.state.loading ? "none" : "block" }}>
-                <Formik
-                    initialValues={initialValues}
-                    validate={validate(validationSchema)}
-                    onSubmit={(values, { setSubmitting, setErrors }) => {   
-                        this.setState({
-                            loading: true
-                        })
-                        JiraTikcetService.addEmailRequestIssue(this.state.planningUnit).then(response => {                                         
-                            console.log("Response :",response.status, ":" ,JSON.stringify(response.data));
-                            if (response.status == 200 || response.status == 201) {
-                                var msg = response.data.key;
-                                this.setState({
-                                    message: msg, loading: false
-                                },
-                                    () => {
-                                        this.resetClicked();
-                                        this.hideSecondComponent();
-                                    })                                
-                            } else {
-                                this.setState({                                    
-                                    message: i18n.t('static.unkownError'), loading: false
-                                },
-                                    () => {                                        
-                                        this.hideSecondComponent();
-                                    })                                
-                            }                            
-                            this.props.togglehelp();
-                            this.props.toggleSmall(this.state.message);
-                        })
-                        .catch(
-                            error => {
-                                this.setState({                                        
-                                    message: i18n.t('static.unkownError'), loading: false
-                                },
-                                () => {                                        
-                                    this.hideSecondComponent();                                     
-                                });                                    
-                            }
-                        );       
-                    }}
-                    render={
-                        ({
-                            values,
-                            errors,
-                            touched,
-                            handleChange,
-                            handleBlur,
-                            handleSubmit,
-                            isSubmitting,
-                            isValid,
-                            setTouched,
-                            handleReset
-                        }) => (
-                                <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm' autocomplete="off">
-                                    < FormGroup >
-                                        <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
-                                        <Input type="text" name="summary" id="summary" readOnly = {true}
-                                        bsSize="sm"
-                                        valid={!errors.summary && this.state.planningUnit.summary != ''}
-                                        invalid={touched.summary && !!errors.summary}
-                                        onChange={(e) => { handleChange(e); this.dataChange(e);}}
-                                        onBlur={handleBlur}
-                                        value={this.state.planningUnit.summary}
-                                        required />
-                                        <FormFeedback className="red">{errors.summary}</FormFeedback>
-                                    </FormGroup>
-                                    < FormGroup >
-                                        <Label for="forecastingUnitDesc">{i18n.t('static.forecastingunit.forecastingunit')}<span class="red Reqasterisk">*</span></Label>
-                                        <Input type="select" name="forecastingUnitDesc" id="forecastingUnitDesc"
-                                        bsSize="sm"
-                                        valid={!errors.forecastingUnitDesc && this.state.planningUnit.forecastingUnitDesc != ''}
-                                        invalid={touched.forecastingUnitDesc && !!errors.forecastingUnitDesc}
-                                        onChange={(e) => { handleChange(e); this.dataChange(e);}}
-                                        onBlur={handleBlur}
-                                        value={this.state.forecastingUnitId}
-                                        required >
-                                            <option value="">{i18n.t('static.common.select')}</option>
-                                            {forecastingUnitList}
-                                        </Input>
-                                        <FormFeedback className="red">{errors.forecastingUnitDesc}</FormFeedback>
-                                    </FormGroup>
-                                    <FormGroup>
-                                        <Label for="multiplier">{i18n.t('static.unit.multiplier')}<span class="red Reqasterisk">*</span></Label>
-                                        <Input type="number" name="multiplier" id="multiplier"
-                                        bsSize="sm"
-                                        valid={!errors.multiplier && this.state.planningUnit.multiplier != ''}
-                                        invalid={touched.multiplier && !!errors.multiplier}
-                                        onChange={(e) => { handleChange(e); this.dataChange(e);}}
-                                        onBlur={handleBlur}
-                                        value={this.state.planningUnit.multiplier}
-                                        required />
-                                        <FormFeedback className="red">{errors.multiplier}</FormFeedback>
-                                    </FormGroup>
-                                    <FormGroup>
-                                        <Label for="planningUnitDesc">{i18n.t('static.planningUnit.planningUnitName')}<span class="red Reqasterisk">*</span></Label>
-                                        <Input type="text" name="planningUnitDesc" id="planningUnitDesc"
-                                        bsSize="sm"
-                                        valid={!errors.planningUnitDesc && this.state.planningUnit.planningUnitDesc != ''}
-                                        invalid={touched.planningUnitDesc && !!errors.planningUnitDesc}
-                                        onChange={(e) => { handleChange(e); this.dataChange(e);}}
-                                        onBlur={handleBlur}
-                                        value={this.state.planningUnit.planningUnitDesc}
-                                        required />
-                                        <FormFeedback className="red">{errors.planningUnitDesc}</FormFeedback>
-                                    </FormGroup>                                    
-                                    <FormGroup>
-                                        <Label for="unit">{i18n.t('static.unit.unit')}<span class="red Reqasterisk">*</span></Label>
-                                        <Input type="select" name="unit" id="unit"
-                                        bsSize="sm"
-                                        valid={!errors.unit && this.state.planningUnit.unit != ''}
-                                        invalid={touched.unit && !!errors.unit}
-                                        onChange={(e) => { handleChange(e); this.dataChange(e);}}
-                                        onBlur={handleBlur}
-                                        value={this.state.unitId}
-                                        required >
-                                            <option value="">{i18n.t('static.common.select')}</option>
-                                            {unitList}
-                                        </Input>
-                                        <FormFeedback className="red">{errors.unit}</FormFeedback>
-                                    </FormGroup>                                                                        
-                                    <FormGroup>
-                                        <Label for="notes">{i18n.t('static.common.notes')}</Label>
-                                        <Input type="textarea" name="notes" id="notes"
-                                        bsSize="sm"
-                                        valid={!errors.notes && this.state.planningUnit.notes != ''}
-                                        invalid={touched.notes && !!errors.notes}
-                                        onChange={(e) => { handleChange(e); this.dataChange(e);}}
-                                        onBlur={handleBlur}
-                                        value={this.state.planningUnit.notes}
-                                        // required 
-                                        />
-                                        <FormFeedback className="red">{errors.notes}</FormFeedback>
-                                    </FormGroup>
-                                    <ModalFooter className="pb-0 pr-0">
-                                    <Button type="button" size="md" color="info" className="mr-1" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
-                                        <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>                                        
-                                        <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                    </ModalFooter>
-                                    {/* <br></br><br></br>
+                    <Formik
+                        initialValues={initialValues}
+                        validate={validate(validationSchema)}
+                        onSubmit={(values, { setSubmitting, setErrors }) => {
+                            this.setState({
+                                loading: true
+                            })
+                            JiraTikcetService.addEmailRequestIssue(this.state.planningUnit).then(response => {
+                                console.log("Response :", response.status, ":", JSON.stringify(response.data));
+                                if (response.status == 200 || response.status == 201) {
+                                    var msg = response.data.key;
+                                    this.setState({
+                                        message: msg, loading: false
+                                    },
+                                        () => {
+                                            this.resetClicked();
+                                            this.hideSecondComponent();
+                                        })
+                                } else {
+                                    this.setState({
+                                        message: i18n.t('static.unkownError'), loading: false
+                                    },
+                                        () => {
+                                            this.hideSecondComponent();
+                                        })
+                                }
+                                this.props.togglehelp();
+                                this.props.toggleSmall(this.state.message);
+                            })
+                                .catch(
+                                    error => {
+                                        this.setState({
+                                            message: i18n.t('static.unkownError'), loading: false
+                                        },
+                                            () => {
+                                                this.hideSecondComponent();
+                                            });
+                                    }
+                                );
+                        }}
+                        render={
+                            ({
+                                values,
+                                errors,
+                                touched,
+                                handleChange,
+                                handleBlur,
+                                handleSubmit,
+                                isSubmitting,
+                                isValid,
+                                setTouched,
+                                handleReset
+                            }) => (
+                                    <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm' autocomplete="off">
+                                        < FormGroup >
+                                            <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
+                                            <Input type="text" name="summary" id="summary" readOnly={true}
+                                                bsSize="sm"
+                                                valid={!errors.summary && this.state.planningUnit.summary != ''}
+                                                invalid={touched.summary && !!errors.summary}
+                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                onBlur={handleBlur}
+                                                value={this.state.planningUnit.summary}
+                                                required />
+                                            <FormFeedback className="red">{errors.summary}</FormFeedback>
+                                        </FormGroup>
+                                        < FormGroup >
+                                            <Label for="forecastingUnitDesc">{i18n.t('static.forecastingunit.forecastingunit')}<span class="red Reqasterisk">*</span></Label>
+                                            <Input type="select" name="forecastingUnitDesc" id="forecastingUnitDesc"
+                                                bsSize="sm"
+                                                valid={!errors.forecastingUnitDesc && this.state.planningUnit.forecastingUnitDesc != ''}
+                                                invalid={touched.forecastingUnitDesc && !!errors.forecastingUnitDesc}
+                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                onBlur={handleBlur}
+                                                value={this.state.forecastingUnitId}
+                                                required >
+                                                <option value="">{i18n.t('static.common.select')}</option>
+                                                {forecastingUnitList}
+                                            </Input>
+                                            <FormFeedback className="red">{errors.forecastingUnitDesc}</FormFeedback>
+                                        </FormGroup>
+                                        <FormGroup>
+                                            <Label for="multiplier">{i18n.t('static.unit.multiplier')}<span class="red Reqasterisk">*</span></Label>
+                                            <Input type="number" name="multiplier" id="multiplier"
+                                                bsSize="sm"
+                                                valid={!errors.multiplier && this.state.planningUnit.multiplier != ''}
+                                                invalid={touched.multiplier && !!errors.multiplier}
+                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                onBlur={handleBlur}
+                                                value={this.state.planningUnit.multiplier}
+                                                required />
+                                            <FormFeedback className="red">{errors.multiplier}</FormFeedback>
+                                        </FormGroup>
+                                        <FormGroup>
+                                            <Label for="planningUnitDesc">{i18n.t('static.planningUnit.planningUnitName')}<span class="red Reqasterisk">*</span></Label>
+                                            <Input type="text" name="planningUnitDesc" id="planningUnitDesc"
+                                                bsSize="sm"
+                                                valid={!errors.planningUnitDesc && this.state.planningUnit.planningUnitDesc != ''}
+                                                invalid={touched.planningUnitDesc && !!errors.planningUnitDesc}
+                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                onBlur={handleBlur}
+                                                value={this.state.planningUnit.planningUnitDesc}
+                                                required />
+                                            <FormFeedback className="red">{errors.planningUnitDesc}</FormFeedback>
+                                        </FormGroup>
+                                        <FormGroup>
+                                            <Label for="unit">{i18n.t('static.unit.unit')}<span class="red Reqasterisk">*</span></Label>
+                                            <Input type="select" name="unit" id="unit"
+                                                bsSize="sm"
+                                                valid={!errors.unit && this.state.planningUnit.unit != ''}
+                                                invalid={touched.unit && !!errors.unit}
+                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                onBlur={handleBlur}
+                                                value={this.state.unitId}
+                                                required >
+                                                <option value="">{i18n.t('static.common.select')}</option>
+                                                {unitList}
+                                            </Input>
+                                            <FormFeedback className="red">{errors.unit}</FormFeedback>
+                                        </FormGroup>
+                                        <FormGroup>
+                                            <Label for="notes">{i18n.t('static.common.notes')}</Label>
+                                            <Input type="textarea" name="notes" id="notes"
+                                                bsSize="sm"
+                                                valid={!errors.notes && this.state.planningUnit.notes != ''}
+                                                invalid={touched.notes && !!errors.notes}
+                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                onBlur={handleBlur}
+                                                value={this.state.planningUnit.notes}
+                                            // required 
+                                            />
+                                            <FormFeedback className="red">{errors.notes}</FormFeedback>
+                                        </FormGroup>
+                                        <ModalFooter className="pb-0 pr-0">
+                                            <Button type="button" size="md" color="info" className="mr-1" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
+                                            <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                            <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                        </ModalFooter>
+                                        {/* <br></br><br></br>
                                     <div className={this.props.className}>
                                         <p>{i18n.t('static.ticket.drodownvaluenotfound')}</p>
                                     </div> */}
-                                </Form>
-                            )} />
-                            </div>
-                            <div style={{ display: this.state.loading ? "block" : "none" }}>
-                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                                    <div class="align-items-center">
-                                        <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-                                        <div class="spinner-border blue ml-4" role="status"></div>
-                                    </div>
-                                </div> 
-                            </div>
+                                    </Form>
+                                )} />
+                </div>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+                            <div class="spinner-border blue ml-4" role="status"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }

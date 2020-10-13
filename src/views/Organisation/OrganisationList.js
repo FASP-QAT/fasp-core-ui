@@ -341,8 +341,9 @@ import paginationFactory from 'react-bootstrap-table2-paginator'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
+import moment from 'moment';
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
-import { JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
+import { DATE_FORMAT_CAP, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
 
 const entityname = i18n.t('static.organisation.organisation');
 
@@ -408,7 +409,9 @@ export default class OrganisationListComponent extends Component {
             data[1] = getLabelText(organisations[j].realm.label, this.state.lang)
             data[2] = getLabelText(organisations[j].label, this.state.lang)
             data[3] = organisations[j].organisationCode
-            data[4] = organisations[j].active;
+            data[4] = organisations[j].lastModifiedBy.username;
+            data[5] = (organisations[j].lastModifiedDate ? moment(organisations[j].lastModifiedDate).format(`${DATE_FORMAT_CAP}`) : null)
+            data[6] = organisations[j].active;
 
             organisationsArray[count] = data;
             count++;
@@ -446,6 +449,16 @@ export default class OrganisationListComponent extends Component {
                 },
                 {
                     title: i18n.t('static.organisation.organisationcode'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.common.lastModifiedBy'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.common.lastModifiedDate'),
                     type: 'text',
                     readOnly: true
                 },
@@ -514,7 +527,7 @@ export default class OrganisationListComponent extends Component {
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-    
+
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -562,7 +575,7 @@ export default class OrganisationListComponent extends Component {
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-    
+
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;

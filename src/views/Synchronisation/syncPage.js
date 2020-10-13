@@ -1186,13 +1186,18 @@ export default class syncPage extends Component {
                                       // If 0 check whether that exists in latest version or not
                                       console.log("oldProgramDataInventory[c].actualQty", oldProgramDataInventory[c].actualQty);
                                       console.log("Katest program data inventory", latestProgramDataInventory);
-                                      var index = latestProgramDataInventory.findIndex(f =>
-                                        f.planningUnit.id == oldProgramDataInventory[c].planningUnit.id &&
-                                        moment(f.inventoryDate).format("YYYY-MM") == moment(oldProgramDataInventory[c].inventoryDate).format("YYYY-MM") &&
-                                        f.region != null && f.region.id != 0 && oldProgramDataInventory[c].region != null && oldProgramDataInventory[c].region.id != 0 && f.region.id == oldProgramDataInventory[c].region.id &&
-                                        (f.actualQty != null && f.actualQty.toString() != "" && f.actualQty != undefined) == (oldProgramDataInventory[c].actualQty != null && oldProgramDataInventory[c].actualQty != "" && oldProgramDataInventory[c].actualQty != undefined) &&
-                                        f.realmCountryPlanningUnit.id == oldProgramDataInventory[c].realmCountryPlanningUnit.id
-                                      );
+                                      var index = 0;
+                                      if (oldProgramDataInventory[c].actualQty != null && oldProgramDataInventory[c].actualQty != "" && oldProgramDataInventory[c].actualQty != undefined) {
+                                        index = latestProgramDataInventory.findIndex(f =>
+                                          f.planningUnit.id == oldProgramDataInventory[c].planningUnit.id &&
+                                          moment(f.inventoryDate).format("YYYY-MM") == moment(oldProgramDataInventory[c].inventoryDate).format("YYYY-MM") &&
+                                          f.region != null && f.region.id != 0 && oldProgramDataInventory[c].region != null && oldProgramDataInventory[c].region.id != 0 && f.region.id == oldProgramDataInventory[c].region.id &&
+                                          (f.actualQty != null && f.actualQty.toString() != "" && f.actualQty != undefined) == (oldProgramDataInventory[c].actualQty != null && oldProgramDataInventory[c].actualQty != "" && oldProgramDataInventory[c].actualQty != undefined) &&
+                                          f.realmCountryPlanningUnit.id == oldProgramDataInventory[c].realmCountryPlanningUnit.id
+                                        );
+                                      } else {
+                                        index = -1;
+                                      }
                                       console.log("Inventory date", oldProgramDataInventory[c].inventoryDate, "index------>", index);
                                       if (index == -1) { // Does not exists
                                         mergedInventoryData.push(oldProgramDataInventory[c]);
@@ -2020,7 +2025,7 @@ export default class syncPage extends Component {
             this.setState({
               isChanged: true
             })
-            console.log("old-->",oldData[j],"Downloaded---->",downloadedData[j],"Latest--->",latestData[j])
+            console.log("old-->", oldData[j], "Downloaded---->", downloadedData[j], "Latest--->", latestData[j])
             if (oldData[j] == downloadedData[j]) {
               var col = (colArr[j]).concat(parseInt(c) + 1);
               elInstance.setValueFromCoords(j, c, latestData[j], true);
@@ -2131,6 +2136,9 @@ export default class syncPage extends Component {
             this.setState({
               isChanged: true
             })
+            console.log("OldData[j", oldData[j]);
+            console.log("DownloadedDara[j", downloadedData[j]);
+            console.log("Latest data[j]", latestData[j]);
             if (oldData[j] == downloadedData[j]) {
               var col = (colArr[j]).concat(parseInt(c) + 1);
               elInstance.setValueFromCoords(j, c, latestData[j], true);
@@ -2286,7 +2294,7 @@ export default class syncPage extends Component {
                           <div className="controls ">
                             <InputGroup>
                               <Input type="textarea"
-                                name="notes" id="notes">
+                                name="notes" maxLength={600} id="notes">
                               </Input>
                             </InputGroup>
                           </div>

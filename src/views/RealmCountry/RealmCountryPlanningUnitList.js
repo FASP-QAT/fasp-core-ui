@@ -298,7 +298,8 @@ import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import { JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from '../../Constants';
+import moment from 'moment';
+import { DATE_FORMAT_CAP, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from '../../Constants';
 const entityname = i18n.t('static.dashboad.planningunitcountry');
 export default class RealmCountryPlanningUnitList extends Component {
 
@@ -343,7 +344,9 @@ export default class RealmCountryPlanningUnitList extends Component {
             data[4] = realmCountryList[j].skuCode;
             data[5] = getLabelText(realmCountryList[j].unit.label, this.state.lang)
             data[6] = realmCountryList[j].multiplier;
-            data[7] = realmCountryList[j].active;
+            data[7] = realmCountryList[j].lastModifiedBy.username;
+            data[8] = (realmCountryList[j].lastModifiedDate ? moment(realmCountryList[j].lastModifiedDate).format(`${DATE_FORMAT_CAP}`) : null)
+            data[9] = realmCountryList[j].active;
 
             realmCountryArray[count] = data;
             count++;
@@ -399,7 +402,18 @@ export default class RealmCountryPlanningUnitList extends Component {
                 },
 
                 {
+                    // title: i18n.t('static.planningUnit.multiplierLabel'),
                     title: i18n.t('static.unit.multiplier'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.common.lastModifiedBy'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.common.lastModifiedDate'),
                     type: 'text',
                     readOnly: true
                 },

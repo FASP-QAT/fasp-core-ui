@@ -264,7 +264,7 @@ console.log("Going to change online")
           </DropdownItem>
           <DropdownItem header tag="div" className="text-center"><b>{i18n.t('static.language.preferredlng')}</b></DropdownItem>
           <DropdownItem onClick={this.changeLanguage.bind(this, 'en')}><i className="flag-icon flag-icon-us"></i>
-            {localStorage.getItem('lang').toString() == 'undefined' || localStorage.getItem('lang').toString() == 'en' ? <b>{i18n.t('static.language.english')}</b> : i18n.t('static.language.english')}
+            {localStorage.getItem('lang')==null||localStorage.getItem('lang').toString() == 'undefined' || localStorage.getItem('lang').toString() == 'en' ? <b>{i18n.t('static.language.english')}</b> : i18n.t('static.language.english')}
           </DropdownItem>
           <DropdownItem onClick={this.changeLanguage.bind(this, 'fr')}><i className="flag-icon flag-icon-wf "></i>{localStorage.getItem('lang').toString() == "fr" ? <b>{i18n.t('static.language.french')}</b> : i18n.t('static.language.french')}</DropdownItem>
           <DropdownItem onClick={this.changeLanguage.bind(this, 'sp')}><i className="flag-icon flag-icon-es"></i> {localStorage.getItem('lang').toString() == "sp" ? <b>{i18n.t('static.language.spanish')}</b> : i18n.t('static.language.spanish')}</DropdownItem>

@@ -236,43 +236,43 @@ class AddprogramPlanningUnit extends Component {
                                                         colWidths: [290, 290, 100, 100, 100, 100, 100, 100, 100, 100, 100],
                                                         columns: [
                                                             {
-                                                                title: 'Product Category',
+                                                                title: i18n.t('static.productCategory.productCategory'),
                                                                 type: 'dropdown',
                                                                 source: productCategoryListNew
                                                             },
                                                             {
-                                                                title: 'Planning Unit',
+                                                                title: i18n.t('static.dashboard.product'),
                                                                 type: 'autocomplete',
                                                                 source: list,
                                                                 filter: this.dropdownFilter
                                                             },
                                                             {
-                                                                title: 'Reorder Frequency In Months',
+                                                                title: i18n.t('static.product.reorderFrequency'),
                                                                 type: 'number',
 
                                                             },
                                                             {
-                                                                title: 'Min Month Of Stock',
+                                                                title: i18n.t('static.product.minMonthOfStock'),
                                                                 type: 'number'
                                                             },
                                                             {
-                                                                title: 'Months In Future For AMC',
+                                                                title: i18n.t('static.program.monthfutureamc'),
                                                                 type: 'number'
                                                             },
                                                             {
-                                                                title: 'Months In Past For AMC',
+                                                                title: i18n.t('static.program.monthpastamc'),
                                                                 type: 'number'
                                                             },
                                                             {
-                                                                title: 'Local Procurment Lead Time(Months)',
+                                                                title: i18n.t('static.product.localProcurementAgentLeadTime'),
                                                                 type: 'number'
                                                             },
                                                             {
-                                                                title: 'Shelf Life(Months)',
+                                                                title: i18n.t('static.report.shelfLife'),
                                                                 type: 'number'
                                                             },
                                                             {
-                                                                title: 'Catalog Price (USD)',
+                                                                title: i18n.t('static.procurementAgentPlanningUnit.catalogPrice'),
                                                                 type: 'number'
                                                             },
                                                             {
@@ -755,7 +755,7 @@ class AddprogramPlanningUnit extends Component {
                         if (planningUnitValue == value && y != i && i > y) {
                             this.el.setStyle(col, "background-color", "transparent");
                             this.el.setStyle(col, "background-color", "yellow");
-                            this.el.setComments(col, "Planning Unit Allready Exists");
+                            this.el.setComments(col, i18n.t('static.message.planningUnitAlreadyExists'));
                             i = -1;
                             valid = false;
                         } else {
@@ -980,7 +980,7 @@ class AddprogramPlanningUnit extends Component {
                     if (planningUnitValue == value && y != i) {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, "Planning Unit Allready Exists");
+                        this.el.setComments(col, i18n.t('static.message.planningUnitAlreadyExists'));
                         this.el.setValueFromCoords(11, y, 1, true);
                         valid = false;
                         i = -1;

@@ -262,7 +262,7 @@ class AddSupplierComponent extends Component {
                     setTouched,
                     handleReset
                   }) => (
-                      <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='supplierForm'>
+                      <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='supplierForm' autocomplete="off">
                         <CardBody>
                           <FormGroup>
                             <Label htmlFor="realmId">{i18n.t('static.supplier.realm')}<span className="red Reqasterisk">*</span></Label>

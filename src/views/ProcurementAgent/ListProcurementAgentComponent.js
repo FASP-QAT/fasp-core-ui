@@ -498,7 +498,8 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from '../../Constants';
+import moment from 'moment';
+import { DATE_FORMAT_CAP, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from '../../Constants';
 
 
 const entityname = i18n.t('static.procurementagent.procurementagent')
@@ -690,7 +691,9 @@ class ListProcurementAgentComponent extends Component {
             data[5] = procurementAgentList[j].submittedToApprovedLeadTime;
             data[6] = procurementAgentList[j].approvedToShippedLeadTime;
             data[7] = (procurementAgentList[j].localProcurementAgent ? i18n.t('static.program.yes') : i18n.t('static.program.no'))
-            data[8] = procurementAgentList[j].active;
+            data[8] = procurementAgentList[j].lastModifiedBy.username;
+            data[9] = (procurementAgentList[j].lastModifiedDate ? moment(procurementAgentList[j].lastModifiedDate).format(`${DATE_FORMAT_CAP}`) : null)
+            data[10] = procurementAgentList[j].active;
 
 
             procurementAgentArray[count] = data;
@@ -748,6 +751,16 @@ class ListProcurementAgentComponent extends Component {
                 },
                 {
                     title: i18n.t('static.procurementAgent.localProcurementAgent'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.common.lastModifiedBy'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.common.lastModifiedDate'),
                     type: 'text',
                     readOnly: true
                 },

@@ -125,8 +125,8 @@ export default class BugReportTicketComponent extends Component {
         let { bugReport } = this.state;
         // bugReport.summary = '';
         bugReport.description = '';
-        bugReport.file= '';
-        bugReport.attachFile= '';
+        bugReport.file = '';
+        bugReport.attachFile = '';
         this.setState({
             bugReport
         },
@@ -136,127 +136,128 @@ export default class BugReportTicketComponent extends Component {
     render() {
 
         return (
-            <div className="col-md-12">                
+            <div className="col-md-12">
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
                 <h4>{i18n.t('static.common.bugreport')}</h4>
                 <br></br>
                 <div style={{ display: this.state.loading ? "none" : "block" }}>
-                <Formik
-                    initialValues={initialValues}
-                    validate={validate(validationSchema)}
-                    onSubmit={(values, { setSubmitting, setErrors }) => {
-                        this.setState({
-                            loading: true
-                        })
-                        this.state.bugReport.summary = "Report a bug";
-                        JiraTikcetService.addBugReportIssue(this.state.bugReport).then(response => {                             
-                            console.log("Response :",response.status, ":" ,JSON.stringify(response.data));
-                            if (response.status == 200 || response.status == 201) {
-                                var msg = response.data.key;
-                                JiraTikcetService.addIssueAttachment(this.state.bugReport, response.data.id).then(response => {
-                                    
-                                });
+                    <Formik
+                        initialValues={initialValues}
+                        validate={validate(validationSchema)}
+                        onSubmit={(values, { setSubmitting, setErrors }) => {
+                            this.setState({
+                                loading: true
+                            })
+                            this.state.bugReport.summary = "Report a bug";
+                            JiraTikcetService.addBugReportIssue(this.state.bugReport).then(response => {
+                                console.log("Response :", response.status, ":", JSON.stringify(response.data));
+                                if (response.status == 200 || response.status == 201) {
+                                    var msg = response.data.key;
+                                    JiraTikcetService.addIssueAttachment(this.state.bugReport, response.data.id).then(response => {
 
-                                this.setState({
-                                    message: msg, loading: false
-                                },
-                                    () => {
-                                        this.resetClicked();
-                                        this.hideSecondComponent();
-                                    })                                
-                            } else {
-                                this.setState({                                    
-                                    message: i18n.t('static.unkownError'), loading: false
-                                },
-                                    () => {                                        
-                                        this.hideSecondComponent();
-                                    })                                
-                            }
-                            this.props.togglehelp();
-                            this.props.toggleSmall(this.state.message);
-                        })
-                        .catch(
-                                error => {
-                                    this.setState({                                        
+                                    });
+
+                                    this.setState({
+                                        message: msg, loading: false
+                                    },
+                                        () => {
+                                            this.resetClicked();
+                                            this.hideSecondComponent();
+                                        })
+                                } else {
+                                    this.setState({
                                         message: i18n.t('static.unkownError'), loading: false
                                     },
-                                    () => {                                        
-                                        this.hideSecondComponent();                                     
-                                    });                                    
+                                        () => {
+                                            this.hideSecondComponent();
+                                        })
                                 }
-                            );
-                    }}
-                    render={
-                        ({
-                            values,
-                            errors,
-                            touched,
-                            handleChange,
-                            handleBlur,
-                            handleSubmit,
-                            isSubmitting,
-                            isValid,
-                            setTouched,
-                            handleReset
-                        }) => (
-                                <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm'>
-                                    < FormGroup >
-                                        <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
-                                        <Input type="text" name="summary" id="summary" readOnly = {true}
-                                            bsSize="sm"
-                                            valid={!errors.summary && this.state.bugReport.summary != ''}
-                                            invalid={touched.summary && !!errors.summary}
-                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                            onBlur={handleBlur}
-                                            value={this.state.bugReport.summary}
-                                            required />
-                                        <FormFeedback className="red">{errors.summary}</FormFeedback>
-                                    </FormGroup>
-                                    <FormGroup>
-                                        <Label for="description">{i18n.t('static.common.description')}<span class="red Reqasterisk">*</span></Label>
-                                        <Input type="textarea" name="description" id="description"
-                                            bsSize="sm"
-                                            valid={!errors.description && this.state.bugReport.description != ''}
-                                            invalid={touched.description && !!errors.description}
-                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                            onBlur={handleBlur}
-                                            value={this.state.bugReport.description}
-                                            required />
-                                        <FormFeedback className="red">{errors.description}</FormFeedback>
-                                    </FormGroup>
-                                    <FormGroup >
-                                        <Col>
-                                            <Label className="uploadfilelable" htmlFor="attachFile">{i18n.t('static.ticket.uploadScreenshot')}<span class="red Reqasterisk">*</span></Label>
-                                        </Col>
-                                        <div className="custom-file">                                            
-                                            <Input type="file" className="custom-file-input" id="attachFile" name="attachFile" accept=".zip,.png,.jpg,.jpeg"
-                                                valid={!errors.attachFile && this.state.bugReport.attachFile != ''}
-                                                invalid={touched.attachFile && !!errors.attachFile}
+                                this.props.togglehelp();
+                                this.props.toggleSmall(this.state.message);
+                            })
+                                .catch(
+                                    error => {
+                                        this.setState({
+                                            message: i18n.t('static.unkownError'), loading: false
+                                        },
+                                            () => {
+                                                this.hideSecondComponent();
+                                            });
+                                    }
+                                );
+                        }}
+                        render={
+                            ({
+                                values,
+                                errors,
+                                touched,
+                                handleChange,
+                                handleBlur,
+                                handleSubmit,
+                                isSubmitting,
+                                isValid,
+                                setTouched,
+                                handleReset
+                            }) => (
+                                    <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm'>
+                                        < FormGroup >
+                                            <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
+                                            <Input type="text" name="summary" id="summary" readOnly={true}
+                                                bsSize="sm"
+                                                valid={!errors.summary && this.state.bugReport.summary != ''}
+                                                invalid={touched.summary && !!errors.summary}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}                                            
-                                            />
-                                            <label className="custom-file-label" id="attachFile">{this.state.bugReport.attachFile}</label>                                            
-                                            <FormFeedback className="red">{errors.attachFile}</FormFeedback>
-                                        </div>
-                                    </FormGroup>
-                                    <ModalFooter className="pr-0 pb-0">
-                                        
-                                        <Button type="button" size="md" color="info" className="mr-1" onClick={this.props.toggleMain}><i className="fa fa-angle-double-left "></i> {i18n.t('static.common.back')}</Button>
-                                        <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                        <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>
-                                       
-                                    </ModalFooter>
-                                </Form>
-                            )} />
-                            </div>
-                            <div style={{ display: this.state.loading ? "block" : "none" }}>
-                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                                    <div class="align-items-center">
-                                        <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-                                        <div class="spinner-border blue ml-4" role="status"></div>
-                                    </div>
-                                </div> 
-                            </div>
+                                                onBlur={handleBlur}
+                                                value={this.state.bugReport.summary}
+                                                required />
+                                            <FormFeedback className="red">{errors.summary}</FormFeedback>
+                                        </FormGroup>
+                                        <FormGroup>
+                                            <Label for="description">{i18n.t('static.common.description')}<span class="red Reqasterisk">*</span></Label>
+                                            <Input type="textarea" name="description" id="description"
+                                                bsSize="sm"
+                                                valid={!errors.description && this.state.bugReport.description != ''}
+                                                invalid={touched.description && !!errors.description}
+                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                onBlur={handleBlur}
+                                                maxLength={600}
+                                                value={this.state.bugReport.description}
+                                                required />
+                                            <FormFeedback className="red">{errors.description}</FormFeedback>
+                                        </FormGroup>
+                                        <FormGroup >
+                                            <Col>
+                                                <Label className="uploadfilelable" htmlFor="attachFile">{i18n.t('static.ticket.uploadScreenshot')}<span class="red Reqasterisk">*</span></Label>
+                                            </Col>
+                                            <div className="custom-file">
+                                                <Input type="file" className="custom-file-input" id="attachFile" name="attachFile" accept=".zip,.png,.jpg,.jpeg"
+                                                    valid={!errors.attachFile && this.state.bugReport.attachFile != ''}
+                                                    invalid={touched.attachFile && !!errors.attachFile}
+                                                    onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                    onBlur={handleBlur}
+                                                />
+                                                <label className="custom-file-label" id="attachFile">{this.state.bugReport.attachFile}</label>
+                                                <FormFeedback className="red">{errors.attachFile}</FormFeedback>
+                                            </div>
+                                        </FormGroup>
+                                        <ModalFooter className="pr-0 pb-0">
+
+                                            <Button type="button" size="md" color="info" className="mr-1" onClick={this.props.toggleMain}><i className="fa fa-angle-double-left "></i> {i18n.t('static.common.back')}</Button>
+                                            <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                            <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>
+
+                                        </ModalFooter>
+                                    </Form>
+                                )} />
+                </div>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+                            <div class="spinner-border blue ml-4" role="status"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }

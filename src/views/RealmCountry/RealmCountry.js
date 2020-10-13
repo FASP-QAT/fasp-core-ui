@@ -762,7 +762,7 @@ class RealmCountry extends Component {
         console.log('hasDuplicate', hasDuplicate);
         if (hasDuplicate) {
             this.setState({
-                message: 'Duplicate Country Found',
+                message: i18n.t('static.country.duplicateCountry'),
                 changedFlag: 0,
 
             },

@@ -888,7 +888,7 @@ class AddRoleComponent extends Component {
                                         setFieldValue,
                                         setFieldTouched
                                     }) => (
-                                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='roleForm'>
+                                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='roleForm' autocomplete="off">
                                                 <CardBody className="pt-2 pb-0">
                                                     <FormGroup>
                                                         <Label for="roleName">{i18n.t('static.role.role')}<span className="red Reqasterisk">*</span> </Label>
