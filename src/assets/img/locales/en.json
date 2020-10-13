@@ -960,7 +960,7 @@
     "static.supplyPlan.qatAdjustment": "QAT Adjustment",
     "static.dashboard.stockstatusacrossplanningunit": "Stock Status (Across Planning Units)",
     "static.supplyPlan.lastinventorydt": "Last Inventory Date",
-    "static.report.withinstock": "Within Stock?",
+    "static.report.withinstock": "Stock Status",
     "static.report.low": "Low Stock",
     "static.report.excess": "Excess Stock",
     "static.report.ok": "Okay",
@@ -996,7 +996,7 @@
     "static.report.timeWindow": "Time window",
     "static.report.validShipmentStatusText": "Select Shipment Status",
     "static.report.plannedBudgetAmt": "Budget allocated to Planned Shipment",
-    "static.report.orderedBudgetAmt": "Budget allocated to Ordered Shipment",
+    "static.report.orderedBudgetAmt": "Budget Allocated to Shipment (Submitted or later)",
     "static.report.remainingBudgetAmt": "Budget remaining",
     "static.report.inmillions": "(in millions)",
     "static.supplyPlan.procurementAgentCannotBeTBD": "Procurement Agent cannot be 'TBD'",
@@ -1283,5 +1283,11 @@
     "static.reports.forecastMetrics.noConsumptionAcrossPeriod":"No months in period contain both forecast and actual consumption",
     "static.reports.forecastMetrics.noConsumption":"Current month does not contain actual consumption and/or* forecasted consumption",
     "static.reports.forecastMetrics.totalConsumptionIs0":"Total actual consumption for last 6 months = 0",
-    "static.report.qatPID":"QAT Product Id"
+    "static.report.qatPID":"QAT Product Id",
+    "static.report.qatPIDFID":"QAT Product Id/Forecast Product Id",
+    "static.report.includeapproved":"Use Approved Supply Plan Only",
+    "static.report.stockout":"Stocked Out",
+    "static.report.lowstock":"Under Stocked",
+    "static.report.okaystock":"Stocked to Plan",
+    "static.report.overstock":"Over Stocked"
 }
