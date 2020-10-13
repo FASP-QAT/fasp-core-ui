@@ -772,7 +772,7 @@
     "static.supplyPlan.index": "Índice",
     "static.pipeline.programData": "Dados do Programa",
     "static.dashboard.programs": "Programas",
-    "static.common.version": "Ver.:",
+    "static.common.version": "VER.:",
     "static.dashboard.supplierLeadTimes": "Prazo de entrega do agente de compras",
     "static.dashboard.shipmentGlobalViewheader": "Demanda global ",
     "static.report.warehouseCapacity": "Capacidade do Armazém",
@@ -914,5 +914,7 @@
     "static.ticket.requestNewTo": "Solicite um novo para...",
     "static.ticket.requestUpdateTo": "Solicite uma atualização para...",
     "static.ticket.addMasters": "Adicionar Masters",
-    "static.ticket.editMasters": "Editar Masters"
+    "static.ticket.editMasters": "Editar Masters",
+    "static.message.alreadyTagged":"Este pedido não. e linha principal no. já estão marcados. Para alterar a marcação, desvincule primeiro e tente.",
+    "static.shipment.linkingsuccess": "Remessa vinculada com sucesso"
 }

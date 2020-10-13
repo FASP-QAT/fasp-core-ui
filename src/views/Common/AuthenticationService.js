@@ -1153,9 +1153,9 @@ class AuthenticationService {
                     break;
                 case "/quantimed/quantimedImport":
                     // if (bfunction.includes("ROLE_BF_ADD_PROBLEM")) {
-                        return true;
+                    return true;
                     // }
-                    break;    
+                    break;
                 default:
                     console.log("default case");
                     return false;
@@ -1214,6 +1214,8 @@ class AuthenticationService {
                         console.log("common component token error");
                         return "/logout/static.message.tokenError";
                     }
+                } else {
+                    return "";
                 }
                 // else {
                 //     console.log("common component user is offline");

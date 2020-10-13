@@ -501,7 +501,7 @@ export default class AddForecastingUnitComponent extends Component {
                                         setTouched,
                                         handleReset
                                     }) => (
-                                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='forecastingUnit'>
+                                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='forecastingUnit' autocomplete="off">
                                                 <CardBody>
                                                     <FormGroup>
                                                         <Label htmlFor="realmId">{i18n.t('static.realm.realm')}<span className="red Reqasterisk">*</span></Label>

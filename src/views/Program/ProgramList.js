@@ -360,10 +360,11 @@ import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import jexcel from 'jexcel';
+import moment from 'moment';
 import RealmCountryService from '../../api/RealmCountryService';
 import "../../../node_modules/jexcel/dist/jexcel.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from "../../Constants";
+import { DATE_FORMAT_CAP, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from "../../Constants";
 
 const entityname = i18n.t('static.program.programMaster');
 export default class ProgramList extends Component {
@@ -450,6 +451,8 @@ export default class ProgramList extends Component {
       data[4] = getLabelText(programList[j].realmCountry.country.label, this.state.lang)
       data[5] = getLabelText(programList[j].organisation.label, this.state.lang)
       data[6] = getLabelText(programList[j].healthArea.label, this.state.lang)
+      data[7] = programList[j].lastModifiedBy.username;
+      data[8] = (programList[j].lastModifiedDate ? moment(programList[j].lastModifiedDate).format(`${DATE_FORMAT_CAP}`) : null)
 
 
       programArray[count] = data;
@@ -502,6 +505,16 @@ export default class ProgramList extends Component {
         },
         {
           title: i18n.t('static.program.healtharea'),
+          type: 'text',
+          readOnly: true
+        },
+        {
+          title: i18n.t('static.common.lastModifiedBy'),
+          type: 'text',
+          readOnly: true
+        },
+        {
+          title: i18n.t('static.common.lastModifiedDate'),
           type: 'text',
           readOnly: true
         },
@@ -715,7 +728,7 @@ export default class ProgramList extends Component {
   }
   buttonFormatter(cell, row) {
     // console.log("-----------", cell);
-    return <Button type="button" size="sm" color="success" onClick={(event) => this.addProductMapping(event, cell)} ><i className="fa fa-check"></i> Add</Button>;
+    return <Button type="button" size="sm" color="success" onClick={(event) => this.addProductMapping(event, cell)} ><i className="fa fa-check"></i> {i18n.t('static.common.add')}</Button>;
   }
   addProductMapping(event, cell) {
     if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROGRAM')) {

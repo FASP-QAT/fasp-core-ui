@@ -404,8 +404,9 @@ import paginationFactory from 'react-bootstrap-table2-paginator';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
+import moment from 'moment';
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
-import { JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from '../../Constants';
+import { DATE_FORMAT_CAP, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from '../../Constants';
 const entityname = i18n.t('static.tracercategory.tracercategory');
 class ListTracerCategoryComponent extends Component {
     constructor(props) {
@@ -438,7 +439,9 @@ class ListTracerCategoryComponent extends Component {
             data[0] = tracerCategoryList[j].tracerCategoryId
             data[1] = getLabelText(tracerCategoryList[j].realm.label, this.state.lang)
             data[2] = getLabelText(tracerCategoryList[j].label, this.state.lang)
-            data[3] = tracerCategoryList[j].active;
+            data[3] = tracerCategoryList[j].lastModifiedBy.username;
+            data[4] = (tracerCategoryList[j].lastModifiedDate ? moment(tracerCategoryList[j].lastModifiedDate).format(`${DATE_FORMAT_CAP}`) : null)
+            data[5] = tracerCategoryList[j].active;
             tracerCategory[count] = data;
             count++;
         }
@@ -470,6 +473,16 @@ class ListTracerCategoryComponent extends Component {
                 },
                 {
                     title: i18n.t('static.tracercategory.tracercategory'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.common.lastModifiedBy'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.common.lastModifiedDate'),
                     type: 'text',
                     readOnly: true
                 },
@@ -634,96 +647,98 @@ class ListTracerCategoryComponent extends Component {
 
         TracerCategoryService.getTracerCategoryListAll()
             .then(response => {
+                console.log("response.data----", response.data);
                 this.setState({
                     tracerCategoryList: response.data,
                     selTracerCategory: response.data
                 },
                     () => {
+                        this.buildJexcel();
 
-                        let tracerCategoryList = this.state.selTracerCategory;
-                        // console.log("tracerCategoryList---->", tracerCategoryList);
-                        let tracerCategory = [];
-                        let count = 0;
+                        // let tracerCategoryList = this.state.selTracerCategory;
+                        // // console.log("tracerCategoryList---->", tracerCategoryList);
+                        // let tracerCategory = [];
+                        // let count = 0;
 
-                        for (var j = 0; j < tracerCategoryList.length; j++) {
-                            data = [];
-                            data[0] = tracerCategoryList[j].tracerCategoryId
-                            data[1] = getLabelText(tracerCategoryList[j].realm.label, this.state.lang)
-                            data[2] = getLabelText(tracerCategoryList[j].label, this.state.lang)
-                            data[3] = tracerCategoryList[j].active;
-                            tracerCategory[count] = data;
-                            count++;
-                        }
-                        // if (tracerCategoryList.length == 0) {
+                        // for (var j = 0; j < tracerCategoryList.length; j++) {
                         //     data = [];
-                        //     tracerCategory[0] = data;
+                        //     data[0] = tracerCategoryList[j].tracerCategoryId
+                        //     data[1] = getLabelText(tracerCategoryList[j].realm.label, this.state.lang)
+                        //     data[2] = getLabelText(tracerCategoryList[j].label, this.state.lang)
+                        //     data[3] = tracerCategoryList[j].active;
+                        //     tracerCategory[count] = data;
+                        //     count++;
                         // }
-                        // console.log("tracerCategory---->", tracerCategory);
-                        this.el = jexcel(document.getElementById("tableDiv"), '');
-                        this.el.destroy();
-                        var json = [];
-                        var data = tracerCategory;
+                        // // if (tracerCategoryList.length == 0) {
+                        // //     data = [];
+                        // //     tracerCategory[0] = data;
+                        // // }
+                        // // console.log("tracerCategory---->", tracerCategory);
+                        // this.el = jexcel(document.getElementById("tableDiv"), '');
+                        // this.el.destroy();
+                        // var json = [];
+                        // var data = tracerCategory;
 
-                        var options = {
-                            data: data,
-                            columnDrag: true,
-                            // colWidths: [150, 150, 100],
-                            colHeaderClasses: ["Reqasterisk"],
-                            columns: [
-                                {
-                                    title: 'tracerCategoryId',
-                                    type: 'hidden',
-                                    readOnly: true
-                                },
-                                {
-                                    title: i18n.t('static.realm.realm'),
-                                    type: (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') ? 'text' : 'hidden'),
-                                    readOnly: true
-                                },
-                                {
-                                    title: i18n.t('static.tracercategory.tracercategory'),
-                                    type: 'text',
-                                    readOnly: true
-                                },
-                                {
-                                    type: 'dropdown',
-                                    title: i18n.t('static.common.status'),
-                                    readOnly: true,
-                                    source: [
-                                        { id: true, name: i18n.t('static.common.active') },
-                                        { id: false, name: i18n.t('static.common.disabled') }
-                                    ]
-                                },
-                            ],
-                            text: {
-                                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}  ${i18n.t('static.jexcel.pages')}`,
-                                show: '',
-                                entries: '',
-                            },
-                            onload: this.loaded,
-                            pagination: JEXCEL_DEFAULT_PAGINATION,
-                            search: true,
-                            columnSorting: true,
-                            tableOverflow: true,
-                            wordWrap: true,
-                            allowInsertColumn: false,
-                            allowManualInsertColumn: false,
-                            allowDeleteRow: false,
-                            onselection: this.selected,
+                        // var options = {
+                        //     data: data,
+                        //     columnDrag: true,
+                        //     // colWidths: [150, 150, 100],
+                        //     colHeaderClasses: ["Reqasterisk"],
+                        //     columns: [
+                        //         {
+                        //             title: 'tracerCategoryId',
+                        //             type: 'hidden',
+                        //             readOnly: true
+                        //         },
+                        //         {
+                        //             title: i18n.t('static.realm.realm'),
+                        //             type: (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') ? 'text' : 'hidden'),
+                        //             readOnly: true
+                        //         },
+                        //         {
+                        //             title: i18n.t('static.tracercategory.tracercategory'),
+                        //             type: 'text',
+                        //             readOnly: true
+                        //         },
+                        //         {
+                        //             type: 'dropdown',
+                        //             title: i18n.t('static.common.status'),
+                        //             readOnly: true,
+                        //             source: [
+                        //                 { id: true, name: i18n.t('static.common.active') },
+                        //                 { id: false, name: i18n.t('static.common.disabled') }
+                        //             ]
+                        //         },
+                        //     ],
+                        //     text: {
+                        //         showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}  ${i18n.t('static.jexcel.pages')}`,
+                        //         show: '',
+                        //         entries: '',
+                        //     },
+                        //     onload: this.loaded,
+                        //     pagination: JEXCEL_DEFAULT_PAGINATION,
+                        //     search: true,
+                        //     columnSorting: true,
+                        //     tableOverflow: true,
+                        //     wordWrap: true,
+                        //     allowInsertColumn: false,
+                        //     allowManualInsertColumn: false,
+                        //     allowDeleteRow: false,
+                        //     onselection: this.selected,
 
 
-                            oneditionend: this.onedit,
-                            copyCompatibility: true,
-                            allowExport: false,
-                            paginationOptions: JEXCEL_PAGINATION_OPTION,
-                            position: 'top',
-                            contextMenu: false
-                        };
-                        var tracerCategoryEl = jexcel(document.getElementById("tableDiv"), options);
-                        this.el = tracerCategoryEl;
-                        this.setState({
-                            tracerCategoryEl: tracerCategoryEl, loading: false
-                        })
+                        //     oneditionend: this.onedit,
+                        //     copyCompatibility: true,
+                        //     allowExport: false,
+                        //     paginationOptions: JEXCEL_PAGINATION_OPTION,
+                        //     position: 'top',
+                        //     contextMenu: false
+                        // };
+                        // var tracerCategoryEl = jexcel(document.getElementById("tableDiv"), options);
+                        // this.el = tracerCategoryEl;
+                        // this.setState({
+                        //     tracerCategoryEl: tracerCategoryEl, loading: false
+                        // })
 
 
 

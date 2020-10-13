@@ -585,7 +585,7 @@ class AddUserComponent extends Component {
                                         setFieldValue,
                                         setFieldTouched
                                     }) => (
-                                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='userForm'>
+                                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='userForm' autocomplete="off">
                                                 <CardBody className="pt-2 pb-0">
                                                     <Input
                                                         type="hidden"
@@ -629,6 +629,7 @@ class AddUserComponent extends Component {
                                                     <FormGroup>
                                                         <Label for="username">{i18n.t('static.user.username')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input type="text"
+                                                            autocomplete="off"
                                                             name="username"
                                                             id="username"
                                                             bsSize="sm"
@@ -644,6 +645,7 @@ class AddUserComponent extends Component {
                                                     <FormGroup>
                                                         <Label for="emailId">{i18n.t('static.user.emailid')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input type="text"
+                                                            autocomplete="off"
                                                             name="emailId"
                                                             id="emailId"
                                                             bsSize="sm"
@@ -660,6 +662,7 @@ class AddUserComponent extends Component {
                                                     <FormGroup>
                                                         <Label for="phoneNumber">{i18n.t('static.user.phoneNumber')}</Label>
                                                         <Input type="text"
+                                                            autocomplete="off"
                                                             name="phoneNumber"
                                                             id="phoneNumber"
                                                             bsSize="sm"

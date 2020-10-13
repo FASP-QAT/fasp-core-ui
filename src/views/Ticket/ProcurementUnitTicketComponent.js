@@ -675,6 +675,7 @@ export default class ProcurementUnitTicketComponent extends Component {
                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                             onBlur={handleBlur}
                                             value={this.state.procurementUnit.notes}
+                                            maxLength={600}
                                             // required 
                                             />
                                         <FormFeedback className="red">{errors.notes}</FormFeedback>

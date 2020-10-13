@@ -233,7 +233,7 @@ class PlanningUnitCountry extends Component {
                                                         source: unitArr
                                                     },
                                                     {
-                                                        title: i18n.t('static.unit.multiplier'),
+                                                        title: i18n.t('static.planningUnit.multiplierLabel'),
                                                         type: 'number',
 
                                                     },
@@ -778,7 +778,7 @@ class PlanningUnitCountry extends Component {
         console.log('hasDuplicate', hasDuplicate);
         if (hasDuplicate) {
             this.setState({
-                message: 'Duplicate Planning Unit Found',
+                message: i18n.t('static.country.duplicatePlanningUnit'),
                 changedFlag: 0,
 
             },
@@ -822,6 +822,9 @@ class PlanningUnitCountry extends Component {
             } else {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
+                // this.el.setValueFromCoords(2, y, value, true);
+                var text = this.el.getValueFromCoords(1, y);
+                this.el.setValueFromCoords(2, y, text, true);
             }
         }
 

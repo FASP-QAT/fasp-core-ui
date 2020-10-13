@@ -178,7 +178,7 @@ export default class AddProductCategory extends React.Component {
             // console.log(enabledNode);
             this.setState({ treeData: enabledNode });
         } else {
-            this.setState({ message: 'Sorry The Parent Is Disabled !' });
+            this.setState({ message: i18n.t('static.productCategory.parentIsDisabled') });
         }
 
     }
@@ -250,16 +250,16 @@ export default class AddProductCategory extends React.Component {
                                 <FormGroup>
                                     <Row>
                                         <Col md={8}>
-                                            <Label for="product category">Product Category Name</Label>
+                                            <Label for="product category">{i18n.t('static.productCategoryName.productCategoryName')}</Label>
                                             <Input type="text" value={this.state.nodename} onChange={this.dataChange} name="newNode" />
                                         </Col>
                                         <Col md={2} style={{ paddingTop: '29px' }}>
-                                            <Button type="button" size="sm" color="success" onClick={this.addNewNode}><i className="fa fa-plus"></i> Add</Button>
+                                            <Button type="button" size="sm" color="success" onClick={this.addNewNode}><i className="fa fa-plus"></i> {i18n.t('static.common.add')}</Button>
                                         </Col>
                                     </Row>
                                 </FormGroup>
                                 <FormGroup>
-                                    <Label for="product category">Product Category Tree</Label>
+                                    <Label for="product category">{i18n.t('static.productCategoryTree.productCategoryTree')}</Label>
                                     <div style={{ height: 450 }}>
                                         <SortableTree
                                             getNodeKey={({ node }) => node.id}

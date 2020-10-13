@@ -446,7 +446,7 @@ export default class AddOrganisationComponent extends Component {
                                         setFieldValue,
                                         setFieldTouched
                                     }) => (
-                                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='organisationForm'>
+                                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='organisationForm' autocomplete="off">
                                                 <CardBody>
 
                                                     <FormGroup>

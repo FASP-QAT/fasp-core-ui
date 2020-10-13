@@ -278,6 +278,7 @@ class EditBudgetComponent extends Component {
         if (event.target.name === "budgetAmt") {
             // var chnageValue = this.CommaFormatted(event.target.value);
             // budget.budgetAmt = chnageValue;
+
             budget.budgetAmt = event.target.value;
         }
         // if (event.target.name === "startDate") {
@@ -352,8 +353,9 @@ class EditBudgetComponent extends Component {
                                     })
                                     let { budget } = this.state;
 
-                                    var amount = this.state.budget.budgetAmt.replace(/,/g, '');
-                                    budget.budgetAmt = amount;
+                                    // var amount = this.state.budget.budgetAmt.replace(/,/g, '');
+                                    // budget.budgetAmt = amount;
+                                    budget.budgetAmt = this.state.budget.budgetAmt;
 
                                     var startDate = moment(this.state.budget.startDate).format("YYYY-MM-DD");
                                     budget.startDate = startDate;
@@ -427,7 +429,7 @@ class EditBudgetComponent extends Component {
                                         isValid,
                                         setTouched
                                     }) => (
-                                            <Form onSubmit={handleSubmit} noValidate name='budgetForm'>
+                                            <Form onSubmit={handleSubmit} noValidate name='budgetForm' autocomplete="off">
                                                 <CardBody>
 
                                                     <FormGroup>
@@ -682,7 +684,7 @@ class EditBudgetComponent extends Component {
                                                             id="notes"
                                                             bsSize="sm"
                                                             onChange={(e) => { this.dataChange(e) }}
-
+                                                            maxLength={600}
                                                             type="textarea"
                                                         />
                                                         <FormFeedback className="red"></FormFeedback>
@@ -693,7 +695,7 @@ class EditBudgetComponent extends Component {
 
                                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
                                                         <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>Update</Button>
+                                                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                                         &nbsp;
                                                     </FormGroup>
                                                 </CardFooter>

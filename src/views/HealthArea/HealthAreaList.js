@@ -353,7 +353,8 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
-import { JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
+import moment from 'moment';
+import { DATE_FORMAT_CAP, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
 
 const entityname = i18n.t('static.healtharea.healtharea');
 export default class HealthAreaListComponent extends Component {
@@ -386,7 +387,9 @@ export default class HealthAreaListComponent extends Component {
             data[1] = getLabelText(healthAreas[j].realm.label, this.state.lang)
             data[2] = getLabelText(healthAreas[j].label, this.state.lang)
             data[3] = healthAreas[j].healthAreaCode
-            data[4] = healthAreas[j].active;
+            data[4] = healthAreas[j].lastModifiedBy.username;
+            data[5] = (healthAreas[j].lastModifiedDate ? moment(healthAreas[j].lastModifiedDate).format(`${DATE_FORMAT_CAP}`) : null)
+            data[6] = healthAreas[j].active;
             healthAreasArray[count] = data;
             count++;
         }
@@ -423,6 +426,16 @@ export default class HealthAreaListComponent extends Component {
                 },
                 {
                     title: i18n.t('static.technicalArea.technicalAreaDisplayName'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.common.lastModifiedBy'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.common.lastModifiedDate'),
                     type: 'text',
                     readOnly: true
                 },

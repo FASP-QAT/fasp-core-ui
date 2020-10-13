@@ -354,7 +354,7 @@ export default class EditForecastingUnitComponent extends Component {
                                         isValid,
                                         setTouched
                                     }) => (
-                                            <Form onSubmit={handleSubmit} noValidate name='forecastingUnitForm'>
+                                            <Form onSubmit={handleSubmit} noValidate name='forecastingUnitForm' autocomplete="off">
                                                 <CardBody className="pb-0">
                                                     <FormGroup>
                                                         <Label htmlFor="realmId">{i18n.t('static.realm.realm')}<span class="red Reqasterisk">*</span></Label>

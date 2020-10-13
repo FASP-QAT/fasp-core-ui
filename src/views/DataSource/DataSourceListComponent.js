@@ -519,8 +519,9 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
+import moment from 'moment';
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
-import { JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from '../../Constants';
+import { DATE_FORMAT_CAP, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from '../../Constants';
 
 
 const entityname = i18n.t('static.datasource.datasource');
@@ -648,7 +649,9 @@ export default class DataSourceListComponent extends Component {
             data[2] = getLabelText(dataSourceList[j].dataSourceType.label, this.state.lang)
             data[3] = getLabelText(dataSourceList[j].label, this.state.lang)
             data[4] = getLabelText(dataSourceList[j].program.label, this.state.lang)
-            data[5] = dataSourceList[j].active;
+            data[5] = dataSourceList[j].lastModifiedBy.username;
+            data[6] = (dataSourceList[j].lastModifiedDate ? moment(dataSourceList[j].lastModifiedDate).format(`${DATE_FORMAT_CAP}`) : null)
+            data[7] = dataSourceList[j].active;
             dataSourceArray[count] = data;
             count++;
         }
@@ -690,6 +693,16 @@ export default class DataSourceListComponent extends Component {
                 },
                 {
                     title: i18n.t('static.dataSource.program'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.common.lastModifiedBy'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.common.lastModifiedDate'),
                     type: 'text',
                     readOnly: true
                 },

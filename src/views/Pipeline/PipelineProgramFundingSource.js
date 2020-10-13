@@ -40,7 +40,7 @@ export default class PipelineProgramFundingSource extends Component {
             } else {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, (list[y].pipelineFundingSource).concat(" Does not exist."));
+                this.el.setComments(col, (list[y].pipelineFundingSource).concat(i18n.t('static.message.notExist')));
             }
         }
 

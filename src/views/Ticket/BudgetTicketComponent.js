@@ -34,9 +34,9 @@ const validationSchema = function (values) {
             .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.common.summarytext')),
         programName: Yup.string()
-            .required(i18n.t('static.budget.programtext').concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?',i18n.t('static.budget.program')))),
+            .required(i18n.t('static.budget.programtext').concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?', i18n.t('static.budget.program')))),
         fundingSourceName: Yup.string()
-            .required(i18n.t('static.fundingSource.selectFundingSource').concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?',i18n.t('static.budget.fundingsource')))),
+            .required(i18n.t('static.fundingSource.selectFundingSource').concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?', i18n.t('static.budget.fundingsource')))),
         budgetName: Yup.string()
             .required(i18n.t('static.budget.budgetamountdesc')),
         // budgetCode: Yup.string()
@@ -120,14 +120,14 @@ export default class BudgetTicketComponent extends Component {
         if (event.target.name === "programName") {
             budget.programName = event.target.options[event.target.selectedIndex].innerHTML;
             this.setState({
-                programId : event.target.value
-            })            
+                programId: event.target.value
+            })
         }
-        if (event.target.name === "fundingSourceName") {            
+        if (event.target.name === "fundingSourceName") {
             budget.fundingSourceName = event.target.options[event.target.selectedIndex].innerHTML;
             this.setState({
-                fundingSourceId : event.target.value
-            }) 
+                fundingSourceId: event.target.value
+            })
         }
         if (event.target.name === "budgetAmount") {
             budget.budgetAmount = event.target.value;
@@ -135,11 +135,11 @@ export default class BudgetTicketComponent extends Component {
         if (event.target.name === "budgetCode") {
             budget.budgetCode = event.target.value.toUpperCase();
         }
-        if (event.target.name === "currency") {            
+        if (event.target.name === "currency") {
             budget.currency = event.target.options[event.target.selectedIndex].innerHTML;
             this.setState({
-                currencyId : event.target.value
-            }) 
+                currencyId: event.target.value
+            })
         }
         if (event.target.name == "notes") {
             budget.notes = event.target.value;
@@ -311,242 +311,242 @@ export default class BudgetTicketComponent extends Component {
                 <h4>{i18n.t('static.dashboard.budget')}</h4>
                 <br></br>
                 <div style={{ display: this.state.loading ? "none" : "block" }}>
-                <Formik
-                    initialValues={initialValues}
-                    validate={validate(validationSchema)}
-                    onSubmit={(values, { setSubmitting, setErrors }) => {
-                        this.setState({
-                            loading: true
-                        })
-                        JiraTikcetService.addEmailRequestIssue(this.state.budget).then(response => {                                         
-                            console.log("Response :",response.status, ":" ,JSON.stringify(response.data));
-                            if (response.status == 200 || response.status == 201) {
-                                var msg = response.data.key;
-                                this.setState({
-                                    message: msg, loading: false
-                                },
-                                    () => {
-                                        this.resetClicked();
-                                        this.hideSecondComponent();
-                                    })                                
-                            } else {
-                                this.setState({                                    
-                                    message: i18n.t('static.unkownError'), loading: false
-                                },
-                                    () => {                                        
-                                        this.hideSecondComponent();
-                                    })                                
-                            }                            
-                            this.props.togglehelp();
-                            this.props.toggleSmall(this.state.message);
-                        })
-                        .catch(
-                            error => {
-                                this.setState({                                        
-                                    message: i18n.t('static.unkownError'), loading: false
-                                },
-                                () => {                                        
-                                    this.hideSecondComponent();                                     
-                                });                                    
-                            }
-                        );
-                    }}
-                    render={
-                        ({
-                            values,
-                            errors,
-                            touched,
-                            handleChange,
-                            handleBlur,
-                            handleSubmit,
-                            isSubmitting,
-                            isValid,
-                            setTouched,
-                            handleReset
-                        }) => (
-                                <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm' autocomplete="off">
-                                    < FormGroup >
-                                        <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
-                                        <Input type="text" name="summary" id="summary" readOnly = {true}
-                                            bsSize="sm"
-                                            valid={!errors.summary && this.state.budget.summary != ''}
-                                            invalid={touched.summary && !!errors.summary}
-                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                            onBlur={handleBlur}
-                                            value={this.state.budget.summary}
-                                            required />
-                                        <FormFeedback className="red">{errors.summary}</FormFeedback>
-                                    </FormGroup>
+                    <Formik
+                        initialValues={initialValues}
+                        validate={validate(validationSchema)}
+                        onSubmit={(values, { setSubmitting, setErrors }) => {
+                            this.setState({
+                                loading: true
+                            })
+                            JiraTikcetService.addEmailRequestIssue(this.state.budget).then(response => {
+                                console.log("Response :", response.status, ":", JSON.stringify(response.data));
+                                if (response.status == 200 || response.status == 201) {
+                                    var msg = response.data.key;
+                                    this.setState({
+                                        message: msg, loading: false
+                                    },
+                                        () => {
+                                            this.resetClicked();
+                                            this.hideSecondComponent();
+                                        })
+                                } else {
+                                    this.setState({
+                                        message: i18n.t('static.unkownError'), loading: false
+                                    },
+                                        () => {
+                                            this.hideSecondComponent();
+                                        })
+                                }
+                                this.props.togglehelp();
+                                this.props.toggleSmall(this.state.message);
+                            })
+                                .catch(
+                                    error => {
+                                        this.setState({
+                                            message: i18n.t('static.unkownError'), loading: false
+                                        },
+                                            () => {
+                                                this.hideSecondComponent();
+                                            });
+                                    }
+                                );
+                        }}
+                        render={
+                            ({
+                                values,
+                                errors,
+                                touched,
+                                handleChange,
+                                handleBlur,
+                                handleSubmit,
+                                isSubmitting,
+                                isValid,
+                                setTouched,
+                                handleReset
+                            }) => (
+                                    <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm' autocomplete="off">
+                                        < FormGroup >
+                                            <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
+                                            <Input type="text" name="summary" id="summary" readOnly={true}
+                                                bsSize="sm"
+                                                valid={!errors.summary && this.state.budget.summary != ''}
+                                                invalid={touched.summary && !!errors.summary}
+                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                onBlur={handleBlur}
+                                                value={this.state.budget.summary}
+                                                required />
+                                            <FormFeedback className="red">{errors.summary}</FormFeedback>
+                                        </FormGroup>
 
-                                    <FormGroup>
-                                        <Label htmlFor="programName">{i18n.t('static.budget.program')}<span className="red Reqasterisk">*</span></Label>
-                                        <Input
-                                            type="select"
-                                            name="programName"
-                                            id="programName"
-                                            bsSize="sm"
-                                            valid={!errors.programName && this.state.budget.programName != ''}
-                                            invalid={touched.programName && !!errors.programName}
-                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                            onBlur={handleBlur}
-                                            required
-                                            value={this.state.programId}
-                                        >
-                                            <option value="">{i18n.t('static.common.select')}</option>
-                                            {programList}
-                                        </Input>
-                                        <FormFeedback className="red">{errors.programName}</FormFeedback>
-                                    </FormGroup>
-                                    <FormGroup>
-                                        <Label htmlFor="fundingSourceName">{i18n.t('static.budget.fundingsource')}<span className="red Reqasterisk">*</span></Label>
-                                        <Input
-                                            type="select"
-                                            name="fundingSourceName"
-                                            id="fundingSourceName"
-                                            bsSize="sm"
-                                            valid={!errors.fundingSourceName && this.state.budget.fundingSourceName != ''}
-                                            invalid={touched.fundingSourceName && !!errors.fundingSourceName}
-                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                            onBlur={handleBlur}
-                                            required
-                                            value={this.state.fundingSourceId}
-                                        >
-                                            <option value="">{i18n.t('static.common.select')}</option>
-                                            {fundingSourceList}
-                                        </Input>
-                                        <FormFeedback className="red">{errors.fundingSourceName}</FormFeedback>
-                                    </FormGroup>
-                                    <FormGroup>
-                                        <Label for="budgetName">{i18n.t('static.budget.budget')}<span className="red Reqasterisk">*</span></Label>
-                                        <Input type="text"
-                                            name="budgetName"
-                                            id="budgetName"
-                                            bsSize="sm"
-                                            valid={!errors.budgetName && this.state.budget.budgetName != ''}
-                                            invalid={touched.budgetName && !!errors.budgetName}
-                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                            onBlur={handleBlur}
-                                            value={this.state.budget.budgetName}
-                                            required />
-                                        <FormFeedback className="red">{errors.budgetName}</FormFeedback>
-                                    </FormGroup>
-                                    <FormGroup>
-                                        <Label for="budget">{i18n.t('static.budget.budgetCode')}</Label>
-                                        <Input type="text"
-                                            name="budgetCode"
-                                            id="budgetCode"
-                                            bsSize="sm"
-                                            // valid={!errors.budgetCode && this.state.budget.budgetCode != ''}
-                                            // invalid={touched.budgetCode && !!errors.budgetCode}
-                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                            onBlur={handleBlur}
-                                            value={this.state.budget.budgetCode}
+                                        <FormGroup>
+                                            <Label htmlFor="programName">{i18n.t('static.budget.program')}<span className="red Reqasterisk">*</span></Label>
+                                            <Input
+                                                type="select"
+                                                name="programName"
+                                                id="programName"
+                                                bsSize="sm"
+                                                valid={!errors.programName && this.state.budget.programName != ''}
+                                                invalid={touched.programName && !!errors.programName}
+                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                onBlur={handleBlur}
+                                                required
+                                                value={this.state.programId}
+                                            >
+                                                <option value="">{i18n.t('static.common.select')}</option>
+                                                {programList}
+                                            </Input>
+                                            <FormFeedback className="red">{errors.programName}</FormFeedback>
+                                        </FormGroup>
+                                        <FormGroup>
+                                            <Label htmlFor="fundingSourceName">{i18n.t('static.budget.fundingsource')}<span className="red Reqasterisk">*</span></Label>
+                                            <Input
+                                                type="select"
+                                                name="fundingSourceName"
+                                                id="fundingSourceName"
+                                                bsSize="sm"
+                                                valid={!errors.fundingSourceName && this.state.budget.fundingSourceName != ''}
+                                                invalid={touched.fundingSourceName && !!errors.fundingSourceName}
+                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                onBlur={handleBlur}
+                                                required
+                                                value={this.state.fundingSourceId}
+                                            >
+                                                <option value="">{i18n.t('static.common.select')}</option>
+                                                {fundingSourceList}
+                                            </Input>
+                                            <FormFeedback className="red">{errors.fundingSourceName}</FormFeedback>
+                                        </FormGroup>
+                                        <FormGroup>
+                                            <Label for="budgetName">{i18n.t('static.budget.budget')}<span className="red Reqasterisk">*</span></Label>
+                                            <Input type="text"
+                                                name="budgetName"
+                                                id="budgetName"
+                                                bsSize="sm"
+                                                valid={!errors.budgetName && this.state.budget.budgetName != ''}
+                                                invalid={touched.budgetName && !!errors.budgetName}
+                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                onBlur={handleBlur}
+                                                value={this.state.budget.budgetName}
+                                                required />
+                                            <FormFeedback className="red">{errors.budgetName}</FormFeedback>
+                                        </FormGroup>
+                                        <FormGroup>
+                                            <Label for="budget">{i18n.t('static.budget.budgetCode')}</Label>
+                                            <Input type="text"
+                                                name="budgetCode"
+                                                id="budgetCode"
+                                                bsSize="sm"
+                                                // valid={!errors.budgetCode && this.state.budget.budgetCode != ''}
+                                                // invalid={touched.budgetCode && !!errors.budgetCode}
+                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                onBlur={handleBlur}
+                                                value={this.state.budget.budgetCode}
                                             // required 
                                             />
-                                        <FormFeedback className="red">{errors.budgetCode}</FormFeedback>
-                                    </FormGroup>
-                                    <FormGroup>
-                                        <Label htmlFor="currency">{i18n.t("static.country.currency")}<span className="red Reqasterisk">*</span></Label>
-                                        <Input
-                                            type="select"
-                                            name="currency"
-                                            id="currency"
-                                            bsSize="sm"
-                                            valid={!errors.currency && this.state.budget.currency != ''}
-                                            invalid={touched.currency && !!errors.currency}
-                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                            onBlur={handleBlur}
-                                            required
-                                            value={this.state.currencyId}
-                                        >
-                                            <option value="">{i18n.t('static.common.select')}</option>
-                                            {currencyList}
-                                        </Input>
-                                        <FormFeedback className="red">{errors.currency}</FormFeedback>
-                                    </FormGroup>
-                                    <FormGroup>
-                                        <Label for="budgetAmount">{i18n.t('static.budget.budgetamount')}<span className="red Reqasterisk">*</span></Label>
-                                        <Input
-                                            type="number"
-                                            name="budgetAmount"
-                                            id="budgetAmount"
-                                            bsSize="sm"
-                                            valid={!errors.budgetAmount && this.state.budget.budgetAmount != ''}
-                                            invalid={touched.budgetAmount && !!errors.budgetAmount}
-                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                            onBlur={handleBlur}                                            
-                                            value={this.state.budget.budgetAmount}
-                                            required />
-                                        <FormFeedback className="red">{errors.budgetAmount}</FormFeedback>
-                                    </FormGroup>
-                                    <FormGroup>
-                                        <Label for="startDate">{i18n.t('static.common.startdate')}</Label>
-                                        <DatePicker
-                                            id="startDate"
-                                            name="startDate"
-                                            bsSize="sm"
-                                            minDate={this.addMonths(new Date(), -6)}
-                                            selected={this.state.budget.startDate}
-                                            onChange={(date) => { this.dataChangeDate(date) }}
-                                            placeholderText={DATE_PLACEHOLDER_TEXT}
-                                            className="form-control-sm form-control date-color"
-                                            disabledKeyboardNavigation
-                                            autoComplete={"off"}
-                                            dateFormat={DATE_FORMAT_SM}
-                                        />
-                                    </FormGroup>
-                                    <FormGroup>
-                                        <Label for="stopDate">{i18n.t('static.common.stopdate')}</Label>
-                                        <DatePicker
-                                            id="stopDate"
-                                            name="stopDate"
-                                            bsSize="sm"
-                                            minDate={this.state.budget.startDate}
-                                            selected={this.state.budget.stopDate}
-                                            onChange={(date) => { this.dataChangeEndDate(date) }}
-                                            placeholderText={DATE_PLACEHOLDER_TEXT}
-                                            className="form-control-sm form-control date-color"
-                                            disabledKeyboardNavigation
-                                            autoComplete={"off"}
-                                            dateFormat={DATE_FORMAT_SM}
-                                        />
-                                    </FormGroup>
+                                            <FormFeedback className="red">{errors.budgetCode}</FormFeedback>
+                                        </FormGroup>
+                                        <FormGroup>
+                                            <Label htmlFor="currency">{i18n.t("static.country.currency")}<span className="red Reqasterisk">*</span></Label>
+                                            <Input
+                                                type="select"
+                                                name="currency"
+                                                id="currency"
+                                                bsSize="sm"
+                                                valid={!errors.currency && this.state.budget.currency != ''}
+                                                invalid={touched.currency && !!errors.currency}
+                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                onBlur={handleBlur}
+                                                required
+                                                value={this.state.currencyId}
+                                            >
+                                                <option value="">{i18n.t('static.common.select')}</option>
+                                                {currencyList}
+                                            </Input>
+                                            <FormFeedback className="red">{errors.currency}</FormFeedback>
+                                        </FormGroup>
+                                        <FormGroup>
+                                            <Label for="budgetAmount">{i18n.t('static.budget.budgetamount')}<span className="red Reqasterisk">*</span></Label>
+                                            <Input
+                                                type="number"
+                                                name="budgetAmount"
+                                                id="budgetAmount"
+                                                bsSize="sm"
+                                                valid={!errors.budgetAmount && this.state.budget.budgetAmount != ''}
+                                                invalid={touched.budgetAmount && !!errors.budgetAmount}
+                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                onBlur={handleBlur}
+                                                value={this.state.budget.budgetAmount}
+                                                required />
+                                            <FormFeedback className="red">{errors.budgetAmount}</FormFeedback>
+                                        </FormGroup>
+                                        <FormGroup>
+                                            <Label for="startDate">{i18n.t('static.common.startdate')}</Label>
+                                            <DatePicker
+                                                id="startDate"
+                                                name="startDate"
+                                                bsSize="sm"
+                                                minDate={this.addMonths(new Date(), -6)}
+                                                selected={this.state.budget.startDate}
+                                                onChange={(date) => { this.dataChangeDate(date) }}
+                                                placeholderText={DATE_PLACEHOLDER_TEXT}
+                                                className="form-control-sm form-control date-color"
+                                                disabledKeyboardNavigation
+                                                autoComplete={"off"}
+                                                dateFormat={DATE_FORMAT_SM}
+                                            />
+                                        </FormGroup>
+                                        <FormGroup>
+                                            <Label for="stopDate">{i18n.t('static.common.stopdate')}</Label>
+                                            <DatePicker
+                                                id="stopDate"
+                                                name="stopDate"
+                                                bsSize="sm"
+                                                minDate={this.state.budget.startDate}
+                                                selected={this.state.budget.stopDate}
+                                                onChange={(date) => { this.dataChangeEndDate(date) }}
+                                                placeholderText={DATE_PLACEHOLDER_TEXT}
+                                                className="form-control-sm form-control date-color"
+                                                disabledKeyboardNavigation
+                                                autoComplete={"off"}
+                                                dateFormat={DATE_FORMAT_SM}
+                                            />
+                                        </FormGroup>
 
-                                    <FormGroup>
-                                        <Label for="notes">{i18n.t('static.common.notes')}</Label>
-                                        <Input type="textarea" name="notes" id="notes"
-                                            bsSize="sm"
-                                            valid={!errors.notes && this.state.budget.notes != ''}
-                                            invalid={touched.notes && !!errors.notes}
-                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                            onBlur={handleBlur}
-                                            value={this.state.budget.notes}
+                                        <FormGroup>
+                                            <Label for="notes">{i18n.t('static.common.notes')}</Label>
+                                            <Input type="textarea" name="notes" id="notes"
+                                                bsSize="sm"
+                                                valid={!errors.notes && this.state.budget.notes != ''}
+                                                invalid={touched.notes && !!errors.notes}
+                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                onBlur={handleBlur}
+                                                value={this.state.budget.notes}
                                             // required 
                                             />
-                                        <FormFeedback className="red">{errors.notes}</FormFeedback>
-                                    </FormGroup>
-                                    <ModalFooter className="pb-0 pr-0">
-                                   
-                                        <Button type="button" size="md" color="info" className="mr-1" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
-                                        <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                        <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>
-                                    
-                                    </ModalFooter>
-                                    {/* <br></br><br></br> */}
-                                    {/* <div className={this.props.className}>
+                                            <FormFeedback className="red">{errors.notes}</FormFeedback>
+                                        </FormGroup>
+                                        <ModalFooter className="pb-0 pr-0">
+
+                                            <Button type="button" size="md" color="info" className="mr-1" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
+                                            <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                            <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>
+
+                                        </ModalFooter>
+                                        {/* <br></br><br></br> */}
+                                        {/* <div className={this.props.className}>
                                         <p>{i18n.t('static.ticket.drodownvaluenotfound')}</p>
                                     </div> */}
-                                </Form>
-                            )} />
-                            </div>
-                            <div style={{ display: this.state.loading ? "block" : "none" }}>
-                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                                    <div class="align-items-center">
-                                        <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-                                        <div class="spinner-border blue ml-4" role="status"></div>
-                                    </div>
-                                </div> 
-                            </div>
+                                    </Form>
+                                )} />
+                </div>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+                            <div class="spinner-border blue ml-4" role="status"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }

@@ -630,7 +630,7 @@ export default class EditProgram extends Component {
                                         setFieldTouched
                                     }) => (
 
-                                            <Form onSubmit={handleSubmit} noValidate name='programForm'>
+                                            <Form onSubmit={handleSubmit} noValidate name='programForm' autocomplete="off">
                                                 {/* <CardHeader>
                                                     <strong>{i18n.t('static.common.editEntity', { entityname })}</strong>
                                                 </CardHeader> */}
@@ -781,6 +781,7 @@ export default class EditProgram extends Component {
                                                             bsSize="sm"
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
+                                                            maxLength={600}
                                                             type="textarea" name="programNotes" id="programNotes" />
                                                         <FormFeedback>{errors.programNotes}</FormFeedback>
 

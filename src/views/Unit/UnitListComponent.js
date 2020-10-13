@@ -354,8 +354,9 @@ import getLabelText from '../../CommonComponent/getLabelText.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
+import moment from 'moment';
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
-import { JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
+import { DATE_FORMAT_CAP, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
 
 // import { HashRouter, Route, Switch } from 'react-router-dom';
 const entityname = i18n.t('static.unit.unit');
@@ -471,7 +472,9 @@ export default class UnitListComponent extends Component {
             data[1] = getLabelText(unitList[j].label, this.state.lang)
             data[2] = unitList[j].unitCode;
             data[3] = getLabelText(unitList[j].dimension.label, this.state.lang)
-            data[4] = unitList[j].active;
+            data[4] = unitList[j].lastModifiedBy.username;
+            data[5] = (unitList[j].lastModifiedDate ? moment(unitList[j].lastModifiedDate).format(`${DATE_FORMAT_CAP}`) : null)
+            data[6] = unitList[j].active;
 
             unitListArray[count] = data;
             count++;
@@ -513,6 +516,16 @@ export default class UnitListComponent extends Component {
                     readOnly: true
                 },
                 {
+                    title: i18n.t('static.common.lastModifiedBy'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.common.lastModifiedDate'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
                     type: 'dropdown',
                     title: i18n.t('static.common.status'),
                     readOnly: true,
@@ -529,7 +542,7 @@ export default class UnitListComponent extends Component {
                 entries: '',
             },
             onload: this.loaded,
-            pagination:JEXCEL_DEFAULT_PAGINATION,
+            pagination: JEXCEL_DEFAULT_PAGINATION,
             search: true,
             columnSorting: true,
             tableOverflow: true,

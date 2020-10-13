@@ -35,7 +35,7 @@ const validationSchema = function (values) {
     healthAreaCode: Yup.string()
       // .matches(ALPHABET_NUMBER_REGEX, i18n.t('static.message.alphabetnumerallowed'))
       .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly'))
-      .max(6, 'Display name length should be 6')
+      .max(6, i18n.t('static.organisation.organisationcodemax6digittext'))
       .required(i18n.t('static.common.displayName')),
     realmCountryId: Yup.string()
       .required(i18n.t('static.program.validcountrytext'))
@@ -469,7 +469,7 @@ export default class AddHealthAreaComponent extends Component {
                     setFieldValue,
                     setFieldTouched
                   }) => (
-                      <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='healthAreaForm'>
+                      <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='healthAreaForm' autocomplete="off">
                         <CardBody>
 
                           <FormGroup>
