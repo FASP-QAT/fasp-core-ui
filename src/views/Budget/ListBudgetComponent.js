@@ -981,8 +981,11 @@ class ListBudgetComponent extends Component {
       .then(response => {
         if (response.status == 200) {
           console.log("funding source after status 200--->" + response.data)
+          // this.setState({
+          //   fundingSourceList: response.data
+          // })
           this.setState({
-            fundingSourceList: response.data
+            fundingSourceList: response.data.filter(c => (c.allowedInBudget == true || c.allowedInBudget == "true"))
           })
         } else {
           this.setState({ message: response.data.messageCode, loading: false })

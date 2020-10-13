@@ -1702,16 +1702,10 @@ export default class ManualTagging extends Component {
                                         }
                                     </ToolkitProvider>
                                 </div>
-<<<<<<< HEAD
-                                {this.state.reason != "" && this.state.reason != 1 && <div style={{ color: 'red' }}>{i18n.t('static.common.note')} : {this.state.reason}</div>}
-                                <div style={{ color: 'red' }} >
-                                    {this.state.result}</div>
-=======
                                 <h5> {this.state.reason != "" && this.state.reason != 1 && <div style={{ color: 'red' }}>Note : {this.state.reason}</div>}</h5>
                                 <h5><div style={{ color: 'red' }} >
                                     {this.state.result}</div></h5>
                                 <h5 style={{ color: 'red' }}>{i18n.t(this.state.alreadyLinkedmessage)}</h5>
->>>>>>> dev
                             </ModalBody>
                             <ModalFooter>
 

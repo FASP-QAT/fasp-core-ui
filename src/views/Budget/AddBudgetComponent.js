@@ -341,7 +341,9 @@ class AddBudgetComponent extends Component {
         FundingSourceService.getFundingSourceListAll()
             .then(response => {
                 this.setState({
-                    fundingSources: response.data, loading: false
+                    // fundingSources: response.data
+                    fundingSources: response.data.filter(c => (c.allowedInBudget == true || c.allowedInBudget == "true"))
+                    , loading: false
                 })
             }).catch(
                 error => {
