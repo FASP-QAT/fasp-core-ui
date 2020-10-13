@@ -193,8 +193,10 @@ export default class AddProblem extends Component {
                             <Label htmlFor="currencyId">Problem</Label>
                             <Input
                                 type="textarea"
+                                maxLength={600}
                                 name="programNotes"
                                 id="programNotes"
+                                autocomplete="off"
                             />
 
                             {/* <FormFeedback className="red">{errors.currencyId}</FormFeedback> */}

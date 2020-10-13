@@ -65,7 +65,7 @@ export default class PipelineProgramShipment extends Component {
                 valid = false;
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, (list[y].planningUnit).concat(" Does not exist."));
+                this.el.setComments(col, (list[y].planningUnit).concat(i18n.t('static.message.notExist')));
             }
             var col = ("B").concat(parseInt(y) + 1);
             var value = (this.el.getRowData(y)[1]).toString();
@@ -76,7 +76,7 @@ export default class PipelineProgramShipment extends Component {
                 valid = false;
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, (list[y].dataSource).concat(" Does not exist."));
+                this.el.setComments(col, (list[y].dataSource).concat(i18n.t('static.message.notExist')));
             }
 
             var col = ("C").concat(parseInt(y) + 1);
@@ -89,7 +89,7 @@ export default class PipelineProgramShipment extends Component {
                 valid = false;
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, (list[y].procurementAgent).concat(" Does not exist."));
+                this.el.setComments(col, (list[y].procurementAgent).concat(i18n.t('static.message.notExist')));
             }
             var col = ("D").concat(parseInt(y) + 1);
             var value = (this.el.getRowData(y)[3]).toString();
@@ -100,7 +100,7 @@ export default class PipelineProgramShipment extends Component {
                 valid = false;
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, (list[y].fundingSource).concat(" Does not exist."));
+                this.el.setComments(col, (list[y].fundingSource).concat(i18n.t('static.message.notExist')));
             }
             var col = ("E").concat(parseInt(y) + 1);
             var value = (this.el.getRowData(y)[4]).toString();
@@ -112,7 +112,7 @@ export default class PipelineProgramShipment extends Component {
                 valid = false;
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, (list[y].shipmentStatus).concat(" Does not exist."));
+                this.el.setComments(col, (list[y].shipmentStatus).concat(i18n.t('static.message.notExist')));
             }
             var col = ("F").concat(parseInt(y) + 1);
             var value = (this.el.getRowData(y)[5]).toString();
@@ -1358,10 +1358,10 @@ export default class PipelineProgramShipment extends Component {
                     <div id="shipmenttableDiv">
                     </div>
                     <div className="ml-2" >
-                        <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.props.previousToStepFour} > <i className="fa fa-angle-double-left"></i> Back</Button>
+                        <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.props.previousToStepFour} > <i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
                         &nbsp;
-                                       {this.state.changedData && <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.SubmitShipment}>Save<i className="fa fa-angle-double-right"></i></Button>}
-                        {this.state.isValidData && !this.state.changedData && <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.SubmitProgram}>Submit Program</Button>}
+                                       {this.state.changedData && <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.SubmitShipment}>{i18n.t('static.pipeline.save')}<i className="fa fa-angle-double-right"></i></Button>}
+                        {this.state.isValidData && !this.state.changedData && <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.SubmitProgram}>{i18n.t('static.program.submitProgram')}</Button>}
                         &nbsp;
                                         </div>
                 </div>

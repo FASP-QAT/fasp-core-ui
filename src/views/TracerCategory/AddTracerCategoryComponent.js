@@ -598,7 +598,7 @@ class AddTracerCategoryComponent extends Component {
                                         setTouched,
                                         handleReset
                                     }) => (
-                                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='tracerCategoryForm'>
+                                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='tracerCategoryForm' autocomplete="off">
                                                 <CardBody>
                                                     <FormGroup>
                                                         <Label htmlFor="realmId">{i18n.t('static.realm.realm')}<span className="red Reqasterisk">*</span></Label>

@@ -755,7 +755,7 @@ class EditSupplyPlanStatus extends Component {
                     showShipments: 1,
                     shipmentList: shipmentList,
                     shipmentListUnFiltered: shipmentListUnFiltered,
-                    programJson:this.state.program
+                    programJson: this.state.program
                 })
                 this.refs.shipmentChild.showShipmentData();
             }.bind(this)
@@ -1881,152 +1881,152 @@ class EditSupplyPlanStatus extends Component {
                     </option>
                 )
             }, this);
-       
-            let bar = {}
-            if (this.state.jsonArrForGraph.length > 0)
-                bar = {
-    
-                    labels: [...new Set(this.state.jsonArrForGraph.map(ele => (ele.month)))],
-                    datasets: [
-                        {
-                            label: i18n.t('static.supplyPlan.planned'),
-                            stack: 1,
-                            yAxisID: 'A',
-                            backgroundColor: '#a5c5ec',
-                            borderColor: 'rgba(179,181,198,1)',
-                            pointBackgroundColor: 'rgba(179,181,198,1)',
-                            pointBorderColor: '#fff',
-                            pointHoverBackgroundColor: '#fff',
-                            pointHoverBorderColor: 'rgba(179,181,198,1)',
-                            data: this.state.jsonArrForGraph.map((item, index) => (item.planned)),
+
+        let bar = {}
+        if (this.state.jsonArrForGraph.length > 0)
+            bar = {
+
+                labels: [...new Set(this.state.jsonArrForGraph.map(ele => (ele.month)))],
+                datasets: [
+                    {
+                        label: i18n.t('static.supplyPlan.planned'),
+                        stack: 1,
+                        yAxisID: 'A',
+                        backgroundColor: '#a5c5ec',
+                        borderColor: 'rgba(179,181,198,1)',
+                        pointBackgroundColor: 'rgba(179,181,198,1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(179,181,198,1)',
+                        data: this.state.jsonArrForGraph.map((item, index) => (item.planned)),
+                    },
+                    {
+                        label: i18n.t('static.supplyPlan.ordered'),
+                        stack: 1,
+                        yAxisID: 'A',
+                        backgroundColor: '#20a8d8',
+                        borderColor: 'rgba(179,181,198,1)',
+                        pointBackgroundColor: 'rgba(179,181,198,1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(179,181,198,1)',
+                        data: this.state.jsonArrForGraph.map((item, index) => (item.ordered)),
+                    },
+                    {
+                        label: i18n.t('static.supplyPlan.shipped'),
+                        stack: 1,
+                        yAxisID: 'A',
+                        backgroundColor: '#7372cb',
+                        borderColor: 'rgba(179,181,198,1)',
+                        pointBackgroundColor: 'rgba(179,181,198,1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(179,181,198,1)',
+                        data: this.state.jsonArrForGraph.map((item, index) => (item.shipped)),
+                    },
+                    {
+                        label: i18n.t('static.supplyPlan.delivered'),
+                        stack: 1,
+                        yAxisID: 'A',
+                        backgroundColor: '#042e6a',
+                        borderColor: 'rgba(179,181,198,1)',
+                        pointBackgroundColor: 'rgba(179,181,198,1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(179,181,198,1)',
+                        data: this.state.jsonArrForGraph.map((item, index) => (item.delivered)),
+                    }, {
+                        label: i18n.t('static.report.stock'),
+                        stack: 2,
+                        type: 'line',
+                        yAxisID: 'A',
+                        borderColor: '#d0cece',
+                        borderStyle: 'dotted',
+                        ticks: {
+                            fontSize: 2,
+                            fontColor: 'transparent',
                         },
-                        {
-                            label: i18n.t('static.supplyPlan.ordered'),
-                            stack: 1,
-                            yAxisID: 'A',
-                            backgroundColor: '#20a8d8',
-                            borderColor: 'rgba(179,181,198,1)',
-                            pointBackgroundColor: 'rgba(179,181,198,1)',
-                            pointBorderColor: '#fff',
-                            pointHoverBackgroundColor: '#fff',
-                            pointHoverBorderColor: 'rgba(179,181,198,1)',
-                            data: this.state.jsonArrForGraph.map((item, index) => (item.ordered)),
+                        lineTension: 0,
+                        pointStyle: 'line',
+                        showInLegend: true,
+                        data: this.state.jsonArrForGraph.map((item, index) => (item.stock))
+                    }, {
+                        label: i18n.t('static.supplyPlan.consumption'),
+                        type: 'line',
+                        stack: 3,
+                        yAxisID: 'A',
+                        backgroundColor: 'transparent',
+                        borderColor: '#f45c45',
+                        borderStyle: 'dotted',
+                        ticks: {
+                            fontSize: 2,
+                            fontColor: 'transparent',
                         },
-                        {
-                            label: i18n.t('static.supplyPlan.shipped'),
-                            stack: 1,
-                            yAxisID: 'A',
-                            backgroundColor: '#7372cb',
-                            borderColor: 'rgba(179,181,198,1)',
-                            pointBackgroundColor: 'rgba(179,181,198,1)',
-                            pointBorderColor: '#fff',
-                            pointHoverBackgroundColor: '#fff',
-                            pointHoverBorderColor: 'rgba(179,181,198,1)',
-                            data: this.state.jsonArrForGraph.map((item, index) => (item.shipped)),
+                        lineTension: 0,
+                        pointStyle: 'line',
+                        showInLegend: true,
+                        data: this.state.jsonArrForGraph.map((item, index) => (item.consumption))
+                    },
+                    {
+                        label: i18n.t('static.supplyPlan.monthsOfStock'),
+                        type: 'line',
+                        stack: 4,
+                        yAxisID: 'B',
+                        backgroundColor: 'transparent',
+                        borderColor: '#8be665',
+                        borderStyle: 'dotted',
+                        ticks: {
+                            fontSize: 2,
+                            fontColor: 'transparent',
                         },
-                        {
-                            label: i18n.t('static.supplyPlan.delivered'),
-                            stack: 1,
-                            yAxisID: 'A',
-                            backgroundColor: '#042e6a',
-                            borderColor: 'rgba(179,181,198,1)',
-                            pointBackgroundColor: 'rgba(179,181,198,1)',
-                            pointBorderColor: '#fff',
-                            pointHoverBackgroundColor: '#fff',
-                            pointHoverBorderColor: 'rgba(179,181,198,1)',
-                            data: this.state.jsonArrForGraph.map((item, index) => (item.delivered)),
-                        }, {
-                            label: i18n.t('static.report.stock'),
-                            stack: 2,
-                            type: 'line',
-                            yAxisID: 'A',
-                            borderColor: '#d0cece',
-                            borderStyle: 'dotted',
-                            ticks: {
-                                fontSize: 2,
-                                fontColor: 'transparent',
-                            },
-                            lineTension: 0,
-                            pointStyle: 'line',
-                            showInLegend: true,
-                            data: this.state.jsonArrForGraph.map((item, index) => (item.stock))
-                        }, {
-                            label: i18n.t('static.supplyPlan.consumption'),
-                            type: 'line',
-                            stack: 3,
-                            yAxisID: 'A',
-                            backgroundColor: 'transparent',
-                            borderColor: '#f45c45',
-                            borderStyle: 'dotted',
-                            ticks: {
-                                fontSize: 2,
-                                fontColor: 'transparent',
-                            },
-                            lineTension: 0,
-                            pointStyle: 'line',
-                            showInLegend: true,
-                            data: this.state.jsonArrForGraph.map((item, index) => (item.consumption))
+                        lineTension: 0,
+                        pointStyle: 'line',
+                        showInLegend: true,
+                        data: this.state.jsonArrForGraph.map((item, index) => (item.mos))
+                    },
+                    {
+                        label: i18n.t('static.supplyPlan.minStockMos'),
+                        type: 'line',
+                        stack: 5,
+                        yAxisID: 'B',
+                        backgroundColor: 'transparent',
+                        borderColor: '#59cacc',
+                        borderStyle: 'dotted',
+                        borderDash: [10, 10],
+                        fill: '+1',
+                        ticks: {
+                            fontSize: 2,
+                            fontColor: 'transparent',
                         },
-                        {
-                            label: i18n.t('static.supplyPlan.monthsOfStock'),
-                            type: 'line',
-                            stack: 4,
-                            yAxisID: 'B',
-                            backgroundColor: 'transparent',
-                            borderColor: '#8be665',
-                            borderStyle: 'dotted',
-                            ticks: {
-                                fontSize: 2,
-                                fontColor: 'transparent',
-                            },
-                            lineTension: 0,
-                            pointStyle: 'line',
-                            showInLegend: true,
-                            data: this.state.jsonArrForGraph.map((item, index) => (item.mos))
+                        showInLegend: true,
+                        pointStyle: 'line',
+                        yValueFormatString: "$#,##0",
+                        lineTension: 0,
+                        data: this.state.jsonArrForGraph.map((item, index) => (item.minMos))
+                    },
+                    {
+                        label: i18n.t('static.supplyPlan.maxStockMos'),
+                        type: 'line',
+                        stack: 6,
+                        yAxisID: 'B',
+                        backgroundColor: 'rgba(0,0,0,0)',
+                        borderColor: '#59cacc',
+                        borderStyle: 'dotted',
+                        borderDash: [10, 10],
+                        fill: true,
+                        ticks: {
+                            fontSize: 2,
+                            fontColor: 'transparent',
                         },
-                        {
-                            label: i18n.t('static.supplyPlan.minStockMos'),
-                            type: 'line',
-                            stack: 5,
-                            yAxisID: 'B',
-                            backgroundColor: 'transparent',
-                            borderColor: '#59cacc',
-                            borderStyle: 'dotted',
-                            borderDash: [10, 10],
-                            fill: '+1',
-                            ticks: {
-                                fontSize: 2,
-                                fontColor: 'transparent',
-                            },
-                            showInLegend: true,
-                            pointStyle: 'line',
-                            yValueFormatString: "$#,##0",
-                            lineTension: 0,
-                            data: this.state.jsonArrForGraph.map((item, index) => (item.minMos))
-                        },
-                        {
-                            label: i18n.t('static.supplyPlan.maxStockMos'),
-                            type: 'line',
-                            stack: 6,
-                            yAxisID: 'B',
-                            backgroundColor: 'rgba(0,0,0,0)',
-                            borderColor: '#59cacc',
-                            borderStyle: 'dotted',
-                            borderDash: [10, 10],
-                            fill: true,
-                            ticks: {
-                                fontSize: 2,
-                                fontColor: 'transparent',
-                            },
-                            lineTension: 0,
-                            pointStyle: 'line',
-                            showInLegend: true,
-                            yValueFormatString: "$#,##0",
-                            data: this.state.jsonArrForGraph.map((item, index) => (item.maxMos))
-                        }
-                    ]
-    
-                 };
+                        lineTension: 0,
+                        pointStyle: 'line',
+                        showInLegend: true,
+                        yValueFormatString: "$#,##0",
+                        data: this.state.jsonArrForGraph.map((item, index) => (item.maxMos))
+                    }
+                ]
+
+            };
 
         return (
             <div className="animated fadeIn">
@@ -2077,29 +2077,29 @@ class EditSupplyPlanStatus extends Component {
                                                             </div>
                                                         </FormGroup>
                                                         <FormGroup className="col-md-12 mt-2 pl-0" style={{ display: this.state.display }}>
-                                                    <ul className="legendcommitversion list-group">
-                                                        {
-                                                            this.state.paColors.map(item1 => (
-                                                                <li><span className="legendcolor" style={{ backgroundColor: item1.color }}></span> <span className="legendcommitversionText">{item1.text}</span></li>
-                                                            ))
-                                                        }
-                                                        <li><span className="lightgreylegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.tbd')}</span></li>
-                                                        <li><span className="lightgreenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.multipleShipments')}</span></li>
-                                                        <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyShipments')} </span></li>
-                                                        <li><span className="purplelegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.forecastedConsumption')}</span></li>
-                                                        <li><span className=" blacklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.actualConsumption')} </span></li>
+                                                            <ul className="legendcommitversion list-group">
+                                                                {
+                                                                    this.state.paColors.map(item1 => (
+                                                                        <li><span className="legendcolor" style={{ backgroundColor: item1.color }}></span> <span className="legendcommitversionText">{item1.text}</span></li>
+                                                                    ))
+                                                                }
+                                                                <li><span className="lightgreylegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.tbd')}</span></li>
+                                                                <li><span className="lightgreenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.multipleShipments')}</span></li>
+                                                                <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyShipments')} </span></li>
+                                                                <li><span className="purplelegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.forecastedConsumption')}</span></li>
+                                                                <li><span className=" blacklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.actualConsumption')} </span></li>
 
-                                                    </ul>
-                                                </FormGroup>
-                                                <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px' }} style={{ display: this.state.display }}>
-                                                    <ul className="legendcommitversion list-group">
-                                                        <li><span className="lightgreylegend "></span> <span className="legendcommitversionText"> {i18n.t("static.supplyPlan.minMonthsOfStock")} : {this.state.minMonthsOfStock}</span></li>
-                                                        <li><span className="lightgreenlegend "></span> <span className="legendcommitversionText">{i18n.t("static.report.reorderFrequencyInMonths")} : {this.state.reorderFrequency}</span></li>
-                                                        <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.report.mospast")} : {this.state.monthsInPastForAMC}</span></li>
-                                                        <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.report.mosfuture")} : {this.state.monthsInFutureForAMC}</span></li>
-                                                        <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.shelfLife")} : {this.state.shelfLife}</span></li>
-                                                    </ul>
-                                                </FormGroup>
+                                                            </ul>
+                                                        </FormGroup>
+                                                        <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px' }} style={{ display: this.state.display }}>
+                                                            <ul className="legendcommitversion list-group">
+                                                                <li><span className="lightgreylegend "></span> <span className="legendcommitversionText"> {i18n.t("static.supplyPlan.minMonthsOfStock")} : {this.state.minMonthsOfStock}</span></li>
+                                                                <li><span className="lightgreenlegend "></span> <span className="legendcommitversionText">{i18n.t("static.report.reorderFrequencyInMonths")} : {this.state.reorderFrequency}</span></li>
+                                                                <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.report.mospast")} : {this.state.monthsInPastForAMC}</span></li>
+                                                                <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.report.mosfuture")} : {this.state.monthsInFutureForAMC}</span></li>
+                                                                <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.shelfLife")} : {this.state.shelfLife}</span></li>
+                                                            </ul>
+                                                        </FormGroup>
 
                                                     </div>
                                                 </Col>
@@ -2714,7 +2714,7 @@ class EditSupplyPlanStatus extends Component {
                             // style={{ display: this.state.loading ? "none" : "block" }}
                             >
                                 <ModalBody>
-                                    {this.state.showShipments ==1  && <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} hideFourthComponent={this.hideFourthComponent} hideFifthComponent={this.hideFifthComponent} shipmentPage="supplyPlanComapre" />}
+                                    {this.state.showShipments == 1 && <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} hideFourthComponent={this.hideFourthComponent} hideFifthComponent={this.hideFifthComponent} shipmentPage="supplyPlanComapre" />}
                                     <h6 className="red" id="div2">{this.state.noFundsBudgetError || this.state.shipmentBatchError || this.state.shipmentError}</h6>
                                     <div className="table-responsive">
                                         <div id="shipmentsDetailsTable" />
@@ -2907,6 +2907,7 @@ class EditSupplyPlanStatus extends Component {
 
                                                             <Input
                                                                 type="textarea"
+                                                                maxLength={600}
                                                                 name="versionNotes"
                                                                 id="versionNotes"
                                                                 value={this.state.program.currentVersion.notes}
@@ -2968,7 +2969,7 @@ class EditSupplyPlanStatus extends Component {
         // AuthenticationService.setupAxiosInterceptors();
         ProgramService.getProgramData({ "programId": this.props.match.params.programId, "versionId": this.props.match.params.versionId })
             .then(response => {
-                console.log(response.data) 
+                console.log(response.data)
                 let { program } = this.state
                 program.label = response.data.label
                 this.setState({

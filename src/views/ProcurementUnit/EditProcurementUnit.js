@@ -1277,25 +1277,11 @@ export default class EditProcurementUnit extends Component {
                                         setTouched
                                     }) => (
 
-                                            <Form onSubmit={handleSubmit} noValidate name='procurementUnitForm'>
+                                            <Form onSubmit={handleSubmit} noValidate name='procurementUnitForm' autocomplete="off">
                                                 {/* <CardHeader>
                                                     <strong>{i18n.t('static.common.editEntity', { entityname })}</strong>
                                                 </CardHeader> */}
                                                 <CardBody className="pb-0">
-                                                    <FormGroup>
-                                                        <Label htmlFor="procurementUnit">{i18n.t('static.procurementUnit.procurementUnit')}<span class="red Reqasterisk">*</span></Label>
-                                                        <Input
-                                                            type="text" name="procurementUnitName"
-                                                            valid={!errors.procurementUnitName}
-                                                            bsSize="sm"
-                                                            // invalid={touched.procurementUnitName && !!errors.procurementUnitName || this.state.procurementUnit.label.label_en == ''}
-                                                            invalid={touched.procurementUnitName && !!errors.procurementUnitName || !!errors.procurementUnitName}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.procurementUnit.label.label_en}
-                                                            id="procurementUnitName" />
-                                                        <FormFeedback className="red">{errors.procurementUnitName}</FormFeedback>
-                                                    </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="select">{i18n.t('static.procurementUnit.planningUnit')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
@@ -1311,6 +1297,21 @@ export default class EditProcurementUnit extends Component {
                                                         </Input>
                                                         <FormFeedback>{errors.planningUnitId}</FormFeedback>
                                                     </FormGroup>
+                                                    <FormGroup>
+                                                        <Label htmlFor="procurementUnit">{i18n.t('static.procurementUnit.procurementUnit')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Input
+                                                            type="text" name="procurementUnitName"
+                                                            valid={!errors.procurementUnitName}
+                                                            bsSize="sm"
+                                                            // invalid={touched.procurementUnitName && !!errors.procurementUnitName || this.state.procurementUnit.label.label_en == ''}
+                                                            invalid={touched.procurementUnitName && !!errors.procurementUnitName || !!errors.procurementUnitName}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.procurementUnit.label.label_en}
+                                                            id="procurementUnitName" />
+                                                        <FormFeedback className="red">{errors.procurementUnitName}</FormFeedback>
+                                                    </FormGroup>
+
                                                     <FormGroup>
                                                         <Label htmlFor="multiplier">{i18n.t('static.procurementUnit.multiplier')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
@@ -1606,7 +1607,7 @@ export default class EditProcurementUnit extends Component {
                                                     <FormGroup>
                                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
                                                         <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>Update</Button>
+                                                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                                         &nbsp;
                                             </FormGroup>
                                                 </CardFooter>

@@ -36,7 +36,7 @@ export default class PipelineProgramImport extends Component {
 
         confirmAlert({
             title: i18n.t('static.program.confirmsubmit'),
-            message: 'Please ensure you do not have negative inventory before you proceed.',
+            message: i18n.t('static.message.negativeInventoryMessage'),
             buttons: [
                 {
                     label: i18n.t('static.program.yes'),

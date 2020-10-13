@@ -586,7 +586,7 @@ export default class AddCurrencyComponent extends Component {
                                         setTouched,
                                         handleReset
                                     }) => (
-                                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='currencyForm'>
+                                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='currencyForm' autocomplete="off">
                                                 <CardBody className="pb-0">
                                                     <FormGroup>
                                                         <Label for="label">{i18n.t('static.currency.currency')}<span class="red Reqasterisk">*</span></Label>

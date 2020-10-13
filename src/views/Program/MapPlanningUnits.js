@@ -83,7 +83,7 @@ export default class MapPlanningUnits extends Component {
                     if (planningUnitValue == value && y != i && i > y) {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, "Planning Unit Allready Exists");
+                        this.el.setComments(col, i18n.t('static.message.planningUnitAlreadyExists'));
                         i = -1;
                         valid = false;
                     } else {
@@ -271,7 +271,7 @@ export default class MapPlanningUnits extends Component {
                     if (planningUnitValue == value && y != i) {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, "Planning Unit Allready Exists");
+                        this.el.setComments(col, i18n.t('static.message.planningUnitAlreadyExists'));
                         i = -1;
                     } else {
                         this.el.setStyle(col, "background-color", "transparent");

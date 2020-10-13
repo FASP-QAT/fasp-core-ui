@@ -342,9 +342,10 @@ import RealmService from '../../api/RealmService';
 import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import jexcel from 'jexcel';
+import moment from 'moment';
 import "../../../node_modules/jexcel/dist/jexcel.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
-import { JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from '../../Constants';
+import { DATE_FORMAT_CAP, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from '../../Constants';
 const entityname = i18n.t('static.fundingsource.fundingsource');
 
 
@@ -409,7 +410,10 @@ class FundingSourceListComponent extends Component {
             data[1] = getLabelText(fundingSourceList[j].realm.label, this.state.lang)
             data[2] = getLabelText(fundingSourceList[j].label, this.state.lang)
             data[3] = fundingSourceList[j].fundingSourceCode
-            data[4] = fundingSourceList[j].active;
+            data[4] = fundingSourceList[j].lastModifiedBy.username;
+            data[5] = (fundingSourceList[j].lastModifiedDate ? moment(fundingSourceList[j].lastModifiedDate).format(`${DATE_FORMAT_CAP}`) : null)
+            data[6] = fundingSourceList[j].allowedInBudget;
+            data[7] = fundingSourceList[j].active;
 
             fundingSourceArray[count] = data;
             count++;
@@ -449,6 +453,25 @@ class FundingSourceListComponent extends Component {
                     title: i18n.t('static.fundingsource.fundingsourceCode'),
                     type: 'text',
                     readOnly: true
+                },
+                {
+                    title: i18n.t('static.common.lastModifiedBy'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.common.lastModifiedDate'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.fundingSource.allowInBudget'),
+                    type: 'dropdown',
+                    readOnly: true,
+                    source: [
+                        { id: true, name: i18n.t('static.program.yes') },
+                        { id: false, name: i18n.t('static.realm.no') }
+                    ]
                 },
                 {
                     type: 'dropdown',

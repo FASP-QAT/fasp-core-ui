@@ -2020,7 +2020,7 @@ export default class syncPage extends Component {
             this.setState({
               isChanged: true
             })
-            console.log("old-->",oldData[j],"Downloaded---->",downloadedData[j],"Latest--->",latestData[j])
+            console.log("old-->", oldData[j], "Downloaded---->", downloadedData[j], "Latest--->", latestData[j])
             if (oldData[j] == downloadedData[j]) {
               var col = (colArr[j]).concat(parseInt(c) + 1);
               elInstance.setValueFromCoords(j, c, latestData[j], true);
@@ -2286,7 +2286,7 @@ export default class syncPage extends Component {
                           <div className="controls ">
                             <InputGroup>
                               <Input type="textarea"
-                                name="notes" id="notes">
+                                name="notes" maxLength={600} id="notes">
                               </Input>
                             </InputGroup>
                           </div>

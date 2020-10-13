@@ -1549,7 +1549,7 @@ export default class ManualTagging extends Component {
                                                 name="planningUnitId"
                                                 id="planningUnitId"
                                                 bsSize="sm"
-                                                onChange={this.filterData}
+                                                autocomplete="off"
                                             >
                                                 <option value="0">{i18n.t('static.common.select')}</option>
                                                 {planningUnitList}
@@ -1615,7 +1615,7 @@ export default class ManualTagging extends Component {
                                 <Col md="12 pl-0">
                                     <div className="d-md-flex">
                                         <FormGroup className="col-md-3 pl-0">
-                                            <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.orderNo')}</Label>
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.manualTagging.OrderNo')}</Label>
                                             <div className="controls ">
                                                 <InputGroup>
                                                     <Input
@@ -1623,6 +1623,7 @@ export default class ManualTagging extends Component {
                                                         name="orderNo"
                                                         id="orderNo"
                                                         bsSize="sm"
+                                                        autocomplete="off"
                                                         onChange={this.getOrderDetails}
                                                     >
                                                     </Input>
@@ -1638,6 +1639,7 @@ export default class ManualTagging extends Component {
                                                         name="primeLineNo"
                                                         id="primeLineNo"
                                                         bsSize="sm"
+                                                        autocomplete="off"
                                                         onChange={this.getOrderDetails}
                                                     >
                                                     </Input>

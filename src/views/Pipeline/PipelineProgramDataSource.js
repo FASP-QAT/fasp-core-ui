@@ -55,7 +55,7 @@ export default class PipelineProgramDataSource extends Component {
             } else {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, (list[y].pipelineDataSource).concat(" Does not exist."));
+                this.el.setComments(col, (list[y].pipelineDataSource).concat(i18n.t('static.message.notExist')));
             }
         }
 
@@ -113,7 +113,7 @@ export default class PipelineProgramDataSource extends Component {
                     if (dataSourceValue == currentDataSource && y != i) {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, "Planning Unit aready exist");
+                        this.el.setComments(col, i18n.t('static.message.planningUnitAlreadyExists'));
                         i = json.length;
                         valid = false;
                     } else {

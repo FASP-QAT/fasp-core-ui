@@ -228,11 +228,12 @@ class AddLanguageComponent extends Component {
                                         handleReset
                                     }) => (
                                             <div>
-                                                <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm'>
+                                                <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm' autocomplete="off">
                                                     <CardBody>
                                                         <FormGroup>
                                                             <Label for="languageName">{i18n.t('static.language.language')}<span class="red Reqasterisk">*</span></Label>
                                                             <Input type="text"
+                                                                // autocomplete="off"
                                                                 name="languageName"
                                                                 id="languageName"
                                                                 bsSize="sm"

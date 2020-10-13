@@ -275,7 +275,7 @@ export default class AddDataSourceTypeComponent extends Component {
                                         setTouched,
                                         handleReset
                                     }) => (
-                                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='dataSourceType'>
+                                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='dataSourceType' autocomplete="off">
                                                 <CardBody>
                                                     <FormGroup>
                                                         <Label htmlFor="realmId">{i18n.t('static.realm.realm')}<span class="red Reqasterisk">*</span></Label>
