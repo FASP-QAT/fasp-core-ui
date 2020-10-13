@@ -1044,7 +1044,7 @@ class AuthenticationService {
                     break;
                 case "/program/deleteLocalProgram":
                     console.log("Going to check if condition")
-                    if (bfunction.includes("ROLE_BF_DELETE_LOCAL_PROGARM")) {
+                    if (bfunction.includes("ROLE_BF_DELETE_LOCAL_PROGRAM")) {
                         console.log("Going to check if condition")
                         return true;
                     }
