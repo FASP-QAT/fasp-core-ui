@@ -101,6 +101,126 @@ export default class AddHealthAreaComponent extends Component {
     this.getRealmCountryList = this.getRealmCountryList.bind(this);
     this.resetClicked = this.resetClicked.bind(this);
     this.hideSecondComponent = this.hideSecondComponent.bind(this);
+    this.getDisplayName = this.getDisplayName.bind(this);
+  }
+
+  getDisplayName() {
+    let realmId = document.getElementById("realmId").value;
+    // let realmId = 1;
+    let healthAreaValue = document.getElementById("healthAreaName").value;
+    // let healthAreaValue = "USAID"
+    healthAreaValue = healthAreaValue.replace(/[^A-Za-z0-9]/g, "");
+    healthAreaValue = healthAreaValue.trim().toUpperCase();
+    if (realmId != 0 && healthAreaValue.length != 0) {
+
+      if (healthAreaValue.length >= 6) {//minus 2
+        healthAreaValue = healthAreaValue.slice(0, 4);
+        console.log("DISPLAYNAME-BEF----->", healthAreaValue);
+        HealthAreaService.getHealthAreaDisplayName(realmId, healthAreaValue)
+          .then(response => {
+            console.log("DISPLAYNAME-RESP----->", response);
+            let { healthArea } = this.state
+            healthArea.healthAreaCode = response.data;
+            this.setState({
+              healthArea
+            });
+
+          }).catch(
+            error => {
+              if (error.message === "Network Error") {
+                this.setState({
+                  message: 'static.unkownError',
+                  loading: false
+                });
+              } else {
+                switch (error.response ? error.response.status : "") {
+
+                  case 401:
+                    this.props.history.push(`/login/static.message.sessionExpired`)
+                    break;
+                  case 403:
+                    this.props.history.push(`/accessDenied`)
+                    break;
+                  case 500:
+                  case 404:
+                  case 406:
+                    this.setState({
+                      message: error.response.data.messageCode,
+                      loading: false
+                    });
+                    break;
+                  case 412:
+                    this.setState({
+                      message: error.response.data.messageCode,
+                      loading: false
+                    });
+                    break;
+                  default:
+                    this.setState({
+                      message: 'static.unkownError',
+                      loading: false
+                    });
+                    break;
+                }
+              }
+            }
+          );
+
+      } else {// not need to minus
+        console.log("DISPLAYNAME-BEF-else----->", healthAreaValue);
+        HealthAreaService.getHealthAreaDisplayName(realmId, healthAreaValue)
+          .then(response => {
+            console.log("DISPLAYNAME-RESP-else----->", response);
+            let { healthArea } = this.state
+            healthArea.healthAreaCode = response.data;
+            this.setState({
+              healthArea
+            });
+
+          }).catch(
+            error => {
+              if (error.message === "Network Error") {
+                this.setState({
+                  message: 'static.unkownError',
+                  loading: false
+                });
+              } else {
+                switch (error.response ? error.response.status : "") {
+
+                  case 401:
+                    this.props.history.push(`/login/static.message.sessionExpired`)
+                    break;
+                  case 403:
+                    this.props.history.push(`/accessDenied`)
+                    break;
+                  case 500:
+                  case 404:
+                  case 406:
+                    this.setState({
+                      message: error.response.data.messageCode,
+                      loading: false
+                    });
+                    break;
+                  case 412:
+                    this.setState({
+                      message: error.response.data.messageCode,
+                      loading: false
+                    });
+                    break;
+                  default:
+                    this.setState({
+                      message: 'static.unkownError',
+                      loading: false
+                    });
+                    break;
+                }
+              }
+            }
+          );
+      }
+
+    }
+
   }
 
   dataChange(event) {
@@ -387,7 +507,13 @@ export default class AddHealthAreaComponent extends Component {
               </CardHeader> */}
               <Formik
                 enableReinitialize={true}
-                initialValues={initialValues}
+                // initialValues={initialValues}
+                initialValues={{
+                  healthAreaName: this.state.healthArea.label.label_en,
+                  healthAreaCode: this.state.healthArea.healthAreaCode,
+                  realmId: this.state.healthArea.realm.id,
+                  realmCountryId: this.state.healthArea.realmCountryArray
+                }}
                 validate={validate(validationSchema)}
                 onSubmit={(values, { setSubmitting, setErrors }) => {
 
@@ -512,6 +638,20 @@ export default class AddHealthAreaComponent extends Component {
                           </FormGroup>
 
                           <FormGroup>
+                            <Label htmlFor="company">{i18n.t('static.healthArea.healthAreaName')}<span class="red Reqasterisk">*</span> </Label>
+                            <Input
+                              bsSize="sm"
+                              type="text" name="healthAreaName" valid={!errors.healthAreaName && this.state.healthArea.label.label_en != ''}
+                              invalid={touched.healthAreaName && !!errors.healthAreaName}
+                              onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                              // onBlur={handleBlur}
+                              onBlur={(e) => { handleBlur(e); this.getDisplayName() }}
+                              value={this.state.healthArea.label.label_en}
+                              id="healthAreaName" />
+                            <FormFeedback className="red">{errors.healthAreaName}</FormFeedback>
+                          </FormGroup>
+
+                          <FormGroup>
                             <Label htmlFor="company">{i18n.t('static.technicalArea.technicalAreaDisplayName')}<span class="red Reqasterisk">*</span> </Label>
                             <Input
                               bsSize="sm"
@@ -525,26 +665,14 @@ export default class AddHealthAreaComponent extends Component {
                             <FormFeedback className="red">{errors.healthAreaCode}</FormFeedback>
                           </FormGroup>
 
-                          <FormGroup>
-                            <Label htmlFor="company">{i18n.t('static.healthArea.healthAreaName')}<span class="red Reqasterisk">*</span> </Label>
-                            <Input
-                              bsSize="sm"
-                              type="text" name="healthAreaName" valid={!errors.healthAreaName && this.state.healthArea.label.label_en != ''}
-                              invalid={touched.healthAreaName && !!errors.healthAreaName}
-                              onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
-                              onBlur={handleBlur}
-                              value={this.state.healthArea.label.label_en}
-                              id="healthAreaName" />
-                            <FormFeedback className="red">{errors.healthAreaName}</FormFeedback>
-                          </FormGroup>
-
                         </CardBody>
 
                         <CardFooter>
                           <FormGroup>
                             <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
                             <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                            <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                            {/* <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button> */}
+                            <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
 
                             &nbsp;
                                                   </FormGroup>

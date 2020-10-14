@@ -41,6 +41,11 @@ class ProcurementAgentService {
         return axios.get(`${API_URL}/api/procurementAgent/${json}/procurementUnit/all`, {}
         );
     }
+
+    getProcurementAgentDisplayName(json1,json2) {
+        return axios.get(`${API_URL}/api/procurementAgent/getDisplayName/realmId/${json1}/name/${json2}`, {}
+        );
+    }
 }
 
 export default new ProcurementAgentService();

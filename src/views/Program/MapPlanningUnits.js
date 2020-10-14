@@ -872,6 +872,7 @@ export default class MapPlanningUnits extends Component {
         tr.children[7].classList.add('AsteriskTheadtrTd');
         tr.children[8].classList.add('AsteriskTheadtrTd');
         tr.children[9].classList.add('AsteriskTheadtrTd');
+        tr.children[3].title = i18n.t("static.message.reorderFrequency")
     }
 
     myFunction() {

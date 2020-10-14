@@ -646,7 +646,7 @@ class EditUserComponent extends Component {
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="emailId">{i18n.t('static.user.emailid')}<span class="red Reqasterisk">*</span></Label>
-                                                        <Input type="text"
+                                                        <Input type="search"
                                                             name="emailId"
                                                             id="emailId"
                                                             bsSize="sm"
