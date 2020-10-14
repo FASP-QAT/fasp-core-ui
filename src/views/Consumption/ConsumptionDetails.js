@@ -27,6 +27,8 @@ export default class ConsumptionDetails extends React.Component {
     constructor(props) {
         super(props);
         this.options = props.options;
+        var startDate = moment(Date.now()).subtract(6, 'months').startOf('month').format("YYYY-MM-DD");
+        var endDate=moment(Date.now()).add(18,'months').startOf('month').format("YYYY-MM-DD")
         this.state = {
             loading: true,
             programList: [],
@@ -37,7 +39,7 @@ export default class ConsumptionDetails extends React.Component {
             timeout: 0,
             showConsumption: 0,
             consumptionChangedFlag: 0,
-            rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            rangeValue: { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() }, to: { year: new Date(endDate).getFullYear(), month: new Date(endDate).getMonth() } },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() },
             regionList: [],
