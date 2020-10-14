@@ -664,6 +664,31 @@ label.arrow_label:after {
   background-color: #808080 !important;
 }
 
+.shipmentNotActive{
+  color: #808080 !important;
+  background-color: #808080 !important;
+}
+
+.shipmentEmergencyNotAccount{
+  color: red !important;
+  background-color: #D3D3D3 !important;
+}
+
+.shipmentEmergencyAccount{
+  color: red !important;
+  background-color: #FFF !important;
+}
+
+.shipmentNotEmergencyNotAccount{
+  color: #000 !important;
+  background-color: #D3D3D3 !important;
+}
+
+.shipmentNotEmergencyAccount{
+  color:#000 !important;
+  background-color: #FFF !important;
+}
+
 .whitebtnColor .btn-info {
   color: #fff !important;
 }
@@ -3475,6 +3500,12 @@ margin-left: -45px;
     background-image:url('/src/assets/img/emergencyComment.png');
     background-repeat: no-repeat;
     background-position: top right;
+}
+
+.localProcurementAgent{
+  background-image:url('/src/assets/img/localProcurement.png');
+    background-repeat: no-repeat;
+    background-position: top left;
 }
 
 .supplyplan-Thead {

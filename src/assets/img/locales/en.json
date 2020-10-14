@@ -1362,5 +1362,8 @@
     "static.report.lowstock":"Under Stocked",
     "static.report.okaystock":"Stocked to Plan",
     "static.report.overstock":"Over Stocked",
-    "static.consumption.missingBatch":"Total batch qty is greater than actual quantity"
+    "static.consumption.missingBatch":"Total batch qty is greater than actual quantity",
+    "static.shipmentDataEntry.localProcurement":"Local Proc. Agent",
+    "static.shipmentDataentry.procurementAgentOrderNo":"Proc. Agent Order no.",
+    "static.shipmentDataentry.procurementAgentPrimeLineNo":"Proc. Agent Prime line no."
 }

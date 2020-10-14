@@ -374,10 +374,12 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                             inventoryBatchEditable = false;
                                         }
                                         document.getElementById("showInventoryBatchInfoButtonsDiv").style.display = 'block';
-                                        if (inventoryBatchEditable == false) {
-                                            document.getElementById("inventoryBatchAddRow").style.display = "none";
-                                        }else{
-                                            document.getElementById("inventoryBatchAddRow").style.display = "block";
+                                        if (this.props.consumptionPage != "supplyPlanCompare") {
+                                            if (inventoryBatchEditable == false) {
+                                                document.getElementById("inventoryBatchAddRow").style.display = "none";
+                                            } else {
+                                                document.getElementById("inventoryBatchAddRow").style.display = "block";
+                                            }
                                         }
                                         for (var sb = 0; sb < batchInfo.length; sb++) {
                                             var data = [];
@@ -783,7 +785,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         // } else {
         //     mylist = this.state.batchInfoList.filter(c => (c.id == -1) || (moment(c.expiryDate).format("YYYY-MM-DD") > moment(date).format("YYYY-MM-DD") && moment(c.createdDate).format("YYYY-MM-DD") <= moment(date).format("YYYY-MM-DD")));
         // }
-        mylist = this.state.batchInfoList.filter(c => c.id == 0 || c.id != -1 && (moment(c.expiryDate).format("YYYY-MM-DD") > moment(date).format("YYYY-MM-DD") && moment(c.createdDate).format("YYYY-MM-DD") <= moment(date).format("YYYY-MM-DD")));
+        mylist = this.state.batchInfoList.filter(c => c.id == 0 || c.id != -1 && (moment(c.expiryDate).format("YYYY-MM") > moment(date).format("YYYY-MM") && moment(c.createdDate).format("YYYY-MM") <= moment(date).format("YYYY-MM")));
         return mylist;
     }.bind(this)
 
