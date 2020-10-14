@@ -68,7 +68,8 @@ class AddFundingSourceComponent extends Component {
         label: {
           label_en: ''
         },
-        fundingSourceCode: ''
+        fundingSourceCode: '',
+        allowedInBudget: true
       },
       message: '',
       lang: localStorage.getItem('lang'),
@@ -79,6 +80,126 @@ class AddFundingSourceComponent extends Component {
     this.Capitalize = this.Capitalize.bind(this);
     this.resetClicked = this.resetClicked.bind(this);
     this.hideSecondComponent = this.hideSecondComponent.bind(this);
+    this.getDisplayName = this.getDisplayName.bind(this);
+  }
+
+  getDisplayName() {
+    let realmId = document.getElementById("realmId").value;
+    // let realmId = 1;
+    let fundingSourceValue = document.getElementById("fundingSource").value;
+    // let fundingSourceValue = "USAID"
+    fundingSourceValue = fundingSourceValue.replace(/[^A-Za-z0-9]/g, "");
+    fundingSourceValue = fundingSourceValue.trim().toUpperCase();
+    if (realmId != '' && fundingSourceValue.length != 0) {
+
+      if (fundingSourceValue.length >= 7) {//minus 2
+        fundingSourceValue = fundingSourceValue.slice(0, 5);
+        console.log("DISPLAYNAME-BEF----->", fundingSourceValue);
+        FundingSourceService.getFundingSourceDisplayName(realmId, fundingSourceValue)
+          .then(response => {
+            console.log("DISPLAYNAME-RESP----->", response);
+            let { fundingSource } = this.state;
+            fundingSource.fundingSourceCode = response.data;
+            this.setState({
+              fundingSource
+            });
+
+          }).catch(
+            error => {
+              if (error.message === "Network Error") {
+                this.setState({
+                  message: 'static.unkownError',
+                  loading: false
+                });
+              } else {
+                switch (error.response ? error.response.status : "") {
+
+                  case 401:
+                    this.props.history.push(`/login/static.message.sessionExpired`)
+                    break;
+                  case 403:
+                    this.props.history.push(`/accessDenied`)
+                    break;
+                  case 500:
+                  case 404:
+                  case 406:
+                    this.setState({
+                      message: error.response.data.messageCode,
+                      loading: false
+                    });
+                    break;
+                  case 412:
+                    this.setState({
+                      message: error.response.data.messageCode,
+                      loading: false
+                    });
+                    break;
+                  default:
+                    this.setState({
+                      message: 'static.unkownError',
+                      loading: false
+                    });
+                    break;
+                }
+              }
+            }
+          );
+
+      } else {// not need to minus
+        console.log("DISPLAYNAME-BEF-else----->", fundingSourceValue);
+        FundingSourceService.getFundingSourceDisplayName(realmId, fundingSourceValue)
+          .then(response => {
+            console.log("DISPLAYNAME-RESP-else----->", response);
+            let { fundingSource } = this.state;
+            fundingSource.fundingSourceCode = response.data;
+            this.setState({
+              fundingSource
+            });
+
+          }).catch(
+            error => {
+              if (error.message === "Network Error") {
+                this.setState({
+                  message: 'static.unkownError',
+                  loading: false
+                });
+              } else {
+                switch (error.response ? error.response.status : "") {
+
+                  case 401:
+                    this.props.history.push(`/login/static.message.sessionExpired`)
+                    break;
+                  case 403:
+                    this.props.history.push(`/accessDenied`)
+                    break;
+                  case 500:
+                  case 404:
+                  case 406:
+                    this.setState({
+                      message: error.response.data.messageCode,
+                      loading: false
+                    });
+                    break;
+                  case 412:
+                    this.setState({
+                      message: error.response.data.messageCode,
+                      loading: false
+                    });
+                    break;
+                  default:
+                    this.setState({
+                      message: 'static.unkownError',
+                      loading: false
+                    });
+                    break;
+                }
+              }
+            }
+          );
+      }
+
+    }
+
   }
 
   dataChange(event) {
@@ -134,6 +255,7 @@ class AddFundingSourceComponent extends Component {
   }
   componentDidMount() {
     // AuthenticationService.setupAxiosInterceptors();
+    // this.getDisplayName();
     RealmService.getRealmListAll()
       .then(response => {
         if (response.status == 200) {
@@ -209,7 +331,13 @@ class AddFundingSourceComponent extends Component {
                 <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
               </CardHeader> */}
               <Formik
-                initialValues={initialValues}
+                // initialValues={initialValues}
+                enableReinitialize={true}
+                initialValues={{
+                  realmId: this.state.fundingSource.realm.id,
+                  fundingSource: this.state.fundingSource.label.label_en,
+                  fundingSourceCode: this.state.fundingSource.fundingSourceCode
+                }}
                 validate={validate(validationSchema)}
                 onSubmit={(values, { setSubmitting, setErrors }) => {
                   this.setState({
@@ -312,7 +440,8 @@ class AddFundingSourceComponent extends Component {
                               valid={!errors.fundingSource && this.state.fundingSource.label.label_en != ''}
                               invalid={touched.fundingSource && !!errors.fundingSource}
                               onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                              onBlur={handleBlur}
+                              // onBlur={handleBlur}
+                              onBlur={(e) => { handleBlur(e); this.getDisplayName() }}
                               maxLength={255}
                               value={this.Capitalize(this.state.fundingSource.label.label_en)}
                               required />
@@ -378,7 +507,8 @@ class AddFundingSourceComponent extends Component {
 
                             <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                             <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                            <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                            {/* <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button> */}
+                            <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
 
                             &nbsp;
                           </FormGroup>

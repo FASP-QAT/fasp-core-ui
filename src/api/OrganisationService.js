@@ -27,5 +27,10 @@ class OrganisationService {
         );
     }
 
+    getOrganisationDisplayName(json1,json2) {
+        return axios.get(`${API_URL}/api/organisation/getDisplayName/realmId/${json1}/name/${json2}`, {}
+        );
+    }
+
 }
 export default new OrganisationService();

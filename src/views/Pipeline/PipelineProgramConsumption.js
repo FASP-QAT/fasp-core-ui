@@ -50,6 +50,20 @@ export default class PipelineProgramConsumption extends Component {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
             }
+
+            var col = ("D").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(3, y);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+
+
             var reg = /^[0-9\b]+$/;
             var col = ("G").concat(parseInt(y) + 1);
             var value = this.el.getValueFromCoords(6, y);
@@ -266,7 +280,7 @@ export default class PipelineProgramConsumption extends Component {
 
                             // AuthenticationService.setupAxiosInterceptors();
                             PipelineService.getQatTempConsumptionById(this.props.pipelineId).then(response => {
-                                console.log("temp consumpton list--->", response.data.length);
+                                console.log("temp consumpton list--->", response.data);
                                 if (response.status == 200) {
 
 
@@ -336,7 +350,7 @@ export default class PipelineProgramConsumption extends Component {
                                                 title: i18n.t('static.planningunit.countrysku'),
                                                 type: 'dropdown',
                                                 source: realmCountryPlanningUnitList,
-                                                filter: this.dropdownFilter
+                                                // filter: this.dropdownFilter
 
                                             },
                                             {

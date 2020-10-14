@@ -267,7 +267,8 @@ class ShipmentGlobalDemandView extends Component {
             csvRow.push('')
             this.state.shipmentStatusLabels.map(ele =>
                 csvRow.push((i18n.t('static.common.status')).replaceAll(' ', '%20') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
-
+                csvRow.push('"' +((i18n.t('static.report.includeapproved') + ' : ' + document.getElementById("includeApprovedVersions").selectedOptions[0].text).replaceAll(' ', '%20')+'"'))
+     
 
         } else {
 
@@ -462,7 +463,10 @@ class ShipmentGlobalDemandView extends Component {
             y = y + 10;
             console.log(y)
         }
-
+        doc.text(i18n.t('static.report.includeapproved') + ' : ' + document.getElementById("includeApprovedVersions").selectedOptions[0].text, doc.internal.pageSize.width / 8, y, {
+            align: 'left'
+        })
+      
 
         doc.setTextColor("#fff");
         const title = i18n.t('static.dashboard.shipmentGlobalDemandViewheader');
@@ -473,7 +477,7 @@ class ShipmentGlobalDemandView extends Component {
         var height = doc.internal.pageSize.height;
         var h1 = 50;
         var aspectwidth1 = (width - h1);
-        let startY = y//150 + (this.state.planningUnitLabels.length * 3) + (this.state.fundingSourceLabels.length * 3) + (this.state.shipmentStatusLabels.length * 3)
+        let startY = y+10//150 + (this.state.planningUnitLabels.length * 3) + (this.state.fundingSourceLabels.length * 3) + (this.state.shipmentStatusLabels.length * 3)
         console.log('startY', startY)
         let pages = Math.ceil(startY / height)
         for (var j = 1; j < pages; j++) {
@@ -558,7 +562,8 @@ class ShipmentGlobalDemandView extends Component {
             let fundingSourceIds = this.state.fundingSourceValues.length == this.state.fundingSources.length ? [] : this.state.fundingSourceValues.map(ele => (ele.value).toString());
             let shipmentStatusIds = this.state.shipmentStatusValues.length == this.state.shipmentStatuses.length ? [] : this.state.shipmentStatusValues.map(ele => (ele.value).toString());
             let realmId = document.getElementById('realmId').value;
-
+            let useApprovedVersion = document.getElementById("includeApprovedVersions").value
+    
 
             if (realmId > 0 && productCategoryId != -1 && this.state.planningUnitValues.length > 0 && this.state.fundingSourceValues.length > 0 && this.state.shipmentStatusValues.length > 0) {
                 this.setState({
@@ -573,7 +578,8 @@ class ShipmentGlobalDemandView extends Component {
                     stopDate: new moment(endDate),
                     planningUnitIds: planningUnitIds,
                     fundingSourceIds: fundingSourceIds,
-                    shipmentStatusIds: shipmentStatusIds
+                    shipmentStatusIds: shipmentStatusIds,
+                    useApprovedSupplyPlanOnly: useApprovedVersion
 
                 }
 
@@ -1849,6 +1855,24 @@ class ShipmentGlobalDemandView extends Component {
                                                     onChange={(e) => { this.handleShipmentStatusChange(e) }}
                                                     options={shipmentStatusList && shipmentStatusList.length > 0 ? shipmentStatusList : []}
                                                 />
+                                            </div>
+                                        </FormGroup>
+                                        <FormGroup className="col-md-3">
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.includeapproved')}</Label>
+                                            <div className="controls ">
+                                                <InputGroup>
+                                                    <Input
+                                                        type="select"
+                                                        name="includeApprovedVersions"
+                                                        id="includeApprovedVersions"
+                                                        bsSize="sm"
+                                                        onChange={(e) => { this.fetchData() }}
+                                                    >
+                                                        <option value="true">{i18n.t('static.program.yes')}</option>
+                                                        <option value="false">{i18n.t('static.program.no')}</option>
+                                                    </Input>
+
+                                                </InputGroup>
                                             </div>
                                         </FormGroup>
 

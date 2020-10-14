@@ -258,7 +258,9 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
       csvRow.push(i18n.t('static.dashboard.country') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
     this.state.tracerCategoryLabels.map(ele =>
       csvRow.push((i18n.t('static.tracercategory.tracercategory')).replaceAll(' ', '%20') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
-   csvRow.push('')
+      csvRow.push('"' +((i18n.t('static.report.includeapproved') + ' : ' + document.getElementById("includeApprovedVersions").selectedOptions[0].text).replaceAll(' ', '%20')+'"'))
+     
+      csvRow.push('')
     csvRow.push('')
     csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
     csvRow.push('')
@@ -360,11 +362,15 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
           doc.text(i18n.t('static.program.realm') + ' : ' + document.getElementById("realmId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
             align: 'left'
           })
+          doc.text(i18n.t('static.report.includeapproved') + ' : ' + document.getElementById("includeApprovedVersions").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
+            align: 'left'
+        })
+      
           var planningText = doc.splitTextToSize(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.join(' , '), doc.internal.pageSize.width * 3 / 4);
-          doc.text(doc.internal.pageSize.width / 8, 130, planningText)
+          doc.text(doc.internal.pageSize.width / 8, 150, planningText)
 
           var planningText = doc.splitTextToSize((i18n.t('static.tracercategory.tracercategory') + ' : ' + this.state.tracerCategoryLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-          doc.text(doc.internal.pageSize.width / 8, 150, planningText)
+          doc.text(doc.internal.pageSize.width / 8, 180, planningText)
 
         }
 
@@ -456,6 +462,8 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
     let tracercategory = this.state.tracerCategoryValues.length == this.state.tracerCategories.length ? [] : this.state.tracerCategoryValues.map(ele => (ele.value).toString());//document.getElementById('tracerCategoryId').value
     let realmId = document.getElementById('realmId').value
     let date = moment(new Date(this.state.singleValue2.year, this.state.singleValue2.month, 0)).startOf('month').format('YYYY-MM-DD')
+    let useApprovedVersion = document.getElementById("includeApprovedVersions").value
+    
     console.log(realmId)
     if (realmId > 0 && this.state.countryValues.length > 0 && this.state.tracerCategoryValues.length > 0) {
       this.setState({ loading: true })
@@ -463,7 +471,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
         "realmCountryIds": countrysId,
         "tracerCategoryIds": tracercategory,
         "realmId": realmId,
-        "dt": date
+        "dt": date,"useApprovedSupplyPlanOnly": useApprovedVersion
 
       }
       // AuthenticationService.setupAxiosInterceptors();
@@ -537,10 +545,10 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
   getCountrys = () => {
     // AuthenticationService.setupAxiosInterceptors();
     let realmId = document.getElementById('realmId').value
-    RealmCountryService.getRealmCountryrealmIdById(realmId)
+    RealmCountryService.getRealmCountryForProgram(realmId)
       .then(response => {
         this.setState({
-          countrys: response.data
+          countrys: response.data.map(ele=>ele.realmCountry)
         })
       }).catch(
         error => {
@@ -647,7 +655,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
     const { singleValue2 } = this.state
     const { countrys } = this.state;
     let countryList = countrys.length > 0 && countrys.map((item, i) => {
-      return ({ label: getLabelText(item.country.label, this.state.lang), value: item.realmCountryId })
+      return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
     }, this);
     const { tracerCategories } = this.state;
     const { realmList } = this.state;
@@ -761,6 +769,25 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
 
                       </div>
                     </FormGroup>
+                    <FormGroup className="col-md-3">
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.includeapproved')}</Label>
+                                            <div className="controls ">
+                                                <InputGroup>
+                                                    <Input
+                                                        type="select"
+                                                        name="includeApprovedVersions"
+                                                        id="includeApprovedVersions"
+                                                        bsSize="sm"
+                                                        onChange={(e) => { this.filterData() }}
+                                                    >
+                                                        <option value="true">{i18n.t('static.program.yes')}</option>
+                                                        <option value="false">{i18n.t('static.program.no')}</option>
+                                                    </Input>
+
+                                                </InputGroup>
+                                            </div>
+                                        </FormGroup>
+
                     <FormGroup className="col-md-12 mt-2 " style={{ display: this.state.display }}>
                       <ul className="legendcommitversion list-group">
                         {

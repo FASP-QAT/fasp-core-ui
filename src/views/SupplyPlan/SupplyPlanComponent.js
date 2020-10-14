@@ -1577,7 +1577,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 <div id="showConsumptionBatchInfoButtonsDiv" style={{ display: 'none' }}>
                                     <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceledConsumption()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                     {this.state.consumptionBatchInfoChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.consumptionChild.saveConsumptionBatchInfo()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBatchInfo')}</Button>}
-                                    {this.refs.consumptionChild != undefined && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.refs.consumptionChild.addBatchRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
+                                    {this.refs.consumptionChild != undefined && <Button id="consumptionBatchAddRow" color="info" size="md" className="float-right mr-1" type="button" onClick={this.refs.consumptionChild.addBatchRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
                                 </div>
                                 <div className="pt-4"></div>
                             </ModalBody>
@@ -1763,7 +1763,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 <div id="showInventoryBatchInfoButtonsDiv" style={{ display: 'none' }}>
                                     <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceledInventory()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                     {this.state.inventoryBatchInfoChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.inventoryChild.saveInventoryBatchInfo()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBatchInfo')}</Button>}
-                                    {this.refs.inventoryChild != undefined && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.refs.inventoryChild.addBatchRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
+                                    {this.refs.inventoryChild != undefined && <Button id="inventoryBatchAddRow" color="info" size="md" className="float-right mr-1" type="button" onClick={this.refs.inventoryChild.addBatchRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
                                 </div>
                                 <div className="pt-4"></div>
                             </ModalBody>
@@ -2898,86 +2898,99 @@ export default class SupplyPlanComponent extends React.Component {
     }
 
     toggleLarge(supplyPlanType, month, quantity, startDate, endDate, isEmergencyOrder, shipmentType, count) {
-        var supplyPlanType = supplyPlanType;
-        this.setState({
-            consumptionError: '',
-            inventoryError: '',
-            shipmentError: '',
-            shipmentDuplicateError: '',
-            shipmentBudgetError: '',
-            shipmentBatchError: '',
-            suggestedShipmentError: '',
-            suggestedShipmentDuplicateError: '',
-            budgetError: '',
-            consumptionBatchError: '',
-            inventoryBatchError: '',
-            shipmentValidationBatchError: '',
-            consumptionDuplicateError: '',
-            inventoryDuplicateError: '',
-            consumptionBatchInfoDuplicateError: '',
-            consumptionBatchInfoNoStockError: '',
-            inventoryBatchInfoDuplicateError: '',
-            inventoryBatchInfoNoStockError: '',
-            shipmentBatchInfoDuplicateError: '',
-            inventoryNoStockError: '',
-            consumptionNoStockError: '',
-            noFundsBudgetError: '',
-            consumptionBatchInfoChangedFlag: 0,
-            inventoryBatchInfoChangedFlag: 0,
-            consumptionChangedFlag: 0,
-            inventoryChangedFlag: 0,
-            budgetChangedFlag: 0,
-            shipmentBatchInfoChangedFlag: 0,
-            shipmentChangedFlag: 0,
-            suggestedShipmentChangedFlag: 0,
-            shipmentDatesChangedFlag: 0,
-            shipmentDatesError: '',
-            showShipments: 0,
-            showInventory: 0,
-            showConsumption: 0
-        })
-        if (supplyPlanType == 'Consumption') {
-            console.log("count--------->", count);
-            var monthCountConsumption = count != undefined ? this.state.monthCount + count - 2 : this.state.monthCount;
-            this.setState({
-                consumption: !this.state.consumption,
-                monthCountConsumption: monthCountConsumption,
-            });
-            this.formSubmit(this.state.planningUnit, monthCountConsumption);
-        } else if (supplyPlanType == 'SuggestedShipments') {
-            this.setState({
-                shipments: !this.state.shipments
-            });
-            this.suggestedShipmentsDetailsClicked(month, quantity, isEmergencyOrder);
-        } else if (supplyPlanType == 'shipments') {
-            this.setState({
-                shipments: !this.state.shipments
-            });
-            this.shipmentsDetailsClicked(shipmentType, startDate, endDate);
-        } else if (supplyPlanType == 'Adjustments') {
-            var monthCountAdjustments = count != undefined ? this.state.monthCount + count - 2 : this.state.monthCount;
-            this.setState({
-                adjustments: !this.state.adjustments,
-                monthCountAdjustments: monthCountAdjustments
-            });
-            this.formSubmit(this.state.planningUnit, monthCountAdjustments);
-        } else if (supplyPlanType == 'expiredStock') {
-            this.setState({ loading: true });
-            console.log("Expired stock arr", this.state.expiredStockArr);
-            var details = (this.state.expiredStockArr).filter(c => moment(c.month.startDate).format("YYYY-MM-DD") == moment(startDate).format("YYYY-MM-DD"))
-            console.log("startDate", startDate)
-            if (startDate != undefined) {
-                this.setState({
-                    expiredStockModal: !this.state.expiredStockModal,
-                    expiredStockDetails: details[0].details,
-                    expiredStockDetailsTotal: details[0].qty,
-                    loading: false
-                })
+        var cont = false;
+        if (this.state.consumptionChangedFlag == 1 || this.state.inventoryChangedFlag == 1 || this.state.suggestedShipmentChangedFlag == 1 || this.state.shipmentChangedFlag == 1) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
             } else {
+
+            }
+        } else {
+            cont = true;
+        }
+        if (cont == true) {
+            var supplyPlanType = supplyPlanType;
+            this.setState({
+                consumptionError: '',
+                inventoryError: '',
+                shipmentError: '',
+                shipmentDuplicateError: '',
+                shipmentBudgetError: '',
+                shipmentBatchError: '',
+                suggestedShipmentError: '',
+                suggestedShipmentDuplicateError: '',
+                budgetError: '',
+                consumptionBatchError: '',
+                inventoryBatchError: '',
+                shipmentValidationBatchError: '',
+                consumptionDuplicateError: '',
+                inventoryDuplicateError: '',
+                consumptionBatchInfoDuplicateError: '',
+                consumptionBatchInfoNoStockError: '',
+                inventoryBatchInfoDuplicateError: '',
+                inventoryBatchInfoNoStockError: '',
+                shipmentBatchInfoDuplicateError: '',
+                inventoryNoStockError: '',
+                consumptionNoStockError: '',
+                noFundsBudgetError: '',
+                consumptionBatchInfoChangedFlag: 0,
+                inventoryBatchInfoChangedFlag: 0,
+                consumptionChangedFlag: 0,
+                inventoryChangedFlag: 0,
+                budgetChangedFlag: 0,
+                shipmentBatchInfoChangedFlag: 0,
+                shipmentChangedFlag: 0,
+                suggestedShipmentChangedFlag: 0,
+                shipmentDatesChangedFlag: 0,
+                shipmentDatesError: '',
+                showShipments: 0,
+                showInventory: 0,
+                showConsumption: 0
+            })
+            if (supplyPlanType == 'Consumption') {
+                console.log("count--------->", count);
+                var monthCountConsumption = count != undefined ? this.state.monthCount + count - 2 : this.state.monthCount;
                 this.setState({
-                    expiredStockModal: !this.state.expiredStockModal,
-                    loading: false
-                })
+                    consumption: !this.state.consumption,
+                    monthCountConsumption: monthCountConsumption,
+                });
+                this.formSubmit(this.state.planningUnit, monthCountConsumption);
+            } else if (supplyPlanType == 'SuggestedShipments') {
+                this.setState({
+                    shipments: !this.state.shipments
+                });
+                this.suggestedShipmentsDetailsClicked(month, quantity, isEmergencyOrder);
+            } else if (supplyPlanType == 'shipments') {
+                this.setState({
+                    shipments: !this.state.shipments
+                });
+                this.shipmentsDetailsClicked(shipmentType, startDate, endDate);
+            } else if (supplyPlanType == 'Adjustments') {
+                var monthCountAdjustments = count != undefined ? this.state.monthCount + count - 2 : this.state.monthCount;
+                this.setState({
+                    adjustments: !this.state.adjustments,
+                    monthCountAdjustments: monthCountAdjustments
+                });
+                this.formSubmit(this.state.planningUnit, monthCountAdjustments);
+            } else if (supplyPlanType == 'expiredStock') {
+                this.setState({ loading: true });
+                console.log("Expired stock arr", this.state.expiredStockArr);
+                var details = (this.state.expiredStockArr).filter(c => moment(c.month.startDate).format("YYYY-MM-DD") == moment(startDate).format("YYYY-MM-DD"))
+                console.log("startDate", startDate)
+                if (startDate != undefined) {
+                    this.setState({
+                        expiredStockModal: !this.state.expiredStockModal,
+                        expiredStockDetails: details[0].details,
+                        expiredStockDetailsTotal: details[0].qty,
+                        loading: false
+                    })
+                } else {
+                    this.setState({
+                        expiredStockModal: !this.state.expiredStockModal,
+                        loading: false
+                    })
+                }
             }
         }
     }
@@ -2992,60 +3005,73 @@ export default class SupplyPlanComponent extends React.Component {
     }
 
     actionCanceled(supplyPlanType) {
-        var inputs = document.getElementsByClassName("submitBtn");
-        for (var i = 0; i < inputs.length; i++) {
-            inputs[i].disabled = true;
+        var cont = false;
+        if (this.state.consumptionChangedFlag == 1 || this.state.inventoryChangedFlag == 1 || this.state.suggestedShipmentChangedFlag == 1 || this.state.shipmentChangedFlag == 1) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
+
+            }
+        } else {
+            cont = true;
         }
-        this.setState({
-            loading: false,
-            message: i18n.t('static.actionCancelled'),
-            color: 'red',
-            consumptionError: '',
-            inventoryError: '',
-            shipmentError: '',
-            suggestedShipmentError: '',
-            shipmentDuplicateError: '',
-            shipmentBudgetError: '',
-            shipmentBatchError: '',
-            suggestedShipmentDuplicateError: '',
-            budgetError: '',
-            consumptionBatchError: '',
-            inventoryBatchError: '',
-            shipmentValidationBatchError: '',
-            consumptionChangedFlag: 0,
-            suggestedShipmentChangedFlag: 0,
-            shipmentChangedFlag: 0,
-            inventoryChangedFlag: 0,
-            consumptionDuplicateError: '',
-            inventoryDuplicateError: '',
-            inventoryNoStockError: '',
-            consumptionNoStockError: '',
-            consumptionBatchInfoDuplicateError: '',
-            consumptionBatchInfoNoStockError: '',
-            inventoryBatchInfoDuplicateError: '',
-            inventoryBatchInfoNoStockError: '',
-            shipmentBatchInfoDuplicateError: '',
-            noFundsBudgetError: '',
-            consumptionBatchInfoChangedFlag: 0,
-            inventoryBatchInfoChangedFlag: 0,
-            consumptionChangedFlag: 0,
-            inventoryChangedFlag: 0,
-            budgetChangedFlag: 0,
-            shipmentBatchInfoChangedFlag: 0,
-            shipmentChangedFlag: 0,
-            suggestedShipmentChangedFlag: 0,
-            shipmentDatesChangedFlag: 0,
-            shipmentDatesError: '',
-            shipmentQtyChangedFlag: 0,
-            qtyCalculatorValidationError: "",
-            showShipments: 0,
-            showInventory: 0,
-            showConsumption: 0,
-        },
-            () => {
-                this.hideFirstComponent();
-            })
-        this.toggleLarge(supplyPlanType);
+        if (cont == true) {
+            var inputs = document.getElementsByClassName("submitBtn");
+            for (var i = 0; i < inputs.length; i++) {
+                inputs[i].disabled = true;
+            }
+            this.setState({
+                loading: false,
+                message: i18n.t('static.actionCancelled'),
+                color: 'red',
+                consumptionError: '',
+                inventoryError: '',
+                shipmentError: '',
+                suggestedShipmentError: '',
+                shipmentDuplicateError: '',
+                shipmentBudgetError: '',
+                shipmentBatchError: '',
+                suggestedShipmentDuplicateError: '',
+                budgetError: '',
+                consumptionBatchError: '',
+                inventoryBatchError: '',
+                shipmentValidationBatchError: '',
+                consumptionChangedFlag: 0,
+                suggestedShipmentChangedFlag: 0,
+                shipmentChangedFlag: 0,
+                inventoryChangedFlag: 0,
+                consumptionDuplicateError: '',
+                inventoryDuplicateError: '',
+                inventoryNoStockError: '',
+                consumptionNoStockError: '',
+                consumptionBatchInfoDuplicateError: '',
+                consumptionBatchInfoNoStockError: '',
+                inventoryBatchInfoDuplicateError: '',
+                inventoryBatchInfoNoStockError: '',
+                shipmentBatchInfoDuplicateError: '',
+                noFundsBudgetError: '',
+                consumptionBatchInfoChangedFlag: 0,
+                inventoryBatchInfoChangedFlag: 0,
+                consumptionChangedFlag: 0,
+                inventoryChangedFlag: 0,
+                budgetChangedFlag: 0,
+                shipmentBatchInfoChangedFlag: 0,
+                shipmentChangedFlag: 0,
+                suggestedShipmentChangedFlag: 0,
+                shipmentDatesChangedFlag: 0,
+                shipmentDatesError: '',
+                shipmentQtyChangedFlag: 0,
+                qtyCalculatorValidationError: "",
+                showShipments: 0,
+                showInventory: 0,
+                showConsumption: 0,
+            },
+                () => {
+                    this.hideFirstComponent();
+                    this.toggleLarge(supplyPlanType);
+                })
+        }
     }
 
     leftClicked() {
@@ -3100,31 +3126,30 @@ export default class SupplyPlanComponent extends React.Component {
 
     // Show consumption details
     consumptionDetailsClicked(startDate, endDate, region, actualFlag, month) {
-        this.setState({ loading: true });
-        var elInstance = this.state.consumptionBatchInfoTableEl;
-        if (elInstance != undefined && elInstance != "") {
-            elInstance.destroy();
+        var cont = false;
+        if (this.state.consumptionChangedFlag == 1) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
+
+            }
+        } else {
+            cont = true;
         }
-        var planningUnitId = document.getElementById("planningUnitId").value;
-        var programId = document.getElementById("programId").value;
-        var db1;
-        var storeOS;
-        getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function (event) {
-            this.setState({
-                supplyPlanError: i18n.t('static.program.errortext'),
-                loading: false,
-                color: "red"
-            })
-            this.hideFirstComponent()
-        }.bind(this);
-        openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-            var programDataTransaction = db1.transaction(['programData'], 'readwrite');
-            var programDataOs = programDataTransaction.objectStore('programData');
-            var programRequest = programDataOs.get(programId);
-            programRequest.onerror = function (event) {
+        if (cont == true) {
+            this.setState({ loading: true });
+            var elInstance = this.state.consumptionBatchInfoTableEl;
+            if (elInstance != undefined && elInstance != "") {
+                elInstance.destroy();
+            }
+            var planningUnitId = document.getElementById("planningUnitId").value;
+            var programId = document.getElementById("programId").value;
+            var db1;
+            var storeOS;
+            getDatabase();
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            openRequest.onerror = function (event) {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext'),
                     loading: false,
@@ -3132,76 +3157,91 @@ export default class SupplyPlanComponent extends React.Component {
                 })
                 this.hideFirstComponent()
             }.bind(this);
-            programRequest.onsuccess = function (e) {
-                var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                var programJson = JSON.parse(programData);
-                var batchInfoList = programJson.batchInfoList;
-                var consumptionListUnFiltered = (programJson.consumptionList);
-                var consumptionList = consumptionListUnFiltered.filter(con =>
-                    con.planningUnit.id == planningUnitId
-                    && con.region.id == region
-                    && ((con.consumptionDate >= startDate && con.consumptionDate <= endDate)));
+            openRequest.onsuccess = function (e) {
+                db1 = e.target.result;
+                var programDataTransaction = db1.transaction(['programData'], 'readwrite');
+                var programDataOs = programDataTransaction.objectStore('programData');
+                var programRequest = programDataOs.get(programId);
+                programRequest.onerror = function (event) {
+                    this.setState({
+                        supplyPlanError: i18n.t('static.program.errortext'),
+                        loading: false,
+                        color: "red"
+                    })
+                    this.hideFirstComponent()
+                }.bind(this);
+                programRequest.onsuccess = function (e) {
+                    var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                    var programJson = JSON.parse(programData);
+                    var batchInfoList = programJson.batchInfoList;
+                    var consumptionListUnFiltered = (programJson.consumptionList);
+                    var consumptionList = consumptionListUnFiltered.filter(con =>
+                        con.planningUnit.id == planningUnitId
+                        && con.region.id == region
+                        && ((con.consumptionDate >= startDate && con.consumptionDate <= endDate)));
 
-                var batchList = [];
-                var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == planningUnitId && c.active.toString() == "true" && c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS);
-                console.log("Shipment list=============>", shipmentList);
-                for (var sl = 0; sl < shipmentList.length; sl++) {
-                    var bdl = shipmentList[sl].batchInfoList;
-                    for (var bd = 0; bd < bdl.length; bd++) {
-                        var index = batchList.findIndex(c => c.batchNo == bdl[bd].batch.batchNo);
-                        if (index == -1) {
-                            var batchDetailsToPush = batchInfoList.filter(c => c.batchNo == bdl[bd].batch.batchNo && c.planningUnitId == planningUnitId)[0];
-                            batchList.push(batchDetailsToPush);
+                    var batchList = [];
+                    var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == planningUnitId && c.active.toString() == "true" && c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS);
+                    console.log("Shipment list=============>", shipmentList);
+                    for (var sl = 0; sl < shipmentList.length; sl++) {
+                        var bdl = shipmentList[sl].batchInfoList;
+                        for (var bd = 0; bd < bdl.length; bd++) {
+                            var index = batchList.findIndex(c => c.batchNo == bdl[bd].batch.batchNo);
+                            if (index == -1) {
+                                var batchDetailsToPush = batchInfoList.filter(c => c.batchNo == bdl[bd].batch.batchNo && c.planningUnitId == planningUnitId)[0];
+                                batchList.push(batchDetailsToPush);
+                            }
                         }
                     }
-                }
-                console.log("Btach List============>", batchList);
+                    console.log("Btach List============>", batchList);
 
-                this.setState({
-                    programJsonAfterConsumptionClicked: programJson,
-                    consumptionListUnFiltered: consumptionListUnFiltered,
-                    batchInfoList: batchList,
-                    programJson: programJson,
-                    consumptionList: consumptionList,
-                    showConsumption: 1,
-                    consumptionMonth: month,
-                    consumptionStartDate: startDate,
-                    consumptionRegion: region
-                })
-                this.refs.consumptionChild.showConsumptionData();
+                    this.setState({
+                        programJsonAfterConsumptionClicked: programJson,
+                        consumptionListUnFiltered: consumptionListUnFiltered,
+                        batchInfoList: batchList,
+                        programJson: programJson,
+                        consumptionList: consumptionList,
+                        showConsumption: 1,
+                        consumptionMonth: month,
+                        consumptionStartDate: startDate,
+                        consumptionChangedFlag: 0,
+                        consumptionBatchInfoChangedFlag: 0,
+                        consumptionRegion: region
+                    })
+                    this.refs.consumptionChild.showConsumptionData();
+                }.bind(this)
             }.bind(this)
-        }.bind(this)
+        }
     }
     // Consumption Functionality
 
     // Adjustments Functionality
     // Show adjustments details
     adjustmentsDetailsClicked(region, month, endDate, inventoryType) {
-        this.setState({ loading: true })
-        var elInstance = this.state.inventoryBatchInfoTableEl;
-        if (elInstance != undefined && elInstance != "") {
-            elInstance.destroy();
+        var cont = false;
+        if (this.state.inventoryChangedFlag == 1) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
+
+            }
+        } else {
+            cont = true;
         }
-        var planningUnitId = document.getElementById("planningUnitId").value;
-        var programId = document.getElementById("programId").value;
-        var db1;
-        getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function (event) {
-            this.setState({
-                supplyPlanError: i18n.t('static.program.errortext'),
-                loading: false,
-                color: "red"
-            })
-            this.hideFirstComponent()
-        }.bind(this);
-        openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-            var transaction = db1.transaction(['programData'], 'readwrite');
-            var programTransaction = transaction.objectStore('programData');
-            var programRequest = programTransaction.get(programId);
-            programRequest.onerror = function (event) {
+        if (cont == true) {
+            this.setState({ loading: true })
+            var elInstance = this.state.inventoryBatchInfoTableEl;
+            if (elInstance != undefined && elInstance != "") {
+                elInstance.destroy();
+            }
+            var planningUnitId = document.getElementById("planningUnitId").value;
+            var programId = document.getElementById("programId").value;
+            var db1;
+            getDatabase();
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            openRequest.onerror = function (event) {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext'),
                     loading: false,
@@ -3209,50 +3249,66 @@ export default class SupplyPlanComponent extends React.Component {
                 })
                 this.hideFirstComponent()
             }.bind(this);
-            programRequest.onsuccess = function (event) {
-                var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                var programJson = JSON.parse(programData);
-                var batchInfoList = programJson.batchInfoList;
+            openRequest.onsuccess = function (e) {
+                db1 = e.target.result;
+                var transaction = db1.transaction(['programData'], 'readwrite');
+                var programTransaction = transaction.objectStore('programData');
+                var programRequest = programTransaction.get(programId);
+                programRequest.onerror = function (event) {
+                    this.setState({
+                        supplyPlanError: i18n.t('static.program.errortext'),
+                        loading: false,
+                        color: "red"
+                    })
+                    this.hideFirstComponent()
+                }.bind(this);
+                programRequest.onsuccess = function (event) {
+                    var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                    var programJson = JSON.parse(programData);
+                    var batchInfoList = programJson.batchInfoList;
 
-                var batchList = [];
-                var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == planningUnitId && c.active.toString() == "true" && c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS);
+                    var batchList = [];
+                    var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == planningUnitId && c.active.toString() == "true" && c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS);
 
-                for (var sl = 0; sl < shipmentList.length; sl++) {
-                    var bdl = shipmentList[sl].batchInfoList;
-                    for (var bd = 0; bd < bdl.length; bd++) {
-                        var index = batchList.findIndex(c => c.batchNo == bdl[bd].batch.batchNo);
-                        if (index == -1) {
-                            var batchDetailsToPush = batchInfoList.filter(c => c.batchNo == bdl[bd].batch.batchNo && c.planningUnitId == planningUnitId)[0];
-                            batchList.push(batchDetailsToPush);
+                    for (var sl = 0; sl < shipmentList.length; sl++) {
+                        var bdl = shipmentList[sl].batchInfoList;
+                        for (var bd = 0; bd < bdl.length; bd++) {
+                            var index = batchList.findIndex(c => c.batchNo == bdl[bd].batch.batchNo);
+                            if (index == -1) {
+                                var batchDetailsToPush = batchInfoList.filter(c => c.batchNo == bdl[bd].batch.batchNo && c.planningUnitId == planningUnitId)[0];
+                                batchList.push(batchDetailsToPush);
+                            }
                         }
                     }
-                }
-                var inventoryListUnFiltered = (programJson.inventoryList);
-                var inventoryList = (programJson.inventoryList).filter(c =>
-                    c.planningUnit.id == planningUnitId &&
-                    c.region != null && c.region.id != 0 &&
-                    c.region.id == region &&
-                    moment(c.inventoryDate).format("MMM YY") == month);
-                if (inventoryType == 1) {
-                    inventoryList = inventoryList.filter(c => c.actualQty != "" && c.actualQty != undefined && c.actualQty != null);
-                } else {
-                    inventoryList = inventoryList.filter(c => c.adjustmentQty != "" && c.adjustmentQty != undefined && c.adjustmentQty != null);
-                }
-                this.setState({
-                    batchInfoList: batchList,
-                    programJson: programJson,
-                    inventoryListUnFiltered: inventoryListUnFiltered,
-                    inventoryList: inventoryList,
-                    showInventory: 1,
-                    inventoryType: inventoryType,
-                    inventoryMonth: month,
-                    inventoryEndDate: endDate,
-                    inventoryRegion: region
-                })
-                this.refs.inventoryChild.showInventoryData();
+                    var inventoryListUnFiltered = (programJson.inventoryList);
+                    var inventoryList = (programJson.inventoryList).filter(c =>
+                        c.planningUnit.id == planningUnitId &&
+                        c.region != null && c.region.id != 0 &&
+                        c.region.id == region &&
+                        moment(c.inventoryDate).format("MMM YY") == month);
+                    if (inventoryType == 1) {
+                        inventoryList = inventoryList.filter(c => c.actualQty != "" && c.actualQty != undefined && c.actualQty != null);
+                    } else {
+                        inventoryList = inventoryList.filter(c => c.adjustmentQty != "" && c.adjustmentQty != undefined && c.adjustmentQty != null);
+                    }
+                    this.setState({
+                        batchInfoList: batchList,
+                        programJson: programJson,
+                        inventoryListUnFiltered: inventoryListUnFiltered,
+                        inventoryList: inventoryList,
+                        showInventory: 1,
+                        inventoryType: inventoryType,
+                        inventoryMonth: month,
+                        inventoryEndDate: endDate,
+                        inventoryRegion: region,
+                        inventoryChangedFlag: 0,
+                        inventoryBatchInfoChangedFlag: 0
+                    })
+                    this.refs.inventoryChild.showInventoryData();
+                }.bind(this)
             }.bind(this)
-        }.bind(this)
+        }
     }
 
     // Adjustments Functionality
@@ -3589,56 +3645,121 @@ export default class SupplyPlanComponent extends React.Component {
 
     actionCanceledShipments(type) {
         if (type == "qtyCalculator") {
-            document.getElementById("showSaveQtyButtonDiv").style.display = 'none';
-            (this.refs.shipmentChild.state.qtyCalculatorTableEl).destroy();
-            (this.refs.shipmentChild.state.qtyCalculatorTableEl1).destroy();
-            this.refs.shipmentChild.state.shipmentQtyChangedFlag = 0;
-            this.setState({
-                qtyCalculatorValidationError: "",
-                shipmentQtyChangedFlag: 0
-            })
+            var cont = false;
+            if (this.state.shipmentQtyChangedFlag == 1) {
+                var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+                if (cf == true) {
+                    cont = true;
+                } else {
+
+                }
+            } else {
+                cont = true;
+            }
+            if (cont == true) {
+                document.getElementById("showSaveQtyButtonDiv").style.display = 'none';
+                (this.refs.shipmentChild.state.qtyCalculatorTableEl).destroy();
+                (this.refs.shipmentChild.state.qtyCalculatorTableEl1).destroy();
+                this.refs.shipmentChild.state.shipmentQtyChangedFlag = 0;
+                this.setState({
+                    qtyCalculatorValidationError: "",
+                    shipmentQtyChangedFlag: 0
+                })
+            }
         } else if (type == "shipmentDates") {
-            document.getElementById("showSaveShipmentsDatesButtonsDiv").style.display = 'none';
-            (this.refs.shipmentChild.state.shipmentDatesTableEl).destroy();
-            this.refs.shipmentChild.state.shipmentDatesChangedFlag = 0;
-            this.setState({
-                shipmentDatesChangedFlag: 0,
-                shipmentDatesError: ""
-            })
+            var cont = false;
+            if (this.state.shipmentDatesChangedFlag == 1) {
+                var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+                if (cf == true) {
+                    cont = true;
+                } else {
+
+                }
+            } else {
+                cont = true;
+            }
+            if (cont == true) {
+                document.getElementById("showSaveShipmentsDatesButtonsDiv").style.display = 'none';
+                (this.refs.shipmentChild.state.shipmentDatesTableEl).destroy();
+                this.refs.shipmentChild.state.shipmentDatesChangedFlag = 0;
+                this.setState({
+                    shipmentDatesChangedFlag: 0,
+                    shipmentDatesError: ""
+                })
+            }
         } else if (type == "shipmentBatch") {
-            document.getElementById("showShipmentBatchInfoButtonsDiv").style.display = 'none';
-            (this.refs.shipmentChild.state.shipmentBatchInfoTableEl).destroy();
-            this.refs.shipmentChild.state.shipmentBatchInfoChangedFlag = 0;
-            this.setState({
-                shipmentBatchInfoChangedFlag: 0,
-                shipmentValidationBatchError: "",
-                shipmentBatchInfoDuplicateError: ""
-            })
+            var cont = false;
+            if (this.state.shipmentBatchInfoChangedFlag == 1) {
+                var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+                if (cf == true) {
+                    cont = true;
+                } else {
+
+                }
+            } else {
+                cont = true;
+            }
+            if (cont == true) {
+                document.getElementById("showShipmentBatchInfoButtonsDiv").style.display = 'none';
+                (this.refs.shipmentChild.state.shipmentBatchInfoTableEl).destroy();
+                this.refs.shipmentChild.state.shipmentBatchInfoChangedFlag = 0;
+                this.setState({
+                    shipmentBatchInfoChangedFlag: 0,
+                    shipmentValidationBatchError: "",
+                    shipmentBatchInfoDuplicateError: ""
+                })
+            }
         }
     }
 
     actionCanceledInventory() {
-        document.getElementById("showInventoryBatchInfoButtonsDiv").style.display = 'none';
-        (this.refs.inventoryChild.state.inventoryBatchInfoTableEl).destroy();
-        this.refs.inventoryChild.state.inventoryBatchInfoChangedFlag = 0;
-        this.setState({
-            inventoryBatchInfoChangedFlag: 0,
-            inventoryBatchInfoDuplicateError: "",
-            inventoryBatchInfoNoStockError: "",
-            inventoryBatchError: ""
-        })
+        var cont = false;
+        if (this.state.inventoryBatchInfoChangedFlag == 1) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
+
+            }
+        } else {
+            cont = true;
+        }
+        if (cont == true) {
+            document.getElementById("showInventoryBatchInfoButtonsDiv").style.display = 'none';
+            (this.refs.inventoryChild.state.inventoryBatchInfoTableEl).destroy();
+            this.refs.inventoryChild.state.inventoryBatchInfoChangedFlag = 0;
+            this.setState({
+                inventoryBatchInfoChangedFlag: 0,
+                inventoryBatchInfoDuplicateError: "",
+                inventoryBatchInfoNoStockError: "",
+                inventoryBatchError: ""
+            })
+        }
     }
 
     actionCanceledConsumption() {
-        document.getElementById("showConsumptionBatchInfoButtonsDiv").style.display = 'none';
-        (this.refs.consumptionChild.state.consumptionBatchInfoTableEl).destroy();
-        this.refs.consumptionChild.state.consumptionBatchInfoChangedFlag = 0;
-        this.setState({
-            consumptionBatchInfoChangedFlag: 0,
-            consumptionBatchInfoDuplicateError: "",
-            consumptionBatchInfoNoStockError: "",
-            consumptionBatchError: ""
-        })
+        var cont = false;
+        if (this.state.consumptionBatchInfoChangedFlag == 1) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
+
+            }
+        } else {
+            cont = true;
+        }
+        if (cont == true) {
+            document.getElementById("showConsumptionBatchInfoButtonsDiv").style.display = 'none';
+            (this.refs.consumptionChild.state.consumptionBatchInfoTableEl).destroy();
+            this.refs.consumptionChild.state.consumptionBatchInfoChangedFlag = 0;
+            this.setState({
+                consumptionBatchInfoChangedFlag: 0,
+                consumptionBatchInfoDuplicateError: "",
+                consumptionBatchInfoNoStockError: "",
+                consumptionBatchError: ""
+            })
+        }
     }
     getDataforExport = (report) => {
         this.setState({ loading: true }, () => {

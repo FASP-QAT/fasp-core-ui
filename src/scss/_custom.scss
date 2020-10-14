@@ -2881,7 +2881,7 @@ input::placeholder {
 }
 
 .readonly{
-  background-color: #efefef;
+  background-color: #cfcdc9;
 }
 
 
@@ -3597,3 +3597,17 @@ margin-left: -45px;
 // .werehousecapacitySearchposition{
 //   margin-top: -36px;
 //  } 
+
+.qat-problemListSearch{
+  margin-top:-4%;
+}
+
+.problemList-red{
+  background-color: #f48282;
+}
+.problemList-orange{
+  background-color: orange;
+}
+.problemList-yellow{
+background-color: yellow;
+}

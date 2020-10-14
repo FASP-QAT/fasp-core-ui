@@ -1125,16 +1125,20 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     shipmentInstance.setStyle(col, "background-color", "#D3D3D3");
                     var cell = shipmentInstance.getCell(`L${parseInt(i) + 1}`)
                     cell.classList.add('shipmentEntryDoNotInclude');
+                    cell.classList.remove('readonly');
                     var cell = shipmentInstance.getCell(`I${parseInt(i) + 1}`)
                     cell.classList.add('shipmentEntryDoNotInclude');
+                    cell.classList.remove('readonly');
                     var element = document.getElementById("shipmentsDetailsTable");
                     element.classList.remove("jexcelremoveReadonlybackground");
                 } else {
                     shipmentInstance.setStyle(col, "background-color", "transparent");
                     var cell = shipmentInstance.getCell(`L${parseInt(i) + 1}`)
                     cell.classList.remove('shipmentEntryDoNotInclude');
+                    cell.classList.add('readonly');
                     var cell = shipmentInstance.getCell(`I${parseInt(i) + 1}`)
                     cell.classList.remove('shipmentEntryDoNotInclude');
+                    cell.classList.add('readonly');
                     var element = document.getElementById("shipmentsDetailsTable");
                     element.classList.add("jexcelremoveReadonlybackground");
                 }
@@ -1763,7 +1767,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             document.getElementById("showSaveQtyButtonDiv").style.display = 'none';
             this.props.updateState("qtyCalculatorValidationError", "");
             if (this.props.shipmentPage == "shipmentDataEntry") {
-                this.props.toggleLarge();
+                this.props.toggleLarge("submit");
             }
             this.props.updateState("loading", false);
             if (elInstance != undefined && elInstance != "") {
@@ -1961,7 +1965,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             })
             document.getElementById("showShipmentBatchInfoButtonsDiv").style.display = 'none';
             if (this.props.shipmentPage == "shipmentDataEntry") {
-                this.props.toggleLarge();
+                this.props.toggleLarge("submit");
             }
             this.props.updateState("loading", false);
             elInstance.destroy();
@@ -2523,7 +2527,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             document.getElementById("showSaveShipmentsDatesButtonsDiv").style.display = 'none';
             this.props.updateState("shipmentDatesError", "");
             if (this.props.shipmentPage == "shipmentDataEntry") {
-                this.props.toggleLarge();
+                this.props.toggleLarge("submit");
             }
             this.props.updateState("loading", false);
             elInstance.destroy();
