@@ -529,21 +529,6 @@ export default class EditHealthAreaComponent extends Component {
                                                     </FormGroup>
 
                                                     <FormGroup>
-                                                        <Label htmlFor="company">{i18n.t('static.technicalArea.technicalAreaDisplayName')}<span class="red Reqasterisk">*</span> </Label>
-                                                        <Input
-                                                            bsSize="sm"
-                                                            type="text" name="healthAreaCode"
-                                                            valid={!errors.healthAreaCode}
-                                                            invalid={touched.healthAreaCode && !!errors.healthAreaCode || !!errors.healthAreaCode}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                            onBlur={handleBlur}
-                                                            maxLength={6}
-                                                            value={this.state.healthArea.healthAreaCode}
-                                                            id="healthAreaCode" />
-                                                        <FormFeedback className="red">{errors.healthAreaCode}</FormFeedback>
-                                                    </FormGroup>
-
-                                                    <FormGroup>
                                                         <Label htmlFor="company">{i18n.t('static.healthArea.healthAreaName')}<span class="red Reqasterisk">*</span> </Label>
                                                         <Input
                                                             bsSize="sm"
@@ -558,6 +543,20 @@ export default class EditHealthAreaComponent extends Component {
                                                         <FormFeedback className="red">{errors.healthAreaName}</FormFeedback>
                                                     </FormGroup>
 
+                                                    <FormGroup>
+                                                        <Label htmlFor="company">{i18n.t('static.technicalArea.technicalAreaDisplayName')}<span class="red Reqasterisk">*</span> </Label>
+                                                        <Input
+                                                            bsSize="sm"
+                                                            type="text" name="healthAreaCode"
+                                                            valid={!errors.healthAreaCode}
+                                                            invalid={touched.healthAreaCode && !!errors.healthAreaCode || !!errors.healthAreaCode}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                            onBlur={handleBlur}
+                                                            maxLength={6}
+                                                            value={this.state.healthArea.healthAreaCode}
+                                                            id="healthAreaCode" />
+                                                        <FormFeedback className="red">{errors.healthAreaCode}</FormFeedback>
+                                                    </FormGroup>
 
 
                                                     <FormGroup>

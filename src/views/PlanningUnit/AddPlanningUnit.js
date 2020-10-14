@@ -420,7 +420,7 @@ export default class AddPlanningUnit extends Component {
                                                         <FormFeedback className="red">{errors.forecastingUnitId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="multiplier">{i18n.t('static.planningUnit.multiplier')}<span className="red Reqasterisk">*</span></Label>
+                                                        <Label for="multiplier">{i18n.t('static.planningUnit.labelMultiplier')}<span className="red Reqasterisk">*</span></Label>
                                                         <Input type="number"
                                                             name="multiplier"
                                                             id="multiplier"
@@ -434,7 +434,7 @@ export default class AddPlanningUnit extends Component {
                                                         <FormFeedback className="red">{errors.multiplier}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="label">{i18n.t('static.planningUnit.plannignUnitName')}<span className="red Reqasterisk">*</span></Label>
+                                                        <Label for="label">{i18n.t('static.product.productName')}<span className="red Reqasterisk">*</span></Label>
                                                         <Input type="text"
                                                             name="label"
                                                             id="label"
@@ -448,7 +448,7 @@ export default class AddPlanningUnit extends Component {
                                                         <FormFeedback className="red">{errors.label}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="unitId">{i18n.t('static.planningUnit.plannignUnitMeasure')}<span className="red Reqasterisk">*</span></Label>
+                                                        <Label htmlFor="unitId">{i18n.t('static.planningUnit.planningUnitOfMeasure')}<span className="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             type="select"
                                                             name="unitId"

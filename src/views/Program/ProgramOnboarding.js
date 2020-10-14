@@ -29,8 +29,10 @@ export default class ProgramOnboarding extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            loading: true,
+            loading: true, 
             program: {
+                uniqueCode:'',
+                programCode: '<%RC%>-<%TA%>-<%OR%>-',
                 label: {
                     label_en: '',
                     label_sp: '',
@@ -416,18 +418,35 @@ export default class ProgramOnboarding extends Component {
             this.refs.organisationChild.getOrganisationList();
             this.refs.sixChild.getProgramManagerList();
         } if (event.target.name == 'realmCountryId') {
+
+            var index = event.nativeEvent.target.selectedIndex;
+            var dname = this.state.program.programCode;
+            var email_array = dname.split('-');
+            var new_string = email_array[0];
+            program.programCode = dname.replace(new_string,event.nativeEvent.target[index].text);
+
             program.realmCountry.realmCountryId = event.target.value;
             this.refs.regionChild.getRegionList();
         } if (event.target.name == 'organisationId') {
+            var index = event.nativeEvent.target.selectedIndex;
+            var dname = this.state.program.programCode;
+            var email_array = dname.split('-');
+            var new_string = email_array[2];
+            program.programCode = dname.replace(new_string,event.nativeEvent.target[index].text);
+
             program.organisation.id = event.target.value;
         } if (event.target.name == 'airFreightPerc') {
             program.airFreightPerc = event.target.value;
         } if (event.target.name == 'seaFreightPerc') {
             program.seaFreightPerc = event.target.value;
         }
-        // if (event.target.name == 'deliveredToReceivedLeadTime') {
-        //     program.deliveredToReceivedLeadTime = event.target.value;
-        // } 
+        if (event.target.name == 'uniqueCode') {
+            var dname = this.state.program.programCode;
+            var email_array = dname.split('-');
+            var new_string = email_array[3];
+            program.programCode = dname.replace(new_string,"").concat(event.target.value.toUpperCase());
+            program.uniqueCode=event.target.value.toUpperCase()
+        } 
         // if (event.target.name == 'draftToSubmittedLeadTime') {
         //     program.draftToSubmittedLeadTime = event.target.value;
         // } 
@@ -443,6 +462,12 @@ export default class ProgramOnboarding extends Component {
         } if (event.target.name == 'monthsInPastForAmc') {
             program.monthsInPastForAmc = event.target.value;
         } if (event.target.name == 'healthAreaId') {
+            var index = event.nativeEvent.target.selectedIndex;
+            var dname = this.state.program.programCode;
+            var email_array = dname.split('-');
+            var new_string = email_array[1];
+            program.programCode = dname.replace(new_string,event.nativeEvent.target[index].text);
+
             program.healthArea.id = event.target.value;
         } if (event.target.name == 'userId') {
             program.programManager.userId = event.target.value;
@@ -459,7 +484,7 @@ export default class ProgramOnboarding extends Component {
             program.programNotes = event.target.value;
         }
 
-        this.setState({ program }, () => { })
+        this.setState({ program }, () => { console.log(this.state) })
 
     }
 
@@ -881,7 +906,7 @@ export default class ProgramOnboarding extends Component {
                                     </FormGroup> */}
                                 </div>
                                 <div id="stepSix">
-                                    <StepSix ref='sixChild' dataChange={this.dataChange} Capitalize={this.Capitalize} finishedStepSix={this.finishedStepSix} previousToStepFive={this.previousToStepFive} items={this.state}></StepSix>
+                                    <StepSix ref='sixChild' dataChange={this.dataChange} Capitalize={this.Capitalize} finishedStepSix={this.finishedStepSix} previousToStepFive={this.previousToStepFive} items={this.state} Capitalize={this.Capitalize}></StepSix>
                                     {/* <Row>
                                         <FormGroup className="col-md-6">
                                             <Label htmlFor="company">{i18n.t('static.program.program')}<span class="red Reqasterisk">*</span></Label>

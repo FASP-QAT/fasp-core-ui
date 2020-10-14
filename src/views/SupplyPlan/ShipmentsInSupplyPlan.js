@@ -1125,16 +1125,20 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     shipmentInstance.setStyle(col, "background-color", "#D3D3D3");
                     var cell = shipmentInstance.getCell(`L${parseInt(i) + 1}`)
                     cell.classList.add('shipmentEntryDoNotInclude');
+                    cell.classList.remove('readonly');
                     var cell = shipmentInstance.getCell(`I${parseInt(i) + 1}`)
                     cell.classList.add('shipmentEntryDoNotInclude');
+                    cell.classList.remove('readonly');
                     var element = document.getElementById("shipmentsDetailsTable");
                     element.classList.remove("jexcelremoveReadonlybackground");
                 } else {
                     shipmentInstance.setStyle(col, "background-color", "transparent");
                     var cell = shipmentInstance.getCell(`L${parseInt(i) + 1}`)
                     cell.classList.remove('shipmentEntryDoNotInclude');
+                    cell.classList.add('readonly');
                     var cell = shipmentInstance.getCell(`I${parseInt(i) + 1}`)
                     cell.classList.remove('shipmentEntryDoNotInclude');
+                    cell.classList.add('readonly');
                     var element = document.getElementById("shipmentsDetailsTable");
                     element.classList.add("jexcelremoveReadonlybackground");
                 }

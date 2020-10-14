@@ -1607,7 +1607,8 @@ console.log(dateFilter)
                                                         <tr>
                                                             <th style={{ 'text-align': 'center' }}>{i18n.t('static.report.planningUnit/ForecastingUnit')}</th>
                                                             <th style={{ 'width': '87px', 'text-align': 'center' }}>{i18n.t('static.report.id')}</th>
-                                                            <th style={{ 'text-align': 'center' }}>{i18n.t('static.report.procurementAgentName')}</th>
+                                                            <th style={{ 'width': '87px', 'text-align': 'center' }}>{i18n.t('static.supplyPlan.consideAsEmergencyOrder')}</th>
+                                                             <th style={{ 'text-align': 'center' }}>{i18n.t('static.report.procurementAgentName')}</th>
                                                             <th style={{ 'text-align': 'center' }}>{i18n.t('static.budget.fundingsource')}</th>
                                                             <th style={{ 'text-align': 'center' }}>{i18n.t('static.common.status')}</th>
                                                             <th style={{ 'text-align': 'center' }}>{i18n.t('static.report.qty')}</th>
@@ -1673,6 +1674,7 @@ console.log(dateFilter)
                                                                 <tr id="addr0" key={idx} >
                                                                     <td style={{ 'text-align': 'left' }}>{getLabelText(this.state.shipmentDetailsList[idx].planningUnit.label, this.state.lang)}</td>
                                                                     <td style={{ 'text-align': 'center' }}>{this.state.shipmentDetailsList[idx].shipmentId}</td>
+                                                                    <td style={{ 'text-align': 'center' }}>{(this.state.shipmentDetailsList[idx].emergencyOrder==true?i18n.t('static.supplyPlan.consideAsEmergencyOrder'):'')}</td>
                                                                     <td style={{ 'text-align': 'center' }}>{getLabelText(this.state.shipmentDetailsList[idx].procurementAgent.label, this.state.lang)}</td>
                                                                     <td style={{ 'text-align': 'center' }}>{getLabelText(this.state.shipmentDetailsList[idx].fundingSource.label, this.state.lang)}</td>
                                                                     <td style={{ 'text-align': 'center' }}>{getLabelText(this.state.shipmentDetailsList[idx].shipmentStatus.label, this.state.lang)}</td>

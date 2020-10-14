@@ -8,7 +8,7 @@ import i18n from '../../i18n';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunctionOnlyHideRow, checkValidtion, inValid, positiveValidation, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { SECRET_KEY, JEXCEL_INTEGER_REGEX, INDEXED_DB_VERSION, INDEXED_DB_NAME, DATE_FORMAT_CAP, ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE, JEXCEL_DATE_FORMAT_WITHOUT_DATE, ACTUAL_CONSUMPTION_TYPE, FORCASTED_CONSUMPTION_TYPE, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from "../../Constants";
+import { SECRET_KEY, JEXCEL_INTEGER_REGEX, INDEXED_DB_VERSION, INDEXED_DB_NAME, DATE_FORMAT_CAP, ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE, JEXCEL_DATE_FORMAT_WITHOUT_DATE, ACTUAL_CONSUMPTION_TYPE, FORCASTED_CONSUMPTION_TYPE, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION, ACTUAL_CONSUMPTION_MONTHS_IN_PAST, FORECASTED_CONSUMPTION_MONTHS_IN_PAST } from "../../Constants";
 import moment from "moment";
 import CryptoJS from 'crypto-js'
 import { calculateSupplyPlan } from "./SupplyPlanCalculations";
@@ -276,16 +276,26 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         editable: consumptionEditable,
                         onchange: this.consumptionChanged,
                         updateTable: function (el, cell, x, y, source, value, id) {
-                            // var elInstance = el.jexcel;
-                            // var rowData = elInstance.getRowData(y);
-                            // var batchDetails = rowData[11];
-                            // if (batchDetails.length == 0) {
-                            //     var cell = elInstance.getCell(`F${parseInt(y) + 1}`)
-                            //     cell.classList.remove('readonly');
-                            // } else {
-                            //     var cell = elInstance.getCell(`F${parseInt(y) + 1}`)
-                            //     cell.classList.add('readonly');
-                            // }
+                            var elInstance = el.jexcel;
+                            var rowData = elInstance.getRowData(y);
+                            var lastEditableDate = "";
+                            if (rowData[2] == 1) {
+                                lastEditableDate = moment(Date.now()).subtract(ACTUAL_CONSUMPTION_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
+                            } else {
+                                lastEditableDate = moment(Date.now()).subtract(FORECASTED_CONSUMPTION_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
+                            }
+                            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O']
+                            if (moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD")) {
+                                for (var c = 0; c < colArr.length; c++) {
+                                    var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
+                                    cell.classList.add('readonly');
+                                }
+                            } else {
+                                for (var c = 0; c < colArr.length; c++) {
+                                    var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
+                                    cell.classList.remove('readonly');
+                                }
+                            }
                         }.bind(this),
                         contextMenu: function (obj, x, y, e) {
                             var items = [];
@@ -328,7 +338,6 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                                         this.setState({
                                             batchInfoList: batchList
                                         })
-                                        document.getElementById("showConsumptionBatchInfoButtonsDiv").style.display = 'block';
                                         if (this.state.consumptionBatchInfoTableEl != "" && this.state.consumptionBatchInfoTableEl != undefined) {
                                             this.state.consumptionBatchInfoTableEl.destroy();
                                         }
@@ -337,6 +346,18 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                                         var batchInfo = rowData[11];
                                         consumptionQty = (rowData[5]).toString().replaceAll("\,", "");
                                         var consumptionBatchInfoQty = 0;
+                                        var consumptionBatchEditable = consumptionEditable;
+                                        var lastEditableDate = "";
+                                        lastEditableDate = moment(Date.now()).subtract(ACTUAL_CONSUMPTION_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
+                                        if (moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD")) {
+                                            consumptionBatchEditable = false;
+                                        }
+                                        document.getElementById("showConsumptionBatchInfoButtonsDiv").style.display = 'block';
+                                        if (consumptionBatchEditable == false) {
+                                            document.getElementById("consumptionBatchAddRow").style.display = "none";
+                                        }else{
+                                            document.getElementById("consumptionBatchAddRow").style.display = "block";
+                                        }
                                         for (var sb = 0; sb < batchInfo.length; sb++) {
                                             var data = [];
                                             data[0] = batchInfo[sb].batch.batchNo; //A
@@ -348,7 +369,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                                             consumptionBatchInfoQty += parseInt(batchInfo[sb].consumptionQty);
                                             json.push(data);
                                         }
-                                        if (parseInt(consumptionQty) != consumptionBatchInfoQty && batchInfo.length > 0) {
+                                        if (parseInt(consumptionQty) > consumptionBatchInfoQty && batchInfo.length > 0) {
                                             var qty = parseInt(consumptionQty) - parseInt(consumptionBatchInfoQty);
                                             var data = [];
                                             data[0] = -1; //A
@@ -393,7 +414,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                                             allowManualInsertRow: false,
                                             allowExport: false,
                                             onchange: this.batchInfoChangedConsumption,
-                                            editable: consumptionEditable,
+                                            editable: consumptionBatchEditable,
                                             text: {
                                                 showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
                                                 show: '',
@@ -407,7 +428,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                                                 var items = [];
                                                 if (y == null) {
                                                 } else {
-                                                    if (consumptionEditable) {
+                                                    if (consumptionBatchEditable) {
                                                         items.push({
                                                             title: i18n.t('static.supplyPlan.addNewBatchInfo'),
                                                             onclick: function () {
@@ -415,7 +436,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                                                             }.bind(this)
                                                         });
                                                     }
-                                                    if (consumptionEditable && obj.options.allowDeleteRow == true && obj.getJson().length > 1) {
+                                                    if (consumptionBatchEditable && obj.options.allowDeleteRow == true && obj.getJson().length > 1) {
                                                         // region id
                                                         if (obj.getRowData(y)[3] == 0) {
                                                             items.push({
@@ -601,6 +622,33 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         }
         if (x == 5) {
             var valid = checkValidtion("number", "F", y, rowData[5], elInstance, JEXCEL_INTEGER_REGEX, 1, 1);
+            if (valid == true) {
+                var batchDetails = rowData[11];
+                var consumptionBatchQty = 0;
+                for (var b = 0; b < batchDetails.length; b++) {
+                    consumptionBatchQty += parseInt(batchDetails[b].consumptionQty);
+                }
+                if (parseInt(rowData[5]) < parseInt(consumptionBatchQty)) {
+                    inValid("F", y, i18n.t('static.consumption.missingBatch'), elInstance);
+                    valid = false;
+                } else {
+                    positiveValidation("F", y, elInstance)
+                }
+            }
+        }
+
+        if (x == 11) {
+            var batchDetails = rowData[11];
+            var consumptionBatchQty = 0;
+            for (var b = 0; b < batchDetails.length; b++) {
+                consumptionBatchQty += batchDetails[b].consumptionQty;
+            }
+            if (parseInt(rowData[5]) < parseInt(consumptionBatchQty)) {
+                inValid("F", y, i18n.t('static.consumption.missingBatch'), elInstance);
+                valid = false;
+            } else {
+                positiveValidation("F", y, elInstance)
+            }
         }
 
         if (x == 8) {
@@ -988,6 +1036,18 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                 if (validation == false) {
                     valid = false;
                     elInstance.setValueFromCoords(14, y, 1, true);
+                } else {
+                    var batchDetails = rowData[11];
+                    var consumptionBatchQty = 0;
+                    for (var b = 0; b < batchDetails.length; b++) {
+                        consumptionBatchQty += batchDetails[b].consumptionQty;
+                    }
+                    if (parseInt(rowData[5]) < parseInt(consumptionBatchQty)) {
+                        inValid("F", y, i18n.t('static.consumption.missingBatch'), elInstance);
+                        valid = false;
+                    } else {
+                        positiveValidation("F", y, elInstance)
+                    }
                 }
 
                 validation = checkValidtion("numberNotRequired", "I", y, rowData[8], elInstance, JEXCEL_INTEGER_REGEX, 1, 1);

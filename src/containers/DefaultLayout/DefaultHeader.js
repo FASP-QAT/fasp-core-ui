@@ -87,7 +87,7 @@ class DefaultHeader extends Component {
             <NavLink to="#" className="nav-link">
               <span className="icon-wrapper icon-wrapper-alt rounded-circle ">
                 <span className="icon-wrapper-bg "></span>
-                <i className="cui-home icons HomeIcon   icon-anim-pulse text-primary " onClick={this.props.onChangeDashboard} title="View Dashboard"></i>
+                <i className="cui-home icons HomeIcon   icon-anim-pulse text-primary " onClick={this.props.onChangeDashboard} title={i18n.t('static.common.viewDashBoard')}></i>
               </span>
             </NavLink>
           </NavItem>
@@ -97,7 +97,7 @@ class DefaultHeader extends Component {
             <NavLink to="#" className="nav-link">
               <span className="icon-wrapper icon-wrapper-alt rounded-circle ">
                 <span className="icon-wrapper-bg "></span>
-                <i className="cui-account-logout icons   icon-anim-pulse text-primary " onClick={this.props.onLogout} title="Logout"></i>
+                <i className="cui-account-logout icons   icon-anim-pulse text-primary " onClick={this.props.onLogout} title={i18n.t('static.common.logout')}></i>
               </span>
             </NavLink>
           </NavItem>
