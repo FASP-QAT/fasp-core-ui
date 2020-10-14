@@ -1378,5 +1378,8 @@
     "static.report.okaystock":"Stocked to Plan",
     "static.report.overstock":"Over Stocked",
     "static.consumption.missingBatch":"Total batch qty is greater than actual quantity",
-    "static.editSupplyPlan.notes":"Latest Notes"
+    "static.editSupplyPlan.notes":"Latest Notes",
+    "static.report.expiredQty": "Expired/Expiring Quantity",
+    "static.report.batchstartdt": " Batch Start Date",
+    "static.report.actualInv": "Actual Inventory Count"
 }

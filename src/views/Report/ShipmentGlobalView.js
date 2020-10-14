@@ -439,7 +439,8 @@ class ShipmentGlobalView extends Component {
                 csvRow.push('"' + (i18n.t('static.procurementagent.procurementagent') + ' : ' + (ele.toString())).replaceAll(' ', '%20') + '"'))
         }
         csvRow.push('"' +((i18n.t('static.report.includeapproved') + ' : ' + document.getElementById("includeApprovedVersions").selectedOptions[0].text).replaceAll(' ', '%20')+'"'))
-     
+        csvRow.push((i18n.t('static.program.isincludeplannedshipment') + ' , ' + document.getElementById("includePlanningShipments").selectedOptions[0].text).replaceAll(' ', '%20'))
+       
         csvRow.push('')
         csvRow.push('')
         csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
@@ -572,17 +573,19 @@ class ShipmentGlobalView extends Component {
                     doc.text(i18n.t('static.report.includeapproved') + ' : ' + document.getElementById("includeApprovedVersions").selectedOptions[0].text, doc.internal.pageSize.width / 8, 210, {
                         align: 'left'
                     })
-                  
+                    doc.text(i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text, doc.internal.pageSize.width / 8, 225, {
+                        align: 'left'
+                    })
                     var viewby = document.getElementById("viewById").value;
                     if (viewby == 1) {
 
                         var fundingSourceText = doc.splitTextToSize((i18n.t('static.budget.fundingsource') + ' : ' + this.state.fundingSourceLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-                        doc.text(doc.internal.pageSize.width / 8, 230, fundingSourceText)
+                        doc.text(doc.internal.pageSize.width / 8, 240, fundingSourceText)
 
                     } else {
 
                         var procurementAgentText = doc.splitTextToSize((i18n.t('static.procurementagent.procurementagent') + ' : ' + this.state.procurementAgentLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-                        doc.text(doc.internal.pageSize.width / 8, 230, procurementAgentText)
+                        doc.text(doc.internal.pageSize.width / 8, 240, procurementAgentText)
                     }
 
                 }
@@ -1088,6 +1091,7 @@ class ShipmentGlobalView extends Component {
         let productCategoryId = document.getElementById("productCategoryId").value;
         let CountryIds = this.state.countryValues.length == this.state.countrys.length ? [] : this.state.countryValues.map(ele => (ele.value).toString());
         let useApprovedVersion = document.getElementById("includeApprovedVersions").value
+        let includePlanningShipments = document.getElementById("includePlanningShipments").value
     
         let planningUnitId = document.getElementById("planningUnitId").value;
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
@@ -1121,7 +1125,8 @@ class ShipmentGlobalView extends Component {
                 planningUnitId: planningUnitId,
                 reportView: viewby,
                 fundingSourceProcurementAgentIds: fundingSourceProcurementAgentIds
-                ,useApprovedSupplyPlanOnly: useApprovedVersion
+                ,useApprovedSupplyPlanOnly: useApprovedVersion,
+                includePlannedShipments:includePlanningShipments
             }
             console.log("INPUTJSON--------->", inputjson);
             // AuthenticationService.setupAxiosInterceptors();
@@ -1703,7 +1708,24 @@ class ShipmentGlobalView extends Component {
                                                 </InputGroup>
                                             </div>
                                         </FormGroup>
+                                        <FormGroup className="col-md-3">
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.program.isincludeplannedshipment')}</Label>
+                                                <div className="controls ">
+                                                    <InputGroup>
+                                                        <Input
+                                                            type="select"
+                                                            name="includePlanningShipments"
+                                                            id="includePlanningShipments"
+                                                            bsSize="sm"
+                                                            onChange={(e) => { this.fetchData() }}
+                                                        >
+                                                            <option value="true">{i18n.t('static.program.yes')}</option>
+                                                            <option value="false">{i18n.t('static.program.no')}</option>
+                                                        </Input>
 
+                                                    </InputGroup>
+                                                </div>
+                                            </FormGroup>
 
 
                                     </div>
