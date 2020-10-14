@@ -64,6 +64,8 @@ class warehouseCapacity extends Component {
             lang: localStorage.getItem('lang'),
             programValues: [],
             programLabels: [],
+            countryValues: [],
+            countryLabels: [],
             loading: true
 
         };
@@ -97,8 +99,8 @@ class warehouseCapacity extends Component {
         var csvRow = [];
 
         if (navigator.onLine) {
-            csvRow.push(i18n.t('static.program.realmcountry') + ' , ' + (document.getElementById("countryId").selectedOptions[0].text).replaceAll(' ', '%20'))
-            // csvRow.push(i18n.t('static.program.program') + ' , ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20'))
+            this.state.countryLabels.map(ele =>
+                csvRow.push(i18n.t('static.dashboard.country') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
             csvRow.push('')
             this.state.programLabels.map(ele =>
                 csvRow.push(i18n.t('static.program.program') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
@@ -196,11 +198,16 @@ class warehouseCapacity extends Component {
                     doc.setFont('helvetica', 'normal')
 
                     if (navigator.onLine) {
-
-                        doc.text(i18n.t('static.program.realmcountry') + ' : ' + document.getElementById("countryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 90, {
-                            align: 'left'
-                        })
-
+var y=90
+                        var planningText = doc.splitTextToSize(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.join('; '), doc.internal.pageSize.width * 3 / 4);
+                        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+                        for (var i = 0; i < planningText.length; i++) {
+                          if (y > doc.internal.pageSize.height - 100) {
+                            doc.addPage();
+                            y = 80;
+                    
+                          }
+                        }
                         // doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
                         //     align: 'left'
                         // })
@@ -209,7 +216,7 @@ class warehouseCapacity extends Component {
                         // doc.text(doc.internal.pageSize.width / 8, 110, programText)
 
                         var programText = doc.splitTextToSize((i18n.t('static.program.program') + ' : ' + this.state.programLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-                        doc.text(doc.internal.pageSize.width / 8, 110, programText)
+                        doc.text(doc.internal.pageSize.width / 8, y, programText)
 
                     } else {
                         doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programIdOffline").selectedOptions[0].text, doc.internal.pageSize.width / 8, 90, {
@@ -287,10 +294,10 @@ let data=this.state.data.map(elt=>[getLabelText(elt.realmCountry.label, this.sta
     getCountrylist() {
         // AuthenticationService.setupAxiosInterceptors();
         let realmId = AuthenticationService.getRealmId();
-        RealmCountryService.getRealmCountryrealmIdById(realmId)
+        RealmCountryService.getRealmCountryForProgram(realmId)
             .then(response => {
                 this.setState({
-                    countries: response.data, loading: false
+                    countries: response.data.map(ele=>ele.realmCountry), loading: false
                 })
             }).catch(
                 error => {
@@ -318,31 +325,51 @@ let data=this.state.data.map(elt=>[getLabelText(elt.realmCountry.label, this.sta
 
     }
     filterProgram = () => {
-        let countryId = document.getElementById("countryId").value;
+        let countryIds = this.state.countryValues.map(ele=>ele.value);
+        console.log('countryIds',countryIds,'programs',this.state.programs)
         this.setState({
             programLst: [],
             programValues: [],
             programLabels: []
         }, () => {
-            if (countryId != 0) {
-                const programLst = this.state.programs.filter(c => c.realmCountry.realmCountryId == countryId)
+            if (countryIds.length != 0) {
+                let programLst =[];
+                 for(var i=0;i<countryIds.length;i++){
+                     programLst=[...programLst,...this.state.programs.filter(c => c.realmCountry.realmCountryId == countryIds[i])]
+                    }
+
+                console.log('programLst',programLst)
                 if (programLst.length > 0) {
 
                     this.setState({
                         programLst: programLst
                     }, () => {
-                        // this.fetchData() 
+                         this.fetchData() 
                     });
                 } else {
                     this.setState({
                         programLst: []
-                    });
+                    },() => {
+                        this.fetchData() 
+                   });
                 }
             }
-            this.fetchData();
+         
         })
     }
+    handleChange(countrysId) {
 
+        countrysId = countrysId.sort(function (a, b) {
+          return parseInt(a.value) - parseInt(b.value);
+        })
+        this.setState({
+          countryValues: countrysId.map(ele => ele),
+          countryLabels: countrysId.map(ele => ele.label)
+        }, () => {
+    this.filterProgram()
+      
+        })
+      }
     handleChangeProgram(programIds) {
         programIds = programIds.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
@@ -438,15 +465,14 @@ let data=this.state.data.map(elt=>[getLabelText(elt.realmCountry.label, this.sta
         if (navigator.onLine) {
 
             let programId = this.state.programValues.length == this.state.programs.length ? [] : this.state.programValues.map(ele => (ele.value).toString());
-            let countryId = document.getElementById("countryId").value;
-
+            let CountryIds = this.state.countryValues.length == this.state.countries.length ? [] : this.state.countryValues.map(ele => (ele.value).toString());
+    
             console.log("programId---", programId);
-            console.log("countryId---", countryId);
-            if (this.state.programValues.length > 0 && countryId > 0) {
+            if (this.state.programValues.length > 0 && this.state.countryValues.length > 0) {
                 this.setState({ loading: true })
                 // AuthenticationService.setupAxiosInterceptors();
                 let inputjson = {
-                    realmCountryId: countryId,
+                    realmCountryIds: CountryIds,
                     programIds: programId
                 }
                 ReportService.wareHouseCapacityExporttList(inputjson)
@@ -490,7 +516,7 @@ let data=this.state.data.map(elt=>[getLabelText(elt.realmCountry.label, this.sta
                     this.el = jexcel(document.getElementById("tableDiv"), '');
                     this.el.destroy();
                 });
-            } else if (countryId == 0) {
+            } else if (this.state.countryValues.length == 0) {
                 this.setState({ message: i18n.t('static.healtharea.countrytext'), data: [] }, () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
                     this.el.destroy();
@@ -701,12 +727,7 @@ let data=this.state.data.map(elt=>[getLabelText(elt.realmCountry.label, this.sta
         const { offlinePrograms } = this.state;
         const { countries } = this.state;
         let countryList = countries.length > 0 && countries.map((item, i) => {
-            return (
-                <option key={i} value={item.realmCountryId}>
-                    {getLabelText(item.country.label, this.state.lang)}
-                </option>
-            )
-
+            return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
         }, this);
 
         return (
@@ -743,26 +764,27 @@ let data=this.state.data.map(elt=>[getLabelText(elt.realmCountry.label, this.sta
                                     <div className="pl-0">
                                         <div className="row">
                                             <Online>
-                                                <FormGroup className="col-md-3">
-                                                    <Label htmlFor="countryId">{i18n.t('static.program.realmcountry')}<span className="red Reqasterisk">*</span></Label>
-                                                    <div className="controls edit">
-                                                        <InputGroup>
-                                                            <Input
-                                                                type="select"
-                                                                bsSize="sm"
-                                                                name="countryId"
-                                                                id="countryId"
-                                                                onChange={(e) => { this.filterProgram(); }}
-                                                            >  <option value="0">{i18n.t('static.common.select')}</option>
-                                                                {countryList}</Input>
-                                                            {!!this.props.error &&
-                                                                this.props.touched && (
-                                                                    <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
-                                                                )}
-                                                        </InputGroup>
+                                            <FormGroup className="col-md-3">
+                      <Label htmlFor="countrysId">{i18n.t('static.program.realmcountry')}</Label>
+                      <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
 
-                                                    </div>
-                                                </FormGroup>
+                      <div className="controls edit">
+                        <MultiSelect
+
+                          bsSize="sm"
+                          name="countrysId"
+                          id="countrysId"
+                          value={this.state.countryValues}
+                          onChange={(e) => { this.handleChange(e) }}
+                          options={countryList && countryList.length > 0 ? countryList : []}
+                        />
+                        {!!this.props.error &&
+                          this.props.touched && (
+                            <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
+                          )}
+                      </div>
+
+                    </FormGroup>
                                             </Online>
                                             <Online>
 
