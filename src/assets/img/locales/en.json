@@ -817,7 +817,7 @@
     "static.supplyPlan.primeLineNo": "Prime Line Number",
     "static.supplyPlan.noOfPallets": "No. of Pallets",
     "static.supplyPlan.noOfContainers": "No. of Containers",
-    "static.supplyPlan.orderBasedOn": "Order based on",
+    "static.supplyPlan.orderBasedOn": "Packaging based on",
     "static.supplyPlan.container": "Container",
     "static.supplyPlan.pallet": "Pallet",
     "static.supplyPlan.roundingOption": "Rounding option",
