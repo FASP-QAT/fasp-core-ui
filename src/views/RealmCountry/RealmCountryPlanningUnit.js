@@ -233,7 +233,7 @@ class PlanningUnitCountry extends Component {
                                                         source: unitArr
                                                     },
                                                     {
-                                                        title: i18n.t('static.planningUnit.multiplierLabel'),
+                                                        title: i18n.t('static.unit.multiplier'),
                                                         type: 'number',
 
                                                     },
@@ -800,6 +800,7 @@ class PlanningUnitCountry extends Component {
         tr.children[4].classList.add('AsteriskTheadtrTd');
         tr.children[5].classList.add('AsteriskTheadtrTd');
         tr.children[6].classList.add('AsteriskTheadtrTd');
+        tr.children[6].title = i18n.t("static.message.tooltipMultiplier")
     }
 
     blur = function (instance) {

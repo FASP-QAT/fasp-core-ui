@@ -21,6 +21,11 @@ class FundingSourceService {
         return axios.get(`${API_URL}/api/fundingSource/${json}`, {}
         );
     }
+
+    getFundingSourceDisplayName(json1,json2) {
+        return axios.get(`${API_URL}/api/fundingSource/getDisplayName/realmId/${json1}/name/${json2}`, {}
+        );
+    }
 }
 
 export default new FundingSourceService();

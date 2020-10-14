@@ -519,6 +519,9 @@ export default class RealmCountryPlanningUnitList extends Component {
     }
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
+        var asterisk = document.getElementsByClassName("resizable")[0];
+        var tr = asterisk.firstChild;
+        tr.children[7].title = i18n.t("static.message.tooltipMultiplier")
     }
 
 
