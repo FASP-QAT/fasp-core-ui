@@ -1284,8 +1284,8 @@
     "static.supplyPlan.noteBelowGraph": "Note: If you remove an element it doesn't actually adjust the numbers",
     "static.common.max26digittext": "Maximum 26 characters only",
     "static.message.alphaspeccharnumtext": "Only letters, numbers and special characters like /,- are allowed",
-    "static.supplyPlanReview.review":"Review",
-    "static.supplyPlanReview.reviewNotes":"Review Notes",
+    "static.supplyPlanReview.review":"Reviewed",
+    "static.supplyPlanReview.reviewNotes":"Enter Reviewed Notes",
     "static.programOnboarding.programDisplayName":"Program Display Name",
     "static.programOnboarding.programCode":"Program Code",
     "static.programOnboarding.validprogramCode":"Enter valid program code",
@@ -1374,5 +1374,6 @@
     "static.report.lowstock":"Under Stocked",
     "static.report.okaystock":"Stocked to Plan",
     "static.report.overstock":"Over Stocked",
-    "static.consumption.missingBatch":"Total batch qty is greater than actual quantity"
+    "static.consumption.missingBatch":"Total batch qty is greater than actual quantity",
+    "static.editSupplyPlan.notes":"Latest Notes"
 }

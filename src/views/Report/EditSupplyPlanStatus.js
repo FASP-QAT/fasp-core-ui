@@ -2717,7 +2717,7 @@ class EditSupplyPlanStatus extends Component {
                     readOnly: true
                 },
                 {
-                    title: i18n.t('static.program.notes'),
+                    title: i18n.t('static.editSupplyPlan.notes'),
                     type: 'text',
                     readOnly: true
                 },
