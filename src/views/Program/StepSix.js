@@ -23,7 +23,8 @@ const initialValuesSix = {
     programNotes: '',
     shippedToArrivedByAirLeadTime: '',
     shippedToArrivedBySeaLeadTime: '',
-    arrivedToDeliveredLeadTime: ''
+    arrivedToDeliveredLeadTime: '',
+    programCode: ''
 
 }
 
@@ -75,6 +76,9 @@ const validationSchemaSix = function (values) {
             .matches(/^\s*(?=.*[1-9])\d{1,2}(?:\.\d{1,2})?\s*$/, i18n.t('static.message.2digitDecimal'))
             .required(i18n.t('static.program.validapprovetoshiptext'))
             .min(0, i18n.t('static.program.validvaluetext')),
+        // uniqueCode: Yup.string()
+        //     .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly'))
+        //     .required(i18n.t('static.programOnboarding.validprogramCode')),
 
     })
 }
@@ -125,7 +129,9 @@ export default class StepSix extends Component {
             // programNotes: true,
             shippedToArrivedByAirLeadTime: true,
             shippedToArrivedBySeaLeadTime: true,
-            arrivedToDeliveredLeadTime: true
+            arrivedToDeliveredLeadTime: true,
+            // uniqueCode: true,
+            message: ''
 
         }
         )
@@ -254,7 +260,7 @@ export default class StepSix extends Component {
                                         <FormFeedback className="red">{errors.seaFreightPerc}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup className="col-md-6">
-                                        <Label htmlFor="company">{i18n.t('static.program.planleadtime')}<span class="red Reqasterisk">*</span></Label>
+                                        <Label htmlFor="company">{i18n.t('static.report.plannedToSubmitLeadTime')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
                                             onBlur={handleBlur}
                                             valid={!errors.plannedToSubmittedLeadTime && this.props.items.program.plannedToSubmittedLeadTime != ''}
@@ -280,7 +286,7 @@ export default class StepSix extends Component {
                                         <FormFeedback className="red">{errors.submittedToApprovedLeadTime}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup className="col-md-6">
-                                        <Label htmlFor="company">{i18n.t('static.program.approvetoshipleadtime')}<span class="red Reqasterisk">*</span></Label>
+                                        <Label htmlFor="company">{i18n.t('static.procurementAgentProcurementUnit.approvedToShippedLeadTime')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
                                             onBlur={handleBlur}
                                             valid={!errors.approvedToShippedLeadTime && this.props.items.program.approvedToShippedLeadTime != ''}
@@ -324,7 +330,7 @@ export default class StepSix extends Component {
 
 
                                     <FormGroup className="col-md-6">
-                                        <Label htmlFor="company"> {i18n.t('static.shipment.arrivedToreceivedLeadTime')}<span class="red Reqasterisk">*</span></Label>
+                                        <Label htmlFor="company"> {i18n.t('static.realmcountry.arrivedToDeliveredLeadTime')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
                                             onBlur={handleBlur}
                                             valid={!errors.arrivedToDeliveredLeadTime && this.props.items.program.arrivedToDeliveredLeadTime != ''}
@@ -356,12 +362,13 @@ export default class StepSix extends Component {
                                         &nbsp;
                                          <Button color="info" size="md" className="float-left mr-1" type="submit" name="regionSub" id="regionSub" onClick={() => this.touchAllSix(setTouched, errors)} disabled={!isValid}>{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
 
-                                    </FormGroup>
-                                </Row>
-                            </Form>
-                        )} />
+                                        </FormGroup>
+                                    </Row>
+                                </Form>
+                            )} />
 
-
+            // </>
         );
+
     }
 }

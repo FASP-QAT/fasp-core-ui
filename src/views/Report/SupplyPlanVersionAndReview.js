@@ -1087,7 +1087,7 @@ class SupplyPlanVersionAndReview extends Component {
             let versionStatusId = rowData[10];
             let versionTypeId = rowData[9];
             console.log("====>", versionStatusId, "====>", versionTypeId);
-            if (versionStatusId == 2 && versionTypeId == 2) {
+            if (versionStatusId == 1 && versionTypeId == 2) {
                 this.props.history.push({
                     pathname: `/report/editStatus/${programId}/${this.el.getValueFromCoords(1, x)}`,
 
