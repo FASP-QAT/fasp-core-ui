@@ -841,7 +841,7 @@ let data=this.state.data.map(elt=>[getLabelText(elt.realmCountry.label, this.sta
                                     </div>
                                 </Form>
 
-                                <Col md="12 pl-0">
+                                {/* <div className="werehousecapacitySearchposition"> */}
                                     <div id="tableDiv" className="jexcelremoveReadonlybackground"> </div>
                                     {/*  <div className="row">
                                         <div className="col-md-12">
@@ -886,7 +886,7 @@ let data=this.state.data.map(elt=>[getLabelText(elt.realmCountry.label, this.sta
                                         </div>
                                     </div>*/}
 
-                                </Col>
+                                {/* </div> */}
                             </div>
                         </div>
                     </CardBody>

@@ -1069,63 +1069,6 @@ class DefaultLayout extends Component {
                             url: '/shipment/delinking',
                             icon: 'fa fa-truck',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DELINKING') ? false : true) }
-                          }
-                        ]
-                      },
-                      {
-                        name: i18n.t('static.pipeline.programData'),
-                        icon: 'fa fa-list',
-                        attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_VIEW_PROGRAM_DATA') ? false : true) },
-                        // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DOWNLOAD_PROGRAM') ? false : true) },
-                        children: [
-                          // {
-                          //   name: i18n.t('static.dashboard.datasync'),
-                          //   url: '/masterDataSync',
-                          //   icon: 'fa fa-list',
-                          // },
-                          {
-                            name: i18n.t('static.dashboard.programs'),
-                            icon: 'fa fa-list',
-                            // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DOWNLOAD_PROGRAM') ? false : true) },
-                            children: [
-                              // {
-                              //   name: i18n.t('static.dashboard.datasync'),
-                              //   url: '/masterDataSync',
-                              //   icon: 'fa fa-list',
-                              // },
-                              {
-                                name: i18n.t('static.dashboard.downloadprogram'),
-                                url: '/program/downloadProgram',
-                                icon: 'fa fa-download',
-                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DOWNLOAD_PROGARM') ? false : true) }
-                              },
-                              {
-                                name: i18n.t('static.program.deleteLocalProgram'),
-                                url: '/program/deleteLocalProgram',
-                                icon: 'fa fa-trash',
-                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DELETE_LOCAL_PROGRAM') ? false : true) }
-                                // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DOWNLOAD_PROGARM') ? false : true) }
-                              },
-                              {
-                                name: i18n.t('static.dashboard.importprogram'),
-                                url: '/program/importProgram',
-                                icon: 'fa fa-cloud-download',
-                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_IMPORT_EXPORT_PROGARM') ? false : true) }
-                              },
-                              {
-                                name: i18n.t('static.dashboard.exportprogram'),
-                                url: '/program/exportProgram',
-                                icon: 'fa fa-sign-in',
-                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_IMPORT_EXPORT_PROGARM') ? false : true) }
-                              }
-
-                            ]
-                          },
-                          {
-                            name: i18n.t('static.consumptionDetailHead.consumptionDetail'),
-                            url: '/consumptionDetails',
-                            icon: 'fa fa-bar-chart',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }
                           },
                           {
                             name: i18n.t('static.dashboard.commitVersion'),
@@ -1141,6 +1084,75 @@ class DefaultLayout extends Component {
                           }
                         ]
                       },
+                      // {
+                      //   name: i18n.t('static.pipeline.programData'),
+                      //   icon: 'fa fa-list',
+                      //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_VIEW_PROGRAM_DATA') ? false : true) },
+                      //   // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DOWNLOAD_PROGRAM') ? false : true) },
+                      //   children: [
+                      //     // {
+                      //     //   name: i18n.t('static.dashboard.datasync'),
+                      //     //   url: '/masterDataSync',
+                      //     //   icon: 'fa fa-list',
+                      //     // },
+                      //     {
+                      //       name: i18n.t('static.dashboard.programs'),
+                      //       icon: 'fa fa-list',
+                      //       // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DOWNLOAD_PROGRAM') ? false : true) },
+                      //       children: [
+                      //         // {
+                      //         //   name: i18n.t('static.dashboard.datasync'),
+                      //         //   url: '/masterDataSync',
+                      //         //   icon: 'fa fa-list',
+                      //         // },
+                      //         {
+                      //           name: i18n.t('static.dashboard.downloadprogram'),
+                      //           url: '/program/downloadProgram',
+                      //           icon: 'fa fa-download',
+                      //           attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DOWNLOAD_PROGARM') ? false : true) }
+                      //         },
+                      //         {
+                      //           name: i18n.t('static.program.deleteLocalProgram'),
+                      //           url: '/program/deleteLocalProgram',
+                      //           icon: 'fa fa-trash',
+                      //           attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DELETE_LOCAL_PROGRAM') ? false : true) }
+                      //           // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DOWNLOAD_PROGARM') ? false : true) }
+                      //         },
+                      //         {
+                      //           name: i18n.t('static.dashboard.importprogram'),
+                      //           url: '/program/importProgram',
+                      //           icon: 'fa fa-cloud-download',
+                      //           attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_IMPORT_EXPORT_PROGARM') ? false : true) }
+                      //         },
+                      //         {
+                      //           name: i18n.t('static.dashboard.exportprogram'),
+                      //           url: '/program/exportProgram',
+                      //           icon: 'fa fa-sign-in',
+                      //           attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_IMPORT_EXPORT_PROGARM') ? false : true) }
+                      //         }
+
+                      //       ]
+                      //     },
+                      //     {
+                      //       name: i18n.t('static.consumptionDetailHead.consumptionDetail'),
+                      //       url: '/consumptionDetails',
+                      //       icon: 'fa fa-bar-chart',
+                      //       attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }
+                      //     },
+                      //     {
+                      //       name: i18n.t('static.dashboard.commitVersion'),
+                      //       url: '/program/syncPage',
+                      //       icon: 'fa fa-code-fork',
+                      //       attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_COMMIT_VERSION') ? false : true) }
+                      //     },
+                      //     {
+                      //       name: i18n.t('static.report.supplyplanversionandreviewReport'),
+                      //       url: '/report/supplyPlanVersionAndReview',
+                      //       icon: 'fa fa-exchange',
+                      //       attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_VERSION_AND_REVIEW') ? false : true) }
+                      //     }
+                      //   ]
+                      // },
                       // {
                       //   name: i18n.t('static.pipeline.programData'),
                       //   icon: 'fa fa-list',
@@ -1836,12 +1848,12 @@ class DefaultLayout extends Component {
                           // },
 
                         
-                              {
-                                name: i18n.t('static.program.deleteLocalProgram'),
-                                url: '/program/deleteLocalProgram',
-                                icon: 'fa fa-trash',
-                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DELETE_LOCAL_PROGRAM') ? false : true) }
-                              },
+                              // {
+                              //   name: i18n.t('static.program.deleteLocalProgram'),
+                              //   url: '/program/deleteLocalProgram',
+                              //   icon: 'fa fa-trash',
+                              //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DELETE_LOCAL_PROGRAM') ? false : true) }
+                              // },
                               {
                                 name: i18n.t('static.dashboard.importprogram'),
                                 url: '/program/importProgram',
