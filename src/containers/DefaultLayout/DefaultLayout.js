@@ -769,25 +769,6 @@ class DefaultLayout extends Component {
                         attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_VIEW_APPL_MASTERS') ? false : true) },
                         children: [
                           {
-                            name: i18n.t('static.roleHead.role'),
-                            url: '/role/listRole',
-                            icon: 'fa fa-dot-circle-o',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_MANAGE_ROLE') ? false : true) }
-                          },
-                          // (this.state.businessFunctions.includes('ROLE_BF_CREATE_USERL')?
-                          {
-                            name: i18n.t('static.userHead.user'),
-                            url: '/user/listUser',
-                            icon: 'fa fa-users',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_MANAGE_USER') ? false : true) }
-                          },
-                          {
-                            name: i18n.t('static.dashboard.language'),
-                            url: '/language/listLanguage',
-                            icon: 'fa fa-language',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_MANAGE_LANGUAGE') ? false : true) }
-                          },
-                          {
                             name: i18n.t('static.dashboard.country'),
                             url: '/country/listCountry',
                             icon: 'fa fa-globe',
@@ -804,7 +785,32 @@ class DefaultLayout extends Component {
                             url: '/dimension/listDimension',
                             icon: 'fa fa-map',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_MANAGE_DIMENSION') ? false : true) }
-                          }
+                          },
+                          {
+                            name: i18n.t('static.dashboard.language'),
+                            url: '/language/listLanguage',
+                            icon: 'fa fa-language',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_MANAGE_LANGUAGE') ? false : true) }
+                          },
+                          {
+                            name: i18n.t('static.roleHead.role'),
+                            url: '/role/listRole',
+                            icon: 'fa fa-dot-circle-o',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_MANAGE_ROLE') ? false : true) }
+                          },
+                          {
+                            name: i18n.t('static.dashboard.realmheader'),
+                            url: '/realm/listRealm',
+                            icon: 'fa fa-th-large',
+                            // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM') ? false : true) }
+                          },
+                          // (this.state.businessFunctions.includes('ROLE_BF_CREATE_USERL')?
+                          {
+                            name: i18n.t('static.userHead.user'),
+                            url: '/user/listUser',
+                            icon: 'fa fa-users',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_MANAGE_USER') ? false : true) }
+                          },
                           , {
                             name: i18n.t('static.dashboard.unit'),
                             url: '/unit/listUnit',
@@ -834,12 +840,7 @@ class DefaultLayout extends Component {
                           //   }]
                           // },
 
-                          {
-                            name: i18n.t('static.dashboard.realmheader'),
-                            url: '/realm/listRealm',
-                            icon: 'fa fa-th-large',
-                            // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM') ? false : true) }
-                          },
+                          
 
                         ]
                       },
@@ -1000,13 +1001,13 @@ class DefaultLayout extends Component {
                             //       }
                             //     ]
                           },
-                          {
-                            name: i18n.t('static.program.deleteLocalProgram'),
-                            url: '/program/deleteLocalProgram',
-                            icon: 'fa fa-trash',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DELETE_LOCAL_PROGARM') ? false : true) }
-                            // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DOWNLOAD_PROGARM') ? false : true) }
-                          },
+                          // {
+                          //   name: i18n.t('static.program.deleteLocalProgram'),
+                          //   url: '/program/deleteLocalProgram',
+                          //   icon: 'fa fa-trash',
+                          //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DELETE_LOCAL_PROGARM') ? false : true) }
+                          //   // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DOWNLOAD_PROGARM') ? false : true) }
+                          // },
                           {
                             name: i18n.t('static.Update.PlanningUnits'),
                             url: '/program/listProgram',
@@ -1014,6 +1015,14 @@ class DefaultLayout extends Component {
                             // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_PROGRAM') ? false : true) }
                       
                           },
+
+                          {
+                            name: i18n.t('static.dashboard.budget'),
+                            url: '/budget/listBudget',
+                            icon: 'fa fa-dollar',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_BUDGET') ? false : true) }
+                          },
+                          
                           {
                             name: i18n.t('static.dashboard.importprogram'),
                             url: '/program/importProgram',
@@ -1032,13 +1041,14 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-download',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DOWNLOAD_PROGARM') ? false : true) }
                           },
-                          
                           {
-                            name: i18n.t('static.dashboard.budget'),
-                            url: '/budget/listBudget',
-                            icon: 'fa fa-dollar',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_BUDGET') ? false : true) }
+                            name: i18n.t('static.program.deleteLocalProgram'),
+                            url: '/program/deleteLocalProgram',
+                            icon: 'fa fa-trash',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DELETE_LOCAL_PROGRAM') ? false : true) }
+                            // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DOWNLOAD_PROGARM') ? false : true) }
                           },
+                          
 
                           // {
                           //   name: i18n.t('static.dashboard.product'),
@@ -1058,18 +1068,7 @@ class DefaultLayout extends Component {
                           // ]
                           // },
 
-                          {
-                            name: i18n.t('static.dashboard.manualTagging'),
-                            url: '/shipment/manualTagging',
-                            icon: 'fa fa-truck',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_MANUAL_TAGGING') ? false : true) }
-                          },
-                          {
-                            name: i18n.t('static.dashboard.delinking'),
-                            url: '/shipment/delinking',
-                            icon: 'fa fa-truck',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DELINKING') ? false : true) }
-                          },
+                          
                           {
                             name: i18n.t('static.dashboard.commitVersion'),
                             url: '/program/syncPage',
@@ -1231,7 +1230,24 @@ class DefaultLayout extends Component {
                               icon: 'fa fa-cube',
                               attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }
                             },
-                            
+                            {
+                              name: i18n.t('static.dashboard.manualTagging'),
+                              url: '/shipment/manualTagging',
+                              icon: 'fa fa-truck',
+                              attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_MANUAL_TAGGING') ? false : true) }
+                            },
+                            {
+                              name: i18n.t('static.dashboard.delinking'),
+                              url: '/shipment/delinking',
+                              icon: 'fa fa-truck',
+                              attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DELINKING') ? false : true) }
+                            },
+                            {
+                              name: i18n.t('static.quantimed.quantimedImport'),                        
+                              url: '/quantimed/quantimedImport',
+                              icon: 'fa fa-file-text-o',
+                              attributes: { hidden: false }
+                            }
   
                           ]
                         },
@@ -1481,6 +1497,12 @@ class DefaultLayout extends Component {
                         icon: 'fa fa-list',
                         attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_REPORT') ? false : true) },
                         children: [
+                          {
+                            name: i18n.t('static.dashboard.qatProblemList'),
+                            url: '/report/problemList',
+                            icon: 'fa fa-file-text-o',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) }
+                          },
                           {
                             name: i18n.t('static.dashboard.productcatalog'),
                             url: '/report/productCatalog',
@@ -1762,12 +1784,12 @@ class DefaultLayout extends Component {
                           //   ]
                           // },
 
-                          {
-                            name: i18n.t('static.dashboard.qatProblemList'),
-                            url: '/report/problemList',
-                            icon: 'fa fa-file-text-o',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) }
-                          },
+                          // {
+                          //   name: i18n.t('static.dashboard.qatProblemList'),
+                          //   url: '/report/problemList',
+                          //   icon: 'fa fa-file-text-o',
+                          //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) }
+                          // },
 
 
                         ]
@@ -1800,12 +1822,12 @@ class DefaultLayout extends Component {
                         attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PIPELINE_PROGRAM_IMPORT') ? false : true) }
                       },
 
-                      {
-                        name: i18n.t('static.quantimed.quantimedImport'),                        
-                        url: '/quantimed/quantimedImport',
-                        icon: 'fa fa-file-text-o',
-                        attributes: { hidden: false }
-                      }
+                      // {
+                      //   name: i18n.t('static.quantimed.quantimedImport'),                        
+                      //   url: '/quantimed/quantimedImport',
+                      //   icon: 'fa fa-file-text-o',
+                      //   attributes: { hidden: false }
+                      // }
 
                     ]
 
@@ -1848,12 +1870,7 @@ class DefaultLayout extends Component {
                           // },
 
                         
-                              // {
-                              //   name: i18n.t('static.program.deleteLocalProgram'),
-                              //   url: '/program/deleteLocalProgram',
-                              //   icon: 'fa fa-trash',
-                              //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DELETE_LOCAL_PROGRAM') ? false : true) }
-                              // },
+                              
                               {
                                 name: i18n.t('static.dashboard.importprogram'),
                                 url: '/program/importProgram',
@@ -1865,6 +1882,12 @@ class DefaultLayout extends Component {
                                 url: '/program/exportProgram',
                                 icon: 'fa fa-sign-in',
                                 attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_IMPORT_EXPORT_PROGARM') ? false : true) }
+                              },
+                              {
+                                name: i18n.t('static.program.deleteLocalProgram'),
+                                url: '/program/deleteLocalProgram',
+                                icon: 'fa fa-trash',
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DELETE_LOCAL_PROGRAM') ? false : true) }
                               },
                           // {
                           //   name: i18n.t('static.consumptionDetailHead.consumptionDetail'),
@@ -2074,6 +2097,12 @@ class DefaultLayout extends Component {
                         icon: 'fa fa-list',
                         attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_REPORT') ? false : true) },
                         children: [
+                          {
+                            name: i18n.t('static.dashboard.qatProblemList'),
+                            url: '/report/problemList',
+                            icon: 'fa fa-file-text-o',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) }
+                          },
                           // {
                           //   name: i18n.t('static.dashboard.productcatalog'),
                           //   url: '/report/productCatalog',
@@ -2180,11 +2209,12 @@ class DefaultLayout extends Component {
                             attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT')) ? false : true) },
                             children: [
                               {
-                                name: i18n.t('static.report.warehouseCapacity'),
-                                url: '/report/warehouseCapacity',
-                                icon: 'fa fa-line-chart',
-                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
+                                name: i18n.t('static.report.expiredInventory'),
+                                url: '/report/expiredInventory',
+                                icon: 'fa fa-exchange',
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT') ? false : true) }
                               },
+                              
                               {
                                 name: i18n.t('static.dashboard.costOfInventory'),
                                 url: '/report/costOfInventory',
@@ -2196,15 +2226,16 @@ class DefaultLayout extends Component {
                                 icon: 'fa fa-line-chart',
                                 attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) }
                               },
-                              {
-                                name: i18n.t('static.report.expiredInventory'),
-                                url: '/report/expiredInventory',
-                                icon: 'fa fa-exchange',
-                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT') ? false : true) }
-                              },
+                              
                               {
                                 name: i18n.t('static.report.stockAdjustment'),
                                 url: '/report/stockAdjustment',
+                                icon: 'fa fa-line-chart',
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
+                              },
+                              {
+                                name: i18n.t('static.report.warehouseCapacity'),
+                                url: '/report/warehouseCapacity',
                                 icon: 'fa fa-line-chart',
                                 attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
                               },
@@ -2255,12 +2286,12 @@ class DefaultLayout extends Component {
                           // },
 
 
-                          {
-                            name: i18n.t('static.dashboard.qatProblemList'),
-                            url: '/report/problemList',
-                            icon: 'fa fa-file-text-o',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) }
-                          },
+                          // {
+                          //   name: i18n.t('static.dashboard.qatProblemList'),
+                          //   url: '/report/problemList',
+                          //   icon: 'fa fa-file-text-o',
+                          //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) }
+                          // },
                         ]
                       }
 
