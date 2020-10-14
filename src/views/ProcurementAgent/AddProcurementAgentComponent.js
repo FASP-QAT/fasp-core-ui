@@ -125,6 +125,7 @@ class AddProcurementAgentComponent extends Component {
         this.Capitalize = this.Capitalize.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.getDisplayName = this.getDisplayName.bind(this);
     }
     handleClick = () => {
         this.setState({ displayColorPicker: !this.state.displayColorPicker })
@@ -160,6 +161,124 @@ class AddProcurementAgentComponent extends Component {
         }
     }
 
+    getDisplayName() {
+        let realmId = document.getElementById("realmId").value;
+        // let realmId = 1;
+        let procurementAgentValue = document.getElementById("procurementAgentName").value;
+        // let procurementAgentValue = "USAID"
+        procurementAgentValue = procurementAgentValue.replace(/[^A-Za-z0-9]/g, "");
+        procurementAgentValue = procurementAgentValue.trim().toUpperCase();
+        if (realmId != '' && procurementAgentValue.length != 0) {
+
+            if (procurementAgentValue.length >= 10) {//minus 2
+                procurementAgentValue = procurementAgentValue.slice(0, 8);
+                console.log("DISPLAYNAME-BEF----->", procurementAgentValue);
+                ProcurementAgentService.getProcurementAgentDisplayName(realmId, procurementAgentValue)
+                    .then(response => {
+                        console.log("DISPLAYNAME-RESP----->", response);
+                        let { procurementAgent } = this.state;
+                        procurementAgent.procurementAgentCode = response.data;
+                        this.setState({
+                            procurementAgent
+                        });
+
+                    }).catch(
+                        error => {
+                            if (error.message === "Network Error") {
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
+
+                                    case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
+                                    case 404:
+                                    case 406:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    case 412:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    default:
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                        break;
+                                }
+                            }
+                        }
+                    );
+
+            } else {// not need to minus
+                console.log("DISPLAYNAME-BEF-else----->", procurementAgentValue);
+                ProcurementAgentService.getProcurementAgentDisplayName(realmId, procurementAgentValue)
+                    .then(response => {
+                        console.log("DISPLAYNAME-RESP-else----->", response);
+                        let { procurementAgent } = this.state;
+                        procurementAgent.procurementAgentCode = response.data;
+                        this.setState({
+                            procurementAgent
+                        });
+
+                    }).catch(
+                        error => {
+                            if (error.message === "Network Error") {
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
+
+                                    case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
+                                    case 404:
+                                    case 406:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    case 412:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    default:
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                        break;
+                                }
+                            }
+                        }
+                    );
+            }
+
+        }
+
+    }
 
     dataChange(event) {
         let { procurementAgent } = this.state;
@@ -330,7 +449,17 @@ class AddProcurementAgentComponent extends Component {
                                 <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
                             </CardHeader> */}
                             <Formik
-                                initialValues={initialValues}
+                                // initialValues={initialValues}
+                                enableReinitialize={true}
+                                initialValues={
+                                    {
+                                        realmId: this.state.procurementAgent.realm.id,
+                                        procurementAgentCode: this.state.procurementAgent.procurementAgentCode,
+                                        procurementAgentName: this.state.procurementAgent.label.label_en,
+                                        submittedToApprovedLeadTime: this.state.procurementAgent.submittedToApprovedLeadTime,
+                                        approvedToShippedLeadTime: this.state.procurementAgent.approvedToShippedLeadTime,
+                                        colorHtmlCode: this.state.procurementAgent.colorHtmlCode,
+                                    }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     this.setState({
@@ -438,7 +567,8 @@ class AddProcurementAgentComponent extends Component {
                                                             valid={!errors.procurementAgentName && this.state.procurementAgent.label.label_en != ''}
                                                             invalid={touched.procurementAgentName && !!errors.procurementAgentName}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
+                                                            // onBlur={handleBlur}
+                                                            onBlur={(e) => { handleBlur(e); this.getDisplayName() }}
                                                             maxLength={255}
                                                             required
                                                             value={this.Capitalize(this.state.procurementAgent.label.label_en)}
@@ -571,7 +701,8 @@ class AddProcurementAgentComponent extends Component {
                                                     <FormGroup>
                                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                         <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                        {/* <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button> */}
+                                                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
 
                                                         &nbsp;
                                                     </FormGroup>

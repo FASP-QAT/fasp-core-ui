@@ -81,7 +81,7 @@ const options = {
     yAxes: [{
       scaleLabel: {
         display: true,
-        labelString: i18n.t('static.report.consupmtionqty')+i18n.t('static.report.inmillions'),
+        labelString: i18n.t('static.report.consupmtionqty') + i18n.t('static.report.inmillions'),
         fontColor: 'black'
       },
       stacked: true,
@@ -141,7 +141,8 @@ const options = {
           x1 = x1.replace(rgx, '$1' + ',' + '$2');
         }
         return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
-      }}
+      }
+    }
   },
   maintainAspectRatio: false
   ,
@@ -200,8 +201,8 @@ class GlobalConsumption extends Component {
       realmList: [],
       message: '',
       rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-      minDate:{year:  new Date().getFullYear()-3, month: new Date().getMonth()+2},
-      maxDate:{year:  new Date().getFullYear()+3, month: new Date().getMonth()},
+      minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
+      maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
       loading: true
 
 
@@ -228,9 +229,9 @@ class GlobalConsumption extends Component {
     return '?'
   }
 
-  addDoubleQuoteToRowContent=(arr)=>{
-    return arr.map(ele=>'"'+ele+'"')
- }
+  addDoubleQuoteToRowContent = (arr) => {
+    return arr.map(ele => '"' + ele + '"')
+  }
 
   exportCSV() {
 
@@ -244,13 +245,15 @@ class GlobalConsumption extends Component {
     console.log(this.state.planningUnitValues)
     this.state.planningUnitValues.map(ele =>
       csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + (((ele.label).toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
-    csvRow.push('')
+      csvRow.push('"' +((i18n.t('static.report.includeapproved') + ' : ' + document.getElementById("includeApprovedVersions").selectedOptions[0].text).replaceAll(' ', '%20')+'"'))
+     
+      csvRow.push('')
     csvRow.push('')
     csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
     csvRow.push('')
     var re;
 
-    var A = [this.addDoubleQuoteToRowContent([(i18n.t('static.dashboard.country')).replaceAll(' ', '%20'), (i18n.t('static.report.month')).replaceAll(' ', '%20'), (i18n.t('static.consumption.consumptionqty')+' '+i18n.t('static.report.inmillions')).replaceAll(' ', '%20')])]
+    var A = [this.addDoubleQuoteToRowContent([(i18n.t('static.dashboard.country')).replaceAll(' ', '%20'), (i18n.t('static.report.month')).replaceAll(' ', '%20'), (i18n.t('static.consumption.consumptionqty') + ' ' + i18n.t('static.report.inmillions')).replaceAll(' ', '%20')])]
 
     re = this.state.consumptions
 
@@ -400,6 +403,9 @@ class GlobalConsumption extends Component {
       console.log(y)
     }
 
+    doc.text(i18n.t('static.report.includeapproved') + ' : ' + document.getElementById("includeApprovedVersions").selectedOptions[0].text, doc.internal.pageSize.width / 8, y, {
+      align: 'left'
+  })
 
 
 
@@ -415,7 +421,7 @@ class GlobalConsumption extends Component {
     var height = doc.internal.pageSize.height;
     var h1 = 50;
     var aspectwidth1 = (width - h1);
-    let startY = y
+    let startY = y+10
     console.log('startY', startY)
     let pages = Math.ceil(startY / height)
     for (var j = 1; j < pages; j++) {
@@ -426,10 +432,10 @@ class GlobalConsumption extends Component {
     if (startYtable > (height - 400)) {
       doc.addPage()
       startYtable = 80
-  }
+    }
     doc.addImage(canvasImg, 'png', 50, startYtable, 750, 260, 'CANVAS');
 
-    const headers = [[i18n.t('static.dashboard.country'), i18n.t('static.report.month'), i18n.t('static.consumption.consumptionqty')+' '+i18n.t('static.report.inmillions')]]
+    const headers = [[i18n.t('static.dashboard.country'), i18n.t('static.report.month'), i18n.t('static.consumption.consumptionqty') + ' ' + i18n.t('static.report.inmillions')]]
     const data = this.state.consumptions.map(elt => [getLabelText(elt.realmCountry.label, this.state.lang), elt.consumptionDateString, this.formatter(elt.planningUnitQty)]);
     doc.addPage()
     startYtable = 80
@@ -520,6 +526,8 @@ class GlobalConsumption extends Component {
     let programIds = this.state.programValues.length == this.state.programs.length ? [] : this.state.programValues.map(ele => (ele.value).toString());
     let viewById = document.getElementById("viewById").value;
     let realmId = document.getElementById('realmId').value;
+    let useApprovedVersion = document.getElementById("includeApprovedVersions").value
+    
     console.log("realmId--------->", realmId);
     let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
     let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
@@ -533,7 +541,8 @@ class GlobalConsumption extends Component {
         "planningUnitIds": planningUnitIds,
         "startDate": startDate,
         "stopDate": stopDate,
-        "reportView": viewById
+        "reportView": viewById,
+        "useApprovedSupplyPlanOnly": useApprovedVersion
       }
       console.log('inputJSON***' + inputjson)
 
@@ -588,10 +597,10 @@ class GlobalConsumption extends Component {
 
       // let realmId = AuthenticationService.getRealmId();
       let realmId = document.getElementById('realmId').value
-      RealmCountryService.getRealmCountryrealmIdById(realmId)
+      RealmCountryService.getRealmCountryForProgram(realmId)
         .then(response => {
           this.setState({
-            countrys: response.data
+            countrys: response.data.map(ele=>ele.realmCountry)
           })
         }).catch(
           error => {
@@ -681,7 +690,7 @@ class GlobalConsumption extends Component {
 
   getPrograms() {
 
-   ProgramService.getProgramList()
+    ProgramService.getProgramList()
       .then(response => {
         console.log(JSON.stringify(response.data))
         this.setState({
@@ -712,7 +721,7 @@ class GlobalConsumption extends Component {
       );
   }
 
-  
+
   componentDidMount() {
 
     this.getPrograms()
@@ -812,7 +821,7 @@ class GlobalConsumption extends Component {
 
     const { countrys } = this.state;
     let countryList = countrys.length > 0 && countrys.map((item, i) => {
-      return ({ label: getLabelText(item.country.label, this.state.lang), value: item.realmCountryId })
+      return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
     }, this);
 
     const { realmList } = this.state;
@@ -825,7 +834,7 @@ class GlobalConsumption extends Component {
         )
       }, this);
 
-   
+
 
     const backgroundColor = [
       '#002f6c',
@@ -879,7 +888,7 @@ class GlobalConsumption extends Component {
       datasets: consumptionSummerydata.map((item, index) => ({ stack: 1, label: localCountryList[index], data: item, backgroundColor: backgroundColor[index] })),
     };
 
-   
+
     const pickerLang = {
       months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
       from: 'From', to: 'To',
@@ -926,7 +935,7 @@ class GlobalConsumption extends Component {
 
                         <Picker
                           ref="pickRange"
-                          years={{min: this.state.minDate, max: this.state.maxDate}}
+                          years={{ min: this.state.minDate, max: this.state.maxDate }}
                           value={rangeValue}
                           lang={pickerLang}
                           //theme="light"
@@ -1036,6 +1045,26 @@ class GlobalConsumption extends Component {
                         </InputGroup>
                       </div>
                     </FormGroup>
+                    <FormGroup className="col-md-3">
+                      <Label htmlFor="appendedInputButton">{i18n.t('static.report.includeapproved')}</Label>
+                      <div className="controls ">
+                        <InputGroup>
+                          <Input
+                            type="select"
+                            name="includeApprovedVersions"
+                            id="includeApprovedVersions"
+                            bsSize="sm"
+                            onChange={(e) => { this.filterData(this.state.rangeValue) }}
+                          >
+                            <option value="true">{i18n.t('static.program.yes')}</option>
+                            <option value="false">{i18n.t('static.program.no')}</option>
+                          </Input>
+
+                        </InputGroup>
+                      </div>
+                    </FormGroup>
+
+
 
                   </div>
                 </div>
@@ -1073,7 +1102,7 @@ class GlobalConsumption extends Component {
                               <tr>
                                 <th className="text-center" style={{ width: '34%' }}> {i18n.t('static.dashboard.country')} </th>
                                 <th className="text-center " style={{ width: '34%' }}> {i18n.t('static.report.month')} </th>
-                                <th className="text-center" style={{ width: '34%' }}>{i18n.t('static.report.consupmtionqty') } {i18n.t('static.report.inmillions') } </th>
+                                <th className="text-center" style={{ width: '34%' }}>{i18n.t('static.report.consupmtionqty')} {i18n.t('static.report.inmillions')} </th>
                               </tr>
                             </thead>
 

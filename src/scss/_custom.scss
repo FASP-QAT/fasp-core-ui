@@ -2876,7 +2876,7 @@ input::placeholder {
 }
 
 .readonly{
-  background-color: #efefef;
+  background-color: #cfcdc9;
 }
 
 
@@ -3585,4 +3585,18 @@ margin-left: -45px;
     margin-bottom: 0;
     line-height: 1.5;
     width: 100%;
+}
+
+.qat-problemListSearch{
+  margin-top:-4%;
+}
+
+.problemList-red{
+  background-color: #f48282;
+}
+.problemList-orange{
+  background-color: orange;
+}
+.problemList-yellow{
+background-color: yellow;
 }

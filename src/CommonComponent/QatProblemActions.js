@@ -3006,7 +3006,7 @@ export default class QatProblemActions extends Component {
 
                                                         mosArray.push(
                                                             {
-                                                                mos: mos,
+                                                                mos: parseFloat(mos).toFixed(1),
                                                                 maxForMonths: maxForMonths,
                                                                 minForMonths: minForMonths,
                                                                 month: m,
@@ -3069,7 +3069,7 @@ export default class QatProblemActions extends Component {
 
                                                             mosArray1.push(
                                                                 {
-                                                                    mos1: mos1,
+                                                                    mos1: parseFloat(mos1).toFixed(1),
                                                                     maxForMonths1: maxForMonths1,
                                                                     minForMonths1: minForMonths1,
                                                                     month1: m1,
@@ -3327,7 +3327,7 @@ export default class QatProblemActions extends Component {
 
                                                         mosArray.push(
                                                             {
-                                                                mos: mos,
+                                                                mos: parseFloat(mos).toFixed(1),
                                                                 maxForMonths: maxForMonths,
                                                                 minForMonths: minForMonths,
                                                                 month: m,
@@ -3391,7 +3391,7 @@ export default class QatProblemActions extends Component {
 
                                                             mosArray1.push(
                                                                 {
-                                                                    mos1: mos1,
+                                                                    mos1: parseFloat(mos1).toFixed(1),
                                                                     maxForMonths1: maxForMonths1,
                                                                     minForMonths1: minForMonths1,
                                                                     month1: m1,
@@ -3640,7 +3640,7 @@ export default class QatProblemActions extends Component {
                                                         }
                                                         mosArray.push(
                                                             {
-                                                                mos: mos,
+                                                                mos: parseFloat(mos).toFixed(1),
                                                                 maxForMonths: maxForMonths,
                                                                 minForMonths: minForMonths,
                                                                 month: m,
@@ -3702,7 +3702,7 @@ export default class QatProblemActions extends Component {
                                                             }
                                                             mosArray1.push(
                                                                 {
-                                                                    mos1: mos1,
+                                                                    mos1: parseFloat(mos1).toFixed(1),
                                                                     maxForMonths1: maxForMonths1,
                                                                     minForMonths1: minForMonths1,
                                                                     month1: m1,
@@ -3952,7 +3952,7 @@ export default class QatProblemActions extends Component {
 
                                                         mosArray.push(
                                                             {
-                                                                mos: mos,
+                                                                mos: parseFloat(mos).toFixed(1),
                                                                 maxForMonths: maxForMonths,
                                                                 minForMonths: minForMonths,
                                                                 month: m,
@@ -4015,7 +4015,7 @@ export default class QatProblemActions extends Component {
 
                                                             mosArray1.push(
                                                                 {
-                                                                    mos1: mos1,
+                                                                    mos1: parseFloat(mos1).toFixed(1),
                                                                     maxForMonths1: maxForMonths1,
                                                                     minForMonths1: minForMonths1,
                                                                     month1: m1,
@@ -4261,7 +4261,7 @@ export default class QatProblemActions extends Component {
                                                         }
                                                         mosArray.push(
                                                             {
-                                                                mos: mos,
+                                                                mos: parseFloat(mos).toFixed(1),
                                                                 maxForMonths: maxForMonths,
                                                                 minForMonths: minForMonths,
                                                                 month: m,
@@ -4325,7 +4325,7 @@ export default class QatProblemActions extends Component {
                                                             }
                                                             mosArray1.push(
                                                                 {
-                                                                    mos1: mos1,
+                                                                    mos1: parseFloat(mos1).toFixed(1),
                                                                     maxForMonths1: maxForMonths1,
                                                                     minForMonths1: minForMonths1,
                                                                     month1: m1,
@@ -4580,7 +4580,7 @@ export default class QatProblemActions extends Component {
 
                                                         mosArray.push(
                                                             {
-                                                                mos: mos,
+                                                                mos: parseFloat(mos).toFixed(1),
                                                                 maxForMonths: maxForMonths,
                                                                 minForMonths: minForMonths,
                                                                 month: m,
@@ -4647,7 +4647,7 @@ export default class QatProblemActions extends Component {
 
                                                             mosArray1.push(
                                                                 {
-                                                                    mos1: mos1,
+                                                                    mos1: parseFloat(mos1).toFixed(1),
                                                                     maxForMonths1: maxForMonths1,
                                                                     minForMonths1: minForMonths1,
                                                                     month1: m1,

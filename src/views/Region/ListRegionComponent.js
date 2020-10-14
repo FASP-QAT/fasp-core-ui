@@ -742,12 +742,12 @@ class RegionListComponent extends Component {
         //     })
 
         let realmId = AuthenticationService.getRealmId();
-        RealmCountryService.getRealmCountryrealmIdById(realmId)
+        RealmCountryService.getRealmCountryForProgram(realmId)
             .then(response => {
                 console.log("RealmCountryService---->", response.data)
                 if (response.status == 200) {
                     this.setState({
-                        realmCountryList: response.data
+                        realmCountryList: response.data.map(ele=>ele.realmCountry)
                     },
                         () => { })
                 } else {
@@ -816,8 +816,8 @@ class RegionListComponent extends Component {
         let realmCountries = realmCountryList.length > 0
             && realmCountryList.map((item, i) => {
                 return (
-                    <option key={i} value={item.realmCountryId}>
-                        {getLabelText(item.country.label, this.state.lang)}
+                    <option key={i} value={item.id}>
+                        {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);
