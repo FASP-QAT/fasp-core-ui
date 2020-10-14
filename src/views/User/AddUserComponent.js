@@ -644,8 +644,8 @@ class AddUserComponent extends Component {
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="emailId">{i18n.t('static.user.emailid')}<span class="red Reqasterisk">*</span></Label>
-                                                        <Input type="text"
-                                                            autocomplete="off"
+                                                        <Input type="search"
+                                                            // autocomplete="false"
                                                             name="emailId"
                                                             id="emailId"
                                                             bsSize="sm"

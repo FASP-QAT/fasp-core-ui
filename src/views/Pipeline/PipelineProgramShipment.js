@@ -1005,7 +1005,27 @@ export default class PipelineProgramShipment extends Component {
         this.el = jexcel(document.getElementById("shipmenttableDiv"), '');
         this.el.destroy();
 
-        var data = this.state.pipelineShipmentData.map((item, index) => [item.planningUnit, item.dataSource, item.procurementAgent, item.fundingSource, item.shipmentStatus, item.shipmentMode == '' ? this.state.shipModes[1] : item.shipmentMode, item.quantity, item.rate, item.freightCost == 0 ? item.quantity * this.props.items.program.seaFreightPerc : item.freightCost, item.quantity * item.rate, moment(item.expectedDeliveryDate).format("YYYY-MM-DD"), moment(item.orderedDate).format("YYYY-MM-DD"), moment(item.plannedDate).format("YYYY-MM-DD"), moment(item.submittedDate).format("YYYY-MM-DD"), moment(item.approvedDate).format("YYYY-MM-DD"), moment(item.shippedDate).format("YYYY-MM-DD"), moment(item.arrivedDate).format("YYYY-MM-DD"), moment(item.receivedDate).format("YYYY-MM-DD"), item.notes]);
+        var data = this.state.pipelineShipmentData.map((item, index) => [
+            item.planningUnit, 
+            item.dataSource, 
+            item.procurementAgent, 
+            item.fundingSource, 
+            item.shipmentStatus, 
+            item.shipmentMode == '' ? this.state.shipModes[1] : item.shipmentMode, 
+            item.quantity, 
+            item.rate, 
+            // item.freightCost == 0 ? item.quantity * this.props.items.program.seaFreightPerc : item.freightCost, 
+            item.freightCost,
+            // item.quantity * item.rate, 
+            item.productCost, 
+            moment(item.expectedDeliveryDate).format("YYYY-MM-DD"), 
+            moment(item.orderedDate).format("YYYY-MM-DD"), 
+            moment(item.plannedDate).format("YYYY-MM-DD"), 
+            moment(item.submittedDate).format("YYYY-MM-DD"), 
+            moment(item.approvedDate).format("YYYY-MM-DD"),
+            moment(item.shippedDate).format("YYYY-MM-DD"), 
+            moment(item.arrivedDate).format("YYYY-MM-DD"), 
+            moment(item.receivedDate).format("YYYY-MM-DD"), item.notes]);
         // json[0] = data;
         var options = {
             data: data,
@@ -1235,16 +1255,16 @@ export default class PipelineProgramShipment extends Component {
         this.SubmitShipment()
         PipelineService.getPlanningUnitListWithFinalInventry(this.props.match.params.pipelineId)
             .then(response => {
-                var planningUnitListFinalInventory = response.data;
-                console.log("planningUnitListFinalInventory====", planningUnitListFinalInventory);
-                var negtiveInventoryList = (planningUnitListFinalInventory).filter(c => c.inventory < 0);
-                console.log("negtive inventory list=====", negtiveInventoryList);
-                if (negtiveInventoryList.length > 0) {
-                    console.log("my page------");
-                    this.props.history.push({
-                        pathname: `/pipeline/planningUnitListFinalInventory/${this.props.match.params.pipelineId}`
-                    });
-                } else {
+                // var planningUnitListFinalInventory = response.data;
+                // console.log("planningUnitListFinalInventory====", planningUnitListFinalInventory);
+                // var negtiveInventoryList = (planningUnitListFinalInventory).filter(c => c.inventory < 0);
+                // console.log("negtive inventory list=====", negtiveInventoryList);
+                // if (negtiveInventoryList.length > 0) {
+                //     console.log("my page------");
+                //     this.props.history.push({
+                //         pathname: `/pipeline/planningUnitListFinalInventory/${this.props.match.params.pipelineId}`
+                //     });
+                // } else {
                     PipelineService.submitProgram(this.props.match.params.pipelineId)
                         .then(response => {
                             console.log(response.data.messageCode)
@@ -1299,7 +1319,7 @@ export default class PipelineProgramShipment extends Component {
 
 
                     console.log('You have submitted the program');
-                }
+                // }
 
             }).catch(
                 error => {

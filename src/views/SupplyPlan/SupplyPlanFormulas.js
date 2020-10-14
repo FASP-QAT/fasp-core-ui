@@ -273,10 +273,10 @@ Suggest Order = True</p>
                     
                      <img className="formula-img-mr img-fluid" src={suggestorderqty}/>
                      <p><span className="formulastext-p">Example :</span><br></br>
-                     Max = 44,744<br></br>
-                    Min = 25,568<br></br>
+                     Max Stock = 44,744<br></br>
+                     Ending balance = 25,568<br></br>
 <br></br>
-Suggested Order Qty = Max - Min<br></br>
+Suggested Order Qty = (Max Stock - Ending balance) <br></br>
 Suggested Order Qty = 44,744 - 25,568<br></br>
 Suggested Order Qty = 19,176</p>
                     </ListGroupItemText>
@@ -312,7 +312,7 @@ Months Of Stock = 3.54</p>
                     <ListGroupItemText className="formulastext">
                     
                      <img className="formula-img-mr img-fluid" src={costOfinventory}/>
-                    
+                     <p>Note: If "Include planned shipment" is "yes" - Planned, Submitted, Approved, Shipped, Arrived, Received, On Hold statuses are all included in the projected inventory. If "no", all above statuses are included except Planned.</p>
                     </ListGroupItemText>
                   </ListGroupItem>
                       </ListGroup>
@@ -328,6 +328,9 @@ Months Of Stock = 3.54</p>
                     <ListGroupItemText className="formulastext">
                     
                      <img className="formula-img-mr img-fluid" src={Inventoryturns}/>
+                     <p>Note: If "Include planned shipment" is "yes" - Planned, Submitted, Approved, Shipped, Arrived, Received, On Hold statuses are all included in the projected inventory. If "no", all above statuses are included except Planned.</p>
+
+                     <p>Note: Actual consumption precedes forecasted consumption in calculation if available</p>
                     
                     </ListGroupItemText>
                   </ListGroupItem>
@@ -343,7 +346,7 @@ Months Of Stock = 3.54</p>
                     <ListGroupItemHeading className="formulasheading">Weighted Absolute Percentage Error (WAPE)</ListGroupItemHeading>
                     <ListGroupItemText className="formulastext">
                     <img className="formula-img-mr img-fluid" src={forcasterror}/><br></br>
-                    {/* <p>* N is number of months</p> */}
+                    <p>Note : We have used Weighted Absolute Percentage Error (WAPE) Formulae here</p>
                    
                     </ListGroupItemText>
                   </ListGroupItem>

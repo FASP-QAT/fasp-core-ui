@@ -409,7 +409,7 @@ class RegionListComponent extends Component {
                 doc.setPage(i)
                 doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
                 doc.setTextColor("#002f6c");
-                doc.text(i18n.t('static.region.region'), doc.internal.pageSize.width / 2, 60, {
+                doc.text(i18n.t('static.regionHead.region'), doc.internal.pageSize.width / 2, 60, {
                     align: 'center'
                 })
                 if (i == 1) {
@@ -431,7 +431,7 @@ class RegionListComponent extends Component {
         const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size, true);
         doc.setFontSize(8);
-        const title = i18n.t('static.region.region');
+        const title = i18n.t('static.regionHead.region');
         var width = doc.internal.pageSize.width;
         var height = doc.internal.pageSize.height;
         var h1 = 50;
@@ -466,7 +466,7 @@ class RegionListComponent extends Component {
         doc.autoTable(content);
         addHeaders(doc)
         addFooters(doc)
-        doc.save(i18n.t('static.region.region') + '.pdf')
+        doc.save(i18n.t('static.regionHead.region') + '.pdf')
     }
     addDoubleQuoteToRowContent = (arr) => {
         return arr.map(ele => '"' + ele + '"')
@@ -500,7 +500,7 @@ class RegionListComponent extends Component {
         var a = document.createElement("a")
         a.href = 'data:attachment/csv,' + csvString
         a.target = "_Blank"
-        a.download = i18n.t('static.region.region') + ".csv"
+        a.download = i18n.t('static.regionHead.region') + ".csv"
         document.body.appendChild(a)
         a.click()
     }
@@ -742,12 +742,12 @@ class RegionListComponent extends Component {
         //     })
 
         let realmId = AuthenticationService.getRealmId();
-        RealmCountryService.getRealmCountryrealmIdById(realmId)
+        RealmCountryService.getRealmCountryForProgram(realmId)
             .then(response => {
                 console.log("RealmCountryService---->", response.data)
                 if (response.status == 200) {
                     this.setState({
-                        realmCountryList: response.data
+                        realmCountryList: response.data.map(ele=>ele.realmCountry)
                     },
                         () => { })
                 } else {
@@ -816,8 +816,8 @@ class RegionListComponent extends Component {
         let realmCountries = realmCountryList.length > 0
             && realmCountryList.map((item, i) => {
                 return (
-                    <option key={i} value={item.realmCountryId}>
-                        {getLabelText(item.country.label, this.state.lang)}
+                    <option key={i} value={item.id}>
+                        {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);

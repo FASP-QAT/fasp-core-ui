@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { Button, Card, CardBody, CardFooter, CardHeader, Col, Form, FormGroup, Input, InputGroupAddon, InputGroupText, Label, Row, FormFeedback } from 'reactstrap';
 import * as Yup from 'yup';
 import CryptoJS from 'crypto-js';
-import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME } from '../../Constants.js';
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME,DATE_FORMAT_CAP } from '../../Constants.js';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import moment from "moment";
 // import * as myConst from '../../Labels.js';
@@ -585,8 +585,8 @@ export default class EditLanguageComponent extends Component {
                 align: 'center',
                 headerAlign: 'center',
                 style: { width: '80px' },
-                formatter: (cell, row) => {
-                    return new moment(cell).format('yyyy-MM-DD');
+                formatter: (cell, row) => { 
+                    return new moment(cell).format(DATE_FORMAT_CAP);
                 }
             },
 

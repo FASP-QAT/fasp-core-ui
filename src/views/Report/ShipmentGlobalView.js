@@ -105,20 +105,20 @@ const options = {
                 beginAtZero: true,
                 fontColor: 'black',
                 callback: function (value) {
-                  var cell1 = value
-                  cell1 += '';
-                  var x = cell1.split('.');
-                  var x1 = x[0];
-                  var x2 = x.length > 1 ? '.' + x[1] : '';
-                  var rgx = /(\d+)(\d{3})/;
-                  while (rgx.test(x1)) {
-                    x1 = x1.replace(rgx, '$1' + ',' + '$2');
-                  }
-                  return x1 + x2;
-        
+                    var cell1 = value
+                    cell1 += '';
+                    var x = cell1.split('.');
+                    var x1 = x[0];
+                    var x2 = x.length > 1 ? '.' + x[1] : '';
+                    var rgx = /(\d+)(\d{3})/;
+                    while (rgx.test(x1)) {
+                        x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                    }
+                    return x1 + x2;
+
                 }
-              }
             }
+        }
         ],
     },
     tooltips: {
@@ -126,22 +126,22 @@ const options = {
         custom: CustomTooltips,
         callbacks: {
             label: function (tooltipItem, data) {
-      
-              let label = data.labels[tooltipItem.index];
-              let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
-      
-              var cell1 = value
-              cell1 += '';
-              var x = cell1.split('.');
-              var x1 = x[0];
-              var x2 = x.length > 1 ? '.' + x[1] : '';
-              var rgx = /(\d+)(\d{3})/;
-              while (rgx.test(x1)) {
-                x1 = x1.replace(rgx, '$1' + ',' + '$2');
-              }
-              return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
+
+                let label = data.labels[tooltipItem.index];
+                let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+
+                var cell1 = value
+                cell1 += '';
+                var x = cell1.split('.');
+                var x1 = x[0];
+                var x2 = x.length > 1 ? '.' + x[1] : '';
+                var rgx = /(\d+)(\d{3})/;
+                while (rgx.test(x1)) {
+                    x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                }
+                return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
             }
-          }
+        }
     },
     maintainAspectRatio: false
     ,
@@ -158,7 +158,7 @@ const options = {
 const options1 = {
     title: {
         display: true,
-        text:i18n.t('static.shipment.shipmentfundingSource'),
+        text: i18n.t('static.shipment.shipmentfundingSource'),
         fontColor: 'black'
     },
     scales: {
@@ -176,19 +176,19 @@ const options1 = {
                 beginAtZero: true,
                 fontColor: 'black',
                 callback: function (value) {
-                  var cell1 = value
-                  cell1 += '';
-                  var x = cell1.split('.');
-                  var x1 = x[0];
-                  var x2 = x.length > 1 ? '.' + x[1] : '';
-                  var rgx = /(\d+)(\d{3})/;
-                  while (rgx.test(x1)) {
-                    x1 = x1.replace(rgx, '$1' + ',' + '$2');
-                  }
-                  return x1 + x2;
-        
+                    var cell1 = value
+                    cell1 += '';
+                    var x = cell1.split('.');
+                    var x1 = x[0];
+                    var x2 = x.length > 1 ? '.' + x[1] : '';
+                    var rgx = /(\d+)(\d{3})/;
+                    while (rgx.test(x1)) {
+                        x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                    }
+                    return x1 + x2;
+
                 }
-              }
+            }
         }],
     },
     tooltips: {
@@ -196,22 +196,22 @@ const options1 = {
         custom: CustomTooltips,
         callbacks: {
             label: function (tooltipItem, data) {
-      
-              let label = data.labels[tooltipItem.index];
-              let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
-      
-              var cell1 = value
-              cell1 += '';
-              var x = cell1.split('.');
-              var x1 = x[0];
-              var x2 = x.length > 1 ? '.' + x[1] : '';
-              var rgx = /(\d+)(\d{3})/;
-              while (rgx.test(x1)) {
-                x1 = x1.replace(rgx, '$1' + ',' + '$2');
-              }
-              return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
+
+                let label = data.labels[tooltipItem.index];
+                let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+
+                var cell1 = value
+                cell1 += '';
+                var x = cell1.split('.');
+                var x1 = x[0];
+                var x2 = x.length > 1 ? '.' + x[1] : '';
+                var rgx = /(\d+)(\d{3})/;
+                while (rgx.test(x1)) {
+                    x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                }
+                return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
             }
-          }
+        }
     },
     maintainAspectRatio: false
     ,
@@ -227,7 +227,7 @@ const options1 = {
 const options2 = {
     title: {
         display: true,
-        text:i18n.t('static.shipment.shipmentProcurementAgent'),
+        text: i18n.t('static.shipment.shipmentProcurementAgent'),
         fontColor: 'black'
     },
     scales: {
@@ -305,18 +305,18 @@ const chartData1 = {
     ]
 };
 const backgroundColor = [
-'#002f6c',
-'#212721',
-'#20a8d8',
-'#4dbd74',
-'#f86c6b',
-'#d1e3f5',
-'#118b70',
-'#EDB944',
-'#F48521',
-'#ED5626',
-'#cfcdc9',
-'#004876', '#0063a0', '#007ecc', '#0093ee', '#82caf8', '#c8e6f4'
+    '#002f6c',
+    '#212721',
+    '#20a8d8',
+    '#4dbd74',
+    '#f86c6b',
+    '#d1e3f5',
+    '#118b70',
+    '#EDB944',
+    '#F48521',
+    '#ED5626',
+    '#cfcdc9',
+    '#004876', '#0063a0', '#007ecc', '#0093ee', '#82caf8', '#c8e6f4'
 ]
 // var bar_chart = new Chart(bar_ctx, {
 //     type: 'bar',
@@ -394,8 +394,8 @@ class ShipmentGlobalView extends Component {
             table1Headers: [],
             viewby: 1,
             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate:{year:  new Date().getFullYear()-3, month: new Date().getMonth()+2},
-            maxDate:{year:  new Date().getFullYear()+3, month: new Date().getMonth()},
+            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
+            maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
             loading: true
 
 
@@ -417,31 +417,33 @@ class ShipmentGlobalView extends Component {
         if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
         return '?'
     }
-    addDoubleQuoteToRowContent=(arr)=>{
-        return arr.map(ele=>'"'+ele+'"')
-     }
+    addDoubleQuoteToRowContent = (arr) => {
+        return arr.map(ele => '"' + ele + '"')
+    }
     exportCSV() {
 
         var csvRow = [];
-        csvRow.push('"' +(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20')+'"')
+        csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
         this.state.countryLabels.map(ele =>
-            csvRow.push('"' +(i18n.t('static.dashboard.country') + ' : ' + (ele.toString())).replaceAll(' ', '%20')+'"'))
-        csvRow.push('"' +(i18n.t('static.dashboard.productcategory') + ' : ' + (document.getElementById("productCategoryId").selectedOptions[0].text)).replaceAll(' ', '%20')+'"')
-        csvRow.push('"' +(i18n.t('static.planningunit.planningunit') + ' : ' + (document.getElementById("planningUnitId").selectedOptions[0].text)).replaceAll(' ', '%20')+'"')
+            csvRow.push('"' + (i18n.t('static.dashboard.country') + ' : ' + (ele.toString())).replaceAll(' ', '%20') + '"'))
+        csvRow.push('"' + (i18n.t('static.dashboard.productcategory') + ' : ' + (document.getElementById("productCategoryId").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.planningunit.planningunit') + ' : ' + (document.getElementById("planningUnitId").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
         var viewby = document.getElementById("viewById").value;
-        csvRow.push('"' +(i18n.t('static.common.display') + ' : ' + (document.getElementById("viewById").selectedOptions[0].text)).replaceAll(' ', '%20')+'"')
+        csvRow.push('"' + (i18n.t('static.common.display') + ' : ' + (document.getElementById("viewById").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
 
         if (viewby == 1) {
             this.state.fundingSourceLabels.map(ele =>
-                csvRow.push('"' +(i18n.t('static.budget.fundingsource') + ' : ' + (ele.toString())).replaceAll(' ', '%20')+'"'))
+                csvRow.push('"' + (i18n.t('static.budget.fundingsource') + ' : ' + (ele.toString())).replaceAll(' ', '%20') + '"'))
         } else {
             this.state.procurementAgentLabels.map(ele =>
-                csvRow.push('"' +(i18n.t('static.procurementagent.procurementagent') + ' : ' + (ele.toString())).replaceAll(' ', '%20')+'"'))
+                csvRow.push('"' + (i18n.t('static.procurementagent.procurementagent') + ' : ' + (ele.toString())).replaceAll(' ', '%20') + '"'))
         }
-
+        csvRow.push('"' +((i18n.t('static.report.includeapproved') + ' : ' + document.getElementById("includeApprovedVersions").selectedOptions[0].text).replaceAll(' ', '%20')+'"'))
+        csvRow.push((i18n.t('static.program.isincludeplannedshipment') + ' , ' + document.getElementById("includePlanningShipments").selectedOptions[0].text).replaceAll(' ', '%20'))
+       
         csvRow.push('')
         csvRow.push('')
-        csvRow.push('"' +(i18n.t('static.common.youdatastart')).replaceAll(' ', '%20')+'"')
+        csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         var re;
 
@@ -457,7 +459,7 @@ class ShipmentGlobalView extends Component {
             A[0] = this.addDoubleQuoteToRowContent(tableHeadTemp);
             re = this.state.table1Body
             for (var item = 0; item < re.length; item++) {
-                A.push([[('"'+getLabelText(re[item].country.label, this.state.lang)).replaceAll(' ', '%20')+'"', this.addDoubleQuoteToRowContent(re[item].amount)]])
+                A.push([[('"' + getLabelText(re[item].country.label, this.state.lang)).replaceAll(' ', '%20') + '"', this.addDoubleQuoteToRowContent(re[item].amount)]])
             }
             for (var i = 0; i < A.length; i++) {
                 csvRow.push(A[i].join(","))
@@ -568,16 +570,22 @@ class ShipmentGlobalView extends Component {
                     doc.text(i18n.t('static.common.display') + ' : ' + document.getElementById("viewById").selectedOptions[0].text, doc.internal.pageSize.width / 8, 190, {
                         align: 'left'
                     })
+                    doc.text(i18n.t('static.report.includeapproved') + ' : ' + document.getElementById("includeApprovedVersions").selectedOptions[0].text, doc.internal.pageSize.width / 8, 210, {
+                        align: 'left'
+                    })
+                    doc.text(i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text, doc.internal.pageSize.width / 8, 225, {
+                        align: 'left'
+                    })
                     var viewby = document.getElementById("viewById").value;
                     if (viewby == 1) {
 
                         var fundingSourceText = doc.splitTextToSize((i18n.t('static.budget.fundingsource') + ' : ' + this.state.fundingSourceLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-                        doc.text(doc.internal.pageSize.width / 8, 210, fundingSourceText)
+                        doc.text(doc.internal.pageSize.width / 8, 240, fundingSourceText)
 
                     } else {
 
                         var procurementAgentText = doc.splitTextToSize((i18n.t('static.procurementagent.procurementagent') + ' : ' + this.state.procurementAgentLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-                        doc.text(doc.internal.pageSize.width / 8, 210, procurementAgentText)
+                        doc.text(doc.internal.pageSize.width / 8, 240, procurementAgentText)
                     }
 
                 }
@@ -601,13 +609,13 @@ class ShipmentGlobalView extends Component {
         var height = doc.internal.pageSize.height;
         var h1 = 50;
         var aspectwidth1 = (width - h1);
-        doc.addImage(canvasImg, 'png', 50, 240, 300, 200, 'a', 'CANVAS');
+        doc.addImage(canvasImg, 'png', 50, 260, 300, 200, 'a', 'CANVAS');
 
         //creates image2
         canvas = document.getElementById("cool-canvas2");
 
         canvasImg = canvas.toDataURL("image/png", 1.0);
-        doc.addImage(canvasImg, 'png', width / 2, 240, 300, 200, 'b', 'CANVAS');
+        doc.addImage(canvasImg, 'png', width / 2, 260, 300, 200, 'b', 'CANVAS');
 
         let displaylabel = [];
         displaylabel = this.state.dateSplitList.filter((i, index) => (index < 1)).map(ele => (Object.keys(ele.amount)));
@@ -619,7 +627,7 @@ class ShipmentGlobalView extends Component {
         let content1 = {
             margin: { top: 80, bottom: 50 },
             startY: height,
-            styles: { lineWidth: 1, fontSize: 8, cellWidth: 700/displaylabel.length, halign: 'center' },
+            styles: { lineWidth: 1, fontSize: 8, cellWidth: 700 / displaylabel.length, halign: 'center' },
             columnStyles: {
                 // 0: { cellWidth: 100 },
                 // 1: { cellWidth: 100 },
@@ -790,10 +798,10 @@ class ShipmentGlobalView extends Component {
 
         // AuthenticationService.setupAxiosInterceptors();
         let realmId = AuthenticationService.getRealmId();
-        RealmCountryService.getRealmCountryrealmIdById(realmId)
+        RealmCountryService.getRealmCountryForProgram(realmId)
             .then(response => {
                 this.setState({
-                    countrys: response.data
+                    countrys: response.data.map(ele=>ele.realmCountry)
                 })
             }).catch(
                 error => {
@@ -836,7 +844,7 @@ class ShipmentGlobalView extends Component {
                     error => {
                         this.setState({
                             planningUnits: [],
-                            planningUnitValues:[]
+                            planningUnitValues: []
                         })
                         if (error.message === "Network Error") {
                             this.setState({ message: error.message });
@@ -1082,7 +1090,9 @@ class ShipmentGlobalView extends Component {
         let fundingSourceIds = this.state.fundingSourceValues.length == this.state.fundingSources.length ? [] : this.state.fundingSourceValues.map(ele => (ele.value).toString());
         let productCategoryId = document.getElementById("productCategoryId").value;
         let CountryIds = this.state.countryValues.length == this.state.countrys.length ? [] : this.state.countryValues.map(ele => (ele.value).toString());
-
+        let useApprovedVersion = document.getElementById("includeApprovedVersions").value
+        let includePlanningShipments = document.getElementById("includePlanningShipments").value
+    
         let planningUnitId = document.getElementById("planningUnitId").value;
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
@@ -1109,12 +1119,14 @@ class ShipmentGlobalView extends Component {
             // let realmId = AuthenticationService.getRealmId();
             var inputjson = {
                 realmId: realmId,
-                startDate:startDate,
+                startDate: startDate,
                 stopDate: endDate,
                 realmCountryIds: CountryIds,
                 planningUnitId: planningUnitId,
                 reportView: viewby,
                 fundingSourceProcurementAgentIds: fundingSourceProcurementAgentIds
+                ,useApprovedSupplyPlanOnly: useApprovedVersion,
+                includePlannedShipments:includePlanningShipments
             }
             console.log("INPUTJSON--------->", inputjson);
             // AuthenticationService.setupAxiosInterceptors();
@@ -1176,8 +1188,8 @@ class ShipmentGlobalView extends Component {
                     error => {
                         this.setState({
                             // programs: []
-                            loading:false
-                        }, () => { 
+                            loading: false
+                        }, () => {
                             // this.consolidatedProgramList() 
                         })
                         if (error.message === "Network Error") {
@@ -1192,7 +1204,7 @@ class ShipmentGlobalView extends Component {
                                     this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
                                     break;
                                 default:
-                                    this.setState({ message: ''});
+                                    this.setState({ message: '' });
                                     break;
                             }
                         }
@@ -1305,7 +1317,7 @@ class ShipmentGlobalView extends Component {
             procurementAgentValues: procurementAgentIds.map(ele => ele),
             procurementAgentLabels: procurementAgentIds.map(ele => ele.label),
             fundingSourceValues: [],
-            fundingSourceLabels:[]
+            fundingSourceLabels: []
         }, () => {
 
             this.fetchData();
@@ -1319,8 +1331,8 @@ class ShipmentGlobalView extends Component {
         this.setState({
             fundingSourceValues: fundingSourceIds.map(ele => ele),
             fundingSourceLabels: fundingSourceIds.map(ele => ele.label),
-            procurementAgentValues:[],
-            procurementAgentLabels:[]
+            procurementAgentValues: [],
+            procurementAgentLabels: []
         }, () => {
 
             this.fetchData();
@@ -1377,7 +1389,7 @@ class ShipmentGlobalView extends Component {
         const { countrys } = this.state;
         let countryList = countrys.length > 0 && countrys.map((item, i) => {
             console.log(JSON.stringify(item))
-            return ({ label: getLabelText(item.country.label, this.state.lang), value: item.realmCountryId })
+            return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
         }, this);
 
         const { productCategories } = this.state;
@@ -1392,7 +1404,7 @@ class ShipmentGlobalView extends Component {
                 )
             }, this);
 
-       
+
 
         const pickerLang = {
             months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
@@ -1429,11 +1441,12 @@ class ShipmentGlobalView extends Component {
 
         // let displaylabel = Object.keys(this.state.dateSplitList[0].amount);
         let displaylabel = [];
-        if(this.state.viewby==1){
-        displaylabel = this.state.fundingSourceValues.map(ele=>ele.label)
+        if (this.state.viewby == 1) {
+            displaylabel = this.state.fundingSourceValues.map(ele => ele.label)
         }
-        else{
-            displaylabel = this.state.procurementAgentValues.map(ele=>ele.label)}//this.state.dateSplitList.filter((i, index) => (index < 1 && i)).map(ele => (Object.keys(ele.amount)));
+        else {
+            displaylabel = this.state.procurementAgentValues.map(ele => ele.label)
+        }//this.state.dateSplitList.filter((i, index) => (index < 1 && i)).map(ele => (Object.keys(ele.amount)));
         // if (displaylabel.length > 0) {
         //     displaylabel = displaylabel[0];
         // }
@@ -1469,18 +1482,18 @@ class ShipmentGlobalView extends Component {
 
 
 
-        var bar1 =[]
-        const dataSet= displaylabel.map((item, index) => ({ label: item, data: displayObject[index], borderWidth: 0, backgroundColor: backgroundColor[index] }))
-        bar1= {
+        var bar1 = []
+        const dataSet = displaylabel.map((item, index) => ({ label: item, data: displayObject[index], borderWidth: 0, backgroundColor: backgroundColor[index] }))
+        bar1 = {
 
 
 
             labels: [...new Set(this.state.dateSplitList.map(ele => (moment(ele.transDate, 'YYYY-MM-dd').format('MMM YYYY'))))],
-            datasets:dataSet
+            datasets: dataSet
 
         }
         console.log(bar1)
-       let viewby = this.state.viewby;
+        let viewby = this.state.viewby;
 
 
         return (
@@ -1520,7 +1533,7 @@ class ShipmentGlobalView extends Component {
 
                                                 <Picker
                                                     ref="pickRange"
-                                                    years={{min: this.state.minDate, max: this.state.maxDate}}
+                                                    years={{ min: this.state.minDate, max: this.state.maxDate }}
                                                     value={rangeValue}
                                                     lang={pickerLang}
                                                     //theme="light"
@@ -1677,6 +1690,43 @@ class ShipmentGlobalView extends Component {
 
                                             </div>
                                         </FormGroup>
+                                        <FormGroup className="col-md-3">
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.includeapproved')}</Label>
+                                            <div className="controls ">
+                                                <InputGroup>
+                                                    <Input
+                                                        type="select"
+                                                        name="includeApprovedVersions"
+                                                        id="includeApprovedVersions"
+                                                        bsSize="sm"
+                                                        onChange={(e) => { this.fetchData() }}
+                                                    >
+                                                        <option value="true">{i18n.t('static.program.yes')}</option>
+                                                        <option value="false">{i18n.t('static.program.no')}</option>
+                                                    </Input>
+
+                                                </InputGroup>
+                                            </div>
+                                        </FormGroup>
+                                        <FormGroup className="col-md-3">
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.program.isincludeplannedshipment')}</Label>
+                                                <div className="controls ">
+                                                    <InputGroup>
+                                                        <Input
+                                                            type="select"
+                                                            name="includePlanningShipments"
+                                                            id="includePlanningShipments"
+                                                            bsSize="sm"
+                                                            onChange={(e) => { this.fetchData() }}
+                                                        >
+                                                            <option value="true">{i18n.t('static.program.yes')}</option>
+                                                            <option value="false">{i18n.t('static.program.no')}</option>
+                                                        </Input>
+
+                                                    </InputGroup>
+                                                </div>
+                                            </FormGroup>
+
 
                                     </div>
                                 </div>
@@ -1698,7 +1748,7 @@ class ShipmentGlobalView extends Component {
                                         <div className="col-md-6">
                                             <div className="chart-wrapper chart-graph-report">
                                                 {console.log(bar1)/* <Bar id="cool-canvas" data={bar} options={options} /> */}
-                                                <Bar id="cool-canvas2" data={bar1} options={this.state.viewby==1?options1:options2} />
+                                                <Bar id="cool-canvas2" data={bar1} options={this.state.viewby == 1 ? options1 : options2} />
                                             </div>
                                         </div>
                                     }
