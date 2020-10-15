@@ -52,9 +52,11 @@ export function jExcelLoadedFunction(instance, number) {
     jexcel_pagination.firstChild.classList.add('order-2');
     jexcel_pagination.firstChild.classList.add('mr-auto');
     jexcel_pagination.firstChild.classList.add('pl-0');
+    // document.getElementsByClassName('jexcel_pagination')[number].value = localStorage.getItem("sesRecordCount")
+    // document.getElementsByClassName('jexcel_pagination')[number].value = 25
     var pageSelect = document.getElementsByClassName('jexcel_pagination_dropdown')[number];
     pageSelect.options[pageSelect.options.length] = new Option('All', 5000000);
-
+    
 
     var jexcel_filterFirstdiv = document.getElementsByClassName('jexcel_filter')[number];
     var filter = jexcel_filterFirstdiv.firstChild;

@@ -637,6 +637,7 @@ class ListUserComponent extends Component {
             copyCompatibility: true,
             allowExport: false,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
+            onchangepage: this.pageChange,
             position: 'top',
             contextMenu: function (obj, x, y, e) {
                 var items = [];
@@ -682,6 +683,13 @@ class ListUserComponent extends Component {
                 }
             }
         }
+    }.bind(this);
+
+    pageChange = function (el, newPage, oldPage) {
+        console.log(" pagination change called---------------------");
+        console.log("el---",el);
+        console.log("newPage---" + newPage);
+        console.log("oldPage---" + oldPage);
     }.bind(this);
 
     loaded = function (instance, cell, x, y, value) {

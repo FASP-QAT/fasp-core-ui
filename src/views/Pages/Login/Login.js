@@ -16,7 +16,7 @@ import image3 from '../../../assets/img/PEPFAR-logo.png';
 import image1 from '../../../assets/img/QAT-login-logo.png';
 import image4 from '../../../assets/img/USAID-presidents-malaria-initiative.png';
 import image2 from '../../../assets/img/wordmark.png';
-import { SECRET_KEY, APP_VERSION_REACT } from '../../../Constants.js';
+import { SECRET_KEY, APP_VERSION_REACT, JEXCEL_DEFAULT_PAGINATION } from '../../../Constants.js';
 import AuthenticationService from '../../Common/AuthenticationService.js';
 import '../../Forms/ValidationForms/ValidationForms.css';
 import axios from 'axios';
@@ -138,6 +138,7 @@ class Login extends Component {
     } else {
       console.log("############## Offline so can't fetch version #####################");
     }
+    AuthenticationService.setRecordCount(JEXCEL_DEFAULT_PAGINATION);
     i18n.changeLanguage(AuthenticationService.getDefaultUserLanguage())
   }
 
@@ -215,7 +216,7 @@ class Login extends Component {
 
         <div className="Login-component" style={{ backgroundImage: "url(" + InnerBgImg + ")" }}>
           <Container className="container-login">
-          
+
             <Row className="justify-content-center">
               <Col className="float-right pr-5" style={{ width: '100%' }}>
                 <div className="float-right">
@@ -239,7 +240,7 @@ class Login extends Component {
                 <div className="upper-logo logo-MarginTop">
                   <img src={image1} className="img-fluid " />
                 </div>
-               
+
               </Col>
               <Col lg="5" md="7" xl="4">
                 <CardGroup>
@@ -257,7 +258,7 @@ class Login extends Component {
                                 var decoded = jwt_decode(response.data.token);
                                 console.log("decoded token---", decoded);
 
-                                let keysToRemove = ["token-" + decoded.userId, "user-" + decoded.userId, "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken","lastLoggedInUsersLanguage"];
+                                let keysToRemove = ["token-" + decoded.userId, "user-" + decoded.userId, "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "lastLoggedInUsersLanguage"];
                                 keysToRemove.forEach(k => localStorage.removeItem(k))
                                 decoded.user.syncExpiresOn = moment().format("YYYY-MM-DD HH:mm:ss");
                                 decoded.user.apiVersion = this.state.apiVersion;
@@ -446,8 +447,8 @@ class Login extends Component {
                   and delivers health commodities, offers comprehensive technical assistance to strengthen
                   national supply chain systems, and provides global supply chain leadership. For more
                   information, visit <a href="https://www.ghsupplychain.org/" target="_blank">ghsupplychain.org</a>. The information provided in this tool is not
-                                                                                                                                                              official U.S. government information and does not represent the views or positions of the
-                                                                                                                                                              Agency for International Development or the U.S. government.
+                                                                                                                                                                official U.S. government information and does not represent the views or positions of the
+                                                                                                                                                                Agency for International Development or the U.S. government.
               </p>
                 </CardBody>
                 <Row className="text-center Login-bttom-logo">
