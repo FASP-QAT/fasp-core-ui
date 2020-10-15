@@ -10,6 +10,7 @@ import { textFilter } from 'react-bootstrap-table2-filter';
 import { jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunction, jExcelLoadedFunctionPipeline } from '../../CommonComponent/JExcelCommonFunctions.js'
 import DataSourceTypeService from '../../api/DataSourceTypeService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { JEXCEL_DEFAULT_PAGINATION,JEXCEL_PAGINATION_OPTION} from '../../Constants.js';
 export default class PipelineProgramDataSource extends Component {
     constructor(props) {
         super(props);
@@ -192,6 +193,8 @@ export default class PipelineProgramDataSource extends Component {
                 DataSourceService.getActiveDataSourceList()
                     .then(response => {
                         if (response.status == 200) {
+                            console.log("data source====>",response.data);
+
                             // dataSourceListQat = response.data
                             this.setState({ activeDataSourceList: response.data });
                             for (var k = 0; k < (response.data).length; k++) {
@@ -268,12 +271,13 @@ export default class PipelineProgramDataSource extends Component {
                                                         readonly: true
                                                     }
                                                 ],
-                                                pagination: 10,
+                                                pagination:JEXCEL_DEFAULT_PAGINATION,
+                                                contextMenu: false,
                                                 search: true,
                                                 columnSorting: true,
                                                 tableOverflow: true,
                                                 wordWrap: true,
-                                                paginationOptions: [10, 25, 50],
+                                                paginationOptions: JEXCEL_PAGINATION_OPTION,
                                                 // position: 'top',
                                                 allowInsertColumn: false,
                                                 allowManualInsertColumn: false,

@@ -288,21 +288,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         editable: inventoryEditable,
                         onchange: this.inventoryChanged,
                         updateTable: function (el, cell, x, y, source, value, id) {
-                            var elInstance = el.jexcel;
-                            var rowData = elInstance.getRowData(y);
-                            var lastEditableDate = moment(Date.now()).subtract(INVENTORY_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
-                            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q']
-                            if (moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD")) {
-                                for (var c = 0; c < colArr.length; c++) {
-                                    var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
-                                    cell.classList.add('readonly');
-                                }
-                            } else {
-                                for (var c = 0; c < colArr.length; c++) {
-                                    var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
-                                    cell.classList.remove('readonly');
-                                }
-                            }
+
                         }.bind(this),
                         contextMenu: function (obj, x, y, e) {
                             var items = [];
@@ -638,7 +624,22 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         if (this.props.items.inventoryType == 2) {
             tr.children[11].classList.add('AsteriskTheadtrTd');
         }
-        (instance.jexcel).orderBy(0, 0);
+        // (instance.jexcel).orderBy(0, 0);
+        var elInstance = instance.jexcel;
+        var json = elInstance.getJson();
+        for (var z = 0; z < json.length; z++) {
+            var rowData = elInstance.getRowData(z);
+            var lastEditableDate = moment(Date.now()).subtract(INVENTORY_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
+            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q']
+            if (moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD")) {
+                for (var c = 0; c < colArr.length; c++) {
+                    var cell = elInstance.getCell((colArr[c]).concat(parseInt(z) + 1))
+                    cell.classList.add('readonly');
+                }
+            } else {
+
+            }
+        }
     }
 
     inventoryChanged = function (instance, cell, x, y, value) {
@@ -701,7 +702,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         console.log("Adjutsment batch qty", adjustmentBatchQty);
                         console.log("RowData5", rowData[5]);
                         console.log("(parseInt(rowData[5])) > 0", (parseInt(rowData[5])) > 0);
-                        if (parseInt(adjustmentBatchQty) > 0 ? parseInt(adjustmentBatchQty) > parseInt(rowData[5]) : parseInt(adjustmentBatchQty) < parseInt(rowData[5])) {
+                        if (batchDetails.length > 0 && (parseInt(adjustmentBatchQty) > 0 ? parseInt(adjustmentBatchQty) > parseInt(rowData[5]) : parseInt(adjustmentBatchQty) < parseInt(rowData[5]))) {
                             inValid("F", y, i18n.t('static.consumption.missingBatch'), elInstance);
                             valid = false;
                         } else {
@@ -723,7 +724,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     for (var b = 0; b < batchDetails.length; b++) {
                         actualBatchQty += batchDetails[b].actualQty;
                     }
-                    if (parseInt(rowData[6]) < parseInt(actualBatchQty)) {
+                    if (batchDetails.length > 0 && parseInt(rowData[6]) < parseInt(actualBatchQty)) {
                         inValid("G", y, i18n.t('static.consumption.missingBatch'), elInstance);
                         valid = false;
                     } else {
@@ -739,7 +740,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 console.log("Adjutsment batch qty", adjustmentBatchQty);
                 console.log("RowData5", rowData[5]);
                 console.log("(parseInt(rowData[5])) > 0", (parseInt(rowData[5])) > 0);
-                if (parseInt(adjustmentBatchQty) > 0 ? parseInt(adjustmentBatchQty) > parseInt(rowData[5]) : parseInt(adjustmentBatchQty) < parseInt(rowData[5])) {
+                if (batchDetails.length > 0 && (parseInt(adjustmentBatchQty) > 0 ? parseInt(adjustmentBatchQty) > parseInt(rowData[5]) : parseInt(adjustmentBatchQty) < parseInt(rowData[5]))) {
                     inValid("F", y, i18n.t('static.consumption.missingBatch'), elInstance);
                     valid = false;
                 } else {
@@ -755,7 +756,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 for (var b = 0; b < batchDetails.length; b++) {
                     actualBatchQty += batchDetails[b].actualQty;
                 }
-                if (parseInt(rowData[6]) < parseInt(actualBatchQty)) {
+                if (batchDetails.length > 0 && parseInt(rowData[6]) < parseInt(actualBatchQty)) {
                     inValid("G", y, i18n.t('static.consumption.missingBatch'), elInstance);
                     valid = false;
                 } else {

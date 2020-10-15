@@ -255,7 +255,14 @@ export default class PipelineProgramSetup extends Component {
                 if (response.status == "200") {
                     // PipelineService.getPipelineProgramConsumption(this.props.match.params.pipelineId).then(response => {
                     //     if (response.status == "200") {
+                        
                     if (checkValidation == true) {
+                       
+                        PipelineService.createRealmCountryPlanningUnits(this.props.match.params.pipelineId).
+                        then(response => {
+                            console.log("createdRealmCountryPlanningUnit Response===>",response)
+                        });
+                       
                         this.setState({
                             pipelineProgramSetupPer: 29.56, planningUnitStatus: false, consumptionStatus: false, inventoryStatus: false,
                             shipmentStatus: false,
