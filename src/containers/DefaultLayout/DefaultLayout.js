@@ -1052,6 +1052,13 @@ class DefaultLayout extends Component {
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DELETE_LOCAL_PROGRAM') ? false : true) }
                             // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DOWNLOAD_PROGARM') ? false : true) }
                           },
+                          {
+                            name: i18n.t('static.dashboard.programimport'),
+                            // url: '/pipeline/pipelineProgramImport',
+                            url: '/pipeline/pieplineProgramList',
+                            icon: 'fa fa-sitemap',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PIPELINE_PROGRAM_IMPORT') ? false : true) }
+                          },
 
 
                           // {
@@ -1818,13 +1825,13 @@ class DefaultLayout extends Component {
                       // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
 
                       // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
-                      {
-                        name: i18n.t('static.dashboard.programimport'),
-                        // url: '/pipeline/pipelineProgramImport',
-                        url: '/pipeline/pieplineProgramList',
-                        icon: 'fa fa-sitemap',
-                        attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PIPELINE_PROGRAM_IMPORT') ? false : true) }
-                      },
+                      // {
+                      //   name: i18n.t('static.dashboard.programimport'),
+                      //   // url: '/pipeline/pipelineProgramImport',
+                      //   url: '/pipeline/pieplineProgramList',
+                      //   icon: 'fa fa-sitemap',
+                      //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PIPELINE_PROGRAM_IMPORT') ? false : true) }
+                      // },
 
                       // {
                       //   name: i18n.t('static.quantimed.quantimedImport'),                        
