@@ -250,10 +250,10 @@ if(value!=null){
     getCountrylist() {
         // AuthenticationService.setupAxiosInterceptors();
         let realmId = AuthenticationService.getRealmId();
-        RealmCountryService.getRealmCountryrealmIdById(realmId)
+        RealmCountryService.getRealmCountryForProgram(realmId)
             .then(response => {
                 this.setState({
-                    countries: response.data
+                    countries: response.data.map(ele=>ele.realmCountry)
                 })
             }).catch(
                 error => {

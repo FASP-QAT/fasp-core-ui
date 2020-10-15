@@ -654,10 +654,10 @@ class ForecastMetrics extends Component {
     if (navigator.onLine) {
       // AuthenticationService.setupAxiosInterceptors();
       let realmId = AuthenticationService.getRealmId();
-      RealmCountryService.getRealmCountryrealmIdById(realmId)
+      RealmCountryService.getRealmCountryForProgram(realmId)
         .then(response => {
           this.setState({
-            countrys: response.data, loading: false
+            countrys: response.data.map(ele=>ele.realmCountry), loading: false
           })
         }).catch(
           error => {
@@ -895,7 +895,7 @@ class ForecastMetrics extends Component {
     // console.log(JSON.stringify(countrys))
     let countryList = countrys.length > 0 && countrys.map((item, i) => {
       console.log(JSON.stringify(item))
-      return ({ label: getLabelText(item.country.label, this.state.lang), value: item.realmCountryId })
+      return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
     }, this);
     const { productCategories } = this.state;
     let productCategoryList = productCategories.length > 0
