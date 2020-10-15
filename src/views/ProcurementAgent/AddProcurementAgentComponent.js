@@ -624,7 +624,7 @@ class AddProcurementAgentComponent extends Component {
                                                     </FormGroup>
 
                                                     <FormGroup>
-                                                        <Label for="submittedToApprovedLeadTime">{i18n.t('static.procurementagent.procurementagentsubmittoapprovetime')}<span className="red Reqasterisk">*</span></Label>
+                                                        <Label for="submittedToApprovedLeadTime">{i18n.t('static.procurementagent.procurementagentsubmittoapprovetimeLabel')}<span className="red Reqasterisk">*</span></Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
                                                         {/* <InputGroupText><i className="fa fa-clock-o"></i></InputGroupText> */}
                                                         <Input type="number"
@@ -643,7 +643,7 @@ class AddProcurementAgentComponent extends Component {
                                                         <FormFeedback className="red">{errors.submittedToApprovedLeadTime}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="approvedToShippedLeadTime">{i18n.t('static.procurementagent.procurementagentapprovetoshippedtime')}<span className="red Reqasterisk">*</span></Label>
+                                                        <Label for="approvedToShippedLeadTime">{i18n.t('static.procurementagent.procurementagentapprovetoshippedtimeLabel')}<span className="red Reqasterisk">*</span></Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
                                                         {/* <InputGroupText><i className="fa fa-clock-o"></i></InputGroupText> */}
                                                         <Input type="number"
