@@ -1,4 +1,5 @@
 import i18n from '../../src/i18n';
+import { func } from 'prop-types';
 
 export function jExcelLoadedFunction(instance, number) {
     if (number == undefined) {
@@ -55,8 +56,10 @@ export function jExcelLoadedFunction(instance, number) {
     // document.getElementsByClassName('jexcel_pagination')[number].value = localStorage.getItem("sesRecordCount")
     // document.getElementsByClassName('jexcel_pagination')[number].value = 25
     var pageSelect = document.getElementsByClassName('jexcel_pagination_dropdown')[number];
-    pageSelect.options[pageSelect.options.length] = new Option('All', 5000000);
-    
+    pageSelect.options[3].innerHTML = "All";
+
+    pageSelect.addEventListener("change", () => pagignationChange(number));
+
 
     var jexcel_filterFirstdiv = document.getElementsByClassName('jexcel_filter')[number];
     var filter = jexcel_filterFirstdiv.firstChild;
@@ -68,8 +71,14 @@ export function jExcelLoadedFunction(instance, number) {
 
 
 
-
     // document.getElementById("clearBtnID").onclick= function(){alert("ok");}
+}
+
+export function pagignationChange(number) {
+    console.log("number---" + number)
+    var recordCount = document.getElementsByClassName('jexcel_pagination_dropdown')[number].value;
+    console.log("recordCount---", recordCount);
+    localStorage.setItem("sesRecordCount", recordCount)
 }
 
 

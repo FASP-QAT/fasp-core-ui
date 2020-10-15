@@ -13,7 +13,7 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import ProcurementUnitService from "../../api/ProcurementUnitService";
 import i18n from '../../i18n';
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions';
-import { DECIMAL_NO_REGEX, INTEGER_NO_REGEX, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
+import { DECIMAL_NO_REGEX, INTEGER_NO_REGEX, JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
 const entityname = i18n.t('static.dashboard.procurementAgentProcurementUnit')
 
 
@@ -557,7 +557,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                             },
 
                                         ],
-                                        pagination: JEXCEL_DEFAULT_PAGINATION,
+                                        pagination: localStorage.getItem("sesRecordCount"),
                                         search: true,
                                         columnSorting: true,
                                         tableOverflow: true,

@@ -343,7 +343,7 @@ import { LOGO } from '../../CommonComponent/Logo.js';
 import { getStyle } from '@coreui/coreui-pro/dist/js/coreui-utilities';
 import jsPDF from "jspdf";
 import "jspdf-autotable";
-import { JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from '../../Constants';
+import { JEXCEL_PAGINATION_OPTION } from '../../Constants';
 
 
 const entityname = i18n.t('static.region.region');
@@ -585,7 +585,7 @@ class RegionListComponent extends Component {
                 entries: '',
             },
             onload: this.loaded,
-            pagination: JEXCEL_DEFAULT_PAGINATION,
+            pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
             tableOverflow: true,

@@ -400,7 +400,7 @@ import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../Com
 import TracerCategoryService from '../../api/TracerCategoryService';
 import ProductService from '../../api/ProductService';
 import moment from 'moment';
-import { DATE_FORMAT_CAP, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from '../../Constants';
+import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION } from '../../Constants';
 
 
 const entityname = i18n.t('static.planningunit.planningunit');
@@ -809,7 +809,7 @@ export default class PlanningUnitListComponent extends Component {
                 entries: '',
             },
             onload: this.loaded,
-            pagination: JEXCEL_DEFAULT_PAGINATION,
+            pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
             tableOverflow: true,

@@ -18,7 +18,7 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import RegionService from "../../api/RegionService";
 import StatusUpdateButtonFeature from "../../CommonComponent/StatusUpdateButtonFeature";
 import UpdateButtonFeature from '../../CommonComponent/UpdateButtonFeature'
-import { JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from "../../Constants";
+import { JEXCEL_PAGINATION_OPTION } from "../../Constants";
 let initialValues = {
     region: '',
     capacityCBM: '',
@@ -183,7 +183,7 @@ class RealmCountryRegion extends Component {
                                 }
 
                             ],
-                            pagination: JEXCEL_DEFAULT_PAGINATION,
+                            pagination: localStorage.getItem("sesRecordCount"),
                             search: true,
                             columnSorting: true,
                             tableOverflow: true,

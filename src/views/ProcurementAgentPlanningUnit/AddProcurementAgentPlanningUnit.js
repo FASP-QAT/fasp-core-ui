@@ -21,7 +21,7 @@ import CryptoJS from 'crypto-js';
 import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
 import moment from "moment";
-import { DECIMAL_NO_REGEX, INTEGER_NO_REGEX, JEXCEL_PAGINATION_OPTION ,JEXCEL_DEFAULT_PAGINATION} from '../../Constants.js';
+import { DECIMAL_NO_REGEX, JEXCEL_PAGINATION_OPTION} from '../../Constants.js';
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 
 
@@ -1011,7 +1011,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                             }
 
                                                         ],
-                                                        pagination: JEXCEL_DEFAULT_PAGINATION,
+                                                        pagination: localStorage.getItem("sesRecordCount"),
                                                         search: true,
                                                         columnSorting: true,
                                                         tableOverflow: true,

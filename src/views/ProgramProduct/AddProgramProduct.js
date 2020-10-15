@@ -14,7 +14,7 @@ import PlanningUnitService from "../../api/PlanningUnitService";
 import i18n from '../../i18n';
 import ProductCategoryServcie from '../../api/PoroductCategoryService.js';
 import { jExcelLoadedFunction } from "../../CommonComponent/JExcelCommonFunctions";
-import { DECIMAL_NO_REGEX, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from "../../Constants";
+import { DECIMAL_NO_REGEX, JEXCEL_PAGINATION_OPTION } from "../../Constants";
 const entityname = i18n.t('static.dashboard.programPlanningUnit');
 
 
@@ -317,7 +317,7 @@ class AddprogramPlanningUnit extends Component {
 
                                                             }
                                                         },
-                                                        pagination: JEXCEL_DEFAULT_PAGINATION,
+                                                        pagination: localStorage.getItem("sesRecordCount"),
                                                         search: true,
                                                         columnSorting: true,
                                                         tableOverflow: true,
