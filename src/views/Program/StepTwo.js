@@ -142,6 +142,7 @@ export default class Steptwo extends Component {
                 return (
                     <option key={i} value={item.realmCountryId}>
                         {getLabelText(item.country.label, this.state.lang)}
+                        {/* {item.country.countryCode} */}
                     </option>
                 )
             }, this);

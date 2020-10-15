@@ -242,6 +242,9 @@ class StockStatus extends Component {
       return ''
     }
   }
+  formatAmc = value => {
+    return parseFloat(Math.round(value * Math.pow(10, 0)) / Math.pow(10, 0)).toFixed(0);
+}
 
   formatter = value => {
 if(value!=null){
@@ -271,6 +274,10 @@ if(value!=null){
     return arr.map(ele=>'"'+ele+'"')
  }
 
+ rowtextFormatClassName=(row)=> {
+  return (!row.actualConsumption) ? 'textcolor-purple' : '';
+}
+
   exportCSV() {
 
     var csvRow = [];
@@ -283,27 +290,28 @@ if(value!=null){
     csvRow.push('')
     csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
     csvRow.push('')
-
+    
+  
     const headers = [this.addDoubleQuoteToRowContent([i18n.t('static.report.month').replaceAll(' ', '%20'),
-    i18n.t('static.dashboard.consumption').replaceAll(' ', '%20'),
-    i18n.t('static.consumption.actual').replaceAll(' ', '%20'),
-    i18n.t('static.supplyPlan.shipmentQty').replaceAll(' ', '%20'),
-    (i18n.t('static.budget.fundingsource') + "-" + i18n.t('static.supplyPlan.shipmentStatus')).replaceAll(' ', '%20'),
+    i18n.t('static.supplyPlan.openingBalance').replaceAll(' ', '%20'),
+    i18n.t('static.report.forecasted').replaceAll(' ', '%20'),
+    i18n.t('static.report.actual').replaceAll(' ', '%20'),
+    i18n.t('static.shipment.qty').replaceAll(' ', '%20'),
+    (i18n.t('static.shipment.qty')+" | "+i18n.t('static.budget.fundingsource') + " | " + i18n.t('static.supplyPlan.shipmentStatus')).replaceAll(' ', '%20'),
     i18n.t('static.report.adjustmentQty').replaceAll(' ', '%20'),
     i18n.t('static.supplyPlan.endingBalance').replaceAll(' ', '%20'),
-    i18n.t('static.report.mos').replaceAll(' ', '%20'),
-    i18n.t('static.report.minmonth').replaceAll(' ', '%20'),
-    i18n.t('static.report.maxmonth').replaceAll(' ', '%20')])];
+    i18n.t('static.report.amc').replaceAll(' ', '%20'),
+    i18n.t('static.report.mos').replaceAll(' ', '%20')])];
 
     var A = headers
     var re;
-    this.state.stockStatusList.map(ele => A.push(this.addDoubleQuoteToRowContent([this.dateFormatter(ele.dt).replaceAll(' ', '%20'), ele.consumptionQty, ele.actualConsumption ? 'Yes' : '', ele.shipmentQty,
-    ((ele.shipmentInfo.map(item => {
+    this.state.stockStatusList.map(ele => A.push(this.addDoubleQuoteToRowContent([this.dateFormatter(ele.dt).replaceAll(' ', '%20'),ele.openingBalance,  ele.actualConsumption ? '' : ele.consumptionQty,ele.actualConsumption ?ele.consumptionQty:'', ele.shipmentQty,
+    (ele.shipmentInfo.map(item => {
       return (
-        " [ " +item.fundingSource.code + " : " + getLabelText(item.shipmentStatus.label, this.state.lang) + " ] "
+        item.shipmentQty +" | " +item.fundingSource.code + " | " + getLabelText(item.shipmentStatus.label, this.state.lang) 
       )
-    }).toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')
-      , ele.adjustment, ele.closingBalance, this.roundN(ele.mos), ele.minMos, ele.maxMos])));
+    }).join(' \n')).replaceAll(' ', '%20')
+      , ele.adjustment==null?'':ele.adjustment, ele.closingBalance, this.formatAmc(ele.amc), this.roundN(ele.mos)])));
 
     /*for(var item=0;item<re.length;item++){
       A.push([re[item].consumption_date,re[item].forcast,re[item].Actual])
@@ -394,24 +402,23 @@ if(value!=null){
     doc.addImage(canvasImg, 'png', 50, 220, 750, 260, 'CANVAS');
 
     const header = [[i18n.t('static.report.month'),
-    i18n.t('static.dashboard.consumption'),
-    i18n.t('static.consumption.actual'),
-    i18n.t('static.supplyPlan.shipmentQty'),
-    (i18n.t('static.budget.fundingsource') + " : " + i18n.t('static.supplyPlan.shipmentStatus')),
+    i18n.t('static.supplyPlan.openingBalance'),
+    i18n.t('static.report.forecasted'),
+    i18n.t('static.report.actual'),
+    i18n.t('static.shipment.qty'),
+    (i18n.t('static.shipment.qty')+" | "+i18n.t('static.budget.fundingsource') + " | " + i18n.t('static.supplyPlan.shipmentStatus')),
     i18n.t('static.report.adjustmentQty'),
     i18n.t('static.supplyPlan.endingBalance'),
-    i18n.t('static.report.mos'),
-    i18n.t('static.report.minmonth'),
-    i18n.t('static.report.maxmonth')]];
+    i18n.t('static.report.amc'),
+    i18n.t('static.report.mos')]];
 
     let data =
-      this.state.stockStatusList.map(ele => [this.dateFormatter(ele.dt), this.formatter(ele.consumptionQty), ele.actualConsumption ? 'Yes' : '', this.formatter(ele.shipmentQty),
+      this.state.stockStatusList.map(ele => [this.dateFormatter(ele.dt), this.formatter(ele.openingBalance), ele.actualConsumption?'': this.formatter(ele.consumptionQty), ele.actualConsumption?this.formatter(ele.consumptionQty):'', this.formatter(ele.shipmentQty),
       ele.shipmentInfo.map(item => {
         return (
-          " [ " + item.fundingSource.code + " : " + getLabelText(item.shipmentStatus.label, this.state.lang) + " ] "
-        )
-      })
-        , this.formatter(ele.adjustment), this.formatter(ele.closingBalance), this.formatter(this.roundN(ele.mos)), this.formatter(ele.minMos), this.formatter(ele.maxMos)]);
+           item.shipmentQty+ " | " + item.fundingSource.code + " | " + getLabelText(item.shipmentStatus.label, this.state.lang) )
+      }).join(' \n')
+        , this.formatter(ele.adjustment), this.formatter(ele.closingBalance), this.formatter(this.formatAmc(ele.amc)), this.formatter(this.roundN(ele.mos))]);
 
     let content = {
       margin: { top: 80, bottom: 50 },
@@ -420,7 +427,7 @@ if(value!=null){
       body: data,
       styles: { lineWidth: 1, fontSize: 8, cellWidth: 67, halign: 'center' },
       columnStyles: {
-        4: { cellWidth: 158.89 },
+        5: { cellWidth: 158.89 },
       }
     };
     doc.autoTable(content);
@@ -492,16 +499,21 @@ if(value!=null){
 console.log(list)
                 if (list.length > 0) {
                   var shiplist = shipmentList.filter(c => c.receivedDate==null ||c.receivedDate==""?(c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr):(c.receivedDate >= dt && c.receivedDate <= enddtStr))
-
+var totalShipmentQty=0;
+shiplist.map(elt=>{
+  totalShipmentQty=totalShipmentQty+parseInt(elt.shipmentQty)
+})
                   var json = {
                     dt: new Date(from, month - 1),
                     consumptionQty: list[0].consumptionQty,
                     actualConsumption: list[0].actualFlag,
-                    shipmentQty: list[0].shipmentTotalQty,
+                    shipmentQty: totalShipmentQty,
                     shipmentInfo: shiplist,
                     adjustment: list[0].adjustmentQty,
                     closingBalance: list[0].closingBalance,
+                    openingBalance:list[0].openingBalance,
                     mos: list[0].mos,
+                    amc: list[0].amc,
                     minMos: list[0].minStockMoS,
                     maxMos: list[0].maxStockMoS
                   }
@@ -514,7 +526,9 @@ console.log(list)
                     shipmentInfo: [],
                     adjustment: 0,
                     closingBalance: 0,
+                    openingBalance:'',
                     mos: '',
+                    amc:'',
                     minMos: '',
                     maxMos: ''
                   }
@@ -989,7 +1003,7 @@ console.log(list)
           label: i18n.t('static.supplyPlan.delivered'),
           yAxisID: 'A',
           stack: 1,
-          backgroundColor: '#042e6a',
+          backgroundColor: '#002f6c',
           borderColor: 'rgba(179,181,198,1)',
           pointBackgroundColor: 'rgba(179,181,198,1)',
           pointBorderColor: '#fff',
@@ -1008,7 +1022,7 @@ console.log(list)
           label: i18n.t('static.supplyPlan.shipped'),
           yAxisID: 'A',
           stack: 1,
-          backgroundColor: '#7372cb',
+          backgroundColor: '#006789',
           borderColor: 'rgba(179,181,198,1)',
           pointBackgroundColor: 'rgba(179,181,198,1)',
           pointBorderColor: '#fff',
@@ -1027,7 +1041,7 @@ console.log(list)
           label: i18n.t('static.supplyPlan.ordered'),
           yAxisID: 'A',
           stack: 1,
-          backgroundColor:  '#20a8d8',
+          backgroundColor:  '#205493',
           borderColor: 'rgba(179,181,198,1)',
           pointBackgroundColor: 'rgba(179,181,198,1)',
           pointBorderColor: '#fff',
@@ -1043,7 +1057,7 @@ console.log(list)
         },
         {
           label: i18n.t('static.supplyPlan.planned'),
-          backgroundColor: '#a5c5ec',
+          backgroundColor: '#a7c6ed',
           borderColor: 'rgba(179,181,198,1)',
           pointBackgroundColor: 'rgba(179,181,198,1)',
           pointBorderColor: '#fff',
@@ -1103,7 +1117,7 @@ console.log(list)
           type: "line",
           yAxisID: 'B',
           label: i18n.t('static.report.mos'),
-          borderColor: '#205493',
+          borderColor: '#118b70',
           backgroundColor: 'transparent',
           ticks: {
             fontSize: 2,
@@ -1120,7 +1134,7 @@ console.log(list)
           yAxisID: 'A',
           label: i18n.t('static.supplyPlan.consumption'),
           backgroundColor: 'transparent',
-          borderColor: '#f45c45',
+          borderColor: '#ba0c2f',
           ticks: {
             fontSize: 2,
             fontColor: 'transparent',
@@ -1135,7 +1149,7 @@ console.log(list)
           label:i18n.t('static.report.stock'),
           yAxisID: 'A',
           type: 'line',
-          borderColor: '#d0cece',
+          borderColor: '#cfcdc9',
           ticks: {
             fontSize: 2,
             fontColor: 'transparent',
@@ -1297,17 +1311,16 @@ console.log(list)
                   {this.state.show && this.state.stockStatusList.length > 0 && <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
 
                     <thead>
-                      <tr><th rowSpan="2" style={{ width: "200px" }}>{i18n.t('static.report.month')}</th> <th className="text-center" colSpan="2"> {i18n.t('static.dashboard.consumption')} </th> <th className="text-center" colSpan="2"> {i18n.t('static.shipment.shipment')} </th> <th className="text-center" colSpan="5"> {i18n.t('static.report.stock')} </th> </tr><tr>
-
-                        <th className="text-center" style={{ width: "200px" }}> {i18n.t('static.dashboard.consumption')} </th>
-                        <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.consumption.actual')}</th>
-                        <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyPlan.shipmentQty')}</th>
-                        <th className="text-center" style={{ width: "200px" }}>{(i18n.t('static.budget.fundingsource') + " : " + i18n.t('static.supplyPlan.shipmentStatus'))}</th>
+                      <tr><th rowSpan="2" style={{ width: "200px" }}>{i18n.t('static.report.month')}</th>  <th className="text-center" colSpan="1"> {i18n.t('static.report.stock')} </th> <th className="text-center" colSpan="2"> {i18n.t('static.supplyPlan.consumption')} </th> <th className="text-center" colSpan="2"> {i18n.t('static.shipment.shipment')} </th> <th className="text-center" colSpan="4"> {i18n.t('static.report.stock')} </th> </tr><tr>
+                      <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyPlan.openingBalance')}</th>
+                      <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.forecasted')}</th>
+                         <th className="text-center" style={{ width: "200px" }}> {i18n.t('static.report.actual')} </th>
+                       <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.qty')}</th>
+                        <th className="text-center" style={{ width: "600px" }}>{i18n.t('static.report.qty')+" | "+(i18n.t('static.budget.fundingsource') + " | " + i18n.t('static.supplyPlan.shipmentStatus'))}</th>
                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.adjustmentQty')}</th>
                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyPlan.endingBalance')}</th>
+                        <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.amc')}</th>
                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.mos')}</th>
-                        <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.minmonth')}</th>
-                        <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.maxmonth')}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -1321,21 +1334,25 @@ console.log(list)
                               {this.dateFormatter(this.state.stockStatusList[idx].dt)}
                             </td>
                             <td>
+                              {this.formatter(this.state.stockStatusList[idx].openingBalance)}
+                            </td>
+                           
+                            <td  className={this.rowtextFormatClassName(this.state.stockStatusList[idx])}>
+                              {this.state.stockStatusList[idx].actualConsumption ? '' : this.formatter(this.state.stockStatusList[idx].consumptionQty)}
+                            </td> <td>
 
-                              {this.formatter(this.state.stockStatusList[idx].consumptionQty)}
-                            </td>
-                            <td>
-                              {this.state.stockStatusList[idx].actualConsumption ? <img src={actualIcon} /> : ''}
-                            </td>
+{this.state.stockStatusList[idx].actualConsumption?this.formatter(this.state.stockStatusList[idx].consumptionQty):''}
+</td>
                             <td>
                               {this.formatter(this.state.stockStatusList[idx].shipmentQty)}
                             </td>
-                            <td align="center">
+                            <td align="center"><table >
                               {this.state.stockStatusList[idx].shipmentInfo.map((item, index) => {
-                                return (`[ ${item.fundingSource.code} : ${item.shipmentStatus.label.label_en} ]  `)
+                                return (<tr  ><td padding="0">{this.formatter(item.shipmentQty )+`   |    ${item.fundingSource.code}    |    ${item.shipmentStatus.label.label_en}`}</td></tr>)
                                 //return (<tr><td>{item.shipmentQty}</td><td>{item.fundingSource.label.label_en}</td><td>{item.shipmentStatus.label.label_en}</td></tr>)
-                              })}
+                              })}</table>
                             </td>
+                           
                             <td>
                               {this.formatter(this.state.stockStatusList[idx].adjustment)}
                             </td>
@@ -1343,14 +1360,12 @@ console.log(list)
                               {this.formatter(this.state.stockStatusList[idx].closingBalance)}
                             </td>
                             <td>
+                              {this.formatter(this.formatAmc(this.state.stockStatusList[idx].amc))}
+                            </td>
+                            <td>
                               {this.roundN(this.state.stockStatusList[idx].mos)}
                             </td>
-                            <td>
-                              {this.state.stockStatusList[idx].minMos}
-                            </td>
-                            <td>
-                              {this.state.stockStatusList[idx].maxMos}
-                            </td>
+                        
                           </tr>)
 
                       }

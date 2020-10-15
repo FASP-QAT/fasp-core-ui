@@ -6,7 +6,7 @@ import CryptoJS from 'crypto-js'
 import { SECRET_KEY } from '../../Constants.js'
 import bcrypt from 'bcryptjs';
 import moment from 'moment';
-
+import i18n from '../../i18n';
 let myDt;
 class AuthenticationService {
 
@@ -229,7 +229,7 @@ class AuthenticationService {
             userId: decodedObj.userId
         }
         if (!('indexedDB' in window)) {
-            alert('This browser does not support IndexedDB');
+            alert(i18n.t('static.common.notSupportIndexDB'));
         } else {
             var db;
             var customerObjectStore;
@@ -1044,7 +1044,7 @@ class AuthenticationService {
                     break;
                 case "/program/deleteLocalProgram":
                     console.log("Going to check if condition")
-                    if (bfunction.includes("ROLE_BF_DELETE_LOCAL_PROGARM")) {
+                    if (bfunction.includes("ROLE_BF_DELETE_LOCAL_PROGRAM")) {
                         console.log("Going to check if condition")
                         return true;
                     }

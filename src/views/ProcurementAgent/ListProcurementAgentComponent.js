@@ -740,12 +740,12 @@ class ListProcurementAgentComponent extends Component {
                     readOnly: true
                 },
                 {
-                    title: i18n.t('static.procurementagent.procurementagentsubmittoapprovetime'),
+                    title: i18n.t('static.procurementagent.procurementagentsubmittoapprovetimeLabel'),
                     type: 'text',
                     readOnly: true
                 },
                 {
-                    title: i18n.t('static.procurementagent.procurementagentapprovetoshippedtime'),
+                    title: i18n.t('static.procurementagent.procurementagentapprovetoshippedtimeLabel'),
                     type: 'text',
                     readOnly: true
                 },
@@ -1036,14 +1036,14 @@ class ListProcurementAgentComponent extends Component {
             },
             {
                 dataField: 'submittedToApprovedLeadTime',
-                text: i18n.t('static.procurementagent.procurementagentsubmittoapprovetime'),
+                text: i18n.t('static.procurementagent.procurementagentsubmittoapprovetimeLabel'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center'
             },
             {
                 dataField: 'approvedToShippedLeadTime',
-                text: i18n.t('static.procurementagent.procurementagentapprovetoshippedtime'),
+                text: i18n.t('static.procurementagent.procurementagentapprovetoshippedtimeLabel'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center'

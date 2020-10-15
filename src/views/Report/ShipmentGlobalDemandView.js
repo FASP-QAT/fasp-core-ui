@@ -267,7 +267,8 @@ class ShipmentGlobalDemandView extends Component {
             csvRow.push('')
             this.state.shipmentStatusLabels.map(ele =>
                 csvRow.push((i18n.t('static.common.status')).replaceAll(' ', '%20') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
-
+                csvRow.push('"' +((i18n.t('static.report.includeapproved') + ' : ' + document.getElementById("includeApprovedVersions").selectedOptions[0].text).replaceAll(' ', '%20')+'"'))
+     
 
         } else {
 
@@ -296,6 +297,7 @@ class ShipmentGlobalDemandView extends Component {
 
             let tableHead = this.state.table1Headers;
             let tableHeadTemp = [];
+            tableHeadTemp.push(i18n.t('static.report.qatPID'));
             tableHeadTemp.push(i18n.t('static.dashboard.product'));
             for (var i = 0; i < tableHead.length; i++) {
                 console.log(tableHead[i])
@@ -308,7 +310,7 @@ class ShipmentGlobalDemandView extends Component {
             for (var item = 0; item < re.length; item++) {
                 let item1 = Object.values(re[item].procurementAgentQty);
                 console.log(item1)
-                A.push([this.addDoubleQuoteToRowContent([(getLabelText(re[item].planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),...item1, re[item].total])])
+                A.push([this.addDoubleQuoteToRowContent([re[item].planningUnit.id,(getLabelText(re[item].planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),...item1, re[item].total])])
             }
             for (var i = 0; i < A.length; i++) {
                 csvRow.push(A[i].join(","))
@@ -404,15 +406,7 @@ class ShipmentGlobalDemandView extends Component {
                 align: 'left'
             })
 
-            // var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-            // doc.text(doc.internal.pageSize.width / 8, 140, planningText)
-
-            // var fundingSourceText = doc.splitTextToSize((i18n.t('static.budget.fundingsource') + ' : ' + this.state.fundingSourceLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-            // doc.text(doc.internal.pageSize.width / 8, 170, fundingSourceText)
-
-            // var statusText = doc.splitTextToSize((i18n.t('static.common.status') + ' : ' + this.state.shipmentStatusLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-            // doc.text(doc.internal.pageSize.width / 8, 200, statusText)
-
+         
         } else {
             doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
                 align: 'left'
@@ -423,47 +417,7 @@ class ShipmentGlobalDemandView extends Component {
             })
 
             var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-            //     doc.text(doc.internal.pageSize.width / 8, 150, planningText)
-            /* let y = 150
-             console.log(doc.internal.pageSize.height)
-             var fundingSourceText = doc.splitTextToSize((i18n.t('static.budget.fundingsource') + ' : ' + this.state.fundingSourceLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-             // doc.text(doc.internal.pageSize.width / 8, 150+(this.state.planningUnitLabels.length*3), fundingSourceText)
-             for (var i = 0; i < fundingSourceText.length; i++) {
-                 if (y > doc.internal.pageSize.height - 100) {
-                     doc.addPage();
-                     y = 80;
- 
-                 }
-                 doc.text(doc.internal.pageSize.width / 8, y, fundingSourceText[i]);
-                 y = y + 10;
-                 console.log(y)
-             }
-             var statusText = doc.splitTextToSize((i18n.t('static.common.status') + ' : ' + this.state.shipmentStatusLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-             //     doc.text(doc.internal.pageSize.width / 8, 150+(this.state.planningUnitLabels.length*3)+(this.state.fundingSourceLabels.lenght*2), statusText)
-             // 
-             y = y + 10;
-             for (var i = 0; i < statusText.length; i++) {
-                 if (y > doc.internal.pageSize.height - 100) {
-                     doc.addPage();
-                     y = 80;
- 
-                 }
-                 doc.text(doc.internal.pageSize.width / 8, y, statusText[i]);
-                 y = y + 10;
-                 console.log(y)
-             }
-             y = y + 10;
-             for (var i = 0; i < planningText.length; i++) {
-                 if (y > doc.internal.pageSize.height - 100) {
-                     doc.addPage();
-                     y = 80;
- 
-                 }
-                 doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
-                 y = y + 10;
-                 console.log(y)
-             }
- */
+         
         }
         doc.setFontSize(8);
         doc.setTextColor("#002f6c");
@@ -509,7 +463,10 @@ class ShipmentGlobalDemandView extends Component {
             y = y + 10;
             console.log(y)
         }
-
+        doc.text(i18n.t('static.report.includeapproved') + ' : ' + document.getElementById("includeApprovedVersions").selectedOptions[0].text, doc.internal.pageSize.width / 8, y, {
+            align: 'left'
+        })
+      
 
         doc.setTextColor("#fff");
         const title = i18n.t('static.dashboard.shipmentGlobalDemandViewheader');
@@ -520,7 +477,7 @@ class ShipmentGlobalDemandView extends Component {
         var height = doc.internal.pageSize.height;
         var h1 = 50;
         var aspectwidth1 = (width - h1);
-        let startY = y//150 + (this.state.planningUnitLabels.length * 3) + (this.state.fundingSourceLabels.length * 3) + (this.state.shipmentStatusLabels.length * 3)
+        let startY = y+10//150 + (this.state.planningUnitLabels.length * 3) + (this.state.fundingSourceLabels.length * 3) + (this.state.shipmentStatusLabels.length * 3)
         console.log('startY', startY)
         let pages = Math.ceil(startY / height)
         for (var j = 1; j < pages; j++) {
@@ -605,7 +562,8 @@ class ShipmentGlobalDemandView extends Component {
             let fundingSourceIds = this.state.fundingSourceValues.length == this.state.fundingSources.length ? [] : this.state.fundingSourceValues.map(ele => (ele.value).toString());
             let shipmentStatusIds = this.state.shipmentStatusValues.length == this.state.shipmentStatuses.length ? [] : this.state.shipmentStatusValues.map(ele => (ele.value).toString());
             let realmId = document.getElementById('realmId').value;
-
+            let useApprovedVersion = document.getElementById("includeApprovedVersions").value
+    
 
             if (realmId > 0 && productCategoryId != -1 && this.state.planningUnitValues.length > 0 && this.state.fundingSourceValues.length > 0 && this.state.shipmentStatusValues.length > 0) {
                 this.setState({
@@ -620,7 +578,8 @@ class ShipmentGlobalDemandView extends Component {
                     stopDate: new moment(endDate),
                     planningUnitIds: planningUnitIds,
                     fundingSourceIds: fundingSourceIds,
-                    shipmentStatusIds: shipmentStatusIds
+                    shipmentStatusIds: shipmentStatusIds,
+                    useApprovedSupplyPlanOnly: useApprovedVersion
 
                 }
 
@@ -1896,6 +1855,24 @@ class ShipmentGlobalDemandView extends Component {
                                                     onChange={(e) => { this.handleShipmentStatusChange(e) }}
                                                     options={shipmentStatusList && shipmentStatusList.length > 0 ? shipmentStatusList : []}
                                                 />
+                                            </div>
+                                        </FormGroup>
+                                        <FormGroup className="col-md-3">
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.includeapproved')}</Label>
+                                            <div className="controls ">
+                                                <InputGroup>
+                                                    <Input
+                                                        type="select"
+                                                        name="includeApprovedVersions"
+                                                        id="includeApprovedVersions"
+                                                        bsSize="sm"
+                                                        onChange={(e) => { this.fetchData() }}
+                                                    >
+                                                        <option value="true">{i18n.t('static.program.yes')}</option>
+                                                        <option value="false">{i18n.t('static.program.no')}</option>
+                                                    </Input>
+
+                                                </InputGroup>
                                             </div>
                                         </FormGroup>
 

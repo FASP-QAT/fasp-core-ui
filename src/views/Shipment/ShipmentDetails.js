@@ -26,6 +26,8 @@ export default class ShipmentDetails extends React.Component {
     constructor(props) {
         super(props);
         this.options = props.options;
+        var startDate = moment(Date.now()).subtract(6, 'months').startOf('month').format("YYYY-MM-DD");
+        var endDate = moment(Date.now()).add(18, 'months').startOf('month').format("YYYY-MM-DD")
         this.state = {
             loading: true,
             message: '',
@@ -43,7 +45,7 @@ export default class ShipmentDetails extends React.Component {
             shipmentChangedFlag: 0,
             shipmentModalTitle: "",
             shipmentType: { value: 1, label: i18n.t('static.shipment.manualShipments') },
-            rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            rangeValue: { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() }, to: { year: new Date(endDate).getFullYear(), month: new Date(endDate).getMonth() } },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() },
         }
@@ -70,24 +72,51 @@ export default class ShipmentDetails extends React.Component {
         //
     }
     handleRangeDissmis(value) {
-        this.setState({ rangeValue: value })
-        this.formSubmit(this.state.planningUnit, value);
+        var cont = false;
+        if (this.state.shipmentChangedFlag == 1) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
+
+            }
+        } else {
+            cont = true;
+        }
+        if (cont == true) {
+            this.setState({ rangeValue: value, shipmentChangedFlag: 0 })
+            this.formSubmit(this.state.planningUnit, value);
+        }
     }
 
     updateDataType(value) {
-        console.log("In update", value);
-        this.setState({
-            shipmentType: value
-        }, () => {
-            document.getElementById("shipmentsDetailsTableDiv").style.display = "none";
-            if (document.getElementById("addRowButtonId") != null) {
-                console.log("In if");
-                document.getElementById("addRowButtonId").style.display = "none";
+        var cont = false;
+        if (this.state.shipmentChangedFlag == 1) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
+
             }
-            if (this.state.planningUnit != 0 && (value != "" && value != undefined ? value.value : 0) != 0) {
-                this.formSubmit(this.state.planningUnit, this.state.rangeValue);
-            }
-        })
+        } else {
+            cont = true;
+        }
+        if (cont == true) {
+            console.log("In update", value);
+            this.setState({
+                shipmentType: value,
+                shipmentChangedFlag: 0
+            }, () => {
+                document.getElementById("shipmentsDetailsTableDiv").style.display = "none";
+                if (document.getElementById("addRowButtonId") != null) {
+                    console.log("In if");
+                    document.getElementById("addRowButtonId").style.display = "none";
+                }
+                if (this.state.planningUnit != 0 && (value != "" && value != undefined ? value.value : 0) != 0) {
+                    this.formSubmit(this.state.planningUnit, this.state.rangeValue);
+                }
+            })
+        }
     }
 
     hideFirstComponent() {
@@ -194,196 +223,268 @@ export default class ShipmentDetails extends React.Component {
     };
 
     getPlanningUnitList(value) {
-        document.getElementById("planningUnitId").value = 0;
-        document.getElementById("planningUnit").value = "";
-        document.getElementById("shipmentsDetailsTableDiv").style.display = "none";
-        if (document.getElementById("addRowButtonId") != null) {
-            document.getElementById("addRowButtonId").style.display = "none";
-        }
-        this.setState({
-            programSelect: value,
-            programId: value != "" && value != undefined ? value != "" && value != undefined ? value.value : 0 : 0,
-            planningUnit: "",
-            planningUnitId: "",
-            loading: true
-        })
-        var programId = value != "" && value != undefined ? value.value : 0;
-        if (programId != 0) {
-            var db1;
-            var storeOS;
-            getDatabase();
-            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-            openRequest.onerror = function (event) {
-                this.setState({
-                    message: i18n.t('static.program.errortext'),
-                    color: 'red'
-                })
-                this.hideFirstComponent()
-            }.bind(this);
-            openRequest.onsuccess = function (e) {
-                db1 = e.target.result;
-                var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
-                var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
-                var planningunitRequest = planningunitOs.getAll();
-                var planningList = []
-                planningunitRequest.onerror = function (event) {
-                    this.setState({
-                        message: i18n.t('static.program.errortext'),
-                        color: 'red'
-                    })
-                    this.hideFirstComponent()
-                }.bind(this);
-                planningunitRequest.onsuccess = function (e) {
-                    var myResult = [];
-                    myResult = planningunitRequest.result;
-                    console.log("myResult", myResult);
-                    var programId = (value != "" && value != undefined ? value.value : 0).split("_")[0];
-                    console.log('programId----->>>', programId)
-                    console.log(myResult);
-                    var proList = []
-                    for (var i = 0; i < myResult.length; i++) {
-                        if (myResult[i].program.id == programId && myResult[i].active == true) {
-                            var productJson = {
-                                label: getLabelText(myResult[i].planningUnit.label, this.state.lang),
-                                value: myResult[i].planningUnit.id
-                            }
-                            proList.push(productJson)
-                        }
-                    }
-                    console.log("proList---" + proList);
-                    this.setState({
-                        planningUnitList: proList,
-                        planningUnitListAll: myResult,
-                        loading: false
-                    })
-                    var planningUnitIdProp = this.props.match.params.planningUnitId;
-                    console.log("planningUnitIdProp===>", planningUnitIdProp);
-                    if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
-                        var planningUnit = { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label };
-                        this.setState({
-                            planningUnit: planningUnit,
-                            planningUnitId: planningUnitIdProp
-                        })
-                        this.formSubmit(planningUnit, this.state.rangeValue);
-                    }
-                }.bind(this);
-            }.bind(this)
-        } else {
-            this.setState({
-                loading: false,
-                planningUnitList: []
-            })
-        }
-    }
+        var cont = false;
+        if (this.state.shipmentChangedFlag == 1) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
 
-    formSubmit(value, rangeValue) {
-        let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
-        let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
-        this.setState({ loading: true })
-        var programId = document.getElementById('programId').value;
-        this.setState({ programId: programId, planningUnitId: value != "" && value != undefined ? value.value : 0, planningUnit: value });
-        var planningUnitId = value != "" && value != undefined ? value.value : 0;
-        var programId = document.getElementById("programId").value;
-        if (planningUnitId != 0) {
-            document.getElementById("shipmentsDetailsTableDiv").style.display = "block";
-            console.log("(this.state.shipmentType).value", (this.state.shipmentType).value);
-            if (document.getElementById("addRowButtonId") != null) {
-                console.log("In if");
-                if ((this.state.shipmentType).value == 1) {
-                    console.log("in if 1")
-                    document.getElementById("addRowButtonId").style.display = "block";
-                } else {
-                    console.log("in else")
-                    document.getElementById("addRowButtonId").style.display = "none";
-                }
             }
-            var db1;
-            getDatabase();
-            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-            openRequest.onerror = function (event) {
-                this.setState({
-                    message: i18n.t('static.program.errortext'),
-                    color: 'red'
-                })
-                this.hideFirstComponent()
-            }.bind(this);
-            openRequest.onsuccess = function (e) {
-                db1 = e.target.result;
-                var transaction = db1.transaction(['programData'], 'readwrite');
-                var programTransaction = transaction.objectStore('programData');
-                var programRequest = programTransaction.get(programId);
-                programRequest.onerror = function (event) {
-                    this.setState({
-                        message: i18n.t('static.program.errortext'),
-                        color: 'red'
-                    })
-                    this.hideFirstComponent()
-                }.bind(this);
-                programRequest.onsuccess = function (event) {
-                    var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                    var programJson = JSON.parse(programData);
-
-                    console.log("this.state.planningUnitListAll", this.state.planningUnitListAll);
-                    var programPlanningUnit = ((this.state.planningUnitListAll).filter(p => p.planningUnit.id == planningUnitId))[0];
-                    var shipmentListUnFiltered = programJson.shipmentList;
-                    this.setState({
-                        shipmentListUnFiltered: shipmentListUnFiltered
-                    })
-                    var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == (value != "" && value != undefined ? value.value : 0) && c.active.toString() == "true");
-                    if ((this.state.shipmentType).value == 1) {
-                        shipmentList = shipmentList.filter(c => c.erpFlag.toString() == "false");
-                    } else {
-                        shipmentList = shipmentList.filter(c => c.erpFlag.toString() == "true");
-                    }
-                    shipmentList = shipmentList.filter(c => c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? moment(c.receivedDate).format("YYYY-MM-DD") >= moment(startDate).format("YYYY-MM-DD") && moment(c.receivedDate).format("YYYY-MM-DD") <= moment(stopDate).format("YYYY-MM-DD") : moment(c.expectedDeliveryDate).format("YYYY-MM-DD") >= moment(startDate).format("YYYY-MM-DD") && moment(c.expectedDeliveryDate).format("YYYY-MM-DD") <= moment(stopDate).format("YYYY-MM-DD"))
-                    console.log("Shipment list", shipmentList);
-                    this.setState({
-                        shelfLife: programPlanningUnit.shelfLife,
-                        catalogPrice: programPlanningUnit.catalogPrice,
-                        programJson: programJson,
-                        shipmentListUnFiltered: shipmentListUnFiltered,
-                        shipmentList: shipmentList,
-                        showShipments: 1,
-                    })
-                    this.refs.shipmentChild.showShipmentData();
-                }.bind(this)
-            }.bind(this)
         } else {
+            cont = true;
+        }
+        if (cont == true) {
+            document.getElementById("planningUnitId").value = 0;
+            document.getElementById("planningUnit").value = "";
             document.getElementById("shipmentsDetailsTableDiv").style.display = "none";
             if (document.getElementById("addRowButtonId") != null) {
                 document.getElementById("addRowButtonId").style.display = "none";
             }
-            this.setState({ loading: false });
+            this.setState({
+                programSelect: value,
+                programId: value != "" && value != undefined ? value != "" && value != undefined ? value.value : 0 : 0,
+                planningUnit: "",
+                planningUnitId: "",
+                loading: true,
+                shipmentChangedFlag: 0
+            })
+            var programId = value != "" && value != undefined ? value.value : 0;
+            if (programId != 0) {
+                var db1;
+                var storeOS;
+                getDatabase();
+                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                openRequest.onerror = function (event) {
+                    this.setState({
+                        message: i18n.t('static.program.errortext'),
+                        color: 'red'
+                    })
+                    this.hideFirstComponent()
+                }.bind(this);
+                openRequest.onsuccess = function (e) {
+                    db1 = e.target.result;
+                    var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+                    var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
+                    var planningunitRequest = planningunitOs.getAll();
+                    var planningList = []
+                    planningunitRequest.onerror = function (event) {
+                        this.setState({
+                            message: i18n.t('static.program.errortext'),
+                            color: 'red'
+                        })
+                        this.hideFirstComponent()
+                    }.bind(this);
+                    planningunitRequest.onsuccess = function (e) {
+                        var myResult = [];
+                        myResult = planningunitRequest.result;
+                        console.log("myResult", myResult);
+                        var programId = (value != "" && value != undefined ? value.value : 0).split("_")[0];
+                        console.log('programId----->>>', programId)
+                        console.log(myResult);
+                        var proList = []
+                        for (var i = 0; i < myResult.length; i++) {
+                            if (myResult[i].program.id == programId && myResult[i].active == true) {
+                                var productJson = {
+                                    label: getLabelText(myResult[i].planningUnit.label, this.state.lang),
+                                    value: myResult[i].planningUnit.id
+                                }
+                                proList.push(productJson)
+                            }
+                        }
+                        console.log("proList---" + proList);
+                        this.setState({
+                            planningUnitList: proList,
+                            planningUnitListAll: myResult,
+                            loading: false
+                        })
+                        var planningUnitIdProp = this.props.match.params.planningUnitId;
+                        console.log("planningUnitIdProp===>", planningUnitIdProp);
+                        if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
+                            var planningUnit = { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label };
+                            this.setState({
+                                planningUnit: planningUnit,
+                                planningUnitId: planningUnitIdProp
+                            })
+                            this.formSubmit(planningUnit, this.state.rangeValue);
+                        }
+                    }.bind(this);
+                }.bind(this)
+            } else {
+                this.setState({
+                    loading: false,
+                    planningUnitList: []
+                })
+            }
+        }
+    }
+
+    formSubmit(value, rangeValue) {
+        var cont = false;
+        if (this.state.shipmentChangedFlag == 1) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
+
+            }
+        } else {
+            cont = true;
+        }
+        if (cont == true) {
+            let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
+            let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
+            this.setState({ loading: true, shipmentChangedFlag: 0 })
+            var programId = document.getElementById('programId').value;
+            this.setState({ programId: programId, planningUnitId: value != "" && value != undefined ? value.value : 0, planningUnit: value });
+            var planningUnitId = value != "" && value != undefined ? value.value : 0;
+            var programId = document.getElementById("programId").value;
+            if (planningUnitId != 0) {
+                document.getElementById("shipmentsDetailsTableDiv").style.display = "block";
+                console.log("(this.state.shipmentType).value", (this.state.shipmentType).value);
+                if (document.getElementById("addRowButtonId") != null) {
+                    console.log("In if");
+                    if ((this.state.shipmentType).value == 1) {
+                        console.log("in if 1")
+                        document.getElementById("addRowButtonId").style.display = "block";
+                    } else {
+                        console.log("in else")
+                        document.getElementById("addRowButtonId").style.display = "none";
+                    }
+                }
+                var db1;
+                getDatabase();
+                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                openRequest.onerror = function (event) {
+                    this.setState({
+                        message: i18n.t('static.program.errortext'),
+                        color: 'red'
+                    })
+                    this.hideFirstComponent()
+                }.bind(this);
+                openRequest.onsuccess = function (e) {
+                    db1 = e.target.result;
+                    var transaction = db1.transaction(['programData'], 'readwrite');
+                    var programTransaction = transaction.objectStore('programData');
+                    var programRequest = programTransaction.get(programId);
+                    programRequest.onerror = function (event) {
+                        this.setState({
+                            message: i18n.t('static.program.errortext'),
+                            color: 'red'
+                        })
+                        this.hideFirstComponent()
+                    }.bind(this);
+                    programRequest.onsuccess = function (event) {
+                        var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                        var programJson = JSON.parse(programData);
+
+                        console.log("this.state.planningUnitListAll", this.state.planningUnitListAll);
+                        var programPlanningUnit = ((this.state.planningUnitListAll).filter(p => p.planningUnit.id == planningUnitId))[0];
+                        var shipmentListUnFiltered = programJson.shipmentList;
+                        this.setState({
+                            shipmentListUnFiltered: shipmentListUnFiltered
+                        })
+                        var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == (value != "" && value != undefined ? value.value : 0) && c.active.toString() == "true");
+                        if ((this.state.shipmentType).value == 1) {
+                            shipmentList = shipmentList.filter(c => c.erpFlag.toString() == "false");
+                        } else {
+                            shipmentList = shipmentList.filter(c => c.erpFlag.toString() == "true");
+                        }
+                        shipmentList = shipmentList.filter(c => c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? moment(c.receivedDate).format("YYYY-MM-DD") >= moment(startDate).format("YYYY-MM-DD") && moment(c.receivedDate).format("YYYY-MM-DD") <= moment(stopDate).format("YYYY-MM-DD") : moment(c.expectedDeliveryDate).format("YYYY-MM-DD") >= moment(startDate).format("YYYY-MM-DD") && moment(c.expectedDeliveryDate).format("YYYY-MM-DD") <= moment(stopDate).format("YYYY-MM-DD"))
+                        console.log("Shipment list", shipmentList);
+                        this.setState({
+                            shelfLife: programPlanningUnit.shelfLife,
+                            catalogPrice: programPlanningUnit.catalogPrice,
+                            programJson: programJson,
+                            shipmentListUnFiltered: shipmentListUnFiltered,
+                            shipmentList: shipmentList,
+                            showShipments: 1,
+                        })
+                        this.refs.shipmentChild.showShipmentData();
+                    }.bind(this)
+                }.bind(this)
+            } else {
+                document.getElementById("shipmentsDetailsTableDiv").style.display = "none";
+                if (document.getElementById("addRowButtonId") != null) {
+                    document.getElementById("addRowButtonId").style.display = "none";
+                }
+                this.setState({ loading: false });
+            }
         }
     }
 
     cancelClicked() {
-        let id = AuthenticationService.displayDashboardBasedOnRole();
-        this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
+        var cont = false;
+        if (this.state.shipmentChangedFlag == 1) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
+
+            }
+        } else {
+            cont = true;
+        }
+        if (cont == true) {
+            let id = AuthenticationService.displayDashboardBasedOnRole();
+            this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
+        }
     }
 
-    toggleLarge() {
-        this.setState({
-            shipmentBatchInfoChangedFlag: 0,
-            shipmentBatchInfoDuplicateError: '',
-            shipmentValidationBatchError: '',
-            qtyCalculatorValidationError: "",
-            shipmentDatesError: "",
+    toggleLarge(method) {
+        var cont = false;
+        if (method != "submit" && (this.state.shipmentQtyChangedFlag == 1 || this.state.shipmentBatchInfoChangedFlag == 1 || this.state.shipmentDatesChangedFlag == 1)) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
 
-        })
-        this.setState({
-            batchInfo: !this.state.batchInfo,
-        });
+            }
+        } else {
+            cont = true;
+        }
+        if (cont == true) {
+            this.setState({
+                shipmentBatchInfoChangedFlag: 0,
+                shipmentDatesChangedFlag: 0,
+                shipmentQtyChangedFlag: 0,
+                shipmentBatchInfoDuplicateError: '',
+                shipmentValidationBatchError: '',
+                qtyCalculatorValidationError: "",
+                shipmentDatesError: "",
+
+            })
+            this.setState({
+                batchInfo: !this.state.batchInfo,
+            });
+        }
     }
 
     actionCanceled() {
-        this.setState({
-            message: i18n.t('static.actionCancelled'),
-            color: 'red',
-        })
-        this.hideFirstComponent()
-        this.toggleLarge();
+        var cont = false;
+        if (this.state.shipmentQtyChangedFlag == 1 || this.state.shipmentBatchInfoChangedFlag == 1 || this.state.shipmentDatesChangedFlag == 1) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
+
+            }
+        } else {
+            cont = true;
+        }
+        if (cont == true) {
+            this.setState({
+                message: i18n.t('static.actionCancelled'),
+                color: 'red',
+                shipmentQtyChangedFlag: 0,
+                shipmentBatchInfoChangedFlag: 0,
+                shipmentDatesChangedFlag: 0
+            }, () => {
+                this.hideFirstComponent()
+                this.toggleLarge();
+            })
+        }
     }
 
     updateState(parameterName, value) {
@@ -536,15 +637,15 @@ export default class ShipmentDetails extends React.Component {
 
                     </ModalBody>
                     <ModalFooter>
-                        <div id="showShipmentBatchInfoButtonsDiv" style={{ display: 'none' }}>
-                            {this.state.shipmentBatchInfoChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentBatchInfo()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBatchInfo')}</Button>}
+                        <div id="showShipmentBatchInfoButtonsDiv" style={{ display: 'none' }} className="mr-0">
+                            {this.state.shipmentBatchInfoChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right" onClick={() => this.refs.shipmentChild.saveShipmentBatchInfo()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBatchInfo')}</Button>}
                             {this.refs.shipmentChild != undefined && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.refs.shipmentChild.addBatchRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
                         </div>
-                        <div id="showSaveShipmentsDatesButtonsDiv" style={{ display: 'none' }}>
-                            {this.state.shipmentDatesChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentsDate()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveShipmentDates')}</Button>}
+                        <div id="showSaveShipmentsDatesButtonsDiv" style={{ display: 'none' }} className="mr-0">
+                            {this.state.shipmentDatesChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right" onClick={() => this.refs.shipmentChild.saveShipmentsDate()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveShipmentDates')}</Button>}
                         </div>
-                        <div id="showSaveQtyButtonDiv" style={{ display: 'none' }}>
-                            {this.state.shipmentQtyChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentQty()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveShipmentQty')}</Button>}
+                        <div id="showSaveQtyButtonDiv" style={{ display: 'none' }} className="mr-0">
+                            {this.state.shipmentQtyChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right" onClick={() => this.refs.shipmentChild.saveShipmentQty()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveShipmentQty')}</Button>}
                         </div>
                         <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceled()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                     </ModalFooter>

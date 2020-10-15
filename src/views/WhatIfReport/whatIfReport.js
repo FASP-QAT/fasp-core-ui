@@ -1644,6 +1644,7 @@ export default class WhatIfReportComponent extends React.Component {
                                     var sd4 = [];
                                     var paColor = "";
                                     var isEmergencyOrder = 0;
+                                    var isLocalProcurementAgent = 0;
                                     if (shipmentDetails != "" && shipmentDetails != undefined) {
                                         for (var i = 0; i < shipmentDetails.length; i++) {
                                             if (shipmentDetails[i].shipmentStatus.id == DELIVERED_SHIPMENT_STATUS) {
@@ -1671,6 +1672,9 @@ export default class WhatIfReportComponent extends React.Component {
                                                 if (shipmentDetails[i].emergencyOrder.toString() == "true") {
                                                     isEmergencyOrder = true
                                                 }
+                                                if(shipmentDetails[i].localProcurement.toString()=="true"){
+                                                    isLocalProcurementAgent=true;
+                                                }
                                                 sd1.push(shipmentDetail);
                                             } else if (shipmentDetails[i].shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == ARRIVED_SHIPMENT_STATUS) {
                                                 if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
@@ -1696,6 +1700,9 @@ export default class WhatIfReportComponent extends React.Component {
                                                 }
                                                 if (shipmentDetails[i].emergencyOrder.toString() == "true") {
                                                     isEmergencyOrder = true
+                                                }
+                                                if(shipmentDetails[i].localProcurement.toString()=="true"){
+                                                    isLocalProcurementAgent=true;
                                                 }
                                                 sd2.push(shipmentDetail);
                                             } else if (shipmentDetails[i].shipmentStatus.id == APPROVED_SHIPMENT_STATUS) {
@@ -1723,6 +1730,9 @@ export default class WhatIfReportComponent extends React.Component {
                                                 if (shipmentDetails[i].emergencyOrder.toString() == "true") {
                                                     isEmergencyOrder = true
                                                 }
+                                                if(shipmentDetails[i].localProcurement.toString()=="true"){
+                                                    isLocalProcurementAgent=true;
+                                                }
                                                 sd3.push(shipmentDetail);
                                             } else if (shipmentDetails[i].shipmentStatus.id == PLANNED_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS) {
                                                 if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
@@ -1749,6 +1759,9 @@ export default class WhatIfReportComponent extends React.Component {
                                                 if (shipmentDetails[i].emergencyOrder.toString() == "true") {
                                                     isEmergencyOrder = true
                                                 }
+                                                if(shipmentDetails[i].localProcurement.toString()=="true"){
+                                                    isLocalProcurementAgent=true;
+                                                }
                                                 sd4.push(shipmentDetail);
                                             }
                                         }
@@ -1759,7 +1772,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         if (sd1.length > 1) {
                                             colour = "#d9ead3";
                                         }
-                                        deliveredShipmentsTotalData.push({ qty: jsonList[0].receivedShipmentsTotalData, month: m[n], shipmentDetail: sd1, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder });
+                                        deliveredShipmentsTotalData.push({ qty: jsonList[0].receivedShipmentsTotalData, month: m[n], shipmentDetail: sd1, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder,isLocalProcurementAgent:isLocalProcurementAgent });
                                     } else {
                                         deliveredShipmentsTotalData.push("")
                                     }
@@ -1769,7 +1782,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         if (sd2.length > 1) {
                                             colour = "#d9ead3";
                                         }
-                                        shippedShipmentsTotalData.push({ qty: jsonList[0].shippedShipmentsTotalData, month: m[n], shipmentDetail: sd2, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder });
+                                        shippedShipmentsTotalData.push({ qty: jsonList[0].shippedShipmentsTotalData, month: m[n], shipmentDetail: sd2, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder,isLocalProcurementAgent:isLocalProcurementAgent });
                                     } else {
                                         shippedShipmentsTotalData.push("")
                                     }
@@ -1779,7 +1792,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         if (sd3.length > 1) {
                                             colour = "#d9ead3";
                                         }
-                                        orderedShipmentsTotalData.push({ qty: jsonList[0].approvedShipmentsTotalData, month: m[n], shipmentDetail: sd3, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder });
+                                        orderedShipmentsTotalData.push({ qty: jsonList[0].approvedShipmentsTotalData, month: m[n], shipmentDetail: sd3, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder,isLocalProcurementAgent:isLocalProcurementAgent });
                                     } else {
                                         orderedShipmentsTotalData.push("")
                                     }
@@ -1789,7 +1802,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         if (sd4.length > 1) {
                                             colour = "#d9ead3";
                                         }
-                                        plannedShipmentsTotalData.push({ qty: parseInt(jsonList[0].submittedShipmentsTotalData) + parseInt(jsonList[0].onholdShipmentsTotalData) + parseInt(jsonList[0].plannedShipmentsTotalData), month: m[n], shipmentDetail: sd4, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder });
+                                        plannedShipmentsTotalData.push({ qty: parseInt(jsonList[0].submittedShipmentsTotalData) + parseInt(jsonList[0].onholdShipmentsTotalData) + parseInt(jsonList[0].plannedShipmentsTotalData), month: m[n], shipmentDetail: sd4, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder,isLocalProcurementAgent:isLocalProcurementAgent });
                                     } else {
                                         plannedShipmentsTotalData.push("")
                                     }
@@ -1803,6 +1816,7 @@ export default class WhatIfReportComponent extends React.Component {
                                     var sd3 = [];
                                     var sd4 = [];
                                     var isEmergencyOrder = 0;
+                                    var isLocalProcurementAgent=0;
                                     if (shipmentDetails != "" && shipmentDetails != undefined) {
                                         for (var i = 0; i < shipmentDetails.length; i++) {
                                             if (shipmentDetails[i].shipmentStatus.id == DELIVERED_SHIPMENT_STATUS) {
@@ -1829,6 +1843,9 @@ export default class WhatIfReportComponent extends React.Component {
                                                 }
                                                 if (shipmentDetails[i].emergencyOrder.toString() == "true") {
                                                     isEmergencyOrder = true
+                                                }
+                                                if(shipmentDetails[i].localProcurement.toString()=="true"){
+                                                    isLocalProcurementAgent=true;
                                                 }
                                                 sd1.push(shipmentDetail);
 
@@ -1857,6 +1874,9 @@ export default class WhatIfReportComponent extends React.Component {
                                                 if (shipmentDetails[i].emergencyOrder.toString() == "true") {
                                                     isEmergencyOrder = true
                                                 }
+                                                if(shipmentDetails[i].localProcurement.toString()=="true"){
+                                                    isLocalProcurementAgent=true;
+                                                }
                                                 sd2.push(shipmentDetail);
                                             } else if (shipmentDetails[i].shipmentStatus.id == APPROVED_SHIPMENT_STATUS) {
                                                 if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
@@ -1882,6 +1902,9 @@ export default class WhatIfReportComponent extends React.Component {
                                                 }
                                                 if (shipmentDetails[i].emergencyOrder.toString() == "true") {
                                                     isEmergencyOrder = true
+                                                }
+                                                if(shipmentDetails[i].localProcurement.toString()=="true"){
+                                                    isLocalProcurementAgent=true;
                                                 }
                                                 sd3.push(shipmentDetail);
                                             } else if (shipmentDetails[i].shipmentStatus.id == PLANNED_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS) {
@@ -1909,6 +1932,9 @@ export default class WhatIfReportComponent extends React.Component {
                                                 if (shipmentDetails[i].emergencyOrder.toString() == "true") {
                                                     isEmergencyOrder = true
                                                 }
+                                                if(shipmentDetails[i].localProcurement.toString()=="true"){
+                                                    isLocalProcurementAgent=true;
+                                                }
                                                 sd4.push(shipmentDetail);
                                             }
                                         }
@@ -1919,7 +1945,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         if (sd1.length > 1) {
                                             colour = "#d9ead3";
                                         }
-                                        deliveredErpShipmentsTotalData.push({ qty: jsonList[0].receivedErpShipmentsTotalData, month: m[n], shipmentDetail: sd1, colour: colour, textColor: contrast(colour) });
+                                        deliveredErpShipmentsTotalData.push({ qty: jsonList[0].receivedErpShipmentsTotalData, month: m[n], shipmentDetail: sd1, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder,isLocalProcurementAgent:isLocalProcurementAgent });
                                     } else {
                                         deliveredErpShipmentsTotalData.push("")
                                     }
@@ -1929,7 +1955,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         if (sd2.length > 1) {
                                             colour = "#d9ead3";
                                         }
-                                        shippedErpShipmentsTotalData.push({ qty: jsonList[0].shippedErpShipmentsTotalData, month: m[n], shipmentDetail: sd2, colour: colour, textColor: contrast(colour) });
+                                        shippedErpShipmentsTotalData.push({ qty: jsonList[0].shippedErpShipmentsTotalData, month: m[n], shipmentDetail: sd2, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder,isLocalProcurementAgent:isLocalProcurementAgent });
                                     } else {
                                         shippedErpShipmentsTotalData.push("")
                                     }
@@ -1939,7 +1965,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         if (sd3.length > 1) {
                                             colour = "#d9ead3";
                                         }
-                                        orderedErpShipmentsTotalData.push({ qty: jsonList[0].approvedErpShipmentsTotalData, month: m[n], shipmentDetail: sd3, colour: colour, textColor: contrast(colour) });
+                                        orderedErpShipmentsTotalData.push({ qty: jsonList[0].approvedErpShipmentsTotalData, month: m[n], shipmentDetail: sd3, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder,isLocalProcurementAgent:isLocalProcurementAgent });
                                     } else {
                                         orderedErpShipmentsTotalData.push("")
                                     }
@@ -1949,7 +1975,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         if (sd4.length > 1) {
                                             colour = "#d9ead3";
                                         }
-                                        plannedErpShipmentsTotalData.push({ qty: parseInt(jsonList[0].submittedErpShipmentsTotalData) + parseInt(jsonList[0].onholdErpShipmentsTotalData) + parseInt(jsonList[0].plannedErpShipmentsTotalData), month: m[n], shipmentDetail: sd4, colour: colour, textColor: contrast(colour) });
+                                        plannedErpShipmentsTotalData.push({ qty: parseInt(jsonList[0].submittedErpShipmentsTotalData) + parseInt(jsonList[0].onholdErpShipmentsTotalData) + parseInt(jsonList[0].plannedErpShipmentsTotalData), month: m[n], shipmentDetail: sd4, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder,isLocalProcurementAgent:isLocalProcurementAgent });
                                     } else {
                                         plannedErpShipmentsTotalData.push("")
                                     }
@@ -2194,86 +2220,99 @@ export default class WhatIfReportComponent extends React.Component {
     }
 
     toggleLarge(supplyPlanType, month, quantity, startDate, endDate, isEmergencyOrder, shipmentType, count) {
-        var supplyPlanType = supplyPlanType;
-        this.setState({
-            consumptionError: '',
-            inventoryError: '',
-            shipmentError: '',
-            shipmentDuplicateError: '',
-            shipmentBudgetError: '',
-            shipmentBatchError: '',
-            suggestedShipmentError: '',
-            suggestedShipmentDuplicateError: '',
-            budgetError: '',
-            consumptionBatchError: '',
-            inventoryBatchError: '',
-            shipmentValidationBatchError: '',
-            consumptionDuplicateError: '',
-            inventoryDuplicateError: '',
-            consumptionBatchInfoDuplicateError: '',
-            consumptionBatchInfoNoStockError: '',
-            inventoryBatchInfoDuplicateError: '',
-            inventoryBatchInfoNoStockError: '',
-            shipmentBatchInfoDuplicateError: '',
-            inventoryNoStockError: '',
-            consumptionNoStockError: '',
-            noFundsBudgetError: '',
-            consumptionBatchInfoChangedFlag: 0,
-            inventoryBatchInfoChangedFlag: 0,
-            consumptionChangedFlag: 0,
-            inventoryChangedFlag: 0,
-            budgetChangedFlag: 0,
-            shipmentBatchInfoChangedFlag: 0,
-            shipmentChangedFlag: 0,
-            suggestedShipmentChangedFlag: 0,
-            shipmentDatesChangedFlag: 0,
-            shipmentDatesError: '',
-            shipmentQtyChangedFlag: 0,
-            qtyCalculatorValidationError: "",
-            showShipments: 0,
-            showInventory: 0,
-            showConsumption: 0
-
-        })
-        if (supplyPlanType == 'Consumption') {
-            var monthCountConsumption = count - 2;
-            this.setState({
-                consumption: !this.state.consumption,
-                monthCountConsumption: monthCountConsumption,
-            });
-            this.formSubmit(this.state.planningUnit, monthCountConsumption);
-        } else if (supplyPlanType == 'SuggestedShipments') {
-            this.setState({
-                shipments: !this.state.shipments
-            });
-            this.suggestedShipmentsDetailsClicked(month, quantity, isEmergencyOrder);
-        } else if (supplyPlanType == 'shipments') {
-            this.setState({
-                shipments: !this.state.shipments
-            });
-            this.shipmentsDetailsClicked(shipmentType, startDate, endDate);
-        } else if (supplyPlanType == 'Adjustments') {
-            var monthCountAdjustments = count - 2;
-            this.setState({
-                adjustments: !this.state.adjustments,
-                monthCountAdjustments: monthCountAdjustments
-            });
-            this.formSubmit(this.state.planningUnit, monthCountAdjustments);
-        } else if (supplyPlanType == 'expiredStock') {
-            this.setState({ loading: true });
-            var details = (this.state.expiredStockArr).filter(c => moment(c.month.startDate).format("YYYY-MM-DD") == moment(startDate).format("YYYY-MM-DD"))
-            console.log("startDate", startDate)
-            if (startDate != undefined) {
-                this.setState({
-                    expiredStockModal: !this.state.expiredStockModal,
-                    expiredStockDetails: details[0].details,
-                    expiredStockDetailsTotal: details[0].qty,
-                    loading: false
-                })
+        var cont = false;
+        if (this.state.consumptionChangedFlag == 1 || this.state.inventoryChangedFlag == 1 || this.state.suggestedShipmentChangedFlag == 1 || this.state.shipmentChangedFlag == 1) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
             } else {
+
+            }
+        } else {
+            cont = true;
+        }
+        if (cont == true) {
+            var supplyPlanType = supplyPlanType;
+            this.setState({
+                consumptionError: '',
+                inventoryError: '',
+                shipmentError: '',
+                shipmentDuplicateError: '',
+                shipmentBudgetError: '',
+                shipmentBatchError: '',
+                suggestedShipmentError: '',
+                suggestedShipmentDuplicateError: '',
+                budgetError: '',
+                consumptionBatchError: '',
+                inventoryBatchError: '',
+                shipmentValidationBatchError: '',
+                consumptionDuplicateError: '',
+                inventoryDuplicateError: '',
+                consumptionBatchInfoDuplicateError: '',
+                consumptionBatchInfoNoStockError: '',
+                inventoryBatchInfoDuplicateError: '',
+                inventoryBatchInfoNoStockError: '',
+                shipmentBatchInfoDuplicateError: '',
+                inventoryNoStockError: '',
+                consumptionNoStockError: '',
+                noFundsBudgetError: '',
+                consumptionBatchInfoChangedFlag: 0,
+                inventoryBatchInfoChangedFlag: 0,
+                consumptionChangedFlag: 0,
+                inventoryChangedFlag: 0,
+                budgetChangedFlag: 0,
+                shipmentBatchInfoChangedFlag: 0,
+                shipmentChangedFlag: 0,
+                suggestedShipmentChangedFlag: 0,
+                shipmentDatesChangedFlag: 0,
+                shipmentDatesError: '',
+                shipmentQtyChangedFlag: 0,
+                qtyCalculatorValidationError: "",
+                showShipments: 0,
+                showInventory: 0,
+                showConsumption: 0
+
+            })
+            if (supplyPlanType == 'Consumption') {
+                var monthCountConsumption = count - 2;
                 this.setState({
-                    expiredStockModal: !this.state.expiredStockModal
-                })
+                    consumption: !this.state.consumption,
+                    monthCountConsumption: monthCountConsumption,
+                });
+                this.formSubmit(this.state.planningUnit, monthCountConsumption);
+            } else if (supplyPlanType == 'SuggestedShipments') {
+                this.setState({
+                    shipments: !this.state.shipments
+                });
+                this.suggestedShipmentsDetailsClicked(month, quantity, isEmergencyOrder);
+            } else if (supplyPlanType == 'shipments') {
+                this.setState({
+                    shipments: !this.state.shipments
+                });
+                this.shipmentsDetailsClicked(shipmentType, startDate, endDate);
+            } else if (supplyPlanType == 'Adjustments') {
+                var monthCountAdjustments = count - 2;
+                this.setState({
+                    adjustments: !this.state.adjustments,
+                    monthCountAdjustments: monthCountAdjustments
+                });
+                this.formSubmit(this.state.planningUnit, monthCountAdjustments);
+            } else if (supplyPlanType == 'expiredStock') {
+                this.setState({ loading: true });
+                var details = (this.state.expiredStockArr).filter(c => moment(c.month.startDate).format("YYYY-MM-DD") == moment(startDate).format("YYYY-MM-DD"))
+                console.log("startDate", startDate)
+                if (startDate != undefined) {
+                    this.setState({
+                        expiredStockModal: !this.state.expiredStockModal,
+                        expiredStockDetails: details[0].details,
+                        expiredStockDetailsTotal: details[0].qty,
+                        loading: false
+                    })
+                } else {
+                    this.setState({
+                        expiredStockModal: !this.state.expiredStockModal
+                    })
+                }
             }
         }
     }
@@ -2288,60 +2327,73 @@ export default class WhatIfReportComponent extends React.Component {
     }
 
     actionCanceled(supplyPlanType) {
-        var inputs = document.getElementsByClassName("submitBtn");
-        for (var i = 0; i < inputs.length; i++) {
-            inputs[i].disabled = true;
-        }
-        this.setState({
-            message: i18n.t('static.actionCancelled'),
-            color: 'red',
-            consumptionError: '',
-            inventoryError: '',
-            shipmentError: '',
-            suggestedShipmentError: '',
-            shipmentDuplicateError: '',
-            shipmentBudgetError: '',
-            shipmentBatchError: '',
-            suggestedShipmentDuplicateError: '',
-            budgetError: '',
-            consumptionBatchError: '',
-            inventoryBatchError: '',
-            shipmentValidationBatchError: '',
-            consumptionChangedFlag: 0,
-            suggestedShipmentChangedFlag: 0,
-            shipmentChangedFlag: 0,
-            inventoryChangedFlag: 0,
-            consumptionDuplicateError: '',
-            inventoryDuplicateError: '',
-            inventoryNoStockError: '',
-            consumptionNoStockError: '',
-            consumptionBatchInfoDuplicateError: '',
-            consumptionBatchInfoNoStockError: '',
-            inventoryBatchInfoDuplicateError: '',
-            inventoryBatchInfoNoStockError: '',
-            shipmentBatchInfoDuplicateError: '',
-            noFundsBudgetError: '',
-            consumptionBatchInfoChangedFlag: 0,
-            inventoryBatchInfoChangedFlag: 0,
-            consumptionChangedFlag: 0,
-            inventoryChangedFlag: 0,
-            budgetChangedFlag: 0,
-            shipmentBatchInfoChangedFlag: 0,
-            shipmentChangedFlag: 0,
-            suggestedShipmentChangedFlag: 0,
-            shipmentDatesChangedFlag: 0,
-            shipmentDatesError: '',
-            shipmentQtyChangedFlag: 0,
-            qtyCalculatorValidationError: "",
-            showShipments: 0,
-            showInventory: 0,
-            loading: false
+        var cont = false;
+        if (this.state.consumptionChangedFlag == 1 || this.state.inventoryChangedFlag == 1 || this.state.suggestedShipmentChangedFlag == 1 || this.state.shipmentChangedFlag == 1) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
 
-        },
-            () => {
-                this.hideFirstComponent()
-            })
-        this.toggleLarge(supplyPlanType);
+            }
+        } else {
+            cont = true;
+        }
+        if (cont == true) {
+            var inputs = document.getElementsByClassName("submitBtn");
+            for (var i = 0; i < inputs.length; i++) {
+                inputs[i].disabled = true;
+            }
+            this.setState({
+                message: i18n.t('static.actionCancelled'),
+                color: 'red',
+                consumptionError: '',
+                inventoryError: '',
+                shipmentError: '',
+                suggestedShipmentError: '',
+                shipmentDuplicateError: '',
+                shipmentBudgetError: '',
+                shipmentBatchError: '',
+                suggestedShipmentDuplicateError: '',
+                budgetError: '',
+                consumptionBatchError: '',
+                inventoryBatchError: '',
+                shipmentValidationBatchError: '',
+                consumptionChangedFlag: 0,
+                suggestedShipmentChangedFlag: 0,
+                shipmentChangedFlag: 0,
+                inventoryChangedFlag: 0,
+                consumptionDuplicateError: '',
+                inventoryDuplicateError: '',
+                inventoryNoStockError: '',
+                consumptionNoStockError: '',
+                consumptionBatchInfoDuplicateError: '',
+                consumptionBatchInfoNoStockError: '',
+                inventoryBatchInfoDuplicateError: '',
+                inventoryBatchInfoNoStockError: '',
+                shipmentBatchInfoDuplicateError: '',
+                noFundsBudgetError: '',
+                consumptionBatchInfoChangedFlag: 0,
+                inventoryBatchInfoChangedFlag: 0,
+                consumptionChangedFlag: 0,
+                inventoryChangedFlag: 0,
+                budgetChangedFlag: 0,
+                shipmentBatchInfoChangedFlag: 0,
+                shipmentChangedFlag: 0,
+                suggestedShipmentChangedFlag: 0,
+                shipmentDatesChangedFlag: 0,
+                shipmentDatesError: '',
+                shipmentQtyChangedFlag: 0,
+                qtyCalculatorValidationError: "",
+                showShipments: 0,
+                showInventory: 0,
+                loading: false
+
+            },
+                () => {
+                    this.hideFirstComponent()
+                })
+            this.toggleLarge(supplyPlanType);
+        }
     }
 
     leftClicked() {
@@ -2396,31 +2448,30 @@ export default class WhatIfReportComponent extends React.Component {
 
     // Show consumption details
     consumptionDetailsClicked(startDate, endDate, region, actualFlag, month) {
-        this.setState({ loading: true });
-        var elInstance = this.state.consumptionBatchInfoTableEl;
-        if (elInstance != undefined && elInstance != "") {
-            elInstance.destroy();
+        var cont = false;
+        if (this.state.consumptionChangedFlag == 1) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
+
+            }
+        } else {
+            cont = true;
         }
-        var planningUnitId = document.getElementById("planningUnitId").value;
-        var programId = document.getElementById("programId").value;
-        var db1;
-        var storeOS;
-        getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function (event) {
-            this.setState({
-                supplyPlanError: i18n.t('static.program.errortext'),
-                loading: false,
-                color: "red"
-            })
-            this.hideFirstComponent()
-        }.bind(this);
-        openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-            var programDataTransaction = db1.transaction(['whatIfProgramData'], 'readwrite');
-            var programDataOs = programDataTransaction.objectStore('whatIfProgramData');
-            var programRequest = programDataOs.get(programId);
-            programRequest.onerror = function (event) {
+        if (cont == true) {
+            this.setState({ loading: true });
+            var elInstance = this.state.consumptionBatchInfoTableEl;
+            if (elInstance != undefined && elInstance != "") {
+                elInstance.destroy();
+            }
+            var planningUnitId = document.getElementById("planningUnitId").value;
+            var programId = document.getElementById("programId").value;
+            var db1;
+            var storeOS;
+            getDatabase();
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            openRequest.onerror = function (event) {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext'),
                     loading: false,
@@ -2428,75 +2479,88 @@ export default class WhatIfReportComponent extends React.Component {
                 })
                 this.hideFirstComponent()
             }.bind(this);
-            programRequest.onsuccess = function (e) {
-                var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                var programJson = JSON.parse(programData);
-                var batchInfoList = programJson.batchInfoList;
+            openRequest.onsuccess = function (e) {
+                db1 = e.target.result;
+                var programDataTransaction = db1.transaction(['whatIfProgramData'], 'readwrite');
+                var programDataOs = programDataTransaction.objectStore('whatIfProgramData');
+                var programRequest = programDataOs.get(programId);
+                programRequest.onerror = function (event) {
+                    this.setState({
+                        supplyPlanError: i18n.t('static.program.errortext'),
+                        loading: false,
+                        color: "red"
+                    })
+                    this.hideFirstComponent()
+                }.bind(this);
+                programRequest.onsuccess = function (e) {
+                    var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                    var programJson = JSON.parse(programData);
+                    var batchInfoList = programJson.batchInfoList;
 
-                var batchList = [];
-                var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == planningUnitId && c.active.toString() == "true" && c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS);
-                console.log("Shipment list=============>", shipmentList);
-                for (var sl = 0; sl < shipmentList.length; sl++) {
-                    var bdl = shipmentList[sl].batchInfoList;
-                    for (var bd = 0; bd < bdl.length; bd++) {
-                        var index = batchList.findIndex(c => c.batchNo == bdl[bd].batch.batchNo);
-                        if (index == -1) {
-                            var batchDetailsToPush = batchInfoList.filter(c => c.batchNo == bdl[bd].batch.batchNo && c.planningUnitId == planningUnitId)[0];
-                            batchList.push(batchDetailsToPush);
+                    var batchList = [];
+                    var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == planningUnitId && c.active.toString() == "true" && c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS);
+                    console.log("Shipment list=============>", shipmentList);
+                    for (var sl = 0; sl < shipmentList.length; sl++) {
+                        var bdl = shipmentList[sl].batchInfoList;
+                        for (var bd = 0; bd < bdl.length; bd++) {
+                            var index = batchList.findIndex(c => c.batchNo == bdl[bd].batch.batchNo);
+                            if (index == -1) {
+                                var batchDetailsToPush = batchInfoList.filter(c => c.batchNo == bdl[bd].batch.batchNo && c.planningUnitId == planningUnitId)[0];
+                                batchList.push(batchDetailsToPush);
+                            }
                         }
                     }
-                }
-                console.log("Btach List============>", batchList);
-                var consumptionListUnFiltered = (programJson.consumptionList);
-                var consumptionList = consumptionListUnFiltered.filter(con =>
-                    con.planningUnit.id == planningUnitId
-                    && con.region.id == region
-                    && ((con.consumptionDate >= startDate && con.consumptionDate <= endDate)));
-                this.setState({
-                    programJsonAfterConsumptionClicked: programJson,
-                    consumptionListUnFiltered: consumptionListUnFiltered,
-                    batchInfoList: batchList,
-                    programJson: programJson,
-                    consumptionList: consumptionList,
-                    showConsumption: 1,
-                    consumptionMonth: month,
-                    consumptionStartDate: startDate,
-                    consumptionRegion: region
-                })
-                this.refs.consumptionChild.showConsumptionData();
+                    console.log("Btach List============>", batchList);
+                    var consumptionListUnFiltered = (programJson.consumptionList);
+                    var consumptionList = consumptionListUnFiltered.filter(con =>
+                        con.planningUnit.id == planningUnitId
+                        && con.region.id == region
+                        && ((con.consumptionDate >= startDate && con.consumptionDate <= endDate)));
+                    this.setState({
+                        programJsonAfterConsumptionClicked: programJson,
+                        consumptionListUnFiltered: consumptionListUnFiltered,
+                        batchInfoList: batchList,
+                        programJson: programJson,
+                        consumptionList: consumptionList,
+                        showConsumption: 1,
+                        consumptionMonth: month,
+                        consumptionStartDate: startDate,
+                        consumptionRegion: region
+                    })
+                    this.refs.consumptionChild.showConsumptionData();
+                }.bind(this)
             }.bind(this)
-        }.bind(this)
+        }
     }
     // Consumption Functionality
 
     // Adjustments Functionality
     // Show adjustments details
     adjustmentsDetailsClicked(region, month, endDate, inventoryType) {
-        this.setState({ loading: true });
-        var elInstance = this.state.inventoryBatchInfoTableEl;
-        if (elInstance != undefined && elInstance != "") {
-            elInstance.destroy();
+        var cont = false;
+        if (this.state.inventoryChangedFlag == 1) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
+
+            }
+        } else {
+            cont = true;
         }
-        var planningUnitId = document.getElementById("planningUnitId").value;
-        var programId = document.getElementById("programId").value;
-        var db1;
-        getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function (event) {
-            this.setState({
-                supplyPlanError: i18n.t('static.program.errortext'),
-                loading: false,
-                color: "red"
-            })
-            this.hideFirstComponent()
-        }.bind(this);
-        openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-            var transaction = db1.transaction(['whatIfProgramData'], 'readwrite');
-            var programTransaction = transaction.objectStore('whatIfProgramData');
-            var programRequest = programTransaction.get(programId);
-            programRequest.onerror = function (event) {
+        if (cont == true) {
+            this.setState({ loading: true });
+            var elInstance = this.state.inventoryBatchInfoTableEl;
+            if (elInstance != undefined && elInstance != "") {
+                elInstance.destroy();
+            }
+            var planningUnitId = document.getElementById("planningUnitId").value;
+            var programId = document.getElementById("programId").value;
+            var db1;
+            getDatabase();
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            openRequest.onerror = function (event) {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext'),
                     loading: false,
@@ -2504,50 +2568,64 @@ export default class WhatIfReportComponent extends React.Component {
                 })
                 this.hideFirstComponent()
             }.bind(this);
-            programRequest.onsuccess = function (event) {
-                var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                var programJson = JSON.parse(programData);
-                var batchInfoList = programJson.batchInfoList;
+            openRequest.onsuccess = function (e) {
+                db1 = e.target.result;
+                var transaction = db1.transaction(['whatIfProgramData'], 'readwrite');
+                var programTransaction = transaction.objectStore('whatIfProgramData');
+                var programRequest = programTransaction.get(programId);
+                programRequest.onerror = function (event) {
+                    this.setState({
+                        supplyPlanError: i18n.t('static.program.errortext'),
+                        loading: false,
+                        color: "red"
+                    })
+                    this.hideFirstComponent()
+                }.bind(this);
+                programRequest.onsuccess = function (event) {
+                    var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                    var programJson = JSON.parse(programData);
+                    var batchInfoList = programJson.batchInfoList;
 
-                var batchList = [];
-                var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == planningUnitId && c.active.toString() == "true" && c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS);
+                    var batchList = [];
+                    var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == planningUnitId && c.active.toString() == "true" && c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS);
 
-                for (var sl = 0; sl < shipmentList.length; sl++) {
-                    var bdl = shipmentList[sl].batchInfoList;
-                    for (var bd = 0; bd < bdl.length; bd++) {
-                        var index = batchList.findIndex(c => c.batchNo == bdl[bd].batch.batchNo);
-                        if (index == -1) {
-                            var batchDetailsToPush = batchInfoList.filter(c => c.batchNo == bdl[bd].batch.batchNo && c.planningUnitId == planningUnitId)[0];
-                            batchList.push(batchDetailsToPush);
+                    for (var sl = 0; sl < shipmentList.length; sl++) {
+                        var bdl = shipmentList[sl].batchInfoList;
+                        for (var bd = 0; bd < bdl.length; bd++) {
+                            var index = batchList.findIndex(c => c.batchNo == bdl[bd].batch.batchNo);
+                            if (index == -1) {
+                                var batchDetailsToPush = batchInfoList.filter(c => c.batchNo == bdl[bd].batch.batchNo && c.planningUnitId == planningUnitId)[0];
+                                batchList.push(batchDetailsToPush);
+                            }
                         }
                     }
-                }
-                var inventoryListUnFiltered = (programJson.inventoryList);
-                var inventoryList = (programJson.inventoryList).filter(c =>
-                    c.planningUnit.id == planningUnitId &&
-                    c.region != null && c.region.id != 0 &&
-                    c.region.id == region &&
-                    moment(c.inventoryDate).format("MMM YY") == month);
-                if (inventoryType == 1) {
-                    inventoryList = inventoryList.filter(c => c.actualQty != "" && c.actualQty != undefined && c.actualQty != null);
-                } else {
-                    inventoryList = inventoryList.filter(c => c.adjustmentQty != "" && c.adjustmentQty != undefined && c.adjustmentQty != null);
-                }
-                this.setState({
-                    batchInfoList: batchList,
-                    programJson: programJson,
-                    inventoryListUnFiltered: inventoryListUnFiltered,
-                    inventoryList: inventoryList,
-                    showInventory: 1,
-                    inventoryType: inventoryType,
-                    inventoryMonth: month,
-                    inventoryEndDate: endDate,
-                    inventoryRegion: region
-                })
-                this.refs.inventoryChild.showInventoryData();
+                    var inventoryListUnFiltered = (programJson.inventoryList);
+                    var inventoryList = (programJson.inventoryList).filter(c =>
+                        c.planningUnit.id == planningUnitId &&
+                        c.region != null && c.region.id != 0 &&
+                        c.region.id == region &&
+                        moment(c.inventoryDate).format("MMM YY") == month);
+                    if (inventoryType == 1) {
+                        inventoryList = inventoryList.filter(c => c.actualQty != "" && c.actualQty != undefined && c.actualQty != null);
+                    } else {
+                        inventoryList = inventoryList.filter(c => c.adjustmentQty != "" && c.adjustmentQty != undefined && c.adjustmentQty != null);
+                    }
+                    this.setState({
+                        batchInfoList: batchList,
+                        programJson: programJson,
+                        inventoryListUnFiltered: inventoryListUnFiltered,
+                        inventoryList: inventoryList,
+                        showInventory: 1,
+                        inventoryType: inventoryType,
+                        inventoryMonth: month,
+                        inventoryEndDate: endDate,
+                        inventoryRegion: region
+                    })
+                    this.refs.inventoryChild.showInventoryData();
+                }.bind(this)
             }.bind(this)
-        }.bind(this)
+        }
     }
     // Adjustments Functionality
 
@@ -2747,7 +2825,7 @@ export default class WhatIfReportComponent extends React.Component {
                         label: i18n.t('static.supplyPlan.planned'),
                         stack: 1,
                         yAxisID: 'A',
-                        backgroundColor: '#a5c5ec',
+                        backgroundColor: '#a7c6ed',
                         borderColor: 'rgba(179,181,198,1)',
                         pointBackgroundColor: 'rgba(179,181,198,1)',
                         pointBorderColor: '#fff',
@@ -2759,7 +2837,7 @@ export default class WhatIfReportComponent extends React.Component {
                         label: i18n.t('static.supplyPlan.ordered'),
                         stack: 1,
                         yAxisID: 'A',
-                        backgroundColor: '#20a8d8',
+                        backgroundColor: '#205493',
                         borderColor: 'rgba(179,181,198,1)',
                         pointBackgroundColor: 'rgba(179,181,198,1)',
                         pointBorderColor: '#fff',
@@ -2771,7 +2849,7 @@ export default class WhatIfReportComponent extends React.Component {
                         label: i18n.t('static.supplyPlan.shipped'),
                         stack: 1,
                         yAxisID: 'A',
-                        backgroundColor: '#7372cb',
+                        backgroundColor: '#006789',
                         borderColor: 'rgba(179,181,198,1)',
                         pointBackgroundColor: 'rgba(179,181,198,1)',
                         pointBorderColor: '#fff',
@@ -2783,7 +2861,7 @@ export default class WhatIfReportComponent extends React.Component {
                         label: i18n.t('static.supplyPlan.delivered'),
                         stack: 1,
                         yAxisID: 'A',
-                        backgroundColor: '#042e6a',
+                        backgroundColor: '#002f6c',
                         borderColor: 'rgba(179,181,198,1)',
                         pointBackgroundColor: 'rgba(179,181,198,1)',
                         pointBorderColor: '#fff',
@@ -2795,7 +2873,7 @@ export default class WhatIfReportComponent extends React.Component {
                         stack: 2,
                         type: 'line',
                         yAxisID: 'A',
-                        borderColor: '#d0cece',
+                        borderColor: '#cfcdc9',
                         borderStyle: 'dotted',
                         ticks: {
                             fontSize: 2,
@@ -2811,7 +2889,7 @@ export default class WhatIfReportComponent extends React.Component {
                         stack: 3,
                         yAxisID: 'A',
                         backgroundColor: 'transparent',
-                        borderColor: '#f45c45',
+                        borderColor: '#ba0c2f',
                         borderStyle: 'dotted',
                         ticks: {
                             fontSize: 2,
@@ -2828,7 +2906,7 @@ export default class WhatIfReportComponent extends React.Component {
                         stack: 4,
                         yAxisID: 'B',
                         backgroundColor: 'transparent',
-                        borderColor: '#8be665',
+                        borderColor: '#118b70',
                         borderStyle: 'dotted',
                         ticks: {
                             fontSize: 2,
@@ -3023,7 +3101,7 @@ export default class WhatIfReportComponent extends React.Component {
 
                                     </Form>
                                 )} />
-                    <span onClick={() => this.toggleAccordionScenarioList()}>{this.state.showScenarioList ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}</span><span>{i18n.t('static.whatIf.scenarioList')}</span>
+                    <span onClick={() => this.toggleAccordionScenarioList()}>{this.state.showScenarioList ? <i className="fa fa-minus-square-o scenarioListIcon" ></i> : <i className="fa fa-plus-square-o scenarioListIcon" ></i>}</span>&nbsp;&nbsp;<span style={{fontSize:'16px'}}>{i18n.t('static.whatIf.scenarioList')}</span>
                     <Row className="pt-3 pb-3 scenarioListDiv" >
                         <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                             <Col md="12 pl-0" id="realmDiv">
@@ -3170,7 +3248,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             {
                                                 this.state.deliveredShipmentsTotalData.map(item1 => {
                                                     if (item1.toString() != "") {
-                                                        return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} align="right" className={item1.isEmergencyOrder == true ? "emergencyComment hoverTd" : "hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'deliveredShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                        return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} align="right" className={item1.isEmergencyOrder == true ? item1.isLocalProcurementAgent == true?"localProcurementAgent emergencyComment hoverTd":"emergencyComment hoverTd" : item1.isLocalProcurementAgent==true?"localProcurementAgent hoverTd":"hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'deliveredShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                                     } else {
                                                         return (<td align="right" >{item1}</td>)
                                                     }
@@ -3185,7 +3263,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             {
                                                 this.state.shippedShipmentsTotalData.map(item1 => {
                                                     if (item1.toString() != "") {
-                                                        return (<td align="right" bgcolor={item1.colour} style={{ color: item1.textColor }} data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className={item1.isEmergencyOrder == true ? "emergencyComment hoverTd" : "hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'shippedShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                        return (<td align="right" bgcolor={item1.colour} style={{ color: item1.textColor }} data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className={item1.isEmergencyOrder == true ? item1.isLocalProcurementAgent == true?"localProcurementAgent emergencyComment hoverTd":"emergencyComment hoverTd" : item1.isLocalProcurementAgent==true?"localProcurementAgent hoverTd":"hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'shippedShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                                     } else {
                                                         return (<td align="right" >{item1}</td>)
                                                     }
@@ -3199,7 +3277,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             {
                                                 this.state.orderedShipmentsTotalData.map(item1 => {
                                                     if (item1.toString() != "") {
-                                                        return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} align="right" className={item1.isEmergencyOrder == true ? "emergencyComment hoverTd" : "hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'orderedShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                        return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} align="right" className={item1.isEmergencyOrder == true ? item1.isLocalProcurementAgent == true?"localProcurementAgent emergencyComment hoverTd":"emergencyComment hoverTd" : item1.isLocalProcurementAgent==true?"localProcurementAgent hoverTd":"hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'orderedShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                                     } else {
                                                         return (<td align="right" >{item1}</td>)
                                                     }
@@ -3212,7 +3290,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             {
                                                 this.state.plannedShipmentsTotalData.map(item1 => {
                                                     if (item1.toString() != "") {
-                                                        return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className={item1.isEmergencyOrder == true ? "emergencyComment hoverTd" : "hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'plannedShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                        return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className={item1.isEmergencyOrder == true ? item1.isLocalProcurementAgent == true?"localProcurementAgent emergencyComment hoverTd":"emergencyComment hoverTd" : item1.isLocalProcurementAgent==true?"localProcurementAgent hoverTd":"hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'plannedShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                                     } else {
                                                         return (<td align="right" >{item1}</td>)
                                                     }
@@ -3236,7 +3314,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             {
                                                 this.state.deliveredErpShipmentsTotalData.map(item1 => {
                                                     if (item1.toString() != "") {
-                                                        return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className={item1.isEmergencyOrder == true ? "emergencyComment hoverTd" : "hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'deliveredErpShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                        return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className={item1.isEmergencyOrder == true ? item1.isLocalProcurementAgent == true?"localProcurementAgent emergencyComment hoverTd":"emergencyComment hoverTd" : item1.isLocalProcurementAgent==true?"localProcurementAgent hoverTd":"hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'deliveredErpShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                                     } else {
                                                         return (<td align="right" >{item1}</td>)
                                                     }
@@ -3250,7 +3328,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             {
                                                 this.state.shippedErpShipmentsTotalData.map(item1 => {
                                                     if (item1.toString() != "") {
-                                                        return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className={item1.isEmergencyOrder == true ? "emergencyComment hoverTd" : "hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'shippedErpShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                        return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className={item1.isEmergencyOrder == true ? item1.isLocalProcurementAgent == true?"localProcurementAgent emergencyComment hoverTd":"emergencyComment hoverTd" : item1.isLocalProcurementAgent==true?"localProcurementAgent hoverTd":"hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'shippedErpShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                                     } else {
                                                         return (<td align="right" >{item1}</td>)
                                                     }
@@ -3263,7 +3341,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             {
                                                 this.state.orderedErpShipmentsTotalData.map(item1 => {
                                                     if (item1.toString() != "") {
-                                                        return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className={item1.isEmergencyOrder == true ? "emergencyComment hoverTd" : "hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'orderedErpShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                        return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className={item1.isEmergencyOrder == true ? item1.isLocalProcurementAgent == true?"localProcurementAgent emergencyComment hoverTd":"emergencyComment hoverTd" : item1.isLocalProcurementAgent==true?"localProcurementAgent hoverTd":"hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'orderedErpShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                                     } else {
                                                         return (<td align="right" >{item1}</td>)
                                                     }
@@ -3276,7 +3354,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             {
                                                 this.state.plannedErpShipmentsTotalData.map(item1 => {
                                                     if (item1.toString() != "") {
-                                                        return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className={item1.isEmergencyOrder == true ? "emergencyComment hoverTd" : "hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'plannedErpShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                        return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className={item1.isEmergencyOrder == true ? item1.isLocalProcurementAgent == true?"localProcurementAgent emergencyComment hoverTd":"emergencyComment hoverTd" : item1.isLocalProcurementAgent==true?"localProcurementAgent hoverTd":"hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'plannedErpShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                                     } else {
                                                         return (<td align="right" >{item1}</td>)
                                                     }
@@ -3487,7 +3565,7 @@ export default class WhatIfReportComponent extends React.Component {
                             <div id="showConsumptionBatchInfoButtonsDiv" style={{ display: 'none' }}>
                                 <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceledConsumption()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 {this.state.consumptionBatchInfoChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.consumptionChild.saveConsumptionBatchInfo()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBatchInfo')}</Button>}
-                                {this.refs.consumptionChild != undefined && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.refs.consumptionChild.addBatchRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
+                                {this.refs.consumptionChild != undefined && <Button color="info" id="consumptionBatchAddRow" size="md" className="float-right mr-1" type="button" onClick={this.refs.consumptionChild.addBatchRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
                             </div>
                             <div className="pt-4"></div>
                         </ModalBody>
@@ -3672,7 +3750,7 @@ export default class WhatIfReportComponent extends React.Component {
                             <div id="showInventoryBatchInfoButtonsDiv" style={{ display: 'none' }}>
                                 <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceledInventory()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 {this.state.inventoryBatchInfoChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.inventoryChild.saveInventoryBatchInfo()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBatchInfo')}</Button>}
-                                {this.refs.inventoryChild != undefined && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.refs.inventoryChild.addBatchRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
+                                {this.refs.inventoryChild != undefined && <Button id="inventoryBatchAddRow" color="info" size="md" className="float-right mr-1" type="button" onClick={this.refs.inventoryChild.addBatchRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
                             </div>
                             <div className="pt-4"></div>
                         </ModalBody>
@@ -3705,7 +3783,7 @@ export default class WhatIfReportComponent extends React.Component {
                             <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyOrder')}</span></li>
                             <li><span className=" greylegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.doNotIncludeInProjectedShipment')} </span></li>
                         </ul>
-                        <div className="card-header-actions" style={{ marginTop: '-5px' }}>
+                        <div className="card-header-actions" style={{ marginTop: '19px' }}>
                             <a className="card-header-action">
                                 {/* <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggle() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span> */}
                                 <Link to={`/shipment/shipmentDetails/` + this.state.programId + `/0/` + this.state.planningUnitId} target="_blank"><small className="dataEntryLink">{i18n.t('static.supplyplan.shipmentDataEntry')}</small></Link>
@@ -4060,56 +4138,121 @@ export default class WhatIfReportComponent extends React.Component {
 
     actionCanceledShipments(type) {
         if (type == "qtyCalculator") {
-            document.getElementById("showSaveQtyButtonDiv").style.display = 'none';
-            (this.refs.shipmentChild.state.qtyCalculatorTableEl).destroy();
-            (this.refs.shipmentChild.state.qtyCalculatorTableEl1).destroy();
-            this.refs.shipmentChild.state.shipmentQtyChangedFlag = 0;
-            this.setState({
-                qtyCalculatorValidationError: "",
-                shipmentQtyChangedFlag: 0
-            })
+            var cont = false;
+            if (this.state.shipmentQtyChangedFlag == 1) {
+                var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+                if (cf == true) {
+                    cont = true;
+                } else {
+
+                }
+            } else {
+                cont = true;
+            }
+            if (cont == true) {
+                document.getElementById("showSaveQtyButtonDiv").style.display = 'none';
+                (this.refs.shipmentChild.state.qtyCalculatorTableEl).destroy();
+                (this.refs.shipmentChild.state.qtyCalculatorTableEl1).destroy();
+                this.refs.shipmentChild.state.shipmentQtyChangedFlag = 0;
+                this.setState({
+                    qtyCalculatorValidationError: "",
+                    shipmentQtyChangedFlag: 0
+                })
+            }
         } else if (type == "shipmentDates") {
-            document.getElementById("showSaveShipmentsDatesButtonsDiv").style.display = 'none';
-            (this.refs.shipmentChild.state.shipmentDatesTableEl).destroy();
-            this.refs.shipmentChild.state.shipmentDatesChangedFlag = 0;
-            this.setState({
-                shipmentDatesChangedFlag: 0,
-                shipmentDatesError: ""
-            })
+            var cont = false;
+            if (this.state.shipmentDatesChangedFlag == 1) {
+                var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+                if (cf == true) {
+                    cont = true;
+                } else {
+
+                }
+            } else {
+                cont = true;
+            }
+            if (cont == true) {
+                document.getElementById("showSaveShipmentsDatesButtonsDiv").style.display = 'none';
+                (this.refs.shipmentChild.state.shipmentDatesTableEl).destroy();
+                this.refs.shipmentChild.state.shipmentDatesChangedFlag = 0;
+                this.setState({
+                    shipmentDatesChangedFlag: 0,
+                    shipmentDatesError: ""
+                })
+            }
         } else if (type == "shipmentBatch") {
-            document.getElementById("showShipmentBatchInfoButtonsDiv").style.display = 'none';
-            (this.refs.shipmentChild.state.shipmentBatchInfoTableEl).destroy();
-            this.refs.shipmentChild.state.shipmentBatchInfoChangedFlag = 0;
-            this.setState({
-                shipmentBatchInfoChangedFlag: 0,
-                shipmentValidationBatchError: "",
-                shipmentBatchInfoDuplicateError: ""
-            })
+            var cont = false;
+            if (this.state.shipmentBatchInfoChangedFlag == 1) {
+                var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+                if (cf == true) {
+                    cont = true;
+                } else {
+
+                }
+            } else {
+                cont = true;
+            }
+            if (cont == true) {
+                document.getElementById("showShipmentBatchInfoButtonsDiv").style.display = 'none';
+                (this.refs.shipmentChild.state.shipmentBatchInfoTableEl).destroy();
+                this.refs.shipmentChild.state.shipmentBatchInfoChangedFlag = 0;
+                this.setState({
+                    shipmentBatchInfoChangedFlag: 0,
+                    shipmentValidationBatchError: "",
+                    shipmentBatchInfoDuplicateError: ""
+                })
+            }
         }
     }
 
     actionCanceledInventory() {
-        document.getElementById("showInventoryBatchInfoButtonsDiv").style.display = 'none';
-        (this.refs.inventoryChild.state.inventoryBatchInfoTableEl).destroy();
-        this.refs.inventoryChild.state.inventoryBatchInfoChangedFlag = 0;
-        this.setState({
-            inventoryBatchInfoChangedFlag: 0,
-            inventoryBatchInfoDuplicateError: "",
-            inventoryBatchInfoNoStockError: "",
-            inventoryBatchError: ""
-        })
+        var cont = false;
+        if (this.state.inventoryBatchInfoChangedFlag == 1) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
+
+            }
+        } else {
+            cont = true;
+        }
+        if (cont == true) {
+            document.getElementById("showInventoryBatchInfoButtonsDiv").style.display = 'none';
+            (this.refs.inventoryChild.state.inventoryBatchInfoTableEl).destroy();
+            this.refs.inventoryChild.state.inventoryBatchInfoChangedFlag = 0;
+            this.setState({
+                inventoryBatchInfoChangedFlag: 0,
+                inventoryBatchInfoDuplicateError: "",
+                inventoryBatchInfoNoStockError: "",
+                inventoryBatchError: ""
+            })
+        }
     }
 
     actionCanceledConsumption() {
-        document.getElementById("showConsumptionBatchInfoButtonsDiv").style.display = 'none';
-        (this.refs.consumptionChild.state.consumptionBatchInfoTableEl).destroy();
-        this.refs.consumptionChild.state.consumptionBatchInfoChangedFlag = 0;
-        this.setState({
-            consumptionBatchInfoChangedFlag: 0,
-            consumptionBatchInfoDuplicateError: "",
-            consumptionBatchInfoNoStockError: "",
-            consumptionBatchError: ""
-        })
+        var cont = false;
+        if (this.state.consumptionBatchInfoChangedFlag == 1) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
+
+            }
+        } else {
+            cont = true;
+        }
+        if (cont == true) {
+            document.getElementById("showConsumptionBatchInfoButtonsDiv").style.display = 'none';
+            (this.refs.consumptionChild.state.consumptionBatchInfoTableEl).destroy();
+            this.refs.consumptionChild.state.consumptionBatchInfoChangedFlag = 0;
+            this.setState({
+                consumptionBatchInfoChangedFlag: 0,
+                consumptionBatchInfoDuplicateError: "",
+                consumptionBatchInfoNoStockError: "",
+                consumptionBatchError: ""
+            })
+        }
     }
 
 }

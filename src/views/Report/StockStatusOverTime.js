@@ -250,10 +250,10 @@ if(value!=null){
     getCountrylist() {
         // AuthenticationService.setupAxiosInterceptors();
         let realmId = AuthenticationService.getRealmId();
-        RealmCountryService.getRealmCountryrealmIdById(realmId)
+        RealmCountryService.getRealmCountryForProgram(realmId)
             .then(response => {
                 this.setState({
-                    countries: response.data
+                    countries: response.data.map(ele=>ele.realmCountry)
                 })
             }).catch(
                 error => {
@@ -734,7 +734,7 @@ if(value!=null){
                                             sumOfConsumptions += amcArrayFilteredForMonth[amcFilteredArray].consumptionQty
                                         }
                                         var amcCalcualted = 0
-                                        var mos = 0
+                                        var mos = null
                                         if (countAMC > 0 && sumOfConsumptions > 0) {
                                             amcCalcualted = (sumOfConsumptions) / countAMC;
                                             console.log('amcCalcualted', amcCalcualted, ' endingBalance', endingBalance)
@@ -771,7 +771,7 @@ if(value!=null){
                                             "consumptionQty": 0,
                                             "amc": 0,
                                             "amcMonthCount": 0,
-                                            "mos": 0
+                                            "mos": null
                                         }
                                         data.push(json)
 
@@ -922,10 +922,10 @@ addDoubleQuoteToRowContent=(arr)=>{
         csvRow.push('')
         var re;
 
-        var A = [this.addDoubleQuoteToRowContent([i18n.t('static.report.month'),  ((i18n.t('static.planningunit.planningunit')).replaceAll(',', '%20')).replaceAll(' ', '%20'), i18n.t('static.report.stock'), ((i18n.t('static.report.consupmtionqty')).replaceAll(',', '%20')).replaceAll(' ', '%20'), i18n.t('static.report.amc'), ((i18n.t('static.report.noofmonth')).replaceAll(',', '%20')).replaceAll(' ', '%20'), i18n.t('static.report.mos')])]
+        var A = [this.addDoubleQuoteToRowContent([i18n.t('static.report.month'), ((i18n.t('static.report.qatPID')).replaceAll(',', '%20')).replaceAll(' ', '%20'), ((i18n.t('static.planningunit.planningunit')).replaceAll(',', '%20')).replaceAll(' ', '%20'), i18n.t('static.report.stock'), ((i18n.t('static.report.consupmtionqty')).replaceAll(',', '%20')).replaceAll(' ', '%20'), i18n.t('static.report.amc'), ((i18n.t('static.report.noofmonth')).replaceAll(',', '%20')).replaceAll(' ', '%20'), i18n.t('static.report.mos')])]
 
 
-        this.state.matricsList.map(elt => A.push(this.addDoubleQuoteToRowContent([this.dateFormatter(elt.dt).replaceAll(' ', '%20'), ((getLabelText(elt.planningUnit.label, this.state.lang)).replaceAll(',', '%20')).replaceAll(' ', '%20'), elt.stock, elt.consumptionQty, this.formatAmc(elt.amc), elt.amcMonthCount, this.roundN(elt.mos)])));
+        this.state.matricsList.map(elt => A.push(this.addDoubleQuoteToRowContent([this.dateFormatter(elt.dt).replaceAll(' ', '%20'), elt.planningUnit.id,((getLabelText(elt.planningUnit.label, this.state.lang)).replaceAll(',', '%20')).replaceAll(' ', '%20'), elt.stock, elt.consumptionQty, this.formatAmc(elt.amc), elt.amcMonthCount, this.roundN(elt.mos)])));
 
 
         for (var i = 0; i < A.length; i++) {
@@ -1052,10 +1052,10 @@ addDoubleQuoteToRowContent=(arr)=>{
         // doc.addImage(canvasImg, 'png', 50, 130, aspectwidth1, height * 2 / 3);
         doc.addImage(canvasImg, 'png', 50, startYtable, 750, 230, 'CANVAS');
 
-        const headers = [[i18n.t('static.report.month'), i18n.t('static.planningunit.planningunit'), i18n.t('static.report.stock'), i18n.t('static.report.consupmtionqty'), i18n.t('static.report.amc'), i18n.t('static.report.noofmonth'), i18n.t('static.report.mos')]];
+        const headers = [[i18n.t('static.report.month'),i18n.t('static.report.qatPID'), i18n.t('static.planningunit.planningunit'), i18n.t('static.report.stock'), i18n.t('static.report.consupmtionqty'), i18n.t('static.report.amc'), i18n.t('static.report.noofmonth'), i18n.t('static.report.mos')]];
 
         const data = [];
-        this.state.matricsList.map(elt => data.push([this.dateFormatter(elt.dt),  getLabelText(elt.planningUnit.label, this.state.lang), this.formatter(elt.stock), this.formatter(elt.consumptionQty), this.formatter(this.formatAmc(elt.amc)), elt.amcMonthCount, this.roundN(elt.mos)]));
+        this.state.matricsList.map(elt => data.push([this.dateFormatter(elt.dt),elt.planningUnit.id,  getLabelText(elt.planningUnit.label, this.state.lang), this.formatter(elt.stock), this.formatter(elt.consumptionQty), this.formatter(this.formatAmc(elt.amc)), elt.amcMonthCount, this.roundN(elt.mos)]));
         doc.addPage()
         startYtable = 80
         let content = {
@@ -1063,10 +1063,9 @@ addDoubleQuoteToRowContent=(arr)=>{
             startY: startYtable,
             head: headers,
             body: data,
-            styles: { lineWidth: 1, fontSize: 8, cellWidth: 75 },
+            styles: { lineWidth: 1, fontSize: 8, cellWidth: 85 },
             columnStyles: {
-                1: { cellWidth: 151 },
-                2: { cellWidth: 160.89 },
+                2: { cellWidth: 166.89 },
             }
         };
 
@@ -1139,7 +1138,7 @@ addDoubleQuoteToRowContent=(arr)=>{
             '#f86c6b'
         ]
         console.log(this.state.matricsList)
-        var v = this.state.planningUnitValues.map(pu => this.state.matricsList.filter(c => c.planningUnit.id == pu.value).map(ele => this.roundN(ele.mos)))
+        var v = this.state.planningUnitValues.map(pu => this.state.matricsList.filter(c => c.planningUnit.id == pu.value).map(ele => (this.roundN(ele.mos)>48?48:this.roundN(ele.mos))))
         var dts = Array.from(new Set(this.state.matricsList.map(ele => (this.dateFormatter(ele.dt)))))
         console.log(dts)
         const bar = {

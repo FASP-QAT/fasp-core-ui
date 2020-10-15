@@ -97,8 +97,129 @@ export default class AddOrganisationComponent extends Component {
         this.getRealmCountryList = this.getRealmCountryList.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.getDisplayName = this.getDisplayName.bind(this);
 
     }
+
+    getDisplayName() {
+        let realmId = document.getElementById("realmId").value;
+        // let realmId = 1;
+        let organisationValue = document.getElementById("organisationName").value;
+        // let organisationValue = "USAID"
+        organisationValue = organisationValue.replace(/[^A-Za-z0-9]/g, "");
+        organisationValue = organisationValue.trim().toUpperCase();
+        if (realmId != 0 && organisationValue.length != 0) {
+
+            if (organisationValue.length >= 4) {//minus 2
+                organisationValue = organisationValue.slice(0, 2);
+                console.log("DISPLAYNAME-BEF----->", organisationValue);
+                OrganisationService.getOrganisationDisplayName(realmId, organisationValue)
+                    .then(response => {
+                        console.log("DISPLAYNAME-RESP----->", response);
+                        let { organisation } = this.state
+                        organisation.organisationCode = response.data;
+                        this.setState({
+                            organisation
+                        });
+
+                    }).catch(
+                        error => {
+                            if (error.message === "Network Error") {
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
+
+                                    case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
+                                    case 404:
+                                    case 406:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    case 412:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    default:
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                        break;
+                                }
+                            }
+                        }
+                    );
+
+            } else {// not need to minus
+                console.log("DISPLAYNAME-BEF-else----->", organisationValue);
+                OrganisationService.getOrganisationDisplayName(realmId, organisationValue)
+                    .then(response => {
+                        console.log("DISPLAYNAME-RESP-else----->", response);
+                        let { organisation } = this.state
+                        organisation.organisationCode = response.data;
+                        this.setState({
+                            organisation
+                        });
+
+                    }).catch(
+                        error => {
+                            if (error.message === "Network Error") {
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
+
+                                    case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
+                                    case 404:
+                                    case 406:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    case 412:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    default:
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                        break;
+                                }
+                            }
+                        }
+                    );
+            }
+
+        }
+
+    }
+
     dataChange(event) {
         let { organisation } = this.state
         console.log(event.target.name);
@@ -368,7 +489,14 @@ export default class AddOrganisationComponent extends Component {
                                 <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
                             </CardHeader> */}
                             <Formik
-                                initialValues={initialValues}
+                                // initialValues={initialValues}
+                                enableReinitialize={true}
+                                initialValues={{
+                                    organisationName: this.state.organisation.label.label_en,
+                                    organisationCode: this.state.organisation.organisationCode,
+                                    realmId: this.state.organisation.realm.id,
+                                    realmCountryId: this.state.organisation.realmCountryArray
+                                }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
 
@@ -489,6 +617,19 @@ export default class AddOrganisationComponent extends Component {
                                                     </FormGroup>
 
                                                     <FormGroup>
+                                                        <Label htmlFor="organisationName">{i18n.t('static.organisation.organisationname')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Input
+                                                            bsSize="sm"
+                                                            type="text" name="organisationName" valid={!errors.organisationName && this.state.organisation.label.label_en != ''}
+                                                            invalid={touched.organisationName && !!errors.organisationName}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                            onBlur={(e) => { handleBlur(e); this.getDisplayName() }}
+                                                            value={this.state.organisation.label.label_en}
+                                                            id="organisationName" />
+                                                        <FormFeedback className="red">{errors.organisationName}</FormFeedback>
+                                                    </FormGroup>
+
+                                                    <FormGroup>
                                                         <Label htmlFor="organisationCode">{i18n.t('static.organisation.organisationcode')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             bsSize="sm"
@@ -501,18 +642,7 @@ export default class AddOrganisationComponent extends Component {
                                                         <FormFeedback className="red">{errors.organisationCode}</FormFeedback>
                                                     </FormGroup>
 
-                                                    <FormGroup>
-                                                        <Label htmlFor="organisationName">{i18n.t('static.organisation.organisationname')}<span class="red Reqasterisk">*</span></Label>
-                                                        <Input
-                                                            bsSize="sm"
-                                                            type="text" name="organisationName" valid={!errors.organisationName && this.state.organisation.label.label_en != ''}
-                                                            invalid={touched.organisationName && !!errors.organisationName}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.organisation.label.label_en}
-                                                            id="organisationName" />
-                                                        <FormFeedback className="red">{errors.organisationName}</FormFeedback>
-                                                    </FormGroup>
+
 
                                                 </CardBody>
 
@@ -520,7 +650,8 @@ export default class AddOrganisationComponent extends Component {
                                                     <FormGroup>
                                                         <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
                                                         <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                        {/* <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button> */}
+                                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
 
                                                         &nbsp;
                                                     </FormGroup>

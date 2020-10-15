@@ -1,506 +1,3 @@
-// import React, { Component } from 'react';
-// import { Card, CardHeader, Form, CardBody, FormGroup, Input, InputGroup, InputGroupAddon, Label, Button, Col } from 'reactstrap';
-// import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
-// import i18n from '../../i18n'
-// import RegionService from "../../api/RegionService";
-// import AuthenticationService from '../Common/AuthenticationService.js';
-// import getLabelText from '../../CommonComponent/getLabelText';
-// import RealmCountryService from "../../api/RealmCountryService.js";
-
-// import BootstrapTable from 'react-bootstrap-table-next';
-// import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
-// import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
-// import paginationFactory from 'react-bootstrap-table2-paginator';
-// import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-// import pdfIcon from '../../assets/img/pdf.png';
-// import csvicon from '../../assets/img/csv.png'
-
-
-
-// const entityname = i18n.t('static.region.region');
-
-// class RegionListComponent extends Component {
-//     constructor(props) {
-//         super(props);
-//         this.state = {
-//             regionList: [],
-//             message: '',
-//             selRegion: [],
-//             realmCountryList: [],
-//             lang: localStorage.getItem('lang'),
-//             loading: true
-//         }
-//         this.editRegion = this.editRegion.bind(this);
-//         this.addRegion = this.addRegion.bind(this);
-//         this.filterData = this.filterData.bind(this);
-//         this.formatLabel = this.formatLabel.bind(this);
-//     }
-//     filterData() {
-//         let countryId = document.getElementById("realmCountryId").value;
-//         if (countryId != 0) {
-//             const selRegion = this.state.regionList.filter(c => c.realmCountry.realmCountryId == countryId)
-//             this.setState({
-//                 selRegion: selRegion
-//             });
-//         } else {
-//             this.setState({
-//                 selRegion: this.state.regionList
-//             });
-//         }
-//     }
-//     editRegion(region) {
-//         this.props.history.push({
-//             pathname: `/region/editRegion/${region.regionId}`,
-//             // state: { region }
-//         });
-//     }
-//     addRegion(region) {
-//         this.props.history.push({
-//             pathname: "/region/addRegion"
-//         });
-//     }
-
-//     componentDidMount() {
-//         AuthenticationService.setupAxiosInterceptors();
-//         RegionService.getRegionList()
-//             .then(response => {
-//                 console.log("RESP---", response.data);
-
-//                 if (response.status == 200) {
-//                     this.setState({
-//                         regionList: response.data,
-//                         selRegion: [{
-//                             "active": true,
-//                             "regionId": 1,
-//                             "label": {
-//                                 "active": false,
-//                                 "labelId": 41,
-//                                 "label_en": "National level",
-//                                 "label_sp": "",
-//                                 "label_fr": "",
-//                                 "label_pr": ""
-//                             },
-//                             "realmCountry": {
-//                                 "active": false,
-//                                 "realmCountryId": 1,
-//                                 "country": {
-//                                     "active": false,
-//                                     "countryId": 2,
-//                                     "countryCode": "KEN",
-//                                     "label": {
-//                                         "active": false,
-//                                         "labelId": 306,
-//                                         "label_en": "Kenya",
-//                                         "label_sp": "",
-//                                         "label_fr": "",
-//                                         "label_pr": ""
-//                                     },
-//                                     "currency": null
-//                                 },
-//                                 "realm": {
-//                                     "active": false,
-//                                     "realmId": 1,
-//                                     "label": {
-//                                         "active": false,
-//                                         "labelId": 4,
-//                                         "label_en": "USAID",
-//                                         "label_sp": "",
-//                                         "label_fr": "",
-//                                         "label_pr": ""
-//                                     },
-//                                     "realmCode": "UAID",
-//                                     "defaultRealm": false
-//                                 },
-//                                 "defaultCurrency": null
-//                             },
-//                             "gln": '1298769856365',
-//                             "capacityCbm": '40,000',
-//                             "regionIdString": "1",
-//                             "programName": "HIV/AIDS - Kenya - Ministry Of Health   \n HIV/AIDS - Malawi - National ",
-//                         },
-//                         {
-//                             "active": true,
-//                             "regionId": 2,
-//                             "label": {
-//                                 "active": false,
-//                                 "labelId": 42,
-//                                 "label_en": "North",
-//                                 "label_sp": "",
-//                                 "label_fr": "",
-//                                 "label_pr": ""
-//                             },
-//                             "realmCountry": {
-//                                 "active": false,
-//                                 "realmCountryId": 2,
-//                                 "country": {
-//                                     "active": false,
-//                                     "countryId": 3,
-//                                     "countryCode": "MWI",
-//                                     "label": {
-//                                         "active": false,
-//                                         "labelId": 343,
-//                                         "label_en": "Malawi",
-//                                         "label_sp": "",
-//                                         "label_fr": "",
-//                                         "label_pr": ""
-//                                     },
-//                                     "currency": null
-//                                 },
-//                                 "realm": {
-//                                     "active": false,
-//                                     "realmId": 1,
-//                                     "label": {
-//                                         "active": false,
-//                                         "labelId": 4,
-//                                         "label_en": "USAID",
-//                                         "label_sp": "",
-//                                         "label_fr": "",
-//                                         "label_pr": ""
-//                                     },
-//                                     "realmCode": "UAID",
-//                                     "defaultRealm": false
-//                                 },
-//                                 "defaultCurrency": null
-//                             },
-//                             "gln": '6758432123456',
-//                             "capacityCbm": '18,000',
-//                             "regionIdString": "2",
-//                             "programName": "HIV/AIDS - Kenya - Ministry Of Health \n Malaria - Kenya - National",
-//                         },
-//                         {
-//                             "active": true,
-//                             "regionId": 3,
-//                             "label": {
-//                                 "active": false,
-//                                 "labelId": 43,
-//                                 "label_en": "South",
-//                                 "label_sp": "",
-//                                 "label_fr": "",
-//                                 "label_pr": ""
-//                             },
-//                             "realmCountry": {
-//                                 "active": false,
-//                                 "realmCountryId": 2,
-//                                 "country": {
-//                                     "active": false,
-//                                     "countryId": 3,
-//                                     "countryCode": "MWI",
-//                                     "label": {
-//                                         "active": false,
-//                                         "labelId": 343,
-//                                         "label_en": "Malawi",
-//                                         "label_sp": "",
-//                                         "label_fr": "",
-//                                         "label_pr": ""
-//                                     },
-//                                     "currency": null
-//                                 },
-//                                 "realm": {
-//                                     "active": false,
-//                                     "realmId": 1,
-//                                     "label": {
-//                                         "active": false,
-//                                         "labelId": 4,
-//                                         "label_en": "USAID",
-//                                         "label_sp": "",
-//                                         "label_fr": "",
-//                                         "label_pr": ""
-//                                     },
-//                                     "realmCode": "UAID",
-//                                     "defaultRealm": false
-//                                 },
-//                                 "defaultCurrency": null
-//                             },
-//                             "gln": '5678903456789',
-//                             "capacityCbm": '13,500',
-//                             "regionIdString": "3",
-//                             "programName": "HIV/AIDS - Kenya - Ministry Of Health \n Malaria - Kenya - National",
-//                         }
-
-//                         ],
-//                         loading: false
-//                     })
-//                 } else {
-//                     this.setState({ message: response.data.messageCode })
-//                 }
-//             })
-
-//         RealmCountryService.getRealmCountryListAll()
-//             .then(response => {
-//                 if (response.status == 200) {
-//                     this.setState({
-//                         realmCountryList: response.data
-//                     })
-//                 } else {
-//                     this.setState({
-//                         message: response.data.messageCode
-//                     })
-//                 }
-//             })
-//     }
-
-//     formatLabel(cell, row) {
-//         return getLabelText(cell, this.state.lang);
-//     }
-
-//     render() {
-
-//         const { SearchBar, ClearSearchButton } = Search;
-//         const customTotal = (from, to, size) => (
-//             <span className="react-bootstrap-table-pagination-total">
-//                 {i18n.t('static.common.result', { from, to, size })}
-//             </span>
-//         );
-
-//         const { realmCountryList } = this.state;
-//         let realmCountries = realmCountryList.length > 0
-//             && realmCountryList.map((item, i) => {
-//                 return (
-//                     <option key={i} value={item.realmCountryId}>
-//                         {getLabelText(item.country.label, this.state.lang)}
-//                     </option>
-//                 )
-//             }, this);
-
-//         const columns = [
-//             {
-//                 dataField: 'realmCountry.country.label',
-//                 text: i18n.t('static.region.country'),
-//                 sort: true,
-//                 align: 'center',
-//                 headerAlign: 'center',
-//                 formatter: this.formatLabel,
-//                 style: { width: '80px' },
-//             },
-//             {
-//                 dataField: 'label',
-//                 text: i18n.t('static.region.region'),
-//                 sort: true,
-//                 align: 'center',
-//                 headerAlign: 'center',
-//                 formatter: this.formatLabel,
-//                 style: { width: '80px' },
-//             },
-//             {
-//                 dataField: 'programName',
-//                 text: i18n.t('static.program.program'),
-//                 sort: true,
-//                 align: 'center',
-//                 headerAlign: 'center',
-//                 style: { width: '80px' },
-//             },
-//             {
-//                 dataField: 'gln',
-//                 text: i18n.t('static.region.gln'),
-//                 sort: true,
-//                 align: 'center',
-//                 headerAlign: 'center',
-//                 style: { width: '10px' },
-//             },
-//             {
-//                 dataField: 'capacityCbm',
-//                 text: 'Capacity (CBM)',
-//                 sort: true,
-//                 align: 'center',
-//                 headerAlign: 'center',
-//                 style: { width: '10px' },
-//             }
-
-//         ];
-//         const options = {
-//             hidePageListOnlyOnePage: true,
-//             firstPageText: i18n.t('static.common.first'),
-//             prePageText: i18n.t('static.common.back'),
-//             nextPageText: i18n.t('static.common.next'),
-//             lastPageText: i18n.t('static.common.last'),
-//             nextPageTitle: i18n.t('static.common.firstPage'),
-//             prePageTitle: i18n.t('static.common.prevPage'),
-//             firstPageTitle: i18n.t('static.common.nextPage'),
-//             lastPageTitle: i18n.t('static.common.lastPage'),
-//             showTotal: true,
-//             paginationTotalRenderer: customTotal,
-//             disablePageTitle: true,
-//             sizePerPageList: [{
-//                 text: '10', value: 10
-//             }, {
-//                 text: '30', value: 30
-//             }
-//                 ,
-//             {
-//                 text: '50', value: 50
-//             },
-//             {
-//                 text: 'All', value: this.state.selRegion.length
-//             }]
-//         }
-//         return (
-//             <div className="animated">
-//                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
-//                     this.setState({ message: message })
-//                 }} />
-//                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
-//                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
-//                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
-//                     <CardHeader className="mb-md-3 pb-lg-1">
-//                         <i className="icon-menu"></i><strong>Warehouse Capacity Report</strong>{' '}
-//                         <div className="card-header-actions">
-//                             <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF()} />
-//                             <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
-//                         </div>
-//                     </CardHeader>
-//                     <CardBody className="pb-lg-0">
-
-//                         {/* <Form >
-//                             <Col md="12 pl-0">
-//                                 <div className="row">
-//                                     <FormGroup className="col-md-3">
-//                                         <Label htmlFor="countrysId">{i18n.t('static.program.realmcountry')}</Label>
-//                                         <InputGroup>
-//                                             <Input
-//                                                 type="select"
-//                                                 name="realmCountryId"
-//                                                 id="realmCountryId"
-//                                                 bsSize="sm"
-//                                                 onChange={this.filterData}
-//                                             >
-//                                                 <option value="0">{i18n.t('static.common.all')}</option>
-//                                                 {realmCountries}
-//                                             </Input>
-//                                         </InputGroup>
-//                                     </FormGroup>
-
-//                                     <FormGroup className="col-md-3">
-//                                         <Label htmlFor="countrysId">Program</Label>
-//                                         <InputGroup>
-//                                             <Input
-//                                                 type="select"
-//                                                 name="realmCountryId"
-//                                                 id="realmCountryId"
-//                                                 bsSize="sm"
-//                                                 onChange={this.filterData}
-//                                             >
-//                                                 <option value="0">{i18n.t('static.common.all')}</option>
-//                                                 {realmCountries}
-//                                             </Input>
-//                                         </InputGroup>
-//                                     </FormGroup>
-
-//                                 </div>
-//                             </Col>
-//                         </Form> */}
-
-//                         <Col md="6 pl-0">
-//                             <div className="d-md-flex Selectdiv2">
-//                                 <FormGroup>
-//                                     <Label htmlFor="appendedInputButton">{i18n.t('static.region.country')}</Label>
-//                                     <div className="controls SelectGo">
-//                                         <InputGroup>
-//                                             <Input
-//                                                 type="select"
-//                                                 name="realmCountryId"
-//                                                 id="realmCountryId"
-//                                                 bsSize="sm"
-//                                                 onChange={this.filterData}
-//                                             >
-//                                                 <option value="0">{i18n.t('static.common.all')}</option>
-//                                                 {realmCountries}
-//                                             </Input>
-
-//                                         </InputGroup>
-//                                     </div>
-//                                 </FormGroup>
-
-//                                 <FormGroup className="tab-ml-1">
-//                                     <Label htmlFor="appendedInputButton">Program</Label>
-//                                     <div className="controls SelectGo">
-//                                         <InputGroup>
-//                                             <Input
-//                                                 type="select"
-//                                                 name="realmCountryId"
-//                                                 id="realmCountryId"
-//                                                 bsSize="sm"
-//                                                 onChange={this.filterData}
-//                                             >
-//                                                 <option value="0">{i18n.t('static.common.all')}</option>
-//                                                 {/* <option value="1" selected>HIV/AIDS - Malawi - Ministry Of Health</option> */}
-//                                             </Input>
-
-//                                         </InputGroup>
-//                                     </div>
-//                                 </FormGroup>
-
-//                                 {/* <FormGroup className="tab-ml-1">
-//                                     <Label htmlFor="appendedInputButton">Version</Label>
-//                                     <div className="controls SelectGo">
-//                                         <InputGroup>
-//                                             <Input
-//                                                 type="select"
-//                                                 name="realmCountryId"
-//                                                 id="realmCountryId"
-//                                                 bsSize="sm"
-//                                                 onChange={this.filterData}
-//                                             >
-//                                                 <option value="0">{i18n.t('static.common.all')}</option>
-//                                                 <option value="1" selected>6</option>
-//                                             </Input>
-
-//                                         </InputGroup>
-//                                     </div>
-//                                 </FormGroup> */}
-//                             </div>
-//                         </Col>
-
-
-//                         <ToolkitProvider
-//                             keyField="regionId"
-//                             data={this.state.selRegion}
-//                             columns={columns}
-//                             search={{ searchFormatted: true }}
-//                             hover
-//                             filter={filterFactory()}
-//                         >
-//                             {
-//                                 props => (
-
-//                                     <div className="TableCust">
-//                                         <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
-//                                             <SearchBar {...props.searchProps} />
-//                                             <ClearSearchButton {...props.searchProps} />
-//                                         </div>
-//                                         <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
-//                                             pagination={paginationFactory(options)}
-//                                             /* rowEvents={{
-//                                                  onClick: (e, row, rowIndex) => {
-//                                                      this.editRegion(row);
-//                                                  }
-//                                              }}*/
-//                                             {...props.baseProps}
-//                                         />
-//                                     </div>
-//                                 )
-//                             }
-//                         </ToolkitProvider>
-//                     </CardBody>
-//                 </Card>
-//                 <div style={{ display: this.state.loading ? "block" : "none" }}>
-//                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-//                         <div class="align-items-center">
-//                             <div ><h4> <strong>Loading...</strong></h4></div>
-
-//                             <div class="spinner-border blue ml-4" role="status">
-
-//                             </div>
-//                         </div>
-//                     </div>
-//                 </div>
-//             </div>
-//         );
-//     }
-// }
-// export default RegionListComponent;
-
-
-
 import React, { Component, lazy, Suspense, DatePicker } from 'react';
 import { Bar, Line, Pie } from 'react-chartjs-2';
 import { Link } from 'react-router-dom';
@@ -567,6 +64,8 @@ class warehouseCapacity extends Component {
             lang: localStorage.getItem('lang'),
             programValues: [],
             programLabels: [],
+            countryValues: [],
+            countryLabels: [],
             loading: true
 
         };
@@ -600,8 +99,8 @@ class warehouseCapacity extends Component {
         var csvRow = [];
 
         if (navigator.onLine) {
-            csvRow.push(i18n.t('static.program.realmcountry') + ' , ' + (document.getElementById("countryId").selectedOptions[0].text).replaceAll(' ', '%20'))
-            // csvRow.push(i18n.t('static.program.program') + ' , ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20'))
+            this.state.countryLabels.map(ele =>
+                csvRow.push(i18n.t('static.dashboard.country') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
             csvRow.push('')
             this.state.programLabels.map(ele =>
                 csvRow.push(i18n.t('static.program.program') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
@@ -699,11 +198,16 @@ class warehouseCapacity extends Component {
                     doc.setFont('helvetica', 'normal')
 
                     if (navigator.onLine) {
-
-                        doc.text(i18n.t('static.program.realmcountry') + ' : ' + document.getElementById("countryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 90, {
-                            align: 'left'
-                        })
-
+var y=90
+                        var planningText = doc.splitTextToSize(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.join('; '), doc.internal.pageSize.width * 3 / 4);
+                        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+                        for (var i = 0; i < planningText.length; i++) {
+                          if (y > doc.internal.pageSize.height - 100) {
+                            doc.addPage();
+                            y = 80;
+                    
+                          }
+                        }
                         // doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
                         //     align: 'left'
                         // })
@@ -712,7 +216,7 @@ class warehouseCapacity extends Component {
                         // doc.text(doc.internal.pageSize.width / 8, 110, programText)
 
                         var programText = doc.splitTextToSize((i18n.t('static.program.program') + ' : ' + this.state.programLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-                        doc.text(doc.internal.pageSize.width / 8, 110, programText)
+                        doc.text(doc.internal.pageSize.width / 8, y, programText)
 
                     } else {
                         doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programIdOffline").selectedOptions[0].text, doc.internal.pageSize.width / 8, 90, {
@@ -790,10 +294,10 @@ let data=this.state.data.map(elt=>[getLabelText(elt.realmCountry.label, this.sta
     getCountrylist() {
         // AuthenticationService.setupAxiosInterceptors();
         let realmId = AuthenticationService.getRealmId();
-        RealmCountryService.getRealmCountryrealmIdById(realmId)
+        RealmCountryService.getRealmCountryForProgram(realmId)
             .then(response => {
                 this.setState({
-                    countries: response.data, loading: false
+                    countries: response.data.map(ele=>ele.realmCountry), loading: false
                 })
             }).catch(
                 error => {
@@ -821,31 +325,51 @@ let data=this.state.data.map(elt=>[getLabelText(elt.realmCountry.label, this.sta
 
     }
     filterProgram = () => {
-        let countryId = document.getElementById("countryId").value;
+        let countryIds = this.state.countryValues.map(ele=>ele.value);
+        console.log('countryIds',countryIds,'programs',this.state.programs)
         this.setState({
             programLst: [],
             programValues: [],
             programLabels: []
         }, () => {
-            if (countryId != 0) {
-                const programLst = this.state.programs.filter(c => c.realmCountry.realmCountryId == countryId)
+            if (countryIds.length != 0) {
+                let programLst =[];
+                 for(var i=0;i<countryIds.length;i++){
+                     programLst=[...programLst,...this.state.programs.filter(c => c.realmCountry.realmCountryId == countryIds[i])]
+                    }
+
+                console.log('programLst',programLst)
                 if (programLst.length > 0) {
 
                     this.setState({
                         programLst: programLst
                     }, () => {
-                        // this.fetchData() 
+                         this.fetchData() 
                     });
                 } else {
                     this.setState({
                         programLst: []
-                    });
+                    },() => {
+                        this.fetchData() 
+                   });
                 }
             }
-            this.fetchData();
+         
         })
     }
+    handleChange(countrysId) {
 
+        countrysId = countrysId.sort(function (a, b) {
+          return parseInt(a.value) - parseInt(b.value);
+        })
+        this.setState({
+          countryValues: countrysId.map(ele => ele),
+          countryLabels: countrysId.map(ele => ele.label)
+        }, () => {
+    this.filterProgram()
+      
+        })
+      }
     handleChangeProgram(programIds) {
         programIds = programIds.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
@@ -941,15 +465,14 @@ let data=this.state.data.map(elt=>[getLabelText(elt.realmCountry.label, this.sta
         if (navigator.onLine) {
 
             let programId = this.state.programValues.length == this.state.programs.length ? [] : this.state.programValues.map(ele => (ele.value).toString());
-            let countryId = document.getElementById("countryId").value;
-
+            let CountryIds = this.state.countryValues.length == this.state.countries.length ? [] : this.state.countryValues.map(ele => (ele.value).toString());
+    
             console.log("programId---", programId);
-            console.log("countryId---", countryId);
-            if (this.state.programValues.length > 0 && countryId > 0) {
+            if (this.state.programValues.length > 0 && this.state.countryValues.length > 0) {
                 this.setState({ loading: true })
                 // AuthenticationService.setupAxiosInterceptors();
                 let inputjson = {
-                    realmCountryId: countryId,
+                    realmCountryIds: CountryIds,
                     programIds: programId
                 }
                 ReportService.wareHouseCapacityExporttList(inputjson)
@@ -993,7 +516,7 @@ let data=this.state.data.map(elt=>[getLabelText(elt.realmCountry.label, this.sta
                     this.el = jexcel(document.getElementById("tableDiv"), '');
                     this.el.destroy();
                 });
-            } else if (countryId == 0) {
+            } else if (this.state.countryValues.length == 0) {
                 this.setState({ message: i18n.t('static.healtharea.countrytext'), data: [] }, () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
                     this.el.destroy();
@@ -1204,12 +727,7 @@ let data=this.state.data.map(elt=>[getLabelText(elt.realmCountry.label, this.sta
         const { offlinePrograms } = this.state;
         const { countries } = this.state;
         let countryList = countries.length > 0 && countries.map((item, i) => {
-            return (
-                <option key={i} value={item.realmCountryId}>
-                    {getLabelText(item.country.label, this.state.lang)}
-                </option>
-            )
-
+            return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
         }, this);
 
         return (
@@ -1246,26 +764,27 @@ let data=this.state.data.map(elt=>[getLabelText(elt.realmCountry.label, this.sta
                                     <div className="pl-0">
                                         <div className="row">
                                             <Online>
-                                                <FormGroup className="col-md-3">
-                                                    <Label htmlFor="countryId">{i18n.t('static.program.realmcountry')}<span className="red Reqasterisk">*</span></Label>
-                                                    <div className="controls edit">
-                                                        <InputGroup>
-                                                            <Input
-                                                                type="select"
-                                                                bsSize="sm"
-                                                                name="countryId"
-                                                                id="countryId"
-                                                                onChange={(e) => { this.filterProgram(); }}
-                                                            >  <option value="0">{i18n.t('static.common.select')}</option>
-                                                                {countryList}</Input>
-                                                            {!!this.props.error &&
-                                                                this.props.touched && (
-                                                                    <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
-                                                                )}
-                                                        </InputGroup>
+                                            <FormGroup className="col-md-3">
+                      <Label htmlFor="countrysId">{i18n.t('static.program.realmcountry')}</Label>
+                      <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
 
-                                                    </div>
-                                                </FormGroup>
+                      <div className="controls edit">
+                        <MultiSelect
+
+                          bsSize="sm"
+                          name="countrysId"
+                          id="countrysId"
+                          value={this.state.countryValues}
+                          onChange={(e) => { this.handleChange(e) }}
+                          options={countryList && countryList.length > 0 ? countryList : []}
+                        />
+                        {!!this.props.error &&
+                          this.props.touched && (
+                            <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
+                          )}
+                      </div>
+
+                    </FormGroup>
                                             </Online>
                                             <Online>
 
@@ -1344,7 +863,7 @@ let data=this.state.data.map(elt=>[getLabelText(elt.realmCountry.label, this.sta
                                     </div>
                                 </Form>
 
-                                <Col md="12 pl-0">
+                                {/* <div className="werehousecapacitySearchposition"> */}
                                     <div id="tableDiv" className="jexcelremoveReadonlybackground"> </div>
                                     {/*  <div className="row">
                                         <div className="col-md-12">
@@ -1389,7 +908,7 @@ let data=this.state.data.map(elt=>[getLabelText(elt.realmCountry.label, this.sta
                                         </div>
                                     </div>*/}
 
-                                </Col>
+                                {/* </div> */}
                             </div>
                         </div>
                     </CardBody>

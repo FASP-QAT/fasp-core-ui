@@ -16,7 +16,7 @@ import { ALPHABET_NUMBER_REGEX, SPACE_REGEX } from '../../Constants.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import classNames from 'classnames';
 
-const initialValues = {
+let initialValues = {
     username: "",
     realmId: [],
     emailId: "",
@@ -299,9 +299,16 @@ class AddUserComponent extends Component {
         LanguageService.getLanguageList()
             .then(response => {
                 if (response.status == 200) {
+                    let { user } = this.state;
+                    user.language.languageId = (response.data.length == 1 ? response.data[0].languageId : "")
                     this.setState({
                         languages: response.data, loading: false
-                    })
+                    },
+                        () => {
+                            initialValues = {
+                                languageId: (response.data.length == 1 ? response.data[0].languageId : "")
+                            }
+                        })
                 } else {
                     this.setState({
                         message: response.data.messageCode, loading: false
@@ -355,9 +362,16 @@ class AddUserComponent extends Component {
         RealmService.getRealmListAll()
             .then(response => {
                 if (response.status == 200) {
+                    let { user } = this.state;
+                    user.realm.realmId = (response.data.length == 1 ? response.data[0].realmId : "")
                     this.setState({
                         realms: response.data, loading: false
-                    })
+                    },
+                        () => {
+                            initialValues = {
+                                realmId: (response.data.length == 1 ? response.data[0].realmId : "")
+                            }
+                        })
                 } else {
                     this.setState({
                         message: response.data.messageCode, loading: false
@@ -411,6 +425,8 @@ class AddUserComponent extends Component {
         UserService.getRoleList()
             .then(response => {
                 if (response.status == 200) {
+                    let { user } = this.state;
+                    user.roles = (response.data.length == 1 ? response.data[0].roleId : "")
                     var roleList = [];
                     for (var i = 0; i < response.data.length; i++) {
                         roleList[i] = { value: response.data[i].roleId, label: getLabelText(response.data[i].label, this.state.lang) }
@@ -418,7 +434,12 @@ class AddUserComponent extends Component {
                     this.setState({
                         roleList,
                         loading: false
-                    })
+                    },
+                        () => {
+                            initialValues = {
+                                roleId: (response.data.length == 1 ? response.data[0].roleId : "")
+                            }
+                        })
                 } else {
                     this.setState({
                         message: response.data.messageCode, loading: false
@@ -505,6 +526,7 @@ class AddUserComponent extends Component {
                                 <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
                             </CardHeader> */}
                             <Formik
+                                enableReinitialize={true}
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -644,8 +666,8 @@ class AddUserComponent extends Component {
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="emailId">{i18n.t('static.user.emailid')}<span class="red Reqasterisk">*</span></Label>
-                                                        <Input type="text"
-                                                            autocomplete="off"
+                                                        <Input type="search"
+                                                            // autocomplete="false"
                                                             name="emailId"
                                                             id="emailId"
                                                             bsSize="sm"

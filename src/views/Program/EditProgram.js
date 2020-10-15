@@ -37,7 +37,8 @@ let initialValues = {
     arrivedToDeliveredLeadTime: '',
     healthAreaId: '',
     programNotes: '',
-    regionId: []
+    regionId: [],
+    uniqueCode: ''
 }
 
 const validationSchema = function (values) {
@@ -54,45 +55,49 @@ const validationSchema = function (values) {
         userId: Yup.string()
             .required(i18n.t('static.program.validmanagertext')),
         airFreightPerc: Yup.string()
+            // .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount'))
+            .matches(/^\s*(?=.*[1-9])\d{1,2}(?:\.\d{1,2})?\s*$/, i18n.t('static.message.2digitDecimal'))
             .required(i18n.t('static.program.validairfreighttext'))
-            .min(0, i18n.t('static.program.validvaluetext'))
-            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
+            .min(0, i18n.t('static.program.validvaluetext')),
         seaFreightPerc: Yup.string()
+            .matches(/^\s*(?=.*[1-9])\d{1,2}(?:\.\d{1,2})?\s*$/, i18n.t('static.message.2digitDecimal'))
             .required(i18n.t('static.program.validseafreighttext'))
-            .min(0, i18n.t('static.program.validvaluetext'))
-            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
+            .min(0, i18n.t('static.program.validvaluetext')),
         // deliveredToReceivedLeadTime: Yup.number()
         //     .required(i18n.t('static.program.validdelivertoreceivetext')).min(0, i18n.t('static.program.validvaluetext')),
         plannedToSubmittedLeadTime: Yup.string()
+            .matches(/^\s*(?=.*[1-9])\d{1,2}(?:\.\d{1,2})?\s*$/, i18n.t('static.message.2digitDecimal'))
             .required(i18n.t('static.program.validplantosubmittext'))
-            .min(0, i18n.t('static.program.validvaluetext'))
-            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
+            .min(0, i18n.t('static.program.validvaluetext')),
         submittedToApprovedLeadTime: Yup.string()
+            .matches(/^\s*(?=.*[1-9])\d{1,2}(?:\.\d{1,2})?\s*$/, i18n.t('static.message.2digitDecimal'))
             .required(i18n.t('static.program.validsubmittoapprovetext'))
-            .min(0, i18n.t('static.program.validvaluetext'))
-            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
+            .min(0, i18n.t('static.program.validvaluetext')),
         approvedToShippedLeadTime: Yup.string()
+            .matches(/^\s*(?=.*[1-9])\d{1,2}(?:\.\d{1,2})?\s*$/, i18n.t('static.message.2digitDecimal'))
             .required(i18n.t('static.program.validapprovetoshiptext'))
-            .min(0, i18n.t('static.program.validvaluetext'))
-            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
+            .min(0, i18n.t('static.program.validvaluetext')),
         shippedToArrivedByAirLeadTime: Yup.string()
+            .matches(/^\s*(?=.*[1-9])\d{1,2}(?:\.\d{1,2})?\s*$/, i18n.t('static.message.2digitDecimal'))
             .required(i18n.t('static.program.validapprovetoshiptext'))
-            .min(0, i18n.t('static.program.validvaluetext'))
-            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
+            .min(0, i18n.t('static.program.validvaluetext')),
         shippedToArrivedBySeaLeadTime: Yup.string()
+            .matches(/^\s*(?=.*[1-9])\d{1,2}(?:\.\d{1,2})?\s*$/, i18n.t('static.message.2digitDecimal'))
             .required(i18n.t('static.program.validapprovetoshiptext'))
-            .min(0, i18n.t('static.program.validvaluetext'))
-            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
+            .min(0, i18n.t('static.program.validvaluetext')),
         arrivedToDeliveredLeadTime: Yup.string()
+            .matches(/^\s*(?=.*[1-9])\d{1,2}(?:\.\d{1,2})?\s*$/, i18n.t('static.message.2digitDecimal'))
             .required(i18n.t('static.program.validapprovetoshiptext'))
-            .min(0, i18n.t('static.program.validvaluetext'))
-            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
+            .min(0, i18n.t('static.program.validvaluetext')),
         healthAreaId: Yup.string()
             .required(i18n.t('static.program.validhealthareatext')),
         // programNotes: Yup.string()
         //     .required(i18n.t('static.program.validnotestext'))
         regionId: Yup.string()
-            .required(i18n.t('static.common.regiontext'))
+            .required(i18n.t('static.common.regiontext')),
+        // uniqueCode: Yup.string()
+        //     .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly'))
+        //     .required(i18n.t('static.programOnboarding.validprogramCode')),
     })
 }
 
@@ -123,7 +128,9 @@ export default class EditProgram extends Component {
         super(props);
         this.state = {
             // program: this.props.location.state.program,
+            uniqueCode: '',
             program: {
+                programCode: '<%RC%>-<%TA%>-<%OR%>-',
                 label: {
                     label_en: '',
                     label_sp: '',
@@ -241,8 +248,12 @@ export default class EditProgram extends Component {
         // AuthenticationService.setupAxiosInterceptors();
         ProgramService.getProgramById(this.props.match.params.programId).then(response => {
             console.log("program obj===>", response.data);
+            var programCode = response.data.programCode;
+            var splitCode = programCode.split("-");
+            var uniqueCode = splitCode[3];
             this.setState({
-                program: response.data, loading: false
+                program: response.data, loading: false,
+                uniqueCode: uniqueCode
             })
             // initialValues = {
             //     programName: getLabelText(this.state.program.label, lang),
@@ -469,6 +480,13 @@ export default class EditProgram extends Component {
         } if (event.target.name == 'userId') {
             program.programManager.userId = event.target.value;
         }
+        if (event.target.name == 'uniqueCode') {
+            var dname = this.state.program.programCode;
+            var email_array = dname.split('-');
+            var new_string = email_array[3];
+            program.programCode = dname.replace(new_string, "").concat(event.target.value.toUpperCase());
+            this.state.uniqueCode = event.target.value.toUpperCase()
+        }
         else if (event.target.name == 'programNotes') {
             program.programNotes = event.target.value;
         }
@@ -493,7 +511,8 @@ export default class EditProgram extends Component {
             shippedToArrivedBySeaLeadTime: true,
             arrivedToDeliveredLeadTime: true,
             healthAreaId: true,
-            regionId: true
+            regionId: true,
+            // uniqueCode:''
         }
         )
         this.validateForm(errors)
@@ -664,6 +683,24 @@ export default class EditProgram extends Component {
                                                             id="programCode" />
                                                         <FormFeedback>{errors.programCode}</FormFeedback>
                                                     </FormGroup>
+
+                                                    {/* <FormGroup>
+                                                        <Label htmlFor="company">{i18n.t('static.programOnboarding.programCode')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Input
+                                                            type="text"
+                                                            name="uniqueCode"
+                                                            bsSize="sm"
+                                                            onBlur={handleBlur}
+                                                            valid={!errors.uniqueCode && this.state.uniqueCode != ''}
+                                                            invalid={touched.uniqueCode && !!errors.uniqueCode}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            id="uniqueCode"
+                                                            value={this.state.uniqueCode}
+                                                            required
+                                                            maxLength={6}
+                                                        />
+                                                        <FormFeedback className="red">{errors.uniqueCode}</FormFeedback>
+                                                    </FormGroup> */}
 
                                                     <FormGroup>
 
@@ -976,8 +1013,12 @@ export default class EditProgram extends Component {
     resetClicked() {
         // AuthenticationService.setupAxiosInterceptors();
         ProgramService.getProgramById(this.props.match.params.programId).then(response => {
+            var programCode = response.data.programCode;
+            var splitCode = programCode.split("-");
+            var uniqueCode = splitCode[3];
             this.setState({
-                program: response.data
+                program: response.data,
+                uniqueCode: uniqueCode
             })
             initialValues = {
                 programName: getLabelText(this.state.program.label, lang),
@@ -996,7 +1037,8 @@ export default class EditProgram extends Component {
                 arrivedToDeliveredLeadTime: this.state.program.arrivedToDeliveredLeadTime,
                 healthAreaId: this.state.program.healthArea.id,
                 programNotes: this.state.program.programNotes,
-                regionArray: this.state.program.regionArray
+                regionArray: this.state.program.regionArray,
+                uniqueCode: this.state.uniqueCode
             }
             // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramManagerList(response.data.realmCountry.realm.realmId)
