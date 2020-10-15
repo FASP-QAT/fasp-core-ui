@@ -276,26 +276,6 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         editable: consumptionEditable,
                         onchange: this.consumptionChanged,
                         updateTable: function (el, cell, x, y, source, value, id) {
-                            var elInstance = el.jexcel;
-                            var rowData = elInstance.getRowData(y);
-                            var lastEditableDate = "";
-                            if (rowData[2] == 1) {
-                                lastEditableDate = moment(Date.now()).subtract(ACTUAL_CONSUMPTION_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
-                            } else {
-                                lastEditableDate = moment(Date.now()).subtract(FORECASTED_CONSUMPTION_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
-                            }
-                            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O']
-                            if (moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD")) {
-                                for (var c = 0; c < colArr.length; c++) {
-                                    var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
-                                    cell.classList.add('readonly');
-                                }
-                            } else {
-                                for (var c = 0; c < colArr.length; c++) {
-                                    var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
-                                    cell.classList.remove('readonly');
-                                }
-                            }
                         }.bind(this),
                         contextMenu: function (obj, x, y, e) {
                             var items = [];
@@ -353,10 +333,12 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                                             consumptionBatchEditable = false;
                                         }
                                         document.getElementById("showConsumptionBatchInfoButtonsDiv").style.display = 'block';
-                                        if (consumptionBatchEditable == false) {
-                                            document.getElementById("consumptionBatchAddRow").style.display = "none";
-                                        }else{
-                                            document.getElementById("consumptionBatchAddRow").style.display = "block";
+                                        if (this.props.consumptionPage != "supplyPlanCompare") {
+                                            if (consumptionBatchEditable == false) {
+                                                document.getElementById("consumptionBatchAddRow").style.display = "none";
+                                            } else {
+                                                document.getElementById("consumptionBatchAddRow").style.display = "block";
+                                            }
                                         }
                                         for (var sb = 0; sb < batchInfo.length; sb++) {
                                             var data = [];
@@ -569,6 +551,33 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         tr.children[4].classList.add('AsteriskTheadtrTd');
         tr.children[5].classList.add('AsteriskTheadtrTd');
         tr.children[6].classList.add('AsteriskTheadtrTd');
+
+        var elInstance = instance.jexcel;
+        console.log("Y--->", y)
+        var json = elInstance.getJson();
+        for (var z = 0; z < json.length; z++) {
+            var rowData = elInstance.getRowData(z);
+            console.log("RowData", rowData);
+            var lastEditableDate = "";
+            if (rowData[2] == 1) {
+                lastEditableDate = moment(Date.now()).subtract(ACTUAL_CONSUMPTION_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
+            } else {
+                lastEditableDate = moment(Date.now()).subtract(FORECASTED_CONSUMPTION_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
+            }
+            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O']
+            if (rowData[12] != -1 && moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD")) {
+                for (var c = 0; c < colArr.length; c++) {
+                    var cell = elInstance.getCell((colArr[c]).concat(parseInt(z) + 1))
+                    cell.classList.add('readonly');
+                }
+            } else {
+                // for (var c = 0; c < colArr.length; c++) {
+                //     var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
+                //     cell.classList.remove('readonly');
+                // }
+            }
+
+        }
         // (instance.jexcel).orderBy(0, 0);
     }
 
@@ -628,7 +637,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                 for (var b = 0; b < batchDetails.length; b++) {
                     consumptionBatchQty += parseInt(batchDetails[b].consumptionQty);
                 }
-                if (parseInt(rowData[5]) < parseInt(consumptionBatchQty)) {
+                if (batchDetails.length > 0 && parseInt(rowData[5]) < parseInt(consumptionBatchQty)) {
                     inValid("F", y, i18n.t('static.consumption.missingBatch'), elInstance);
                     valid = false;
                 } else {
@@ -643,7 +652,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             for (var b = 0; b < batchDetails.length; b++) {
                 consumptionBatchQty += batchDetails[b].consumptionQty;
             }
-            if (parseInt(rowData[5]) < parseInt(consumptionBatchQty)) {
+            if (batchDetails.length > 0 && parseInt(rowData[5]) < parseInt(consumptionBatchQty)) {
                 inValid("F", y, i18n.t('static.consumption.missingBatch'), elInstance);
                 valid = false;
             } else {
@@ -695,7 +704,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         // } else {
         //     mylist = this.state.batchInfoList.filter(c => (c.id == -1) || (moment(c.expiryDate).format("YYYY-MM-DD") > moment(date).format("YYYY-MM-DD") && moment(c.createdDate).format("YYYY-MM-DD") <= moment(date).format("YYYY-MM-DD")));
         // }
-        mylist = this.state.batchInfoList.filter(c => c.id == 0 || c.id != -1 && (moment(c.expiryDate).format("YYYY-MM-DD") > moment(date).format("YYYY-MM-DD") && moment(c.createdDate).format("YYYY-MM-DD") <= moment(date).format("YYYY-MM-DD")));
+        mylist = this.state.batchInfoList.filter(c => c.id == 0 || c.id != -1 && (moment(c.expiryDate).format("YYYY-MM") > moment(date).format("YYYY-MM") && moment(c.createdDate).format("YYYY-MM") <= moment(date).format("YYYY-MM")));
         return mylist;
     }.bind(this)
 
@@ -865,7 +874,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                             autoGenerated: 0,
                             planningUnitId: parseInt(document.getElementById("planningUnitId").value),
                             expiryDate: moment(map.get("1")).format("YYYY-MM-DD"),
-                            createdDate: null
+                            createdDate: this.state.batchInfoList.filter(c => c.name == elInstance.getCell(`A${parseInt(i) + 1}`).innerText)[0].createdDate
                         },
                         consumptionQty: parseInt(map.get("2").toString().replaceAll("\,", "")),
                     }
@@ -1042,7 +1051,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                     for (var b = 0; b < batchDetails.length; b++) {
                         consumptionBatchQty += batchDetails[b].consumptionQty;
                     }
-                    if (parseInt(rowData[5]) < parseInt(consumptionBatchQty)) {
+                    if (batchDetails.length > 0 && parseInt(rowData[5]) < parseInt(consumptionBatchQty)) {
                         inValid("F", y, i18n.t('static.consumption.missingBatch'), elInstance);
                         valid = false;
                     } else {

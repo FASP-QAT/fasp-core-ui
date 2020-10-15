@@ -239,7 +239,8 @@ export default class AddRealmComponent extends Component {
                                                         case 404:
                                                         case 406:
                                                             this.setState({
-                                                                message: error.response.data.messageCode,
+                                                                // message: error.response.data.messageCode,
+                                                                message: i18n.t('static.message.alreadExists'),
                                                                 loading: false
                                                             });
                                                             break;
