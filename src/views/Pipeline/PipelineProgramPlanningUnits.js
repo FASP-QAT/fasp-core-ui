@@ -8,6 +8,7 @@ import { jExcelLoadedFunction, jExcelLoadedFunctionPipeline } from '../../Common
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { JEXCEL_DEFAULT_PAGINATION,JEXCEL_PAGINATION_OPTION} from '../../Constants.js';
 export default class PipelineProgramPlanningUnits extends Component {
     constructor(props) {
         super(props);
@@ -740,12 +741,13 @@ export default class PipelineProgramPlanningUnits extends Component {
                                                         source: [{ id: true, name: i18n.t('static.common.active') }, { id: false, name: i18n.t('static.common.disabled') }]
                                                     }
                                                 ],
-                                                pagination: 10,
-                                                search: true,
+                                                pagination:JEXCEL_DEFAULT_PAGINATION,
+                                                contextMenu: false,
+                                                search: true, 
                                                 columnSorting: true,
                                                 tableOverflow: true,
                                                 wordWrap: true,
-                                                paginationOptions: [10, 25, 50],
+                                                paginationOptions: JEXCEL_PAGINATION_OPTION,
                                                 // position: 'top',
                                                 allowInsertColumn: false,
                                                 allowManualInsertColumn: false,
