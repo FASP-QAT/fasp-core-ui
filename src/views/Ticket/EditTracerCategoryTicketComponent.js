@@ -9,12 +9,12 @@ import * as Yup from 'yup';
 import JiraTikcetService from '../../api/JiraTikcetService';
 import RealmService from '../../api/RealmService';
 import getLabelText from '../../CommonComponent/getLabelText';
-import { SPACE_REGEX } from '../../Constants';
+import { BUDGET_NAME_REGEX, SPACE_REGEX } from '../../Constants';
+import TracerCategoryService from '../../api/TracerCategoryService';
 
 const initialValues = {
-    summary: "Add Planning Unit Category",
-    realmName: "",
-    productCategoryName: "",
+    summary: "Edit Tracer Category",
+    tracerCategoryName: "",
     notes: ""
 }
 
@@ -23,12 +23,11 @@ const validationSchema = function (values) {
         summary: Yup.string()
             .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.common.summarytext')),
-        realmName: Yup.string()
-            .required(i18n.t('static.common.realmtext').concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?', i18n.t('static.realm.realmName')))),
-        productCategoryName: Yup.string()
-            .required(i18n.t('static.technicalArea.productcategorynametext')),
-        // notes: Yup.string()
-        //     .required(i18n.t('static.common.notestext'))
+        tracerCategoryName: Yup.string()
+            .required(i18n.t('static.common.pleaseSelect').concat(" ").concat((i18n.t('static.tracercategory.tracercategory')).concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?', i18n.t('static.tracercategory.tracercategory'))))),
+
+        notes: Yup.string()
+            .required(i18n.t('static.program.validnotestext'))
     })
 }
 
@@ -54,20 +53,19 @@ const getErrorsFromValidationError = (validationError) => {
     }, {})
 }
 
-export default class ProductCategoryTicketComponent extends Component {
+export default class EditTracerCategoryTicketComponent extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            productCategory: {
-                summary: "Add Planning Unit Category",
-                realmName: "",
-                productCategoryName: "",
+            tracerCategory: {
+                summary: "Edit Tracer Category",
+                tracerCategoryName: "",
                 notes: ""
             },
             message: '',
-            realms: [],
-            realmId: '',
+            tracerCategories: [],
+            tracerCategoryId: '',
             loading: false
         }
         this.dataChange = this.dataChange.bind(this);
@@ -76,32 +74,29 @@ export default class ProductCategoryTicketComponent extends Component {
     }
 
     dataChange(event) {
-        let { productCategory } = this.state
+        let { tracerCategory } = this.state
         if (event.target.name == "summary") {
-            productCategory.summary = event.target.value;
+            tracerCategory.summary = event.target.value;
         }
-        if (event.target.name == "realmName") {
-            productCategory.realmName = event.target.options[event.target.selectedIndex].innerHTML;
+        if (event.target.name == "tracerCategoryName") {
+            tracerCategory.tracerCategoryName = event.target.options[event.target.selectedIndex].innerHTML;
             this.setState({
-                realmId: event.target.value
+                tracerCategoryId: event.target.value
             })
         }
-        if (event.target.name == "productCategoryName") {
-            productCategory.productCategoryName = event.target.value;
-        }
+
         if (event.target.name == "notes") {
-            productCategory.notes = event.target.value;
+            tracerCategory.notes = event.target.value;
         }
         this.setState({
-            productCategory
+            tracerCategory
         }, () => { })
     };
 
     touchAll(setTouched, errors) {
         setTouched({
             summary: true,
-            realmName: true,
-            productCategoryName: true,
+            tracerCategoryName: true,
             notes: true
         })
         this.validateForm(errors)
@@ -123,18 +118,52 @@ export default class ProductCategoryTicketComponent extends Component {
 
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
-        RealmService.getRealmListAll()
+        TracerCategoryService.getTracerCategoryListAll()
             .then(response => {
-                if (response.status == 200) {
-                    this.setState({
-                        realms: response.data
-                    })
-                } else {
-                    this.setState({
-                        message: response.data.messageCode
-                    })
+                console.log("response.data----", response.data);
+                this.setState({
+                    tracerCategories: response.data
+                })
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
                 }
-            })
+            );
     }
 
     hideSecondComponent() {
@@ -149,25 +178,24 @@ export default class ProductCategoryTicketComponent extends Component {
     }
 
     resetClicked() {
-        let { productCategory } = this.state;
-        // productCategory.summary = '';
-        productCategory.realmName = '';
-        productCategory.productCategoryName = '';
-        productCategory.notes = '';
+        let { tracerCategory } = this.state;
+        // tracerCategory.summary = '';        
+        tracerCategory.tracerCategoryName = '';
+        tracerCategory.notes = '';
         this.setState({
-            productCategory
+            tracerCategory
         },
             () => { });
     }
 
     render() {
 
-        const { realms } = this.state;
-        let realmList = realms.length > 0
-            && realms.map((item, i) => {
+        const { tracerCategories } = this.state;
+        let tracerCategoryList = tracerCategories.length > 0
+            && tracerCategories.map((item, i) => {
                 return (
-                    <option key={i} value={item.realmId}>
-                        {getLabelText(item.label, this.state.lang)}
+                    <option key={i} value={item.tracerCategoryId}>
+                        {getLabelText(item.realm.label, this.state.lang) + " : " + getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);
@@ -175,7 +203,7 @@ export default class ProductCategoryTicketComponent extends Component {
         return (
             <div className="col-md-12">
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
-                <h4>{i18n.t('static.product.productcategory')}</h4>
+                <h4>{i18n.t('static.tracercategory.tracercategory')}</h4>
                 <br></br>
                 <div style={{ display: this.state.loading ? "none" : "block" }}>
                     <Formik
@@ -185,7 +213,7 @@ export default class ProductCategoryTicketComponent extends Component {
                             this.setState({
                                 loading: true
                             })
-                            JiraTikcetService.addEmailRequestIssue(this.state.productCategory).then(response => {
+                            JiraTikcetService.addEmailRequestIssue(this.state.tracerCategory).then(response => {
                                 console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
                                     var msg = response.data.key;
@@ -236,50 +264,39 @@ export default class ProductCategoryTicketComponent extends Component {
                                             <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
                                             <Input type="text" name="summary" id="summary" readOnly={true}
                                                 bsSize="sm"
-                                                valid={!errors.summary && this.state.productCategory.summary != ''}
+                                                valid={!errors.summary && this.state.tracerCategory.summary != ''}
                                                 invalid={touched.summary && !!errors.summary}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                 onBlur={handleBlur}
-                                                value={this.state.productCategory.summary}
+                                                value={this.state.tracerCategory.summary}
                                                 required />
                                             <FormFeedback className="red">{errors.summary}</FormFeedback>
                                         </FormGroup>
                                         <FormGroup>
-                                            <Label for="realmName">{i18n.t('static.realm.realmName')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="select" name="realmName" id="realmName"
+                                            <Label for="tracerCategoryName">{i18n.t('static.tracercategory.tracercategory')}<span class="red Reqasterisk">*</span></Label>
+                                            <Input type="select" name="tracerCategoryName" id="tracerCategoryName"
                                                 bsSize="sm"
-                                                valid={!errors.realmName && this.state.productCategory.realmName != ''}
-                                                invalid={touched.realmName && !!errors.realmName}
+                                                valid={!errors.tracerCategoryName && this.state.tracerCategory.tracerCategoryName != ''}
+                                                invalid={touched.tracerCategoryName && !!errors.tracerCategoryName}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                 onBlur={handleBlur}
-                                                value={this.state.realmId}
+                                                value={this.state.tracerCategoryId}
                                                 required >
                                                 <option value="">{i18n.t('static.common.select')}</option>
-                                                {realmList}
+                                                {tracerCategoryList}
                                             </Input>
-                                            <FormFeedback className="red">{errors.realmName}</FormFeedback>
+                                            <FormFeedback className="red">{errors.tracerCategoryName}</FormFeedback>
                                         </FormGroup>
-                                        < FormGroup >
-                                            <Label for="productCategoryName">{i18n.t('static.productCategory.productCategoryName')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text" name="productCategoryName" id="productCategoryName"
-                                                bsSize="sm"
-                                                valid={!errors.productCategoryName && this.state.productCategory.productCategoryName != ''}
-                                                invalid={touched.productCategoryName && !!errors.productCategoryName}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                value={this.state.productCategory.productCategoryName}
-                                                required />
-                                            <FormFeedback className="red">{errors.productCategoryName}</FormFeedback>
-                                        </FormGroup>
+
                                         <FormGroup>
-                                            <Label for="notes">{i18n.t('static.common.notes')}</Label>
+                                            <Label for="notes">{i18n.t('static.common.notes')}<span class="red Reqasterisk">*</span></Label>
                                             <Input type="textarea" name="notes" id="notes"
                                                 bsSize="sm"
-                                                valid={!errors.notes && this.state.productCategory.notes != ''}
+                                                valid={!errors.notes && this.state.tracerCategory.notes != ''}
                                                 invalid={touched.notes && !!errors.notes}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                 onBlur={handleBlur}
-                                                value={this.state.productCategory.notes}
+                                                value={this.state.tracerCategory.notes}
                                             // required 
                                             />
                                             <FormFeedback className="red">{errors.notes}</FormFeedback>
@@ -304,6 +321,7 @@ export default class ProductCategoryTicketComponent extends Component {
                         </div>
                     </div>
                 </div>
+
             </div>
         );
     }

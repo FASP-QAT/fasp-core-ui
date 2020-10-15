@@ -29,7 +29,8 @@ export default class QuantimedImportOnboarding extends Component {
             program: {
                 programId: '',
                 rangeValue: '',
-                filename: ''
+                filename: '',
+                regionId: ''
             },
             qatPlanningList: []
         }
@@ -45,6 +46,7 @@ export default class QuantimedImportOnboarding extends Component {
 
         this.removeMessageText = this.removeMessageText.bind(this);
         this.triggerChildAlert = this.triggerChildAlert.bind(this);
+        this.triggerStepThree = this.triggerStepThree.bind(this);
         this.triggerStepFour = this.triggerStepFour.bind(this);
         this.redirectToDashboard = this.redirectToDashboard.bind(this);
 
@@ -130,8 +132,12 @@ export default class QuantimedImportOnboarding extends Component {
         this.refs.child.loadTableData();
     }
 
+    triggerStepThree() {
+        this.refs.child_3.loadRegionList();
+    }
+
     triggerStepFour() {
-        this.refs.child_2.showFinalData();
+        this.refs.child_4.showFinalData();
     }
 
 
@@ -218,7 +224,7 @@ export default class QuantimedImportOnboarding extends Component {
                                     <ul>
                                         <li className="quantimedProgressbartext1">{i18n.t('static.quantimed.quantimedImportScreenOne')}</li>
                                         <li className="quantimedProgressbartext2">{i18n.t('static.quantimed.quantimedImportScreenSecond')}</li>
-                                        <li className="quantimedProgressbartext3">{i18n.t('static.quantimed.quantimedImportScreenThird')}</li>
+                                        <li className="quantimedProgressbartext3">{i18n.t('static.region.region')}</li>
                                         <li className="quantimedProgressbartext4">{i18n.t('static.quantimed.quantimedImportScreenFourth')}</li>
                                     </ul>
                                 </div>
@@ -228,13 +234,13 @@ export default class QuantimedImportOnboarding extends Component {
                                     <QuantimedImportStepOne finishedStepOne={this.finishedStepOne} dataChange={this.dataChange} items={this.state} triggerChildAlert={this.triggerChildAlert}></QuantimedImportStepOne>
                                 </div>
                                 <div id="stepTwo">
-                                    <QuantimedImportStepTwo ref="child" finishedStepTwo={this.finishedStepTwo} previousToStepOne={this.previousToStepOne} dataChange={this.dataChange} items={this.state}></QuantimedImportStepTwo>
+                                    <QuantimedImportStepTwo ref="child" finishedStepTwo={this.finishedStepTwo} previousToStepOne={this.previousToStepOne} dataChange={this.dataChange} items={this.state} triggerStepThree={this.triggerStepThree}></QuantimedImportStepTwo>
                                 </div>
                                 <div id="stepThree">
-                                    <QuantimedImportStepThree finishedStepThree={this.finishedStepThree} previousToStepTwo={this.previousToStepTwo} dataChange={this.dataChange} items={this.state} triggerStepFour={this.triggerStepFour}></QuantimedImportStepThree>
+                                    <QuantimedImportStepThree ref="child_3" finishedStepThree={this.finishedStepThree} previousToStepTwo={this.previousToStepTwo} dataChange={this.dataChange} items={this.state} triggerStepFour={this.triggerStepFour}></QuantimedImportStepThree>
                                 </div>
                                 <div id="stepFour">
-                                    <QunatimedImportStepFour ref="child_2" previousToStepThree={this.previousToStepThree} dataChange={this.dataChange} items={this.state} redirectToDashboard={this.redirectToDashboard}></QunatimedImportStepFour>
+                                    <QunatimedImportStepFour ref="child_4" previousToStepThree={this.previousToStepThree} dataChange={this.dataChange} items={this.state} redirectToDashboard={this.redirectToDashboard}></QunatimedImportStepFour>
                                 </div>
 
                             </CardBody></Card>

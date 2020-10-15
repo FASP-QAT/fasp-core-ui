@@ -62,7 +62,8 @@ export default class QunatimedImportStepTwo extends Component {
             loading: false,
             quantimedEl: "",
             programId: '',
-            filename: ''
+            filename: '',
+            procurementAgentPlanningUnitList: []
         }
 
         this.loadTableData = this.loadTableData.bind(this);
@@ -72,6 +73,7 @@ export default class QunatimedImportStepTwo extends Component {
         this.checkDuplicateCountry = this.checkDuplicateCountry.bind(this);
         this.loaded = this.loaded.bind(this);
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
+        this.updateDoNotImport = this.updateDoNotImport.bind(this);
     }
 
     hideFirstComponent() {
@@ -110,10 +112,23 @@ export default class QunatimedImportStepTwo extends Component {
     }
 
     loaded = function (instance, cell, x, y, value) {
-        jExcelLoadedFunctionOnlyHideRow(instance);
+        jExcelLoadedFunctionWithoutPagination(instance);
         var asterisk = document.getElementsByClassName("resizable")[0];
         var tr = asterisk.firstChild;
         tr.children[3].classList.add('AsteriskTheadtrTd');
+    }
+
+    updateDoNotImport = function() {        
+        var json = this.el.getJson();
+
+        for (var y = 0; y < json.length; y++) {
+            
+            var col = ("C").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(2, y);
+            if (value == "-1") {                
+                this.el.setStyle(col, "background-color", "pink");                
+            }
+        }
     }
 
     programPlanningUnitChanged = function (instance, cell, x, y, value) {
@@ -126,16 +141,16 @@ export default class QunatimedImportStepTwo extends Component {
             var value_C_1 = this.el.getValueFromCoords(2, y);
             for (var z = 0; z < tableJson.length; z++) {
                 var col_C_2 = ("C").concat(parseInt(z) + 1);
-                var value_C_2 = this.el.getValueFromCoords(2, z);
-                if (col_C_1 !== col_C_2 && value_C_1 === value_C_2) {
+                var value_C_2 = this.el.getValueFromCoords(2, z);                
+                if (col_C_1 !== col_C_2 && value_C_1 == value_C_2) {
                     hasDuplicate = true;
                 }
             }
 
             var col = ("C").concat(parseInt(y) + 1);
 
-            if (value == "") {
-                // this.el.setStyle(col, "background-color", "transparent");
+            if (value == "" || value == "-2") {
+                this.el.setStyle(col, "background-color", "transparent");
                 // this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else if (value == "-1") {
@@ -156,13 +171,13 @@ export default class QunatimedImportStepTwo extends Component {
             var col_D = ("D").concat(parseInt(y) + 1);
             var value_D = this.el.getValueFromCoords(3, y);
 
-            if (value_D !== "" && value_D !== "-1") {
+            if (value_D !== "" && value_D !== "-1" && value_D !== "-2") {
                 for (var z = 0; z < tableJson.length; z++) {
                     var col_D_2 = ("D").concat(parseInt(z) + 1);
                     var col_C_3 = ("C").concat(parseInt(z) + 1);
                     var value_D_2 = this.el.getValueFromCoords(3, z);
 
-                    if (col_D !== col_D_2 && value_D_2 !== "-1" && value_D === value_D_2) {
+                    if (col_D !== col_D_2 && value_D_2 !== "-1" && value_D_2 !== "-2" && value_D == value_D_2) {
 
                         this.el.setStyle(col_C_3, "background-color", "transparent");
                         this.el.setComments(col_C_3, "");
@@ -188,7 +203,7 @@ export default class QunatimedImportStepTwo extends Component {
             //Currency
             var col = ("C").concat(parseInt(y) + 1);
             var value = this.el.getValueFromCoords(2, y);
-            if (value == "") {
+            if (value == "" || value == "-2") {
                 // this.el.setStyle(col, "background-color", "transparent");
                 // this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
@@ -210,15 +225,15 @@ export default class QunatimedImportStepTwo extends Component {
         tempArray.map(v => v[Object.keys(v)[2]]).sort().sort((a, b) => {
 
             if (a !== "" && b !== "")
-                if (a !== '-1' && b !== '-1')
-                    if (a === b)
+                if ((a !== '-1' && b !== '-1') && (a !== '-2' && b !== '-2'))
+                    if (a == b)
                         hasDuplicate = true
         })
 
         if (hasDuplicate) {
             alert(i18n.t('static.quantimed.duplicateQATPlanningUnitFound'));
             this.setState({
-                message: i18n.t('static.quantimed.duplicateQATPlanningUnitFound'),
+                // message: i18n.t('static.quantimed.duplicateQATPlanningUnitFound'),
                 changedFlag: 0,
 
             },
@@ -255,7 +270,8 @@ export default class QunatimedImportStepTwo extends Component {
             // QuantimedImportService.addImportedForecastData(this.props.items.importData).then(response => {
 
             //     if (response.status == 200) {
-                    this.props.finishedStepTwo();
+            this.props.finishedStepTwo();
+            this.props.triggerStepThree();
             //     }
             //     else {
 
@@ -296,11 +312,11 @@ export default class QunatimedImportStepTwo extends Component {
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
 
-            var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
-            var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
-            var planningunitRequest = planningunitOs.getAll();
-            var planningList = []
-            planningunitRequest.onerror = function (event) {
+            var procurementAgentPlanningunitTransaction = db1.transaction(['procurementAgentPlanningUnit'], 'readwrite');
+            var procurementAgentPlanningunitOs = procurementAgentPlanningunitTransaction.objectStore('procurementAgentPlanningUnit');
+            var procurementAgentPlanningunitRequest = procurementAgentPlanningunitOs.getAll();
+            
+            procurementAgentPlanningunitRequest.onerror = function (event) {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext'),
                     loading: false,
@@ -308,147 +324,166 @@ export default class QunatimedImportStepTwo extends Component {
                 })
                 this.hideFirstComponent()
             }.bind(this);
-            planningunitRequest.onsuccess = function (e) {
+            procurementAgentPlanningunitRequest.onsuccess = function (e) {
                 var myResult = [];
-                myResult = planningunitRequest.result;
-
-                var programId = (value != "" && value != undefined ? value : 0).split("_")[0];
-                var proList = []
-                for (var i = 0; i < myResult.length; i++) {
-
-                    if (myResult[i].program.id == parseInt(programId) && myResult[i].active == true) {
-                        var productJson = {
-                            label: getLabelText(myResult[i].planningUnit.label, this.state.lang),
-                            value: myResult[i].planningUnit.id
-                        }
-
-                        proList.push(productJson);
-                        planningList.push(myResult[i]);
-                    }
-                }
-
-
-
+                myResult = procurementAgentPlanningunitRequest.result;
                 this.setState({
-                    programPlanningUnits: proList,
-                    qatPlanningList: planningList
-                })
-                this.props.items.qatPlanningList = proList;
+                    procurementAgentPlanningUnitList: myResult
+                })           
+                
 
-                if (this.state.programId !== this.props.items.program.programId || this.state.filename !== this.props.items.program.filename) {
-                    //     AuthenticationService.setupAxiosInterceptors();
-                    //     ProgramService.getProgramPlaningUnitListByProgramId(this.props.items.program.programId).then(response => {
+                var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+                var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
+                var planningunitRequest = planningunitOs.getAll();
+                var planningList = []
+                planningunitRequest.onerror = function (event) {
+                    this.setState({
+                        supplyPlanError: i18n.t('static.program.errortext'),
+                        loading: false,
+                        color: "red"
+                    })
+                    this.hideFirstComponent()
+                }.bind(this);
+                planningunitRequest.onsuccess = function (e) {
+                    var myResult = [];
+                    myResult = planningunitRequest.result;
+                    
+                    var programId = (value != "" && value != undefined ? value : 0).split("_")[0];
+                    var proList = []
+                    for (var i = 0; i < myResult.length; i++) {
 
-                    //         if (response.status == 200) {
+                        if (myResult[i].program.id == parseInt(programId) && myResult[i].active == true) {
+                            var productJson = {
+                                label: getLabelText(myResult[i].planningUnit.label, this.state.lang),
+                                value: myResult[i].planningUnit.id
+                            }
 
-                    //             this.setState({
-                    //                 programPlanningUnits: response.data
-                    //             })
-
-                    const { programPlanningUnits } = this.state;
-
-                    let programPlanningUnitsArr = [];
-                    var myVar = "";
-
-                    if (programPlanningUnits.length > 0) {
-                        var paJson = {
-                            name: 'Do not import',
-                            id: -1,
-                            active: true
+                            proList.push(productJson);
+                            planningList.push(myResult[i]);
                         }
-                        programPlanningUnitsArr[0] = paJson
-                        for (var i = 0; i < programPlanningUnits.length; i++) {
+                    }
+
+
+
+                    this.setState({
+                        programPlanningUnits: proList,
+                        qatPlanningList: planningList
+                    })
+                    this.props.items.qatPlanningList = proList;
+
+                    if (this.state.programId !== this.props.items.program.programId || this.state.filename !== this.props.items.program.filename) {
+                        
+
+                        const { programPlanningUnits } = this.state;
+                        
+                        let programPlanningUnitsArr = [];
+                        var myVar = "";
+
+                        if (programPlanningUnits.length > 0) {
                             var paJson = {
-                                name: programPlanningUnits[i].label,
-                                id: parseInt(programPlanningUnits[i].value),
+                                name: 'Do not import',
+                                id: -1,
                                 active: true
                             }
-                            programPlanningUnitsArr[i + 1] = paJson
+                            var paJson_1 = {
+                                name: 'Planning Unit Not Found',
+                                id: -2,
+                                active: true
+                            }
+                            programPlanningUnitsArr[0] = paJson_1;
+                            programPlanningUnitsArr[1] = paJson;
+                            for (var i = 0; i < programPlanningUnits.length; i++) {
+                                var paJson = {
+                                    name: programPlanningUnits[i].label,
+                                    id: parseInt(programPlanningUnits[i].value),
+                                    active: true
+                                }
+                                programPlanningUnitsArr[i + 2] = paJson
+                            }
                         }
+
+                        this.el = jexcel(document.getElementById("paputableDiv"), '');
+                        this.el.destroy();
+
+                        var json = this.props.items.importData.products;
+                        var data = [];
+                        var products = [];
+                        
+                        for (var i = 0; i < json.length; i++) {                            
+                           
+                            
+                            var index_1 = this.state.procurementAgentPlanningUnitList.findIndex(c => ((c.skuCode).substring(0,12)) == json[i].productId);
+                            var selectedPlanningUnitId = "-2";
+                            if(index_1 != -1) {
+                                selectedPlanningUnitId = this.state.procurementAgentPlanningUnitList[index_1].planningUnit.id;
+                                var index_2 = this.state.programPlanningUnits.findIndex(c => c.value == selectedPlanningUnitId);
+                                if(index_2 != -1) {
+                                    selectedPlanningUnitId = this.state.programPlanningUnits[index_2].value;                            
+                                } else {
+                                    selectedPlanningUnitId = "-2";
+                                }                          
+                            }
+                            
+                            data = [];
+                            data[0] = json[i].productId;// A
+                            data[1] = json[i].productName;// B
+                            data[2] = selectedPlanningUnitId;// C    
+                            data[3] = selectedPlanningUnitId;// D                    
+                            products[i] = data;
+                        }
+                        var options = {
+                            data: products,
+                            contextMenu: function () { return false; },
+                            colHeaders: [
+                                i18n.t('static.quantimed.quantimedProductIdLabel'),
+                                i18n.t('static.quantimed.quantimedPlanningUnitLabel'),
+                                i18n.t('static.supplyPlan.qatProduct'),
+                                'Previous Program Planning Unit',
+                            ],
+                            colWidths: [80, 80, 80, 80],
+                            columns: [
+                                { type: 'hidden' },
+                                { type: 'text', readOnly: true },
+                                { type: 'dropdown', source: programPlanningUnitsArr },
+                                { type: 'hidden' }
+                            ],
+                            text: {
+                                // showingPage: 'Showing {0} to {1} of {1}',
+                                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
+                                show: '',
+                                entries: '',
+                            },
+                            pagination: false,
+                            search: true,
+                            columnSorting: false,
+                            tableOverflow: true,
+                            wordWrap: true,
+                            paginationOptions: [],
+                            allowInsertColumn: false,
+                            allowManualInsertColumn: false,
+                            onchange: this.programPlanningUnitChanged,
+                            // oneditionstart: this.editStart,
+                            allowDeleteRow: false,
+                            tableOverflow: false,
+                            onload: this.loaded,
+                            // tableHeight: '500px',
+                        };
+                        myVar = jexcel(document.getElementById("paputableDiv"), options);
+                        this.el = myVar;
+                        
+                        this.setState({
+                            programId: this.props.items.program.programId,
+                            filename: this.props.items.program.filename
+                        }, () => {this.updateDoNotImport()})
+                        
                     }
 
-                    this.el = jexcel(document.getElementById("paputableDiv"), '');
-                    this.el.destroy();
-
-                    var json = this.props.items.importData.products;
-                    var data = [];
-                    var products = [];
-                    for (var i = 0; i < json.length; i++) {
-                        data = [];
-                        data[0] = json[i].productId;// A
-                        data[1] = json[i].productName;// B
-                        data[2] = "";// C    
-                        data[3] = "";// D                    
-                        products[i] = data;
-                    }
-                    var options = {
-                        data: products,
-                        contextMenu: function () { return false; },
-                        colHeaders: [
-                            i18n.t('static.quantimed.quantimedProductIdLabel'),
-                            i18n.t('static.quantimed.quantimedPlanningUnitLabel'),
-                            i18n.t('static.supplyPlan.qatProduct'),
-                            'Previous Program Planning Unit',
-                        ],
-                        colWidths: [80, 80, 80, 80],
-                        columns: [
-                            { type: 'hidden' },
-                            { type: 'text', readOnly: true },
-                            { type: 'dropdown', source: programPlanningUnitsArr },
-                            { type: 'hidden' }
-                        ],
-                        text: {
-                            // showingPage: 'Showing {0} to {1} of {1}',
-                            showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
-                            show: '',
-                            entries: '',
-                        },
-                        pagination: false,
-                        search: true,
-                        columnSorting: false,
-                        tableOverflow: true,
-                        wordWrap: true,
-                        paginationOptions: [],
-                        allowInsertColumn: false,
-                        allowManualInsertColumn: false,
-                        onchange: this.programPlanningUnitChanged,
-                        // oneditionstart: this.editStart,
-                        allowDeleteRow: false,
-                        tableOverflow: false,
-                        onload: this.loaded,
-                        // tableHeight: '500px',
-                    };
-                    myVar = jexcel(document.getElementById("paputableDiv"), options);
-                    this.el = myVar;
                     this.setState({
-                        programId: this.props.items.program.programId,
-                        filename: this.props.items.program.filename
+                        loading: false
                     })
-
-                    //     }
-                    //     else {
-
-                    //         this.setState({
-                    //             message: response.data.messageCode
-                    //         },
-                    //             () => {
-
-                    //             })
-                    //     }
-
-
-                    // })
-
-
-
-
-                }
-
-                this.setState({                    
-                    loading: false
-                })
+                }.bind(this)
             }.bind(this)
-        }.bind(this)        
+        }.bind(this)
 
     }
 
@@ -473,16 +508,16 @@ export default class QunatimedImportStepTwo extends Component {
                             </div>
 
                         </Col>
-                    {/* </CardBody>
+                        {/* </CardBody>
                     <CardFooter> */}
-                    <br></br>
+                        <br></br>
                         <FormGroup>
                             {/* <Button color="info" size="md" className="float-right mr-1" type="submit" name="healthAreaSub" id="healthAreaSub" onClick={this.props.finishedStepTwo}>{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button> */}
                             <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" >{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
                             <Button color="info" size="md" className="float-right mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.props.previousToStepOne} > <i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
                                 &nbsp;
                         </FormGroup>
-                    {/* </CardFooter> */}
+                        {/* </CardFooter> */}
                     </CardBody>
                     {/* </Card> */}
                 </div>

@@ -7,23 +7,19 @@ import { Formik } from 'formik';
 import i18n from '../../i18n';
 import * as Yup from 'yup';
 import JiraTikcetService from '../../api/JiraTikcetService';
-import RealmService from '../../api/RealmService';
 import UserService from '../../api/UserService';
-import HealthAreaService from '../../api/HealthAreaService';
 import CountryService from '../../api/CountryService';
+import HealthAreaService from '../../api/HealthAreaService';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import classNames from 'classnames';
 import { SPACE_REGEX, ALPHABET_NUMBER_REGEX } from '../../Constants';
-import RealmCountryService from '../../api/RealmCountryService';
+import OrganisationService from '../../api/OrganisationService';
 
 const initialValues = {
-    summary: "Add Technical Area",
-    realmName: "",
-    countryName: "",
-    technicalAreaName: "",
-    technicalAreaCode: "",
-    notes: ""
+    summary: 'Edit Organization',
+    organizationName: '',
+    notes: ''
 }
 
 const validationSchema = function (values) {
@@ -31,19 +27,10 @@ const validationSchema = function (values) {
         summary: Yup.string()
             .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.common.summarytext')),
-        realmName: Yup.string()
-            .required(i18n.t('static.common.realmtext').concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?', i18n.t('static.realm.realmName')))),
-        countryName: Yup.string()
-            .required(i18n.t('static.program.validcountrytext')),
-        technicalAreaName: Yup.string()
-            .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
-            .required(i18n.t('static.healtharea.healthareatext')),
-        technicalAreaCode: Yup.string()
-            .matches(ALPHABET_NUMBER_REGEX, i18n.t('static.message.alphabetnumerallowed'))
-            .max(6, 'Display name length should be 6')
-            .required(i18n.t('static.technicalArea.technicalAreaCodeText')),
-        // notes: Yup.string()
-        //     .required(i18n.t('static.common.notestext'))
+        organizationName: Yup.string()
+            .required(i18n.t('static.common.pleaseSelect').concat(" ").concat((i18n.t('static.organisation.organisation')).concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?', i18n.t('static.organisation.organisation'))))),
+        notes: Yup.string()
+            .required(i18n.t('static.program.validnotestext'))
     })
 }
 
@@ -69,70 +56,50 @@ const getErrorsFromValidationError = (validationError) => {
     }, {})
 }
 
-export default class TechnicalAreaTicketComponent extends Component {
+export default class EditOrganisationTicketComponent extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            technicalArea: {
-                summary: "Add Technical Area",
-                realmName: "",
-                countryName: [],
-                technicalAreaName: "",
-                technicalAreaCode: "",
+            organisation: {
+                summary: "Edit Organization",
+                organizationName: "",
                 notes: ""
             },
             message: '',
-            realms: [],
-            countryList: [],
-            realmId: '',
-            countryId: '',
-            countries: [],
-            realmCountryList: [],
+            organizations: [],
+            organizationId: '',
             loading: false
         }
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
-        this.updateFieldData = this.updateFieldData.bind(this);
-        this.getRealmCountryList = this.getRealmCountryList.bind(this);
     }
 
     dataChange(event) {
-        let { technicalArea } = this.state
+        let { organisation } = this.state
         if (event.target.name == "summary") {
-            technicalArea.summary = event.target.value;
+            organisation.summary = event.target.value;
         }
-        if (event.target.name == "realmName") {
-            technicalArea.realmName = event.target.options[event.target.selectedIndex].innerHTML;
+        if (event.target.name === "organizationName") {
+            organisation.organizationName = event.target.options[event.target.selectedIndex].innerHTML;
             this.setState({
-                realmId: event.target.value
+                organizationId: event.target.value
             })
         }
-        // if(event.target.name == "countryName") {
-        //     technicalArea.countryName = event.target.value;
-        // }
-        if (event.target.name == "technicalAreaName") {
-            technicalArea.technicalAreaName = event.target.value;
-        }
-        if (event.target.name == "technicalAreaCode") {
-            technicalArea.technicalAreaCode = event.target.value.toUpperCase();
-        }
+
         if (event.target.name == "notes") {
-            technicalArea.notes = event.target.value;
+            organisation.notes = event.target.value;
         }
         this.setState({
-            technicalArea
+            organisation
         }, () => { })
     };
 
     touchAll(setTouched, errors) {
         setTouched({
             summary: true,
-            realmName: true,
-            countryName: true,
-            technicalAreaName: true,
-            technicalAreaCode: true,
+            organizationName: true,
             notes: true
         })
         this.validateForm(errors)
@@ -154,67 +121,55 @@ export default class TechnicalAreaTicketComponent extends Component {
 
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
-        CountryService.getCountryListAll()
+
+        OrganisationService.getOrganisationList()
             .then(response => {
-                if (response.status == 200) {
-                    this.setState({
-                        countries: response.data
-                    })
-                }
-                else {
-
-                    this.setState({
-                        message: response.data.messageCode
-                    },
-                        () => {
-                            this.hideSecondComponent();
-                        })
-                }
-
-            })
-
-        UserService.getRealmList()
-            .then(response => {
+                console.log("response---", response);
                 this.setState({
-                    realms: response.data
+                    organizations: response.data,
                 })
-            })
-    }
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
 
-    updateFieldData(value) {
-        let { technicalArea } = this.state;
-        this.setState({ countryId: value });
-        var realmCountryId = value;
-        var realmCountryIdArray = [];
-        for (var i = 0; i < realmCountryId.length; i++) {
-            realmCountryIdArray[i] = realmCountryId[i].label;
-        }
-        technicalArea.countryName = realmCountryIdArray;
-        this.setState({ technicalArea: technicalArea });
-    }
-
-    getRealmCountryList(e) {
-        AuthenticationService.setupAxiosInterceptors();
-        RealmCountryService.getRealmCountryForProgram(e.target.value)
-            .then(response => {
-                if (response.status == 200) {
-                    var json = response.data;
-                    console.log("json",json)
-                    var regList = [];
-                    for (var i = 0; i < json.length; i++) {
-                        regList[i] = { value: json[i].realmCountry.id, label: json[i].realmCountry.label.label_en }
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
                     }
-                    this.setState({
-                        countryId: '',
-                        realmCountryList: regList
-                    })
-                } else {
-                    this.setState({
-                        message: response.data.messageCode
-                    })
                 }
-            })
+            );
     }
+
 
     hideSecondComponent() {
         setTimeout(function () {
@@ -228,26 +183,23 @@ export default class TechnicalAreaTicketComponent extends Component {
     }
 
     resetClicked() {
-        let { technicalArea } = this.state;
-        // technicalArea.summary = '';
-        technicalArea.realmName = '';
-        technicalArea.countryName = '';
-        technicalArea.technicalAreaName = '';
-        technicalArea.technicalAreaCode = '';
-        technicalArea.notes = '';
+        let { organisation } = this.state;
+        // organisation.summary = '';
+        organisation.organizationName = '';
+        organisation.notes = '';
         this.setState({
-            technicalArea
+            organisation
         },
             () => { });
     }
 
     render() {
 
-        const { realms } = this.state;
-        let realmList = realms.length > 0
-            && realms.map((item, i) => {
+        const { organizations } = this.state;
+        let organizationList = organizations.length > 0
+            && organizations.map((item, i) => {
                 return (
-                    <option key={i} value={item.realmId}>
+                    <option key={i} value={item.organisationId}>
                         {item.label.label_en}
                     </option>
                 )
@@ -256,7 +208,7 @@ export default class TechnicalAreaTicketComponent extends Component {
         return (
             <div className="col-md-12">
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
-                <h4>{i18n.t('static.healtharea.healtharea')}</h4>
+                <h4>{i18n.t('static.organisation.organisation')}</h4>
                 <br></br>
                 <div style={{ display: this.state.loading ? "none" : "block" }}>
                     <Formik
@@ -266,7 +218,7 @@ export default class TechnicalAreaTicketComponent extends Component {
                             this.setState({
                                 loading: true
                             })
-                            JiraTikcetService.addEmailRequestIssue(this.state.technicalArea).then(response => {
+                            JiraTikcetService.addEmailRequestIssue(this.state.organisation).then(response => {
                                 console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
                                     var msg = response.data.key;
@@ -319,80 +271,39 @@ export default class TechnicalAreaTicketComponent extends Component {
                                             <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
                                             <Input type="text" name="summary" id="summary" readOnly={true}
                                                 bsSize="sm"
-                                                valid={!errors.summary && this.state.technicalArea.summary != ''}
+                                                valid={!errors.summary && this.state.organisation.summary != ''}
                                                 invalid={touched.summary && !!errors.summary}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                 onBlur={handleBlur}
-                                                value={this.state.technicalArea.summary}
+                                                value={this.state.organisation.summary}
                                                 required />
                                             <FormFeedback className="red">{errors.summary}</FormFeedback>
                                         </FormGroup>
                                         <FormGroup>
-                                            <Label for="realmName">{i18n.t('static.realm.realmName')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="select" name="realmName" id="realmName"
+                                            <Label for="organizationName">{i18n.t('static.organisation.organisation')}<span class="red Reqasterisk">*</span></Label>
+                                            <Input type="select" name="organizationName" id="organizationName"
                                                 bsSize="sm"
-                                                valid={!errors.realmName && this.state.technicalArea.realmName != ''}
-                                                invalid={touched.realmName && !!errors.realmName}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); this.getRealmCountryList(e) }}
+                                                valid={!errors.organizationName && this.state.organisation.organizationName != ''}
+                                                invalid={touched.organizationName && !!errors.organizationName}
+                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                 onBlur={handleBlur}
-                                                value={this.state.realmId}
+                                                value={this.state.organizationId}
                                                 required >
                                                 <option value="">{i18n.t('static.common.select')}</option>
-                                                {realmList}
+                                                {organizationList}
                                             </Input>
-                                            <FormFeedback className="red">{errors.realmName}</FormFeedback>
+                                            <FormFeedback className="red">{errors.organizationName}</FormFeedback>
                                         </FormGroup>
-                                        < FormGroup className="Selectcontrol-bdrNone">
-                                            <Label for="countryName">{i18n.t('static.country.countryName')}<span class="red Reqasterisk">*</span></Label>
-                                            <Select
-                                                className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
-                                                    { 'is-valid': !errors.countryName && this.state.technicalArea.countryName.length != 0 },
-                                                    { 'is-invalid': (touched.countryName && !!errors.countryName) }
-                                                )}
-                                                name="countryName" id="countryName"
-                                                bsSize="sm"
-                                                onChange={(e) => { handleChange(e); setFieldValue("countryName", e); this.updateFieldData(e); }}
-                                                onBlur={() => setFieldTouched("countryName", true)}
-                                                multi
-                                                options={this.state.realmCountryList}
-                                                value={this.state.countryId}
-                                                required />
-                                            <FormFeedback className="red">{errors.countryName}</FormFeedback>
-                                        </FormGroup>
-                                        < FormGroup >
-                                            <Label for="technicalAreaName">{i18n.t('static.healthArea.healthAreaName')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text" name="technicalAreaName" id="technicalAreaName"
-                                                bsSize="sm"
-                                                valid={!errors.technicalAreaName && this.state.technicalArea.technicalAreaName != ''}
-                                                invalid={touched.technicalAreaName && !!errors.technicalAreaName}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                value={this.state.technicalArea.technicalAreaName}
-                                                required />
-                                            <FormFeedback className="red">{errors.technicalAreaName}</FormFeedback>
-                                        </FormGroup>
-                                        < FormGroup >
-                                            <Label for="technicalAreaCode">{i18n.t('static.technicalArea.technicalAreaCode')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text" name="technicalAreaCode" id="technicalAreaCode"
-                                                bsSize="sm"
-                                                valid={!errors.technicalAreaCode && this.state.technicalArea.technicalAreaCode != ''}
-                                                invalid={touched.technicalAreaCode && !!errors.technicalAreaCode}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                value={this.state.technicalArea.technicalAreaCode}
-                                            // required 
-                                            />
-                                            <FormFeedback className="red">{errors.technicalAreaCode}</FormFeedback>
-                                        </FormGroup>
+
                                         <FormGroup>
-                                            <Label for="notes">{i18n.t('static.common.notes')}</Label>
+                                            <Label for="notes">{i18n.t('static.common.notes')}<span class="red Reqasterisk">*</span></Label>
                                             <Input type="textarea" name="notes" id="notes"
                                                 bsSize="sm"
-                                                valid={!errors.notes && this.state.technicalArea.notes != ''}
+                                                valid={!errors.notes && this.state.organisation.notes != ''}
                                                 invalid={touched.notes && !!errors.notes}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                 onBlur={handleBlur}
-                                                value={this.state.technicalArea.notes}
+                                                value={this.state.organisation.notes}
                                             // required 
                                             />
                                             <FormFeedback className="red">{errors.notes}</FormFeedback>
@@ -421,4 +332,4 @@ export default class TechnicalAreaTicketComponent extends Component {
         );
     }
 
-}
+} 
