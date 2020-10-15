@@ -48,7 +48,9 @@ class AddprogramPlanningUnit extends Component {
             localProcurementLeadTime: '',
             isValidData: true,
             loading: true,
-            productCategoryList: []
+            productCategoryList: [],
+            list: [],
+            productCategoryListNew: []
 
         }
         // this.addRow = this.addRow.bind(this);
@@ -64,6 +66,7 @@ class AddprogramPlanningUnit extends Component {
         this.addRowInJexcel = this.addRowInJexcel.bind(this);
         this.changed = this.changed.bind(this);
         this.dropdownFilter = this.dropdownFilter.bind(this);
+        this.buildJEcxel = this.buildJEcxel.bind(this);
     }
 
     dropdownFilter = function (instance, cell, c, r, source) {
@@ -106,6 +109,339 @@ class AddprogramPlanningUnit extends Component {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 8000);
+    }
+
+    buildJEcxel() {
+
+        // alert("hi");
+        let myReasponse = this.state.rows;
+        let productCategoryListNew = this.state.productCategoryListNew;
+        let list = this.state.list;
+        var productDataArr = []
+        // if (myReasponse.length > 0) {
+
+        var data = [];
+        if (myReasponse.length != 0) {
+            for (var j = 0; j < myReasponse.length; j++) {
+                console.log("myReasponse[j]---", myReasponse[j]);
+                data = [];
+                data[0] = myReasponse[j].productCategory.id;
+                data[1] = myReasponse[j].planningUnit.id;
+                data[2] = myReasponse[j].reorderFrequencyInMonths;
+                data[3] = myReasponse[j].minMonthsOfStock;
+                data[4] = myReasponse[j].monthsInFutureForAmc;
+                data[5] = myReasponse[j].monthsInPastForAmc;
+                data[6] = myReasponse[j].localProcurementLeadTime;
+                data[7] = myReasponse[j].shelfLife;
+                data[8] = myReasponse[j].catalogPrice;
+                data[9] = myReasponse[j].programPlanningUnitId;
+                data[10] = myReasponse[j].active;
+                data[11] = 0;
+                data[12] = myReasponse[j].program.id;
+                productDataArr.push(data);
+            }
+        }
+
+        if (productDataArr.length == 0) {
+            data = [];
+            data[0] = 0;
+            data[1] = "";
+            data[2] = "";
+            data[3] = "";
+            data[4] = "";
+            data[5] = "";
+            data[6] = "";
+            data[7] = "";
+            data[8] = 0;
+            data[9] = 0;
+            data[10] = 1;
+            data[11] = 1;
+            data[12] = this.props.match.params.programId;
+            productDataArr[0] = data;
+        }
+
+
+        this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
+        this.el.destroy();
+        var json = [];
+        var data = productDataArr;
+        var options = {
+            data: data,
+            columnDrag: true,
+            colWidths: [290, 290, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+            columns: [
+                {
+                    title: i18n.t('static.productCategory.productCategory'),
+                    type: 'dropdown',
+                    source: productCategoryListNew
+                },
+                {
+                    title: i18n.t('static.dashboard.product'),
+                    type: 'autocomplete',
+                    source: list,
+                    filter: this.dropdownFilter
+                },
+                {
+                    title: i18n.t('static.product.reorderFrequency'),
+                    type: 'number',
+
+                },
+                {
+                    title: i18n.t('static.product.minMonthOfStock'),
+                    type: 'number'
+                },
+                {
+                    title: i18n.t('static.program.monthfutureamc'),
+                    type: 'number'
+                },
+                {
+                    title: i18n.t('static.program.monthpastamc'),
+                    type: 'number'
+                },
+                {
+                    title: i18n.t('static.product.localProcurementAgentLeadTime'),
+                    type: 'number'
+                },
+                {
+                    title: i18n.t('static.report.shelfLife'),
+                    type: 'number'
+                },
+                {
+                    title: i18n.t('static.procurementAgentPlanningUnit.catalogPrice'),
+                    type: 'number'
+                },
+                {
+                    title: 'Id',
+                    type: 'hidden'
+                },
+                {
+                    title: 'Active',
+                    type: 'hidden'
+                },
+                {
+                    title: 'Changed Flag',
+                    type: 'hidden'
+                },
+                {
+                    title: 'ProgramId',
+                    type: 'hidden'
+                }
+
+
+            ],
+            updateTable: function (el, cell, x, y, source, value, id) {
+                var elInstance = el.jexcel;
+                var rowData = elInstance.getRowData(y);
+                // var productCategoryId = rowData[0];
+                var programPlanningUnitId = rowData[9];
+                if (programPlanningUnitId == 0) {
+                    var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
+                    cell1.classList.remove('readonly');
+
+                    var cell2 = elInstance.getCell(`A${parseInt(y) + 1}`)
+                    cell2.classList.remove('readonly');
+
+
+                } else {
+                    var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
+                    cell1.classList.add('readonly');
+
+                    var cell2 = elInstance.getCell(`A${parseInt(y) + 1}`)
+                    cell2.classList.add('readonly');
+
+
+                }
+            },
+            pagination: JEXCEL_DEFAULT_PAGINATION,
+            search: true,
+            columnSorting: true,
+            tableOverflow: true,
+            wordWrap: true,
+            paginationOptions: JEXCEL_PAGINATION_OPTION,
+            position: 'top',
+            allowInsertColumn: false,
+            allowManualInsertColumn: false,
+            allowDeleteRow: true,
+            onchange: this.changed,
+            oneditionend: this.onedit,
+            copyCompatibility: true,
+            allowManualInsertRow: false,
+            text: {
+                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                show: '',
+                entries: '',
+            },
+            onload: this.loaded,
+            contextMenu: function (obj, x, y, e) {
+                var items = [];
+                //Add consumption batch info
+
+
+                if (y == null) {
+                    // Insert a new column
+                    if (obj.options.allowInsertColumn == true) {
+                        items.push({
+                            title: obj.options.text.insertANewColumnBefore,
+                            onclick: function () {
+                                obj.insertColumn(1, parseInt(x), 1);
+                            }
+                        });
+                    }
+
+                    if (obj.options.allowInsertColumn == true) {
+                        items.push({
+                            title: obj.options.text.insertANewColumnAfter,
+                            onclick: function () {
+                                obj.insertColumn(1, parseInt(x), 0);
+                            }
+                        });
+                    }
+
+                    // Delete a column
+                    // if (obj.options.allowDeleteColumn == true) {
+                    //     items.push({
+                    //         title: obj.options.text.deleteSelectedColumns,
+                    //         onclick: function () {
+                    //             obj.deleteColumn(obj.getSelectedColumns().length ? undefined : parseInt(x));
+                    //         }
+                    //     });
+                    // }
+
+                    // Rename column
+                    // if (obj.options.allowRenameColumn == true) {
+                    //     items.push({
+                    //         title: obj.options.text.renameThisColumn,
+                    //         onclick: function () {
+                    //             obj.setHeader(x);
+                    //         }
+                    //     });
+                    // }
+
+                    // Sorting
+                    if (obj.options.columnSorting == true) {
+                        // Line
+                        items.push({ type: 'line' });
+
+                        items.push({
+                            title: obj.options.text.orderAscending,
+                            onclick: function () {
+                                obj.orderBy(x, 0);
+                            }
+                        });
+                        items.push({
+                            title: obj.options.text.orderDescending,
+                            onclick: function () {
+                                obj.orderBy(x, 1);
+                            }
+                        });
+                    }
+                } else {
+                    // Insert new row before
+                    if (obj.options.allowInsertRow == true) {
+                        items.push({
+                            title: i18n.t('static.common.insertNewRowBefore'),
+                            onclick: function () {
+                                var data = [];
+                                data[0] = 0;
+                                data[1] = "";
+                                data[2] = "";
+                                data[3] = "";
+                                data[4] = "";
+                                data[5] = "";
+                                data[6] = "";
+                                data[7] = "";
+                                data[8] = 0;
+                                data[9] = 0;
+                                data[10] = 1;
+                                data[11] = 1;
+                                data[12] = this.props.match.params.programId;
+                                obj.insertRow(data, parseInt(y), 1);
+                            }.bind(this)
+                        });
+                    }
+                    // after
+                    if (obj.options.allowInsertRow == true) {
+                        items.push({
+                            title: i18n.t('static.common.insertNewRowAfter'),
+                            onclick: function () {
+                                var data = [];
+                                data[0] = 0;
+                                data[1] = "";
+                                data[2] = "";
+                                data[3] = "";
+                                data[4] = "";
+                                data[5] = "";
+                                data[6] = "";
+                                data[7] = "";
+                                data[8] = 0;
+                                data[9] = 0;
+                                data[10] = 1;
+                                data[11] = 1;
+                                data[12] = this.props.match.params.programId;
+                                obj.insertRow(data, parseInt(y));
+                            }.bind(this)
+                        });
+                    }
+                    // Delete a row
+                    if (obj.options.allowDeleteRow == true) {
+                        // region id
+                        if (obj.getRowData(y)[9] == 0) {
+                            items.push({
+                                title: i18n.t("static.common.deleterow"),
+                                onclick: function () {
+                                    obj.deleteRow(parseInt(y));
+                                }
+                            });
+                        }
+                    }
+
+                    if (x) {
+                        if (obj.options.allowComments == true) {
+                            items.push({ type: 'line' });
+
+                            var title = obj.records[y][x].getAttribute('title') || '';
+
+                            items.push({
+                                title: title ? obj.options.text.editComments : obj.options.text.addComments,
+                                onclick: function () {
+                                    obj.setComments([x, y], prompt(obj.options.text.comments, title));
+                                }
+                            });
+
+                            if (title) {
+                                items.push({
+                                    title: obj.options.text.clearComments,
+                                    onclick: function () {
+                                        obj.setComments([x, y], '');
+                                    }
+                                });
+                            }
+                        }
+                    }
+                }
+
+                // Line
+                items.push({ type: 'line' });
+
+                // // Save
+                // if (obj.options.allowExport) {
+                //     items.push({
+                //         title: i18n.t('static.supplyPlan.exportAsCsv'),
+                //         shortcut: 'Ctrl + S',
+                //         onclick: function () {
+                //             obj.download(true);
+                //         }
+                //     });
+                // }
+
+                return items;
+            }.bind(this)
+        };
+        var elVar = jexcel(document.getElementById("mapPlanningUnit"), options);
+        this.el = elVar;
+        this.setState({ mapPlanningUnitEl: elVar, loading: false });
+
     }
 
     componentDidMount() {
@@ -157,7 +493,7 @@ class AddprogramPlanningUnit extends Component {
 
                             }
                             console.log("constant product category list====>", productCategoryListNew);
-                            this.setState({ productCategoryList: response.data });
+                            this.setState({ productCategoryList: response.data, productCategoryListNew: productCategoryListNew });
 
                             // PlanningUnitService.getAllPlanningUnitList()
                             PlanningUnitService.getActivePlanningUnitList()
@@ -180,332 +516,11 @@ class AddprogramPlanningUnit extends Component {
                                         ProgramService.getProgramPlaningUnitListByProgramId(this.state.programId)
                                             .then(response => {
                                                 if (response.status == 200) {
-                                                    // alert("hi");
                                                     let myReasponse = response.data;
-                                                    var productDataArr = []
-                                                    // if (myReasponse.length > 0) {
-                                                    this.setState({ rows: myReasponse });
-                                                    var data = [];
-                                                    if (myReasponse.length != 0) {
-                                                        for (var j = 0; j < myReasponse.length; j++) {
-                                                            console.log("myReasponse[j]---", myReasponse[j]);
-                                                            data = [];
-                                                            data[0] = myReasponse[j].productCategory.id;
-                                                            data[1] = myReasponse[j].planningUnit.id;
-                                                            data[2] = myReasponse[j].reorderFrequencyInMonths;
-                                                            data[3] = myReasponse[j].minMonthsOfStock;
-                                                            data[4] = myReasponse[j].monthsInFutureForAmc;
-                                                            data[5] = myReasponse[j].monthsInPastForAmc;
-                                                            data[6] = myReasponse[j].localProcurementLeadTime;
-                                                            data[7] = myReasponse[j].shelfLife;
-                                                            data[8] = myReasponse[j].catalogPrice;
-                                                            data[9] = myReasponse[j].programPlanningUnitId;
-                                                            data[10] = myReasponse[j].active;
-                                                            data[11] = 0;
-                                                            data[12] = myReasponse[j].program.id;
-                                                            productDataArr.push(data);
-                                                        }
-                                                    }
+                                                    this.setState({ rows: myReasponse, list: list }, () => {
+                                                        this.buildJEcxel();
+                                                    });
 
-                                                    if (productDataArr.length == 0) {
-                                                        data = [];
-                                                        data[0] = 0;
-                                                        data[1] = "";
-                                                        data[2] = "";
-                                                        data[3] = "";
-                                                        data[4] = "";
-                                                        data[5] = "";
-                                                        data[6] = "";
-                                                        data[7] = "";
-                                                        data[8] = 0;
-                                                        data[9] = 0;
-                                                        data[10] = 1;
-                                                        data[11] = 1;
-                                                        data[12] = this.props.match.params.programId;
-                                                        productDataArr[0] = data;
-                                                    }
-
-
-                                                    this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
-                                                    this.el.destroy();
-                                                    var json = [];
-                                                    var data = productDataArr;
-                                                    var options = {
-                                                        data: data,
-                                                        columnDrag: true,
-                                                        colWidths: [290, 290, 100, 100, 100, 100, 100, 100, 100, 100, 100],
-                                                        columns: [
-                                                            {
-                                                                title: i18n.t('static.productCategory.productCategory'),
-                                                                type: 'dropdown',
-                                                                source: productCategoryListNew
-                                                            },
-                                                            {
-                                                                title: i18n.t('static.dashboard.product'),
-                                                                type: 'autocomplete',
-                                                                source: list,
-                                                                filter: this.dropdownFilter
-                                                            },
-                                                            {
-                                                                title: i18n.t('static.product.reorderFrequency'),
-                                                                type: 'number',
-
-                                                            },
-                                                            {
-                                                                title: i18n.t('static.product.minMonthOfStock'),
-                                                                type: 'number'
-                                                            },
-                                                            {
-                                                                title: i18n.t('static.program.monthfutureamc'),
-                                                                type: 'number'
-                                                            },
-                                                            {
-                                                                title: i18n.t('static.program.monthpastamc'),
-                                                                type: 'number'
-                                                            },
-                                                            {
-                                                                title: i18n.t('static.product.localProcurementAgentLeadTime'),
-                                                                type: 'number'
-                                                            },
-                                                            {
-                                                                title: i18n.t('static.report.shelfLife'),
-                                                                type: 'number'
-                                                            },
-                                                            {
-                                                                title: i18n.t('static.procurementAgentPlanningUnit.catalogPrice'),
-                                                                type: 'number'
-                                                            },
-                                                            {
-                                                                title: 'Id',
-                                                                type: 'hidden'
-                                                            },
-                                                            {
-                                                                title: 'Active',
-                                                                type: 'hidden'
-                                                            },
-                                                            {
-                                                                title: 'Changed Flag',
-                                                                type: 'hidden'
-                                                            },
-                                                            {
-                                                                title: 'ProgramId',
-                                                                type: 'hidden'
-                                                            }
-
-
-                                                        ],
-                                                        updateTable: function (el, cell, x, y, source, value, id) {
-                                                            var elInstance = el.jexcel;
-                                                            var rowData = elInstance.getRowData(y);
-                                                            // var productCategoryId = rowData[0];
-                                                            var programPlanningUnitId = rowData[9];
-                                                            if (programPlanningUnitId == 0) {
-                                                                var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
-                                                                cell1.classList.remove('readonly');
-
-                                                                var cell2 = elInstance.getCell(`A${parseInt(y) + 1}`)
-                                                                cell2.classList.remove('readonly');
-
-
-                                                            } else {
-                                                                var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
-                                                                cell1.classList.add('readonly');
-
-                                                                var cell2 = elInstance.getCell(`A${parseInt(y) + 1}`)
-                                                                cell2.classList.add('readonly');
-
-
-                                                            }
-                                                        },
-                                                        pagination: JEXCEL_DEFAULT_PAGINATION,
-                                                        search: true,
-                                                        columnSorting: true,
-                                                        tableOverflow: true,
-                                                        wordWrap: true,
-                                                        paginationOptions: JEXCEL_PAGINATION_OPTION,
-                                                        position: 'top',
-                                                        allowInsertColumn: false,
-                                                        allowManualInsertColumn: false,
-                                                        allowDeleteRow: true,
-                                                        onchange: this.changed,
-                                                        oneditionend: this.onedit,
-                                                        copyCompatibility: true,
-                                                        allowManualInsertRow: false,
-                                                        text: {
-                                                            // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                                                            showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                                                            show: '',
-                                                            entries: '',
-                                                        },
-                                                        onload: this.loaded,
-                                                        contextMenu: function (obj, x, y, e) {
-                                                            var items = [];
-                                                            //Add consumption batch info
-
-
-                                                            if (y == null) {
-                                                                // Insert a new column
-                                                                if (obj.options.allowInsertColumn == true) {
-                                                                    items.push({
-                                                                        title: obj.options.text.insertANewColumnBefore,
-                                                                        onclick: function () {
-                                                                            obj.insertColumn(1, parseInt(x), 1);
-                                                                        }
-                                                                    });
-                                                                }
-
-                                                                if (obj.options.allowInsertColumn == true) {
-                                                                    items.push({
-                                                                        title: obj.options.text.insertANewColumnAfter,
-                                                                        onclick: function () {
-                                                                            obj.insertColumn(1, parseInt(x), 0);
-                                                                        }
-                                                                    });
-                                                                }
-
-                                                                // Delete a column
-                                                                // if (obj.options.allowDeleteColumn == true) {
-                                                                //     items.push({
-                                                                //         title: obj.options.text.deleteSelectedColumns,
-                                                                //         onclick: function () {
-                                                                //             obj.deleteColumn(obj.getSelectedColumns().length ? undefined : parseInt(x));
-                                                                //         }
-                                                                //     });
-                                                                // }
-
-                                                                // Rename column
-                                                                // if (obj.options.allowRenameColumn == true) {
-                                                                //     items.push({
-                                                                //         title: obj.options.text.renameThisColumn,
-                                                                //         onclick: function () {
-                                                                //             obj.setHeader(x);
-                                                                //         }
-                                                                //     });
-                                                                // }
-
-                                                                // Sorting
-                                                                if (obj.options.columnSorting == true) {
-                                                                    // Line
-                                                                    items.push({ type: 'line' });
-
-                                                                    items.push({
-                                                                        title: obj.options.text.orderAscending,
-                                                                        onclick: function () {
-                                                                            obj.orderBy(x, 0);
-                                                                        }
-                                                                    });
-                                                                    items.push({
-                                                                        title: obj.options.text.orderDescending,
-                                                                        onclick: function () {
-                                                                            obj.orderBy(x, 1);
-                                                                        }
-                                                                    });
-                                                                }
-                                                            } else {
-                                                                // Insert new row before
-                                                                if (obj.options.allowInsertRow == true) {
-                                                                    items.push({
-                                                                        title: i18n.t('static.common.insertNewRowBefore'),
-                                                                        onclick: function () {
-                                                                            var data = [];
-                                                                            data[0] = 0;
-                                                                            data[1] = "";
-                                                                            data[2] = "";
-                                                                            data[3] = "";
-                                                                            data[4] = "";
-                                                                            data[5] = "";
-                                                                            data[6] = "";
-                                                                            data[7] = "";
-                                                                            data[8] = 0;
-                                                                            data[9] = 0;
-                                                                            data[10] = 1;
-                                                                            data[11] = 1;
-                                                                            data[12] = this.props.match.params.programId;
-                                                                            obj.insertRow(data, parseInt(y), 1);
-                                                                        }.bind(this)
-                                                                    });
-                                                                }
-                                                                // after
-                                                                if (obj.options.allowInsertRow == true) {
-                                                                    items.push({
-                                                                        title: i18n.t('static.common.insertNewRowAfter'),
-                                                                        onclick: function () {
-                                                                            var data = [];
-                                                                            data[0] = 0;
-                                                                            data[1] = "";
-                                                                            data[2] = "";
-                                                                            data[3] = "";
-                                                                            data[4] = "";
-                                                                            data[5] = "";
-                                                                            data[6] = "";
-                                                                            data[7] = "";
-                                                                            data[8] = 0;
-                                                                            data[9] = 0;
-                                                                            data[10] = 1;
-                                                                            data[11] = 1;
-                                                                            data[12] = this.props.match.params.programId;
-                                                                            obj.insertRow(data, parseInt(y));
-                                                                        }.bind(this)
-                                                                    });
-                                                                }
-                                                                // Delete a row
-                                                                if (obj.options.allowDeleteRow == true) {
-                                                                    // region id
-                                                                    if (obj.getRowData(y)[9] == 0) {
-                                                                        items.push({
-                                                                            title: i18n.t("static.common.deleterow"),
-                                                                            onclick: function () {
-                                                                                obj.deleteRow(parseInt(y));
-                                                                            }
-                                                                        });
-                                                                    }
-                                                                }
-
-                                                                if (x) {
-                                                                    if (obj.options.allowComments == true) {
-                                                                        items.push({ type: 'line' });
-
-                                                                        var title = obj.records[y][x].getAttribute('title') || '';
-
-                                                                        items.push({
-                                                                            title: title ? obj.options.text.editComments : obj.options.text.addComments,
-                                                                            onclick: function () {
-                                                                                obj.setComments([x, y], prompt(obj.options.text.comments, title));
-                                                                            }
-                                                                        });
-
-                                                                        if (title) {
-                                                                            items.push({
-                                                                                title: obj.options.text.clearComments,
-                                                                                onclick: function () {
-                                                                                    obj.setComments([x, y], '');
-                                                                                }
-                                                                            });
-                                                                        }
-                                                                    }
-                                                                }
-                                                            }
-
-                                                            // Line
-                                                            items.push({ type: 'line' });
-
-                                                            // // Save
-                                                            // if (obj.options.allowExport) {
-                                                            //     items.push({
-                                                            //         title: i18n.t('static.supplyPlan.exportAsCsv'),
-                                                            //         shortcut: 'Ctrl + S',
-                                                            //         onclick: function () {
-                                                            //             obj.download(true);
-                                                            //         }
-                                                            //     });
-                                                            // }
-
-                                                            return items;
-                                                        }.bind(this)
-                                                    };
-                                                    var elVar = jexcel(document.getElementById("mapPlanningUnit"), options);
-                                                    this.el = elVar;
-                                                    this.setState({ mapPlanningUnitEl: elVar, loading: false });
                                                     // }
                                                 } else {
                                                     this.setState({

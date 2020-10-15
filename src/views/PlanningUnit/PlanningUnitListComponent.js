@@ -763,22 +763,22 @@ export default class PlanningUnitListComponent extends Component {
                     type: 'hidden',
                 },
                 {
-                    title: i18n.t('static.planningunit.planningunit'),
+                    title: i18n.t('static.product.productName'),
                     type: 'text',
                     readOnly: true
                 },
                 {
-                    title: i18n.t('static.forecastingunit.forecastingunit'),
+                    title: i18n.t('static.planningUnit.associatedForecastingUnit'),
                     type: 'text',
                     readOnly: true
                 },
                 {
-                    title: i18n.t('static.unit.unit'),
+                    title: i18n.t('static.planningUnit.planningUnitOfMeasure'),
                     type: 'text',
                     readOnly: true
                 },
                 {
-                    title: i18n.t('static.unit.multiplier'),
+                    title: i18n.t('static.planningUnit.labelMultiplier'),
                     type: 'text',
                     readOnly: true
                 },

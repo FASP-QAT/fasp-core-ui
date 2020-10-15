@@ -1269,7 +1269,7 @@
     "static.message.alreadyExists": "Display Name Already Exists",
     "static.message.2digitDecimal": "Enter 2 digit decimal numbers(e.g- 0.95,10.11)",
     "static.region.duplicateRegion": "Duplicate Region Found",
-    "static.region.duplicateGLN": "GLN No already exists",
+    "static.region.duplicateGLN": "GLN Number already exists",
     "static.report.problemAction.automatic": "Automatic",
     "static.report.problemAction.manual": "Manual",
     "static.shipmentDataEntry.shipmentStatus": "Status",

@@ -888,7 +888,8 @@ class AuthenticationService {
                         return true;
                     }
                     break;
-                case "/programProduct/addProgramProduct/:programId":
+                // case "/programProduct/addProgramProduct/:programId":
+                case "/programProduct/addProgramProduct":
                     if (bfunction.includes("ROLE_BF_EDIT_PROGRAM")) {
                         return true;
                     }

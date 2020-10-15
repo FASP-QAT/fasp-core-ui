@@ -704,23 +704,47 @@ class RealmCountryRegion extends Component {
                 }
 
                 //Capacity
+                // var col = ("C").concat(parseInt(y) + 1);
+                // var value = this.el.getValueFromCoords(2, y);
+                // var reg = /^\s*(?=.*[1-9])\d{1,9}(?:\.\d{1,2})?\s*$/;
+                // value = value.replace(/,/g, "");
+                // if (value == "" || isNaN(Number.parseFloat(value)) || value < 0) {
+                //     this.el.setStyle(col, "background-color", "transparent");
+                //     this.el.setStyle(col, "background-color", "yellow");
+                //     valid = false;
+                //     if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
+                //         this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                //     } else {
+                //         this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                //     }
+                // } else {
+                //     this.el.setStyle(col, "background-color", "transparent");
+                //     this.el.setComments(col, "");
+                // }
                 var col = ("C").concat(parseInt(y) + 1);
-                var value = this.el.getValueFromCoords(2, y);
                 var reg = /^\s*(?=.*[1-9])\d{1,9}(?:\.\d{1,2})?\s*$/;
+                var value = this.el.getValueFromCoords(2, y);
                 value = value.replace(/,/g, "");
-                if (value == "" || isNaN(Number.parseFloat(value)) || value < 0) {
+                if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
-                    if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
-                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                    } else {
-                        this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                    }
                 } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
+                    if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+
                 }
+
+
+
 
                 //GLN
                 // var col = ("D").concat(parseInt(y) + 1);

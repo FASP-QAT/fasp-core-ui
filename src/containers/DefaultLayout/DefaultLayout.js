@@ -300,7 +300,7 @@ const routes = [
   { path: '/program/editProgram/:programId', name: 'static.breadcrum.edit', entityname: 'static.programHead.program', component: EditProgram },
 
   { path: '/productCategory/addProductCategory', name: 'Add Product Category', component: AddProductCategory },
-  { path: '/programProduct/addProgramProduct/:programId', name: 'static.breadcrum.add', entityname: 'static.dashboard.programPlanningUnit', component: AddProgramProduct },
+  { path: '/programProduct/addProgramProduct', name: 'static.breadcrum.add', entityname: 'static.dashboard.programPlanningUnit', component: AddProgramProduct },
 
 
   { path: '/procurementAgent/addProcurementAgentPlanningUnit/:procurementAgentId', name: 'static.breadcrum.add', entityname: 'static.dashboard.procurementAgentPlanningUnit', component: AddProcurementAgentPlanningUnit },
@@ -1010,9 +1010,10 @@ class DefaultLayout extends Component {
                           // },
                           {
                             name: i18n.t('static.Update.PlanningUnits'),
-                            url: '/program/listProgram',
+                            // url: '/program/listProgram',
+                            url: '/programProduct/addProgramProduct',
                             icon: 'fa fa-list-alt',
-                            // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_PROGRAM') ? false : true) }
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_EDIT_PROGRAM') ? false : true) }
                       
                           },
 
