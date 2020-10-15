@@ -1397,5 +1397,6 @@
     "static.report.expiredQty": "Expired/Expiring Quantity",
     "static.report.batchstartdt": " Batch Start Date",
     "static.report.actualInv": "Actual Inventory Count",
+    "static.user.usermanual" :"User Manual",
     "static.inventory.adjustmentdetils": "Adjustment details"
 }
