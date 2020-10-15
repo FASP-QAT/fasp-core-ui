@@ -1391,5 +1391,6 @@
     "static.editSupplyPlan.notes":"Latest Notes",
     "static.report.expiredQty": "Expired/Expiring Quantity",
     "static.report.batchstartdt": " Batch Start Date",
-    "static.report.actualInv": "Actual Inventory Count"
+    "static.report.actualInv": "Actual Inventory Count",
+    "static.inventory.adjustmentdetils": "Adjustment details"
 }

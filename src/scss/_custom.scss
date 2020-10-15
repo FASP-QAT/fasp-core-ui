@@ -2906,7 +2906,7 @@ input::placeholder {
 }
 
 .readonly{
-  background-color: #cfcdc9;
+  background-color: #cfcdc9!important;
 }
 
 
@@ -3504,16 +3504,22 @@ margin-left: -45px;
   }
 }
 
-.emergencyComment{
-    background-image:url('/src/assets/img/emergencyComment.png');
-    background-repeat: no-repeat;
-    background-position: top right;
+.localProcurementEmergencyComment{
+    background-image:url('/src/assets/img/emergencyComment.png'),url('/src/assets/img/localProcurement.png');
+    background-repeat: no-repeat,no-repeat;
+    background-position: top right,top left;
 }
 
 .localProcurementAgent{
-  background-image:url('/src/assets/img/localProcurement.png');
+    background-image:url('/src/assets/img/localProcurement.png');
     background-repeat: no-repeat;
     background-position: top left;
+}
+
+.emergencyComment{
+  background-image:url('/src/assets/img/emergencyComment.png');
+    background-repeat: no-repeat;
+    background-position: top right;
 }
 
 .supplyplan-Thead {
