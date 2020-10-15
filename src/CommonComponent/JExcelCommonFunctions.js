@@ -114,7 +114,10 @@ export function jExcelLoadedFunctionPipeline(instance, number) {
     jexcel_pagination.firstChild.classList.add('mr-auto');
     jexcel_pagination.firstChild.classList.add('pl-0');
     var pageSelect = document.getElementsByClassName('jexcel_pagination_dropdown')[number];
-    pageSelect.options[pageSelect.options.length] = new Option('All', 5000000);
+    // pageSelect.options[pageSelect.options.length] = new Option('All', 5000000);
+    pageSelect.options[3].innerHTML = "All";
+
+    pageSelect.addEventListener("change", () => pagignationChange(number));
 
     var jexcel_filterFirstdiv = document.getElementsByClassName('jexcel_filter')[number];
     var filter = jexcel_filterFirstdiv.firstChild;
