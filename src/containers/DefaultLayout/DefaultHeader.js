@@ -86,7 +86,7 @@ class DefaultHeader extends Component {
           <DefaultHeaderDropdown mssgs/>
           <NavItem className="">
             <NavLink to="#" className="nav-link">
-            <img src={imageUsermanual} className="HelpIcon" title={i18n.t('static.user.usermanual')}  />
+            <img src={imageUsermanual} className="HelpIcon" title={i18n.t('static.user.usermanual')} />
             </NavLink>
           </NavItem>
           <NavItem className="">
