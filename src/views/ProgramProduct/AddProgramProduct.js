@@ -14,7 +14,7 @@ import PlanningUnitService from "../../api/PlanningUnitService";
 import i18n from '../../i18n';
 import ProductCategoryServcie from '../../api/PoroductCategoryService.js';
 import { jExcelLoadedFunction } from "../../CommonComponent/JExcelCommonFunctions";
-import { JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from "../../Constants";
+import { DECIMAL_NO_REGEX, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from "../../Constants";
 const entityname = i18n.t('static.dashboard.programPlanningUnit');
 
 
@@ -902,7 +902,8 @@ class AddprogramPlanningUnit extends Component {
                 //Catalog price
                 var col = ("I").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(8, y);
-                var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
+                // var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
+                var reg = DECIMAL_NO_REGEX;
                 // console.log("value-----", value);
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
@@ -1156,7 +1157,8 @@ class AddprogramPlanningUnit extends Component {
         //Catalog price
         if (x == 8) {
             console.log("changed 10");
-            var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
+            // var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
+            var reg = DECIMAL_NO_REGEX;
             var col = ("I").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");

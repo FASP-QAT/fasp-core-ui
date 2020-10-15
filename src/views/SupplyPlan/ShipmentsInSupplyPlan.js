@@ -5,11 +5,12 @@ import i18n from '../../i18n';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunctionOnlyHideRow, checkValidtion, inValid, positiveValidation, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { SECRET_KEY, SHIPMENT_DATA_SOURCE_TYPE, DELIVERED_SHIPMENT_STATUS, TBD_PROCUREMENT_AGENT_ID, TBD_FUNDING_SOURCE, SUBMITTED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, JEXCEL_DECIMAL_NO_REGEX, JEXCEL_INTEGER_REGEX, CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, INDEXED_DB_VERSION, INDEXED_DB_NAME, ALPHABET_NUMBER_REGEX, JEXCEL_DATE_FORMAT, BATCH_PREFIX, NONE_SELECTED_DATA_SOURCE_ID, LABEL_WITH_SPECIAL_SYMBOL_REGEX, BATCH_NO_REGEX, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from "../../Constants";
+import { SECRET_KEY, SHIPMENT_DATA_SOURCE_TYPE, DELIVERED_SHIPMENT_STATUS, TBD_PROCUREMENT_AGENT_ID, TBD_FUNDING_SOURCE, SUBMITTED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, JEXCEL_DECIMAL_NO_REGEX, JEXCEL_INTEGER_REGEX, CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, INDEXED_DB_VERSION, INDEXED_DB_NAME, ALPHABET_NUMBER_REGEX, JEXCEL_DATE_FORMAT, BATCH_PREFIX, NONE_SELECTED_DATA_SOURCE_ID, LABEL_WITH_SPECIAL_SYMBOL_REGEX, BATCH_NO_REGEX, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION, USD_CURRENCY_ID } from "../../Constants";
 import moment, { invalid } from "moment";
 import { paddingZero, generateRandomAplhaNumericCode, contrast } from "../../CommonComponent/JavascriptCommonFunctions";
 import CryptoJS from 'crypto-js'
 import { calculateSupplyPlan } from "./SupplyPlanCalculations";
+import AuthenticationService from "../Common/AuthenticationService";
 
 
 export default class ShipmentsInSupplyPlanComponent extends React.Component {
@@ -35,7 +36,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         this.loadedShipmentDates = this.loadedShipmentDates.bind(this)
         this.calculateLeadTimesOnChange = this.calculateLeadTimesOnChange.bind(this)
         this.shipmentDatesChanged = this.shipmentDatesChanged.bind(this)
-        this.calculateFutureDates = this.calculateFutureDates.bind(this)
         this.checkValidationForShipmentDates = this.checkValidationForShipmentDates.bind(this)
         this.saveShipmentsDate = this.saveShipmentsDate.bind(this);
         this.saveShipments = this.saveShipments.bind(this);
@@ -256,6 +256,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                         if (this.props.shipmentPage == "supplyPlanCompare") {
                                             shipmentEditable = false;
                                         }
+                                        if (this.props.shipmentPage == "shipmentDataEntry" && (this.props.items.shipmentType).value == 2) {
+                                            shipmentEditable = false;
+                                        }
                                         var paginationOption = false;
                                         var searchOption = false;
                                         var paginationArray = []
@@ -276,10 +279,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             }
                                             if (this.props.shipmentPage == "shipmentDataEntry" && (this.props.items.shipmentType).value == 2) {
                                                 erpType = "text";
-                                            }
-                                            var orderNoAndPrimeLineNo = "";
-                                            if (shipmentList[i].orderNo != "" && shipmentList[i].orderNo != null) {
-                                                orderNoAndPrimeLineNo = shipmentList[i].orderNo.concat("~").concat(shipmentList[i].primeLineNo);
                                             }
 
                                             var totalShipmentQty = 0;
@@ -317,97 +316,112 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
 
                                             console.log("shipmentList[i].receivedDate", shipmentList[i].receivedDate);
                                             data = [];
-                                            data[0] = shipmentList[i].shipmentStatus.id; //A
-                                            data[1] = shipmentList[i].receivedDate != "" && shipmentList[i].receivedDate != null && shipmentList[i].receivedDate != undefined && shipmentList[i].receivedDate != "Invalid date" ? shipmentList[i].receivedDate : shipmentList[i].expectedDeliveryDate;//B
-                                            data[2] = shipmentList[i].procurementAgent.id;//C
-                                            data[3] = shipmentList[i].fundingSource.id;//D
-                                            data[4] = shipmentList[i].budget.id;//E
-                                            data[5] = orderNoAndPrimeLineNo;
-                                            data[6] = shipmentList[i].dataSource.id;//G
-                                            data[7] = shipmentMode;//H
-                                            data[8] = shipmentList[i].shipmentQty;//I
-                                            data[9] = shipmentList[i].currency.currencyId;//J
-                                            data[10] = parseFloat(shipmentList[i].rate).toFixed(2);//K
-                                            data[11] = `=ROUND(K${parseInt(i) + 1}*I${parseInt(i) + 1},2)`;//L
-                                            data[12] = parseFloat(shipmentList[i].freightCost).toFixed(2);//M
-                                            data[13] = shipmentList[i].notes;//N
-                                            data[14] = shipmentList[i].erpFlag;//O
-                                            data[15] = shipmentList[i].shipmentStatus.id;//P
+                                            data[0] = shipmentList[i].accountFlag;//A
+                                            data[1] = shipmentList[i].shipmentId;//B
+                                            data[2] = shipmentList[i].planningUnit.id;//C
+                                            data[3] = shipmentList[i].shipmentStatus.id;//D
+                                            data[4] = shipmentList[i].receivedDate != "" && shipmentList[i].receivedDate != null && shipmentList[i].receivedDate != undefined && shipmentList[i].receivedDate != "Invalid date" ? shipmentList[i].receivedDate : shipmentList[i].expectedDeliveryDate;//E
+                                            data[5] = shipmentMode;//F
+                                            data[6] = shipmentList[i].procurementAgent.id;//G
+                                            data[7] = shipmentList[i].localProcurement;//H
+                                            data[8] = shipmentList[i].orderNo;//I
+                                            data[9] = shipmentList[i].primeLineNo;//J
+                                            data[10] = shipmentList[i].shipmentQty;//K
+                                            data[11] = isEmergencyOrder;//L
+                                            data[12] = shipmentList[i].fundingSource.id;//M
+                                            data[13] = shipmentList[i].budget.id;//N
+                                            data[14] = shipmentList[i].currency.currencyId;//O
+                                            data[15] = parseFloat(shipmentList[i].rate).toFixed(2);//P
+                                            data[16] = `=ROUND(K${parseInt(i) + 1}*P${parseInt(i) + 1},2)`;//Q
+                                            data[17] = parseFloat(shipmentList[i].freightCost).toFixed(2);//R
+                                            data[18] = shipmentList[i].dataSource.id;//S
+                                            data[19] = shipmentList[i].notes;//T
+                                            data[20] = shipmentList[i].createdDate;//U
+                                            data[21] = shipmentList[i].erpFlag;//V
+                                            data[22] = shipmentList[i].shipmentStatus.id;//W
                                             var index;
                                             if (shipmentList[i].shipmentId != 0) {
                                                 index = shipmentListUnFiltered.findIndex(c => c.shipmentId == shipmentList[i].shipmentId);
                                             } else {
                                                 index = shipmentList[i].index;
                                             }
-                                            data[16] = index; // Q
-                                            data[17] = shipmentList[i].batchInfoList; //R
-                                            data[18] = totalShipmentQty; //S
-                                            data[19] = isEmergencyOrder;
-                                            data[20] = shipmentList[i].accountFlag;
-                                            data[21] = shipmentDatesJson;
-                                            data[22] = shipmentList[i].suggestedQty;
-                                            data[23] = 0;
-                                            data[24] = shipmentList[i].active;
-                                            data[25] = 0;
+                                            data[23] = index; // X
+                                            data[24] = shipmentList[i].batchInfoList; //Y
+                                            data[25] = totalShipmentQty; //Z
+                                            data[26] = shipmentDatesJson;//AA
+                                            data[27] = shipmentList[i].suggestedQty;//AB
+                                            data[28] = 0;//AC
+                                            data[29] = shipmentList[i].active;//AD
+                                            data[30] = 0;//AE
                                             shipmentsArr.push(data);
                                         }
                                         if (shipmentList.length == 0 && this.props.shipmentPage == "shipmentDataEntry" && this.props.items.shipmentType.value == 1) {
                                             var data = [];
-                                            data[0] = "";
-                                            data[1] = "";
-                                            data[2] = "";
+                                            data[0] = true;
+                                            data[1] = 0;
+                                            data[2] = document.getElementById("planningUnitId").value;
                                             data[3] = "";
                                             data[4] = "";
                                             data[5] = "";
-                                            data[6] = NONE_SELECTED_DATA_SOURCE_ID;
-                                            data[7] = "";
-                                            data[8] = 0;
+                                            data[6] = "";
+                                            data[7] = false;
+                                            data[8] = "";
                                             data[9] = "";
-                                            data[10] = this.props.items.catalogPrice;
-                                            data[11] = `=ROUND(K${parseInt(0) + 1}*I${parseInt(0) + 1},2)`;
+                                            data[10] = 0;
+                                            data[11] = false;
                                             data[12] = "";
                                             data[13] = "";
-                                            data[14] = false;
-                                            data[15] = ""
-                                            data[16] = -1;
+                                            data[14] = USD_CURRENCY_ID;
+                                            data[15] = this.props.items.catalogPrice;
+                                            data[16] = `=ROUND(P${parseInt(0) + 1}*K${parseInt(0) + 1},2)`;
                                             data[17] = "";
-                                            data[18] = 0;
-                                            data[19] = false;
-                                            data[20] = true;
-                                            data[21] = "";
-                                            data[22] = 0;
-                                            data[23] = 1;
-                                            data[24] = true;
+                                            data[18] = NONE_SELECTED_DATA_SOURCE_ID;
+                                            data[19] = "";
+                                            data[20] = moment(Date.now()).format("YYYY-MM-DD");
+                                            data[21] = false;
+                                            data[22] = ""
+                                            data[23] = -1;
+                                            data[24] = "";
                                             data[25] = 0;
+                                            data[26] = "";
+                                            data[27] = 0;
+                                            data[28] = 1;
+                                            data[29] = true;
+                                            data[30] = 0;
                                             shipmentsArr[0] = data;
                                         }
                                         var options = {
                                             data: shipmentsArr,
                                             columns: [
+                                                { type: 'checkbox', title: i18n.t('static.common.active'), width: 80 },
+                                                { type: 'text', title: i18n.t('static.report.id'), width: 80, readOnly: true },
+                                                { type: 'hidden', title: i18n.t('static.supplyPlan.qatProduct'), width: 150 },
                                                 { type: 'dropdown', title: i18n.t('static.shipmentDataEntry.shipmentStatus'), source: shipmentStatusList, filter: this.filterShipmentStatus, width: 100 },
                                                 { type: 'calendar', title: i18n.t('static.common.receivedate'), options: { format: JEXCEL_DATE_FORMAT }, width: 100 },
+                                                { type: 'dropdown', title: i18n.t("static.supplyPlan.shipmentMode"), source: [{ id: 1, name: i18n.t('static.supplyPlan.sea') }, { id: 2, name: i18n.t('static.supplyPlan.air') }], width: 100 },
                                                 { type: 'dropdown', title: i18n.t('static.procurementagent.procurementagent'), source: procurementAgentList, filter: this.filterProcurementAgent, width: 120 },
+                                                { type: 'checkbox', title: i18n.t('static.shipmentDataEntry.localProcurement'), width: 80 },
+                                                { type: 'text', title: i18n.t('static.shipmentDataentry.procurementAgentOrderNo'), width: 100 },
+                                                { type: erpType, title: i18n.t('static.shipmentDataentry.procurementAgentPrimeLineNo'), width: 100 },
+                                                { type: 'numeric', readOnly: true, title: i18n.t("static.supplyPlan.adjustesOrderQty"), width: 100, mask: '#,##.00', decimal: '.' },
+                                                { type: 'checkbox', title: i18n.t('static.supplyPlan.emergencyOrder'), width: 80 },
                                                 { type: 'dropdown', title: i18n.t('static.subfundingsource.fundingsource'), source: fundingSourceList, filter: this.filterFundingSource, width: 120 },
                                                 { type: 'dropdown', title: i18n.t('static.dashboard.budget'), source: budgetList, filter: this.budgetDropdownFilter, width: 120 },
-                                                { type: erpType, readOnly: true, title: i18n.t('static.supplyPlan.orderNoAndPrimeLineNo'), width: 150 },
-                                                { type: 'dropdown', title: i18n.t('static.datasource.datasource'), source: dataSourceList, filter: this.filterDataSourceList, width: 150 },
-                                                { type: 'dropdown', title: i18n.t("static.supplyPlan.shipmentMode"), source: [{ id: 1, name: i18n.t('static.supplyPlan.sea') }, { id: 2, name: i18n.t('static.supplyPlan.air') }], width: 100 },
-                                                { type: 'numeric', readOnly: true, title: i18n.t("static.supplyPlan.adjustesOrderQty"), width: 100, mask: '#,##.00', decimal: '.' },
                                                 { type: 'dropdown', title: i18n.t('static.dashboard.currency'), source: currencyList, filter: this.filterCurrency, width: 120 },
                                                 { type: 'numeric', title: i18n.t('static.supplyPlan.pricePerPlanningUnit'), width: 80, mask: '#,##.00', decimal: '.' },
                                                 { type: 'numeric', readOnly: true, title: i18n.t('static.shipment.productcost'), width: 80, mask: '#,##.00', decimal: '.' },
                                                 { type: 'numeric', title: i18n.t('static.shipment.freightcost'), width: 80, mask: '#,##.00', decimal: '.' },
+                                                { type: 'dropdown', title: i18n.t('static.datasource.datasource'), source: dataSourceList, filter: this.filterDataSourceList, width: 150 },
                                                 { type: 'text', title: i18n.t('static.program.notes'), width: 200 },
+                                                { type: 'hidden', title: i18n.t('static.supplyPlan.createdDate'), width: 0 },
                                                 { type: 'hidden', title: i18n.t('static.supplyPlan.erpFlag'), width: 0 },
-                                                { type: 'hidden', title: i18n.t('static.supplyPlan.shipmentStatus'), width: 0 },
+                                                { type: 'hidden', title: i18n.t('static.supplyPlan.lastshipmentStatus'), width: 0 },
                                                 { type: 'hidden', title: i18n.t('static.supplyPlan.index'), width: 0 },
                                                 { type: 'hidden', title: i18n.t('static.supplyPlan.batchInfo'), width: 200 },
                                                 { type: 'hidden', title: i18n.t('static.supplyPlan.totalQtyBatchInfo'), width: 0 },
-                                                { type: 'checkbox', title: i18n.t('static.supplyPlan.emergencyOrder'), width: 80 },
-                                                { type: 'checkbox', title: i18n.t('static.common.accountFlag'), width: 80 },
                                                 { type: 'hidden', title: i18n.t('static.supplyPlan.shipmentDatesJson'), width: 0 },
-                                                { type: 'hidden' },
-                                                { type: 'hidden' },
+                                                { type: 'hidden', title: "Suggested order Qty" },
+                                                { type: 'hidden', title: "Is changed" },
                                                 { title: i18n.t('static.inventory.active'), type: 'hidden', width: 0 },
                                                 { type: 'hidden' }
                                             ],
@@ -435,25 +449,29 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             onload: this.loadedShipments,
                                             updateTable: function (el, cell, x, y, source, value, id) {
                                                 var elInstance = el.jexcel;
-                                                var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
-                                                    'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W']
+                                                // var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
+                                                //     'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
+                                                //     'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE']
                                                 var rowData = elInstance.getRowData(y);
-                                                var erpFlag = rowData[14];
-                                                if (erpFlag.toString() == true) {
-                                                    for (var i = 0; i < colArr.length; i++) {
-                                                        var cell = elInstance.getCell(`${colArr[i]}${parseInt(y) + 1}`)
+                                                // var erpFlag = rowData[21];
+                                                // if (erpFlag.toString() == true) {
+                                                //     for (var i = 0; i < colArr.length; i++) {
+                                                //         var cell = elInstance.getCell(`${colArr[i]}${parseInt(y) + 1}`)
+                                                //         cell.classList.add('readonly');
+                                                //     }
+                                                // } else {
+                                                // }
+                                                if (x == 6 || x == 2) {
+                                                    var procurementAgentPlanningUnit = papuResult.filter(p => p.procurementAgent.id == rowData[6] && p.planningUnit.id == rowData[2]);
+                                                    if (rowData[6] == "" || (procurementAgentPlanningUnit.length > 0 && ((procurementAgentPlanningUnit[0].unitsPerPalletEuro1 != 0 && procurementAgentPlanningUnit[0].unitsPerPalletEuro1 != null) || (procurementAgentPlanningUnit[0].moq != 0 && procurementAgentPlanningUnit[0].moq != null) || (procurementAgentPlanningUnit[0].unitsPerPalletEuro2 != 0 && procurementAgentPlanningUnit[0].unitsPerPalletEuro2 != null) || (procurementAgentPlanningUnit[0].unitsPerContainer != 0 && procurementAgentPlanningUnit[0].unitsPerContainer != null)))) {
+                                                        console.log("In if")
+                                                        var cell = elInstance.getCell(`K${parseInt(y) + 1}`)
                                                         cell.classList.add('readonly');
+                                                    } else {
+                                                        console.log("In else")
+                                                        var cell = elInstance.getCell(`K${parseInt(y) + 1}`)
+                                                        cell.classList.remove('readonly');
                                                     }
-                                                } else {
-                                                }
-
-                                                var procurementAgentPlanningUnit = papuResult.filter(p => p.procurementAgent.id == rowData[2] && p.planningUnit.id == planningUnitId);
-                                                if (rowData[2] == "" || (procurementAgentPlanningUnit.length > 0 && ((procurementAgentPlanningUnit[0].unitsPerPalletEuro1 != 0 && procurementAgentPlanningUnit[0].unitsPerPalletEuro1 != null) || (procurementAgentPlanningUnit[0].moq != 0 && procurementAgentPlanningUnit[0].moq != null) || (procurementAgentPlanningUnit[0].unitsPerPalletEuro2 != 0 && procurementAgentPlanningUnit[0].unitsPerPalletEuro2 != null) || (procurementAgentPlanningUnit[0].unitsPerContainer != 0 && procurementAgentPlanningUnit[0].unitsPerContainer != null)))) {
-                                                    var cell = elInstance.getCell(`I${parseInt(y) + 1}`)
-                                                    cell.classList.add('readonly');
-                                                } else {
-                                                    var cell = elInstance.getCell(`I${parseInt(y) + 1}`)
-                                                    cell.classList.remove('readonly');
                                                 }
                                             }.bind(this),
                                             contextMenu: function (obj, x, y, e) {
@@ -469,9 +487,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
 
                                                 // Add shipment batch info
                                                 var rowData = obj.getRowData(y);
-                                                var expectedDeliveryDate = moment(rowData[1]).format("YYYY-MM-DD");
+                                                var expectedDeliveryDate = moment(rowData[4]).format("YYYY-MM-DD");
                                                 var expiryDate = moment(expectedDeliveryDate).add(this.props.items.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
-                                                if ((rowData[0] == DELIVERED_SHIPMENT_STATUS || rowData[0] == SHIPPED_SHIPMENT_STATUS || rowData[0] == ARRIVED_SHIPMENT_STATUS)) {
+                                                if ((rowData[3] == DELIVERED_SHIPMENT_STATUS || rowData[3] == SHIPPED_SHIPMENT_STATUS || rowData[3] == ARRIVED_SHIPMENT_STATUS)) {
                                                     items.push({
                                                         title: i18n.t('static.supplyPlan.addOrListBatchInfo'),
                                                         onclick: function () {
@@ -480,7 +498,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                 this.props.updateState("shipmentModalTitle", i18n.t("static.dataEntry.batchDetails"));
                                                                 this.props.toggleLarge();
                                                             }
-                                                            var batchInfoListAll = this.props.items.programJson.batchInfoList.filter(c => c.planningUnitId == document.getElementById("planningUnitId").value);
+                                                            var rowData = obj.getRowData(y)
+                                                            var batchInfoListAll = this.props.items.programJson.batchInfoList.filter(c => c.planningUnitId == rowData[2]);
                                                             this.setState({
                                                                 batchInfoListAll: batchInfoListAll
                                                             })
@@ -489,15 +508,14 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                             this.el.destroy();
                                                             var json = [];
                                                             // var elInstance=this.state.plannedPsmShipmentsEl;
-                                                            var rowData = obj.getRowData(y)
-                                                            var batchInfo = rowData[17];
+
+                                                            var batchInfo = rowData[24];
                                                             var tableEditable = true;
-                                                            if (rowData[14].toString() == "true" || this.props.shipmentPage == "supplyPlanCompare") {
+                                                            if (rowData[21].toString() == "true" || this.props.shipmentPage == "supplyPlanCompare") {
                                                                 tableEditable = false;
                                                             }
                                                             if (this.props.shipmentPage != "shipmentDataEntry" && document.getElementById("addRowBatchId") != null) {
-                                                                console.log("rowData[14]", rowData[14])
-                                                                if (rowData[14].toString() == "false") {
+                                                                if (rowData[21].toString() == "false") {
                                                                     document.getElementById("addRowBatchId").style.display = "block";
                                                                 } else {
                                                                     document.getElementById("addRowBatchId").style.display = "none";
@@ -624,11 +642,11 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                     });
                                                 }
 
-                                                if (rowData[2] != "" && rowData[7] != "") {
+                                                if (rowData[6] != "" && rowData[5] != "" && rowData[2] != "") {
                                                     items.push({
                                                         title: i18n.t('static.supplyPlan.showShipmentDates'),
                                                         onclick: function () {
-                                                            var procurementAgent = rowData[2];
+                                                            var procurementAgent = rowData[6];
                                                             var db1;
                                                             var storeOS;
                                                             getDatabase();
@@ -662,9 +680,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                     this.el = jexcel(document.getElementById("shipmentDatesTable"), '');
                                                                     this.el.destroy();
                                                                     var json = [];
-                                                                    var shipmentDates = rowData[21];
-                                                                    var shipmentStatus = rowData[0];
-                                                                    var emergencyOrder = rowData[19];
+                                                                    var shipmentDates = rowData[26];
+                                                                    var shipmentStatus = rowData[3];
+                                                                    var emergencyOrder = rowData[11];
                                                                     var expectedDeliveryDate = shipmentDates.expectedDeliveryDate;
                                                                     var expectedPlannedDate = "";
                                                                     var expectedSubmittedDate = "";
@@ -680,8 +698,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                     console.log("Shipment Dates", shipmentDates);
                                                                     console.log("Received Date", receivedDate)
                                                                     var addLeadTimes = 0;
-                                                                    if (papuResult.localProcurementAgent) {
-                                                                        addLeadTimes = this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
+                                                                    if (rowData[7].toString() == "true") {
+                                                                        addLeadTimes = this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == rowData[2])[0].localProcurementLeadTime;
                                                                         var leadTimesPerStatus = addLeadTimes / 5;
                                                                         expectedArrivedDate = moment(expectedDeliveryDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
                                                                         expectedShippedDate = moment(expectedArrivedDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
@@ -689,7 +707,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                         expectedSubmittedDate = moment(expectedApprovedDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
                                                                         expectedPlannedDate = moment(expectedSubmittedDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
                                                                     } else {
-                                                                        var shipmentMode = rowData[7];
+                                                                        var shipmentMode = rowData[5];
                                                                         var ppUnit = papuResult;
                                                                         var submittedToApprovedLeadTime = ppUnit.submittedToApprovedLeadTime;
                                                                         if (submittedToApprovedLeadTime == 0 || submittedToApprovedLeadTime == "" || submittedToApprovedLeadTime == null) {
@@ -717,7 +735,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
 
 
                                                                     var tableEditable = true;
-                                                                    if (rowData[14].toString() == "true" || this.props.shipmentPage == "supplyPlanCompare" || shipmentStatus == ON_HOLD_SHIPMENT_STATUS || shipmentStatus == CANCELLED_SHIPMENT_STATUS) {
+                                                                    if (rowData[21].toString() == "true" || this.props.shipmentPage == "supplyPlanCompare" || shipmentStatus == ON_HOLD_SHIPMENT_STATUS || shipmentStatus == CANCELLED_SHIPMENT_STATUS) {
                                                                         tableEditable = false;
                                                                     }
 
@@ -798,7 +816,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                                 type: 'calendar',
                                                                                 options: {
                                                                                     format: JEXCEL_DATE_FORMAT,
-                                                                                    validRange: shipmentStatus == DELIVERED_SHIPMENT_STATUS ? [null, (moment(Date.now()).format("YYYY-MM-DD")).toString()] : [(moment(Date.now()).format("YYYY-MM-DD")).toString(), null]
+                                                                                    validRange: shipmentStatus == DELIVERED_SHIPMENT_STATUS ? [null, (moment(Date.now()).format("YYYY-MM-DD")).toString()] : [null, null]
                                                                                 }
                                                                             },
                                                                             {
@@ -962,17 +980,17 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                         }.bind(this)
                                                     })
                                                 }
-                                                if (shipmentEditable && rowData[0].toString() == PLANNED_SHIPMENT_STATUS && rowData[16] != -1) {
+                                                if (shipmentEditable && rowData[3].toString() == PLANNED_SHIPMENT_STATUS && rowData[23] != -1) {
                                                     items.push({
                                                         title: i18n.t('static.common.deleterow'),
                                                         onclick: function () {
-                                                            obj.setValueFromCoords(24, y, false, true);
+                                                            obj.setValueFromCoords(29, y, false, true);
                                                         }.bind(this)
                                                     });
                                                 }
                                                 if (shipmentEditable && obj.options.allowDeleteRow == true && obj.getJson().length > 1) {
                                                     // region id
-                                                    if (obj.getRowData(y)[16] == -1) {
+                                                    if (obj.getRowData(y)[23] == -1) {
                                                         items.push({
                                                             title: i18n.t("static.common.deleterow"),
                                                             onclick: function () {
@@ -1003,46 +1021,62 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
 
     addRowInJexcel() {
         var obj = this.state.shipmentsEl;
+        console.log("this.props.items.catalogPrice",this.props.items.catalogPrice)
         var json = obj.getJson();
         var data = [];
-        data[0] = "";
-        data[1] = "";
-        data[2] = "";
+        data[0] = true;
+        data[1] = 0;
+        data[2] = document.getElementById("planningUnitId").value;
         data[3] = "";
         data[4] = "";
         data[5] = "";
-        data[6] = NONE_SELECTED_DATA_SOURCE_ID;
-        data[7] = "";
-        data[8] = 0;
+        data[6] = "";
+        data[7] = false;
+        data[8] = "";
         data[9] = "";
-        data[10] = this.props.items.catalogPrice;
-        data[11] = `=ROUND(K${parseInt(json.length) + 1}*I${parseInt(json.length) + 1},2)`;
+        data[10] = 0;
+        data[11] = false;
         data[12] = "";
         data[13] = "";
-        data[14] = false;
-        data[15] = ""
-        data[16] = -1;
+        data[14] = USD_CURRENCY_ID;
+        data[15] = this.props.items.catalogPrice;
+        data[16] = `=ROUND(P${parseInt(json.length) + 1}*K${parseInt(json.length) + 1},2)`;
         data[17] = "";
-        data[18] = 0;
-        data[19] = false;
-        data[20] = true;
-        data[21] = "";
-        data[22] = 0;
-        data[23] = 1;
-        data[24] = true;
+        data[18] = NONE_SELECTED_DATA_SOURCE_ID;
+        data[19] = "";
+        data[20] = moment(Date.now()).format("YYYY-MM-DD");
+        data[21] = false;
+        data[22] = ""
+        data[23] = -1;
+        data[24] = "";
         data[25] = 0;
+        data[26] = "";
+        data[27] = 0;
+        data[28] = 1;
+        data[29] = true;
+        data[30] = 0;
         obj.insertRow(data);
-        console.log("Json.length", json.length);
-        obj.setValueFromCoords(6, json.length, NONE_SELECTED_DATA_SOURCE_ID, true);
-        obj.setValueFromCoords(14, json.length, false, true);
-        obj.setValueFromCoords(16, json.length, -1, true);
-        obj.setValueFromCoords(18, json.length, 0, true);
-        obj.setValueFromCoords(19, json.length, false, true);
-        obj.setValueFromCoords(20, json.length, true, true);
-        obj.setValueFromCoords(22, json.length, 0, true);
-        obj.setValueFromCoords(23, json.length, 1, true);
-        obj.setValueFromCoords(24, json.length, true, true);
+        obj.setValueFromCoords(1, json.length, 0, true);
+        obj.setValueFromCoords(10, json.length, 0, true);
+        obj.setValueFromCoords(15, json.length, this.props.items.catalogPrice, true);
+        obj.setValueFromCoords(21, json.length, false, true);
         obj.setValueFromCoords(25, json.length, 0, true);
+        obj.setValueFromCoords(27, json.length, 0, true);
+        obj.setValueFromCoords(30, json.length, 0, true);
+        // obj.setValueFromCoords(2, json.length, document.getElementById("planningUnitId").value, true);
+        // obj.setValueFromCoords(7, json.length, false, true);
+        // obj.setValueFromCoords(20, json.length, moment(Date.now()).format("YYYY-MM-DD"), true);
+
+        // obj.setValueFromCoords(18, json.length, NONE_SELECTED_DATA_SOURCE_ID, true);
+        // obj.setValueFromCoords(21, json.length, false, true);
+        // obj.setValueFromCoords(23, json.length, -1, true);
+        // obj.setValueFromCoords(25, json.length, 0, true);
+        // obj.setValueFromCoords(11, json.length, false, true);
+        // obj.setValueFromCoords(0, json.length, true, true);
+        // obj.setValueFromCoords(27, json.length, 0, true);
+        // obj.setValueFromCoords(28, json.length, 1, true);
+        // obj.setValueFromCoords(29, json.length, true, true);
+        // obj.setValueFromCoords(30, json.length, 0, true);
         if (this.props.shipmentPage == "shipmentDataEntry") {
             var showOption = (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
             console.log("showOption", showOption);
@@ -1059,7 +1093,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         var rowData = obj.getRowData(0);
         var shipmentInstance = this.state.shipmentsEl;
         var shipmentRowData = shipmentInstance.getRowData(rowData[4]);
-        var expectedDeliveryDate = moment(shipmentRowData[1]).format("YYYY-MM-DD");
+        var expectedDeliveryDate = moment(shipmentRowData[4]).format("YYYY-MM-DD");
         var expiryDate = moment(expectedDeliveryDate).add(this.props.items.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
         data[0] = "";
         data[1] = expiryDate;
@@ -1100,63 +1134,70 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         }
         var asterisk = document.getElementsByClassName("resizable")[0];
         var tr = asterisk.firstChild;
-        tr.children[1].classList.add('AsteriskTheadtrTd');
-        tr.children[2].classList.add('AsteriskTheadtrTd');
-        tr.children[3].classList.add('AsteriskTheadtrTd');
+        tr.children[4].classList.add('AsteriskTheadtrTd');
+        tr.children[5].classList.add('AsteriskTheadtrTd');
         tr.children[6].classList.add('AsteriskTheadtrTd');
         tr.children[7].classList.add('AsteriskTheadtrTd');
-        tr.children[8].classList.add('AsteriskTheadtrTd');
-        tr.children[9].classList.add('AsteriskTheadtrTd');
-        tr.children[10].classList.add('AsteriskTheadtrTd');
-        tr.children[11].classList.add('AsteriskTheadtrTd');
-        tr.children[12].classList.add('AsteriskTheadtrTd');
         tr.children[13].classList.add('AsteriskTheadtrTd');
+        tr.children[18].classList.add('AsteriskTheadtrTd');
+        tr.children[11].classList.add('AsteriskTheadtrTd');
+        // tr.children[14].classList.add('AsteriskTheadtrTd');
+        tr.children[15].classList.add('AsteriskTheadtrTd');
+        tr.children[16].classList.add('AsteriskTheadtrTd');
+        // tr.children[17].classList.add('AsteriskTheadtrTd');
+        tr.children[19].classList.add('AsteriskTheadtrTd');
         var shipmentInstance = (instance).jexcel;
-        shipmentInstance.orderBy(1, 0);
+        shipmentInstance.orderBy(4, 0);
         var json = shipmentInstance.getJson();
-        var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X']
+        var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE']
         for (var i = 0; i < json.length; i++) {
             var rowData = shipmentInstance.getRowData(i);
-            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y']
+            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE']
             for (var j = 0; j < colArr.length; j++) {
                 var col = (colArr[j]).concat(parseInt(i) + 1);
-                if (rowData[20].toString() == "false") {
+                if (rowData[0].toString() == "false") {
                     shipmentInstance.setStyle(col, "background-color", "transparent");
                     shipmentInstance.setStyle(col, "background-color", "#D3D3D3");
-                    var cell = shipmentInstance.getCell(`L${parseInt(i) + 1}`)
+                    var cell = shipmentInstance.getCell(`Q${parseInt(i) + 1}`)
                     cell.classList.add('shipmentEntryDoNotInclude');
-                    cell.classList.remove('readonly');
-                    var cell = shipmentInstance.getCell(`I${parseInt(i) + 1}`)
+                    var cell = shipmentInstance.getCell(`K${parseInt(i) + 1}`)
                     cell.classList.add('shipmentEntryDoNotInclude');
-                    cell.classList.remove('readonly');
+                    var cell = shipmentInstance.getCell(`B${parseInt(i) + 1}`)
+                    cell.classList.add('shipmentEntryDoNotInclude');
                     var element = document.getElementById("shipmentsDetailsTable");
                     element.classList.remove("jexcelremoveReadonlybackground");
                 } else {
                     shipmentInstance.setStyle(col, "background-color", "transparent");
-                    var cell = shipmentInstance.getCell(`L${parseInt(i) + 1}`)
+                    var cell = shipmentInstance.getCell(`Q${parseInt(i) + 1}`)
                     cell.classList.remove('shipmentEntryDoNotInclude');
-                    cell.classList.add('readonly');
-                    var cell = shipmentInstance.getCell(`I${parseInt(i) + 1}`)
+                    // cell.classList.add('readonly');
+                    var cell = shipmentInstance.getCell(`K${parseInt(i) + 1}`)
                     cell.classList.remove('shipmentEntryDoNotInclude');
-                    cell.classList.add('readonly');
+                    var cell = shipmentInstance.getCell(`B${parseInt(i) + 1}`)
+                    cell.classList.remove('shipmentEntryDoNotInclude');
+                    // cell.classList.add('readonly');
                     var element = document.getElementById("shipmentsDetailsTable");
-                    element.classList.add("jexcelremoveReadonlybackground");
+                    element.classList.remove("jexcelremoveReadonlybackground");
                 }
 
-                if (rowData[19].toString() == "true") {
+                if (rowData[11].toString() == "true") {
                     console.log("In if");
                     shipmentInstance.setStyle(col, "color", "#000");
                     shipmentInstance.setStyle(col, "color", "red");
-                    var cell = shipmentInstance.getCell(`L${parseInt(i) + 1}`)
+                    var cell = shipmentInstance.getCell(`Q${parseInt(i) + 1}`)
                     cell.classList.add('shipmentEntryEmergency');
-                    var cell = shipmentInstance.getCell(`I${parseInt(i) + 1}`)
+                    var cell = shipmentInstance.getCell(`K${parseInt(i) + 1}`)
+                    cell.classList.add('shipmentEntryEmergency');
+                    var cell = shipmentInstance.getCell(`B${parseInt(i) + 1}`)
                     cell.classList.add('shipmentEntryEmergency');
                 } else {
                     console.log("In else")
                     shipmentInstance.setStyle(col, "color", "#000");
-                    var cell = shipmentInstance.getCell(`L${parseInt(i) + 1}`)
+                    var cell = shipmentInstance.getCell(`Q${parseInt(i) + 1}`)
                     cell.classList.remove('shipmentEntryEmergency');
-                    var cell = shipmentInstance.getCell(`I${parseInt(i) + 1}`)
+                    var cell = shipmentInstance.getCell(`K${parseInt(i) + 1}`)
+                    cell.classList.remove('shipmentEntryEmergency');
+                    var cell = shipmentInstance.getCell(`B${parseInt(i) + 1}`)
                     cell.classList.remove('shipmentEntryEmergency');
                 }
             }
@@ -1185,7 +1226,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
 
     budgetDropdownFilter = function (instance, cell, c, r, source) {
         var mylist = [];
-        var value = (instance.jexcel.getJson()[r])[3];
+        var value = (instance.jexcel.getJson()[r])[12];
         console.log("Value", value);
         if (value != "") {
             var budgetList = this.state.budgetListAll;
@@ -1199,15 +1240,15 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
     calculateEmergencyOrder(y) {
         var shipmentInstance = this.state.shipmentsEl;
         var rowData = shipmentInstance.getRowData(y);
-        var procurementAgent = rowData[2];
-        var shipmentStatus = rowData[0];
+        var procurementAgent = rowData[6];
+        var shipmentStatus = rowData[3];
         var expectedPlannedDate = "";
         var expectedSubmittedDate = "";
         var expectedApprovedDate = "";
         var expectedShippedDate = "";
         var expectedArrivedDate = "";
-        var expectedDeliveryDate = rowData[1];
-        var shipmentMode = rowData[7];
+        var expectedDeliveryDate = rowData[4];
+        var shipmentMode = rowData[5];
         var programJson = this.props.items.programJson;
         if (expectedDeliveryDate != "") {
             if (procurementAgent != "") {
@@ -1235,9 +1276,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         papuResult = papuRequest.result;
                         var addLeadTimes = 0;
                         console.log("Expected delivery date", expectedDeliveryDate);
-                        if (papuResult.localProcurementAgent) {
+                        if (rowData[7].toString() == "true") {
                             console.log("In if");
-                            addLeadTimes = this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
+                            addLeadTimes = this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == rowData[2])[0].localProcurementLeadTime;
                             var leadTimesPerStatus = addLeadTimes / 5;
                             expectedArrivedDate = moment(expectedDeliveryDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
                             expectedShippedDate = moment(expectedArrivedDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
@@ -1270,9 +1311,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             expectedPlannedDate = moment(expectedSubmittedDate).subtract(parseInt(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
                         }
                         if (moment(expectedPlannedDate).format("YYYY-MM-DD") < moment(Date.now()).format("YYYY-MM-DD")) {
-                            shipmentInstance.setValueFromCoords(19, y, true, true);
+                            shipmentInstance.setValueFromCoords(11, y, true, true);
                         } else {
-                            shipmentInstance.setValueFromCoords(19, y, false, true);
+                            shipmentInstance.setValueFromCoords(11, y, false, true);
                         }
                     }.bind(this)
                 }.bind(this)
@@ -1287,31 +1328,49 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 expectedSubmittedDate = moment(expectedApprovedDate).subtract(parseInt(programJson.submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
                 expectedPlannedDate = moment(expectedSubmittedDate).subtract(parseInt(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
                 if (moment(expectedPlannedDate).format("YYYY-MM-DD") < moment(Date.now()).format("YYYY-MM-DD")) {
-                    shipmentInstance.setValueFromCoords(19, y, true, true);
+                    shipmentInstance.setValueFromCoords(11, y, true, true);
                 } else {
-                    shipmentInstance.setValueFromCoords(19, y, false, true);
+                    shipmentInstance.setValueFromCoords(11, y, false, true);
                 }
             }
         }
     }
 
     shipmentChanged = function (instance, cell, x, y, value) {
-        var planningUnitId = document.getElementById("planningUnitId").value;
         var elInstance = this.state.shipmentsEl;
         var rowData = elInstance.getRowData(y);
+        var planningUnitId = rowData[2];
         this.props.updateState("shipmentError", "");
         this.props.updateState("noFundsBudgetError", "");
         console.log("X-------->", x, "Y---------->", y);
-        if ((x == 1 || x == 2 || x == 7) && rowData[15] == "") {
+        if ((x == 4 || x == 6 || x == 5 || x == 7) && rowData[22] == "") {
             this.calculateEmergencyOrder(y);
         }
-        if (x == 21) {
+        if (x == 26) {
             console.log("Changed", value.expectedDeliveryDate);
         }
-        if (x == 1) {
+        if (x == 4) {
+            console.log("In 4")
+            var validation = checkValidtion("date", "E", y, rowData[4], elInstance);
+            if (validation == false) {
+            } else {
+                if (rowData[3] == DELIVERED_SHIPMENT_STATUS) {
+                    var curDate = moment(Date.now()).format("YYYY-MM-DD");
+                    var selectedDate = moment(rowData[4]).format("YYYY-MM-DD");
+                    if (selectedDate > curDate) {
+                        inValid("E", y, i18n.t('static.supplyPlan.dateustBeLessThanCurDate'), elInstance);
+                    } else {
+                        positiveValidation("E", y, elInstance);
+                    }
+                } else {
+                    positiveValidation("E", y, elInstance);
+                }
+            }
+        }
+        if (x == 4) {
             console.log("Changed 1 =>", value);
-            var shipmentDatesJson = rowData[21];
-            var shipmentStatus = rowData[0];
+            var shipmentDatesJson = rowData[26];
+            var shipmentStatus = rowData[3];
             console.log("shipmentDatesJson", shipmentDatesJson);
             if (shipmentDatesJson != "") {
             } else {
@@ -1331,193 +1390,227 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 }
                 console.log("In if");
                 if (shipmentDatesJson != "") {
-                    elInstance.setValueFromCoords(21, y, shipmentDatesJson, true);
+                    elInstance.setValueFromCoords(26, y, shipmentDatesJson, true);
                 }
             } else {
                 shipmentDatesJson.expectedDeliveryDate = moment(value).format("YYYY-MM-DD");
-                elInstance.setValueFromCoords(21, y, shipmentDatesJson, true);
+                elInstance.setValueFromCoords(26, y, shipmentDatesJson, true);
                 console.log("In else", shipmentDatesJson.expectedDeliveryDate);
             }
         }
-        if (x == 19 || x == 20 || x == 24) {
+        if (x == 11 || x == 0 || x == 29) {
             console.log("In 19");
-            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y']
+            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE']
             for (var j = 0; j < colArr.length; j++) {
                 var col = (colArr[j]).concat(parseInt(y) + 1);
-                if (rowData[20].toString() == "false") {
+                if (rowData[0].toString() == "false") {
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setStyle(col, "background-color", "#D3D3D3");
-                    var cell = elInstance.getCell(`L${parseInt(y) + 1}`)
+                    var cell = elInstance.getCell(`Q${parseInt(y) + 1}`)
                     cell.classList.add('shipmentEntryDoNotInclude');
-                    var cell = elInstance.getCell(`I${parseInt(y) + 1}`)
+                    var cell = elInstance.getCell(`K${parseInt(y) + 1}`)
+                    cell.classList.add('shipmentEntryDoNotInclude');
+                    var cell = elInstance.getCell(`B${parseInt(y) + 1}`)
                     cell.classList.add('shipmentEntryDoNotInclude');
                     var element = document.getElementById("shipmentsDetailsTable");
                     element.classList.remove("jexcelremoveReadonlybackground");
                 } else {
                     elInstance.setStyle(col, "background-color", "transparent");
-                    var cell = elInstance.getCell(`L${parseInt(y) + 1}`)
+                    var cell = elInstance.getCell(`Q${parseInt(y) + 1}`)
                     cell.classList.remove('shipmentEntryDoNotInclude');
-                    var cell = elInstance.getCell(`I${parseInt(y) + 1}`)
+                    var cell = elInstance.getCell(`K${parseInt(y) + 1}`)
+                    cell.classList.remove('shipmentEntryDoNotInclude');
+                    var cell = elInstance.getCell(`B${parseInt(y) + 1}`)
                     cell.classList.remove('shipmentEntryDoNotInclude');
                     var element = document.getElementById("shipmentsDetailsTable");
-                    element.classList.add("jexcelremoveReadonlybackground");
+                    element.classList.remove("jexcelremoveReadonlybackground");
                 }
 
-                if (rowData[19].toString() == "true") {
+                if (rowData[11].toString() == "true") {
                     console.log("In if");
                     elInstance.setStyle(col, "color", "#000");
                     elInstance.setStyle(col, "color", "red");
-                    var cell = elInstance.getCell(`L${parseInt(y) + 1}`)
+                    var cell = elInstance.getCell(`Q${parseInt(y) + 1}`)
                     cell.classList.add('shipmentEntryEmergency');
-                    var cell = elInstance.getCell(`I${parseInt(y) + 1}`)
+                    var cell = elInstance.getCell(`K${parseInt(y) + 1}`)
+                    cell.classList.add('shipmentEntryEmergency');
+                    var cell = elInstance.getCell(`B${parseInt(y) + 1}`)
                     cell.classList.add('shipmentEntryEmergency');
                 } else {
                     console.log("In else")
                     elInstance.setStyle(col, "color", "#000");
-                    var cell = elInstance.getCell(`L${parseInt(y) + 1}`)
+                    var cell = elInstance.getCell(`Q${parseInt(y) + 1}`)
                     cell.classList.remove('shipmentEntryEmergency');
-                    var cell = elInstance.getCell(`I${parseInt(y) + 1}`)
+                    var cell = elInstance.getCell(`K${parseInt(y) + 1}`)
+                    cell.classList.remove('shipmentEntryEmergency');
+                    var cell = elInstance.getCell(`B${parseInt(y) + 1}`)
                     cell.classList.remove('shipmentEntryEmergency');
                 }
 
-                if (rowData[24].toString() == "false") {
+                if (rowData[29].toString() == "false") {
                     elInstance.setStyle(col, "color", "#000");
                     elInstance.setStyle(col, "color", "#808080");
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setStyle(col, "background-color", "#808080");
                     var element = document.getElementById("shipmentsDetailsTable");
                     element.classList.remove("jexcelremoveReadonlybackground");
-                    var cell = elInstance.getCell(`L${parseInt(y) + 1}`)
+                    var cell = elInstance.getCell(`Q${parseInt(y) + 1}`)
                     cell.classList.add('shipmentEntryDelete');
-                    var cell = elInstance.getCell(`I${parseInt(y) + 1}`)
+                    var cell = elInstance.getCell(`K${parseInt(y) + 1}`)
+                    cell.classList.add('shipmentEntryDelete');
+                    var cell = elInstance.getCell(`B${parseInt(y) + 1}`)
                     cell.classList.add('shipmentEntryDelete');
                 } else {
-                    if (rowData[20].toString() == "false") {
+                    if (rowData[0].toString() == "false") {
                         elInstance.setStyle(col, "background-color", "transparent");
                         elInstance.setStyle(col, "background-color", "#D3D3D3");
-                        var cell = elInstance.getCell(`L${parseInt(y) + 1}`)
+                        var cell = elInstance.getCell(`Q${parseInt(y) + 1}`)
                         cell.classList.add('shipmentEntryDoNotInclude');
-                        var cell = elInstance.getCell(`I${parseInt(y) + 1}`)
+                        var cell = elInstance.getCell(`K${parseInt(y) + 1}`)
+                        cell.classList.add('shipmentEntryDoNotInclude');
+                        var cell = elInstance.getCell(`B${parseInt(y) + 1}`)
                         cell.classList.add('shipmentEntryDoNotInclude');
                         var element = document.getElementById("shipmentsDetailsTable");
                         element.classList.remove("jexcelremoveReadonlybackground");
                     } else {
                         elInstance.setStyle(col, "background-color", "transparent");
-                        var cell = elInstance.getCell(`L${parseInt(y) + 1}`)
+                        var cell = elInstance.getCell(`Q${parseInt(y) + 1}`)
                         cell.classList.remove('shipmentEntryDoNotInclude');
-                        var cell = elInstance.getCell(`I${parseInt(y) + 1}`)
+                        var cell = elInstance.getCell(`K${parseInt(y) + 1}`)
+                        cell.classList.remove('shipmentEntryDoNotInclude');
+                        var cell = elInstance.getCell(`B${parseInt(y) + 1}`)
                         cell.classList.remove('shipmentEntryDoNotInclude');
                         var element = document.getElementById("shipmentsDetailsTable");
-                        element.classList.add("jexcelremoveReadonlybackground");
+                        element.classList.remove("jexcelremoveReadonlybackground");
                     }
-                    if (rowData[19].toString() == "true") {
+                    if (rowData[11].toString() == "true") {
                         console.log("In if");
                         elInstance.setStyle(col, "color", "#000");
                         elInstance.setStyle(col, "color", "red");
-                        var cell = elInstance.getCell(`L${parseInt(y) + 1}`)
+                        var cell = elInstance.getCell(`Q${parseInt(y) + 1}`)
                         cell.classList.add('shipmentEntryEmergency');
-                        var cell = elInstance.getCell(`I${parseInt(y) + 1}`)
+                        var cell = elInstance.getCell(`K${parseInt(y) + 1}`)
+                        cell.classList.add('shipmentEntryEmergency');
+                        var cell = elInstance.getCell(`B${parseInt(y) + 1}`)
                         cell.classList.add('shipmentEntryEmergency');
                     } else {
                         console.log("In else")
                         elInstance.setStyle(col, "color", "#000");
-                        var cell = elInstance.getCell(`L${parseInt(y) + 1}`)
+                        var cell = elInstance.getCell(`Q${parseInt(y) + 1}`)
                         cell.classList.remove('shipmentEntryEmergency');
-                        var cell = elInstance.getCell(`I${parseInt(y) + 1}`)
+                        var cell = elInstance.getCell(`K${parseInt(y) + 1}`)
+                        cell.classList.remove('shipmentEntryEmergency');
+                        var cell = elInstance.getCell(`B${parseInt(y) + 1}`)
                         cell.classList.remove('shipmentEntryEmergency');
                     }
                 }
             }
         }
-        if (x != 23 && x != 21 && x != 25) {
-            elInstance.setValueFromCoords(25, y, 0, true);
+        if (x != 28 && x != 26 && x != 30) {
+            elInstance.setValueFromCoords(30, y, 0, true);
 
         }
-        if (x != 23 && x != 21) {
-            elInstance.setValueFromCoords(23, y, 1, true);
+        if (x != 28 && x != 26) {
+            elInstance.setValueFromCoords(28, y, 1, true);
         }
-        if (x == 0) {
-            var valid = checkValidtion("text", "A", y, value, elInstance);
+        if (x == 3) {
+            var valid = checkValidtion("text", "D", y, value, elInstance);
             if (valid == true) {
-                var shipmentDates = rowData[21];
+                var shipmentDates = rowData[26];
                 if (value == DELIVERED_SHIPMENT_STATUS) {
                     if (shipmentDates.receivedDate != "" && shipmentDates.receivedDate != null && shipmentDates.receivedDate != "Invalid date") {
-                        elInstance.setValueFromCoords(1, y, shipmentDates.receivedDate, true);
+                        elInstance.setValueFromCoords(4, y, shipmentDates.receivedDate, true);
                     } else {
-                        elInstance.setValueFromCoords(1, y, moment(Date.now()).format("YYYY-MM-DD"), true);
+                        elInstance.setValueFromCoords(4, y, moment(Date.now()).format("YYYY-MM-DD"), true);
                     }
                 } else {
                     if (shipmentDates.expectedDeliveryDate != "" && shipmentDates.expectedDeliveryDate != null && shipmentDates.expectedDeliveryDate != "Invalid date") {
-                        elInstance.setValueFromCoords(1, y, shipmentDates.expectedDeliveryDate, true);
+                        elInstance.setValueFromCoords(4, y, shipmentDates.expectedDeliveryDate, true);
                     } else {
-                        elInstance.setValueFromCoords(1, y, "", true);
+                        elInstance.setValueFromCoords(4, y, "", true);
                     }
                 }
                 if (value == SUBMITTED_SHIPMENT_STATUS || value == ARRIVED_SHIPMENT_STATUS || value == SHIPPED_SHIPMENT_STATUS || value == DELIVERED_SHIPMENT_STATUS || value == APPROVED_SHIPMENT_STATUS) {
-                    var budget = rowData[4];
-                    var valid = checkValidtion("text", "E", y, budget, elInstance);
-                    var procurementAgent = rowData[2];
-                    var fundingSource = rowData[3];
+                    var budget = rowData[13];
+                    var valid = checkValidtion("text", "N", y, budget, elInstance);
+                    var procurementAgent = rowData[6];
+                    var fundingSource = rowData[12];
                     if (procurementAgent == TBD_PROCUREMENT_AGENT_ID) {
-                        inValid("C", y, i18n.t('static.supplyPlan.procurementAgentCannotBeTBD'), elInstance);
+                        inValid("G", y, i18n.t('static.supplyPlan.procurementAgentCannotBeTBD'), elInstance);
                     } else {
-                        positiveValidation("C", y, elInstance);
+                        positiveValidation("G", y, elInstance);
                     }
 
                     if (fundingSource == TBD_FUNDING_SOURCE) {
-                        inValid("D", y, i18n.t('static.supplyPlan.fundingSourceCannotBeTBD'), elInstance);
+                        inValid("M", y, i18n.t('static.supplyPlan.fundingSourceCannotBeTBD'), elInstance);
                     } else {
-                        positiveValidation("D", y, elInstance);
+                        positiveValidation("M", y, elInstance);
                     }
                 } else {
-                    positiveValidation("E", y, elInstance);
-                    positiveValidation("C", y, elInstance);
-                    positiveValidation("D", y, elInstance);
+                    positiveValidation("N", y, elInstance);
+                    positiveValidation("G", y, elInstance);
+                    positiveValidation("M", y, elInstance);
                 }
-                console.log("rowData[21] for lead time", rowData[21].expectedDeliveryDate)
-                if (rowData[16] == -1 && (rowData[21].expectedDeliveryDate == "" || rowData[21].expectedDeliveryDate == null || rowData[21].expectedDeliveryDate == "Invalid date")) {
+                console.log("rowData[21] for lead time", rowData[26].expectedDeliveryDate)
+                if (rowData[23] == -1 && (rowData[26].expectedDeliveryDate == "" || rowData[26].expectedDeliveryDate == null || rowData[26].expectedDeliveryDate == "Invalid date")) {
                     this.calculateLeadTimesOnChange(y);
                 }
 
             } else {
-                elInstance.setValueFromCoords(25, y, 1, true);
+                elInstance.setValueFromCoords(30, y, 1, true);
             }
-        }
 
-        if (x == 4) {
-            var value = rowData[0];
-            if (value == SUBMITTED_SHIPMENT_STATUS || value == ARRIVED_SHIPMENT_STATUS || value == SHIPPED_SHIPMENT_STATUS || value == DELIVERED_SHIPMENT_STATUS || value == APPROVED_SHIPMENT_STATUS) {
-                var budget = rowData[4];
-                var valid = checkValidtion("text", "E", y, budget, elInstance);
-                if (valid == false) {
-                    elInstance.setValueFromCoords(25, y, 1, true);
+            var validation = checkValidtion("date", "E", y, rowData[4], elInstance);
+            if (validation == false) {
+            } else {
+                if (rowData[3] == DELIVERED_SHIPMENT_STATUS) {
+                    var curDate = moment(Date.now()).format("YYYY-MM-DD");
+                    var selectedDate = moment(rowData[4]).format("YYYY-MM-DD");
+                    if (selectedDate > curDate) {
+                        inValid("E", y, i18n.t('static.supplyPlan.dateustBeLessThanCurDate'), elInstance);
+                    } else {
+                        positiveValidation("E", y, elInstance);
+                    }
+                } else {
+                    positiveValidation("E", y, elInstance);
                 }
             }
         }
 
-        if (x == 2) {
-            var valid = checkValidtion("text", "C", y, rowData[2], elInstance);
+        if (x == 13) {
+            var value = rowData[3];
+            if (value == SUBMITTED_SHIPMENT_STATUS || value == ARRIVED_SHIPMENT_STATUS || value == SHIPPED_SHIPMENT_STATUS || value == DELIVERED_SHIPMENT_STATUS || value == APPROVED_SHIPMENT_STATUS) {
+                var budget = rowData[13];
+                var valid = checkValidtion("text", "N", y, budget, elInstance);
+                if (valid == false) {
+                    elInstance.setValueFromCoords(30, y, 1, true);
+                }
+            }
+        }
+
+        if (x == 6) {
+            var valid = checkValidtion("text", "G", y, rowData[6], elInstance);
             if (valid == true) {
-                var shipmentStatus = rowData[0];
+                var shipmentStatus = rowData[3];
                 if (shipmentStatus == SUBMITTED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS || shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == DELIVERED_SHIPMENT_STATUS || shipmentStatus == APPROVED_SHIPMENT_STATUS) {
-                    if (rowData[2] == TBD_PROCUREMENT_AGENT_ID) {
-                        inValid("C", y, i18n.t('static.supplyPlan.procurementAgentCannotBeTBD'), elInstance);
+                    if (rowData[6] == TBD_PROCUREMENT_AGENT_ID) {
+                        inValid("G", y, i18n.t('static.supplyPlan.procurementAgentCannotBeTBD'), elInstance);
                     } else {
-                        positiveValidation("C", y, elInstance);
+                        positiveValidation("G", y, elInstance);
                         valid = true;
                     }
                 }
             } else {
-                elInstance.setValueFromCoords(25, y, 1, true);
+                elInstance.setValueFromCoords(30, y, 1, true);
             }
             if (valid == true) {
-                var procurementAgentPlanningUnit = this.state.procurementAgentPlanningUnitListAll.filter(c => c.procurementAgent.id == rowData[2] && c.planningUnit.id == planningUnitId);
+                var procurementAgentPlanningUnit = this.state.procurementAgentPlanningUnitListAll.filter(c => c.procurementAgent.id == rowData[6] && c.planningUnit.id == planningUnitId);
                 // if (procurementAgentPlanningUnit.length > 0 && ((procurementAgentPlanningUnit[0].unitsPerPalletEuro1 != 0 && procurementAgentPlanningUnit[0].unitsPerPalletEuro1 != null) || (procurementAgentPlanningUnit[0].moq != 0 && procurementAgentPlanningUnit[0].moq != null) || (procurementAgentPlanningUnit[0].unitsPerPalletEuro2 != 0 && procurementAgentPlanningUnit[0].unitsPerPalletEuro2 != null) || (procurementAgentPlanningUnit[0].unitsPerContainer != 0 && procurementAgentPlanningUnit[0].unitsPerContainer != null))) {
                 //     elInstance.setValueFromCoords(8, y, "", true);
                 // }
                 console.log("RowData------------------>", rowData)
-                var pricePerUnit = rowData[10];
-                if (rowData[16] == -1) {
+                var pricePerUnit = rowData[15];
+                if (rowData[23] == -1) {
                     console.log("Price per unit", pricePerUnit);
                     if (procurementAgentPlanningUnit.length > 0) {
                         console.log("in length greater than 0")
@@ -1525,27 +1618,27 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     } else {
                         pricePerUnit = this.props.items.catalogPrice
                     }
-                    if (rowData[9] != "") {
-                        var conversionRateToUsd = parseFloat((this.state.currencyListAll.filter(c => c.currencyId == rowData[9])[0]).conversionRateToUsd);
+                    if (rowData[14] != "") {
+                        var conversionRateToUsd = parseFloat((this.state.currencyListAll.filter(c => c.currencyId == rowData[14])[0]).conversionRateToUsd);
                         pricePerUnit = parseFloat(pricePerUnit / conversionRateToUsd).toFixed(2);
-                        elInstance.setValueFromCoords(10, y, pricePerUnit, true);
+                        elInstance.setValueFromCoords(15, y, pricePerUnit, true);
                     }
                 }
-                console.log("rowData[21] for lead time", rowData[21].expectedDeliveryDate)
-                if (rowData[16] == -1 && (rowData[21].expectedDeliveryDate == "" || rowData[21].expectedDeliveryDate == null || rowData[21].expectedDeliveryDate == "Invalid date")) {
+                console.log("rowData[21] for lead time", rowData[26].expectedDeliveryDate)
+                if (rowData[23] == -1 && (rowData[26].expectedDeliveryDate == "" || rowData[26].expectedDeliveryDate == null || rowData[26].expectedDeliveryDate == "Invalid date")) {
                     this.calculateLeadTimesOnChange(y);
                 }
             } else {
-                elInstance.setValueFromCoords(25, y, 1, true);
+                elInstance.setValueFromCoords(30, y, 1, true);
             }
         }
 
-        if (x == 9) {
-            var valid = checkValidtion("text", "J", y, rowData[9], elInstance);
+        if (x == 14) {
+            var valid = checkValidtion("text", "O", y, rowData[14], elInstance);
             if (valid == true) {
-                if (rowData[16] == -1 && rowData[9] != "") {
-                    var procurementAgentPlanningUnit = this.state.procurementAgentPlanningUnitListAll.filter(c => c.procurementAgent.id == rowData[2] && c.planningUnit.id == planningUnitId);
-                    var pricePerUnit = rowData[10];
+                if (rowData[23] == -1 && rowData[14] != "") {
+                    var procurementAgentPlanningUnit = this.state.procurementAgentPlanningUnitListAll.filter(c => c.procurementAgent.id == rowData[6] && c.planningUnit.id == planningUnitId);
+                    var pricePerUnit = rowData[15];
                     // if (pricePerUnit.toString() == "") {
                     console.log("Price per unit", pricePerUnit);
                     if (procurementAgentPlanningUnit.length > 0) {
@@ -1554,138 +1647,138 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     } else {
                         pricePerUnit = this.props.items.catalogPrice;
                     }
-                    var conversionRateToUsd = parseFloat((this.state.currencyListAll.filter(c => c.currencyId == rowData[9])[0]).conversionRateToUsd);
+                    var conversionRateToUsd = parseFloat((this.state.currencyListAll.filter(c => c.currencyId == rowData[14])[0]).conversionRateToUsd);
                     pricePerUnit = parseFloat(pricePerUnit / conversionRateToUsd).toFixed(2);
-                    elInstance.setValueFromCoords(10, y, pricePerUnit, true);
+                    elInstance.setValueFromCoords(15, y, pricePerUnit, true);
                 }
                 // }
             } else {
-                elInstance.setValueFromCoords(25, y, 1, true);
+                elInstance.setValueFromCoords(30, y, 1, true);
             }
         }
 
-        if (x == 3) {
-            var valid = checkValidtion("text", "D", y, rowData[3], elInstance);
-            elInstance.setValueFromCoords(4, y, "", true);
+        if (x == 12) {
+            var valid = checkValidtion("text", "M", y, rowData[12], elInstance);
+            elInstance.setValueFromCoords(13, y, "", true);
             if (valid == true) {
-                var shipmentStatus = rowData[0];
+                var shipmentStatus = rowData[3];
                 if (shipmentStatus == SUBMITTED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS || shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == DELIVERED_SHIPMENT_STATUS || shipmentStatus == APPROVED_SHIPMENT_STATUS) {
-                    if (rowData[3] == TBD_FUNDING_SOURCE) {
-                        inValid("D", y, i18n.t('static.supplyPlan.fundingSourceCannotBeTBD'), elInstance);
+                    if (rowData[12] == TBD_FUNDING_SOURCE) {
+                        inValid("M", y, i18n.t('static.supplyPlan.fundingSourceCannotBeTBD'), elInstance);
                     } else {
-                        positiveValidation("D", y, elInstance);
+                        positiveValidation("M", y, elInstance);
                     }
                 }
             } else {
-                elInstance.setValueFromCoords(25, y, 1, true);
+                elInstance.setValueFromCoords(30, y, 1, true);
             }
         }
 
-        if (x == 6) {
-            var valid = checkValidtion("text", "G", y, rowData[6], elInstance);
+        if (x == 18) {
+            var valid = checkValidtion("text", "S", y, rowData[18], elInstance);
             if (valid == false) {
-                elInstance.setValueFromCoords(25, y, 1, true);
+                elInstance.setValueFromCoords(30, y, 1, true);
             }
         }
 
-        if (x == 7) {
-            var valid = checkValidtion("text", "H", y, rowData[7], elInstance);
+        if (x == 5) {
+            var valid = checkValidtion("text", "F", y, rowData[5], elInstance);
             if (valid == true) {
-                var rate = ((elInstance.getCell(`L${parseInt(y) + 1}`)).innerHTML).toString().replaceAll("\,", "");
-                if (rowData[16] == -1) {
+                var rate = ((elInstance.getCell(`Q${parseInt(y) + 1}`)).innerHTML).toString().replaceAll("\,", "");
+                if (rowData[23] == -1) {
                     var freightCost = 0;
-                    if (rowData[7] == 1) {
+                    if (rowData[5] == 1) {
                         var seaFreightPercentage = this.props.items.programJson.seaFreightPerc;
                         freightCost = parseFloat(rate) * (parseFloat(parseFloat(seaFreightPercentage) / 100));
-                        elInstance.setValueFromCoords(12, y, freightCost.toFixed(2), true);
+                        elInstance.setValueFromCoords(17, y, freightCost.toFixed(2), true);
                     } else {
                         var airFreightPercentage = this.props.items.programJson.airFreightPerc;
                         freightCost = parseFloat(rate) * (parseFloat(parseFloat(airFreightPercentage) / 100));
-                        elInstance.setValueFromCoords(12, y, freightCost.toFixed(2), true);
+                        elInstance.setValueFromCoords(17, y, freightCost.toFixed(2), true);
                     }
                 }
-                console.log("rowData[21] for lead time", rowData[21].expectedDeliveryDate)
-                if (rowData[16] == -1 && (rowData[21].expectedDeliveryDate == "" || rowData[21].expectedDeliveryDate == null || rowData[21].expectedDeliveryDate == "Invalid date")) {
+                console.log("rowData[21] for lead time", rowData[26].expectedDeliveryDate)
+                if (rowData[23] == -1 && (rowData[26].expectedDeliveryDate == "" || rowData[26].expectedDeliveryDate == null || rowData[26].expectedDeliveryDate == "Invalid date")) {
                     this.calculateLeadTimesOnChange(y);
                 }
             } else {
-                elInstance.setValueFromCoords(25, y, 1, true);
+                elInstance.setValueFromCoords(30, y, 1, true);
             }
         }
 
-        if (x == 11) {
-            var rate = ((elInstance.getCell(`L${parseInt(y) + 1}`)).innerHTML).toString().replaceAll("\,", "");
-            console.log("RowData[12]", rowData[12]);
-            if (rowData[16] == -1) {
+        if (x == 16) {
+            var rate = ((elInstance.getCell(`Q${parseInt(y) + 1}`)).innerHTML).toString().replaceAll("\,", "");
+            console.log("RowData[12]", rowData[17]);
+            if (rowData[23] == -1) {
                 console.log("In if");
                 var freightCost = 0;
-                if (rowData[7] == 1) {
+                if (rowData[5] == 1) {
                     var seaFreightPercentage = this.props.items.programJson.seaFreightPerc;
                     freightCost = parseFloat(rate) * (parseFloat(parseFloat(seaFreightPercentage) / 100));
-                    elInstance.setValueFromCoords(12, y, freightCost.toFixed(2), true);
+                    elInstance.setValueFromCoords(17, y, freightCost.toFixed(2), true);
                 } else {
                     var airFreightPercentage = this.props.items.programJson.airFreightPerc;
                     freightCost = parseFloat(rate) * (parseFloat(parseFloat(airFreightPercentage) / 100));
-                    elInstance.setValueFromCoords(12, y, freightCost.toFixed(2), true);
+                    elInstance.setValueFromCoords(17, y, freightCost.toFixed(2), true);
                 }
             }
-            positiveValidation("L", y, elInstance);
+            positiveValidation("Q", y, elInstance);
         }
 
-        if (x == 1) {
-            var batchDetails = rowData[17];
+        if (x == 4) {
+            var batchDetails = rowData[24];
             if (batchDetails.length > 0) {
                 var findAutoGenerated = batchDetails.findIndex(c => c.batch.autoGenerated.toString() == "true");
                 if (findAutoGenerated != -1) {
                     batchDetails[findAutoGenerated].batch.expiryDate = moment(value).add(this.props.items.shelfLife, 'months').startOf('month').format("YYYY-MM-DD")
-                    elInstance.setValueFromCoords(17, y, batchDetails, true);
-                }
-            }
-        }
-
-        if (x == 8) {
-            var valid = checkValidtion("number", "I", y, rowData[8], elInstance, JEXCEL_INTEGER_REGEX, 1, 0);
-            console.log("Valida", valid);
-            if (valid == false) {
-                elInstance.setValueFromCoords(25, y, 1, true);
-            } else {
-                var batchDetails = rowData[17];
-                if (batchDetails.length == 1) {
-                    if (batchDetails[0].batch.autoGenerated.toString() == "true") {
-                        batchDetails[0].shipmentQty = rowData[8];
-                        elInstance.setValueFromCoords(17, y, batchDetails, true);
-                        elInstance.setValueFromCoords(18, y, rowData[8], true);
-                    }
+                    elInstance.setValueFromCoords(24, y, batchDetails, true);
                 }
             }
         }
 
         if (x == 10) {
-            var valid = checkValidtion("number", "K", y, rowData[10], elInstance, JEXCEL_DECIMAL_NO_REGEX, 1, 1);
+            var valid = checkValidtion("number", "K", y, rowData[10], elInstance, JEXCEL_INTEGER_REGEX, 1, 0);
+            console.log("Valida", valid);
             if (valid == false) {
-                elInstance.setValueFromCoords(25, y, 1, true);
+                elInstance.setValueFromCoords(30, y, 1, true);
+            } else {
+                var batchDetails = rowData[24];
+                if (batchDetails.length == 1) {
+                    if (batchDetails[0].batch.autoGenerated.toString() == "true") {
+                        batchDetails[0].shipmentQty = rowData[10];
+                        elInstance.setValueFromCoords(24, y, batchDetails, true);
+                        elInstance.setValueFromCoords(25, y, rowData[8], true);
+                    }
+                }
             }
         }
 
-        if (x == 12) {
-            var valid = checkValidtion("number", "M", y, rowData[12], elInstance, JEXCEL_DECIMAL_NO_REGEX, 1, 1);
+        if (x == 15) {
+            var valid = checkValidtion("number", "P", y, rowData[15], elInstance, JEXCEL_DECIMAL_NO_REGEX, 1, 1);
             if (valid == false) {
-                elInstance.setValueFromCoords(25, y, 1, true);
+                elInstance.setValueFromCoords(30, y, 1, true);
             }
         }
 
-        if (x == 18) {
+        if (x == 17) {
+            var valid = checkValidtion("number", "R", y, rowData[17], elInstance, JEXCEL_DECIMAL_NO_REGEX, 1, 1);
+            if (valid == false) {
+                elInstance.setValueFromCoords(30, y, 1, true);
+            }
+        }
+
+        if (x == 25) {
             if (value != 0) {
-                var adjustedQty = ((elInstance.getCell(`I${parseInt(y) + 1}`)).innerHTML).toString().replaceAll("\,", "");
+                var adjustedQty = ((elInstance.getCell(`K${parseInt(y) + 1}`)).innerHTML).toString().replaceAll("\,", "");
                 console.log("Adjusted Qty", adjustedQty);
                 console.log("Value", value);
                 if (value > adjustedQty) {
-                    inValid("I", y, i18n.t('static.supplyPlan.batchNumberMissing'), elInstance);
+                    inValid("K", y, i18n.t('static.supplyPlan.batchNumberMissing'), elInstance);
                     this.props.updateState("shipmentBatchError", i18n.t('static.supplyPlan.batchNumberMissing'));
                     this.props.hideSecondComponent()
                 } else {
                     console.log("In eklse");
-                    positiveValidation("I", y, elInstance);
+                    positiveValidation("K", y, elInstance);
                     this.props.updateState("shipmentBatchError", "");
                 }
             }
@@ -1755,7 +1848,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             var shipmentQty = ((elInstance.getCell(`F${parseInt(0) + 1}`)).innerHTML).toString().replaceAll("\,", "");
             var rowNumber = rowData[6];
             var shipmentInstance = this.state.shipmentsEl;
-            shipmentInstance.setValueFromCoords(8, rowNumber, shipmentQty, true);
+            shipmentInstance.setValueFromCoords(10, rowNumber, shipmentQty, true);
             this.props.updateState("shipmentQtyChangedFlag", 0);
             this.props.updateState("shipmentChangedFlag", 1);
             this.props.updateState("qtyCalculatorTableEl", "");
@@ -1926,7 +2019,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 var shipmentInstance = this.state.shipmentsEl;
                 var rowData = shipmentInstance.getRowData(parseInt(rowNumber));
                 var batchNo = "";
-                var autoGenerated = false;
+                var autoGenerated = map.get("6");
                 if (map.get("0") != "") {
                     batchNo = map.get("0");
                 } else {
@@ -1955,8 +2048,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 batchInfoArray.push(batchInfoJson);
                 totalShipmentQty += parseInt(map.get("2").toString().replaceAll("\,", ""))
             }
-            shipmentInstance.setValueFromCoords(17, rowNumber, batchInfoArray, true);
-            shipmentInstance.setValueFromCoords(18, rowNumber, totalShipmentQty, true);
+            shipmentInstance.setValueFromCoords(24, rowNumber, batchInfoArray, true);
+            shipmentInstance.setValueFromCoords(25, rowNumber, totalShipmentQty, true);
             this.props.updateState("shipmentChangedFlag", 1);
             this.props.updateState("shipmentBatchInfoChangedFlag", 0);
             this.props.updateState("shipmentBatchInfoTableEl", "");
@@ -1993,11 +2086,11 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         var elInstance = this.state.shipmentsEl;
         console.log("In calculate lead times")
         var rowData = elInstance.getRowData(y);
-        var shipmentMode = rowData[7];
-        var procurementAgent = rowData[2];
-        var shipmentDatesJson = rowData[21];
-        var shipmentStatus = rowData[0];
-        var lastShipmentStatus = rowData[15];
+        var shipmentMode = rowData[5];
+        var procurementAgent = rowData[6];
+        var shipmentDatesJson = rowData[26];
+        var shipmentStatus = rowData[3];
+        var lastShipmentStatus = rowData[22];
         var addLeadTimes = 0;
         if (shipmentMode != "" && procurementAgent != "" && shipmentStatus != "") {
             var db1;
@@ -2031,8 +2124,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     var arrivedDate = shipmentDatesJson.arrivedDate;
                     var receivedDate = shipmentDatesJson.receivedDate;
                     var expectedDeliveryDate = shipmentDatesJson.expectedDeliveryDate;
-                    if (papuResult.localProcurementAgent) {
-                        addLeadTimes = this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
+                    if (rowData[7].toString() == "true") {
+                        addLeadTimes = this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == rowData[2])[0].localProcurementLeadTime;
                         expectedDeliveryDate = moment(Date.now()).add((addLeadTimes * 30), 'days').format("YYYY-MM-DD");
                     } else {
                         var ppUnit = papuResult;
@@ -2060,16 +2153,16 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         arrivedDate = moment(shippedDate).add(parseInt(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
                         expectedDeliveryDate = moment(arrivedDate).add(parseInt(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
                     }
-                    if (moment(elInstance.getValueFromCoords(1, y)).format("YYYY-MM-DD") != moment(expectedDeliveryDate).format("YYYY-MM-DD") && shipmentStatus != DELIVERED_SHIPMENT_STATUS) {
+                    if (moment(elInstance.getValueFromCoords(4, y)).format("YYYY-MM-DD") != moment(expectedDeliveryDate).format("YYYY-MM-DD") && shipmentStatus != DELIVERED_SHIPMENT_STATUS) {
                         console.log("In if for calculate lead times", expectedDeliveryDate);
-                        elInstance.setValueFromCoords(1, y, expectedDeliveryDate, true);
+                        elInstance.setValueFromCoords(4, y, expectedDeliveryDate, true);
                     } else {
                         shipmentDatesJson.expectedDeliveryDate = expectedDeliveryDate;
-                        elInstance.setValueFromCoords(21, y, shipmentDatesJson, true);
+                        elInstance.setValueFromCoords(26, y, shipmentDatesJson, true);
                         console.log("In else for calculate lead times", expectedDeliveryDate);
                         if (shipmentStatus != DELIVERED_SHIPMENT_STATUS) {
                             console.log("In else if for calculate lead times", expectedDeliveryDate);
-                            elInstance.setValueFromCoords(1, y, expectedDeliveryDate, true);
+                            elInstance.setValueFromCoords(4, y, expectedDeliveryDate, true);
                         }
                     }
                 }.bind(this)
@@ -2087,8 +2180,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         var rowDataForDates1 = elInstance.getRowData(1);
         shipmentInstance = this.state.shipmentsEl;
         var rowData = shipmentInstance.getRowData(rowDataForDates[7]);
-        var shipmentStatus = rowData[0];
-        var lastShipmentStatus = rowData[15];
+        var shipmentStatus = rowData[3];
+        var lastShipmentStatus = rowData[22];
         positiveValidation("G", 0, elInstance);
         positiveValidation("C", 1, elInstance);
         positiveValidation("D", 1, elInstance);
@@ -2103,8 +2196,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 if (y == 0) {
                     console.log("In y==0")
                     var shipmentInstance = this.state.shipmentsEl;
-                    var procurementAgent = rowData[2];
-                    var shipmentStatus = rowData[0];
+                    var procurementAgent = rowData[6];
+                    var shipmentStatus = rowData[3];
                     var db1;
                     var storeOS;
                     getDatabase();
@@ -2136,9 +2229,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             var expectedArrivedDate = "";
                             var addLeadTimes = 0;
                             console.log("Expected delivery date", expectedDeliveryDate);
-                            if (papuResult.localProcurementAgent) {
+                            if (rowData[7].toString() == "true") {
                                 console.log("In if");
-                                addLeadTimes = this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
+                                addLeadTimes = this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == rowData[2])[0].localProcurementLeadTime;
                                 var leadTimesPerStatus = addLeadTimes / 5;
                                 expectedArrivedDate = moment(expectedDeliveryDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
                                 expectedShippedDate = moment(expectedArrivedDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
@@ -2147,7 +2240,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                 expectedPlannedDate = moment(expectedSubmittedDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
                             } else {
                                 console.log("In else");
-                                var shipmentMode = rowData[7];
+                                var shipmentMode = rowData[5];
                                 var ppUnit = papuResult;
                                 var submittedToApprovedLeadTime = ppUnit.submittedToApprovedLeadTime;
                                 if (submittedToApprovedLeadTime == 0 || submittedToApprovedLeadTime == "" || submittedToApprovedLeadTime == null) {
@@ -2172,9 +2265,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                 expectedPlannedDate = moment(expectedSubmittedDate).subtract(parseInt(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
                             }
                             if (lastShipmentStatus == "" && moment(expectedPlannedDate).format("YYYY-MM-DD") < moment(Date.now()).format("YYYY-MM-DD")) {
-                                shipmentInstance.setValueFromCoords(19, rowDataForDates[7], true, true);
+                                shipmentInstance.setValueFromCoords(11, rowDataForDates[7], true, true);
                             } else {
-                                shipmentInstance.setValueFromCoords(19, rowDataForDates[7], false, true);
+                                shipmentInstance.setValueFromCoords(11, rowDataForDates[7], false, true);
                             }
                             console.log("dates", expectedArrivedDate);
                             console.log("dates", expectedShippedDate);
@@ -2254,172 +2347,15 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         }
     }
 
-    calculateFutureDates(x, y) {
-        // Logic for dates
-        var elInstance = this.state.shipmentDatesTableEl;
-        var shipmentInstance = "";
-        var rowDataForDates = elInstance.getRowData(y);
-        shipmentInstance = this.state.shipmentsEl;
-        var rowData = shipmentInstance.getRowData(rowDataForDates[7]);
-        var shipmentMode = rowData[7];
-        var procurementAgent = rowData[2];
-        var addLeadTimes = 0;
-        if (shipmentMode != "" && procurementAgent != "") {
-            var db1;
-            var storeOS;
-            getDatabase();
-            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-            openRequest.onerror = function (event) {
-                this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-                this.props.updateState("color", "red");
-                this.props.hideFirstComponent();
-            }.bind(this);
-            openRequest.onsuccess = function (e) {
-                db1 = e.target.result;
-
-                var programJson = this.props.items.programJson;
-                var papuTransaction = db1.transaction(['procurementAgent'], 'readwrite');
-                var papuOs = papuTransaction.objectStore('procurementAgent');
-                var papuRequest = papuOs.get(parseInt(procurementAgent));
-                papuRequest.onerror = function (event) {
-                    this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-                    this.props.updateState("color", "red");
-                    this.props.hideFirstComponent();
-                }.bind(this);
-                papuRequest.onsuccess = function (event) {
-                    var papuResult = [];
-                    papuResult = papuRequest.result;
-                    var plannedDate = "";
-                    var submittedDate = "";
-                    var approvedDate = "";
-                    var shippedDate = "";
-                    var arrivedDate = "";
-                    var expectedDeliveryDate = "";
-                    if (x == 1) {
-                        plannedDate = rowDataForDates[1];
-                    } else if (x == 2) {
-                        plannedDate = rowDataForDates[1];
-                        submittedDate = rowDataForDates[2];
-                    } else if (x == 3) {
-                        plannedDate = rowDataForDates[1];
-                        submittedDate = rowDataForDates[2];
-                        approvedDate = rowDataForDates[3];
-                    } else if (x == 4) {
-                        plannedDate = rowDataForDates[1];
-                        submittedDate = rowDataForDates[2];
-                        approvedDate = rowDataForDates[3];
-                        shippedDate = rowDataForDates[4];
-                    } else if (x == 5) {
-                        plannedDate = rowDataForDates[1];
-                        submittedDate = rowDataForDates[2];
-                        approvedDate = rowDataForDates[3];
-                        shippedDate = rowDataForDates[4];
-                        arrivedDate = rowDataForDates[5];
-                    }
-
-                    if (papuResult.localProcurementAgent) {
-                        addLeadTimes = this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
-                        var leadTimesPerStatus = addLeadTimes / 5;
-                        if (x == 1) {
-                            submittedDate = moment(plannedDate).add(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                            approvedDate = moment(submittedDate).add(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                            shippedDate = moment(approvedDate).add(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                            arrivedDate = moment(shippedDate).add(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                            expectedDeliveryDate = moment(arrivedDate).add(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                        } else if (x == 2) {
-                            approvedDate = moment(submittedDate).add(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                            shippedDate = moment(approvedDate).add(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                            arrivedDate = moment(shippedDate).add(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                            expectedDeliveryDate = moment(arrivedDate).add(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                        } else if (x == 3) {
-                            shippedDate = moment(approvedDate).add(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                            arrivedDate = moment(shippedDate).add(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                            expectedDeliveryDate = moment(arrivedDate).add(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                        } else if (x == 4) {
-                            arrivedDate = moment(shippedDate).add(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                            expectedDeliveryDate = moment(arrivedDate).add(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                        } else if (x == 5) {
-                            expectedDeliveryDate = moment(arrivedDate).add(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                        }
-                    } else {
-                        var ppUnit = papuResult;
-                        var submittedToApprovedLeadTime = ppUnit.submittedToApprovedLeadTime;
-                        if (submittedToApprovedLeadTime == 0 || submittedToApprovedLeadTime == "" || submittedToApprovedLeadTime == null) {
-                            submittedToApprovedLeadTime = programJson.submittedToApprovedLeadTime;
-                        }
-                        var approvedToShippedLeadTime = "";
-
-                        approvedToShippedLeadTime = ppUnit.approvedToShippedLeadTime;
-                        if (approvedToShippedLeadTime == 0 || approvedToShippedLeadTime == "" || approvedToShippedLeadTime == null) {
-                            approvedToShippedLeadTime = programJson.approvedToShippedLeadTime;
-                        }
-
-
-                        var shippedToArrivedLeadTime = ""
-                        if (shipmentMode == 2) {
-                            shippedToArrivedLeadTime = parseFloat(programJson.shippedToArrivedByAirLeadTime);
-                        } else {
-                            shippedToArrivedLeadTime = parseFloat(programJson.shippedToArrivedBySeaLeadTime);
-                        }
-                        if (x == 1) {
-                            submittedDate = moment(plannedDate).add(parseInt(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                            approvedDate = moment(submittedDate).add(parseInt(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                            shippedDate = moment(approvedDate).add(parseInt(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                            arrivedDate = moment(shippedDate).add(parseInt(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                            expectedDeliveryDate = moment(arrivedDate).add(parseInt(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
-                        } else if (x == 2) {
-                            approvedDate = moment(submittedDate).add(parseInt(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                            shippedDate = moment(approvedDate).add(parseInt(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                            arrivedDate = moment(shippedDate).add(parseInt(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                            expectedDeliveryDate = moment(arrivedDate).add(parseInt(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
-                        } else if (x == 3) {
-                            shippedDate = moment(approvedDate).add(parseInt(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                            arrivedDate = moment(shippedDate).add(parseInt(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                            expectedDeliveryDate = moment(arrivedDate).add(parseInt(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
-                        } else if (x == 4) {
-                            arrivedDate = moment(shippedDate).add(parseInt(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                            expectedDeliveryDate = moment(arrivedDate).add(parseInt(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
-                        } else if (x == 5) {
-                            expectedDeliveryDate = moment(arrivedDate).add(parseInt(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
-                        }
-                    }
-                    if (rowData[19].toString() == "false") {
-                        if (x == 1) {
-                            elInstance.setValueFromCoords(2, 1, submittedDate, true);
-                            elInstance.setValueFromCoords(3, 1, approvedDate, true);
-                            elInstance.setValueFromCoords(4, 1, shippedDate, true);
-                            elInstance.setValueFromCoords(5, 1, arrivedDate, true);
-                            elInstance.setValueFromCoords(6, 1, expectedDeliveryDate, true);
-                        } else if (x == 2) {
-                            elInstance.setValueFromCoords(3, 1, approvedDate, true);
-                            elInstance.setValueFromCoords(4, 1, shippedDate, true);
-                            elInstance.setValueFromCoords(5, 1, arrivedDate, true);
-                            elInstance.setValueFromCoords(6, 1, expectedDeliveryDate, true);
-                        } else if (x == 3) {
-                            elInstance.setValueFromCoords(4, 1, shippedDate, true);
-                            elInstance.setValueFromCoords(5, 1, arrivedDate, true);
-                            elInstance.setValueFromCoords(6, 1, expectedDeliveryDate, true);
-                        } else if (x == 4) {
-                            elInstance.setValueFromCoords(5, 1, arrivedDate, true);
-                            elInstance.setValueFromCoords(6, 1, expectedDeliveryDate, true);
-                        } else if (x == 5) {
-                            elInstance.setValueFromCoords(6, 1, expectedDeliveryDate, true);
-                        }
-                    }
-                }.bind(this)
-            }.bind(this)
-        }
-    }
-
     checkValidationForShipmentDates() {
         var valid = true;
         var elInstance = this.state.shipmentDatesTableEl;
-        var shipmentInstance = "";
+        // var shipmentInstance = "";
         var rowDataForDates = elInstance.getRowData(0);
         var rowDataForDates1 = elInstance.getRowData(1);
-        shipmentInstance = this.state.shipmentsEl;
-        var rowData = shipmentInstance.getRowData(rowDataForDates[7]);
-        var shipmentStatus = rowData[0];
+        // shipmentInstance = this.state.shipmentsEl;
+        // var rowData = shipmentInstance.getRowData(rowDataForDates[7]);
+        // var shipmentStatus = rowData[3];
         var validation = checkValidtion("date", "G", 0, rowDataForDates[6], elInstance);
         if (validation == false) {
             valid = false;
@@ -2517,8 +2453,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             console.log("map1", moment(map1.get("6")).format("YYYY-MM-DD"));
             console.log("Json", json.expectedDeliveryDate);
             var shipmentInstance = this.state.shipmentsEl;
-            shipmentInstance.setValueFromCoords(21, parseInt(rowNumber), json, true);
-            shipmentInstance.setValueFromCoords(1, parseInt(rowNumber), map.get("6") != "" && map.get("6") != null && map.get("6") != undefined ? moment(map.get("6")).format("YYYY-MM-DD") : moment(map1.get("6")).format("YYYY-MM-DD"), true);
+            shipmentInstance.setValueFromCoords(26, parseInt(rowNumber), json, true);
+            shipmentInstance.setValueFromCoords(4, parseInt(rowNumber), map.get("6") != "" && map.get("6") != null && map.get("6") != undefined ? moment(map.get("6")).format("YYYY-MM-DD") : moment(map1.get("6")).format("YYYY-MM-DD"), true);
             this.props.updateState("shipmentChangedFlag", 1);
             this.props.updateState("shipmentDatesChangedFlag", 0);
             this.setState({
@@ -2548,37 +2484,37 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             var map = new Map(Object.entries(json[y]));
             var rowData = elInstance.getRowData(y);
             if (checkOtherValidation) {
-                var validation = checkValidtion("text", "A", y, rowData[0], elInstance);
+                var validation = checkValidtion("text", "D", y, rowData[3], elInstance);
                 if (validation == true) {
-                    if (rowData[0] == SUBMITTED_SHIPMENT_STATUS || rowData[0] == ARRIVED_SHIPMENT_STATUS || rowData[0] == SHIPPED_SHIPMENT_STATUS || rowData[0] == DELIVERED_SHIPMENT_STATUS || rowData[0] == APPROVED_SHIPMENT_STATUS) {
-                        var budget = rowData[4];
-                        var v = checkValidtion("text", "E", y, budget, elInstance);
+                    if (rowData[3] == SUBMITTED_SHIPMENT_STATUS || rowData[3] == ARRIVED_SHIPMENT_STATUS || rowData[3] == SHIPPED_SHIPMENT_STATUS || rowData[3] == DELIVERED_SHIPMENT_STATUS || rowData[3] == APPROVED_SHIPMENT_STATUS) {
+                        var budget = rowData[13];
+                        var v = checkValidtion("text", "N", y, budget, elInstance);
                         if (v == false) {
                             valid = false;
                         }
-                        var procurementAgent = rowData[2];
-                        var fundingSource = rowData[3];
+                        var procurementAgent = rowData[6];
+                        var fundingSource = rowData[12];
                         console.log("fundingSource", fundingSource);
                         if (procurementAgent == TBD_PROCUREMENT_AGENT_ID) {
-                            inValid("C", y, i18n.t('static.supplyPlan.procurementAgentCannotBeTBD'), elInstance);
+                            inValid("G", y, i18n.t('static.supplyPlan.procurementAgentCannotBeTBD'), elInstance);
                             valid = false;
-                            elInstance.setValueFromCoords(25, y, 1, true);
+                            elInstance.setValueFromCoords(30, y, 1, true);
                         } else {
-                            positiveValidation("C", y, elInstance);
+                            positiveValidation("G", y, elInstance);
                         }
 
                         if (fundingSource == TBD_FUNDING_SOURCE) {
-                            inValid("D", y, i18n.t('static.supplyPlan.fundingSourceCannotBeTBD'), elInstance);
+                            inValid("M", y, i18n.t('static.supplyPlan.fundingSourceCannotBeTBD'), elInstance);
                             valid = false
                         } else {
-                            positiveValidation("D", y, elInstance);
+                            positiveValidation("M", y, elInstance);
                         }
                     } else {
-                        positiveValidation("E", y, elInstance);
-                        if (map.get("4") != "" && map.get("9") != "") {
-                            var budget = this.state.budgetListAll.filter(c => c.id == map.get("4"))[0]
+                        positiveValidation("N", y, elInstance);
+                        if (map.get("13") != "" && map.get("14") != "") {
+                            var budget = this.state.budgetListAll.filter(c => c.id == map.get("13"))[0]
                             var totalBudget = budget.budgetAmt * budget.currency.conversionRateToUsd;
-                            var shipmentList = this.props.items.shipmentListUnFiltered.filter(c => c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.active == true && c.budget.id == map.get("4"));
+                            var shipmentList = this.props.items.shipmentListUnFiltered.filter(c => c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.active == true && c.budget.id == map.get("13"));
                             var usedBudgetTotalAmount = 0;
                             for (var s = 0; s < shipmentList.length; s++) {
                                 var index = "";
@@ -2587,134 +2523,134 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                 } else {
                                     index = shipmentList[s].index;
                                 }
-                                if (map.get("16") != index) {
+                                if (map.get("23") != index) {
                                     usedBudgetTotalAmount += parseFloat((parseFloat(shipmentList[s].productCost) + parseFloat(shipmentList[s].freightCost)) * parseFloat(shipmentList[s].currency.conversionRateToUsd));
                                 }
                             }
-                            var totalCost = parseFloat(((elInstance.getCell(`L${parseInt(y) + 1}`)).innerHTML).toString().replaceAll("\,", "")) + parseFloat(((elInstance.getCell(`M${parseInt(y) + 1}`)).innerHTML).toString().replaceAll("\,", ""));
-                            var enteredBudgetAmt = (totalCost * (parseFloat((this.state.currencyListAll.filter(c => c.currencyId == rowData[9])[0]).conversionRateToUsd)));
+                            var totalCost = parseFloat(((elInstance.getCell(`Q${parseInt(y) + 1}`)).innerHTML).toString().replaceAll("\,", "")) + parseFloat(((elInstance.getCell(`R${parseInt(y) + 1}`)).innerHTML).toString().replaceAll("\,", ""));
+                            var enteredBudgetAmt = (totalCost * (parseFloat((this.state.currencyListAll.filter(c => c.currencyId == rowData[14])[0]).conversionRateToUsd)));
                             usedBudgetTotalAmount = usedBudgetTotalAmount.toFixed(2);
                             enteredBudgetAmt = enteredBudgetAmt.toFixed(2);
                             var availableBudgetAmount = totalBudget - usedBudgetTotalAmount;
                             if (enteredBudgetAmt > availableBudgetAmount || availableBudgetAmount < 0) {
                                 negativeBudget = negativeBudget + 1;
-                                inValid("E", y, i18n.t('static.label.noFundsAvailable'), elInstance);
+                                inValid("N", y, i18n.t('static.label.noFundsAvailable'), elInstance);
                             } else {
                             }
                         } else {
                         }
-                        positiveValidation("C", y, elInstance);
-                        positiveValidation("D", y, elInstance);
+                        positiveValidation("G", y, elInstance);
+                        positiveValidation("M", y, elInstance);
                     }
 
                 } else {
                     valid = false;
-                }
-
-                var validation = checkValidtion("text", "C", y, rowData[2], elInstance);
-                if (validation == true) {
-                    var shipmentStatus = rowData[0];
-                    if (shipmentStatus == SUBMITTED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS || shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == DELIVERED_SHIPMENT_STATUS || shipmentStatus == APPROVED_SHIPMENT_STATUS) {
-                        if (rowData[2] == TBD_PROCUREMENT_AGENT_ID) {
-                            inValid("C", y, i18n.t('static.supplyPlan.procurementAgentCannotBeTBD'), elInstance);
-                            valid = false;
-                            elInstance.setValueFromCoords(25, y, 1, true);
-                        } else {
-                            positiveValidation("C", y, elInstance);
-                        }
-                    }
-                }
-
-                var validation = checkValidtion("text", "D", y, rowData[3], elInstance);
-                if (validation == true) {
-                    var shipmentStatus = rowData[0];
-                    if (shipmentStatus == SUBMITTED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS || shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == DELIVERED_SHIPMENT_STATUS || shipmentStatus == APPROVED_SHIPMENT_STATUS) {
-                        if (rowData[3] == TBD_FUNDING_SOURCE) {
-                            inValid("D", y, i18n.t('static.supplyPlan.fundingSourceCannotBeTBD'), elInstance);
-                            valid = false;
-                            elInstance.setValueFromCoords(25, y, 1, true);
-                        } else {
-                            positiveValidation("D", y, elInstance);
-                        }
-                    }
-                } else {
-                    valid = false;
-                }
-
-                var validation = checkValidtion("date", "B", y, rowData[1], elInstance);
-                if (validation == false) {
-                    valid = false;
-                } else {
-                    if (rowData[0] == DELIVERED_SHIPMENT_STATUS) {
-                        var curDate = moment(Date.now()).format("YYYY-MM-DD");
-                        var selectedDate = moment(rowData[1]).format("YYYY-MM-DD");
-                        if (selectedDate > curDate) {
-                            inValid("B", y, i18n.t('static.supplyPlan.dateustBeLessThanCurDate'), elInstance);
-                            valid = false;
-                        } else {
-                            positiveValidation("B", y, elInstance);
-                        }
-                    } else {
-                        positiveValidation("B", y, elInstance);
-                    }
                 }
 
                 var validation = checkValidtion("text", "G", y, rowData[6], elInstance);
-                if (validation == false) {
-                    valid = false;
-                    elInstance.setValueFromCoords(25, y, 1, true);
+                if (validation == true) {
+                    var shipmentStatus = rowData[3];
+                    if (shipmentStatus == SUBMITTED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS || shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == DELIVERED_SHIPMENT_STATUS || shipmentStatus == APPROVED_SHIPMENT_STATUS) {
+                        if (rowData[6] == TBD_PROCUREMENT_AGENT_ID) {
+                            inValid("G", y, i18n.t('static.supplyPlan.procurementAgentCannotBeTBD'), elInstance);
+                            valid = false;
+                            elInstance.setValueFromCoords(30, y, 1, true);
+                        } else {
+                            positiveValidation("G", y, elInstance);
+                        }
+                    }
                 }
 
-                var validation = checkValidtion("text", "H", y, rowData[7], elInstance);
-                if (validation == false) {
+                var validation = checkValidtion("text", "M", y, rowData[12], elInstance);
+                if (validation == true) {
+                    var shipmentStatus = rowData[3];
+                    if (shipmentStatus == SUBMITTED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS || shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == DELIVERED_SHIPMENT_STATUS || shipmentStatus == APPROVED_SHIPMENT_STATUS) {
+                        if (rowData[12] == TBD_FUNDING_SOURCE) {
+                            inValid("M", y, i18n.t('static.supplyPlan.fundingSourceCannotBeTBD'), elInstance);
+                            valid = false;
+                            elInstance.setValueFromCoords(30, y, 1, true);
+                        } else {
+                            positiveValidation("M", y, elInstance);
+                        }
+                    }
+                } else {
                     valid = false;
-                    elInstance.setValueFromCoords(25, y, 1, true);
                 }
 
-                var validation = checkValidtion("number", "I", y, rowData[8], elInstance, JEXCEL_INTEGER_REGEX, 1, 0);
+                var validation = checkValidtion("date", "E", y, rowData[4], elInstance);
                 if (validation == false) {
                     valid = false;
-                    elInstance.setValueFromCoords(25, y, 1, true);
+                } else {
+                    if (rowData[3] == DELIVERED_SHIPMENT_STATUS) {
+                        var curDate = moment(Date.now()).format("YYYY-MM-DD");
+                        var selectedDate = moment(rowData[4]).format("YYYY-MM-DD");
+                        if (selectedDate > curDate) {
+                            inValid("E", y, i18n.t('static.supplyPlan.dateustBeLessThanCurDate'), elInstance);
+                            valid = false;
+                        } else {
+                            positiveValidation("E", y, elInstance);
+                        }
+                    } else {
+                        positiveValidation("E", y, elInstance);
+                    }
                 }
 
-                var validation = checkValidtion("text", "J", y, rowData[9], elInstance);
+                var validation = checkValidtion("text", "S", y, rowData[18], elInstance);
                 if (validation == false) {
                     valid = false;
-                    elInstance.setValueFromCoords(25, y, 1, true);
+                    elInstance.setValueFromCoords(30, y, 1, true);
                 }
 
-                var validation = checkValidtion("number", "K", y, rowData[10], elInstance, JEXCEL_DECIMAL_NO_REGEX, 1, 1);
+                var validation = checkValidtion("text", "F", y, rowData[5], elInstance);
                 if (validation == false) {
                     valid = false;
-                    elInstance.setValueFromCoords(25, y, 1, true);
+                    elInstance.setValueFromCoords(30, y, 1, true);
                 }
 
-                var validation = checkValidtion("number", "M", y, rowData[12], elInstance, JEXCEL_DECIMAL_NO_REGEX, 1, 1);
+                var validation = checkValidtion("number", "K", y, rowData[10], elInstance, JEXCEL_INTEGER_REGEX, 1, 0);
                 if (validation == false) {
                     valid = false;
-                    elInstance.setValueFromCoords(25, y, 1, true);
+                    elInstance.setValueFromCoords(30, y, 1, true);
                 }
 
-                var shipmentStatus = elInstance.getRowData(y)[0];
+                var validation = checkValidtion("text", "O", y, rowData[14], elInstance);
+                if (validation == false) {
+                    valid = false;
+                    elInstance.setValueFromCoords(30, y, 1, true);
+                }
+
+                var validation = checkValidtion("number", "P", y, rowData[15], elInstance, JEXCEL_DECIMAL_NO_REGEX, 1, 1);
+                if (validation == false) {
+                    valid = false;
+                    elInstance.setValueFromCoords(30, y, 1, true);
+                }
+
+                var validation = checkValidtion("number", "R", y, rowData[17], elInstance, JEXCEL_DECIMAL_NO_REGEX, 1, 1);
+                if (validation == false) {
+                    valid = false;
+                    elInstance.setValueFromCoords(30, y, 1, true);
+                }
+
+                var shipmentStatus = elInstance.getRowData(y)[3];
                 if (shipmentStatus != CANCELLED_SHIPMENT_STATUS && shipmentStatus != ON_HOLD_SHIPMENT_STATUS) {
                     if (shipmentStatus == DELIVERED_SHIPMENT_STATUS || shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS) {
-                        var totalShipmentQty = (rowData[18]);
-                        var adjustedOrderQty = (elInstance.getCell(`I${parseInt(y) + 1}`)).innerHTML;
+                        var totalShipmentQty = (rowData[25]);
+                        var adjustedOrderQty = (elInstance.getCell(`K${parseInt(y) + 1}`)).innerHTML;
                         adjustedOrderQty = adjustedOrderQty.toString().replaceAll("\,", "");
-                        var col = ("I").concat(parseInt(y) + 1);
+                        var col = ("K").concat(parseInt(y) + 1);
 
                         elInstance.setStyle(col, "background-color", "transparent");
                         elInstance.setStyle(col, "background-color", "yellow");
                         elInstance.setComments(col, i18n.t('static.supplyPlan.batchNumberMissing'));
-                        inValid("I", y, i18n.t('static.supplyPlan.batchNumberMissing'), elInstance);
+                        inValid("K", y, i18n.t('static.supplyPlan.batchNumberMissing'), elInstance);
                         console.log("TotalShipment Qty", totalShipmentQty, "Adjusted order qty", adjustedOrderQty);
                         if (totalShipmentQty != 0 && totalShipmentQty > adjustedOrderQty) {
                             valid = false;
-                            elInstance.setValueFromCoords(25, y, 1, true);
+                            elInstance.setValueFromCoords(30, y, 1, true);
                             this.props.updateState("shipmentBatchError", i18n.t('static.supplyPlan.batchNumberMissing'));
                             this.props.hideSecondComponent();
                         } else {
-                            positiveValidation("I", y, elInstance);
+                            positiveValidation("K", y, elInstance);
                         }
                     }
                 }
@@ -2782,69 +2718,85 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     var shipmentDataList = (programJson.shipmentList);
                     var batchInfoList = programJson.batchInfoList;
                     var minDate = moment(Date.now()).startOf('month').format("YYYY-MM-DD");
+                    var curDate = ((moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD HH:mm:ss')));
+                    var curUser = AuthenticationService.getLoggedInUserId();
                     for (var j = 0; j < json.length; j++) {
                         var map = new Map(Object.entries(json[j]));
-                        if (map.get("23") == 1) {
+                        if (map.get("28") == 1) {
                             console.log("In if");
-                            if (moment(map.get("1")).format("YYYY-MM") < moment(minDate).format("YYYY-MM")) {
-                                minDate = moment(map.get("1")).format("YYYY-MM-DD");
+                            if (moment(map.get("4")).format("YYYY-MM") < moment(minDate).format("YYYY-MM")) {
+                                minDate = moment(map.get("4")).format("YYYY-MM-DD");
                             }
                         }
                         console.log("minDate", minDate);
-                        var selectedShipmentStatus = map.get("0");
+                        var selectedShipmentStatus = map.get("3");
                         var shipmentStatusId = selectedShipmentStatus;
-                        var shipmentQty = (elInstance.getCell(`I${parseInt(j) + 1}`)).innerHTML;
-                        var productCost = (elInstance.getCell(`L${parseInt(j) + 1}`)).innerHTML;
-                        var rate = (elInstance.getCell(`K${parseInt(j) + 1}`)).innerHTML;
-                        var freightCost = (elInstance.getCell(`M${parseInt(j) + 1}`)).innerHTML;
+                        var shipmentQty = (elInstance.getCell(`K${parseInt(j) + 1}`)).innerHTML;
+                        var productCost = (elInstance.getCell(`Q${parseInt(j) + 1}`)).innerHTML;
+                        var rate = (elInstance.getCell(`P${parseInt(j) + 1}`)).innerHTML;
+                        var freightCost = (elInstance.getCell(`R${parseInt(j) + 1}`)).innerHTML;
                         var shipmentMode = "Sea";
-                        if (map.get("7") == 2) {
+                        if (map.get("5") == 2) {
                             shipmentMode = "Air";
                         }
-                        var shipmentDatesJson = map.get("21");
-                        var plannedDate = shipmentDatesJson.plannedDate;
-                        var submittedDate = shipmentDatesJson.submittedDate;
-                        var approvedDate = shipmentDatesJson.approvedDate;
-                        var shippedDate = shipmentDatesJson.shippedDate;
-                        var arrivedDate = shipmentDatesJson.arrivedDate;
-                        var receivedDate = shipmentDatesJson.receivedDate;
-                        var expectedDeliveryDate = shipmentDatesJson.expectedDeliveryDate;
+                        var shipmentDatesJson = map.get("26");
+                        var plannedDate = shipmentDatesJson.plannedDate!="" && shipmentDatesJson.plannedDate!="Invalid date"?shipmentDatesJson.plannedDate:null;
+                        var submittedDate = shipmentDatesJson.submittedDate!="" && shipmentDatesJson.submittedDate!="Invalid date"?shipmentDatesJson.submittedDate:null;
+                        var approvedDate = shipmentDatesJson.approvedDate!="" && shipmentDatesJson.approvedDate!="Invalid date"?shipmentDatesJson.approvedDate:null;
+                        var shippedDate = shipmentDatesJson.shippedDate!="" && shipmentDatesJson.shippedDate!="Invalid date"?shipmentDatesJson.shippedDate:null;
+                        var arrivedDate = shipmentDatesJson.arrivedDate!="" && shipmentDatesJson.arrivedDate!="Invalid date"?shipmentDatesJson.arrivedDate:null;
+                        var receivedDate = shipmentDatesJson.receivedDate!="" && shipmentDatesJson.receivedDate!="Invalid date"?shipmentDatesJson.receivedDate:null;
+                        var expectedDeliveryDate = shipmentDatesJson.expectedDeliveryDate!="" && shipmentDatesJson.expectedDeliveryDate!="Invalid date"?shipmentDatesJson.expectedDeliveryDate:null;
                         console.log("shipmentDatesJson", shipmentDatesJson);
                         console.log("Received date", receivedDate);
                         console.log("Shipment Received date", shipmentDatesJson.receivedDate);
 
-                        var expiryDate = moment(expectedDeliveryDate).add(this.props.items.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
+                        var expiryDate = moment(receivedDate != "" && receivedDate != null && receivedDate != "Invalid date" ? receivedDate : expectedDeliveryDate).add(this.props.items.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
                         console.log("expected received dare", expectedDeliveryDate);
                         console.log("Shipment dates", shipmentDatesJson);
-                        if (map.get("16") != -1) {
-                            shipmentDataList[parseInt(map.get("16"))].plannedDate = plannedDate;
-                            shipmentDataList[parseInt(map.get("16"))].submittedDate = submittedDate;
-                            shipmentDataList[parseInt(map.get("16"))].approvedDate = approvedDate;
-                            shipmentDataList[parseInt(map.get("16"))].shippedDate = shippedDate;
-                            shipmentDataList[parseInt(map.get("16"))].arrivedDate = arrivedDate;
-                            shipmentDataList[parseInt(map.get("16"))].receivedDate = receivedDate;
-                            shipmentDataList[parseInt(map.get("16"))].expectedDeliveryDate = moment(shipmentDatesJson.expectedDeliveryDate).format("YYYY-MM-DD");
+                        if (map.get("23") != -1) {
+                            console.log("shipmentDataList[parseInt(map.get", shipmentDataList[parseInt(map.get("23"))]);
+                            shipmentDataList[parseInt(map.get("23"))].plannedDate = plannedDate;
+                            shipmentDataList[parseInt(map.get("23"))].submittedDate = submittedDate;
+                            shipmentDataList[parseInt(map.get("23"))].approvedDate = approvedDate;
+                            shipmentDataList[parseInt(map.get("23"))].shippedDate = shippedDate;
+                            shipmentDataList[parseInt(map.get("23"))].arrivedDate = arrivedDate;
+                            shipmentDataList[parseInt(map.get("23"))].receivedDate = receivedDate;
+                            shipmentDataList[parseInt(map.get("23"))].expectedDeliveryDate = moment(shipmentDatesJson.expectedDeliveryDate).format("YYYY-MM-DD");
 
-                            shipmentDataList[parseInt(map.get("16"))].shipmentStatus.id = shipmentStatusId;
-                            shipmentDataList[parseInt(map.get("16"))].dataSource.id = map.get("6");
-                            shipmentDataList[parseInt(map.get("16"))].procurementAgent.id = map.get("2");
-                            shipmentDataList[parseInt(map.get("16"))].fundingSource.id = map.get("3");
-                            shipmentDataList[parseInt(map.get("16"))].budget.id = map.get("4");
-                            shipmentDataList[parseInt(map.get("16"))].shipmentQty = shipmentQty.toString().replaceAll("\,", "");
-                            shipmentDataList[parseInt(map.get("16"))].rate = rate.toString().replaceAll("\,", "");
-                            shipmentDataList[parseInt(map.get("16"))].shipmentMode = shipmentMode;
-                            shipmentDataList[parseInt(map.get("16"))].productCost = productCost.toString().replaceAll("\,", "");
-                            shipmentDataList[parseInt(map.get("16"))].freightCost = parseFloat(freightCost.toString().replaceAll("\,", "")).toFixed(2);
-                            shipmentDataList[parseInt(map.get("16"))].notes = map.get("13");
-                            shipmentDataList[parseInt(map.get("16"))].accountFlag = map.get("20");
-                            shipmentDataList[parseInt(map.get("16"))].active = map.get("24");
-                            shipmentDataList[parseInt(map.get("16"))].emergencyOrder = map.get("19");
-                            shipmentDataList[parseInt(map.get("16"))].currency.currencyId = map.get("9");
-                            shipmentDataList[parseInt(map.get("16"))].currency.conversionRateToUsd = (parseFloat((this.state.currencyListAll.filter(c => c.currencyId == map.get("9"))[0]).conversionRateToUsd));
-                            if (map.get("17") != "" && map.get("17").length != 0) {
-                                var totalShipmentQty = (map.get("18"));
-                                var adjustedOrderQty = ((elInstance.getCell(`I${parseInt(j) + 1}`)).innerHTML).replaceAll(",", "");
-                                var eBatchInfoList = map.get("17")
+                            shipmentDataList[parseInt(map.get("23"))].shipmentStatus.id = shipmentStatusId;
+                            shipmentDataList[parseInt(map.get("23"))].dataSource.id = map.get("18");
+                            shipmentDataList[parseInt(map.get("23"))].procurementAgent.id = map.get("6");
+                            shipmentDataList[parseInt(map.get("23"))].fundingSource.id = map.get("12");
+                            shipmentDataList[parseInt(map.get("23"))].budget.id = map.get("13");
+                            shipmentDataList[parseInt(map.get("23"))].shipmentQty = shipmentQty.toString().replaceAll("\,", "");
+                            shipmentDataList[parseInt(map.get("23"))].rate = rate.toString().replaceAll("\,", "");
+                            shipmentDataList[parseInt(map.get("23"))].shipmentMode = shipmentMode;
+                            shipmentDataList[parseInt(map.get("23"))].productCost = productCost.toString().replaceAll("\,", "");
+                            shipmentDataList[parseInt(map.get("23"))].freightCost = parseFloat(freightCost.toString().replaceAll("\,", "")).toFixed(2);
+                            shipmentDataList[parseInt(map.get("23"))].notes = map.get("19");
+                            shipmentDataList[parseInt(map.get("23"))].accountFlag = map.get("0");
+                            shipmentDataList[parseInt(map.get("23"))].localProcurement = map.get("7");
+                            shipmentDataList[parseInt(map.get("23"))].active = map.get("29");
+
+                            shipmentDataList[parseInt(map.get("23"))].orderNo = map.get("8");
+
+                            shipmentDataList[parseInt(map.get("23"))].emergencyOrder = map.get("11");
+                            shipmentDataList[parseInt(map.get("23"))].currency.currencyId = map.get("14");
+                            shipmentDataList[parseInt(map.get("23"))].currency.conversionRateToUsd = (parseFloat((this.state.currencyListAll.filter(c => c.currencyId == map.get("14"))[0]).conversionRateToUsd));
+                            if (map.get("28") == 1) {
+                                if (shipmentDataList[parseInt(map.get("23"))].lastModifiedBy != null) {
+                                    shipmentDataList[parseInt(map.get("23"))].lastModifiedBy.userId = curUser;
+                                } else {
+                                    shipmentDataList[parseInt(map.get("23"))].lastModifiedBy = { userId: curUser };
+                                }
+                                shipmentDataList[parseInt(map.get("23"))].lastModifiedDate = curDate;
+                            }
+
+                            if (map.get("24") != "" && map.get("24").length != 0) {
+                                var totalShipmentQty = (map.get("25"));
+                                var adjustedOrderQty = ((elInstance.getCell(`K${parseInt(j) + 1}`)).innerHTML).replaceAll(",", "");
+                                var eBatchInfoList = map.get("24")
                                 for (var a = 0; a < eBatchInfoList.length; a++) {
                                     console.log("batchInfoList 1", eBatchInfoList[a])
                                 }
@@ -2859,7 +2811,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                     } else {
                                         console.log("In if")
                                         var programId = (document.getElementById("programId").value).split("_")[0];
-                                        var planningUnitId = document.getElementById("planningUnitId").value;
+                                        var planningUnitId = map.get("2");
                                         programId = paddingZero(programId, 0, 6);
                                         planningUnitId = paddingZero(planningUnitId, 0, 8);
                                         var batchNo = (BATCH_PREFIX).concat(programId).concat(planningUnitId).concat(moment(Date.now()).format("YYMMDD")).concat(generateRandomAplhaNumericCode(3));
@@ -2878,8 +2830,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                     }
                                     console.log("Json1 ", json1);
                                 }
-                                shipmentDataList[parseInt(map.get("16"))].batchInfoList = eBatchInfoList;
-                                map.set("17", eBatchInfoList);
+                                shipmentDataList[parseInt(map.get("23"))].batchInfoList = eBatchInfoList;
+                                map.set("24", eBatchInfoList);
                                 for (var a = 0; a < eBatchInfoList.length; a++) {
                                     console.log("eBatchInfoList 2", eBatchInfoList[a])
                                 }
@@ -2887,9 +2839,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
 
 
                             // if (shipmentStatusId == DELIVERED_SHIPMENT_STATUS) {
-                            var shipmentBatchInfoList = map.get("17");
+                            var shipmentBatchInfoList = map.get("24");
                             console.log("Shipment Batcg info list", shipmentBatchInfoList);
-                            var expectedDeliveryDate = moment(map.get("1")).format("YYYY-MM-DD");
+                            var expectedDeliveryDate = moment(map.get("4")).format("YYYY-MM-DD");
                             var createdDate = expectedDeliveryDate;
                             // if (shipmentDatesJson.receivedDate != "" && shipmentDatesJson.receivedDate != null && shipmentDatesJson.receivedDate != undefined && shipmentDatesJson.receivedDate != "Invalid date") {
                             //     createdDate = moment(shipmentDatesJson.receivedDate).format("YYYY-MM-DD");
@@ -2898,7 +2850,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                 // If user is not entering anything system will create its own batch
                                 console.log("In if")
                                 var programId = (document.getElementById("programId").value).split("_")[0];
-                                var planningUnitId = document.getElementById("planningUnitId").value;
+                                var planningUnitId = map.get("2");
                                 var batchNo = (BATCH_PREFIX).concat(paddingZero(programId, 0, 6)).concat(paddingZero(planningUnitId, 0, 8)).concat(moment(Date.now()).format("YYMMDD")).concat(generateRandomAplhaNumericCode(3));
                                 // if (shipmentDatesJson.receivedDate != "" && shipmentDatesJson.receivedDate != null && shipmentDatesJson.receivedDate != undefined && shipmentDatesJson.receivedDate != "Invalid date") {
                                 //     expiryDate = moment(shipmentDatesJson.receivedDate).add(this.props.items.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
@@ -2909,20 +2861,20 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                         batchNo: batchNo,
                                         expiryDate: expiryDate,
                                         batchId: 0,
-                                        autoGenerated: true
+                                        autoGenerated: true,
+                                        createdDate: createdDate
                                     },
-                                    shipmentQty: shipmentQty.toString().replaceAll("\,", ""),
-                                    createdDate: createdDate
+                                    shipmentQty: shipmentQty.toString().replaceAll("\,", "")
                                 }
                                 var batchArr = [];
                                 batchArr.push(batchInfoJson);
-                                shipmentDataList[parseInt(map.get("16"))].batchInfoList = batchArr;
+                                shipmentDataList[parseInt(map.get("23"))].batchInfoList = batchArr;
 
                                 // Enter details in batch info list
                                 var batchDetails = {
                                     batchId: 0,
                                     batchNo: batchNo,
-                                    planningUnitId: parseInt(document.getElementById("planningUnitId").value),
+                                    planningUnitId: parseInt(map.get("2")),
                                     expiryDate: expiryDate,
                                     createdDate: createdDate,
                                     autoGenerated: true
@@ -2939,7 +2891,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                     var batchDetails = {
                                         batchId: shipmentBatchInfoList[bi].batch.batchId,
                                         batchNo: shipmentBatchInfoList[bi].batch.batchNo,
-                                        planningUnitId: parseInt(document.getElementById("planningUnitId").value),
+                                        planningUnitId: parseInt(map.get("2")),
                                         expiryDate: shipmentBatchInfoList[bi].batch.expiryDate,
                                         createdDate: createdDate,
                                         autoGenerated: shipmentBatchInfoList[bi].batch.autoGenerated
@@ -2958,20 +2910,21 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             console.log("In else---------->", expectedDeliveryDate);
                             console.log("In else---------->", receivedDate);
                             var shipmentJson = {
-                                accountFlag: true,
-                                active: map.get("24"),
+                                accountFlag: map.get("0"),
+                                active: map.get("29"),
                                 dataSource: {
-                                    id: map.get("6")
+                                    id: map.get("18")
                                 },
                                 erpFlag: false,
+                                localProcurement: map.get("7"),
                                 freightCost: parseFloat(freightCost.toString().replaceAll("\,", "")).toFixed(2),
-                                notes: map.get("13"),
+                                notes: map.get("19"),
                                 planningUnit: {
-                                    id: document.getElementById("planningUnitId").value,
-                                    label: (this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0]).planningUnit.label
+                                    id: map.get("2"),
+                                    label: (this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == map.get("2"))[0]).planningUnit.label
                                 },
                                 procurementAgent: {
-                                    id: map.get("2")
+                                    id: map.get("6")
                                 },
                                 productCost: productCost.toString().replaceAll("\,", ""),
                                 shipmentQty: shipmentQty.toString().replaceAll("\,", ""),
@@ -2979,19 +2932,19 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                 shipmentId: 0,
                                 shipmentMode: shipmentMode,
                                 shipmentStatus: {
-                                    id: map.get("0")
+                                    id: map.get("3")
                                 },
-                                suggestedQty: map.get("22"),
+                                suggestedQty: map.get("27"),
                                 budget: {
-                                    id: map.get("4")
+                                    id: map.get("13")
                                 },
-                                emergencyOrder: map.get("19"),
+                                emergencyOrder: map.get("11"),
                                 currency: {
-                                    currencyId: map.get("9"),
-                                    conversionRateToUsd: parseFloat((this.state.currencyListAll.filter(c => c.currencyId == map.get("9"))[0]).conversionRateToUsd)
+                                    currencyId: map.get("14"),
+                                    conversionRateToUsd: parseFloat((this.state.currencyListAll.filter(c => c.currencyId == map.get("14"))[0]).conversionRateToUsd)
                                 },
                                 fundingSource: {
-                                    id: map.get("3")
+                                    id: map.get("12")
                                 },
                                 plannedDate: plannedDate,
                                 submittedDate: submittedDate,
@@ -3001,13 +2954,22 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                 expectedDeliveryDate: expectedDeliveryDate,
                                 receivedDate: receivedDate,
                                 index: shipmentDataList.length,
-                                batchInfoList: []
+                                batchInfoList: [],
+                                orderNo: map.get("8"),
+                                createdBy: {
+                                    userId: curUser
+                                },
+                                createdDate: curDate,
+                                lastModifiedBy: {
+                                    userId: curUser
+                                },
+                                lastModifiedDate: curDate
                             }
                             console.log("Shipment json", shipmentJson);
-                            if (map.get("17") != "" && map.get("17").length != 0) {
-                                var totalShipmentQty = (map.get("18"));
-                                var adjustedOrderQty = ((elInstance.getCell(`I${parseInt(j) + 1}`)).innerHTML).replaceAll(",", "");
-                                var eBatchInfoList = map.get("17")
+                            if (map.get("24") != "" && map.get("24").length != 0) {
+                                var totalShipmentQty = (map.get("25"));
+                                var adjustedOrderQty = ((elInstance.getCell(`K${parseInt(j) + 1}`)).innerHTML).replaceAll(",", "");
+                                var eBatchInfoList = map.get("24")
                                 var remainingBatchQty = parseInt(adjustedOrderQty) - parseInt(totalShipmentQty);
                                 if (totalShipmentQty < adjustedOrderQty) {
                                     var indexBatchNo = eBatchInfoList.findIndex(c => c.batch.autoGenerated.toString() == "true");
@@ -3016,7 +2978,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                     } else {
                                         console.log("In if")
                                         var programId = (document.getElementById("programId").value).split("_")[0];
-                                        var planningUnitId = document.getElementById("planningUnitId").value;
+                                        var planningUnitId = map.get("2");
                                         programId = paddingZero(programId, 0, 6);
                                         planningUnitId = paddingZero(planningUnitId, 0, 8);
                                         var batchNo = (BATCH_PREFIX).concat(programId).concat(planningUnitId).concat(moment(Date.now()).format("YYMMDD")).concat(generateRandomAplhaNumericCode(3));
@@ -3035,23 +2997,23 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                     }
                                     console.log("Json1 ", json1);
                                 }
-                                map.set("17", eBatchInfoList);
-                                shipmentJson.batchInfoList = map.get("17");
+                                map.set("24", eBatchInfoList);
+                                shipmentJson.batchInfoList = map.get("24");
                             }
 
                             // if (shipmentStatusId == DELIVERED_SHIPMENT_STATUS) {
-                            var shipmentBatchInfoList = map.get("17");
+                            var shipmentBatchInfoList = map.get("24");
                             console.log("Shipment byach info list", shipmentBatchInfoList);
-                            var expectedDeliveryDate = moment(map.get("1")).format("YYYY-MM-DD");
+                            var expectedDeliveryDate = moment(map.get("4")).format("YYYY-MM-DD");
                             var createdDate = expectedDeliveryDate;
                             // if (shipmentDatesJson.receivedDate != "" && shipmentDatesJson.receivedDate != null && shipmentDatesJson.receivedDate != undefined && shipmentDatesJson.receivedDate != "Invalid date") {
                             //     createdDate = moment(shipmentDatesJson.receivedDate).format("YYYY-MM-DD");
                             // }
                             if (shipmentBatchInfoList == "" && shipmentBatchInfoList.length == 0) {
                                 var programId = (document.getElementById("programId").value).split("_")[0];
-                                var planningUnitId = document.getElementById("planningUnitId").value;
+                                var planningUnitId = map.get("2");
                                 var batchNo = (BATCH_PREFIX).concat(paddingZero(programId, 0, 6)).concat(paddingZero(planningUnitId, 0, 8)).concat(moment(Date.now()).format("YYMMDD")).concat(generateRandomAplhaNumericCode(3));
-                                var expiryDate = moment(expectedDeliveryDate).add(this.props.items.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
+                                var expiryDate = moment(receivedDate != "" && receivedDate != null && receivedDate != "Invalid date" ? receivedDate : expectedDeliveryDate).add(this.props.items.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
                                 // if (shipmentDatesJson.receivedDate != "" && shipmentDatesJson.receivedDate != null && shipmentDatesJson.receivedDate != undefined && shipmentDatesJson.receivedDate != "Invalid date") {
                                 //     expiryDate = moment(shipmentDatesJson.receivedDate).add(this.props.items.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
                                 // }
@@ -3061,10 +3023,10 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                         batchNo: batchNo,
                                         expiryDate: expiryDate,
                                         batchId: 0,
-                                        autoGenerated: true
+                                        autoGenerated: true,
+                                        createdDate: createdDate
                                     },
-                                    shipmentQty: shipmentQty.toString().replaceAll("\,", ""),
-                                    createdDate: createdDate
+                                    shipmentQty: shipmentQty.toString().replaceAll("\,", "")
                                 }
                                 var batchArr = [];
                                 batchArr.push(batchInfoJson);
@@ -3074,7 +3036,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                 var batchDetails = {
                                     batchId: 0,
                                     batchNo: batchNo,
-                                    planningUnitId: parseInt(document.getElementById("planningUnitId").value),
+                                    planningUnitId: map.get("2"),
                                     expiryDate: expiryDate,
                                     createdDate: createdDate,
                                     autoGenerated: true
@@ -3090,7 +3052,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                     var batchDetails = {
                                         batchId: shipmentBatchInfoList[bi].batch.batchId,
                                         batchNo: shipmentBatchInfoList[bi].batch.batchNo,
-                                        planningUnitId: parseInt(document.getElementById("planningUnitId").value),
+                                        planningUnitId: map.get("2"),
                                         expiryDate: shipmentBatchInfoList[bi].batch.expiryDate,
                                         createdDate: createdDate,
                                         autoGenerated: shipmentBatchInfoList[bi].batch.autoGenerated
@@ -3147,9 +3109,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         var papuResult = this.state.procurementAgentPlanningUnitListAll;
         var elInstance = this.state.shipmentsEl;
         var rowData = elInstance.getRowData(y);
-        var planningUnitId = document.getElementById("planningUnitId").value;
-        var procurementAgentPlanningUnit = papuResult.filter(p => p.procurementAgent.id == rowData[2] && p.planningUnit.id == planningUnitId);
-        if (x == 8 && (procurementAgentPlanningUnit.length > 0 && ((procurementAgentPlanningUnit[0].unitsPerPalletEuro1 != 0 && procurementAgentPlanningUnit[0].unitsPerPalletEuro1 != null) || (procurementAgentPlanningUnit[0].moq != 0 && procurementAgentPlanningUnit[0].moq != null) || (procurementAgentPlanningUnit[0].unitsPerPalletEuro2 != 0 && procurementAgentPlanningUnit[0].unitsPerPalletEuro2 != null) || (procurementAgentPlanningUnit[0].unitsPerContainer != 0 && procurementAgentPlanningUnit[0].unitsPerContainer != null)))) {
+        var planningUnitId = rowData[2];
+        var procurementAgentPlanningUnit = papuResult.filter(p => p.procurementAgent.id == rowData[6] && p.planningUnit.id == planningUnitId);
+        if (x == 10 && (procurementAgentPlanningUnit.length > 0 && ((procurementAgentPlanningUnit[0].unitsPerPalletEuro1 != 0 && procurementAgentPlanningUnit[0].unitsPerPalletEuro1 != null) || (procurementAgentPlanningUnit[0].moq != 0 && procurementAgentPlanningUnit[0].moq != null) || (procurementAgentPlanningUnit[0].unitsPerPalletEuro2 != 0 && procurementAgentPlanningUnit[0].unitsPerPalletEuro2 != null) || (procurementAgentPlanningUnit[0].unitsPerContainer != 0 && procurementAgentPlanningUnit[0].unitsPerContainer != null)))) {
             this.props.updateState("loading", true);
             if (this.props.shipmentPage == "shipmentDataEntry") {
                 this.props.updateState("shipmentModalTitle", i18n.t("static.supplyPlan.qtyCalculator"));
@@ -3188,18 +3150,18 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 orderBasedOn.push({ id: 4, name: i18n.t('static.supplyPlan.palletEuro2') })
             }
             var tableEditable = true;
-            if (rowData[14].toString() == "true" || this.props.shipmentPage == "supplyPlanCompare") {
+            if (rowData[21].toString() == "true" || this.props.shipmentPage == "supplyPlanCompare") {
                 tableEditable = false;
             }
             var adjustedOrderQty = [];
-            if (rowData[22] != "" || rowData[22] > 0) {
+            if (rowData[27] != "" || rowData[27] > 0) {
                 adjustedOrderQty.push({ id: 1, name: i18n.t('static.supplyPlan.suggestedOrderQty') })
             }
             adjustedOrderQty.push({ id: 2, name: i18n.t('static.supplyPlan.manualOrderQty') })
             var data = [];
             data[0] = 2;//A
-            data[1] = rowData[22];//B
-            data[2] = rowData[8] != "" ? rowData[8] : 0;//C
+            data[1] = rowData[27];//B
+            data[2] = rowData[10] != "" ? rowData[10] : 0;//C
             data[3] = 5;//D
             data[4] = "";//E
             data[5] = `=IF(
@@ -3307,8 +3269,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 data1[5] = `=ROUND((K1/C1),2)`;//F
                 data1[6] = `=ROUND((K1/D1),2)`;//G
                 data1[7] = 2;//H
-                data1[8] = rowData[22];//I
-                data1[9] = rowData[8];//J
+                data1[8] = rowData[27];//I
+                data1[9] = rowData[10];//J
                 data1[10] = ((elVar.getCell(`F${parseInt(0) + 1}`)).innerHTML).toString().replaceAll("\,", "");//K
                 json1.push(data1)
                 var options1 = {

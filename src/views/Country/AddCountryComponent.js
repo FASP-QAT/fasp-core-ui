@@ -487,7 +487,7 @@ import { ALPHABET_NUMBER_REGEX, SPACE_REGEX } from '../../Constants.js';
 
 
 const entityname = i18n.t('static.country.countryMaster');
-const initialValues = {
+let initialValues = {
     label: '',
     countryCode: '',
     countryCode2: '',
@@ -671,9 +671,16 @@ export default class AddCountryComponent extends Component {
 
         CurrencyService.getCurrencyListActive().then(response => {
             if (response.status == 200) {
+                let { country } = this.state;
+                country.currency.id = (response.data.length == 1 ? response.data[0].currencyId : "")
                 this.setState({
-                    currencyList: response.data, loading: false
-                })
+                    currencyList: response.data, loading: false, country
+                },
+                    () => {
+                        initialValues = {
+                            currencyId: (response.data.length == 1 ? response.data[0].currencyId : "")
+                        }
+                    })
             } else {
                 this.setState({
                     message: response.data.messageCode, loading: false
@@ -758,6 +765,7 @@ export default class AddCountryComponent extends Component {
                                 <i className="icon-note"></i><strong>{i18n.t('static.country.countryadd')}</strong>{' '}
                             </CardHeader> */}
                             <Formik
+                                enableReinitialize={true}
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
