@@ -2764,7 +2764,7 @@ export default class WhatIfReportComponent extends React.Component {
                         }
                     },
                     gridLines: {
-                        display: false
+                        drawBorder: true, lineWidth: 0
                     },
                     position: 'left',
                 },
@@ -2781,7 +2781,7 @@ export default class WhatIfReportComponent extends React.Component {
                         fontColor: 'black'
                     },
                     gridLines: {
-                        display: false
+                        drawBorder: true, lineWidth: 0
                     },
                     position: 'right',
                 }
@@ -2791,7 +2791,7 @@ export default class WhatIfReportComponent extends React.Component {
                         fontColor: 'black'
                     },
                     gridLines: {
-                        display: false
+                        drawBorder: true, lineWidth: 0
                     }
                 }]
             },

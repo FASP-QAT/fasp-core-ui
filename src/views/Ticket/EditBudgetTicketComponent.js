@@ -1,20 +1,26 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, CardBody, Form, FormGroup, Label, Input, FormFeedback, InputGroup, InputGroupAddon, InputGroupText, ModalFooter } from 'reactstrap';
+import DatePicker from 'react-datepicker';
+import { Button, Form, FormFeedback, FormGroup, Input, Label, ModalFooter } from 'reactstrap';
 import AuthenticationService from '../Common/AuthenticationService';
 import imageHelp from '../../assets/img/help-icon.png';
 import InitialTicketPageComponent from './InitialTicketPageComponent';
 import { Formik } from 'formik';
 import i18n from '../../i18n';
 import * as Yup from 'yup';
+import { DATE_FORMAT_SM, DATE_PLACEHOLDER_TEXT, SPACE_REGEX } from '../../Constants.js';
+import { Date } from 'core-js';
+import moment from 'moment';
+import '../../../node_modules/react-datepicker/dist/react-datepicker.css';
 import JiraTikcetService from '../../api/JiraTikcetService';
-import RealmService from '../../api/RealmService';
+import ProgramService from '../../api/ProgramService';
+import FundingSourceService from '../../api/FundingSourceService';
+import CurrencyService from '../../api/CurrencyService';
 import getLabelText from '../../CommonComponent/getLabelText';
-import { SPACE_REGEX } from '../../Constants';
+import BudgetService from '../../api/BudgetService';
 
 const initialValues = {
-    summary: "Add Planning Unit Category",
-    realmName: "",
-    productCategoryName: "",
+    summary: "Edit Budget",
+    budgetName: "",
     notes: ""
 }
 
@@ -23,12 +29,10 @@ const validationSchema = function (values) {
         summary: Yup.string()
             .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.common.summarytext')),
-        realmName: Yup.string()
-            .required(i18n.t('static.common.realmtext').concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?', i18n.t('static.realm.realmName')))),
-        productCategoryName: Yup.string()
-            .required(i18n.t('static.technicalArea.productcategorynametext')),
-        // notes: Yup.string()
-        //     .required(i18n.t('static.common.notestext'))
+        budgetName: Yup.string()
+            .required(i18n.t('static.common.pleaseSelect').concat(" ").concat((i18n.t('static.dashboard.budget')).concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?', i18n.t('static.dashboard.budget'))))),
+        notes: Yup.string()
+            .required(i18n.t('static.program.validnotestext'))
     })
 }
 
@@ -54,21 +58,20 @@ const getErrorsFromValidationError = (validationError) => {
     }, {})
 }
 
-export default class ProductCategoryTicketComponent extends Component {
+export default class EditBudgetTicketComponent extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            productCategory: {
-                summary: "Add Planning Unit Category",
-                realmName: "",
-                productCategoryName: "",
+            budget: {
+                summary: "Edit Budget",
+                budgetName: "",
                 notes: ""
             },
             lang: localStorage.getItem('lang'),
             message: '',
-            realms: [],
-            realmId: '',
+            budgets: [],
+            budgetId: '',
             loading: false
         }
         this.dataChange = this.dataChange.bind(this);
@@ -77,32 +80,28 @@ export default class ProductCategoryTicketComponent extends Component {
     }
 
     dataChange(event) {
-        let { productCategory } = this.state
+        let { budget } = this.state
         if (event.target.name == "summary") {
-            productCategory.summary = event.target.value;
+            budget.summary = event.target.value;
         }
-        if (event.target.name == "realmName") {
-            productCategory.realmName = this.state.realms.filter(c => c.realmId == event.target.value)[0].label.label_en;
+        if (event.target.name === "budgetName") {
+            budget.budgetName = event.target.options[event.target.selectedIndex].innerHTML;
             this.setState({
-                realmId: event.target.value
+                budgetId: event.target.value
             })
         }
-        if (event.target.name == "productCategoryName") {
-            productCategory.productCategoryName = event.target.value;
-        }
         if (event.target.name == "notes") {
-            productCategory.notes = event.target.value;
+            budget.notes = event.target.value;
         }
         this.setState({
-            productCategory
+            budget
         }, () => { })
     };
 
     touchAll(setTouched, errors) {
         setTouched({
             summary: true,
-            realmName: true,
-            productCategoryName: true,
+            budgetName: true,
             notes: true
         })
         this.validateForm(errors)
@@ -124,16 +123,22 @@ export default class ProductCategoryTicketComponent extends Component {
 
     componentDidMount() {
         // AuthenticationService.setupAxiosInterceptors();
-        RealmService.getRealmListAll()
+        BudgetService.getBudgetList()
             .then(response => {
+                console.log(response)
                 if (response.status == 200) {
+                    console.log("budget after status 200 new console --- ---->", response.data);
                     this.setState({
-                        realms: response.data
-                    })
+                        budgets: response.data,
+                        loading: false
+                    });
                 } else {
                     this.setState({
-                        message: response.data.messageCode
-                    })
+                        message: response.data.messageCode, loading: false
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
                 }
             }).catch(
                 error => {
@@ -189,33 +194,33 @@ export default class ProductCategoryTicketComponent extends Component {
     }
 
     resetClicked() {
-        let { productCategory } = this.state;
-        // productCategory.summary = '';
-        productCategory.realmName = '';
-        productCategory.productCategoryName = '';
-        productCategory.notes = '';
+        let { budget } = this.state;
+        // budget.summary = '';
+        budget.budgetName = '';
+        budget.notes = '';
         this.setState({
-            productCategory
+            budget
         },
             () => { });
     }
 
     render() {
 
-        const { realms } = this.state;
-        let realmList = realms.length > 0
-            && realms.map((item, i) => {
-                return (
-                    <option key={i} value={item.realmId}>
-                        {getLabelText(item.label, this.state.lang)}
-                    </option>
-                )
-            }, this);
+        const { budgets } = this.state;
+
+
+        let programList = budgets.length > 0 && budgets.map((item, i) => {
+            return (
+                <option key={i} value={item.budgetId}>
+                    {getLabelText(item.program.label, this.state.lang) + " | " + getLabelText(item.label, this.state.lang) + " | " + item.budgetCode}
+                </option>
+            )
+        }, this);
 
         return (
             <div className="col-md-12">
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
-                <h4>{i18n.t('static.product.productcategory')}</h4>
+                <h4>{i18n.t('static.dashboard.budget')}</h4>
                 <br></br>
                 <div style={{ display: this.state.loading ? "none" : "block" }}>
                     <Formik
@@ -225,7 +230,7 @@ export default class ProductCategoryTicketComponent extends Component {
                             this.setState({
                                 loading: true
                             })
-                            JiraTikcetService.addEmailRequestIssue(this.state.productCategory).then(response => {
+                            JiraTikcetService.addEmailRequestIssue(this.state.budget).then(response => {
                                 console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
                                     var msg = response.data.key;
@@ -305,61 +310,57 @@ export default class ProductCategoryTicketComponent extends Component {
                                             <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
                                             <Input type="text" name="summary" id="summary" readOnly={true}
                                                 bsSize="sm"
-                                                valid={!errors.summary && this.state.productCategory.summary != ''}
+                                                valid={!errors.summary && this.state.budget.summary != ''}
                                                 invalid={touched.summary && !!errors.summary}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                 onBlur={handleBlur}
-                                                value={this.state.productCategory.summary}
+                                                value={this.state.budget.summary}
                                                 required />
                                             <FormFeedback className="red">{errors.summary}</FormFeedback>
                                         </FormGroup>
+
                                         <FormGroup>
-                                            <Label for="realmName">{i18n.t('static.realm.realmName')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="select" name="realmName" id="realmName"
+                                            <Label htmlFor="budgetName">{i18n.t('static.dashboard.budget')}<span className="red Reqasterisk">*</span></Label>
+                                            <Input
+                                                type="select"
+                                                name="budgetName"
+                                                id="budgetName"
                                                 bsSize="sm"
-                                                valid={!errors.realmName && this.state.productCategory.realmName != ''}
-                                                invalid={touched.realmName && !!errors.realmName}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                valid={!errors.budgetName && this.state.budget.budgetName != ''}
+                                                invalid={touched.budgetName && !!errors.budgetName}
+                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                 onBlur={handleBlur}
-                                                value={this.state.realmId}
-                                                required >
+                                                required
+                                                value={this.state.budgetId}
+                                            >
                                                 <option value="">{i18n.t('static.common.select')}</option>
-                                                {realmList}
+                                                {programList}
                                             </Input>
-                                            <FormFeedback className="red">{errors.realmName}</FormFeedback>
+                                            <FormFeedback className="red">{errors.budgetName}</FormFeedback>
                                         </FormGroup>
-                                        < FormGroup >
-                                            <Label for="productCategoryName">{i18n.t('static.productCategory.productCategoryName')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text" name="productCategoryName" id="productCategoryName"
-                                                bsSize="sm"
-                                                valid={!errors.productCategoryName && this.state.productCategory.productCategoryName != ''}
-                                                invalid={touched.productCategoryName && !!errors.productCategoryName}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                value={this.state.productCategory.productCategoryName}
-                                                required />
-                                            <FormFeedback className="red">{errors.productCategoryName}</FormFeedback>
-                                        </FormGroup>
+
                                         <FormGroup>
-                                            <Label for="notes">{i18n.t('static.common.notes')}</Label>
+                                            <Label for="notes">{i18n.t('static.common.notes')}<span class="red Reqasterisk">*</span></Label>
                                             <Input type="textarea" name="notes" id="notes"
                                                 bsSize="sm"
-                                                valid={!errors.notes && this.state.productCategory.notes != ''}
+                                                valid={!errors.notes && this.state.budget.notes != ''}
                                                 invalid={touched.notes && !!errors.notes}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                 onBlur={handleBlur}
-                                                value={this.state.productCategory.notes}
+                                                value={this.state.budget.notes}
                                             // required 
                                             />
                                             <FormFeedback className="red">{errors.notes}</FormFeedback>
                                         </FormGroup>
                                         <ModalFooter className="pb-0 pr-0">
+
                                             <Button type="button" size="md" color="info" className="mr-1" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
                                             <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                            <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                            <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>
+
                                         </ModalFooter>
-                                        {/* <br></br><br></br>
-                                    <div className={this.props.className}>
+                                        {/* <br></br><br></br> */}
+                                        {/* <div className={this.props.className}>
                                         <p>{i18n.t('static.ticket.drodownvaluenotfound')}</p>
                                     </div> */}
                                     </Form>

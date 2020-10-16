@@ -10,11 +10,11 @@ import JiraTikcetService from '../../api/JiraTikcetService';
 import RealmService from '../../api/RealmService';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { SPACE_REGEX } from '../../Constants';
+import PoroductCategoryService from '../../api/PoroductCategoryService';
 
 const initialValues = {
-    summary: "Add Planning Unit Category",
-    realmName: "",
-    productCategoryName: "",
+    summary: "Edit Planning Unit Category",
+    planningUnitCategoryName: "",
     notes: ""
 }
 
@@ -23,12 +23,10 @@ const validationSchema = function (values) {
         summary: Yup.string()
             .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.common.summarytext')),
-        realmName: Yup.string()
-            .required(i18n.t('static.common.realmtext').concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?', i18n.t('static.realm.realmName')))),
-        productCategoryName: Yup.string()
-            .required(i18n.t('static.technicalArea.productcategorynametext')),
-        // notes: Yup.string()
-        //     .required(i18n.t('static.common.notestext'))
+        planningUnitCategoryName: Yup.string()
+            .required(i18n.t('static.common.pleaseSelect').concat(" ").concat((i18n.t('static.product.productcategory')).concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?', i18n.t('static.product.productcategory'))))),
+        notes: Yup.string()
+            .required(i18n.t('static.program.validnotestext'))
     })
 }
 
@@ -54,21 +52,20 @@ const getErrorsFromValidationError = (validationError) => {
     }, {})
 }
 
-export default class ProductCategoryTicketComponent extends Component {
+export default class EditProductCategoryTicketComponent extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
             productCategory: {
-                summary: "Add Planning Unit Category",
-                realmName: "",
-                productCategoryName: "",
+                summary: "Edit Planning Unit Category",
+                planningUnitCategoryName: "",
                 notes: ""
             },
             lang: localStorage.getItem('lang'),
             message: '',
-            realms: [],
-            realmId: '',
+            planningUnitCategories: [],
+            planningUnitCategoryId: '',
             loading: false
         }
         this.dataChange = this.dataChange.bind(this);
@@ -81,15 +78,13 @@ export default class ProductCategoryTicketComponent extends Component {
         if (event.target.name == "summary") {
             productCategory.summary = event.target.value;
         }
-        if (event.target.name == "realmName") {
-            productCategory.realmName = this.state.realms.filter(c => c.realmId == event.target.value)[0].label.label_en;
+        if (event.target.name == "planningUnitCategoryName") {
+            productCategory.planningUnitCategoryName = event.target.options[event.target.selectedIndex].innerHTML;
             this.setState({
-                realmId: event.target.value
+                planningUnitCategoryId: event.target.value
             })
         }
-        if (event.target.name == "productCategoryName") {
-            productCategory.productCategoryName = event.target.value;
-        }
+
         if (event.target.name == "notes") {
             productCategory.notes = event.target.value;
         }
@@ -101,8 +96,7 @@ export default class ProductCategoryTicketComponent extends Component {
     touchAll(setTouched, errors) {
         setTouched({
             summary: true,
-            realmName: true,
-            productCategoryName: true,
+            planningUnitCategoryName: true,
             notes: true
         })
         this.validateForm(errors)
@@ -124,16 +118,22 @@ export default class ProductCategoryTicketComponent extends Component {
 
     componentDidMount() {
         // AuthenticationService.setupAxiosInterceptors();
-        RealmService.getRealmListAll()
+        PoroductCategoryService.getProductCategoryListByRealmId(AuthenticationService.getRealmId())
+
             .then(response => {
+                console.log("response product category list ====>", response.data);
                 if (response.status == 200) {
+                    console.log("planningUnitCategories", response.data)
                     this.setState({
-                        realms: response.data
-                    })
+                        planningUnitCategories: response.data,
+                    });
+                    this.setState({ loading: false });
+
                 } else {
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode, loading: false
                     })
+                    this.hideSecondComponent();
                 }
             }).catch(
                 error => {
@@ -191,8 +191,7 @@ export default class ProductCategoryTicketComponent extends Component {
     resetClicked() {
         let { productCategory } = this.state;
         // productCategory.summary = '';
-        productCategory.realmName = '';
-        productCategory.productCategoryName = '';
+        productCategory.planningUnitCategoryName = '';
         productCategory.notes = '';
         this.setState({
             productCategory
@@ -202,15 +201,17 @@ export default class ProductCategoryTicketComponent extends Component {
 
     render() {
 
-        const { realms } = this.state;
-        let realmList = realms.length > 0
-            && realms.map((item, i) => {
+        const { planningUnitCategories } = this.state;
+
+        let planningUnitCategoryList = planningUnitCategories.length > 0
+            && planningUnitCategories.map((item, i) => {
                 return (
-                    <option key={i} value={item.realmId}>
-                        {getLabelText(item.label, this.state.lang)}
+                    <option key={i} value={item.payloadId}>
+                        {getLabelText(item.payload.realm.label, this.state.lang) + " | " + getLabelText(item.payload.label, this.state.lang)}
                     </option>
                 )
             }, this);
+
 
         return (
             <div className="col-md-12">
@@ -314,34 +315,22 @@ export default class ProductCategoryTicketComponent extends Component {
                                             <FormFeedback className="red">{errors.summary}</FormFeedback>
                                         </FormGroup>
                                         <FormGroup>
-                                            <Label for="realmName">{i18n.t('static.realm.realmName')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="select" name="realmName" id="realmName"
+                                            <Label for="planningUnitCategoryName">{i18n.t('static.product.productcategory')}<span class="red Reqasterisk">*</span></Label>
+                                            <Input type="select" name="planningUnitCategoryName" id="planningUnitCategoryName"
                                                 bsSize="sm"
-                                                valid={!errors.realmName && this.state.productCategory.realmName != ''}
-                                                invalid={touched.realmName && !!errors.realmName}
+                                                valid={!errors.planningUnitCategoryName && this.state.productCategory.planningUnitCategoryName != ''}
+                                                invalid={touched.planningUnitCategoryName && !!errors.planningUnitCategoryName}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                 onBlur={handleBlur}
-                                                value={this.state.realmId}
+                                                value={this.state.planningUnitCategoryId}
                                                 required >
                                                 <option value="">{i18n.t('static.common.select')}</option>
-                                                {realmList}
+                                                {planningUnitCategoryList}
                                             </Input>
-                                            <FormFeedback className="red">{errors.realmName}</FormFeedback>
-                                        </FormGroup>
-                                        < FormGroup >
-                                            <Label for="productCategoryName">{i18n.t('static.productCategory.productCategoryName')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text" name="productCategoryName" id="productCategoryName"
-                                                bsSize="sm"
-                                                valid={!errors.productCategoryName && this.state.productCategory.productCategoryName != ''}
-                                                invalid={touched.productCategoryName && !!errors.productCategoryName}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                value={this.state.productCategory.productCategoryName}
-                                                required />
-                                            <FormFeedback className="red">{errors.productCategoryName}</FormFeedback>
+                                            <FormFeedback className="red">{errors.planningUnitCategoryName}</FormFeedback>
                                         </FormGroup>
                                         <FormGroup>
-                                            <Label for="notes">{i18n.t('static.common.notes')}</Label>
+                                            <Label for="notes">{i18n.t('static.common.notes')}<span class="red Reqasterisk">*</span></Label>
                                             <Input type="textarea" name="notes" id="notes"
                                                 bsSize="sm"
                                                 valid={!errors.notes && this.state.productCategory.notes != ''}

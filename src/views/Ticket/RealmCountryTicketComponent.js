@@ -14,7 +14,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import { SPACE_REGEX } from '../../Constants';
 
 const initialValues = {
-    summary: "Add / Update Realm Country",
+    summary: "Add Realm Country",
     realmId: "",
     countryId: "",
     currencyId: "",
@@ -65,12 +65,13 @@ export default class RealmCountryTicketComponent extends Component {
         super(props);
         this.state = {
             realmCountry: {
-                summary: "Add / Update Realm Country",
+                summary: "Add Realm Country",
                 realmId: "",
                 countryId: "",
                 currencyId: "",
                 notes: ""
             },
+            lang: localStorage.getItem('lang'),
             message: '',
             realms: [],
             countries: [],
@@ -91,19 +92,19 @@ export default class RealmCountryTicketComponent extends Component {
             realmCountry.summary = event.target.value;
         }
         if (event.target.name == "realmId") {
-            realmCountry.realmId = event.target.options[event.target.selectedIndex].innerHTML;
+            realmCountry.realmId = this.state.realms.filter(c => c.realmId == event.target.value)[0].label.label_en;
             this.setState({
                 realm: event.target.value
             })
         }
         if (event.target.name == "countryId") {
-            realmCountry.countryId = event.target.options[event.target.selectedIndex].innerHTML;
+            realmCountry.countryId = this.state.countries.filter(c => c.countryId == event.target.value)[0].label.label_en;
             this.setState({
                 country: event.target.value
             })
         }
         if (event.target.name == "currencyId") {
-            realmCountry.currencyId = event.target.options[event.target.selectedIndex].innerHTML;
+            realmCountry.currencyId = this.state.currencies.filter(c => c.currencyId == event.target.value)[0].label.label_en;
             this.setState({
                 currency: event.target.value
             })
@@ -142,7 +143,7 @@ export default class RealmCountryTicketComponent extends Component {
     }
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         RealmService.getRealmListAll()
             .then(response => {
                 if (response.status == 200) {
@@ -160,24 +161,43 @@ export default class RealmCountryTicketComponent extends Component {
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
                     } else {
                         switch (error.response ? error.response.status : "") {
-                            case 500:
+
                             case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
                             case 404:
                             case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
                             case 412:
-                                this.setState({ message: error.response.data.messageCode });
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
                                 break;
                             default:
-                                this.setState({ message: 'static.unkownError' });
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
                                 break;
                         }
                     }
                 }
             );
-
         CountryService.getCountryListAll()
             .then(response => {
                 if (response.status == 200) {
@@ -196,17 +216,41 @@ export default class RealmCountryTicketComponent extends Component {
 
             }).catch(
                 error => {
-                    switch (error.message) {
-                        case "Network Error":
-                            this.setState({
-                                message: error.message
-                            })
-                            break
-                        default:
-                            this.setState({
-                                message: error.response.data.message
-                            })
-                            break
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
                     }
                 }
             );
@@ -221,7 +265,46 @@ export default class RealmCountryTicketComponent extends Component {
                     message: response.data.messageCode
                 })
             }
-        })
+        }).catch(
+            error => {
+                if (error.message === "Network Error") {
+                    this.setState({
+                        message: 'static.unkownError',
+                        loading: false
+                    });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+
+                        case 401:
+                            this.props.history.push(`/login/static.message.sessionExpired`)
+                            break;
+                        case 403:
+                            this.props.history.push(`/accessDenied`)
+                            break;
+                        case 500:
+                        case 404:
+                        case 406:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        case 412:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        default:
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                            break;
+                    }
+                }
+            }
+        );
     }
 
     hideSecondComponent() {
@@ -256,15 +339,15 @@ export default class RealmCountryTicketComponent extends Component {
             && realms.map((item, i) => {
                 return (
                     <option key={i} value={item.realmId}>
-                        {item.label.label_en}
+                        {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);
         let countryList = countries.length > 0
             && countries.map((item, i) => {
                 return (
-                    <option key={i} value={item.countryuId}>
-                        {item.label.label_en}
+                    <option key={i} value={item.countryId}>
+                        {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);
@@ -280,7 +363,7 @@ export default class RealmCountryTicketComponent extends Component {
         return (
             <div className="col-md-12">
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
-                <h4>{i18n.t('static.dashboard.realmcountry')}</h4>
+                <h4>{i18n.t('static.program.realmcountrydashboard')}</h4>
                 <br></br>
                 <div style={{ display: this.state.loading ? "none" : "block" }}>
                     <Formik
@@ -311,17 +394,46 @@ export default class RealmCountryTicketComponent extends Component {
                                 }
                                 this.props.togglehelp();
                                 this.props.toggleSmall(this.state.message);
-                            })
-                                .catch(
-                                    error => {
+                            }).catch(
+                                error => {
+                                    if (error.message === "Network Error") {
                                         this.setState({
-                                            message: i18n.t('static.unkownError'), loading: false
-                                        },
-                                            () => {
-                                                this.hideSecondComponent();
-                                            });
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                    } else {
+                                        switch (error.response ? error.response.status : "") {
+
+                                            case 401:
+                                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                                break;
+                                            case 403:
+                                                this.props.history.push(`/accessDenied`)
+                                                break;
+                                            case 500:
+                                            case 404:
+                                            case 406:
+                                                this.setState({
+                                                    message: error.response.data.messageCode,
+                                                    loading: false
+                                                });
+                                                break;
+                                            case 412:
+                                                this.setState({
+                                                    message: error.response.data.messageCode,
+                                                    loading: false
+                                                });
+                                                break;
+                                            default:
+                                                this.setState({
+                                                    message: 'static.unkownError',
+                                                    loading: false
+                                                });
+                                                break;
+                                        }
                                     }
-                                );
+                                }
+                            );
                         }}
                         render={
                             ({

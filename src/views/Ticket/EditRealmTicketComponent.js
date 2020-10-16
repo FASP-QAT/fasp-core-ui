@@ -7,14 +7,13 @@ import { Formik } from 'formik';
 import i18n from '../../i18n';
 import * as Yup from 'yup';
 import JiraTikcetService from '../../api/JiraTikcetService';
+import { SPACE_REGEX } from '../../Constants';
 import RealmService from '../../api/RealmService';
 import getLabelText from '../../CommonComponent/getLabelText';
-import { SPACE_REGEX } from '../../Constants';
 
 const initialValues = {
-    summary: "Add Planning Unit Category",
+    summary: "Edit Realm",
     realmName: "",
-    productCategoryName: "",
     notes: ""
 }
 
@@ -24,11 +23,9 @@ const validationSchema = function (values) {
             .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.common.summarytext')),
         realmName: Yup.string()
-            .required(i18n.t('static.common.realmtext').concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?', i18n.t('static.realm.realmName')))),
-        productCategoryName: Yup.string()
-            .required(i18n.t('static.technicalArea.productcategorynametext')),
-        // notes: Yup.string()
-        //     .required(i18n.t('static.common.notestext'))
+            .required(i18n.t('static.common.pleaseSelect').concat(" ").concat((i18n.t('static.realm.realm')).concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?', i18n.t('static.realm.realm'))))),
+        notes: Yup.string()
+            .required(i18n.t('static.program.validnotestext'))
     })
 }
 
@@ -54,15 +51,14 @@ const getErrorsFromValidationError = (validationError) => {
     }, {})
 }
 
-export default class ProductCategoryTicketComponent extends Component {
+export default class EditRealmTicketComponent extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            productCategory: {
-                summary: "Add Planning Unit Category",
+            realm: {
+                summary: "Edit Realm",
                 realmName: "",
-                productCategoryName: "",
                 notes: ""
             },
             lang: localStorage.getItem('lang'),
@@ -77,24 +73,22 @@ export default class ProductCategoryTicketComponent extends Component {
     }
 
     dataChange(event) {
-        let { productCategory } = this.state
+        let { realm } = this.state
         if (event.target.name == "summary") {
-            productCategory.summary = event.target.value;
+            realm.summary = event.target.value;
         }
         if (event.target.name == "realmName") {
-            productCategory.realmName = this.state.realms.filter(c => c.realmId == event.target.value)[0].label.label_en;
+            realm.realmName = event.target.options[event.target.selectedIndex].innerHTML;
             this.setState({
                 realmId: event.target.value
             })
         }
-        if (event.target.name == "productCategoryName") {
-            productCategory.productCategoryName = event.target.value;
-        }
+
         if (event.target.name == "notes") {
-            productCategory.notes = event.target.value;
+            realm.notes = event.target.value;
         }
         this.setState({
-            productCategory
+            realm
         }, () => { })
     };
 
@@ -102,7 +96,6 @@ export default class ProductCategoryTicketComponent extends Component {
         setTouched({
             summary: true,
             realmName: true,
-            productCategoryName: true,
             notes: true
         })
         this.validateForm(errors)
@@ -133,43 +126,26 @@ export default class ProductCategoryTicketComponent extends Component {
                 } else {
                     this.setState({
                         message: response.data.messageCode
-                    })
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
                 }
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
-                        this.setState({
-                            message: 'static.unkownError',
-                            loading: false
-                        });
+                        this.setState({ message: error.message });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
-                            case 401:
-                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                break;
-                            case 403:
-                                this.props.history.push(`/accessDenied`)
-                                break;
                             case 500:
+                            case 401:
                             case 404:
                             case 406:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
                             case 412:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
+                                this.setState({ message: error.response.data.messageCode });
                                 break;
                             default:
-                                this.setState({
-                                    message: 'static.unkownError',
-                                    loading: false
-                                });
+                                this.setState({ message: 'static.unkownError' });
                                 break;
                         }
                     }
@@ -189,13 +165,12 @@ export default class ProductCategoryTicketComponent extends Component {
     }
 
     resetClicked() {
-        let { productCategory } = this.state;
-        // productCategory.summary = '';
-        productCategory.realmName = '';
-        productCategory.productCategoryName = '';
-        productCategory.notes = '';
+        let { realm } = this.state;
+        // realm.summary = '';
+        realm.realmName = '';
+        realm.notes = '';
         this.setState({
-            productCategory
+            realm
         },
             () => { });
     }
@@ -203,11 +178,12 @@ export default class ProductCategoryTicketComponent extends Component {
     render() {
 
         const { realms } = this.state;
+
         let realmList = realms.length > 0
             && realms.map((item, i) => {
                 return (
                     <option key={i} value={item.realmId}>
-                        {getLabelText(item.label, this.state.lang)}
+                        {getLabelText(item.label, this.state.lang) + " | " + item.realmCode}
                     </option>
                 )
             }, this);
@@ -215,7 +191,7 @@ export default class ProductCategoryTicketComponent extends Component {
         return (
             <div className="col-md-12">
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
-                <h4>{i18n.t('static.product.productcategory')}</h4>
+                <h4>{i18n.t('static.realm.realm')}</h4>
                 <br></br>
                 <div style={{ display: this.state.loading ? "none" : "block" }}>
                     <Formik
@@ -225,7 +201,7 @@ export default class ProductCategoryTicketComponent extends Component {
                             this.setState({
                                 loading: true
                             })
-                            JiraTikcetService.addEmailRequestIssue(this.state.productCategory).then(response => {
+                            JiraTikcetService.addEmailRequestIssue(values).then(response => {
                                 console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
                                     var msg = response.data.key;
@@ -305,63 +281,49 @@ export default class ProductCategoryTicketComponent extends Component {
                                             <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
                                             <Input type="text" name="summary" id="summary" readOnly={true}
                                                 bsSize="sm"
-                                                valid={!errors.summary && this.state.productCategory.summary != ''}
+                                                valid={!errors.summary && this.state.realm.summary != ''}
                                                 invalid={touched.summary && !!errors.summary}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                 onBlur={handleBlur}
-                                                value={this.state.productCategory.summary}
+                                                value={this.state.realm.summary}
                                                 required />
                                             <FormFeedback className="red">{errors.summary}</FormFeedback>
                                         </FormGroup>
                                         <FormGroup>
-                                            <Label for="realmName">{i18n.t('static.realm.realmName')}<span class="red Reqasterisk">*</span></Label>
+                                            <Label for="realmName">{i18n.t('static.realm.realm')}<span class="red Reqasterisk">*</span></Label>
                                             <Input type="select" name="realmName" id="realmName"
                                                 bsSize="sm"
-                                                valid={!errors.realmName && this.state.productCategory.realmName != ''}
+                                                valid={!errors.realmName && this.state.realm.realmName != ''}
                                                 invalid={touched.realmName && !!errors.realmName}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                 onBlur={handleBlur}
                                                 value={this.state.realmId}
-                                                required >
+                                                required>
                                                 <option value="">{i18n.t('static.common.select')}</option>
                                                 {realmList}
                                             </Input>
                                             <FormFeedback className="red">{errors.realmName}</FormFeedback>
                                         </FormGroup>
-                                        < FormGroup >
-                                            <Label for="productCategoryName">{i18n.t('static.productCategory.productCategoryName')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text" name="productCategoryName" id="productCategoryName"
-                                                bsSize="sm"
-                                                valid={!errors.productCategoryName && this.state.productCategory.productCategoryName != ''}
-                                                invalid={touched.productCategoryName && !!errors.productCategoryName}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                value={this.state.productCategory.productCategoryName}
-                                                required />
-                                            <FormFeedback className="red">{errors.productCategoryName}</FormFeedback>
-                                        </FormGroup>
+
                                         <FormGroup>
-                                            <Label for="notes">{i18n.t('static.common.notes')}</Label>
+                                            <Label for="notes">{i18n.t('static.common.notes')}<span class="red Reqasterisk">*</span></Label>
                                             <Input type="textarea" name="notes" id="notes"
                                                 bsSize="sm"
-                                                valid={!errors.notes && this.state.productCategory.notes != ''}
+                                                valid={!errors.notes && this.state.realm.notes != ''}
                                                 invalid={touched.notes && !!errors.notes}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                 onBlur={handleBlur}
-                                                value={this.state.productCategory.notes}
+                                                value={this.state.realm.notes}
+                                                maxLength={600}
                                             // required 
                                             />
                                             <FormFeedback className="red">{errors.notes}</FormFeedback>
                                         </FormGroup>
                                         <ModalFooter className="pb-0 pr-0">
                                             <Button type="button" size="md" color="info" className="mr-1" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
-                                            <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                            <Button type="reset" size="md" color="warning" className=" mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                             <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                         </ModalFooter>
-                                        {/* <br></br><br></br>
-                                    <div className={this.props.className}>
-                                        <p>{i18n.t('static.ticket.drodownvaluenotfound')}</p>
-                                    </div> */}
                                     </Form>
                                 )} />
                 </div>

@@ -24,7 +24,7 @@ export default class AddInventory extends Component {
     constructor(props) {
         super(props);
         var startDate = moment(Date.now()).subtract(6, 'months').startOf('month').format("YYYY-MM-DD");
-        var endDate=moment(Date.now()).add(18,'months').startOf('month').format("YYYY-MM-DD")
+        var endDate = moment(Date.now()).add(18, 'months').startOf('month').format("YYYY-MM-DD")
         this.state = {
             loading: true,
             programList: [],
@@ -617,6 +617,8 @@ export default class AddInventory extends Component {
         }
         if (cont == true) {
             let id = AuthenticationService.displayDashboardBasedOnRole();
+            var entityname = this.state.inventoryType == 1 ?  i18n.t("static.inventoryDetailHead.inventoryDetail")  : i18n.t("static.inventory.adjustmentdetails");
+            console.log("Entity name",entityname)
             this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
         }
     }
