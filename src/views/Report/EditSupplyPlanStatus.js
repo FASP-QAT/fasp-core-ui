@@ -24,6 +24,7 @@ import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import BootstrapTable from 'react-bootstrap-table-next';
 import paginationFactory from 'react-bootstrap-table2-paginator';
+import { JEXCEL_PAGINATION_OPTION} from '../../Constants.js';
 // import { NavLink } from 'react-router-dom';
 
 const entityname = i18n.t('static.program.program');
@@ -2776,7 +2777,7 @@ class EditSupplyPlanStatus extends Component {
             // }.bind(this),
 
             onload: this.loaded,
-            pagination: 10,
+            pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
             tableOverflow: true,
@@ -2790,7 +2791,7 @@ class EditSupplyPlanStatus extends Component {
             copyCompatibility: true,
             editable: true,
             allowExport: false,
-            paginationOptions: [10, 25, 50],
+            paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             contextMenu: function (obj, x, y, e) {
                 var items1 = [];

@@ -221,7 +221,7 @@
 //         );
 //     }
 
-// }
+// } 
 
 import React, { Compoent, Component } from 'react';
 import AuthenticationService from '../Common/AuthenticationService.js';
@@ -242,6 +242,7 @@ import { DATE_FORMAT_CAP } from '../../Constants.js'
 import moment from 'moment';
 import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
+import { JEXCEL_PAGINATION_OPTION} from '../../Constants.js';
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 
 
@@ -340,12 +341,12 @@ export default class PipelineProgramList extends Component {
 
             ],
             text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
+                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')} `,
                 show: '',
                 entries: '',
             },
             onload: this.loaded,
-            pagination: 10,
+            pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
             tableOverflow: true,
@@ -359,7 +360,7 @@ export default class PipelineProgramList extends Component {
             oneditionend: this.onedit,
             copyCompatibility: true,
             allowExport: false,
-            paginationOptions: [10, 25, 50],
+            paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             contextMenu: false,
         };
