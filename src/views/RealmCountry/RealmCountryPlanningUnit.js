@@ -20,7 +20,7 @@ import "../../../node_modules/jexcel/dist/jexcel.css";
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import StatusUpdateButtonFeature from "../../CommonComponent/StatusUpdateButtonFeature";
 import UpdateButtonFeature from '../../CommonComponent/UpdateButtonFeature'
-import { JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from "../../Constants";
+import { JEXCEL_DECIMAL_NO_REGEX,JEXCEL_PAGINATION_OPTION } from "../../Constants";
 let initialValues = {
 
     planningUnit: {
@@ -269,7 +269,7 @@ class PlanningUnitCountry extends Component {
                                                     }
 
                                                 },
-                                                pagination: JEXCEL_DEFAULT_PAGINATION,
+                                                pagination: localStorage.getItem("sesRecordCount"),
                                                 search: true,
                                                 columnSorting: true,
                                                 tableOverflow: true,
@@ -900,20 +900,20 @@ class PlanningUnitCountry extends Component {
         if (x == 5) {
             var col = ("F").concat(parseInt(y) + 1);
             // var reg = /^[0-9\b]+$/;
-            var reg = /^\s*(?=.*[1-9])\d{1,9}(?:\.\d{1,2})?\s*$/;
-            if (value == "" || isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
+            var reg = JEXCEL_DECIMAL_NO_REGEX;
+            if (this.el.getValueFromCoords(x, y) != "") {
+                if (!(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            } else {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
-                if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
-                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                }
-                else {
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                }
-            }
-            else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             }
         }
 
@@ -1002,24 +1002,44 @@ class PlanningUnitCountry extends Component {
                 }
 
                 //Multiplier
+                // var col = ("F").concat(parseInt(y) + 1);
+                // var value = this.el.getValueFromCoords(5, y);
+                // // var reg = /^[0-9\b]+$/;
+                // var reg = /^\s*(?=.*[1-9])\d{1,10}(?:\.\d{1,2})?\s*$/;
+                // // console.log("---------VAL----------", value);
+                // if (value == "" || isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
+                //     this.el.setStyle(col, "background-color", "transparent");
+                //     this.el.setStyle(col, "background-color", "yellow");
+                //     valid = false;
+                //     if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
+                //         this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                //     }
+                //     else {
+                //         this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                //     }
+                // } else {
+                //     this.el.setStyle(col, "background-color", "transparent");
+                //     this.el.setComments(col, "");
+                // }
+
                 var col = ("F").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(5, y);
-                // var reg = /^[0-9\b]+$/;
-                var reg = /^\s*(?=.*[1-9])\d{1,10}(?:\.\d{1,2})?\s*$/;
-                // console.log("---------VAL----------", value);
-                if (value == "" || isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
+                var reg = JEXCEL_DECIMAL_NO_REGEX;
+                if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
-                    if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
-                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                    }
-                    else {
-                        this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                    }
                 } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
+                    if (!(reg.test(value))) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
                 }
 
 

@@ -9,7 +9,7 @@ import { jExcelLoadedFunction, jExcelLoadedFunctionPipeline } from '../../Common
 import RealmCountryService from '../../api/RealmCountryService'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { JEXCEL_DATE_FORMAT_WITHOUT_DATE } from '../../Constants';
-import { JEXCEL_DEFAULT_PAGINATION,JEXCEL_PAGINATION_OPTION} from '../../Constants.js';
+import { JEXCEL_PAGINATION_OPTION} from '../../Constants.js';
 export default class PipelineProgramInventory extends Component {
 
     constructor(props) {
@@ -371,7 +371,7 @@ export default class PipelineProgramInventory extends Component {
                                             type: 'text'
                                         }
                                     ], 
-                                    pagination:JEXCEL_DEFAULT_PAGINATION,
+                                    pagination:localStorage.getItem("sesRecordCount"),
                                     contextMenu: false,
                                     search: true,
                                     columnSorting: true,

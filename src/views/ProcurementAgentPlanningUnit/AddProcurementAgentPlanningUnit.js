@@ -21,7 +21,7 @@ import CryptoJS from 'crypto-js';
 import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
 import moment from "moment";
-import { DECIMAL_NO_REGEX, INTEGER_NO_REGEX, JEXCEL_PAGINATION_OPTION ,JEXCEL_DEFAULT_PAGINATION} from '../../Constants.js';
+import { JEXCEL_DECIMAL_NO_REGEX, JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_CATELOG_PRICE, DECIMAL_NO_REGEX, JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 
 
@@ -1011,7 +1011,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                             }
 
                                                         ],
-                                                        pagination: JEXCEL_DEFAULT_PAGINATION,
+                                                        pagination: localStorage.getItem("sesRecordCount"),
                                                         search: true,
                                                         columnSorting: true,
                                                         tableOverflow: true,
@@ -1591,7 +1591,8 @@ export default class AddProcurementAgentPlanningUnit extends Component {
         //catelog price
         if (x == 3) {
             var col = ("D").concat(parseInt(y) + 1);
-            var reg = DECIMAL_NO_REGEX;
+            // var reg = DECIMAL_NO_REGEX;
+            var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -1612,7 +1613,8 @@ export default class AddProcurementAgentPlanningUnit extends Component {
         //moq
         if (x == 4) {
             var col = ("E").concat(parseInt(y) + 1);
-            var reg = /^[0-9\b]+$/;
+            // var reg = /^[0-9\b]+$/;
+            var reg = JEXCEL_INTEGER_REGEX;
             if (this.el.getValueFromCoords(x, y) != "") {
                 if (isNaN(parseInt(value)) || !(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
@@ -1628,7 +1630,8 @@ export default class AddProcurementAgentPlanningUnit extends Component {
         //unit per pallet euro1
         if (x == 5) {
             var col = ("F").concat(parseInt(y) + 1);
-            var reg = /^[0-9\b]+$/;
+            // var reg = /^[0-9\b]+$/;
+            var reg = JEXCEL_INTEGER_REGEX;
             if (this.el.getValueFromCoords(x, y) != "") {
                 if (isNaN(parseInt(value)) || !(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
@@ -1644,7 +1647,8 @@ export default class AddProcurementAgentPlanningUnit extends Component {
         //unit per pallet euro2
         if (x == 6) {
             var col = ("G").concat(parseInt(y) + 1);
-            var reg = /^[0-9\b]+$/;
+            // var reg = /^[0-9\b]+$/;
+            var reg = JEXCEL_INTEGER_REGEX;
             if (this.el.getValueFromCoords(x, y) != "") {
                 if (isNaN(parseInt(value)) || !(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
@@ -1660,7 +1664,8 @@ export default class AddProcurementAgentPlanningUnit extends Component {
         //unit per container
         if (x == 7) {
             var col = ("H").concat(parseInt(y) + 1);
-            var reg = /^[0-9\b]+$/;
+            // var reg = /^[0-9\b]+$/;
+            var reg = JEXCEL_INTEGER_REGEX;
             if (this.el.getValueFromCoords(x, y) != "") {
                 if (isNaN(parseInt(value)) || !(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
@@ -1675,7 +1680,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
 
         //volume
         if (x == 8) {
-            var reg = DECIMAL_NO_REGEX;
+            var reg = JEXCEL_DECIMAL_NO_REGEX;
             var col = ("I").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -1696,7 +1701,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
 
         //weight
         if (x == 9) {
-            var reg = DECIMAL_NO_REGEX;
+            var reg = JEXCEL_DECIMAL_NO_REGEX;
             var col = ("J").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -1767,27 +1772,52 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                 }
 
                 //price catelog
+                // var col = ("D").concat(parseInt(y) + 1);
+                // var value = this.el.getValueFromCoords(3, y);
+                // var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
+                // // console.log("---------VAL----------", value);
+                // if (value == "" || isNaN(Number.parseFloat(value)) || value < 0) {
+                //     this.el.setStyle(col, "background-color", "transparent");
+                //     this.el.setStyle(col, "background-color", "yellow");
+                //     valid = false;
+                //     if (isNaN(Number.parseFloat(value)) || value < 0) {
+                //         this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                //     } else {
+                //         this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                //     }
+                // } else {
+                //     this.el.setStyle(col, "background-color", "transparent");
+                //     this.el.setComments(col, "");
+                // }
+
+
                 var col = ("D").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(3, y);
-                var reg = /^[0-9\b]+$/;
-                // console.log("---------VAL----------", value);
-                if (value == "" || isNaN(Number.parseFloat(value)) || value < 0) {
+                var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
+                if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
-                    if (isNaN(Number.parseFloat(value)) || value < 0) {
-                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                    } else {
-                        this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                    }
                 } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
+                    if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+
                 }
+
+
 
                 //MOQ
                 var col = ("E").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(4, y);
+                var reg = JEXCEL_INTEGER_REGEX;
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
@@ -1808,6 +1838,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                 //unitPerPalletEuro1
                 var col = ("F").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(5, y);
+                var reg = JEXCEL_INTEGER_REGEX;
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
@@ -1828,6 +1859,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                 //unitPerPalletEuro2
                 var col = ("G").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(6, y);
+                var reg = JEXCEL_INTEGER_REGEX;
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
@@ -1848,6 +1880,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                 //unitPerContainer
                 var col = ("H").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(7, y);
+                var reg = JEXCEL_INTEGER_REGEX;
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
@@ -1868,35 +1901,71 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                 //volume
                 var col = ("I").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(8, y);
-                if (value == "" || isNaN(Number.parseFloat(value)) || value < 0) {
+                var reg = JEXCEL_DECIMAL_NO_REGEX;
+                // if (value == "" || isNaN(Number.parseFloat(value)) || value < 0) {
+                //     this.el.setStyle(col, "background-color", "transparent");
+                //     this.el.setStyle(col, "background-color", "yellow");
+                //     valid = false;
+                //     if (isNaN(Number.parseInt(value)) || value < 0) {
+                //         this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                //     } else {
+                //         this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                //     }
+                // } else {
+                //     this.el.setStyle(col, "background-color", "transparent");
+                //     this.el.setComments(col, "");
+                // }
+                if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
-                    if (isNaN(Number.parseInt(value)) || value < 0) {
-                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                    } else {
-                        this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                    }
                 } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
+                    if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+
                 }
 
                 //weight
                 var col = ("J").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(9, y);
-                if (value == "" || isNaN(Number.parseFloat(value)) || value < 0) {
+                var reg = JEXCEL_DECIMAL_NO_REGEX;
+                // if (value == "" || isNaN(Number.parseFloat(value)) || value < 0) {
+                //     this.el.setStyle(col, "background-color", "transparent");
+                //     this.el.setStyle(col, "background-color", "yellow");
+                //     valid = false;
+                //     if (isNaN(Number.parseInt(value)) || value < 0) {
+                //         this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                //     } else {
+                //         this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                //     }
+                // } else {
+                //     this.el.setStyle(col, "background-color", "transparent");
+                //     this.el.setComments(col, "");
+                // }
+                if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
-                    if (isNaN(Number.parseInt(value)) || value < 0) {
-                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                    } else {
-                        this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                    }
                 } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
+                    if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+
                 }
             }
         }

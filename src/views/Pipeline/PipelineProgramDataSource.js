@@ -10,7 +10,7 @@ import { textFilter } from 'react-bootstrap-table2-filter';
 import { jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunction, jExcelLoadedFunctionPipeline } from '../../CommonComponent/JExcelCommonFunctions.js'
 import DataSourceTypeService from '../../api/DataSourceTypeService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { JEXCEL_DEFAULT_PAGINATION,JEXCEL_PAGINATION_OPTION} from '../../Constants.js';
+import { JEXCEL_PAGINATION_OPTION} from '../../Constants.js';
 export default class PipelineProgramDataSource extends Component {
     constructor(props) {
         super(props);
@@ -271,7 +271,7 @@ export default class PipelineProgramDataSource extends Component {
                                                         readonly: true
                                                     }
                                                 ],
-                                                pagination:JEXCEL_DEFAULT_PAGINATION,
+                                                pagination:localStorage.getItem("sesRecordCount"),
                                                 contextMenu: false,
                                                 search: true,
                                                 columnSorting: true,
