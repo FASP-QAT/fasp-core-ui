@@ -1,13 +1,48 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardBody, FormGroup, Label, Input, CardFooter, Button } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardBody, FormGroup, Label, Input, CardFooter, Button, Modal, ModalBody, ModalFooter, ModalHeader, InputGroup, FormFeedback, Form } from 'reactstrap';
 import i18n from '../../i18n';
 import PipelineService from "../../api/PipelineService.js";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import { confirmAlert } from 'react-confirm-alert';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 
+import * as Yup from 'yup';
 
+import { API_URL } from '../../Constants';
+
+const initialValues = {
+    fileTypeId: "",
+}
 const entityname = i18n.t('static.dashboard.pipelineProgramImport');
+const validationSchema = function (values) {
+    return Yup.object().shape({
+        fileTypeId: Yup.string()
+            .required("Required"),
+    })
+}
+
+const validate = (getValidationSchema) => {
+    return (values) => {
+        const validationSchema = getValidationSchema(values)
+        try {
+            validationSchema.validateSync(values, { abortEarly: false })
+            return {}
+        } catch (error) {
+            return getErrorsFromValidationError(error)
+        }
+    }
+}
+
+const getErrorsFromValidationError = (validationError) => {
+    const FIRST_ERROR = 0
+    return validationError.inner.reduce((errors, error) => {
+        return {
+            ...errors,
+            [error.path]: error.errors[FIRST_ERROR],
+        }
+    }, {})
+}
+
 export default class PipelineProgramImport extends Component {
 
     constructor(props) {
@@ -16,16 +51,43 @@ export default class PipelineProgramImport extends Component {
         this.state = {
             loading: true,
             jsonText: '',
-            message: ''
+            message: '',
+            toggelView: false,
+            fileTypeId: ""
         }
         this.showFile = this.showFile.bind(this);
         this.showPipelineProgramInfo = this.showPipelineProgramInfo.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.toggleModalView = this.toggleModalView.bind(this);
     }
 
     componentDidMount() {
 
+    }
+    touchAll(setTouched, errors) {
+        setTouched({
+            fileTypeId: true,
+        }
+        );
+        this.validateForm(errors);
+    }
+    validateForm(errors) {
+        this.findFirstError('budgetForm', (fieldName) => {
+            return Boolean(errors[fieldName])
+        })
+    }
+    findFirstError(formName, hasError) {
+        const form = document.forms[formName]
+        for (let i = 0; i < form.length; i++) {
+            if (hasError(form[i].name)) {
+                form[i].focus()
+                break
+            }
+        }
+    }
+    toggleModalView() {
+        this.setState({ toggelView: !this.state.toggelView });
     }
     hideSecondComponent() {
         setTimeout(function () {
@@ -144,6 +206,14 @@ export default class PipelineProgramImport extends Component {
                             {/* <CardHeader>
                                 <strong>{i18n.t('static.program.import')}</strong>
                             </CardHeader> */}
+                            <div className="Card-header-addicon">
+                                {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}{' '}</strong> */}
+                                <div className="card-header-actions">
+                                    <div className="card-header-action">
+                                        <a href="javascript:void();" title={i18n.t('static.pipeline.downLoadConverter')} onClick={this.toggleModalView}><i className="fa fa-download"></i></a>
+                                    </div>
+                                </div>
+                            </div>
                             <CardBody>
 
                                 <FormGroup id="fileImportDiv">
@@ -177,7 +247,6 @@ export default class PipelineProgramImport extends Component {
                             </CardBody>
                             <CardFooter>
                                 <FormGroup>
-
                                     <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                     <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                     <Button onClick={this.showPipelineProgramInfo} type="button" id="formSubmitButton" size="md" color="success" className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
@@ -187,7 +256,29 @@ export default class PipelineProgramImport extends Component {
                         </Card>
                     </Col>
                 </Row>
+                {/*  download exe Modal */}
+                <Modal isOpen={this.state.toggelView}
+                    className={'modal-lg ' + this.props.className, "modalWidth"}>
+                    <ModalHeader toggle={() => this.toggleModalView()} className="modalHeaderSupplyPlan">
+                        <strong>{i18n.t('static.pipeline.downLoadConverter')}</strong>
+                    </ModalHeader>
+                    <div>
+                        <ModalBody>
+                            <h5><a href={`${API_URL}/file/pipelineConvertorLinux`}>{i18n.t('static.pipeline.pipelineConvertorLinux')}</a></h5>
+                            <br></br>
+                            <h5><a href={`${API_URL}/file/pipelineConvertorWindows`}>{i18n.t('static.pipeline.pipelineConvertorWindows')}</a></h5>
+                        </ModalBody>
+                        <ModalFooter>
+                            <FormGroup>
+                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.toggleModalView}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                &nbsp;
+                                    </FormGroup>
+                        </ModalFooter>
+                    </div>
+                </Modal>
             </div>
+
+
         );
     }
     cancelClicked() {

@@ -5,7 +5,7 @@ import i18n from '../../i18n';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunctionOnlyHideRow, checkValidtion, inValid, positiveValidation, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { SECRET_KEY, SHIPMENT_DATA_SOURCE_TYPE, DELIVERED_SHIPMENT_STATUS, TBD_PROCUREMENT_AGENT_ID, TBD_FUNDING_SOURCE, SUBMITTED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, JEXCEL_DECIMAL_NO_REGEX, JEXCEL_INTEGER_REGEX, CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, INDEXED_DB_VERSION, INDEXED_DB_NAME, ALPHABET_NUMBER_REGEX, JEXCEL_DATE_FORMAT, BATCH_PREFIX, NONE_SELECTED_DATA_SOURCE_ID, LABEL_WITH_SPECIAL_SYMBOL_REGEX, BATCH_NO_REGEX, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION, USD_CURRENCY_ID } from "../../Constants";
+import { SECRET_KEY, SHIPMENT_DATA_SOURCE_TYPE, DELIVERED_SHIPMENT_STATUS, TBD_PROCUREMENT_AGENT_ID, TBD_FUNDING_SOURCE, SUBMITTED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, JEXCEL_DECIMAL_NO_REGEX, JEXCEL_INTEGER_REGEX, CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, INDEXED_DB_VERSION, INDEXED_DB_NAME, ALPHABET_NUMBER_REGEX, JEXCEL_DATE_FORMAT, BATCH_PREFIX, NONE_SELECTED_DATA_SOURCE_ID, LABEL_WITH_SPECIAL_SYMBOL_REGEX, BATCH_NO_REGEX, JEXCEL_PAGINATION_OPTION, USD_CURRENCY_ID } from "../../Constants";
 import moment, { invalid } from "moment";
 import { paddingZero, generateRandomAplhaNumericCode, contrast } from "../../CommonComponent/JavascriptCommonFunctions";
 import CryptoJS from 'crypto-js'
@@ -263,7 +263,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                         var searchOption = false;
                                         var paginationArray = []
                                         if (this.props.shipmentPage == "shipmentDataEntry") {
-                                            paginationOption = JEXCEL_DEFAULT_PAGINATION;
+                                            paginationOption = localStorage.getItem("sesRecordCount");
                                             searchOption = true;
                                             paginationArray = JEXCEL_PAGINATION_OPTION;
                                         }
@@ -2740,13 +2740,13 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             shipmentMode = "Air";
                         }
                         var shipmentDatesJson = map.get("26");
-                        var plannedDate = shipmentDatesJson.plannedDate;
-                        var submittedDate = shipmentDatesJson.submittedDate;
-                        var approvedDate = shipmentDatesJson.approvedDate;
-                        var shippedDate = shipmentDatesJson.shippedDate;
-                        var arrivedDate = shipmentDatesJson.arrivedDate;
-                        var receivedDate = shipmentDatesJson.receivedDate;
-                        var expectedDeliveryDate = shipmentDatesJson.expectedDeliveryDate;
+                        var plannedDate = shipmentDatesJson.plannedDate!="" && shipmentDatesJson.plannedDate!="Invalid date"?shipmentDatesJson.plannedDate:null;
+                        var submittedDate = shipmentDatesJson.submittedDate!="" && shipmentDatesJson.submittedDate!="Invalid date"?shipmentDatesJson.submittedDate:null;
+                        var approvedDate = shipmentDatesJson.approvedDate!="" && shipmentDatesJson.approvedDate!="Invalid date"?shipmentDatesJson.approvedDate:null;
+                        var shippedDate = shipmentDatesJson.shippedDate!="" && shipmentDatesJson.shippedDate!="Invalid date"?shipmentDatesJson.shippedDate:null;
+                        var arrivedDate = shipmentDatesJson.arrivedDate!="" && shipmentDatesJson.arrivedDate!="Invalid date"?shipmentDatesJson.arrivedDate:null;
+                        var receivedDate = shipmentDatesJson.receivedDate!="" && shipmentDatesJson.receivedDate!="Invalid date"?shipmentDatesJson.receivedDate:null;
+                        var expectedDeliveryDate = shipmentDatesJson.expectedDeliveryDate!="" && shipmentDatesJson.expectedDeliveryDate!="Invalid date"?shipmentDatesJson.expectedDeliveryDate:null;
                         console.log("shipmentDatesJson", shipmentDatesJson);
                         console.log("Received date", receivedDate);
                         console.log("Shipment Received date", shipmentDatesJson.receivedDate);
@@ -2861,10 +2861,10 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                         batchNo: batchNo,
                                         expiryDate: expiryDate,
                                         batchId: 0,
-                                        autoGenerated: true
+                                        autoGenerated: true,
+                                        createdDate: createdDate
                                     },
-                                    shipmentQty: shipmentQty.toString().replaceAll("\,", ""),
-                                    createdDate: createdDate
+                                    shipmentQty: shipmentQty.toString().replaceAll("\,", "")
                                 }
                                 var batchArr = [];
                                 batchArr.push(batchInfoJson);
@@ -3023,10 +3023,10 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                         batchNo: batchNo,
                                         expiryDate: expiryDate,
                                         batchId: 0,
-                                        autoGenerated: true
+                                        autoGenerated: true,
+                                        createdDate: createdDate
                                     },
-                                    shipmentQty: shipmentQty.toString().replaceAll("\,", ""),
-                                    createdDate: createdDate
+                                    shipmentQty: shipmentQty.toString().replaceAll("\,", "")
                                 }
                                 var batchArr = [];
                                 batchArr.push(batchInfoJson);

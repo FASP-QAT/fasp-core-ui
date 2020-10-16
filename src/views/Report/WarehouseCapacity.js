@@ -33,7 +33,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
@@ -677,7 +677,7 @@ let data=this.state.data.map(elt=>[getLabelText(elt.realmCountry.label, this.sta
                 entries: '',
             },
             onload: this.loaded,
-            pagination: JEXCEL_DEFAULT_PAGINATION,
+            pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
             tableOverflow: true,
@@ -757,14 +757,14 @@ let data=this.state.data.map(elt=>[getLabelText(elt.realmCountry.label, this.sta
                         }
 
                     </div>
-                    <CardBody className="pb-lg-2 pt-lg-0 ">
+                    <CardBody className="pb-lg-5 pt-lg-2 ">
                         <div className="" >
                             <div>
                                 <Form >
                                     <div className="pl-0">
                                         <div className="row">
                                             <Online>
-                                            <FormGroup className="col-md-3">
+                                            <FormGroup className="col-md-3 ">
                       <Label htmlFor="countrysId">{i18n.t('static.program.realmcountry')}</Label>
                       <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
 
@@ -863,7 +863,7 @@ let data=this.state.data.map(elt=>[getLabelText(elt.realmCountry.label, this.sta
                                     </div>
                                 </Form>
 
-                                {/* <div className="werehousecapacitySearchposition"> */}
+                                <div className="werehousecapacitySearchposition">
                                     <div id="tableDiv" className="jexcelremoveReadonlybackground"> </div>
                                     {/*  <div className="row">
                                         <div className="col-md-12">
@@ -908,7 +908,7 @@ let data=this.state.data.map(elt=>[getLabelText(elt.realmCountry.label, this.sta
                                         </div>
                                     </div>*/}
 
-                                {/* </div> */}
+                                </div>
                             </div>
                         </div>
                     </CardBody>
