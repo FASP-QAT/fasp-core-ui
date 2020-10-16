@@ -99,7 +99,7 @@ export default class PipelineProgramProcurementAgent extends Component {
     }
 
     saveProcurementAgent() {
-        var list = this.state.ProcurementAgentList;
+        var list = this.state.procurementAgentList;
         var json = this.el.getJson();
         var procurementAgentArray = []
         console.log(json.length)
