@@ -1,4 +1,5 @@
 import i18n from '../../src/i18n';
+import { func } from 'prop-types';
 
 export function jExcelLoadedFunction(instance, number) {
     if (number == undefined) {
@@ -55,8 +56,10 @@ export function jExcelLoadedFunction(instance, number) {
     // document.getElementsByClassName('jexcel_pagination')[number].value = localStorage.getItem("sesRecordCount")
     // document.getElementsByClassName('jexcel_pagination')[number].value = 25
     var pageSelect = document.getElementsByClassName('jexcel_pagination_dropdown')[number];
-    pageSelect.options[pageSelect.options.length] = new Option('All', 5000000);
-    
+    pageSelect.options[3].innerHTML = "All";
+
+    pageSelect.addEventListener("change", () => pagignationChange(number));
+
 
     var jexcel_filterFirstdiv = document.getElementsByClassName('jexcel_filter')[number];
     var filter = jexcel_filterFirstdiv.firstChild;
@@ -68,8 +71,14 @@ export function jExcelLoadedFunction(instance, number) {
 
 
 
-
     // document.getElementById("clearBtnID").onclick= function(){alert("ok");}
+}
+
+export function pagignationChange(number) {
+    console.log("number---" + number)
+    var recordCount = document.getElementsByClassName('jexcel_pagination_dropdown')[number].value;
+    console.log("recordCount---", recordCount);
+    localStorage.setItem("sesRecordCount", recordCount)
 }
 
 
@@ -105,7 +114,10 @@ export function jExcelLoadedFunctionPipeline(instance, number) {
     jexcel_pagination.firstChild.classList.add('mr-auto');
     jexcel_pagination.firstChild.classList.add('pl-0');
     var pageSelect = document.getElementsByClassName('jexcel_pagination_dropdown')[number];
-    pageSelect.options[pageSelect.options.length] = new Option('All', 5000000);
+    // pageSelect.options[pageSelect.options.length] = new Option('All', 5000000);
+    pageSelect.options[3].innerHTML = "All";
+
+    pageSelect.addEventListener("change", () => pagignationChange(number));
 
     var jexcel_filterFirstdiv = document.getElementsByClassName('jexcel_filter')[number];
     var filter = jexcel_filterFirstdiv.firstChild;
@@ -150,6 +162,68 @@ export function jExcelLoadedFunctionWithoutPagination(instance, number) {
 export function jExcelLoadedFunctionOnlyHideRow(instance) {
     var elInstance = instance.jexcel;
     elInstance.hideIndex(0);
+}
+
+export function jExcelLoadedFunctionQuantimed(instance) {
+    
+    var obj = {};
+    obj.options = {};
+    var elInstance = instance.jexcel;
+    elInstance.hideIndex(0);
+    var pagignation = document.getElementsByClassName('jexcel_pagination')[0];
+    pagignation.classList.add('row');
+    var searchContainer = document.getElementsByClassName('jexcel_filter')[1];
+    var searchDiv = (document.getElementsByClassName('jexcel_filter')[1]).childNodes[1];
+    searchDiv.removeChild(((document.getElementsByClassName('jexcel_filter')[1]).childNodes[1]).childNodes[0]);
+    document.getElementsByClassName("jexcel_search")[1].placeholder = i18n.t('static.jexcel.search');
+    // searchContainer.classList.add('TableCust');
+    var clearBtn = document.createElement('button');
+    clearBtn.type = "button";
+    clearBtn.classList.add('btn-default');
+    clearBtn.classList.add('btn');
+    clearBtn.classList.add('jexcel_clear_btn');
+
+    var clarText = document.createTextNode(i18n.t('static.jexcel.clear'));
+    clearBtn.setAttribute("id", "clearBtnID");
+    clearBtn.onclick = function () {
+        document.getElementsByClassName("jexcel_search")[1].value = "";
+        elInstance.resetSearch();
+    };
+    clearBtn.appendChild(clarText);
+    searchContainer.appendChild(clearBtn);
+
+    // var paginationFirst=document.getElementsByClassName('jexcel_pagination')[0];
+    // var paginationInfo = paginationFirst.createElement('span');
+    // paginationInfo.classList.add('bottom_entries');
+    // paginationInfo.classList.add('col-md-7');
+    // paginationInfo.classList.add('order-2');
+    // paginationInfo.classList.add('pl-lg-0');
+
+
+    // var paginationPages = paginationFirst.createElement('div');
+    // paginationPages.classList.add('col-md-4');
+    // paginationPages.classList.add('order-3');
+    // paginationPages.classList.add('f-End');
+
+    // obj.pagination.appendChild(paginationInfo);
+    // obj.pagination.appendChild(paginationPages);
+    //  obj.pagination.appendChild(paginationUpdateContainer);
+
+    var jexcel_pagination = document.getElementsByClassName('jexcel_pagination')[1];
+    jexcel_pagination.lastChild.classList.add('order-3');
+    jexcel_pagination.firstChild.classList.add('order-2');
+    jexcel_pagination.firstChild.classList.add('mr-auto');
+    jexcel_pagination.firstChild.classList.add('pl-0');
+    var pageSelect = document.getElementsByClassName('jexcel_pagination_dropdown')[0];
+    pageSelect.options[pageSelect.options.length] = new Option('All', 5000000);
+
+
+    var jexcel_filterFirstdiv = document.getElementsByClassName('jexcel_filter')[1];
+    var filter = jexcel_filterFirstdiv.firstChild;
+    filter.classList.add('order-1');
+    filter.classList.add('pr-1');
+    filter.classList.add('ml-2');
+    jexcel_pagination.appendChild(filter);
 }
 
 export function checkValidtion(type, colName, rowNo, value, elInstance, reg, greaterThan0, equalTo0) {

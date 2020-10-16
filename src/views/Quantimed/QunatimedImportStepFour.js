@@ -3,13 +3,13 @@ import i18n from '../../i18n';
 import * as Yup from 'yup'
 import {
     Button, FormFeedback, CardBody,
-    Form, FormGroup, Label, Input, CardFooter, Col, Card
+    Form, FormGroup, Label, Input, CardFooter, Col, Card, Row
 } from 'reactstrap';
 import getLabelText from '../../CommonComponent/getLabelText';
 import jexcel from 'jexcel';
 import "../ProductCategory/style.css"
 import "../../../node_modules/jexcel/dist/jexcel.css";
-import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination } from '../../CommonComponent/JExcelCommonFunctions.js';
+import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionQuantimed, jExcelLoadedFunctionWithoutPagination } from '../../CommonComponent/JExcelCommonFunctions.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import AuthenticationService from '../Common/AuthenticationService';
 import LabelsService from '../../api/LabelService.js';
@@ -18,7 +18,7 @@ import QuantimedImportService from '../../api/QuantimedImportService';
 import moment from "moment";
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
-import { DATE_FORMAT_CAP_WITHOUT_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, QUANTIMED_DATA_SOURCE_ID, SECRET_KEY } from '../../Constants';
+import { DATE_FORMAT_CAP_WITHOUT_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION, QUANTIMED_DATA_SOURCE_ID, SECRET_KEY } from '../../Constants';
 import CryptoJS from 'crypto-js'
 import { getDatabase } from '../../CommonComponent/IndexedDbFunctions';
 import { calculateSupplyPlan } from '../SupplyPlan/SupplyPlanCalculations';
@@ -67,6 +67,7 @@ export default class QunatimedImportStepFour extends Component {
         this.formSubmit = this.formSubmit.bind(this);
         this.updateState = this.updateState.bind(this);
         this.redirectToDashbaord = this.redirectToDashbaord.bind(this);
+        this.changedImport = this.changedImport.bind(this);
     }
 
     touchAllThree(setTouched, errors) {
@@ -97,7 +98,7 @@ export default class QunatimedImportStepFour extends Component {
 
     loaded_four = function (instance, cell, x, y, value) {
 
-        jExcelLoadedFunctionOnlyHideRow(instance);
+        jExcelLoadedFunctionQuantimed(instance);
 
     }
 
@@ -112,8 +113,14 @@ export default class QunatimedImportStepFour extends Component {
         this.props.redirectToDashboard();
     }
 
+    changedImport = function (instance, cell, x, y, value) {
+
+
+    }
+
     formSubmit() {
         confirmAlert({
+            title: i18n.t('static.program.confirmsubmit'),
             message: i18n.t('static.quantimed.quantimedImportFinalConfirmText'),
             buttons: [
                 {
@@ -124,6 +131,30 @@ export default class QunatimedImportStepFour extends Component {
                         })
 
                         // console.log("Final Data", this.state.finalImportData)
+
+                        var tableJson = this.el.getJson();
+
+                        for (var y = 0; y < tableJson.length; y++) {
+                            var map1 = new Map(Object.entries(tableJson[y]));
+                            this.state.finalImportData[y].active = map1.get("6");
+                        }
+
+                        var dates = [];
+                        var datesFilter = this.state.finalImportData.filter(c => c.active == true);
+                        for (var i = 0; i < datesFilter.length; i++) {
+                            var index = dates.findIndex(c => c == datesFilter[i].dtmPeriod)
+                            if (index == -1) {
+                                dates.push(datesFilter[i].dtmPeriod)
+                            }
+                        }
+
+                        this.setState({
+                            finalImportData: datesFilter
+                        })
+
+                        // console.log("finalImportData",this.state.finalImportData)
+                        let moments = dates.map(d => moment(d));
+                        var minDate = moment.min(moments).format("YYYY-MM-DD");
 
                         var db1;
                         var storeOS;
@@ -170,12 +201,12 @@ export default class QunatimedImportStepFour extends Component {
                                     rcpuResult = rcpuRequest.result;
 
 
-                                    var consumptionDataList = (programJson.consumptionList);
+                                    var consumptionDataList = (programJson.consumptionList);                                                                        
                                     var qunatimedData = this.state.finalImportData;
-                                    // console.log("consumptionDataList", consumptionDataList)
+                                    
                                     for (var i = 0; i < qunatimedData.length; i++) {
                                         var index = consumptionDataList.findIndex(c => moment(c.consumptionDate).format("YYYY-MM") == moment(qunatimedData[i].dtmPeriod).format("YYYY-MM")
-                                            && c.planningUnit.id == qunatimedData[i].product.programPlanningUnitId
+                                            && c.planningUnit.id == qunatimedData[i].product.programPlanningUnitId && c.region.id == this.props.items.program.regionId
                                             && c.actualFlag == false && c.multiplier == 1);
                                         // console.log("index==", index);
                                         if (index != -1) {
@@ -190,7 +221,7 @@ export default class QunatimedImportStepFour extends Component {
                                                     id: QUANTIMED_DATA_SOURCE_ID
                                                 },
                                                 region: {
-                                                    id: programJson.regionList.filter(c => c.label.label_en.toUpperCase() == "NATIONAL")[0].regionId
+                                                    id: this.props.items.program.regionId
                                                 },
                                                 consumptionDate: moment(qunatimedData[i].dtmPeriod).startOf('month').format("YYYY-MM-DD"),
                                                 consumptionRcpuQty: qunatimedData[i].ingConsumption.toString().replaceAll("\,", ""),
@@ -219,6 +250,7 @@ export default class QunatimedImportStepFour extends Component {
 
                                     var transaction1;
                                     var programTransaction1;
+                                    var finalImportQATData = this.state.finalImportData;
 
                                     transaction1 = db1.transaction(['programData'], 'readwrite');
                                     programTransaction1 = transaction1.objectStore('programData');
@@ -230,17 +262,18 @@ export default class QunatimedImportStepFour extends Component {
                                         this.props.updateState("color", "red");
                                         this.props.hideFirstComponent();
                                     }.bind(this);
-                                    putRequest.onsuccess = function (event) {
-                                        var finalImportQATData = this.state.finalImportData;
+                                    putRequest.onsuccess = function (event) {                                        
+                                        
+                                        
                                         var finalQATPlanningList = [];
-                                        for(var i=0 ; i< finalImportQATData.length; i++) {
+                                        for (var i = 0; i < finalImportQATData.length; i++) {
                                             var index = finalQATPlanningList.findIndex(c => c == finalImportQATData[i].product.programPlanningUnitId)
-                                            if(index == -1) {
+                                            if (index == -1) {
                                                 finalQATPlanningList.push(parseInt(finalImportQATData[i].product.programPlanningUnitId))
                                             }
                                         }
-                                        
-                                        let minDate = moment(this.props.items.program.rangeValue.from.year + '-' + this.props.items.program.rangeValue.from.month + '-01').format("YYYY-MM-DD");
+
+                                        // let minDate = moment(this.props.items.program.rangeValue.from.year + '-' + this.props.items.program.rangeValue.from.month + '-01').format("YYYY-MM-DD");
                                         // console.log("finalQATPlanningList",finalQATPlanningList)
                                         // console.log("minDate",minDate)
                                         calculateSupplyPlan(this.props.items.program.programId, 0, 'programData', 'quantimedImport', this, finalQATPlanningList, minDate);                                        
@@ -269,84 +302,146 @@ export default class QunatimedImportStepFour extends Component {
         var myVar = "";
         var json = this.props.items.importData.records;
 
-        let startDate = this.props.items.program.rangeValue.from.year + '-' + this.props.items.program.rangeValue.from.month + '-01';
-        let endDate = this.props.items.program.rangeValue.to.year + '-' + this.props.items.program.rangeValue.to.month + '-' + new Date(this.props.items.program.rangeValue.to.year, this.props.items.program.rangeValue.to.month, 0).getDate();
+        // let startDate = this.props.items.program.rangeValue.from.year + '-' + this.props.items.program.rangeValue.from.month + '-01';
+        // let endDate = this.props.items.program.rangeValue.to.year + '-' + this.props.items.program.rangeValue.to.month + '-' + new Date(this.props.items.program.rangeValue.to.year, this.props.items.program.rangeValue.to.month, 0).getDate();
 
         const planningUnitFilter = json.filter(c => c.product.programPlanningUnitId != "-1");
-        const dateFilter = planningUnitFilter.filter(c => moment(c.dtmPeriod).isBetween(startDate, endDate, null, '[)'))
-
-        this.setState({
-            finalImportData: dateFilter
-        })
-
-        var qatPlanningList = this.props.items.qatPlanningList;
-        // console.log("qatPlanningList==", qatPlanningList)
-        var data_1 = [];
-        var records = [];
-
-        for (var i = 0; i < dateFilter.length; i++) {
-
-            // console.log("progarm planning unit", qatPlanningList.filter(c => c.value == parseInt(dateFilter[i].product.programPlanningUnitId))[0].label)
-            data_1 = [];
-            data_1[0] = dateFilter[i].productId;// A
-            data_1[1] = dateFilter[i].product.productName;// B
-            data_1[2] = qatPlanningList.filter(c => c.value == parseInt(dateFilter[i].product.programPlanningUnitId))[0].label;// C
-            data_1[3] = moment(dateFilter[i].dtmPeriod).format(DATE_FORMAT_CAP_WITHOUT_DATE).toUpperCase();// D  
-            data_1[4] = dateFilter[i].ingConsumption;// E                                              
-            records.push(data_1);
-        }
-
-        var options = {
-            data: records,
-            contextMenu: function () { return false; },
-            colHeaders: [
-                i18n.t('static.quantimed.quantimedProductIdLabel'),
-                i18n.t('static.quantimed.quantimedPlanningUnitLabel'),
-                i18n.t('static.supplyPlan.qatProduct'),
-                i18n.t('static.quantimed.consumptionDate'),
-                i18n.t('static.report.consupmtionqty')
-            ],
-            colWidths: [80, 80, 80, 80, 80],
-            columns: [
-                { type: 'text' },
-                { type: 'text' },
-                { type: 'text' },
-                { type: 'text' },
-                { type: 'numeric', mask: '#,##' }
-            ],
-            editable: false,
-            text: {
-                // showingPage: 'Showing {0} to {1} of {1}',
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
-                show: '',
-                entries: '',
-            },
-            pagination: false,
-            search: true,
-            columnSorting: false,
-            tableOverflow: true,
-            wordWrap: true,
-            paginationOptions: [],
-            allowInsertColumn: false,
-            allowManualInsertColumn: false,
-            // onchange: this.changed,
-            // oneditionstart: this.editStart,
-            allowDeleteRow: false,
-            tableOverflow: false,
-            onload: this.loaded_four,
-            // tableHeight: '500px',
-        };
+        // const dateFilter = planningUnitFilter.filter(c => moment(c.dtmPeriod).isBetween(startDate, endDate, null, '[)'))
 
 
-        myVar = jexcel(document.getElementById("recordsDiv"), options);
-        this.el = myVar;
-        this.setState({
-            programId: this.props.items.program.programId
-        })
+        var db1;
+        var storeOS;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onerror = function (event) {
+            this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+            this.props.updateState("color", "red");
+            this.props.hideFirstComponent();
+        }.bind(this);
+        openRequest.onsuccess = function (e) {
+            // console.log("in success")
+            db1 = e.target.result;
+            var transaction;
+            var programTransaction;
 
-        this.setState({
-            loading: false
-        })
+            transaction = db1.transaction(['programData'], 'readwrite');
+            programTransaction = transaction.objectStore('programData');
+
+
+            var programId = this.props.items.program.programId;
+
+            var programRequest = programTransaction.get(programId);
+            programRequest.onerror = function (event) {
+                this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+                this.props.updateState("color", "red");
+                this.props.hideFirstComponent();
+            }.bind(this);
+            programRequest.onsuccess = function (event) {
+                var programDataBytes = CryptoJS.AES.decrypt((programRequest.result).programData, SECRET_KEY);
+                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                var programJson = JSON.parse(programData);
+
+
+                var consumptionDataList = (programJson.consumptionList);
+                // console.log("consumptionDataList", consumptionDataList)
+                var qunatimedData = planningUnitFilter;
+                var finalList = [];
+                for (var i = 0; i < qunatimedData.length; i++) {
+                    var index = consumptionDataList.findIndex(c => moment(c.consumptionDate).format("YYYY-MM") == moment(qunatimedData[i].dtmPeriod).format("YYYY-MM")
+                        && c.planningUnit.id == qunatimedData[i].product.programPlanningUnitId && c.region.id == this.props.items.program.regionId
+                        && c.actualFlag == false && c.multiplier == 1);
+                    
+                    if (index != -1) {
+                        console.log("index==", index);
+                        qunatimedData[i].existingConsumptionQty = consumptionDataList[index].consumptionQty;                        
+                    } else {
+                        qunatimedData[i].existingConsumptionQty = "";                        
+                    }
+                    finalList.push(qunatimedData[i]);
+                }
+
+                this.setState({
+                    finalImportData: finalList
+                })
+
+                var qatPlanningList = this.props.items.qatPlanningList;
+                // console.log("qatPlanningList==", qatPlanningList)
+                var data_1 = [];
+                var records = [];
+
+                for (var i = 0; i < finalList.length; i++) {
+
+                    // console.log("progarm planning unit", qatPlanningList.filter(c => c.value == parseInt(dateFilter[i].product.programPlanningUnitId))[0].label)
+                    data_1 = [];
+                    data_1[0] = finalList[i].productId;// A
+                    data_1[1] = finalList[i].product.productName;// B
+                    data_1[2] = qatPlanningList.filter(c => c.value == parseInt(finalList[i].product.programPlanningUnitId))[0].label;// C
+                    data_1[3] = moment(finalList[i].dtmPeriod).format(DATE_FORMAT_CAP_WITHOUT_DATE).toUpperCase();// D  
+                    data_1[4] = finalList[i].existingConsumptionQty;// E 
+                    data_1[5] = finalList[i].ingConsumption;// E 
+                    data_1[6] = true;// F                                              
+                    records.push(data_1);
+                }
+
+                var options = {
+                    data: records,
+                    contextMenu: function () { return false; },
+                    colHeaders: [
+                        i18n.t('static.quantimed.quantimedProductIdLabel'),
+                        i18n.t('static.quantimed.quantimedPlanningUnitLabel'),
+                        i18n.t('static.supplyPlan.qatProduct'),
+                        i18n.t('static.quantimed.consumptionDate'),
+                        i18n.t('static.quantimed.existingconsupmtionqty'),
+                        i18n.t('static.quantimed.newconsupmtionqty'),
+                        i18n.t('static.quantimed.importData')
+                    ],
+                    colWidths: [30, 80, 80, 30, 30, 30, 20],
+                    columns: [
+                        { type: 'text', readOnly: true },
+                        { type: 'text', readOnly: true },
+                        { type: 'text', readOnly: true },
+                        { type: 'text', readOnly: true },
+                        { type: 'numeric', mask: '#,##', readOnly: true },
+                        { type: 'numeric', mask: '#,##', readOnly: true },
+                        { type: 'checkbox' }
+                    ],
+                    // editable: false,
+                    text: {
+                        // showingPage: 'Showing {0} to {1} of {1}',
+                        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
+                        show: '',
+                        entries: '',
+                    },
+                    pagination: JEXCEL_DEFAULT_PAGINATION,
+                    search: true,
+                    columnSorting: false,
+                    tableOverflow: true,
+                    wordWrap: true,
+                    paginationOptions: JEXCEL_PAGINATION_OPTION,
+                    allowInsertColumn: false,
+                    allowManualInsertColumn: false,
+                    onchange: this.changedImport,
+                    // oneditionstart: this.editStart,
+                    allowDeleteRow: false,
+                    tableOverflow: false,
+                    onload: this.loaded_four,
+                    // tableHeight: '500px',
+                };
+
+
+                myVar = jexcel(document.getElementById("recordsDiv"), options);
+                this.el = myVar;
+                this.setState({
+                    programId: this.props.items.program.programId
+                })
+
+                this.setState({
+                    loading: false
+                })
+
+
+            }.bind(this);
+        }.bind(this);
     }
 
     render() {
@@ -357,7 +452,7 @@ export default class QunatimedImportStepFour extends Component {
             <div className="animated fadeIn">
 
                 <br></br>
-                <div style={{ display: this.state.loading ? "none" : "block" }}>
+                <Row style={{ display: this.state.loading ? "none" : "block" }}>
 
                     <CardBody className="table-responsive pt-md-1 pb-md-1">
 
@@ -367,9 +462,9 @@ export default class QunatimedImportStepFour extends Component {
                             </div>
 
                         </Col>
-                    {/* </CardBody>
+                        {/* </CardBody>
                     <CardFooter className="pb-0 pr-0"> */}
-                    <br></br>
+                        <br></br>
                         <FormGroup>
                             <Button type="type" size="md" color="success" className="float-right mr-1" onClick={this.formSubmit}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                             <Button color="info" size="md" className="float-right mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.props.previousToStepThree} ><i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
@@ -377,9 +472,9 @@ export default class QunatimedImportStepFour extends Component {
                         </FormGroup>
                         &nbsp;
                 {/* </CardFooter> */}
-                </CardBody>
-                </div>
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    </CardBody>
+                </Row>
+                <Row style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
                             <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
@@ -389,7 +484,7 @@ export default class QunatimedImportStepFour extends Component {
                             </div>
                         </div>
                     </div>
-                </div>
+                </Row>
             </div>
 
 

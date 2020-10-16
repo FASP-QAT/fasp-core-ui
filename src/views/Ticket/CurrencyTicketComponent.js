@@ -10,7 +10,7 @@ import JiraTikcetService from '../../api/JiraTikcetService';
 import { DECIMAL_NO_REGEX, ALPHABETS_REGEX, SPACE_REGEX } from '../../Constants';
 
 const initialValues = {
-    summary: "Add / Update Currency",
+    summary: "Add Currency",
     currencyName: "",
     currencyCode: "",
     conversionRatetoUSD: "",
@@ -64,7 +64,7 @@ export default class CurrencyTicketComponent extends Component {
         super(props);
         this.state = {
             currency: {
-                summary: 'Add / Update Currency',
+                summary: 'Add Currency',
                 currencyName: "",
                 currencyCode: "",
                 conversionRatetoUSD: "",

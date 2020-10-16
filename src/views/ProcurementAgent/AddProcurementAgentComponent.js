@@ -44,13 +44,13 @@ const validationSchema = function (values) {
         //     .matches(/^[0-9]*$/, i18n.t('static.procurementagent.onlynumberText'))
         //     .required(i18n.t('static.procurementagent.submitToApproveLeadTime')),
         submittedToApprovedLeadTime: Yup.string()
-            .matches(/^\s*(?=.*[1-9])\d{1,2}(?:\.\d{1,2})?\s*$/, i18n.t('static.message.2digitDecimal'))
+            .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
             .required(i18n.t('static.procurementagent.submitToApproveLeadTime'))
             .min(0, i18n.t('static.program.validvaluetext'))
         // .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
         ,
         approvedToShippedLeadTime: Yup.string()
-            .matches(/^\s*(?=.*[1-9])\d{1,2}(?:\.\d{1,2})?\s*$/, i18n.t('static.message.2digitDecimal'))
+            .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
             .required(i18n.t('static.procurementagent.approvedToShippedLeadTime'))
             .min(0, i18n.t('static.program.validvaluetext')),
         // .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),

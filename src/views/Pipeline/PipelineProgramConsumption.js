@@ -10,7 +10,7 @@ import { jExcelLoadedFunction, jExcelLoadedFunctionWithoutPagination, jExcelLoad
 import { ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE, JEXCEL_DATE_FORMAT_WITHOUT_DATE } from '../../Constants';
 import RealmCountryService from '../../api/RealmCountryService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
+import { JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
 export default class PipelineProgramConsumption extends Component {
 
     constructor(props) {
@@ -409,7 +409,7 @@ export default class PipelineProgramConsumption extends Component {
                                             // { title: 'Last Modified date', type: 'text', readOnly: true },
                                             // { title: 'Last Modified by', type: 'text', readOnly: true }
                                         ],
-                                        pagination: JEXCEL_DEFAULT_PAGINATION,
+                                        pagination: localStorage.getItem("sesRecordCount"),
                                         contextMenu: false,
                                         search: true,
                                         columnSorting: true,

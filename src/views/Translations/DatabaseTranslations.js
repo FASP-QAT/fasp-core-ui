@@ -12,7 +12,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import LabelsService from '../../api/LabelService.js';
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from "../../Constants";
+import { JEXCEL_PAGINATION_OPTION } from "../../Constants";
 
 const entityname = i18n.t('static.label.databaseTranslations');
 export default class DatabaseTranslations extends React.Component {
@@ -68,7 +68,7 @@ export default class DatabaseTranslations extends React.Component {
                         { type: 'hidden' },
                         { type: 'text', readOnly: true }
                     ],
-                    pagination:JEXCEL_DEFAULT_PAGINATION,
+                    pagination: localStorage.getItem("sesRecordCount"),
                     search: true,
                     columnSorting: true,
                     tableOverflow: true,
