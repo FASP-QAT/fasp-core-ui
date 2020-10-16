@@ -19,7 +19,7 @@ import PlanningUnitService from "../../api/PlanningUnitService";
 import { SPACE_REGEX } from "../../Constants";
 
 const initialValues = {
-    summary: 'Add / Update Procurement Unit',
+    summary: 'Add Procurement Unit',
     procurementUnitName: '',
     planningUnitId: '',
     multiplier: '',
@@ -110,7 +110,7 @@ export default class ProcurementUnitTicketComponent extends Component {
         super(props);
         this.state = {
             procurementUnit: {
-                summary: 'Add / Update Procurement Unit',
+                summary: 'Add Procurement Unit',
                 planningUnitId: '',
                 multiplier: '',
                 unitId: '',
@@ -129,6 +129,7 @@ export default class ProcurementUnitTicketComponent extends Component {
                 unitsPerContainer: 0,
                 notes: ''
             },
+            lang: localStorage.getItem('lang'),
             message: '',
             planningUnitList: [],
             unitList: [],

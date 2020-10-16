@@ -9,9 +9,11 @@ import * as Yup from 'yup';
 import JiraTikcetService from '../../api/JiraTikcetService';
 import RealmService from '../../api/RealmService';
 import { LABEL_REGEX, SPACE_REGEX } from '../../Constants';
+import FundingSourceService from '../../api/FundingSourceService';
+import getLabelText from '../../CommonComponent/getLabelText';
 
 const initialValues = {
-    summary: "Add / Update Funding Source",
+    summary: "Add Funding Source",
     realmName: "",
     fundingSourceName: "",
     fundingSourceCode: "",
@@ -64,12 +66,14 @@ export default class FundingSourceTicketComponent extends Component {
         super(props);
         this.state = {
             fundingSource: {
-                summary: "Add / Update Funding Source",
+                summary: "Add Funding Source",
                 realmName: "",
                 fundingSourceName: "",
                 fundingSourceCode: "",
+                allowedInBudget: true,
                 notes: ""
             },
+            lang: localStorage.getItem('lang'),
             message: '',
             realms: [],
             realmId: '',
@@ -78,6 +82,8 @@ export default class FundingSourceTicketComponent extends Component {
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.Capitalize = this.Capitalize.bind(this);
+        this.getDisplayName = this.getDisplayName.bind(this);
     }
 
     dataChange(event) {
@@ -86,7 +92,7 @@ export default class FundingSourceTicketComponent extends Component {
             fundingSource.summary = event.target.value;
         }
         if (event.target.name == "realmName") {
-            fundingSource.realmName = event.target.options[event.target.selectedIndex].innerHTML;
+            fundingSource.realmName = this.state.realms.filter(c => c.realmId == event.target.value)[0].label.label_en;
             this.setState({
                 realmId: event.target.value
             })
@@ -96,6 +102,9 @@ export default class FundingSourceTicketComponent extends Component {
         }
         if (event.target.name == "fundingSourceCode") {
             fundingSource.fundingSourceCode = event.target.value;
+        }
+        if (event.target.name == "allowedInBudget") {
+            fundingSource.allowedInBudget = event.target.id === "allowedInBudget2" ? false : true;
         }
         if (event.target.name == "notes") {
             fundingSource.notes = event.target.value;
@@ -164,13 +173,140 @@ export default class FundingSourceTicketComponent extends Component {
             () => { });
     }
 
+    Capitalize(str) {
+        if (str != null && str != "") {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        } else {
+            return "";
+        }
+    }
+
+    getDisplayName() {
+        let realmId = this.state.realmId;
+        // let realmId = 1;
+        let fundingSourceValue = this.state.fundingSource.fundingSourceName;
+        // let fundingSourceValue = "USAID"
+        fundingSourceValue = fundingSourceValue.replace(/[^A-Za-z0-9]/g, "");
+        fundingSourceValue = fundingSourceValue.trim().toUpperCase();
+        if (realmId != '' && fundingSourceValue.length != 0) {
+
+            if (fundingSourceValue.length >= 7) {//minus 2
+                fundingSourceValue = fundingSourceValue.slice(0, 5);
+                console.log("DISPLAYNAME-BEF----->", fundingSourceValue);
+                FundingSourceService.getFundingSourceDisplayName(realmId, fundingSourceValue)
+                    .then(response => {
+                        console.log("DISPLAYNAME-RESP----->", response);
+                        let { fundingSource } = this.state;
+                        fundingSource.fundingSourceCode = response.data;
+                        this.setState({
+                            fundingSource
+                        });
+
+                    }).catch(
+                        error => {
+                            if (error.message === "Network Error") {
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
+
+                                    case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
+                                    case 404:
+                                    case 406:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    case 412:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    default:
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                        break;
+                                }
+                            }
+                        }
+                    );
+
+            } else {// not need to minus
+                console.log("DISPLAYNAME-BEF-else----->", fundingSourceValue);
+                FundingSourceService.getFundingSourceDisplayName(realmId, fundingSourceValue)
+                    .then(response => {
+                        console.log("DISPLAYNAME-RESP-else----->", response);
+                        let { fundingSource } = this.state;
+                        fundingSource.fundingSourceCode = response.data;
+                        this.setState({
+                            fundingSource
+                        });
+
+                    }).catch(
+                        error => {
+                            if (error.message === "Network Error") {
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
+
+                                    case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
+                                    case 404:
+                                    case 406:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    case 412:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    default:
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                        break;
+                                }
+                            }
+                        }
+                    );
+            }
+
+        }
+
+    }
+
     render() {
         const { realms } = this.state;
         let realmList = realms.length > 0
             && realms.map((item, i) => {
                 return (
                     <option key={i} value={item.realmId}>
-                        {item.label.label_en}
+                        {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);
@@ -268,15 +404,15 @@ export default class FundingSourceTicketComponent extends Component {
                                                 bsSize="sm"
                                                 valid={!errors.fundingSourceName && this.state.fundingSource.fundingSourceName != ''}
                                                 invalid={touched.fundingSourceName && !!errors.fundingSourceName}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value); this.getDisplayName() }}
                                                 onBlur={handleBlur}
                                                 value={this.state.fundingSource.fundingSourceName}
                                                 required />
                                             <FormFeedback className="red">{errors.fundingSourceName}</FormFeedback>
                                         </FormGroup>
                                         <FormGroup>
-                                            <Label for="fundingSourceCode">{i18n.t('static.fundingsource.fundingsourceCode')}</Label>
-                                            <Input type="text" name="fundingSourceCode" id="fundingSourceCode"
+                                            <Label for="fundingSourceCode">{i18n.t('static.fundingsource.fundingsourceCode')}<span class="red Reqasterisk">*</span></Label>
+                                            <Input type="text" name="fundingSourceCode" id="fundingSourceCode" readOnly={true}
                                                 bsSize="sm"
                                                 // valid={!errors.fundingSourceCode && this.state.fundingSource.fundingSourceCode != ''}
                                                 // invalid={touched.fundingSourceCode && !!errors.fundingSourceCode}
@@ -286,6 +422,41 @@ export default class FundingSourceTicketComponent extends Component {
                                             // required 
                                             />
                                             <FormFeedback className="red">{errors.fundingSourceCode}</FormFeedback>
+                                        </FormGroup>
+                                        <FormGroup>
+                                            <Label className="P-absltRadio">{i18n.t('static.fundingSource.allowInBudget')}&nbsp;&nbsp;</Label>
+                                            <FormGroup check inline className="ml-5">
+                                                <Input
+                                                    className="form-check-input"
+                                                    type="radio"
+                                                    id="allowedInBudget1"
+                                                    name="allowedInBudget"
+                                                    value={true}
+                                                    checked={this.state.fundingSource.allowedInBudget === true}
+                                                    onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                />
+                                                <Label
+                                                    className="form-check-label"
+                                                    check htmlFor="inline-active1">
+                                                    {i18n.t('static.program.yes')}
+                                                </Label>
+                                            </FormGroup>
+                                            <FormGroup check inline>
+                                                <Input
+                                                    className="form-check-input"
+                                                    type="radio"
+                                                    id="allowedInBudget2"
+                                                    name="allowedInBudget"
+                                                    value={false}
+                                                    checked={this.state.fundingSource.allowedInBudget === false}
+                                                    onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                />
+                                                <Label
+                                                    className="form-check-label"
+                                                    check htmlFor="inline-active2">
+                                                    {i18n.t('static.program.no')}
+                                                </Label>
+                                            </FormGroup>
                                         </FormGroup>
                                         <FormGroup>
                                             <Label for="notes">{i18n.t('static.common.notes')}</Label>

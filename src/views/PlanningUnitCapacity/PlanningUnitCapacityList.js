@@ -262,7 +262,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import PlanningUnitService from '../../api/PlanningUnitService';
 import PlanningUnitCapacityService from '../../api/PlanningUnitCapacityService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import { DATE_FORMAT_CAP, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
+import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
 import moment from 'moment';
 import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
@@ -382,7 +382,7 @@ export default class PlanningUnitCapacityList extends Component {
                 entries: '',
             },
             onload: this.loaded,
-            pagination: JEXCEL_DEFAULT_PAGINATION,
+            pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
             tableOverflow: true,

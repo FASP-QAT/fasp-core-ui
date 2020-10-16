@@ -18,7 +18,7 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import RegionService from "../../api/RegionService";
 import StatusUpdateButtonFeature from "../../CommonComponent/StatusUpdateButtonFeature";
 import UpdateButtonFeature from '../../CommonComponent/UpdateButtonFeature'
-import { JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from "../../Constants";
+import { JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PAGINATION_OPTION } from "../../Constants";
 let initialValues = {
     region: '',
     capacityCBM: '',
@@ -183,7 +183,7 @@ class RealmCountryRegion extends Component {
                                 }
 
                             ],
-                            pagination: JEXCEL_DEFAULT_PAGINATION,
+                            pagination: localStorage.getItem("sesRecordCount"),
                             search: true,
                             columnSorting: true,
                             tableOverflow: true,
@@ -499,7 +499,8 @@ class RealmCountryRegion extends Component {
                         label: {
                             label_en: map1.get("1"),
                         },
-                        capacityCbm: map1.get("2").replace(",", ""),
+                        // capacityCbm: map1.get("2").replace(",", ""),
+                        capacityCbm: map1.get("2").replace(/,/g, ""),
                         gln: (map1.get("3") === '' ? null : map1.get("3")),
                         active: map1.get("4"),
                         realmCountry: {
@@ -623,16 +624,33 @@ class RealmCountryRegion extends Component {
         }
 
         //Capacity
+        // if (x == 2) {
+        //     var col = ("C").concat(parseInt(y) + 1);
+        //     var reg = /^\s*(?=.*[1-9])\d{1,9}(?:\.\d{1,2})?\s*$/;
+        //     value = value.replace(/,/g, "");
+        //     if (value == "") {
+        //         this.el.setStyle(col, "background-color", "transparent");
+        //         this.el.setStyle(col, "background-color", "yellow");
+        //         this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+        //     } else {
+        //         if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
+        //             this.el.setStyle(col, "background-color", "transparent");
+        //             this.el.setStyle(col, "background-color", "yellow");
+        //             this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+        //         } else {
+        //             this.el.setStyle(col, "background-color", "transparent");
+        //             this.el.setComments(col, "");
+        //         }
+
+        //     }
+        // }
         if (x == 2) {
             var col = ("C").concat(parseInt(y) + 1);
-            var reg = /^\s*(?=.*[1-9])\d{1,9}(?:\.\d{1,2})?\s*$/;
+            // var reg = /^[0-9\b]+$/;
+            var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
             value = value.replace(/,/g, "");
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
+            if (this.el.getValueFromCoords(x, y) != "") {
+                if (!(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -640,9 +658,15 @@ class RealmCountryRegion extends Component {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
                 }
-
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             }
         }
+
+
+
         //GLN
         if (x == 3) {
             console.log("value.length---" + value.length);
@@ -704,23 +728,48 @@ class RealmCountryRegion extends Component {
                 }
 
                 //Capacity
+                // var col = ("C").concat(parseInt(y) + 1);
+                // var value = this.el.getValueFromCoords(2, y);
+                // var reg = /^\s*(?=.*[1-9])\d{1,9}(?:\.\d{1,2})?\s*$/;
+                // value = value.replace(/,/g, "");
+                // if (value == "" || isNaN(Number.parseFloat(value)) || value < 0) {
+                //     this.el.setStyle(col, "background-color", "transparent");
+                //     this.el.setStyle(col, "background-color", "yellow");
+                //     valid = false;
+                //     if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
+                //         this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                //     } else {
+                //         this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                //     }
+                // } else {
+                //     this.el.setStyle(col, "background-color", "transparent");
+                //     this.el.setComments(col, "");
+                // }
                 var col = ("C").concat(parseInt(y) + 1);
+                var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
                 var value = this.el.getValueFromCoords(2, y);
-                var reg = /^\s*(?=.*[1-9])\d{1,9}(?:\.\d{1,2})?\s*$/;
                 value = value.replace(/,/g, "");
-                if (value == "" || isNaN(Number.parseFloat(value)) || value < 0) {
+                if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
-                    if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
-                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                    } else {
-                        this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                    }
                 } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
+                    // if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
+                    if (!(reg.test(value))) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+
                 }
+
+
+
 
                 //GLN
                 // var col = ("D").concat(parseInt(y) + 1);

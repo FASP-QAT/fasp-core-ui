@@ -268,7 +268,7 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
-import { DATE_FORMAT_CAP, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
+import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
 import moment from 'moment';
 
 // import { HashRouter, Route, Switch } from 'react-router-dom';
@@ -427,7 +427,7 @@ export default class LanguageListComponent extends Component {
                                     entries: '',
                                 },
                                 onload: this.loaded,
-                                pagination: JEXCEL_DEFAULT_PAGINATION,
+                                pagination: localStorage.getItem("sesRecordCount"),
                                 search: true,
                                 columnSorting: true,
                                 tableOverflow: true,

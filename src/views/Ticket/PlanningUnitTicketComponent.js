@@ -10,9 +10,10 @@ import JiraTikcetService from '../../api/JiraTikcetService';
 import UnitService from '../../api/UnitService';
 import ForecastingUnitService from '../../api/ForecastingUnitService';
 import { SPACE_REGEX } from '../../Constants';
+import getLabelText from '../../CommonComponent/getLabelText';
 
 const initialValues = {
-    summary: "Add / Update Planning Unit",
+    summary: "Add Planning Unit",
     planningUnitDesc: "",
     forecastingUnitDesc: "",
     unit: "",
@@ -26,15 +27,17 @@ const validationSchema = function (values) {
             .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.common.summarytext')),
         planningUnitDesc: Yup.string()
-            .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
+            // .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.product.productnametext')),
         forecastingUnitDesc: Yup.string()
             .required(i18n.t('static.planningunit.forcastingunittext').concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?', i18n.t('static.forecastingunit.forecastingunit')))),
         unit: Yup.string()
             .required(i18n.t('static.procurementUnit.validUnitIdText')),
-        multiplier: Yup.number()
-            .typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .required(i18n.t('static.planningunit.multipliertext')),
+        multiplier: Yup.string()
+            .matches(/^\s*(?=.*[1-9])\d*(?:\.\d{1,2})?\s*$/, i18n.t('static.currency.conversionrateNumberTwoDecimalPlaces'))
+            .required(i18n.t('static.planningUnit.multiplier'))
+            .min(0, i18n.t('static.program.validvaluetext'))
         // notes: Yup.string()
         //     .required(i18n.t('static.common.notestext'))
     })
@@ -68,13 +71,14 @@ export default class PlanningUnitTicketComponent extends Component {
         super(props);
         this.state = {
             planningUnit: {
-                summary: 'Add / Update Planning Unit',
+                summary: 'Add Planning Unit',
                 planningUnitDesc: '',
                 forecastingUnitDesc: '',
                 unit: '',
                 multiplier: '',
                 notes: ''
             },
+            lang: localStorage.getItem('lang'),
             message: '',
             units: [],
             forecastingUnits: [],
@@ -96,13 +100,13 @@ export default class PlanningUnitTicketComponent extends Component {
             planningUnit.planningUnitDesc = event.target.value;
         }
         if (event.target.name == "forecastingUnitDesc") {
-            planningUnit.forecastingUnitDesc = event.target.options[event.target.selectedIndex].innerHTML;
+            planningUnit.forecastingUnitDesc = this.state.forecastingUnits.filter(c => c.forecastingUnitId == event.target.value)[0].label.label_en;
             this.setState({
                 forecastingUnitId: event.target.value
             })
         }
         if (event.target.name == "unit") {
-            planningUnit.unit = event.target.options[event.target.selectedIndex].innerHTML;
+            planningUnit.unit = this.state.units.filter(c => c.unitId == event.target.value)[0].label.label_en;
             this.setState({
                 unitId: event.target.value
             })
@@ -203,7 +207,7 @@ export default class PlanningUnitTicketComponent extends Component {
             && units.map((item, i) => {
                 return (
                     <option key={i} value={item.unitId}>
-                        {item.label.label_en}
+                        {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);
@@ -212,7 +216,7 @@ export default class PlanningUnitTicketComponent extends Component {
             && forecastingUnits.map((item, i) => {
                 return (
                     <option key={i} value={item.forecastingUnitId}>
-                        {item.label.label_en}
+                        {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);

@@ -5,7 +5,7 @@ import i18n from '../../i18n';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunctionOnlyHideRow, checkValidtion, inValid, positiveValidation, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { SECRET_KEY, JEXCEL_INTEGER_REGEX, INVENTORY_DATA_SOURCE_TYPE, JEXCEL_NEGATIVE_INTEGER_NO_REGEX, QAT_DATA_SOURCE_ID, NOTES_FOR_QAT_ADJUSTMENTS, INDEXED_DB_VERSION, INDEXED_DB_NAME, DATE_FORMAT_CAP, JEXCEL_DATE_FORMAT_WITHOUT_DATE, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION, INVENTORY_MONTHS_IN_PAST } from "../../Constants";
+import { SECRET_KEY, JEXCEL_INTEGER_REGEX, INVENTORY_DATA_SOURCE_TYPE, JEXCEL_NEGATIVE_INTEGER_NO_REGEX, QAT_DATA_SOURCE_ID, NOTES_FOR_QAT_ADJUSTMENTS, INDEXED_DB_VERSION, INDEXED_DB_NAME, DATE_FORMAT_CAP, JEXCEL_DATE_FORMAT_WITHOUT_DATE, JEXCEL_PAGINATION_OPTION, INVENTORY_MONTHS_IN_PAST } from "../../Constants";
 import moment from "moment";
 import CryptoJS from 'crypto-js'
 import { calculateSupplyPlan } from "./SupplyPlanCalculations";
@@ -163,7 +163,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     var searchOption = false;
                     var paginationArray = []
                     if (this.props.inventoryPage == "inventoryDataEntry") {
-                        paginationOption = JEXCEL_DEFAULT_PAGINATION;
+                        paginationOption = localStorage.getItem("sesRecordCount");
                         searchOption = true;
                         paginationArray = JEXCEL_PAGINATION_OPTION;
                     }

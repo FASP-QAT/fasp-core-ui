@@ -155,8 +155,8 @@ class UpdateExpiredPasswordComponent extends Component {
                                         validate={validate(validationSchema)}
                                         onSubmit={(values, { setSubmitting, setErrors }) => {
                                             if (navigator.onLine) {
-                                                console.log("Update expired password email id on submit method--->" + values.emailId)
-                                                UserService.updateExpiredPassword(values.emailId, values.oldPassword, values.newPassword)
+                                                console.log("Update expired password email id on submit method--->" + this.props.location.state.emailId)
+                                                UserService.updateExpiredPassword(this.props.location.state.emailId, values.oldPassword, values.newPassword)
                                                     .then(response => {
                                                         var decoded = jwt_decode(response.data.token);
                                                         let keysToRemove = ["token-" + decoded.userId, "user-" + decoded.userId, "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "lastLoggedInUsersLanguage"];

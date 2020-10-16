@@ -16,7 +16,7 @@ import classNames from 'classnames';
 import { SPACE_REGEX } from '../../Constants';
 
 const initialValues = {
-    summary: "Add / Update Program",
+    summary: "Add Program",
     programName: '',
     programCode: '',
     realmId: '',
@@ -58,35 +58,37 @@ const validationSchema = function (values) {
         airFreightPerc: Yup.string()
             .required(i18n.t('static.program.validairfreighttext'))
             .min(0, i18n.t('static.program.validvaluetext'))
-            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
+            // .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount'))
+            .matches(/^\s*(?=.*[1-9])\d{1,2}(?:\.\d{1,2})?\s*$/, i18n.t('static.message.2digitDecimal')),
         seaFreightPerc: Yup.string()
             .required(i18n.t('static.program.validseafreighttext'))
             .min(0, i18n.t('static.program.validvaluetext'))
-            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
+            // .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount'))
+            .matches(/^\s*(?=.*[1-9])\d{1,2}(?:\.\d{1,2})?\s*$/, i18n.t('static.message.2digitDecimal')),
         plannedToSubmittedLeadTime: Yup.string()
             .required(i18n.t('static.program.validplantosubmittext'))
             .min(0, i18n.t('static.program.validvaluetext'))
-            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
+            .matches(/^\s*(?=.*[1-9])\d{1,2}(?:\.\d{1,2})?\s*$/, i18n.t('static.message.2digitDecimal')),
         submittedToApprovedLeadTime: Yup.string()
             .required(i18n.t('static.program.validsubmittoapprovetext'))
             .min(0, i18n.t('static.program.validvaluetext'))
-            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
+            .matches(/^\s*(?=.*[1-9])\d{1,2}(?:\.\d{1,2})?\s*$/, i18n.t('static.message.2digitDecimal')),
         approvedToShippedLeadTime: Yup.string()
             .required(i18n.t('static.program.validapprovetoshiptext'))
             .min(0, i18n.t('static.program.validvaluetext'))
-            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
+            .matches(/^\s*(?=.*[1-9])\d{1,2}(?:\.\d{1,2})?\s*$/, i18n.t('static.message.2digitDecimal')),
         shippedToArrivedByAirLeadTime: Yup.string()
             .required(i18n.t('static.program.shippedToArrivedByAirLeadTime'))
             .min(0, i18n.t('static.program.validvaluetext'))
-            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
+            .matches(/^\s*(?=.*[1-9])\d{1,2}(?:\.\d{1,2})?\s*$/, i18n.t('static.message.2digitDecimal')),
         shippedToArrivedBySeaLeadTime: Yup.string()
             .required(i18n.t('static.program.shippedToArrivedBySeaLeadTime'))
             .min(0, i18n.t('static.program.validvaluetext'))
-            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
+            .matches(/^\s*(?=.*[1-9])\d{1,2}(?:\.\d{1,2})?\s*$/, i18n.t('static.message.2digitDecimal')),
         arrivedToDeliveredLeadTime: Yup.string()
             .required(i18n.t('static.program.arrivedToDeliveredLeadTime'))
             .min(0, i18n.t('static.program.validvaluetext'))
-            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
+            .matches(/^\s*(?=.*[1-9])\d{1,2}(?:\.\d{1,2})?\s*$/, i18n.t('static.message.2digitDecimal')),
         // notes: Yup.string()
         //     .required(i18n.t('static.common.notestext'))
     })
@@ -120,7 +122,7 @@ export default class ProgramTicketComponent extends Component {
         super(props);
         this.state = {
             program: {
-                summary: "Add / Update Program",
+                summary: "Add Program",
                 programName: '',
                 programCode: '',
                 realmId: '',
@@ -139,6 +141,7 @@ export default class ProgramTicketComponent extends Component {
                 arrivedToDeliveredLeadTime: '',
                 notes: ""
             },
+            lang: localStorage.getItem('lang'),
             message: '',
             realmId: '',
             realmList: [],
@@ -175,13 +178,13 @@ export default class ProgramTicketComponent extends Component {
             program.programCode = event.target.value;
         }
         if (event.target.name == "realmId") {
-            program.realmId = event.target.options[event.target.selectedIndex].innerHTML;
+            program.realmId = this.state.realmList.filter(c => c.realmId == event.target.value)[0].label.label_en;
             // this.setState({
             this.state.realmId = event.target.value
             // })            
         }
         if (event.target.name == "realmCountryId") {
-            program.realmCountryId = event.target.options[event.target.selectedIndex].innerHTML;
+            program.realmCountryId = this.state.realmCountryList.filter(c => c.realmCountryId == event.target.value)[0].country.label.label_en;
             // this.setState({
             this.state.realmCountryId = event.target.value
             // })            
@@ -190,13 +193,13 @@ export default class ProgramTicketComponent extends Component {
             program.regionId = event.target.value;
         }
         if (event.target.name == "organisationId") {
-            program.organisationId = event.target.options[event.target.selectedIndex].innerHTML;
+            program.organisationId = this.state.organisationList.filter(c => c.organisationId == event.target.value)[0].label.label_en;
             // this.setState({
             this.state.organisationId = event.target.value
             // })            
         }
         if (event.target.name == "healthAreaId") {
-            program.healthAreaId = event.target.options[event.target.selectedIndex].innerHTML;
+            program.healthAreaId = this.state.healthAreaList.filter(c => c.healthAreaId == event.target.value)[0].label.label_en;
             // this.setState({
             this.state.healthAreaId = event.target.value
             // })            

@@ -356,7 +356,7 @@ import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
 import moment from 'moment';
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
-import { DATE_FORMAT_CAP, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
+import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
 
 // import { HashRouter, Route, Switch } from 'react-router-dom';
 const entityname = i18n.t('static.unit.unit');
@@ -542,7 +542,7 @@ export default class UnitListComponent extends Component {
                 entries: '',
             },
             onload: this.loaded,
-            pagination: JEXCEL_DEFAULT_PAGINATION,
+            pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
             tableOverflow: true,
