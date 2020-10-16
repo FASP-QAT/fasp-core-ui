@@ -768,7 +768,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                         columns: [
                                                                             {
                                                                                 title: i18n.t('static.supplyPlan.type'),
-                                                                                type: 'hidden',
+                                                                                type: 'text',
                                                                                 readOnly: true
                                                                             },
                                                                             {
