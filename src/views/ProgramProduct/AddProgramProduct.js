@@ -1419,7 +1419,7 @@ class AddprogramPlanningUnit extends Component {
                                 </div>
                             </Col>
                         </CardBody> */}
-                        <CardBody className="">
+                        <CardBody className="pb-lg-5">
                             <Col md="3 pl-0">
 
                                 <FormGroup className="Selectdiv mt-md-2 mb-md-0">
@@ -1443,13 +1443,13 @@ class AddprogramPlanningUnit extends Component {
                             </Col>
                             {/* <div id="mapPlanningUnit" className="RowheightForaddprogaddRow">
                             </div> */}
-                            <Col sm={12} md={12}>
+                            <div >
                                 <h4 className="red">{this.props.message}</h4>
                                 <div className="table-responsive" >
                                     <div id="mapPlanningUnit" className="RowheightForaddprogaddRow">
                                     </div>
                                 </div>
-                            </Col>
+                            </div>
 
                         </CardBody>
 

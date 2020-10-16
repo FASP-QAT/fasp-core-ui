@@ -218,7 +218,7 @@ export default class syncPage extends Component {
     consumptionInstance.setRowData(index, resolveConflictsInstance.getRowData(0));
     var jsonData = resolveConflictsInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R']
-    for (var j = 1; j < 13; j++) {
+    for (var j = 0; j < 13; j++) {
       var col = (colArr[j]).concat(parseInt(index) + 1);
       var valueToCompare = (jsonData[0])[j];
       var valueToCompareWith = (jsonData[1])[j];
@@ -255,7 +255,7 @@ export default class syncPage extends Component {
     consumptionInstance.setRowData(index, resolveConflictsInstance.getRowData(1));
     var jsonData = resolveConflictsInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R']
-    for (var j = 1; j < 13; j++) {
+    for (var j = 0; j < 13; j++) {
       var col = (colArr[j]).concat(parseInt(index) + 1);
       var valueToCompare = (jsonData[0])[j];
       var valueToCompareWith = (jsonData[1])[j];
@@ -381,7 +381,7 @@ export default class syncPage extends Component {
     inventoryInstance.setRowData(index, resolveConflictsInstance.getRowData(0));
     var jsonData = resolveConflictsInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S']
-    for (var j = 1; j < 14; j++) {
+    for (var j = 0; j < 14; j++) {
       var col = (colArr[j]).concat(parseInt(index) + 1);
       var valueToCompare = (jsonData[0])[j];
       var valueToCompareWith = (jsonData[1])[j];
@@ -418,7 +418,7 @@ export default class syncPage extends Component {
     inventoryInstance.setRowData(index, resolveConflictsInstance.getRowData(1));
     var jsonData = resolveConflictsInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S']
-    for (var j = 1; j < 14; j++) {
+    for (var j = 0; j < 14; j++) {
       var col = (colArr[j]).concat(parseInt(index) + 1);
       var valueToCompare = (jsonData[0])[j];
       var valueToCompareWith = (jsonData[1])[j];
@@ -556,7 +556,7 @@ export default class syncPage extends Component {
     shipmentInstance.setRowData(index, resolveConflictsInstance.getRowData(0));
     var jsonData = resolveConflictsInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF']
-    for (var j = 1; j < 26; j++) {
+    for (var j = 0; j < 26; j++) {
       var col = (colArr[j]).concat(parseInt(index) + 1);
       var valueToCompare = (jsonData[0])[j];
       var valueToCompareWith = (jsonData[1])[j];
@@ -593,7 +593,7 @@ export default class syncPage extends Component {
     shipmentInstance.setRowData(index, resolveConflictsInstance.getRowData(1));
     var jsonData = resolveConflictsInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF']
-    for (var j = 1; j < 26; j++) {
+    for (var j = 0; j < 26; j++) {
       var col = (colArr[j]).concat(parseInt(index) + 1);
       var valueToCompare = (jsonData[0])[j];
       var valueToCompareWith = (jsonData[1])[j];
@@ -2155,16 +2155,16 @@ export default class syncPage extends Component {
               elInstance.setValueFromCoords(20, c, 2, true);
               (jsonData[c])[20] = 2;
             } else {
-              this.setState({
-                conflictsCount: this.state.conflictsCount + 1
-              })
-              elInstance.setValueFromCoords(20, c, 1, true);
-              (jsonData[c])[20] = 1;
-              for (var j = 0; j < colArr.length; j++) {
-                var col = (colArr[j]).concat(parseInt(c) + 1);
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-              }
+              // this.setState({
+              //   conflictsCount: this.state.conflictsCount + 1
+              // })
+              // elInstance.setValueFromCoords(20, c, 1, true);
+              // (jsonData[c])[20] = 1;
+              // for (var j = 0; j < colArr.length; j++) {
+              //   var col = (colArr[j]).concat(parseInt(c) + 1);
+              //   elInstance.setStyle(col, "background-color", "transparent");
+              //   elInstance.setStyle(col, "background-color", "yellow");
+              // }
             }
           }
         }
@@ -2572,6 +2572,7 @@ export default class syncPage extends Component {
           programJson.notes = document.getElementById("notes").value;
           console.log("Program json", programJson);
           ProgramService.saveProgramData(programJson).then(response => {
+            console.log("Response", response);
             if (response.status == 200) {
               var programDataTransaction1 = db1.transaction(['programData'], 'readwrite');
               var programDataOs1 = programDataTransaction1.objectStore('programData');
@@ -2628,10 +2629,14 @@ export default class syncPage extends Component {
           })
             .catch(
               error => {
+                console.log("Error--->", error);
                 if (error.message === "Network Error") {
                   this.setState({
                     message: 'static.unkownError',
+                    color: "red",
                     loading: false
+                  }, () => {
+                    this.hideFirstComponent();
                   });
                 } else {
                   switch (error.response ? error.response.status : "") {
@@ -2647,19 +2652,28 @@ export default class syncPage extends Component {
                     case 406:
                       this.setState({
                         message: error.response.data.messageCode,
+                        color: "red",
                         loading: false
+                      }, () => {
+                        this.hideFirstComponent()
                       });
                       break;
                     case 412:
                       this.setState({
                         message: error.response.data.messageCode,
-                        loading: false
+                        loading: false,
+                        color: "red"
+                      }, () => {
+                        this.hideFirstComponent()
                       });
                       break;
                     default:
                       this.setState({
                         message: 'static.unkownError',
-                        loading: false
+                        loading: false,
+                        color: "red"
+                      }, () => {
+                        this.hideFirstComponent()
                       });
                       break;
                   }

@@ -99,7 +99,7 @@ export default class PipelineProgramProcurementAgent extends Component {
     }
 
     saveProcurementAgent() {
-        var list = this.state.ProcurementAgentList;
+        var list = this.state.procurementAgentList;
         var json = this.el.getJson();
         var procurementAgentArray = []
         console.log(json.length)
@@ -220,7 +220,7 @@ export default class PipelineProgramProcurementAgent extends Component {
                                         copyCompatibility: true,
                                         // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
                                         text: {
-                                            showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
+                                            showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')} `,
                                             show: '',
                                             entries: '',
                                         },
