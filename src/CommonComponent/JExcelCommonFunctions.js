@@ -58,7 +58,7 @@ export function jExcelLoadedFunction(instance, number) {
     var pageSelect = document.getElementsByClassName('jexcel_pagination_dropdown')[number];
     pageSelect.options[3].innerHTML = "All";
 
-    pageSelect.addEventListener("change", () => pagignationChange(number));
+    pageSelect.addEventListener("change", () => paginationChange(number));
 
 
     var jexcel_filterFirstdiv = document.getElementsByClassName('jexcel_filter')[number];
@@ -74,7 +74,7 @@ export function jExcelLoadedFunction(instance, number) {
     // document.getElementById("clearBtnID").onclick= function(){alert("ok");}
 }
 
-export function pagignationChange(number) {
+export function paginationChange(number) {
     console.log("number---" + number)
     var recordCount = document.getElementsByClassName('jexcel_pagination_dropdown')[number].value;
     console.log("recordCount---", recordCount);
@@ -117,7 +117,7 @@ export function jExcelLoadedFunctionPipeline(instance, number) {
     // pageSelect.options[pageSelect.options.length] = new Option('All', 5000000);
     pageSelect.options[3].innerHTML = "All";
 
-    pageSelect.addEventListener("change", () => pagignationChange(number));
+    pageSelect.addEventListener("change", () => paginationChange(number));
 
     var jexcel_filterFirstdiv = document.getElementsByClassName('jexcel_filter')[number];
     var filter = jexcel_filterFirstdiv.firstChild;
@@ -215,8 +215,10 @@ export function jExcelLoadedFunctionQuantimed(instance) {
     jexcel_pagination.firstChild.classList.add('mr-auto');
     jexcel_pagination.firstChild.classList.add('pl-0');
     var pageSelect = document.getElementsByClassName('jexcel_pagination_dropdown')[0];
-    pageSelect.options[pageSelect.options.length] = new Option('All', 5000000);
+    // pageSelect.options[pageSelect.options.length] = new Option('All', 5000000);
+    pageSelect.options[3].innerHTML = "All";
 
+    pageSelect.addEventListener("change", () => paginationChange(1));
 
     var jexcel_filterFirstdiv = document.getElementsByClassName('jexcel_filter')[1];
     var filter = jexcel_filterFirstdiv.firstChild;

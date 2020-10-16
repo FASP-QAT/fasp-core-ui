@@ -117,13 +117,13 @@ export default class EditProductCategoryTicketComponent extends Component {
     }
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         PoroductCategoryService.getProductCategoryListByRealmId(AuthenticationService.getRealmId())
 
             .then(response => {
                 console.log("response product category list ====>", response.data);
                 if (response.status == 200) {
-                    console.log("planningUnitCategories",response.data)
+                    console.log("planningUnitCategories", response.data)
                     this.setState({
                         planningUnitCategories: response.data,
                     });
@@ -202,7 +202,7 @@ export default class EditProductCategoryTicketComponent extends Component {
     render() {
 
         const { planningUnitCategories } = this.state;
-        
+
         let planningUnitCategoryList = planningUnitCategories.length > 0
             && planningUnitCategories.map((item, i) => {
                 return (
@@ -210,8 +210,8 @@ export default class EditProductCategoryTicketComponent extends Component {
                         {getLabelText(item.payload.realm.label, this.state.lang) + " | " + getLabelText(item.payload.label, this.state.lang)}
                     </option>
                 )
-            }, this);        
-            
+            }, this);
+
 
         return (
             <div className="col-md-12">
@@ -247,17 +247,46 @@ export default class EditProductCategoryTicketComponent extends Component {
                                 }
                                 this.props.togglehelp();
                                 this.props.toggleSmall(this.state.message);
-                            })
-                                .catch(
-                                    error => {
+                            }).catch(
+                                error => {
+                                    if (error.message === "Network Error") {
                                         this.setState({
-                                            message: i18n.t('static.unkownError'), loading: false
-                                        },
-                                            () => {
-                                                this.hideSecondComponent();
-                                            });
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                    } else {
+                                        switch (error.response ? error.response.status : "") {
+
+                                            case 401:
+                                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                                break;
+                                            case 403:
+                                                this.props.history.push(`/accessDenied`)
+                                                break;
+                                            case 500:
+                                            case 404:
+                                            case 406:
+                                                this.setState({
+                                                    message: error.response.data.messageCode,
+                                                    loading: false
+                                                });
+                                                break;
+                                            case 412:
+                                                this.setState({
+                                                    message: error.response.data.messageCode,
+                                                    loading: false
+                                                });
+                                                break;
+                                            default:
+                                                this.setState({
+                                                    message: 'static.unkownError',
+                                                    loading: false
+                                                });
+                                                break;
+                                        }
                                     }
-                                );
+                                }
+                            );
                         }}
                         render={
                             ({

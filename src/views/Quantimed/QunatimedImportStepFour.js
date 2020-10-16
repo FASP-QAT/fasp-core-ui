@@ -412,7 +412,7 @@ export default class QunatimedImportStepFour extends Component {
                         show: '',
                         entries: '',
                     },
-                    pagination: JEXCEL_DEFAULT_PAGINATION,
+                    pagination: localStorage.getItem("sesRecordCount"),
                     search: true,
                     columnSorting: false,
                     tableOverflow: true,
