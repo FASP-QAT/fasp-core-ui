@@ -611,7 +611,7 @@
 
 //JEXCEL-------------------------
 
-import { DATE_FORMAT_CAP, INDEXED_DB_VERSION, INDEXED_DB_NAME, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from '../../Constants';
+import { DATE_FORMAT_CAP, INDEXED_DB_VERSION, INDEXED_DB_NAME, JEXCEL_PAGINATION_OPTION } from '../../Constants';
 import React from "react";
 import ReactDOM from 'react-dom';
 import * as JsStoreFunctions from "../../CommonComponent/JsStoreFunctions.js";
@@ -922,7 +922,7 @@ export default class ConsumptionDetails extends React.Component {
             // }.bind(this),
 
             onload: this.loaded,
-            pagination: JEXCEL_DEFAULT_PAGINATION,
+            pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
             tableOverflow: true,

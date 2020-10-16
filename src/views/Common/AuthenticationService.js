@@ -1238,9 +1238,9 @@ class AuthenticationService {
     clearUserDetails() {
         let keysToRemove;
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != "") {
-            keysToRemove = ["token-" + this.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken"];
+            keysToRemove = ["token-" + this.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "sesRecordCount", "sesRangeValue", "sesProgramId", "sesPlanningUnitId"];
         } else {
-            keysToRemove = ["curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken"];
+            keysToRemove = ["curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "sesRecordCount", "sesRangeValue", "sesProgramId", "sesPlanningUnitId"];
         }
         keysToRemove.forEach(k => localStorage.removeItem(k));
     }
@@ -1251,6 +1251,12 @@ class AuthenticationService {
         } else {
             return "en";
         }
+    }
+    setRecordCount(count) {
+        localStorage.setItem('sesRecordCount', count);
+        localStorage.setItem('sesRangeValue', "");
+        localStorage.setItem('sesProgramId', "");
+        localStorage.setItem('sesPlanningUnitId', "");
     }
 
     getIconAndStaticLabel(val) {

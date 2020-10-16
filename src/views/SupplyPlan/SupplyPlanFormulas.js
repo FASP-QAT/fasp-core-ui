@@ -36,6 +36,7 @@ class SupplyPlanFormulas extends Component {
       stockstatus:false,
       stockstatusacrossplaningunit:false,
       shipmentcost:false,
+      stockstatusmatrix:false,
     };
     this.toggle = this.toggle.bind(this);
     this.toggleLarge = this.toggleLarge.bind(this);
@@ -48,6 +49,7 @@ class SupplyPlanFormulas extends Component {
     this.toggleStockStatus = this.toggleStockStatus.bind(this);
     this.toggleStockStatusAcrossPlaningUnit = this.toggleStockStatusAcrossPlaningUnit.bind(this);
     this.toggleShippmentCost = this.toggleShippmentCost.bind(this);
+    this.toggleStockStatusMatrix = this.toggleStockStatusMatrix.bind(this);
   }
 
   toggle(tab) {
@@ -112,6 +114,11 @@ class SupplyPlanFormulas extends Component {
   toggleShippmentCost(){
     this.setState({
       shipmentcost: !this.state.shipmentcost,
+    });
+  }
+  toggleStockStatusMatrix(){
+    this.setState({
+      stockstatusmatrix: !this.state.stockstatusmatrix,
     });
   }
 
@@ -353,7 +360,56 @@ Months Of Stock = 3.54</p>
                       </ListGroup>
                   </ModalBody>
                   </Modal>
- {/*Stock Status Over Time formuale */} 
+ {/*Stock Status matrix*/} 
+ <Modal isOpen={this.state.stockstatusmatrix}  className={'modal-xl ' + this.props.className} >
+                  <ModalHeader toggle={this.toggleStockStatusMatrix} className="ModalHead modal-info-Headher"><strong className="TextWhite">Formulae</strong></ModalHeader>
+                  <ModalBody >
+                      <ListGroup style={{height:'300px',overflowY:'scroll'}}>
+                      <ListGroupItem >
+                    <ListGroupItemHeading className="formulasheading">Average Monthly Consumption (AMC)</ListGroupItemHeading>
+                    <ListGroupItemText className="formulastext">
+                    <img className="formula-img-mr img-fluid" src={amc}/><br></br>
+                    <p>* Consider only non zero values. Also current month is included in the months in future for AMC</p>
+                    <p><span className="formulastext-p">Example :</span><br></br>
+                    Months in past = 3(Based on program planning unit)<br></br>
+                    Months in future = 3(Based on program planning unit)<br></br>
+                    Current month = May 2020<br></br>
+Consumption in Feb 2020 = 5,000<br></br>
+Consumption in March 2020 = 6,890<br></br>
+Consumption in April 2020 = 6,907<br></br>
+Consumption in May 2020 = 7,087<br></br>
+Consumption in Jun 2020 = 5,678<br></br>
+Consumption in July 2020 = 6,789<br></br>
+
+<br></br>
+AMC =  Consumption in No. of MONTHS_IN_PAST + Consumption in No. of MONTHS_IN_FUTURE/ number of months<br></br>
+AMC = (Consumption for Feb,March,April,May 2020 + June & July 2020) / 6<br></br>
+AMC = (5,000+6,890+6,907+7,087+5,678+6,789) / 6<br></br>
+AMC = 6,392</p>
+                    {/* AMC = AVG(Consumption in last 3 months, current month,future 2 months)(Not based on program) */}
+                    </ListGroupItemText>
+                  </ListGroupItem>
+                  <ListGroupItem >
+                    <ListGroupItemHeading className="formulasheading">Months Of Stock</ListGroupItemHeading>
+                    <ListGroupItemText className="formulastext">
+                    
+                     <img className="formula-img-mr img-fluid" src={mos}/>
+                     <p><span className="formulastext-p">Example :</span><br></br>
+                     Ending Balance = 22,642<br></br>
+AMC = 6,392<br></br>
+<br></br>
+Months Of Stock = Ending Balance / AMC<br></br>
+Months Of Stock = 22,642 / 6,392<br></br>
+Months Of Stock = 3.54</p>
+                    </ListGroupItemText>
+                  </ListGroupItem>
+                  <div className="mt-2" >
+                  <p>Note: If "Include planned shipment" is "yes" - Planned, Submitted, Approved, Shipped, Arrived, Received, On Hold statuses are all included in the projected inventory. If "no", all above statuses are included except Planned.</p>
+                  </div>
+                      </ListGroup>
+                  </ModalBody>
+                  </Modal>
+                   {/*Stock Status Over Time formuale */} 
  <Modal isOpen={this.state.stockstatusovertime}  className={'modal-xl ' + this.props.className} >
                   <ModalHeader toggle={this.toggleStockStatusOverTime} className="ModalHead modal-info-Headher"><strong className="TextWhite">Formulae</strong></ModalHeader>
                   <ModalBody >
@@ -527,7 +583,9 @@ Ending balance = 22,000</p><br></br>
                     {/* AMC = AVG(Consumption in last 3 months, current month,future 2 months)(Not based on program) */}
                     </ListGroupItemText>
                   </ListGroupItem>
-        
+         <div className="mt-2">
+                  <p>Note: If "Include planned shipment" is "yes" - Planned, Submitted, Approved, Shipped, Arrived, Received, On Hold statuses are all included in the projected inventory. If "no", all above statuses are included except Planned.</p>
+                  </div>
                       </ListGroup>
                   </ModalBody>
                   </Modal>

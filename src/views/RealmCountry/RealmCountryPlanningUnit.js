@@ -20,7 +20,7 @@ import "../../../node_modules/jexcel/dist/jexcel.css";
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import StatusUpdateButtonFeature from "../../CommonComponent/StatusUpdateButtonFeature";
 import UpdateButtonFeature from '../../CommonComponent/UpdateButtonFeature'
-import { JEXCEL_DECIMAL_NO_REGEX, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from "../../Constants";
+import { JEXCEL_DECIMAL_NO_REGEX,JEXCEL_PAGINATION_OPTION } from "../../Constants";
 let initialValues = {
 
     planningUnit: {
@@ -269,7 +269,7 @@ class PlanningUnitCountry extends Component {
                                                     }
 
                                                 },
-                                                pagination: JEXCEL_DEFAULT_PAGINATION,
+                                                pagination: localStorage.getItem("sesRecordCount"),
                                                 search: true,
                                                 columnSorting: true,
                                                 tableOverflow: true,

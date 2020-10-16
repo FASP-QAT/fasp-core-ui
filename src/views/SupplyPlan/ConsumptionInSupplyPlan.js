@@ -8,7 +8,7 @@ import i18n from '../../i18n';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunctionOnlyHideRow, checkValidtion, inValid, positiveValidation, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { SECRET_KEY, JEXCEL_INTEGER_REGEX, INDEXED_DB_VERSION, INDEXED_DB_NAME, DATE_FORMAT_CAP, ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE, JEXCEL_DATE_FORMAT_WITHOUT_DATE, ACTUAL_CONSUMPTION_TYPE, FORCASTED_CONSUMPTION_TYPE, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION, ACTUAL_CONSUMPTION_MONTHS_IN_PAST, FORECASTED_CONSUMPTION_MONTHS_IN_PAST } from "../../Constants";
+import { SECRET_KEY, JEXCEL_INTEGER_REGEX, INDEXED_DB_VERSION, INDEXED_DB_NAME, DATE_FORMAT_CAP, ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE, JEXCEL_DATE_FORMAT_WITHOUT_DATE, ACTUAL_CONSUMPTION_TYPE, FORCASTED_CONSUMPTION_TYPE, JEXCEL_PAGINATION_OPTION, ACTUAL_CONSUMPTION_MONTHS_IN_PAST, FORECASTED_CONSUMPTION_MONTHS_IN_PAST } from "../../Constants";
 import moment from "moment";
 import CryptoJS from 'crypto-js'
 import { calculateSupplyPlan } from "./SupplyPlanCalculations";
@@ -163,7 +163,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                     var searchOption = false;
                     var paginationArray = []
                     if (this.props.consumptionPage == "consumptionDataEntry") {
-                        paginationOption = JEXCEL_DEFAULT_PAGINATION;
+                        paginationOption = localStorage.getItem("sesRecordCount");
                         searchOption = true;
                         paginationArray = JEXCEL_PAGINATION_OPTION;
                     }
@@ -276,26 +276,6 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         editable: consumptionEditable,
                         onchange: this.consumptionChanged,
                         updateTable: function (el, cell, x, y, source, value, id) {
-                            var elInstance = el.jexcel;
-                            var rowData = elInstance.getRowData(y);
-                            var lastEditableDate = "";
-                            if (rowData[2] == 1) {
-                                lastEditableDate = moment(Date.now()).subtract(ACTUAL_CONSUMPTION_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
-                            } else {
-                                lastEditableDate = moment(Date.now()).subtract(FORECASTED_CONSUMPTION_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
-                            }
-                            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O']
-                            if (moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD")) {
-                                for (var c = 0; c < colArr.length; c++) {
-                                    var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
-                                    cell.classList.add('readonly');
-                                }
-                            } else {
-                                for (var c = 0; c < colArr.length; c++) {
-                                    var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
-                                    cell.classList.remove('readonly');
-                                }
-                            }
                         }.bind(this),
                         contextMenu: function (obj, x, y, e) {
                             var items = [];
@@ -571,6 +551,33 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         tr.children[4].classList.add('AsteriskTheadtrTd');
         tr.children[5].classList.add('AsteriskTheadtrTd');
         tr.children[6].classList.add('AsteriskTheadtrTd');
+
+        var elInstance = instance.jexcel;
+        console.log("Y--->", y)
+        var json = elInstance.getJson();
+        for (var z = 0; z < json.length; z++) {
+            var rowData = elInstance.getRowData(z);
+            console.log("RowData", rowData);
+            var lastEditableDate = "";
+            if (rowData[2] == 1) {
+                lastEditableDate = moment(Date.now()).subtract(ACTUAL_CONSUMPTION_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
+            } else {
+                lastEditableDate = moment(Date.now()).subtract(FORECASTED_CONSUMPTION_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
+            }
+            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O']
+            if (rowData[12] != -1 && moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD")) {
+                for (var c = 0; c < colArr.length; c++) {
+                    var cell = elInstance.getCell((colArr[c]).concat(parseInt(z) + 1))
+                    cell.classList.add('readonly');
+                }
+            } else {
+                // for (var c = 0; c < colArr.length; c++) {
+                //     var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
+                //     cell.classList.remove('readonly');
+                // }
+            }
+
+        }
         // (instance.jexcel).orderBy(0, 0);
     }
 
@@ -630,7 +637,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                 for (var b = 0; b < batchDetails.length; b++) {
                     consumptionBatchQty += parseInt(batchDetails[b].consumptionQty);
                 }
-                if (parseInt(rowData[5]) < parseInt(consumptionBatchQty)) {
+                if (batchDetails.length > 0 && parseInt(rowData[5]) < parseInt(consumptionBatchQty)) {
                     inValid("F", y, i18n.t('static.consumption.missingBatch'), elInstance);
                     valid = false;
                 } else {
@@ -645,7 +652,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             for (var b = 0; b < batchDetails.length; b++) {
                 consumptionBatchQty += batchDetails[b].consumptionQty;
             }
-            if (parseInt(rowData[5]) < parseInt(consumptionBatchQty)) {
+            if (batchDetails.length > 0 && parseInt(rowData[5]) < parseInt(consumptionBatchQty)) {
                 inValid("F", y, i18n.t('static.consumption.missingBatch'), elInstance);
                 valid = false;
             } else {
@@ -1044,7 +1051,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                     for (var b = 0; b < batchDetails.length; b++) {
                         consumptionBatchQty += batchDetails[b].consumptionQty;
                     }
-                    if (parseInt(rowData[5]) < parseInt(consumptionBatchQty)) {
+                    if (batchDetails.length > 0 && parseInt(rowData[5]) < parseInt(consumptionBatchQty)) {
                         inValid("F", y, i18n.t('static.consumption.missingBatch'), elInstance);
                         valid = false;
                     } else {
