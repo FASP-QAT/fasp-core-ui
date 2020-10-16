@@ -360,7 +360,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                             inventoryBatchEditable = false;
                                         }
                                         document.getElementById("showInventoryBatchInfoButtonsDiv").style.display = 'block';
-                                        if (this.props.consumptionPage != "supplyPlanCompare") {
+                                        if (this.props.inventoryPage != "supplyPlanCompare") {
                                             if (inventoryBatchEditable == false) {
                                                 document.getElementById("inventoryBatchAddRow").style.display = "none";
                                             } else {
