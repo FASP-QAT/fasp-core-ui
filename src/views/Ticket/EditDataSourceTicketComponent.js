@@ -12,12 +12,10 @@ import DataSourceTypeService from '../../api/DataSourceTypeService';
 import ProgramService from '../../api/ProgramService';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { SPACE_REGEX } from '../../Constants';
+import DataSourceService from '../../api/DataSourceService';
 
 const initialValues = {
-    summary: "Add Data Source",
-    realmName: "",
-    programName: "",
-    dataSourceType: "",
+    summary: "Edit Data Source",
     dataSourceName: "",
     notes: ""
 }
@@ -27,17 +25,10 @@ const validationSchema = function (values) {
         summary: Yup.string()
             .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.common.summarytext')),
-        realmName: Yup.string()
-            .required(i18n.t('static.common.realmtext').concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?', i18n.t('static.realm.realmName')))),
-        programName: Yup.string()
-            .required(i18n.t('static.budget.programtext').concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?', i18n.t('static.program.programMaster')))),
-        dataSourceType: Yup.string()
-            .required(i18n.t('static.datasource.datasourcetypetext')),
         dataSourceName: Yup.string()
-            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
-            .required(i18n.t('static.datasource.datasourcetext')),
-        // notes: Yup.string()
-        //     .required(i18n.t('static.common.notestext'))
+            .required(i18n.t('static.common.pleaseSelect').concat(" ").concat((i18n.t('static.datasource.datasource')).concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?', i18n.t('static.datasource.datasource'))))),
+        notes: Yup.string()
+            .required(i18n.t('static.program.validnotestext'))
     })
 }
 
@@ -63,34 +54,25 @@ const getErrorsFromValidationError = (validationError) => {
     }, {})
 }
 
-export default class DataSourceTicketComponent extends Component {
+export default class EditDataSourceTicketComponent extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
             dataSource: {
-                summary: "Add Data Source",
-                realmName: "",
-                programName: "",
-                dataSourceType: "",
+                summary: "Edit Data Source",
                 dataSourceName: "",
                 notes: ""
             },
             lang: localStorage.getItem('lang'),
             message: '',
-            realms: [],
-            programs: [],
-            dataSourceTypes: [],
-            realmId: '',
-            programId: '',
-            dataSourceTypeId: '',
+            dataSources: [],
+            dataSourceId: '',
             loading: false
         }
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
-        this.getDataSourceTypeByRealmId = this.getDataSourceTypeByRealmId.bind(this);
-        this.getProgramByRealmId = this.getProgramByRealmId.bind(this);
     }
 
     dataChange(event) {
@@ -98,27 +80,13 @@ export default class DataSourceTicketComponent extends Component {
         if (event.target.name == "summary") {
             dataSource.summary = event.target.value;
         }
-        if (event.target.name == "realmName") {
-            dataSource.realmName = this.state.realms.filter(c => c.realmId == event.target.value)[0].label.label_en;
-            this.setState({
-                realmId: event.target.value
-            })
-        }
-        if (event.target.name == "programName") {
-            dataSource.programName = this.state.programs.filter(c => c.programId == event.target.value)[0].label.label_en;
-            this.setState({
-                programId: event.target.value
-            })
-        }
-        if (event.target.name == "dataSourceType") {
-            dataSource.dataSourceType = this.state.dataSourceTypes.filter(c => c.dataSourceTypeId == event.target.value)[0].label.label_en;
-            this.setState({
-                dataSourceTypeId: event.target.value
-            })
-        }
         if (event.target.name == "dataSourceName") {
-            dataSource.dataSourceName = event.target.value;
+            dataSource.dataSourceName = event.target.options[event.target.selectedIndex].innerHTML;
+            this.setState({
+                dataSourceId: event.target.value
+            })
         }
+
         if (event.target.name == "notes") {
             dataSource.notes = event.target.value;
         }
@@ -130,9 +98,6 @@ export default class DataSourceTicketComponent extends Component {
     touchAll(setTouched, errors) {
         setTouched({
             summary: true,
-            realmName: true,
-            programName: true,
-            dataSourceType: true,
             dataSourceName: true,
             notes: true
         })
@@ -155,35 +120,56 @@ export default class DataSourceTicketComponent extends Component {
 
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
-        RealmService.getRealmListAll()
-            .then(response => {
-                this.setState({
-                    realms: response.data
-                })
+
+        DataSourceService.getAllDataSourceList().then(response => {
+
+            this.setState({
+                dataSources: response.data, loading: false
             })
+        })
+            .catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
+
     }
 
-    getDataSourceTypeByRealmId(e) {
-
-        AuthenticationService.setupAxiosInterceptors();
-        DataSourceTypeService.getDataSourceTypeByRealmId(e.target.value)
-            .then(response => {
-                this.setState({
-                    dataSourceTypes: response.data
-                })
-
-            })
-    }
-
-    getProgramByRealmId(e) {
-        AuthenticationService.setupAxiosInterceptors();
-        ProgramService.getProgramList(e.target.value)
-            .then(response => {
-                this.setState({
-                    programs: response.data
-                })
-            })
-    }
 
     hideSecondComponent() {
         setTimeout(function () {
@@ -199,9 +185,6 @@ export default class DataSourceTicketComponent extends Component {
     resetClicked() {
         let { dataSource } = this.state;
         // dataSource.summary = '';
-        dataSource.realmName = '';
-        dataSource.programName = '';
-        dataSource.dataSourceType = '';
         dataSource.dataSourceName = '';
         dataSource.notes = '';
         this.setState({
@@ -212,34 +195,17 @@ export default class DataSourceTicketComponent extends Component {
 
     render() {
 
-        const { realms } = this.state;
-        const { programs } = this.state;
-        const { dataSourceTypes } = this.state;
+        const { dataSources } = this.state;
 
-        let programList = programs.length > 0
-            && programs.map((item, i) => {
+        let dataSourceList = dataSources.length > 0
+            && dataSources.map((item, i) => {
                 return (
-                    <option key={i} value={item.programId}>
-                        {getLabelText(item.label, this.state.lang)}
+                    <option key={i} value={item.dataSourceId}>
+                        {getLabelText(item.dataSourceType.label, this.state.lang) + " | " + getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);
 
-        let realmList = realms.length > 0
-            && realms.map((item, i) => {
-                return (
-                    <option key={i} value={item.realmId}>
-                        {getLabelText(item.label, this.state.lang)}
-                    </option>
-                )
-            }, this);
-
-        let dataSourceTypeList = dataSourceTypes.length > 0
-            && dataSourceTypes.map((item, i) => {
-                return (
-                    <option key={i} value={item.dataSourceTypeId}>{getLabelText(item.label, this.state.lang)}</option>
-                )
-            }, this);
 
         return (
             <div className="col-md-12">
@@ -314,64 +280,23 @@ export default class DataSourceTicketComponent extends Component {
                                             <FormFeedback className="red">{errors.summary}</FormFeedback>
                                         </FormGroup>
                                         <FormGroup>
-                                            <Label for="realmName">{i18n.t('static.realm.realmName')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="select" name="realmName" id="realmName"
-                                                bsSize="sm"
-                                                valid={!errors.realmName && this.state.dataSource.realmName != ''}
-                                                invalid={touched.realmName && !!errors.realmName}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); this.getDataSourceTypeByRealmId(e); this.getProgramByRealmId(e) }}
-                                                onBlur={handleBlur}
-                                                value={this.state.realmId}
-                                                required >
-                                                <option value="">{i18n.t('static.common.select')}</option>
-                                                {realmList}
-                                            </Input>
-                                            <FormFeedback className="red">{errors.realmName}</FormFeedback>
-                                        </FormGroup>
-                                        < FormGroup >
-                                            <Label for="programName">{i18n.t('static.program.programMaster')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="select" name="programName" id="programName"
-                                                bsSize="sm"
-                                                valid={!errors.programName && this.state.dataSource.programName != ''}
-                                                invalid={touched.programName && !!errors.programName}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                value={this.state.programId}
-                                                required >
-                                                <option value="">{i18n.t('static.common.select')}</option>
-                                                {programList}
-                                            </Input>
-                                            <FormFeedback className="red">{errors.programName}</FormFeedback>
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <Label for="dataSourceType">{i18n.t('static.datasourcetype.datasourcetype')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="select" name="dataSourceType" id="dataSourceType"
-                                                bsSize="sm"
-                                                valid={!errors.dataSourceType && this.state.dataSource.dataSourceType != ''}
-                                                invalid={touched.dataSourceType && !!errors.dataSourceType}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                value={this.state.dataSourceTypeId}
-                                                required >
-                                                <option value="">{i18n.t('static.common.select')}</option>
-                                                {dataSourceTypeList}
-                                            </Input>
-                                            <FormFeedback className="red">{errors.dataSourceType}</FormFeedback>
-                                        </FormGroup>
-                                        <FormGroup>
                                             <Label for="dataSourceName">{i18n.t('static.datasource.datasource')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text" name="dataSourceName" id="dataSourceName"
+                                            <Input type="select" name="dataSourceName" id="dataSourceName"
                                                 bsSize="sm"
                                                 valid={!errors.dataSourceName && this.state.dataSource.dataSourceName != ''}
                                                 invalid={touched.dataSourceName && !!errors.dataSourceName}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                onChange={(e) => { handleChange(e); this.dataChange(e); this.getDataSourceTypeByRealmId(e); this.getProgramByRealmId(e) }}
                                                 onBlur={handleBlur}
-                                                value={this.state.dataSource.dataSourceName}
-                                                required />
+                                                value={this.state.dataSourceId}
+                                                required >
+                                                <option value="">{i18n.t('static.common.select')}</option>
+                                                {dataSourceList}
+                                            </Input>
                                             <FormFeedback className="red">{errors.dataSourceName}</FormFeedback>
                                         </FormGroup>
+
                                         <FormGroup>
-                                            <Label for="notes">{i18n.t('static.common.notes')}</Label>
+                                            <Label for="notes">{i18n.t('static.common.notes')}<span class="red Reqasterisk">*</span></Label>
                                             <Input type="textarea" name="notes" id="notes"
                                                 bsSize="sm"
                                                 valid={!errors.notes && this.state.dataSource.notes != ''}

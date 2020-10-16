@@ -14,7 +14,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import { SPACE_REGEX } from '../../Constants';
 
 const initialValues = {
-    summary: "Add / Update Realm Country",
+    summary: "Add Realm Country",
     realmId: "",
     countryId: "",
     currencyId: "",
@@ -65,12 +65,13 @@ export default class RealmCountryTicketComponent extends Component {
         super(props);
         this.state = {
             realmCountry: {
-                summary: "Add / Update Realm Country",
+                summary: "Add Realm Country",
                 realmId: "",
                 countryId: "",
                 currencyId: "",
                 notes: ""
             },
+            lang: localStorage.getItem('lang'),
             message: '',
             realms: [],
             countries: [],
@@ -91,19 +92,19 @@ export default class RealmCountryTicketComponent extends Component {
             realmCountry.summary = event.target.value;
         }
         if (event.target.name == "realmId") {
-            realmCountry.realmId = event.target.options[event.target.selectedIndex].innerHTML;
+            realmCountry.realmId = this.state.realms.filter(c => c.realmId == event.target.value)[0].label.label_en;
             this.setState({
                 realm: event.target.value
             })
         }
         if (event.target.name == "countryId") {
-            realmCountry.countryId = event.target.options[event.target.selectedIndex].innerHTML;
+            realmCountry.countryId = this.state.countries.filter(c => c.countryId == event.target.value)[0].label.label_en;
             this.setState({
                 country: event.target.value
             })
         }
         if (event.target.name == "currencyId") {
-            realmCountry.currencyId = event.target.options[event.target.selectedIndex].innerHTML;
+            realmCountry.currencyId = this.state.currencies.filter(c => c.currencyId == event.target.value)[0].label.label_en;
             this.setState({
                 currency: event.target.value
             })
@@ -256,15 +257,15 @@ export default class RealmCountryTicketComponent extends Component {
             && realms.map((item, i) => {
                 return (
                     <option key={i} value={item.realmId}>
-                        {item.label.label_en}
+                        {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);
         let countryList = countries.length > 0
             && countries.map((item, i) => {
                 return (
-                    <option key={i} value={item.countryuId}>
-                        {item.label.label_en}
+                    <option key={i} value={item.countryId}>
+                        {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);
@@ -280,7 +281,7 @@ export default class RealmCountryTicketComponent extends Component {
         return (
             <div className="col-md-12">
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
-                <h4>{i18n.t('static.dashboard.realmcountry')}</h4>
+                <h4>{i18n.t('static.program.realmcountrydashboard')}</h4>
                 <br></br>
                 <div style={{ display: this.state.loading ? "none" : "block" }}>
                     <Formik

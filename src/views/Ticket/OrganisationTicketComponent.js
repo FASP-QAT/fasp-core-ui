@@ -14,9 +14,11 @@ import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import classNames from 'classnames';
 import { SPACE_REGEX, ALPHABET_NUMBER_REGEX } from '../../Constants';
+import OrganisationService from '../../api/OrganisationService';
+import getLabelText from '../../CommonComponent/getLabelText';
 
 const initialValues = {
-    summary: 'Add / Update Organization',
+    summary: 'Add Organization',
     realmId: '',
     realmCountryId: '',
     organisationCode: '',
@@ -37,9 +39,10 @@ const validationSchema = function (values) {
             .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.organisation.organisationtext')),
         // organisationCode: Yup.string()
-        //     .matches(ALPHABET_NUMBER_REGEX, i18n.t('static.message.alphabetnumerallowed'))
-        //     .max(4, i18n.t('static.organisation.organisationcodemax4digittext'))
-        //     .required(i18n.t('static.organisation.organisationcodetext')),
+            // .matches(ALPHABET_NUMBER_REGEX, i18n.t('static.message.alphabetnumerallowed'))
+            // .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly'))
+            // .required(i18n.t('static.common.displayName'))
+            // .max(4, i18n.t('static.organisation.organisationcodemax4digittext')),
         // notes: Yup.string()
         //     .required(i18n.t('static.common.notestext'))
     })
@@ -73,13 +76,14 @@ export default class OrganisationTicketComponent extends Component {
         super(props);
         this.state = {
             organisation: {
-                summary: "Add / Update Organization",
+                summary: "Add Organization",
                 realmId: "",
                 realmCountryId: [],
                 organisationCode: "",
                 organisationName: "",
                 notes: ""
             },
+            lang: localStorage.getItem('lang'),
             message: '',
             realms: [],
             countryList: [],
@@ -94,6 +98,8 @@ export default class OrganisationTicketComponent extends Component {
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.updateFieldData = this.updateFieldData.bind(this);
         this.getRealmCountryList = this.getRealmCountryList.bind(this);
+        this.Capitalize = this.Capitalize.bind(this);
+        this.getDisplayName = this.getDisplayName.bind(this);
     }
 
     dataChange(event) {
@@ -108,7 +114,7 @@ export default class OrganisationTicketComponent extends Component {
             organisation.organisationCode = event.target.value.toUpperCase();
         }
         if (event.target.name === "realmId") {
-            organisation.realmId = event.target.options[event.target.selectedIndex].innerHTML;
+            organisation.realmId = this.state.realms.filter(c => c.realmId == event.target.value)[0].label.label_en;
             this.setState({
                 realm: event.target.value
             })
@@ -148,6 +154,129 @@ export default class OrganisationTicketComponent extends Component {
                 break
             }
         }
+    }
+
+    getDisplayName() {
+        let realmId = this.state.realm;
+        // let realmId = 1;
+        let organisationValue = this.state.organisation.organisationName;
+        // let organisationValue = "USAID"
+        organisationValue = organisationValue.replace(/[^A-Za-z0-9]/g, "");
+        organisationValue = organisationValue.trim().toUpperCase();
+        if (realmId != 0 && organisationValue.length != 0) {
+
+            if (organisationValue.length >= 4) {//minus 2
+                organisationValue = organisationValue.slice(0, 2);
+                console.log("DISPLAYNAME-BEF----->", organisationValue);
+                OrganisationService.getOrganisationDisplayName(realmId, organisationValue)
+                    .then(response => {
+                        console.log("DISPLAYNAME-RESP----->", response);
+                        let { organisation } = this.state
+                        organisation.organisationCode = response.data;
+                        this.setState({
+                            organisation
+                        });
+
+                    }).catch(
+                        error => {
+                            if (error.message === "Network Error") {
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
+
+                                    case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
+                                    case 404:
+                                    case 406:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    case 412:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    default:
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                        break;
+                                }
+                            }
+                        }
+                    );
+
+            } else {// not need to minus
+                console.log("DISPLAYNAME-BEF-else----->", organisationValue);
+                OrganisationService.getOrganisationDisplayName(realmId, organisationValue)
+                    .then(response => {
+                        console.log("DISPLAYNAME-RESP-else----->", response);
+                        let { organisation } = this.state
+                        organisation.organisationCode = response.data;
+                        this.setState({
+                            organisation
+                        });
+
+                    }).catch(
+                        error => {
+                            if (error.message === "Network Error") {
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
+
+                                    case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
+                                    case 404:
+                                    case 406:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    case 412:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    default:
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                        break;
+                                }
+                            }
+                        }
+                    );
+            }
+
+        }
+
+    }
+
+    Capitalize(str) {
+        this.state.organisation.organisationName = str.charAt(0).toUpperCase() + str.slice(1)
     }
 
     componentDidMount() {
@@ -245,7 +374,7 @@ export default class OrganisationTicketComponent extends Component {
             && realms.map((item, i) => {
                 return (
                     <option key={i} value={item.realmId}>
-                        {item.label.label_en}
+                        {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);
@@ -362,22 +491,22 @@ export default class OrganisationTicketComponent extends Component {
                                                 bsSize="sm"
                                                 valid={!errors.organisationName && this.state.organisation.organisationName != ''}
                                                 invalid={touched.organisationName && !!errors.organisationName}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
+                                                onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value); this.getDisplayName()}}
+                                                onBlur={(e) => { handleBlur(e);  }}
                                                 value={this.state.organisation.organisationName}
                                                 required />
                                             <FormFeedback className="red">{errors.organisationName}</FormFeedback>
                                         </FormGroup>
                                         < FormGroup >
-                                            <Label for="organisationCode">{i18n.t('static.organisation.organisationcode')}</Label>
-                                            <Input type="text" name="organisationCode" id="organisationCode"
+                                            <Label for="organisationCode">{i18n.t('static.organisation.organisationcode')}<span class="red Reqasterisk">*</span></Label>
+                                            <Input type="text" name="organisationCode" id="organisationCode" readOnly={true}
                                                 bsSize="sm"
                                                 // valid={!errors.organisationCode && this.state.organisation.organisationCode != ''}
                                                 // invalid={touched.organisationCode && !!errors.organisationCode}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                 onBlur={handleBlur}
                                                 value={this.state.organisation.organisationCode}
-                                            // required 
+                                            required 
                                             />
                                             <FormFeedback className="red">{errors.organisationCode}</FormFeedback>
                                         </FormGroup>

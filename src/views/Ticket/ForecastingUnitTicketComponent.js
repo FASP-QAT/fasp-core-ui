@@ -15,7 +15,7 @@ import RealmService from '../../api/RealmService';
 import { SPACE_REGEX } from '../../Constants';
 
 const initialValues = {
-    summary: "Add / Update Forecasting Unit",
+    summary: "Add Forecasting Unit",
     realm: "",
     tracerCategory: "",
     productCategory: "",
@@ -37,10 +37,11 @@ const validationSchema = function (values) {
         productCategory: Yup.string()
             .required(i18n.t('static.common.selectProductCategory').concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?', i18n.t('static.productcategory.productcategory')))),
         forecastingUnitDesc: Yup.string()
-            .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.forecastingunit.forecastingunittext')),
         genericName: Yup.string()
-            .required(i18n.t('static.product.generictext')),
+            .required(i18n.t('static.product.generictext'))
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string')),
         unit: Yup.string()
             .required(i18n.t('static.procurementUnit.validUnitIdText')),
         // notes: Yup.string()
@@ -76,7 +77,7 @@ export default class ForecastingUnitTicketComponent extends Component {
         super(props);
         this.state = {
             forecastingUnit: {
-                summary: 'Add / Update Forecasting Unit',
+                summary: 'Add Forecasting Unit',
                 realm: "",
                 tracerCategory: "",
                 productCategory: "",
@@ -85,6 +86,7 @@ export default class ForecastingUnitTicketComponent extends Component {
                 unit: "",
                 notes: ''
             },
+            lang: localStorage.getItem('lang'),
             message: '',
             realms: [],
             realmId: '',
@@ -108,19 +110,19 @@ export default class ForecastingUnitTicketComponent extends Component {
             forecastingUnit.summary = event.target.value;
         }
         if (event.target.name == "realm") {
-            forecastingUnit.realm = event.target.options[event.target.selectedIndex].innerHTML;
+            forecastingUnit.realm = this.state.realms.filter(c => c.realmId == event.target.value)[0].label.label_en;
             this.setState({
                 realmId: event.target.value
             })
         }
         if (event.target.name == "tracerCategory") {
-            forecastingUnit.tracerCategory = event.target.options[event.target.selectedIndex].innerHTML;
+            forecastingUnit.tracerCategory = this.state.tracerCategories.filter(c => c.tracerCategoryId == event.target.value)[0].label.label_en;
             this.setState({
                 tracerCategoryId: event.target.value
             })
         }
         if (event.target.name == "productCategory") {
-            forecastingUnit.productCategory = event.target.options[event.target.selectedIndex].innerHTML;
+            forecastingUnit.productCategory = this.state.productCategories.filter(c => c.payload.productCategoryId == event.target.value)[0].payload.label.label_en;
             this.setState({
                 productCategoryId: event.target.value
             })
@@ -132,7 +134,7 @@ export default class ForecastingUnitTicketComponent extends Component {
             forecastingUnit.genericName = event.target.value;
         }
         if (event.target.name == "unit") {
-            forecastingUnit.unit = event.target.options[event.target.selectedIndex].innerHTML;
+            forecastingUnit.unit = this.state.units.filter(c => c.unitId == event.target.value)[0].label.label_en;
             this.setState({
                 unitId: event.target.value
             })
@@ -258,7 +260,7 @@ export default class ForecastingUnitTicketComponent extends Component {
             && units.map((item, i) => {
                 return (
                     <option key={i} value={item.unitId}>
-                        {item.label.label_en}
+                        {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);

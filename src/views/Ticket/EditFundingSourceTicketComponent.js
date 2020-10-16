@@ -8,17 +8,13 @@ import i18n from '../../i18n';
 import * as Yup from 'yup';
 import JiraTikcetService from '../../api/JiraTikcetService';
 import RealmService from '../../api/RealmService';
-import DataSourceTypeService from '../../api/DataSourceTypeService';
-import ProgramService from '../../api/ProgramService';
+import { LABEL_REGEX, SPACE_REGEX } from '../../Constants';
+import FundingSourceService from '../../api/FundingSourceService';
 import getLabelText from '../../CommonComponent/getLabelText';
-import { SPACE_REGEX } from '../../Constants';
 
 const initialValues = {
-    summary: "Add Data Source",
-    realmName: "",
-    programName: "",
-    dataSourceType: "",
-    dataSourceName: "",
+    summary: "Edit Funding Source",
+    fundingSourceName: "",
     notes: ""
 }
 
@@ -27,17 +23,10 @@ const validationSchema = function (values) {
         summary: Yup.string()
             .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.common.summarytext')),
-        realmName: Yup.string()
-            .required(i18n.t('static.common.realmtext').concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?', i18n.t('static.realm.realmName')))),
-        programName: Yup.string()
-            .required(i18n.t('static.budget.programtext').concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?', i18n.t('static.program.programMaster')))),
-        dataSourceType: Yup.string()
-            .required(i18n.t('static.datasource.datasourcetypetext')),
-        dataSourceName: Yup.string()
-            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
-            .required(i18n.t('static.datasource.datasourcetext')),
-        // notes: Yup.string()
-        //     .required(i18n.t('static.common.notestext'))
+        fundingSourceName: Yup.string()
+            .required(i18n.t('static.common.pleaseSelect').concat(" ").concat((i18n.t('static.fundingsource.fundingsource')).concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?', i18n.t('static.fundingsource.fundingsource'))))),
+        notes: Yup.string()
+            .required(i18n.t('static.program.validnotestext'))
     })
 }
 
@@ -63,77 +52,51 @@ const getErrorsFromValidationError = (validationError) => {
     }, {})
 }
 
-export default class DataSourceTicketComponent extends Component {
+export default class EditFundingSourceTicketComponent extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            dataSource: {
-                summary: "Add Data Source",
-                realmName: "",
-                programName: "",
-                dataSourceType: "",
-                dataSourceName: "",
+            fundingSource: {
+                summary: "Edit Funding Source",
+                fundingSourceName: "",
                 notes: ""
             },
             lang: localStorage.getItem('lang'),
             message: '',
-            realms: [],
-            programs: [],
-            dataSourceTypes: [],
-            realmId: '',
-            programId: '',
-            dataSourceTypeId: '',
+            fundingSources: [],
+            fundingSourceId: '',
             loading: false
         }
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
-        this.getDataSourceTypeByRealmId = this.getDataSourceTypeByRealmId.bind(this);
-        this.getProgramByRealmId = this.getProgramByRealmId.bind(this);
     }
 
     dataChange(event) {
-        let { dataSource } = this.state
+        let { fundingSource } = this.state
         if (event.target.name == "summary") {
-            dataSource.summary = event.target.value;
+            fundingSource.summary = event.target.value;
         }
-        if (event.target.name == "realmName") {
-            dataSource.realmName = this.state.realms.filter(c => c.realmId == event.target.value)[0].label.label_en;
+        if (event.target.name == "fundingSourceName") {
+            fundingSource.fundingSourceName = event.target.options[event.target.selectedIndex].innerHTML;
             this.setState({
-                realmId: event.target.value
+                fundingSourceId: event.target.value
             })
         }
-        if (event.target.name == "programName") {
-            dataSource.programName = this.state.programs.filter(c => c.programId == event.target.value)[0].label.label_en;
-            this.setState({
-                programId: event.target.value
-            })
-        }
-        if (event.target.name == "dataSourceType") {
-            dataSource.dataSourceType = this.state.dataSourceTypes.filter(c => c.dataSourceTypeId == event.target.value)[0].label.label_en;
-            this.setState({
-                dataSourceTypeId: event.target.value
-            })
-        }
-        if (event.target.name == "dataSourceName") {
-            dataSource.dataSourceName = event.target.value;
-        }
+
         if (event.target.name == "notes") {
-            dataSource.notes = event.target.value;
+            fundingSource.notes = event.target.value;
         }
         this.setState({
-            dataSource
+            fundingSource
         }, () => { })
     };
 
     touchAll(setTouched, errors) {
         setTouched({
             summary: true,
-            realmName: true,
-            programName: true,
-            dataSourceType: true,
-            dataSourceName: true,
+            fundingSourceName: true,
             notes: true
         })
         this.validateForm(errors)
@@ -155,34 +118,66 @@ export default class DataSourceTicketComponent extends Component {
 
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
-        RealmService.getRealmListAll()
+        FundingSourceService.getFundingSourceListAll()
             .then(response => {
-                this.setState({
-                    realms: response.data
-                })
+                if (response.status == 200) {
+                    console.log("RESP----", response.data);
+                    // this.setState({
+                    //     fundingSourceList: response.data,
+                    //     selSource: response.data
+                    // })
+                    this.setState({
+                        fundingSources: response.data,
+                    })
+                } else {
+                    this.setState({
+                        message: response.data.messageCode, loading: false
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
+                }
             })
-    }
+            .catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
 
-    getDataSourceTypeByRealmId(e) {
-
-        AuthenticationService.setupAxiosInterceptors();
-        DataSourceTypeService.getDataSourceTypeByRealmId(e.target.value)
-            .then(response => {
-                this.setState({
-                    dataSourceTypes: response.data
-                })
-
-            })
-    }
-
-    getProgramByRealmId(e) {
-        AuthenticationService.setupAxiosInterceptors();
-        ProgramService.getProgramList(e.target.value)
-            .then(response => {
-                this.setState({
-                    programs: response.data
-                })
-            })
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
     }
 
     hideSecondComponent() {
@@ -197,54 +192,31 @@ export default class DataSourceTicketComponent extends Component {
     }
 
     resetClicked() {
-        let { dataSource } = this.state;
-        // dataSource.summary = '';
-        dataSource.realmName = '';
-        dataSource.programName = '';
-        dataSource.dataSourceType = '';
-        dataSource.dataSourceName = '';
-        dataSource.notes = '';
+        let { fundingSource } = this.state;
+        // fundingSource.summary = '';
+        fundingSource.fundingSourceName = '';
+        fundingSource.notes = '';
         this.setState({
-            dataSource
+            fundingSource
         },
             () => { });
     }
 
     render() {
-
-        const { realms } = this.state;
-        const { programs } = this.state;
-        const { dataSourceTypes } = this.state;
-
-        let programList = programs.length > 0
-            && programs.map((item, i) => {
+        const { fundingSources } = this.state;
+        let fundingSourceList = fundingSources.length > 0
+            && fundingSources.map((item, i) => {
                 return (
-                    <option key={i} value={item.programId}>
-                        {getLabelText(item.label, this.state.lang)}
+                    <option key={i} value={item.fundingSourceId}>
+                        {getLabelText(item.realm.label, this.state.lang) + " | " + getLabelText(item.label, this.state.lang) + " | " + item.fundingSourceCode}
                     </option>
-                )
-            }, this);
-
-        let realmList = realms.length > 0
-            && realms.map((item, i) => {
-                return (
-                    <option key={i} value={item.realmId}>
-                        {getLabelText(item.label, this.state.lang)}
-                    </option>
-                )
-            }, this);
-
-        let dataSourceTypeList = dataSourceTypes.length > 0
-            && dataSourceTypes.map((item, i) => {
-                return (
-                    <option key={i} value={item.dataSourceTypeId}>{getLabelText(item.label, this.state.lang)}</option>
                 )
             }, this);
 
         return (
             <div className="col-md-12">
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
-                <h4>{i18n.t('static.datasource.datasource')}</h4>
+                <h4>{i18n.t('static.fundingsource.fundingsource')}</h4>
                 <br></br>
                 <div style={{ display: this.state.loading ? "none" : "block" }}>
                     <Formik
@@ -254,7 +226,7 @@ export default class DataSourceTicketComponent extends Component {
                             this.setState({
                                 loading: true
                             })
-                            JiraTikcetService.addEmailRequestIssue(this.state.dataSource).then(response => {
+                            JiraTikcetService.addEmailRequestIssue(this.state.fundingSource).then(response => {
                                 console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
                                     var msg = response.data.key;
@@ -305,80 +277,38 @@ export default class DataSourceTicketComponent extends Component {
                                             <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
                                             <Input type="text" name="summary" id="summary" readOnly={true}
                                                 bsSize="sm"
-                                                valid={!errors.summary && this.state.dataSource.summary != ''}
+                                                valid={!errors.summary && this.state.fundingSource.summary != ''}
                                                 invalid={touched.summary && !!errors.summary}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                 onBlur={handleBlur}
-                                                value={this.state.dataSource.summary}
+                                                value={this.state.fundingSource.summary}
                                                 required />
                                             <FormFeedback className="red">{errors.summary}</FormFeedback>
                                         </FormGroup>
                                         <FormGroup>
-                                            <Label for="realmName">{i18n.t('static.realm.realmName')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="select" name="realmName" id="realmName"
+                                            <Label for="fundingSourceName">{i18n.t('static.fundingsource.fundingsource')}<span class="red Reqasterisk">*</span></Label>
+                                            <Input type="select" name="fundingSourceName" id="fundingSourceName"
                                                 bsSize="sm"
-                                                valid={!errors.realmName && this.state.dataSource.realmName != ''}
-                                                invalid={touched.realmName && !!errors.realmName}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); this.getDataSourceTypeByRealmId(e); this.getProgramByRealmId(e) }}
-                                                onBlur={handleBlur}
-                                                value={this.state.realmId}
-                                                required >
-                                                <option value="">{i18n.t('static.common.select')}</option>
-                                                {realmList}
-                                            </Input>
-                                            <FormFeedback className="red">{errors.realmName}</FormFeedback>
-                                        </FormGroup>
-                                        < FormGroup >
-                                            <Label for="programName">{i18n.t('static.program.programMaster')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="select" name="programName" id="programName"
-                                                bsSize="sm"
-                                                valid={!errors.programName && this.state.dataSource.programName != ''}
-                                                invalid={touched.programName && !!errors.programName}
+                                                valid={!errors.fundingSourceName && this.state.fundingSource.fundingSourceName != ''}
+                                                invalid={touched.fundingSourceName && !!errors.fundingSourceName}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                 onBlur={handleBlur}
-                                                value={this.state.programId}
+                                                value={this.state.fundingSourceId}
                                                 required >
                                                 <option value="">{i18n.t('static.common.select')}</option>
-                                                {programList}
+                                                {fundingSourceList}
                                             </Input>
-                                            <FormFeedback className="red">{errors.programName}</FormFeedback>
+                                            <FormFeedback className="red">{errors.fundingSourceName}</FormFeedback>
                                         </FormGroup>
                                         <FormGroup>
-                                            <Label for="dataSourceType">{i18n.t('static.datasourcetype.datasourcetype')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="select" name="dataSourceType" id="dataSourceType"
-                                                bsSize="sm"
-                                                valid={!errors.dataSourceType && this.state.dataSource.dataSourceType != ''}
-                                                invalid={touched.dataSourceType && !!errors.dataSourceType}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                value={this.state.dataSourceTypeId}
-                                                required >
-                                                <option value="">{i18n.t('static.common.select')}</option>
-                                                {dataSourceTypeList}
-                                            </Input>
-                                            <FormFeedback className="red">{errors.dataSourceType}</FormFeedback>
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <Label for="dataSourceName">{i18n.t('static.datasource.datasource')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text" name="dataSourceName" id="dataSourceName"
-                                                bsSize="sm"
-                                                valid={!errors.dataSourceName && this.state.dataSource.dataSourceName != ''}
-                                                invalid={touched.dataSourceName && !!errors.dataSourceName}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                value={this.state.dataSource.dataSourceName}
-                                                required />
-                                            <FormFeedback className="red">{errors.dataSourceName}</FormFeedback>
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <Label for="notes">{i18n.t('static.common.notes')}</Label>
+                                            <Label for="notes">{i18n.t('static.common.notes')}<span class="red Reqasterisk">*</span></Label>
                                             <Input type="textarea" name="notes" id="notes"
                                                 bsSize="sm"
-                                                valid={!errors.notes && this.state.dataSource.notes != ''}
+                                                valid={!errors.notes && this.state.fundingSource.notes != ''}
                                                 invalid={touched.notes && !!errors.notes}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                 onBlur={handleBlur}
-                                                value={this.state.dataSource.notes}
+                                                value={this.state.fundingSource.notes}
                                             // required 
                                             />
                                             <FormFeedback className="red">{errors.notes}</FormFeedback>

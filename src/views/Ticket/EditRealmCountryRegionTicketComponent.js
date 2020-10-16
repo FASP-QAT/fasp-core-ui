@@ -7,13 +7,16 @@ import { Formik } from 'formik';
 import i18n from '../../i18n';
 import * as Yup from 'yup';
 import JiraTikcetService from '../../api/JiraTikcetService';
-import { DECIMAL_NO_REGEX, ALPHABETS_REGEX, SPACE_REGEX } from '../../Constants';
+import RealmCountryService from '../../api/RealmCountryService';
+import getLabelText from '../../CommonComponent/getLabelText';
+import { SPACE_REGEX } from '../../Constants';
+import ProgramService from '../../api/ProgramService';
+import HealthAreaService from '../../api/HealthAreaService';
+import RegionService from '../../api/RegionService';
 
 const initialValues = {
-    summary: "Add Currency",
-    currencyName: "",
-    currencyCode: "",
-    conversionRatetoUSD: "",
+    summary: "Edit Realm Country Region",
+    realmCountryRegionName: '',
     notes: ""
 }
 
@@ -22,17 +25,10 @@ const validationSchema = function (values) {
         summary: Yup.string()
             .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.common.summarytext')),
-        currencyName: Yup.string()
-            .required(i18n.t('static.currency.currencytext'))
-            .matches(SPACE_REGEX, i18n.t('static.message.rolenamevalidtext')),
-        // currencyCode: Yup.string()
-        //     .required(i18n.t('static.currency.currencycodetext'))
-        //     .matches(ALPHABETS_REGEX, i18n.t('static.common.alphabetsOnly')),
-        conversionRatetoUSD: Yup.string()
-            .required(i18n.t('static.currency.currencyconversiontext'))
-            .matches(DECIMAL_NO_REGEX, i18n.t('static.currency.conversionrateNumberDecimalPlaces')),
-        // notes: Yup.string()
-        //     .required(i18n.t('static.common.notestext'))
+        realmCountryRegionName: Yup.string()
+            .required(i18n.t('static.common.pleaseSelect').concat(" ").concat((i18n.t('static.dashboad.regioncountry')).concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?', i18n.t('static.dashboad.regioncountry'))))),
+        notes: Yup.string()
+            .required(i18n.t('static.program.validnotestext'))
     })
 }
 
@@ -58,20 +54,21 @@ const getErrorsFromValidationError = (validationError) => {
     }, {})
 }
 
-export default class CurrencyTicketComponent extends Component {
+export default class EditRealmCountryRegionTicketComponent extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            currency: {
-                summary: 'Add Currency',
-                currencyName: "",
-                currencyCode: "",
-                conversionRatetoUSD: "",
-                notes: ''
+            realmCountryRegion: {
+                summary: "Edit Realm Country Region",
+                realmCountryRegionName: '',
+                notes: ""
             },
+            lang: localStorage.getItem('lang'),
             message: '',
-            loading: false
+            loading: false,
+            realmCountryRegionId: '',
+            realmCountryRegionList: []
         }
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
@@ -79,33 +76,30 @@ export default class CurrencyTicketComponent extends Component {
     }
 
     dataChange(event) {
-        let { currency } = this.state
+        let { realmCountryRegion } = this.state
         if (event.target.name == "summary") {
-            currency.summary = event.target.value;
+            realmCountryRegion.summary = event.target.value;
         }
-        if (event.target.name == "currencyName") {
-            currency.currencyName = event.target.value;
+        if (event.target.name == "realmCountryRegionName") {
+            realmCountryRegion.realmCountryRegionName = event.target.options[event.target.selectedIndex].innerHTML;
+            // this.setState({
+            this.state.realmCountryRegionId = event.target.value
+            // })            
         }
-        if (event.target.name == "currencyCode") {
-            currency.currencyCode = event.target.value;
-        }
-        if (event.target.name == "conversionRatetoUSD") {
-            currency.conversionRatetoUSD = event.target.value;
-        }
+
         if (event.target.name == "notes") {
-            currency.notes = event.target.value;
+            realmCountryRegion.notes = event.target.value;
         }
         this.setState({
-            currency
+            realmCountryRegion
         }, () => { })
     };
+
 
     touchAll(setTouched, errors) {
         setTouched({
             summary: true,
-            currencyName: true,
-            currencyCode: true,
-            conversionRatetoUSD: true,
+            realmCountryRegionId: true,
             notes: true
         })
         this.validateForm(errors)
@@ -127,6 +121,64 @@ export default class CurrencyTicketComponent extends Component {
 
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
+        RegionService.getRegionList()
+            .then(response => {
+                if (response.status == 200) {
+                    this.setState({
+                        realmCountryRegionList: response.data,
+                        loading: false
+                    }, () => {
+                        console.log("realmCountryRegionList",this.state.realmCountryRegionList)
+                    });
+                } else {
+                    this.setState({
+                        message: response.data.messageCode, loading: false
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
+                }
+            })
+            .catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
     }
 
     hideSecondComponent() {
@@ -141,24 +193,33 @@ export default class CurrencyTicketComponent extends Component {
     }
 
     resetClicked() {
-        let { currency } = this.state;
-        // currency.summary = '';
-        currency.currencyName = '';
-        currency.currencyCode = '';
-        currency.conversionRatetoUSD = '';
-        currency.notes = '';
+        let { realmCountryRegion } = this.state;
+        // realmCountryRegion.summary = '';        
+        realmCountryRegion.realmCountryRegionName = '';
+        realmCountryRegion.notes = '';
         this.setState({
-            currency
+            realmCountryRegion
         },
             () => { });
     }
 
     render() {
+        const { realmCountryRegionList } = this.state;
+        console.log("realmCountryRegionList",this.state.realmCountryRegionList)
+        
+        let realmCountryRegions = realmCountryRegionList.length > 0
+            && realmCountryRegionList.map((item, i) => {
+                return (
+                    <option key={i} value={item.regionId}>
+                        {getLabelText(item.realmCountry.realm.label, this.state.lang) + " | " + getLabelText(item.realmCountry.country.label, this.state.lang) + " | " + getLabelText(item.label, this.state.lang)}
+                    </option>
+                )
+            }, this);
 
         return (
             <div className="col-md-12">
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
-                <h4>{i18n.t('static.currency.currencyMaster')}</h4>
+                <h4>{i18n.t('static.dashboad.regioncountry')}</h4>
                 <br></br>
                 <div style={{ display: this.state.loading ? "none" : "block" }}>
                     <Formik
@@ -219,61 +280,38 @@ export default class CurrencyTicketComponent extends Component {
                                             <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
                                             <Input type="text" name="summary" id="summary" readOnly={true}
                                                 bsSize="sm"
-                                                valid={!errors.summary && this.state.currency.summary != ''}
+                                                valid={!errors.summary && this.state.realmCountryRegion.summary != ''}
                                                 invalid={touched.summary && !!errors.summary}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                 onBlur={handleBlur}
-                                                value={this.state.currency.summary}
+                                                value={this.state.realmCountryRegion.summary}
                                                 required />
                                             <FormFeedback className="red">{errors.summary}</FormFeedback>
                                         </FormGroup>
-                                        <FormGroup>
-                                            <Label for="currencyName">{i18n.t('static.currency.currencyName')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text" name="currencyName" id="currencyName"
-                                                bsSize="sm"
-                                                valid={!errors.currencyName && this.state.currency.currencyName != ''}
-                                                invalid={touched.currencyName && !!errors.currencyName}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                value={this.state.currency.currencyName}
-                                                required />
-                                            <FormFeedback className="red">{errors.currencyName}</FormFeedback>
-                                        </FormGroup>
                                         < FormGroup >
-                                            <Label for="currencyCode">{i18n.t('static.currency.currencycode')}</Label>
-                                            <Input type="text" name="currencyCode" id="currencyCode"
+                                            <Label for="realmCountryRegionName">{i18n.t('static.dashboad.regioncountry')}<span class="red Reqasterisk">*</span></Label>
+                                            <Input type="select" name="realmCountryRegionName" id="realmCountryRegionName"
                                                 bsSize="sm"
-                                                // valid={!errors.currencyCode && this.state.currency.currencyCode != ''}
-                                                // invalid={touched.currencyCode && !!errors.currencyCode}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                valid={!errors.realmCountryRegionName && this.state.realmCountryRegion.realmCountryRegionName != ''}
+                                                invalid={touched.realmCountryRegionName && !!errors.realmCountryRegionName}
+                                                onChange={(e) => { handleChange(e); this.dataChange(e); this.getDependentLists(e) }}
                                                 onBlur={handleBlur}
-                                                value={this.state.currency.currencyCode}
-                                            // required 
-                                            />
-                                            <FormFeedback className="red">{errors.currencyCode}</FormFeedback>
+                                                value={this.state.realmCountryRegionId}
+                                                required >
+                                                <option value="">{i18n.t('static.common.select')}</option>
+                                                {realmCountryRegions}
+                                            </Input>
+                                            <FormFeedback className="red">{errors.realmCountryRegionName}</FormFeedback>
                                         </FormGroup>
                                         <FormGroup>
-                                            <Label for="conversionRatetoUSD">{i18n.t('static.currency.conversionrateusd')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="number" name="conversionRatetoUSD" id="conversionRatetoUSD"
-                                                bsSize="sm"
-                                                valid={!errors.conversionRatetoUSD && this.state.currency.conversionRatetoUSD != ''}
-                                                invalid={touched.conversionRatetoUSD && !!errors.conversionRatetoUSD}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                value={this.state.currency.conversionRatetoUSD}
-                                                required />
-                                            <FormFeedback className="red">{errors.conversionRatetoUSD}</FormFeedback>
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <Label for="notes">{i18n.t('static.common.notes')}</Label>
+                                            <Label for="notes">{i18n.t('static.common.notes')}<span class="red Reqasterisk">*</span></Label>
                                             <Input type="textarea" name="notes" id="notes"
                                                 bsSize="sm"
-                                                valid={!errors.notes && this.state.currency.notes != ''}
+                                                valid={!errors.notes && this.state.realmCountryRegion.notes != ''}
                                                 invalid={touched.notes && !!errors.notes}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                 onBlur={handleBlur}
-                                                maxLength={600}
-                                                value={this.state.currency.notes}
+                                                value={this.state.realmCountryRegion.notes}
                                             // required 
                                             />
                                             <FormFeedback className="red">{errors.notes}</FormFeedback>
@@ -283,6 +321,10 @@ export default class CurrencyTicketComponent extends Component {
                                             <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                             <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check "></i> {i18n.t('static.common.submit')}</Button>
                                         </ModalFooter>
+                                        {/* <br></br><br></br>
+                                    <div className={this.props.className}>
+                                        <p>{i18n.t('static.ticket.drodownvaluenotfound')}</p>
+                                    </div> */}
                                     </Form>
                                 )} />
                 </div>

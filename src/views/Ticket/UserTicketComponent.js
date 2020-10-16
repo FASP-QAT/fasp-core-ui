@@ -113,6 +113,7 @@ export default class UserTicketComponent extends Component {
                 language: "",
                 notes: ''
             },
+            lang: localStorage.getItem('lang'),
             realms: [],
             languages: [],
             roleList: [],
@@ -134,7 +135,7 @@ export default class UserTicketComponent extends Component {
             user.summary = event.target.value;
         }
         if (event.target.name == "realm") {
-            user.realm = event.target.options[event.target.selectedIndex].innerHTML;
+            user.realm = this.state.realms.filter(c => c.realmId == event.target.value)[0].label.label_en;
             this.setState({
                 realmId: event.target.value
             })

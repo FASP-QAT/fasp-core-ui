@@ -7,13 +7,14 @@ import { Formik } from 'formik';
 import i18n from '../../i18n';
 import * as Yup from 'yup';
 import JiraTikcetService from '../../api/JiraTikcetService';
-import { DECIMAL_NO_REGEX, ALPHABETS_REGEX, SPACE_REGEX } from '../../Constants';
+import RealmService from '../../api/RealmService';
+import { SPACE_REGEX } from '../../Constants';
+import ProcurementAgentService from '../../api/ProcurementAgentService';
+import getLabelText from '../../CommonComponent/getLabelText';
 
 const initialValues = {
-    summary: "Add Currency",
-    currencyName: "",
-    currencyCode: "",
-    conversionRatetoUSD: "",
+    summary: "Edit Procurement Agent",
+    procurementAgentName: "",
     notes: ""
 }
 
@@ -22,17 +23,10 @@ const validationSchema = function (values) {
         summary: Yup.string()
             .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.common.summarytext')),
-        currencyName: Yup.string()
-            .required(i18n.t('static.currency.currencytext'))
-            .matches(SPACE_REGEX, i18n.t('static.message.rolenamevalidtext')),
-        // currencyCode: Yup.string()
-        //     .required(i18n.t('static.currency.currencycodetext'))
-        //     .matches(ALPHABETS_REGEX, i18n.t('static.common.alphabetsOnly')),
-        conversionRatetoUSD: Yup.string()
-            .required(i18n.t('static.currency.currencyconversiontext'))
-            .matches(DECIMAL_NO_REGEX, i18n.t('static.currency.conversionrateNumberDecimalPlaces')),
-        // notes: Yup.string()
-        //     .required(i18n.t('static.common.notestext'))
+        procurementAgentName: Yup.string()
+            .required(i18n.t('static.common.pleaseSelect').concat(" ").concat((i18n.t('static.procurementagent.procurementagent')).concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?', i18n.t('static.procurementagent.procurementagent'))))),
+        notes: Yup.string()
+            .required(i18n.t('static.program.validnotestext'))
     })
 }
 
@@ -58,19 +52,20 @@ const getErrorsFromValidationError = (validationError) => {
     }, {})
 }
 
-export default class CurrencyTicketComponent extends Component {
+export default class EditProcurementAgentTicketComponent extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            currency: {
-                summary: 'Add Currency',
-                currencyName: "",
-                currencyCode: "",
-                conversionRatetoUSD: "",
-                notes: ''
+            procurementAgent: {
+                summary: "Edit Procurement Agent",
+                procurementAgentName: "",
+                notes: ""
             },
+            lang: localStorage.getItem('lang'),
             message: '',
+            procurementAgents: [],
+            procurementAgentId: '',
             loading: false
         }
         this.dataChange = this.dataChange.bind(this);
@@ -79,33 +74,29 @@ export default class CurrencyTicketComponent extends Component {
     }
 
     dataChange(event) {
-        let { currency } = this.state
+        let { procurementAgent } = this.state
         if (event.target.name == "summary") {
-            currency.summary = event.target.value;
+            procurementAgent.summary = event.target.value;
         }
-        if (event.target.name == "currencyName") {
-            currency.currencyName = event.target.value;
+        if (event.target.name == "procurementAgentName") {
+            procurementAgent.procurementAgentName = event.target.options[event.target.selectedIndex].innerHTML;
+            this.setState({
+                procurementAgentId: event.target.value
+            })
         }
-        if (event.target.name == "currencyCode") {
-            currency.currencyCode = event.target.value;
-        }
-        if (event.target.name == "conversionRatetoUSD") {
-            currency.conversionRatetoUSD = event.target.value;
-        }
+
         if (event.target.name == "notes") {
-            currency.notes = event.target.value;
+            procurementAgent.notes = event.target.value;
         }
         this.setState({
-            currency
+            procurementAgent
         }, () => { })
     };
 
     touchAll(setTouched, errors) {
         setTouched({
             summary: true,
-            currencyName: true,
-            currencyCode: true,
-            conversionRatetoUSD: true,
+            procurementAgentName: true,
             notes: true
         })
         this.validateForm(errors)
@@ -127,6 +118,62 @@ export default class CurrencyTicketComponent extends Component {
 
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
+        ProcurementAgentService.getProcurementAgentListAll()
+            .then(response => {
+                if (response.status == 200) {
+                    this.setState({
+                        procurementAgents: response.data
+                    })
+                } else {
+                    this.setState({
+                        message: response.data.messageCode, loading: false
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
+                }
+
+            })
+            .catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
     }
 
     hideSecondComponent() {
@@ -141,24 +188,32 @@ export default class CurrencyTicketComponent extends Component {
     }
 
     resetClicked() {
-        let { currency } = this.state;
-        // currency.summary = '';
-        currency.currencyName = '';
-        currency.currencyCode = '';
-        currency.conversionRatetoUSD = '';
-        currency.notes = '';
+        let { procurementAgent } = this.state;
+        // procurementAgent.summary = '';
+        procurementAgent.procurementAgentName = '';
+        procurementAgent.notes = '';
         this.setState({
-            currency
+            procurementAgent
         },
             () => { });
     }
 
     render() {
 
+        const { procurementAgents } = this.state;
+        let procurementAgentList = procurementAgents.length > 0
+            && procurementAgents.map((item, i) => {
+                return (
+                    <option key={i} value={item.procurementAgentId}>
+                        {getLabelText(item.realm.label, this.state.lang) + " | " + getLabelText(item.label, this.state.lang) + " | " + item.procurementAgentCode}
+                    </option>
+                )
+            }, this);
+
         return (
             <div className="col-md-12">
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
-                <h4>{i18n.t('static.currency.currencyMaster')}</h4>
+                <h4>{i18n.t('static.procurementagent.procurementagent')}</h4>
                 <br></br>
                 <div style={{ display: this.state.loading ? "none" : "block" }}>
                     <Formik
@@ -168,7 +223,7 @@ export default class CurrencyTicketComponent extends Component {
                             this.setState({
                                 loading: true
                             })
-                            JiraTikcetService.addEmailRequestIssue(values).then(response => {
+                            JiraTikcetService.addEmailRequestIssue(this.state.procurementAgent).then(response => {
                                 console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
                                     var msg = response.data.key;
@@ -219,61 +274,44 @@ export default class CurrencyTicketComponent extends Component {
                                             <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
                                             <Input type="text" name="summary" id="summary" readOnly={true}
                                                 bsSize="sm"
-                                                valid={!errors.summary && this.state.currency.summary != ''}
+                                                valid={!errors.summary && this.state.procurementAgent.summary != ''}
                                                 invalid={touched.summary && !!errors.summary}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                 onBlur={handleBlur}
-                                                value={this.state.currency.summary}
+                                                value={this.state.procurementAgent.summary}
                                                 required />
                                             <FormFeedback className="red">{errors.summary}</FormFeedback>
                                         </FormGroup>
                                         <FormGroup>
-                                            <Label for="currencyName">{i18n.t('static.currency.currencyName')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text" name="currencyName" id="currencyName"
+                                            <Label htmlFor="procurementAgentName">{i18n.t('static.procurementagent.procurementagent')}<span className="red Reqasterisk">*</span></Label>
+                                            <Input
+                                                type="select"
                                                 bsSize="sm"
-                                                valid={!errors.currencyName && this.state.currency.currencyName != ''}
-                                                invalid={touched.currencyName && !!errors.currencyName}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                name="procurementAgentName"
+                                                id="procurementAgentName"
+                                                valid={!errors.procurementAgentName && this.state.procurementAgent.procurementAgentName != ''}
+                                                invalid={touched.procurementAgentName && !!errors.procurementAgentName}
+                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                 onBlur={handleBlur}
-                                                value={this.state.currency.currencyName}
-                                                required />
-                                            <FormFeedback className="red">{errors.currencyName}</FormFeedback>
+                                                value={this.state.procurementAgentId}
+                                                required
+                                            >
+                                                <option value="">{i18n.t('static.common.select')}</option>
+                                                {procurementAgentList}
+                                            </Input>
+                                            {/* </InputGroupAddon> */}
+                                            <FormFeedback className="red">{errors.procurementAgentName}</FormFeedback>
                                         </FormGroup>
-                                        < FormGroup >
-                                            <Label for="currencyCode">{i18n.t('static.currency.currencycode')}</Label>
-                                            <Input type="text" name="currencyCode" id="currencyCode"
-                                                bsSize="sm"
-                                                // valid={!errors.currencyCode && this.state.currency.currencyCode != ''}
-                                                // invalid={touched.currencyCode && !!errors.currencyCode}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                value={this.state.currency.currencyCode}
-                                            // required 
-                                            />
-                                            <FormFeedback className="red">{errors.currencyCode}</FormFeedback>
-                                        </FormGroup>
+
                                         <FormGroup>
-                                            <Label for="conversionRatetoUSD">{i18n.t('static.currency.conversionrateusd')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="number" name="conversionRatetoUSD" id="conversionRatetoUSD"
-                                                bsSize="sm"
-                                                valid={!errors.conversionRatetoUSD && this.state.currency.conversionRatetoUSD != ''}
-                                                invalid={touched.conversionRatetoUSD && !!errors.conversionRatetoUSD}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                value={this.state.currency.conversionRatetoUSD}
-                                                required />
-                                            <FormFeedback className="red">{errors.conversionRatetoUSD}</FormFeedback>
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <Label for="notes">{i18n.t('static.common.notes')}</Label>
+                                            <Label for="notes">{i18n.t('static.common.notes')}<span class="red Reqasterisk">*</span></Label>
                                             <Input type="textarea" name="notes" id="notes"
                                                 bsSize="sm"
-                                                valid={!errors.notes && this.state.currency.notes != ''}
+                                                valid={!errors.notes && this.state.procurementAgent.notes != ''}
                                                 invalid={touched.notes && !!errors.notes}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                 onBlur={handleBlur}
-                                                maxLength={600}
-                                                value={this.state.currency.notes}
+                                                value={this.state.procurementAgent.notes}
                                             // required 
                                             />
                                             <FormFeedback className="red">{errors.notes}</FormFeedback>
@@ -281,8 +319,12 @@ export default class CurrencyTicketComponent extends Component {
                                         <ModalFooter className="pb-0 pr-0">
                                             <Button type="button" size="md" color="info" className="mr-1" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
                                             <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                            <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check "></i> {i18n.t('static.common.submit')}</Button>
+                                            <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>
                                         </ModalFooter>
+                                        {/* <br></br><br></br>
+                                    <div className={this.props.className}>
+                                        <p>{i18n.t('static.ticket.drodownvaluenotfound')}</p>
+                                    </div> */}
                                     </Form>
                                 )} />
                 </div>

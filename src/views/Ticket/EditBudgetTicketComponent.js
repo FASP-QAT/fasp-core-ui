@@ -1,19 +1,26 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, CardBody, Form, FormGroup, Label, Input, FormFeedback, InputGroup, InputGroupAddon, InputGroupText, ModalFooter } from 'reactstrap';
+import DatePicker from 'react-datepicker';
+import { Button, Form, FormFeedback, FormGroup, Input, Label, ModalFooter } from 'reactstrap';
 import AuthenticationService from '../Common/AuthenticationService';
 import imageHelp from '../../assets/img/help-icon.png';
 import InitialTicketPageComponent from './InitialTicketPageComponent';
 import { Formik } from 'formik';
 import i18n from '../../i18n';
 import * as Yup from 'yup';
+import { DATE_FORMAT_SM, DATE_PLACEHOLDER_TEXT, SPACE_REGEX } from '../../Constants.js';
+import { Date } from 'core-js';
+import moment from 'moment';
+import '../../../node_modules/react-datepicker/dist/react-datepicker.css';
 import JiraTikcetService from '../../api/JiraTikcetService';
-import { DECIMAL_NO_REGEX, ALPHABETS_REGEX, SPACE_REGEX } from '../../Constants';
+import ProgramService from '../../api/ProgramService';
+import FundingSourceService from '../../api/FundingSourceService';
+import CurrencyService from '../../api/CurrencyService';
+import getLabelText from '../../CommonComponent/getLabelText';
+import BudgetService from '../../api/BudgetService';
 
 const initialValues = {
-    summary: "Add Currency",
-    currencyName: "",
-    currencyCode: "",
-    conversionRatetoUSD: "",
+    summary: "Edit Budget",
+    budgetName: "",
     notes: ""
 }
 
@@ -22,17 +29,10 @@ const validationSchema = function (values) {
         summary: Yup.string()
             .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.common.summarytext')),
-        currencyName: Yup.string()
-            .required(i18n.t('static.currency.currencytext'))
-            .matches(SPACE_REGEX, i18n.t('static.message.rolenamevalidtext')),
-        // currencyCode: Yup.string()
-        //     .required(i18n.t('static.currency.currencycodetext'))
-        //     .matches(ALPHABETS_REGEX, i18n.t('static.common.alphabetsOnly')),
-        conversionRatetoUSD: Yup.string()
-            .required(i18n.t('static.currency.currencyconversiontext'))
-            .matches(DECIMAL_NO_REGEX, i18n.t('static.currency.conversionrateNumberDecimalPlaces')),
-        // notes: Yup.string()
-        //     .required(i18n.t('static.common.notestext'))
+        budgetName: Yup.string()
+            .required(i18n.t('static.common.pleaseSelect').concat(" ").concat((i18n.t('static.dashboard.budget')).concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?', i18n.t('static.dashboard.budget'))))),
+        notes: Yup.string()
+            .required(i18n.t('static.program.validnotestext'))
     })
 }
 
@@ -58,19 +58,20 @@ const getErrorsFromValidationError = (validationError) => {
     }, {})
 }
 
-export default class CurrencyTicketComponent extends Component {
+export default class EditBudgetTicketComponent extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            currency: {
-                summary: 'Add Currency',
-                currencyName: "",
-                currencyCode: "",
-                conversionRatetoUSD: "",
-                notes: ''
+            budget: {
+                summary: "Edit Budget",
+                budgetName: "",
+                notes: ""
             },
+            lang: localStorage.getItem('lang'),
             message: '',
+            budgets: [],
+            budgetId: '',
             loading: false
         }
         this.dataChange = this.dataChange.bind(this);
@@ -79,33 +80,28 @@ export default class CurrencyTicketComponent extends Component {
     }
 
     dataChange(event) {
-        let { currency } = this.state
+        let { budget } = this.state
         if (event.target.name == "summary") {
-            currency.summary = event.target.value;
+            budget.summary = event.target.value;
         }
-        if (event.target.name == "currencyName") {
-            currency.currencyName = event.target.value;
-        }
-        if (event.target.name == "currencyCode") {
-            currency.currencyCode = event.target.value;
-        }
-        if (event.target.name == "conversionRatetoUSD") {
-            currency.conversionRatetoUSD = event.target.value;
+        if (event.target.name === "budgetName") {
+            budget.budgetName = event.target.options[event.target.selectedIndex].innerHTML;
+            this.setState({
+                budgetId: event.target.value
+            })
         }
         if (event.target.name == "notes") {
-            currency.notes = event.target.value;
+            budget.notes = event.target.value;
         }
         this.setState({
-            currency
+            budget
         }, () => { })
     };
 
     touchAll(setTouched, errors) {
         setTouched({
             summary: true,
-            currencyName: true,
-            currencyCode: true,
-            conversionRatetoUSD: true,
+            budgetName: true,
             notes: true
         })
         this.validateForm(errors)
@@ -127,6 +123,63 @@ export default class CurrencyTicketComponent extends Component {
 
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
+        BudgetService.getBudgetList()
+            .then(response => {
+                console.log(response)
+                if (response.status == 200) {
+                    console.log("budget after status 200 new console --- ---->", response.data);
+                    this.setState({
+                        budgets: response.data,
+                        loading: false
+                    });
+                } else {
+                    this.setState({
+                        message: response.data.messageCode, loading: false
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
+                }
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
     }
 
     hideSecondComponent() {
@@ -141,24 +194,33 @@ export default class CurrencyTicketComponent extends Component {
     }
 
     resetClicked() {
-        let { currency } = this.state;
-        // currency.summary = '';
-        currency.currencyName = '';
-        currency.currencyCode = '';
-        currency.conversionRatetoUSD = '';
-        currency.notes = '';
+        let { budget } = this.state;
+        // budget.summary = '';
+        budget.budgetName = '';
+        budget.notes = '';
         this.setState({
-            currency
+            budget
         },
             () => { });
     }
 
     render() {
 
+        const { budgets } = this.state;
+
+
+        let programList = budgets.length > 0 && budgets.map((item, i) => {
+            return (
+                <option key={i} value={item.budgetId}>
+                    {getLabelText(item.program.label, this.state.lang) + " | " + getLabelText(item.label, this.state.lang) + " | " + item.budgetCode}
+                </option>
+            )
+        }, this);
+
         return (
             <div className="col-md-12">
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
-                <h4>{i18n.t('static.currency.currencyMaster')}</h4>
+                <h4>{i18n.t('static.dashboard.budget')}</h4>
                 <br></br>
                 <div style={{ display: this.state.loading ? "none" : "block" }}>
                     <Formik
@@ -168,7 +230,7 @@ export default class CurrencyTicketComponent extends Component {
                             this.setState({
                                 loading: true
                             })
-                            JiraTikcetService.addEmailRequestIssue(values).then(response => {
+                            JiraTikcetService.addEmailRequestIssue(this.state.budget).then(response => {
                                 console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
                                     var msg = response.data.key;
@@ -219,70 +281,59 @@ export default class CurrencyTicketComponent extends Component {
                                             <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
                                             <Input type="text" name="summary" id="summary" readOnly={true}
                                                 bsSize="sm"
-                                                valid={!errors.summary && this.state.currency.summary != ''}
+                                                valid={!errors.summary && this.state.budget.summary != ''}
                                                 invalid={touched.summary && !!errors.summary}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                 onBlur={handleBlur}
-                                                value={this.state.currency.summary}
+                                                value={this.state.budget.summary}
                                                 required />
                                             <FormFeedback className="red">{errors.summary}</FormFeedback>
                                         </FormGroup>
+
                                         <FormGroup>
-                                            <Label for="currencyName">{i18n.t('static.currency.currencyName')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text" name="currencyName" id="currencyName"
+                                            <Label htmlFor="budgetName">{i18n.t('static.dashboard.budget')}<span className="red Reqasterisk">*</span></Label>
+                                            <Input
+                                                type="select"
+                                                name="budgetName"
+                                                id="budgetName"
                                                 bsSize="sm"
-                                                valid={!errors.currencyName && this.state.currency.currencyName != ''}
-                                                invalid={touched.currencyName && !!errors.currencyName}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                valid={!errors.budgetName && this.state.budget.budgetName != ''}
+                                                invalid={touched.budgetName && !!errors.budgetName}
+                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                 onBlur={handleBlur}
-                                                value={this.state.currency.currencyName}
-                                                required />
-                                            <FormFeedback className="red">{errors.currencyName}</FormFeedback>
+                                                required
+                                                value={this.state.budgetId}
+                                            >
+                                                <option value="">{i18n.t('static.common.select')}</option>
+                                                {programList}
+                                            </Input>
+                                            <FormFeedback className="red">{errors.budgetName}</FormFeedback>
                                         </FormGroup>
-                                        < FormGroup >
-                                            <Label for="currencyCode">{i18n.t('static.currency.currencycode')}</Label>
-                                            <Input type="text" name="currencyCode" id="currencyCode"
-                                                bsSize="sm"
-                                                // valid={!errors.currencyCode && this.state.currency.currencyCode != ''}
-                                                // invalid={touched.currencyCode && !!errors.currencyCode}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                value={this.state.currency.currencyCode}
-                                            // required 
-                                            />
-                                            <FormFeedback className="red">{errors.currencyCode}</FormFeedback>
-                                        </FormGroup>
+
                                         <FormGroup>
-                                            <Label for="conversionRatetoUSD">{i18n.t('static.currency.conversionrateusd')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="number" name="conversionRatetoUSD" id="conversionRatetoUSD"
-                                                bsSize="sm"
-                                                valid={!errors.conversionRatetoUSD && this.state.currency.conversionRatetoUSD != ''}
-                                                invalid={touched.conversionRatetoUSD && !!errors.conversionRatetoUSD}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                value={this.state.currency.conversionRatetoUSD}
-                                                required />
-                                            <FormFeedback className="red">{errors.conversionRatetoUSD}</FormFeedback>
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <Label for="notes">{i18n.t('static.common.notes')}</Label>
+                                            <Label for="notes">{i18n.t('static.common.notes')}<span class="red Reqasterisk">*</span></Label>
                                             <Input type="textarea" name="notes" id="notes"
                                                 bsSize="sm"
-                                                valid={!errors.notes && this.state.currency.notes != ''}
+                                                valid={!errors.notes && this.state.budget.notes != ''}
                                                 invalid={touched.notes && !!errors.notes}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                 onBlur={handleBlur}
-                                                maxLength={600}
-                                                value={this.state.currency.notes}
+                                                value={this.state.budget.notes}
                                             // required 
                                             />
                                             <FormFeedback className="red">{errors.notes}</FormFeedback>
                                         </FormGroup>
                                         <ModalFooter className="pb-0 pr-0">
+
                                             <Button type="button" size="md" color="info" className="mr-1" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
                                             <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                            <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check "></i> {i18n.t('static.common.submit')}</Button>
+                                            <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>
+
                                         </ModalFooter>
+                                        {/* <br></br><br></br> */}
+                                        {/* <div className={this.props.className}>
+                                        <p>{i18n.t('static.ticket.drodownvaluenotfound')}</p>
+                                    </div> */}
                                     </Form>
                                 )} />
                 </div>
