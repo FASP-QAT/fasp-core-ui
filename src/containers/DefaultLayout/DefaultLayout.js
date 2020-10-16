@@ -300,7 +300,8 @@ const routes = [
   { path: '/program/editProgram/:programId', name: 'static.breadcrum.edit', entityname: 'static.programHead.program', component: EditProgram },
 
   { path: '/productCategory/addProductCategory', name: 'Add Product Category', component: AddProductCategory },
-  { path: '/programProduct/addProgramProduct', name: 'static.breadcrum.add', entityname: 'static.dashboard.programPlanningUnit', component: AddProgramProduct },
+  // { path: '/programProduct/addProgramProduct', name: 'static.breadcrum.add', entityname: 'static.dashboard.programPlanningUnit', component: AddProgramProduct },
+  { path: '/programProduct/addProgramProduct', name: 'static.Update.PlanningUnits', component: AddProgramProduct },
 
 
   { path: '/procurementAgent/addProcurementAgentPlanningUnit/:procurementAgentId', name: 'static.breadcrum.add', entityname: 'static.dashboard.procurementAgentPlanningUnit', component: AddProcurementAgentPlanningUnit },

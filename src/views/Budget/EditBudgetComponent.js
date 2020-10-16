@@ -32,7 +32,7 @@ const validationSchema = function (values) {
             .required(i18n.t('static.budget.budgetamountdesc')),
         budgetAmt: Yup.string()
             // .typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .matches(/^\s*(?=.*[1-9])\d{1,10}(?:\.\d{1,4})?\s*$/, i18n.t('static.program.validBudgetAmount'))
+            .matches(/^\d{0,10}(\.\d{1,4})?$/, i18n.t('static.program.validBudgetAmount'))
             .required(i18n.t('static.budget.budgetamounttext')).min(0, i18n.t('static.program.validvaluetext')),
         // .matches(/^[0-9]+([,\.][0-9]+)?/, i18n.t('static.program.validBudgetAmount')),
         // startDate: Yup.string()
