@@ -5,7 +5,7 @@ import i18n from '../../i18n';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunctionOnlyHideRow, checkValidtion, inValid, positiveValidation, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { SECRET_KEY, SHIPMENT_DATA_SOURCE_TYPE, DELIVERED_SHIPMENT_STATUS, TBD_PROCUREMENT_AGENT_ID, TBD_FUNDING_SOURCE, SUBMITTED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, JEXCEL_DECIMAL_NO_REGEX, JEXCEL_INTEGER_REGEX, CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, INDEXED_DB_VERSION, INDEXED_DB_NAME, ALPHABET_NUMBER_REGEX, JEXCEL_DATE_FORMAT, BATCH_PREFIX, NONE_SELECTED_DATA_SOURCE_ID, LABEL_WITH_SPECIAL_SYMBOL_REGEX, BATCH_NO_REGEX, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION, USD_CURRENCY_ID } from "../../Constants";
+import { SECRET_KEY, SHIPMENT_DATA_SOURCE_TYPE, DELIVERED_SHIPMENT_STATUS, TBD_PROCUREMENT_AGENT_ID, TBD_FUNDING_SOURCE, SUBMITTED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, JEXCEL_DECIMAL_NO_REGEX, JEXCEL_INTEGER_REGEX, CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, INDEXED_DB_VERSION, INDEXED_DB_NAME, ALPHABET_NUMBER_REGEX, JEXCEL_DATE_FORMAT, BATCH_PREFIX, NONE_SELECTED_DATA_SOURCE_ID, LABEL_WITH_SPECIAL_SYMBOL_REGEX, BATCH_NO_REGEX, JEXCEL_PAGINATION_OPTION, USD_CURRENCY_ID } from "../../Constants";
 import moment, { invalid } from "moment";
 import { paddingZero, generateRandomAplhaNumericCode, contrast } from "../../CommonComponent/JavascriptCommonFunctions";
 import CryptoJS from 'crypto-js'
@@ -263,7 +263,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                         var searchOption = false;
                                         var paginationArray = []
                                         if (this.props.shipmentPage == "shipmentDataEntry") {
-                                            paginationOption = JEXCEL_DEFAULT_PAGINATION;
+                                            paginationOption = localStorage.getItem("sesRecordCount");
                                             searchOption = true;
                                             paginationArray = JEXCEL_PAGINATION_OPTION;
                                         }
@@ -768,7 +768,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                         columns: [
                                                                             {
                                                                                 title: i18n.t('static.supplyPlan.type'),
-                                                                                type: 'hidden',
+                                                                                type: 'text',
                                                                                 readOnly: true
                                                                             },
                                                                             {
@@ -1398,114 +1398,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 console.log("In else", shipmentDatesJson.expectedDeliveryDate);
             }
         }
-        if (x == 11 || x == 0 || x == 29) {
-            console.log("In 19");
-            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE']
-            for (var j = 0; j < colArr.length; j++) {
-                var col = (colArr[j]).concat(parseInt(y) + 1);
-                if (rowData[0].toString() == "false") {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "#D3D3D3");
-                    var cell = elInstance.getCell(`Q${parseInt(y) + 1}`)
-                    cell.classList.add('shipmentEntryDoNotInclude');
-                    var cell = elInstance.getCell(`K${parseInt(y) + 1}`)
-                    cell.classList.add('shipmentEntryDoNotInclude');
-                    var cell = elInstance.getCell(`B${parseInt(y) + 1}`)
-                    cell.classList.add('shipmentEntryDoNotInclude');
-                    var element = document.getElementById("shipmentsDetailsTable");
-                    element.classList.remove("jexcelremoveReadonlybackground");
-                } else {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    var cell = elInstance.getCell(`Q${parseInt(y) + 1}`)
-                    cell.classList.remove('shipmentEntryDoNotInclude');
-                    var cell = elInstance.getCell(`K${parseInt(y) + 1}`)
-                    cell.classList.remove('shipmentEntryDoNotInclude');
-                    var cell = elInstance.getCell(`B${parseInt(y) + 1}`)
-                    cell.classList.remove('shipmentEntryDoNotInclude');
-                    var element = document.getElementById("shipmentsDetailsTable");
-                    element.classList.remove("jexcelremoveReadonlybackground");
-                }
-
-                if (rowData[11].toString() == "true") {
-                    console.log("In if");
-                    elInstance.setStyle(col, "color", "#000");
-                    elInstance.setStyle(col, "color", "red");
-                    var cell = elInstance.getCell(`Q${parseInt(y) + 1}`)
-                    cell.classList.add('shipmentEntryEmergency');
-                    var cell = elInstance.getCell(`K${parseInt(y) + 1}`)
-                    cell.classList.add('shipmentEntryEmergency');
-                    var cell = elInstance.getCell(`B${parseInt(y) + 1}`)
-                    cell.classList.add('shipmentEntryEmergency');
-                } else {
-                    console.log("In else")
-                    elInstance.setStyle(col, "color", "#000");
-                    var cell = elInstance.getCell(`Q${parseInt(y) + 1}`)
-                    cell.classList.remove('shipmentEntryEmergency');
-                    var cell = elInstance.getCell(`K${parseInt(y) + 1}`)
-                    cell.classList.remove('shipmentEntryEmergency');
-                    var cell = elInstance.getCell(`B${parseInt(y) + 1}`)
-                    cell.classList.remove('shipmentEntryEmergency');
-                }
-
-                if (rowData[29].toString() == "false") {
-                    elInstance.setStyle(col, "color", "#000");
-                    elInstance.setStyle(col, "color", "#808080");
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "#808080");
-                    var element = document.getElementById("shipmentsDetailsTable");
-                    element.classList.remove("jexcelremoveReadonlybackground");
-                    var cell = elInstance.getCell(`Q${parseInt(y) + 1}`)
-                    cell.classList.add('shipmentEntryDelete');
-                    var cell = elInstance.getCell(`K${parseInt(y) + 1}`)
-                    cell.classList.add('shipmentEntryDelete');
-                    var cell = elInstance.getCell(`B${parseInt(y) + 1}`)
-                    cell.classList.add('shipmentEntryDelete');
-                } else {
-                    if (rowData[0].toString() == "false") {
-                        elInstance.setStyle(col, "background-color", "transparent");
-                        elInstance.setStyle(col, "background-color", "#D3D3D3");
-                        var cell = elInstance.getCell(`Q${parseInt(y) + 1}`)
-                        cell.classList.add('shipmentEntryDoNotInclude');
-                        var cell = elInstance.getCell(`K${parseInt(y) + 1}`)
-                        cell.classList.add('shipmentEntryDoNotInclude');
-                        var cell = elInstance.getCell(`B${parseInt(y) + 1}`)
-                        cell.classList.add('shipmentEntryDoNotInclude');
-                        var element = document.getElementById("shipmentsDetailsTable");
-                        element.classList.remove("jexcelremoveReadonlybackground");
-                    } else {
-                        elInstance.setStyle(col, "background-color", "transparent");
-                        var cell = elInstance.getCell(`Q${parseInt(y) + 1}`)
-                        cell.classList.remove('shipmentEntryDoNotInclude');
-                        var cell = elInstance.getCell(`K${parseInt(y) + 1}`)
-                        cell.classList.remove('shipmentEntryDoNotInclude');
-                        var cell = elInstance.getCell(`B${parseInt(y) + 1}`)
-                        cell.classList.remove('shipmentEntryDoNotInclude');
-                        var element = document.getElementById("shipmentsDetailsTable");
-                        element.classList.remove("jexcelremoveReadonlybackground");
-                    }
-                    if (rowData[11].toString() == "true") {
-                        console.log("In if");
-                        elInstance.setStyle(col, "color", "#000");
-                        elInstance.setStyle(col, "color", "red");
-                        var cell = elInstance.getCell(`Q${parseInt(y) + 1}`)
-                        cell.classList.add('shipmentEntryEmergency');
-                        var cell = elInstance.getCell(`K${parseInt(y) + 1}`)
-                        cell.classList.add('shipmentEntryEmergency');
-                        var cell = elInstance.getCell(`B${parseInt(y) + 1}`)
-                        cell.classList.add('shipmentEntryEmergency');
-                    } else {
-                        console.log("In else")
-                        elInstance.setStyle(col, "color", "#000");
-                        var cell = elInstance.getCell(`Q${parseInt(y) + 1}`)
-                        cell.classList.remove('shipmentEntryEmergency');
-                        var cell = elInstance.getCell(`K${parseInt(y) + 1}`)
-                        cell.classList.remove('shipmentEntryEmergency');
-                        var cell = elInstance.getCell(`B${parseInt(y) + 1}`)
-                        cell.classList.remove('shipmentEntryEmergency');
-                    }
-                }
-            }
-        }
+        
         if (x != 28 && x != 26 && x != 30) {
             elInstance.setValueFromCoords(30, y, 0, true);
 
@@ -1780,6 +1673,115 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     console.log("In eklse");
                     positiveValidation("K", y, elInstance);
                     this.props.updateState("shipmentBatchError", "");
+                }
+            }
+        }
+
+        if (x == 11 || x == 0 || x == 29) {
+            console.log("In 19");
+            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE']
+            for (var j = 0; j < colArr.length; j++) {
+                var col = (colArr[j]).concat(parseInt(y) + 1);
+                if (rowData[0].toString() == "false") {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "#D3D3D3");
+                    var cell = elInstance.getCell(`Q${parseInt(y) + 1}`)
+                    cell.classList.add('shipmentEntryDoNotInclude');
+                    var cell = elInstance.getCell(`K${parseInt(y) + 1}`)
+                    cell.classList.add('shipmentEntryDoNotInclude');
+                    var cell = elInstance.getCell(`B${parseInt(y) + 1}`)
+                    cell.classList.add('shipmentEntryDoNotInclude');
+                    var element = document.getElementById("shipmentsDetailsTable");
+                    element.classList.remove("jexcelremoveReadonlybackground");
+                } else {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    var cell = elInstance.getCell(`Q${parseInt(y) + 1}`)
+                    cell.classList.remove('shipmentEntryDoNotInclude');
+                    var cell = elInstance.getCell(`K${parseInt(y) + 1}`)
+                    cell.classList.remove('shipmentEntryDoNotInclude');
+                    var cell = elInstance.getCell(`B${parseInt(y) + 1}`)
+                    cell.classList.remove('shipmentEntryDoNotInclude');
+                    var element = document.getElementById("shipmentsDetailsTable");
+                    element.classList.remove("jexcelremoveReadonlybackground");
+                }
+
+                if (rowData[11].toString() == "true") {
+                    console.log("In if");
+                    elInstance.setStyle(col, "color", "#000");
+                    elInstance.setStyle(col, "color", "red");
+                    var cell = elInstance.getCell(`Q${parseInt(y) + 1}`)
+                    cell.classList.add('shipmentEntryEmergency');
+                    var cell = elInstance.getCell(`K${parseInt(y) + 1}`)
+                    cell.classList.add('shipmentEntryEmergency');
+                    var cell = elInstance.getCell(`B${parseInt(y) + 1}`)
+                    cell.classList.add('shipmentEntryEmergency');
+                } else {
+                    console.log("In else")
+                    elInstance.setStyle(col, "color", "#000");
+                    var cell = elInstance.getCell(`Q${parseInt(y) + 1}`)
+                    cell.classList.remove('shipmentEntryEmergency');
+                    var cell = elInstance.getCell(`K${parseInt(y) + 1}`)
+                    cell.classList.remove('shipmentEntryEmergency');
+                    var cell = elInstance.getCell(`B${parseInt(y) + 1}`)
+                    cell.classList.remove('shipmentEntryEmergency');
+                }
+
+                if (rowData[29].toString() == "false") {
+                    elInstance.setStyle(col, "color", "#000");
+                    elInstance.setStyle(col, "color", "#808080");
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "#808080");
+                    var element = document.getElementById("shipmentsDetailsTable");
+                    element.classList.remove("jexcelremoveReadonlybackground");
+                    var cell = elInstance.getCell(`Q${parseInt(y) + 1}`)
+                    cell.classList.add('shipmentEntryDelete');
+                    var cell = elInstance.getCell(`K${parseInt(y) + 1}`)
+                    cell.classList.add('shipmentEntryDelete');
+                    var cell = elInstance.getCell(`B${parseInt(y) + 1}`)
+                    cell.classList.add('shipmentEntryDelete');
+                } else {
+                    if (rowData[0].toString() == "false") {
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setStyle(col, "background-color", "#D3D3D3");
+                        var cell = elInstance.getCell(`Q${parseInt(y) + 1}`)
+                        cell.classList.add('shipmentEntryDoNotInclude');
+                        var cell = elInstance.getCell(`K${parseInt(y) + 1}`)
+                        cell.classList.add('shipmentEntryDoNotInclude');
+                        var cell = elInstance.getCell(`B${parseInt(y) + 1}`)
+                        cell.classList.add('shipmentEntryDoNotInclude');
+                        var element = document.getElementById("shipmentsDetailsTable");
+                        element.classList.remove("jexcelremoveReadonlybackground");
+                    } else {
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        var cell = elInstance.getCell(`Q${parseInt(y) + 1}`)
+                        cell.classList.remove('shipmentEntryDoNotInclude');
+                        var cell = elInstance.getCell(`K${parseInt(y) + 1}`)
+                        cell.classList.remove('shipmentEntryDoNotInclude');
+                        var cell = elInstance.getCell(`B${parseInt(y) + 1}`)
+                        cell.classList.remove('shipmentEntryDoNotInclude');
+                        var element = document.getElementById("shipmentsDetailsTable");
+                        element.classList.remove("jexcelremoveReadonlybackground");
+                    }
+                    if (rowData[11].toString() == "true") {
+                        console.log("In if");
+                        elInstance.setStyle(col, "color", "#000");
+                        elInstance.setStyle(col, "color", "red");
+                        var cell = elInstance.getCell(`Q${parseInt(y) + 1}`)
+                        cell.classList.add('shipmentEntryEmergency');
+                        var cell = elInstance.getCell(`K${parseInt(y) + 1}`)
+                        cell.classList.add('shipmentEntryEmergency');
+                        var cell = elInstance.getCell(`B${parseInt(y) + 1}`)
+                        cell.classList.add('shipmentEntryEmergency');
+                    } else {
+                        console.log("In else")
+                        elInstance.setStyle(col, "color", "#000");
+                        var cell = elInstance.getCell(`Q${parseInt(y) + 1}`)
+                        cell.classList.remove('shipmentEntryEmergency');
+                        var cell = elInstance.getCell(`K${parseInt(y) + 1}`)
+                        cell.classList.remove('shipmentEntryEmergency');
+                        var cell = elInstance.getCell(`B${parseInt(y) + 1}`)
+                        cell.classList.remove('shipmentEntryEmergency');
+                    }
                 }
             }
         }

@@ -923,7 +923,7 @@ export default class SupplyPlanComponent extends React.Component {
                         }
                     },
                     gridLines: {
-                        display: false
+                        drawBorder: true, lineWidth: 0
                     },
                     position: 'left',
                 },
@@ -940,7 +940,7 @@ export default class SupplyPlanComponent extends React.Component {
                         fontColor: 'black'
                     },
                     gridLines: {
-                        display: false
+                        drawBorder: true, lineWidth: 0
                     },
                     position: 'right',
                 }
@@ -950,7 +950,7 @@ export default class SupplyPlanComponent extends React.Component {
                         fontColor: 'black'
                     },
                     gridLines: {
-                        display: false
+                        drawBorder: true, lineWidth: 0
                     }
                 }]
             },

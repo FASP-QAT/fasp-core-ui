@@ -10,6 +10,7 @@ import { jExcelLoadedFunction, jExcelLoadedFunctionWithoutPagination, jExcelLoad
 import { ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE, JEXCEL_DATE_FORMAT_WITHOUT_DATE } from '../../Constants';
 import RealmCountryService from '../../api/RealmCountryService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
 export default class PipelineProgramConsumption extends Component {
 
     constructor(props) {
@@ -163,26 +164,46 @@ export default class PipelineProgramConsumption extends Component {
             }
             var map = new Map(Object.entries(json[y]));
             var col = ("C").concat(parseInt(y) + 1);
-            var value = map.get("2");
-            if (value != "" && !isNaN(parseInt(value))) {
+            // var value = map.get("2");
+            var value = (this.el.getRowData(y)[2]).toString();
+            // if (value != "" && !isNaN(parseInt(value))) {
+            //     this.el.setStyle(col, "background-color", "transparent");
+            //     this.el.setComments(col, ""); 
+            // } else {
+            //     this.el.setStyle(col, "background-color", "transparent");
+            //     this.el.setStyle(col, "background-color", "yellow");
+            //     this.el.setComments(col, (list[map.get("2")].regionId).concat(i18n.t('static.message.notExist')));
+            // }
+            if (value != "" && value > 0) {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
             } else {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, (list[map.get("2")].regionId).concat(i18n.t('static.message.notExist')));
+                this.el.setComments(col, (list[y].regionId).concat(i18n.t('static.message.notExist')));
             }
+
             var col = ("D").concat(parseInt(y) + 1);
-            var value = map.get("3");
-            if (value != "" && !isNaN(parseInt(value))) {
+            // var value = map.get("3");
+            var value = (this.el.getRowData(y)[3]).toString();
+            // if (value != "" && !isNaN(parseInt(value))) {
+            //     this.el.setStyle(col, "background-color", "transparent");
+            //     this.el.setComments(col, "");
+            // } else {
+            //     this.el.setStyle(col, "background-color", "transparent");
+            //     this.el.setStyle(col, "background-color", "yellow");
+            //     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            //     // this.el.setComments(col, (list[y].dataSourceId).concat(" Does not exist."));
+            // }
+            if (value != "" && value > 0) {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
             } else {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                // this.el.setComments(col, (list[y].dataSourceId).concat(" Does not exist."));
+                this.el.setComments(col, (list[y].realmCountryPlanningUnitId).concat(i18n.t('static.message.notExist')));
             }
+
 
 
         }
@@ -388,7 +409,8 @@ export default class PipelineProgramConsumption extends Component {
                                             // { title: 'Last Modified date', type: 'text', readOnly: true },
                                             // { title: 'Last Modified by', type: 'text', readOnly: true }
                                         ],
-                                        pagination: 10,
+                                        pagination: localStorage.getItem("sesRecordCount"),
+                                        contextMenu: false,
                                         search: true,
                                         columnSorting: true,
                                         tableOverflow: true,
@@ -400,10 +422,10 @@ export default class PipelineProgramConsumption extends Component {
                                         oneditionend: this.onedit,
                                         allowInsertRow: false,
                                         copyCompatibility: true,
-                                        paginationOptions: [10, 25, 50],
+                                        paginationOptions: JEXCEL_PAGINATION_OPTION,
                                         position: 'top',
                                         text: {
-                                            showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
+                                            showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')} `,
                                             show: '',
                                             entries: '',
                                         },

@@ -26,6 +26,21 @@ import i18n from '../../i18n';
 import { Online } from 'react-detect-offline';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
+import EditBudgetTicketComponent from './EditBudgetTicketComponent';
+import EditDataSourceTicketComponent from './EditDataSourceTicketComponent';
+import EditFundingSourceTicketComponent from './EditFundingSourceTicketComponent';
+import EditForecastingUnitTicketComponent from './EditForecastingUnitTicketComponent';
+import EditOrganisationTicketComponent from './EditOrganisationTicketComponent';
+import EditPlanningUnitTicketComponent from './EditPlanningUnitTicketComponent';
+import EditProductCategoryTicketComponent from './EditProductCategoryTicketComponent';
+import EditProcurementAgentTicketComponent from './EditProcurementAgentTicketComponent';
+import EditProgramTicketComponent from './EditProgramTicketComponent';
+import EditRealmTicketComponent from './EditRealmTicketComponent';
+import EditRealmCountryTicketComponent from './EditRealmCountryTicketComponent';
+import EditRealmCountryRegionTicketComponent from './EditRealmCountryRegionTicketComponent';
+import EditTechnicalAreaTicketComponent from './EditTechnicalAreaTicketComponent';
+import EditTracerCategoryTicketComponent from './EditTracerCategoryTicketComponent';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 
 export default class InitialTicketPageComponent extends Component {
 
@@ -65,25 +80,44 @@ export default class InitialTicketPageComponent extends Component {
       showProcurementUnitData: 0,
       showProgramData: 0,
       showRealmCountryData: 0,
-      showRealmCountryRegionData: 0
+      showRealmCountryRegionData: 0,
+      showAddEditMaster: 0,
+      showEditMaster: 0,
+
+      showEditBudgetData: 0,
+      showEditDataSourceData: 0,
+      showEditFundingSourceData: 0,
+      showEditForecastingUnitData: 0,
+      showEditOrganizationData: 0,
+      showEditPlanningUnitData: 0,
+      showEditProductCategoryData: 0,
+      showEditProcurementAgentData: 0,
+      showEditProgramData: 0,
+      showEditRealmData: 0,
+      showEditRealmCountryData: 0,
+      showEditRealmCountryRegionData: 0,
+      showEditTechnicalAreaData: 0,
+      showEditTracerCategoryData: 0
     };
 
     this.togglehelp = this.togglehelp.bind(this);
     this.toggleLarge = this.toggleLarge.bind(this);
     this.toggleSmall = this.toggleSmall.bind(this);
     this.togglebugreport = this.togglebugreport.bind(this);
-    this.toggleApplicationChangeAdditional = this.toggleApplicationChangeAdditional.bind(this);
-    this.toggleRealmChangeAdditional = this.toggleRealmChangeAdditional.bind(this);
-    this.toggleProgramChangeAdditional = this.toggleProgramChangeAdditional.bind(this);
     this.togglechangemaster = this.togglechangemaster.bind(this);
     this.toggleMain = this.toggleMain.bind(this);
     this.toggleMain1 = this.toggleMain1.bind(this);
-    this.toggleApplicationMasterForm = this.toggleApplicationMasterForm.bind(this);
-    this.toggleRealmMasterForm = this.toggleRealmMasterForm.bind(this);
-    this.toggleProgramMasterForm = this.toggleProgramMasterForm.bind(this);
+    this.toggleMain2 = this.toggleMain2.bind(this);
+    this.toggleMain3 = this.toggleMain3.bind(this);
     this.toggleMasterInitial = this.toggleMasterInitial.bind(this);
     this.toggleSubMaster = this.toggleSubMaster.bind(this);
     this.toggleUserMaster = this.toggleUserMaster.bind(this);
+    this.toggleMasterList = this.toggleMasterList.bind(this);
+    this.toggleEditMaster = this.toggleEditMaster.bind(this);
+    this.showOnlyAddMasterForms = this.showOnlyAddMasterForms.bind(this);
+    this.backFromAddMasterForms = this.backFromAddMasterForms.bind(this);
+    this.showOnlyEditMasterForms = this.showOnlyEditMasterForms.bind(this);
+    this.backFromEditMasterForms = this.backFromEditMasterForms.bind(this);
   }
 
   componentDidMount() {
@@ -119,7 +153,24 @@ export default class InitialTicketPageComponent extends Component {
         showProcurementUnitData: 0,
         showProgramData: 0,
         showRealmCountryData: 0,
-        showRealmCountryRegionData: 0
+        showRealmCountryRegionData: 0,
+        showAddEditMaster: 0,
+        showEditMaster: 0,
+
+        showEditBudgetData: 0,
+        showEditDataSourceData: 0,
+        showEditFundingSourceData: 0,
+        showEditForecastingUnitData: 0,
+        showEditOrganizationData: 0,
+        showEditPlanningUnitData: 0,
+        showEditProductCategoryData: 0,
+        showEditProcurementAgentData: 0,
+        showEditProgramData: 0,
+        showEditRealmData: 0,
+        showEditRealmCountryData: 0,
+        showEditRealmCountryRegionData: 0,
+        showEditTechnicalAreaData: 0,
+        showEditTracerCategoryData: 0
       });
     } else {
       confirmAlert({
@@ -162,9 +213,23 @@ export default class InitialTicketPageComponent extends Component {
   togglechangemaster() {
     this.setState({
       changemaster: !this.state.changemaster,
-      showOnlyMaster: 1,
+      showAddEditMaster: 1,
       initialPage: 0,
       showBugReport: 0
+    });
+  }
+
+  toggleMasterList() {
+    this.setState({
+      showAddEditMaster: 0,
+      showOnlyMaster: 1
+    });
+  }
+
+  toggleEditMaster() {
+    this.setState({
+      showAddEditMaster: 0,
+      showEditMaster: 1
     });
   }
 
@@ -189,7 +254,21 @@ export default class InitialTicketPageComponent extends Component {
   toggleMain1() {
     this.setState({
       initialPage: 1,
+      showAddEditMaster: 0
+    });
+  }
+
+  toggleMain2() {
+    this.setState({
+      showAddEditMaster: 1,
       showOnlyMaster: 0
+    });
+  }
+
+  toggleMain3() {
+    this.setState({
+      showAddEditMaster: 1,
+      showEditMaster: 0
     });
   }
 
@@ -233,131 +312,8 @@ export default class InitialTicketPageComponent extends Component {
     }
   }
 
-  //Show application sub masters data
-  toggleApplicationChangeAdditional(formNo) {
+  showOnlyAddMasterForms(formNo) {
     if (formNo == 1) {
-      this.setState({
-        changeadditional: !this.state.changeadditional,
-        showOnlyMaster: 0,
-        showBugReport: 0,
-        showOnlyApplicationMaster: 0,
-        showUserData: 1
-      });
-    } else if (formNo == 2) {
-      this.setState({
-        changeadditional: !this.state.changeadditional,
-        showOnlyMaster: 0,
-        showBugReport: 0,
-        showOnlyApplicationMaster: 0,
-        showCountryData: 1
-      });
-    } else if (formNo == 3) {
-      this.setState({
-        changeadditional: !this.state.changeadditional,
-        showOnlyMaster: 0,
-        showBugReport: 0,
-        showOnlyApplicationMaster: 0,
-        showCurrencyData: 1
-      });
-    } else if (formNo == 4) {
-      this.setState({
-        changeadditional: !this.state.changeadditional,
-        showOnlyMaster: 0,
-        showBugReport: 0,
-        showOnlyApplicationMaster: 0,
-        showUnitData: 1
-      });
-    }
-  }
-
-  //Show realm sub masters data
-  toggleRealmChangeAdditional(formNo) {
-    if (formNo == 1) {
-      this.setState({
-        changeadditional: !this.state.changeadditional,
-        showOnlyMaster: 0,
-        showBugReport: 0,
-        showOnlyRealmMaster: 0,
-        showRealmData: 1
-      });
-    } else if (formNo == 2) {
-      this.setState({
-        changeadditional: !this.state.changeadditional,
-        showOnlyMaster: 0,
-        showBugReport: 0,
-        showOnlyRealmMaster: 0,
-        showRealmCountryData: 1
-      });
-    } else if (formNo == 3) {
-      this.setState({
-        changeadditional: !this.state.changeadditional,
-        showOnlyMaster: 0,
-        showBugReport: 0,
-        showOnlyRealmMaster: 0,
-        showDataSourceData: 1
-      });
-    } else if (formNo == 4) {
-      this.setState({
-        changeadditional: !this.state.changeadditional,
-        showOnlyMaster: 0,
-        showBugReport: 0,
-        showOnlyRealmMaster: 0,
-        showFundingSourceData: 1
-      });
-    } else if (formNo == 5) {
-      this.setState({
-        changeadditional: !this.state.changeadditional,
-        showOnlyMaster: 0,
-        showBugReport: 0,
-        showOnlyRealmMaster: 0,
-        showProcurementAgentData: 1
-      });
-    } else if (formNo == 6) {
-      this.setState({
-        changeadditional: !this.state.changeadditional,
-        showOnlyMaster: 0,
-        showBugReport: 0,
-        showOnlyRealmMaster: 0,
-        showSupplierData: 1
-      });
-    } else if (formNo == 7) {
-      this.setState({
-        changeadditional: !this.state.changeadditional,
-        showOnlyMaster: 0,
-        showBugReport: 0,
-        showOnlyRealmMaster: 0,
-        showTechnicalAreaData: 1
-      });
-    } else if (formNo == 8) {
-      this.setState({
-        changeadditional: !this.state.changeadditional,
-        showOnlyMaster: 0,
-        showBugReport: 0,
-        showOnlyRealmMaster: 0,
-        showOrganizationData: 1
-      });
-    } else if (formNo == 9) {
-      this.setState({
-        changeadditional: !this.state.changeadditional,
-        showOnlyMaster: 0,
-        showBugReport: 0,
-        showOnlyRealmMaster: 0,
-        showRealmCountryRegionData: 1
-      });
-    }
-  }
-
-  //Show program sub masters data
-  toggleProgramChangeAdditional(formNo) {
-    if (formNo == 1) {
-      this.setState({
-        changeadditional: !this.state.changeadditional,
-        showOnlyMaster: 0,
-        showBugReport: 0,
-        showOnlyProgramMaster: 0,
-        showProgramData: 1
-      });
-    } else if (formNo == 2) {
       this.setState({
         changeadditional: !this.state.changeadditional,
         showOnlyMaster: 0,
@@ -365,13 +321,21 @@ export default class InitialTicketPageComponent extends Component {
         showOnlyProgramMaster: 0,
         showBudgetData: 1
       });
+    } else if (formNo == 2) {
+      this.setState({
+        changeadditional: !this.state.changeadditional,
+        showOnlyMaster: 0,
+        showBugReport: 0,
+        showOnlyProgramMaster: 0,
+        showDataSourceData: 1
+      });
     } else if (formNo == 3) {
       this.setState({
         changeadditional: !this.state.changeadditional,
         showOnlyMaster: 0,
         showBugReport: 0,
         showOnlyProgramMaster: 0,
-        showTracerCategoryData: 1
+        showFundingSourceData: 1
       });
     } else if (formNo == 4) {
       this.setState({
@@ -379,7 +343,7 @@ export default class InitialTicketPageComponent extends Component {
         showOnlyMaster: 0,
         showBugReport: 0,
         showOnlyProgramMaster: 0,
-        showProductCategoryData: 1
+        showForecastingUnitData: 1
       });
     } else if (formNo == 5) {
       this.setState({
@@ -387,7 +351,7 @@ export default class InitialTicketPageComponent extends Component {
         showOnlyMaster: 0,
         showBugReport: 0,
         showOnlyProgramMaster: 0,
-        showForecastingUnitData: 1
+        showOrganizationData: 1
       });
     } else if (formNo == 6) {
       this.setState({
@@ -403,122 +367,329 @@ export default class InitialTicketPageComponent extends Component {
         showOnlyMaster: 0,
         showBugReport: 0,
         showOnlyProgramMaster: 0,
-        showProcurementUnitData: 1
+        showProductCategoryData: 1
+      });
+    } else if (formNo == 8) {
+      this.setState({
+        changeadditional: !this.state.changeadditional,
+        showOnlyMaster: 0,
+        showBugReport: 0,
+        showOnlyProgramMaster: 0,
+        showProcurementAgentData: 1
+      });
+    } else if (formNo == 9) {
+      this.setState({
+        changeadditional: !this.state.changeadditional,
+        showOnlyMaster: 0,
+        showBugReport: 0,
+        showOnlyProgramMaster: 0,
+        showProgramData: 1
+      });
+    } else if (formNo == 10) {
+      this.setState({
+        changeadditional: !this.state.changeadditional,
+        showOnlyMaster: 0,
+        showBugReport: 0,
+        showOnlyProgramMaster: 0,
+        showRealmData: 1
+      });
+    } else if (formNo == 11) {
+      this.setState({
+        changeadditional: !this.state.changeadditional,
+        showOnlyMaster: 0,
+        showBugReport: 0,
+        showOnlyProgramMaster: 0,
+        showRealmCountryData: 1
+      });
+    } else if (formNo == 12) {
+      this.setState({
+        changeadditional: !this.state.changeadditional,
+        showOnlyMaster: 0,
+        showBugReport: 0,
+        showOnlyProgramMaster: 0,
+        showRealmCountryRegionData: 1
+      });
+    } else if (formNo == 13) {
+      this.setState({
+        changeadditional: !this.state.changeadditional,
+        showOnlyMaster: 0,
+        showBugReport: 0,
+        showOnlyProgramMaster: 0,
+        showTechnicalAreaData: 1
+      });
+    } else if (formNo == 14) {
+      this.setState({
+        changeadditional: !this.state.changeadditional,
+        showOnlyMaster: 0,
+        showBugReport: 0,
+        showOnlyProgramMaster: 0,
+        showTracerCategoryData: 1
       });
     }
+
   }
 
-  //Show application sub master page back from application sub master forms
-  toggleApplicationMasterForm(masterFormNo) {
+  backFromAddMasterForms(masterFormNo) {
     if (masterFormNo == 1) {
-      this.setState({
-        showUserData: 0,
-        showOnlyApplicationMaster: 1
-      });
-    } else if (masterFormNo == 2) {
-      this.setState({
-        showCountryData: 0,
-        showOnlyApplicationMaster: 1
-      });
-    } else if (masterFormNo == 3) {
-      this.setState({
-        showCurrencyData: 0,
-        showOnlyApplicationMaster: 1
-      });
-    } else if (masterFormNo == 4) {
-      this.setState({
-        showUnitData: 0,
-        showOnlyApplicationMaster: 1
-      });
-    }
-  }
-
-  //Show realm sub master page back from realm sub master forms
-  toggleRealmMasterForm(masterFormNo) {
-    if (masterFormNo == 1) {
-      this.setState({
-        showRealmData: 0,
-        showOnlyRealmMaster: 1
-      });
-    } else if (masterFormNo == 2) {
-      this.setState({
-        showRealmCountryData: 0,
-        showOnlyRealmMaster: 1
-      });
-    } else if (masterFormNo == 3) {
-      this.setState({
-        showDataSourceData: 0,
-        showOnlyRealmMaster: 1
-      });
-    } else if (masterFormNo == 4) {
-      this.setState({
-        showFundingSourceData: 0,
-        showOnlyRealmMaster: 1
-      });
-    } else if (masterFormNo == 5) {
-      this.setState({
-        showProcurementAgentData: 0,
-        showOnlyRealmMaster: 1
-      });
-    } else if (masterFormNo == 6) {
-      this.setState({
-        showSupplierData: 0,
-        showOnlyRealmMaster: 1
-      });
-    } else if (masterFormNo == 7) {
-      this.setState({
-        showTechnicalAreaData: 0,
-        showOnlyRealmMaster: 1
-      });
-    } else if (masterFormNo == 8) {
-      this.setState({
-        showOrganizationData: 0,
-        showOnlyRealmMaster: 1
-      });
-    } else if (masterFormNo == 9) {
-      this.setState({
-        showRealmCountryRegionData: 0,
-        showOnlyRealmMaster: 1
-      });
-    }
-  }
-
-  //Show program sub master page back from program sub master forms
-  toggleProgramMasterForm(masterFormNo) {
-    if (masterFormNo == 1) {
-      this.setState({
-        showProgramData: 0,
-        showOnlyProgramMaster: 1
-      });
-    } else if (masterFormNo == 2) {
       this.setState({
         showBudgetData: 0,
-        showOnlyProgramMaster: 1
+        showOnlyMaster: 1
+      });
+    } else if (masterFormNo == 2) {
+      this.setState({
+        showDataSourceData: 0,
+        showOnlyMaster: 1
       });
     } else if (masterFormNo == 3) {
       this.setState({
-        showTracerCategoryData: 0,
-        showOnlyProgramMaster: 1
+        showFundingSourceData: 0,
+        showOnlyMaster: 1
       });
     } else if (masterFormNo == 4) {
       this.setState({
-        showProductCategoryData: 0,
-        showOnlyProgramMaster: 1
+        showForecastingUnitData: 0,
+        showOnlyMaster: 1
       });
     } else if (masterFormNo == 5) {
       this.setState({
-        showForecastingUnitData: 0,
-        showOnlyProgramMaster: 1
+        showOrganizationData: 0,
+        showOnlyMaster: 1
       });
     } else if (masterFormNo == 6) {
       this.setState({
         showPlanningUnitData: 0,
-        showOnlyProgramMaster: 1
+        showOnlyMaster: 1
       });
     } else if (masterFormNo == 7) {
       this.setState({
-        showProcurementUnitData: 0,
-        showOnlyProgramMaster: 1
+        showProductCategoryData: 0,
+        showOnlyMaster: 1
+      });
+    } else if (masterFormNo == 8) {
+      this.setState({
+        showProcurementAgentData: 0,
+        showOnlyMaster: 1
+      });
+    } else if (masterFormNo == 9) {
+      this.setState({
+        showProgramData: 0,
+        showOnlyMaster: 1
+      });
+    } else if (masterFormNo == 10) {
+      this.setState({
+        showRealmData: 0,
+        showOnlyMaster: 1
+      });
+    } else if (masterFormNo == 11) {
+      this.setState({
+        showRealmCountryData: 0,
+        showOnlyMaster: 1
+      });
+    } else if (masterFormNo == 12) {
+      this.setState({
+        showRealmCountryRegionData: 0,
+        showOnlyMaster: 1
+      });
+    } else if (masterFormNo == 13) {
+      this.setState({
+        showTechnicalAreaData: 0,
+        showOnlyMaster: 1
+      });
+    } else if (masterFormNo == 14) {
+      this.setState({
+        showTracerCategoryData: 0,
+        showOnlyMaster: 1
+      });
+    }
+  }
+
+  showOnlyEditMasterForms(formNo) {
+    if (formNo == 1) {
+      this.setState({
+        changeadditional: !this.state.changeadditional,
+        showEditMaster: 0,
+        showBugReport: 0,
+        showOnlyProgramMaster: 0,
+        showEditBudgetData: 1
+      });
+    } else if (formNo == 2) {
+      this.setState({
+        changeadditional: !this.state.changeadditional,
+        showEditMaster: 0,
+        showBugReport: 0,
+        showOnlyProgramMaster: 0,
+        showEditDataSourceData: 1
+      });
+    } else if (formNo == 3) {
+      this.setState({
+        changeadditional: !this.state.changeadditional,
+        showEditMaster: 0,
+        showBugReport: 0,
+        showOnlyProgramMaster: 0,
+        showEditFundingSourceData: 1
+      });
+    } else if (formNo == 4) {
+      this.setState({
+        changeadditional: !this.state.changeadditional,
+        showEditMaster: 0,
+        showBugReport: 0,
+        showOnlyProgramMaster: 0,
+        showEditForecastingUnitData: 1
+      });
+    } else if (formNo == 5) {
+      this.setState({
+        changeadditional: !this.state.changeadditional,
+        showEditMaster: 0,
+        showBugReport: 0,
+        showOnlyProgramMaster: 0,
+        showEditOrganizationData: 1
+      });
+    } else if (formNo == 6) {
+      this.setState({
+        changeadditional: !this.state.changeadditional,
+        showEditMaster: 0,
+        showBugReport: 0,
+        showOnlyProgramMaster: 0,
+        showEditPlanningUnitData: 1
+      });
+    } else if (formNo == 7) {
+      this.setState({
+        changeadditional: !this.state.changeadditional,
+        showEditMaster: 0,
+        showBugReport: 0,
+        showOnlyProgramMaster: 0,
+        showEditProductCategoryData: 1
+      });
+    } else if (formNo == 8) {
+      this.setState({
+        changeadditional: !this.state.changeadditional,
+        showEditMaster: 0,
+        showBugReport: 0,
+        showOnlyProgramMaster: 0,
+        showEditProcurementAgentData: 1
+      });
+    } else if (formNo == 9) {
+      this.setState({
+        changeadditional: !this.state.changeadditional,
+        showEditMaster: 0,
+        showBugReport: 0,
+        showOnlyProgramMaster: 0,
+        showEditProgramData: 1
+      });
+    } else if (formNo == 10) {
+      this.setState({
+        changeadditional: !this.state.changeadditional,
+        showEditMaster: 0,
+        showBugReport: 0,
+        showOnlyProgramMaster: 0,
+        showEditRealmData: 1
+      });
+    } else if (formNo == 11) {
+      this.setState({
+        changeadditional: !this.state.changeadditional,
+        showEditMaster: 0,
+        showBugReport: 0,
+        showOnlyProgramMaster: 0,
+        showEditRealmCountryData: 1
+      });
+    } else if (formNo == 12) {
+      this.setState({
+        changeadditional: !this.state.changeadditional,
+        showEditMaster: 0,
+        showBugReport: 0,
+        showOnlyProgramMaster: 0,
+        showEditRealmCountryRegionData: 1
+      });
+    } else if (formNo == 13) {
+      this.setState({
+        changeadditional: !this.state.changeadditional,
+        showEditMaster: 0,
+        showBugReport: 0,
+        showOnlyProgramMaster: 0,
+        showEditTechnicalAreaData: 1
+      });
+    } else if (formNo == 14) {
+      this.setState({
+        changeadditional: !this.state.changeadditional,
+        showEditMaster: 0,
+        showBugReport: 0,
+        showOnlyProgramMaster: 0,
+        showEditTracerCategoryData: 1
+      });
+    }
+
+  }
+
+  backFromEditMasterForms(masterFormNo) {
+    if (masterFormNo == 1) {
+      this.setState({
+        showEditBudgetData: 0,
+        showEditMaster: 1
+      });
+    } else if (masterFormNo == 2) {
+      this.setState({
+        showEditDataSourceData: 0,
+        showEditMaster: 1
+      });
+    } else if (masterFormNo == 3) {
+      this.setState({
+        showEditFundingSourceData: 0,
+        showEditMaster: 1
+      });
+    } else if (masterFormNo == 4) {
+      this.setState({
+        showEditForecastingUnitData: 0,
+        showEditMaster: 1
+      });
+    } else if (masterFormNo == 5) {
+      this.setState({
+        showEditOrganizationData: 0,
+        showEditMaster: 1
+      });
+    } else if (masterFormNo == 6) {
+      this.setState({
+        showEditPlanningUnitData: 0,
+        showEditMaster: 1
+      });
+    } else if (masterFormNo == 7) {
+      this.setState({
+        showEditProductCategoryData: 0,
+        showEditMaster: 1
+      });
+    } else if (masterFormNo == 8) {
+      this.setState({
+        showEditProcurementAgentData: 0,
+        showEditMaster: 1
+      });
+    } else if (masterFormNo == 9) {
+      this.setState({
+        showEditProgramData: 0,
+        showEditMaster: 1
+      });
+    } else if (masterFormNo == 10) {
+      this.setState({
+        showEditRealmData: 0,
+        showEditMaster: 1
+      });
+    } else if (masterFormNo == 11) {
+      this.setState({
+        showEditRealmCountryData: 0,
+        showEditMaster: 1
+      });
+    } else if (masterFormNo == 12) {
+      this.setState({
+        showEditRealmCountryRegionData: 0,
+        showEditMaster: 1
+      });
+    } else if (masterFormNo == 13) {
+      this.setState({
+        showEditTechnicalAreaData: 0,
+        showEditMaster: 1
+      });
+    } else if (masterFormNo == 14) {
+      this.setState({
+        showEditTracerCategoryData: 0,
+        showEditMaster: 1
       });
     }
   }
@@ -532,21 +703,10 @@ export default class InitialTicketPageComponent extends Component {
 
         <img src={imageHelp} className="HelpIcon" title={i18n.t('static.ticket.help')} onClick={this.togglehelp} />
 
-        {/* <Modal isOpen={this.state.small} toggle={this.toggleSmall}
-          className={'modal-sm modal-dialog-center'} aria-labelledby="contained-modal-title-vcenter"
-          centered>
-          <ModalHeader toggle={this.toggleSmall} className="ModalHead modal-info-Headher"><b>Message!</b></ModalHeader>
-          <ModalBody>
-            {i18n.t('static.ticket.ticketcreated')}
-            <br></br><br></br>
-            {i18n.t('static.ticket.ticketcode')}: {this.state.message}
-          </ModalBody>
-          <ModalFooter>
-            <Button color="primary" onClick={() => { this.toggleSmall('') }}>OK</Button>{' '}
-          </ModalFooter>
-        </Modal> */}
+
 
         <Modal isOpen={this.state.help} toggle={this.togglehelp} className={this.props.className} backdrop="static">
+        <AuthenticationServiceComponent history={this.props.history} />
           {/* className={'modal-info ' + this.props.className}> */}
           <ModalHeader toggle={this.togglehelp} className="ModalHead modal-info-Headher"><strong>{i18n.t('static.ticket.help')}</strong></ModalHeader>
           <ModalBody className="pb-0">
@@ -577,94 +737,104 @@ export default class InitialTicketPageComponent extends Component {
               {/* className={'modal-info ' + this.props.className}> */}
               {/* <ModalHeader toggle={this.togglechangemaster} className="ModalHead modal-info-Headher"><strong>Help</strong></ModalHeader> */}
               <ModalBody>
-                {this.state.showOnlyMaster == 1 && <div className="mt-2 mb-2">
-                  <div><h4>{i18n.t('static.ticket.requestTo')}</h4></div><br></br>
+
+                {this.state.showAddEditMaster == 1 && <div className="mt-2 mb-2">
+
                   <ListGroup>
-                    {/* <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleSubMaster(1) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.dashboard.applicationmaster')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem> */}
-                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleSubMaster(3) }} action><i className="icon-note  icons helpclickicon mr-2"></i> {i18n.t('static.dashboard.programmaster')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
-                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleSubMaster(2) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.dashboard.realmlevelmaster')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
+                    <ListGroupItem className="list-group-item-help" tag="a" onClick={this.toggleMasterList} action><i className="icon-note  icons helpclickicon mr-2"></i> {i18n.t('static.ticket.addMasters')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
+                    <ListGroupItem className="list-group-item-help" tag="a" onClick={this.toggleEditMaster} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.ticket.editMasters')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                   </ListGroup>
                   <ModalFooter className="pb-0 pr-0">
                     <Button color="info" onClick={this.toggleMain1}><i className="fa fa-angle-double-left "></i>  Back</Button>
-                    {/* <Button color="success" onClick={this.togglebugreport}>Submit</Button> */}
                   </ModalFooter>
                 </div>}
 
-                {this.state.showOnlyApplicationMaster == 1 && <div className="mt-2 mb-2">
-                  <div><h4>{i18n.t('static.ticket.requestTo')}</h4></div><br></br>
+                {this.state.showOnlyMaster == 1 && <div className="mt-2 mb-2">
+                  <div><h4>{i18n.t('static.ticket.requestNewTo')}</h4></div><br></br>
                   <ListGroup>
-                    {/* <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleApplicationChangeAdditional(1) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.user.user')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem> */}
-                    {/* <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleApplicationChangeAdditional(2) }} action><i className="icon-note  icons helpclickicon mr-2"></i> {i18n.t('static.country.countryMaster')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem> */}
-                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleApplicationChangeAdditional(3) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.currency.currencyMaster')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
-                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleApplicationChangeAdditional(4) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.unit.unit')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
+
+                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyAddMasterForms(1) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.dashboard.budget')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
+                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyAddMasterForms(2) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.datasource.datasource')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
+                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyAddMasterForms(4) }} action><i className="icon-note  icons helpclickicon mr-2"></i> {i18n.t('static.forecastingunit.forecastingunit')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
+                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyAddMasterForms(3) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.fundingsource.fundingsource')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>                    
+                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyAddMasterForms(5) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.organisation.organisation')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
+                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyAddMasterForms(6) }} action><i className="icon-note  icons helpclickicon mr-2"></i> {i18n.t('static.planningunit.planningunit')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
+                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyAddMasterForms(7) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.product.productcategory')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
+                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyAddMasterForms(8) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.procurementagent.procurementagent')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
+                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyAddMasterForms(9) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.program.programMaster')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
+                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyAddMasterForms(10) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.realm.realm')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
+                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyAddMasterForms(11) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.program.realmcountrydashboard')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
+                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyAddMasterForms(12) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.dashboad.regioncountry')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
+                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyAddMasterForms(13) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.healtharea.healtharea')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
+                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyAddMasterForms(14) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.tracercategory.tracercategory')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
+
                   </ListGroup>
                   <ModalFooter className="pb-0 pr-0">
-                    <Button color="info" onClick={() => { this.toggleMasterInitial(1) }}><i className="fa fa-angle-double-left "></i>  Back</Button>
+                    <Button color="info" onClick={this.toggleMain2}><i className="fa fa-angle-double-left "></i>  Back</Button>
                     {/* <Button color="success" onClick={this.togglebugreport}>Submit</Button> */}
                   </ModalFooter>
                 </div>}
 
-                {this.state.showOnlyRealmMaster == 1 && <div className="mt-2 mb-2">
-                  <div><h4>{i18n.t('static.ticket.requestTo')}</h4></div><br></br>
+                {this.state.showEditMaster == 1 && <div className="mt-2 mb-2">
+                  <div><h4>{i18n.t('static.ticket.requestUpdateTo')}</h4></div><br></br>
                   <ListGroup>
-                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleRealmChangeAdditional(3) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.datasource.datasource')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
-                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleRealmChangeAdditional(4) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.fundingsource.fundingsource')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
-                    {/* <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleRealmChangeAdditional(6) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.supplier.supplier')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem> */}
-                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleRealmChangeAdditional(8) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.organisation.organisation')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
-                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleRealmChangeAdditional(5) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.procurementagent.procurementagent')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
-                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleRealmChangeAdditional(1) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.realm.realm')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
-                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleRealmChangeAdditional(2) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.dashboard.realmcountry')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
-                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleRealmChangeAdditional(9) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.dashboad.regioncountry')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
-                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleRealmChangeAdditional(7) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.healtharea.healtharea')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
+
+                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyEditMasterForms(1) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.dashboard.budget')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
+                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyEditMasterForms(2) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.datasource.datasource')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>                    
+                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyEditMasterForms(4) }} action><i className="icon-note  icons helpclickicon mr-2"></i> {i18n.t('static.forecastingunit.forecastingunit')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
+                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyEditMasterForms(3) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.fundingsource.fundingsource')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
+                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyEditMasterForms(5) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.organisation.organisation')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
+                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyEditMasterForms(6) }} action><i className="icon-note  icons helpclickicon mr-2"></i> {i18n.t('static.planningunit.planningunit')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
+                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyEditMasterForms(7) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.product.productcategory')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
+                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyEditMasterForms(8) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.procurementagent.procurementagent')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
+                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyEditMasterForms(9) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.program.programMaster')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
+                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyEditMasterForms(10) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.realm.realm')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
+                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyEditMasterForms(11) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.program.realmcountrydashboard')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
+                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyEditMasterForms(12) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.dashboad.regioncountry')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
+                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyEditMasterForms(13) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.healtharea.healtharea')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
+                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyEditMasterForms(14) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.tracercategory.tracercategory')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
+
                   </ListGroup>
                   <ModalFooter className="pb-0 pr-0">
-                    <Button color="info" onClick={() => { this.toggleMasterInitial(2) }}><i className="fa fa-angle-double-left "></i>  Back</Button>
+                    <Button color="info" onClick={this.toggleMain3}><i className="fa fa-angle-double-left "></i>  Back</Button>
                     {/* <Button color="success" onClick={this.togglebugreport}>Submit</Button> */}
                   </ModalFooter>
                 </div>}
 
-                {this.state.showOnlyProgramMaster == 1 && <div className="mt-2 mb-2">
-                  <div><h4>{i18n.t('static.ticket.requestTo')}</h4></div><br></br>
-                  <ListGroup>
-                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleProgramChangeAdditional(2) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.dashboard.budget')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
-                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleProgramChangeAdditional(5) }} action><i className="icon-note  icons helpclickicon mr-2"></i> {i18n.t('static.forecastingunit.forecastingunit')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
-                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleProgramChangeAdditional(6) }} action><i className="icon-note  icons helpclickicon mr-2"></i> {i18n.t('static.planningunit.planningunit')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
-                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleProgramChangeAdditional(4) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.product.productcategory')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
-                    {/* <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleProgramChangeAdditional(7) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.procurementUnit.procurementUnit')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem> */}
-                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleProgramChangeAdditional(1) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.program.programMaster')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
-                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.toggleProgramChangeAdditional(3) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.tracercategory.tracercategory')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
-                  </ListGroup>
-                  <ModalFooter className="pb-0 pr-0">
-                    <Button color="info" onClick={() => { this.toggleMasterInitial(3) }}><i className="fa fa-angle-double-left "></i>  Back</Button>
-                    {/* <Button color="success" onClick={this.togglebugreport}>Submit</Button> */}
-                  </ModalFooter>
-                </div>}
+                {this.state.showUserData == 1 && <UserTicketComponent toggleMain={() => this.toggleMain()} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
 
-                {/* Application Master */}
-                {this.state.showUserData == 1 && <UserTicketComponent toggleMaster={() => this.toggleApplicationMasterForm(1)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} toggleMain={this.toggleMain} />}
-                {/* {this.state.showCountryData == 1 && <CountryTicketComponent toggleMaster={() => this.toggleApplicationMasterForm(2)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />} */}
-                {this.state.showCurrencyData == 1 && <CurrencyTicketComponent toggleMaster={() => this.toggleApplicationMasterForm(3)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
-                {this.state.showUnitData == 1 && <UnitsTicketComponent toggleMaster={() => this.toggleApplicationMasterForm(4)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
+                {this.state.showBudgetData == 1 && <BudgetTicketComponent toggleMaster={() => this.backFromAddMasterForms(1)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
+                {this.state.showDataSourceData == 1 && <DataSourceTicketComponent toggleMaster={() => this.backFromAddMasterForms(2)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
+                {this.state.showFundingSourceData == 1 && <FundingSourceTicketComponent toggleMaster={() => this.backFromAddMasterForms(3)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
+                {this.state.showForecastingUnitData == 1 && <ForecastingUnitTicketComponent toggleMaster={() => this.backFromAddMasterForms(4)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
+                {this.state.showOrganizationData == 1 && <OrganisationTicketComponent toggleMaster={() => this.backFromAddMasterForms(5)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
+                {this.state.showPlanningUnitData == 1 && <PlanningUnitTicketComponent toggleMaster={() => this.backFromAddMasterForms(6)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
+                {this.state.showProductCategoryData == 1 && <ProductCategoryTicketComponent toggleMaster={() => this.backFromAddMasterForms(7)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
+                {this.state.showProcurementAgentData == 1 && <ProcurementAgentTicketComponent toggleMaster={() => this.backFromAddMasterForms(8)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
+                {this.state.showProgramData == 1 && <ProgramTicketComponent toggleMaster={() => this.backFromAddMasterForms(9)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
+                {this.state.showRealmData == 1 && <RealmTicketComponent toggleMaster={() => this.backFromAddMasterForms(10)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
+                {this.state.showRealmCountryData == 1 && <RealmCountryTicketComponent toggleMaster={() => this.backFromAddMasterForms(11)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
+                {this.state.showRealmCountryRegionData == 1 && <RealmCountryRegionTicketComponent toggleMaster={() => this.backFromAddMasterForms(12)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
+                {this.state.showTechnicalAreaData == 1 && <TechnicalAreaTicketComponent toggleMaster={() => this.backFromAddMasterForms(13)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
+                {this.state.showTracerCategoryData == 1 && <TracerCategoryTicketComponent toggleMaster={() => this.backFromAddMasterForms(14)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
 
-                {/* Realm Master */}
-                {this.state.showRealmData == 1 && <RealmTicketComponent toggleMaster={() => this.toggleRealmMasterForm(1)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
-                {this.state.showRealmCountryData == 1 && <RealmCountryTicketComponent toggleMaster={() => this.toggleRealmMasterForm(2)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
-                {this.state.showDataSourceData == 1 && <DataSourceTicketComponent toggleMaster={() => this.toggleRealmMasterForm(3)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
-                {this.state.showFundingSourceData == 1 && <FundingSourceTicketComponent toggleMaster={() => this.toggleRealmMasterForm(4)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
-                {this.state.showProcurementAgentData == 1 && <ProcurementAgentTicketComponent toggleMaster={() => this.toggleRealmMasterForm(5)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
-                {/* {this.state.showSupplierData == 1 && <SuppliersTicketComponent toggleMaster={() => this.toggleRealmMasterForm(6)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />} */}
-                {this.state.showTechnicalAreaData == 1 && <TechnicalAreaTicketComponent toggleMaster={() => this.toggleRealmMasterForm(7)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
-                {this.state.showOrganizationData == 1 && <OrganisationTicketComponent toggleMaster={() => this.toggleRealmMasterForm(8)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
-                {this.state.showRealmCountryRegionData == 1 && <RealmCountryRegionTicketComponent toggleMaster={() => this.toggleRealmMasterForm(9)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
 
-                {/* Program Master */}
-                {this.state.showProgramData == 1 && <ProgramTicketComponent toggleMaster={() => this.toggleProgramMasterForm(1)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
-                {this.state.showBudgetData == 1 && <BudgetTicketComponent toggleMaster={() => this.toggleProgramMasterForm(2)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
-                {this.state.showTracerCategoryData == 1 && <TracerCategoryTicketComponent toggleMaster={() => this.toggleProgramMasterForm(3)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
-                {this.state.showProductCategoryData == 1 && <ProductCategoryTicketComponent toggleMaster={() => this.toggleProgramMasterForm(4)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
-                {this.state.showForecastingUnitData == 1 && <ForecastingUnitTicketComponent toggleMaster={() => this.toggleProgramMasterForm(5)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
-                {this.state.showPlanningUnitData == 1 && <PlanningUnitTicketComponent toggleMaster={() => this.toggleProgramMasterForm(6)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
-                {/* {this.state.showProcurementUnitData == 1 && <ProcurementUnitTicketComponent toggleMaster={() => this.toggleProgramMasterForm(7)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />} */}
+                {this.state.showEditBudgetData == 1 && <EditBudgetTicketComponent toggleMaster={() => this.backFromEditMasterForms(1)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
+                {this.state.showEditDataSourceData == 1 && <EditDataSourceTicketComponent toggleMaster={() => this.backFromEditMasterForms(2)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
+                {this.state.showEditFundingSourceData == 1 && <EditFundingSourceTicketComponent toggleMaster={() => this.backFromEditMasterForms(3)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
+                {this.state.showEditForecastingUnitData == 1 && <EditForecastingUnitTicketComponent toggleMaster={() => this.backFromEditMasterForms(4)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
+                {this.state.showEditOrganizationData == 1 && <EditOrganisationTicketComponent toggleMaster={() => this.backFromEditMasterForms(5)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
+                {this.state.showEditPlanningUnitData == 1 && <EditPlanningUnitTicketComponent toggleMaster={() => this.backFromEditMasterForms(6)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
+                {this.state.showEditProductCategoryData == 1 && <EditProductCategoryTicketComponent toggleMaster={() => this.backFromEditMasterForms(7)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
+                {this.state.showEditProcurementAgentData == 1 && <EditProcurementAgentTicketComponent toggleMaster={() => this.backFromEditMasterForms(8)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
+                {this.state.showEditProgramData == 1 && <EditProgramTicketComponent toggleMaster={() => this.backFromEditMasterForms(9)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
+                {this.state.showEditRealmData == 1 && <EditRealmTicketComponent toggleMaster={() => this.backFromEditMasterForms(10)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
+                {this.state.showEditRealmCountryData == 1 && <EditRealmCountryTicketComponent toggleMaster={() => this.backFromEditMasterForms(11)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
+                {this.state.showEditRealmCountryRegionData == 1 && <EditRealmCountryRegionTicketComponent toggleMaster={() => this.backFromEditMasterForms(12)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
+                {this.state.showEditTechnicalAreaData == 1 && <EditTechnicalAreaTicketComponent toggleMaster={() => this.backFromEditMasterForms(13)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
+                {this.state.showEditTracerCategoryData == 1 && <EditTracerCategoryTicketComponent toggleMaster={() => this.backFromEditMasterForms(14)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
+
+
               </ModalBody>
 
             </div>
@@ -675,107 +845,7 @@ export default class InitialTicketPageComponent extends Component {
 
 
         </Modal>
-        {/*Change Additaion master */}
-        {/* <Modal isOpen={this.state.changeadditional} toggle={this.togglechangeadditional}>
-                  <ModalHeader toggle={this.togglechangeadditional} className="ModalHead modal-info-Headher"><strong>Add/Update Planning Unit</strong></ModalHeader>
-                  <ModalBody>
-                   <div>
-                   <FormGroup>
-                  <Label >Forecasting Unit</Label>
-                  <Input type="text" />
-                </FormGroup>
-                <FormGroup>
-                  <Label >Unit</Label>
-                  <Input type="text"  />
-                </FormGroup>
-                <FormGroup>
-                  <Label >Planning Unit</Label>
-                  <Input type="text"  />
-                </FormGroup>
-                <FormGroup>
-                  <Label >Multiplier</Label>
-                  <Input type="text"  />
-                </FormGroup>
-                   </div>
-                  </ModalBody>
-                  <ModalFooter>
-                   
-                    <Button color="success" onClick={this.togglechangeadditional}>Submit</Button>
-                  </ModalFooter>
-                </Modal> */}
 
-        {/* <DropdownMenu right className="dropdown-menu-lg">
-          <DropdownItem header tag="div"><strong>You have {itemsCount} messages</strong></DropdownItem>
-          <DropdownItem href="#">
-            <div className="message">
-              <div className="pt-3 mr-3 float-left">
-                <div className="avatar">
-                  <img src={image7} className="img-avatar" alt="admin@bootstrapmaster.com" />
-                  <span className="avatar-status badge-success"></span>
-                </div>
-              </div>
-              <div>
-                <small className="text-muted">John Doe</small>
-                <small className="text-muted float-right mt-1">Just now</small>
-              </div>
-              <div className="text-truncate font-weight-bold"><span className="fa fa-exclamation text-danger"></span> Important message</div>
-              <div className="small text-muted text-truncate">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt...
-              </div>
-            </div>
-          </DropdownItem>
-          <DropdownItem href="#">
-            <div className="message">
-              <div className="pt-3 mr-3 float-left">
-                <div className="avatar">
-                  <img src={image6} className="img-avatar" alt="admin@bootstrapmaster.com" />
-                  <span className="avatar-status badge-warning"></span>
-                </div>
-              </div>
-              <div>
-                <small className="text-muted">Jane Doe</small>
-                <small className="text-muted float-right mt-1">5 minutes ago</small>
-              </div>
-              <div className="text-truncate font-weight-bold">Lorem ipsum dolor sit amet</div>
-              <div className="small text-muted text-truncate">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt...
-              </div>
-            </div>
-          </DropdownItem>
-          <DropdownItem href="#">
-            <div className="message">
-              <div className="pt-3 mr-3 float-left">
-                <div className="avatar">
-                  <img src={image5} className="img-avatar" alt="admin@bootstrapmaster.com" />
-                  <span className="avatar-status badge-danger"></span>
-                </div>
-              </div>
-              <div>
-                <small className="text-muted">Janet Doe</small>
-                <small className="text-muted float-right mt-1">1:52 PM</small>
-              </div>
-              <div className="text-truncate font-weight-bold">Lorem ipsum dolor sit amet</div>
-              <div className="small text-muted text-truncate">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt...
-              </div>
-            </div>
-          </DropdownItem>
-          <DropdownItem href="#">
-            <div className="message">
-              <div className="pt-3 mr-3 float-left">
-                <div className="avatar">
-                  <img src={image4} className="img-avatar" alt="admin@bootstrapmaster.com" />
-                  <span className="avatar-status badge-info"></span>
-                </div>
-              </div>
-              <div>
-                <small className="text-muted">Joe Doe</small>
-                <small className="text-muted float-right mt-1">4:03 AM</small>
-              </div>
-              <div className="text-truncate font-weight-bold">Lorem ipsum dolor sit amet</div>
-              <div className="small text-muted text-truncate">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt...
-              </div>
-            </div>
-          </DropdownItem>
-          <DropdownItem href="#" className="text-center"><strong>View all messages</strong></DropdownItem>
-        </DropdownMenu> */}
       </Dropdown>
     )
 

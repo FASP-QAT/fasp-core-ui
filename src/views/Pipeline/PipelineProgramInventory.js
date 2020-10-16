@@ -9,6 +9,7 @@ import { jExcelLoadedFunction, jExcelLoadedFunctionPipeline } from '../../Common
 import RealmCountryService from '../../api/RealmCountryService'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { JEXCEL_DATE_FORMAT_WITHOUT_DATE } from '../../Constants';
+import { JEXCEL_PAGINATION_OPTION} from '../../Constants.js';
 export default class PipelineProgramInventory extends Component {
 
     constructor(props) {
@@ -60,6 +61,18 @@ export default class PipelineProgramInventory extends Component {
                 this.el.setComments(col, "");
             }
 
+            var col = ("C").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(2, y);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+            
             var col = ("D").concat(parseInt(y) + 1);
             var value = this.el.getValueFromCoords(3, y);
             if (value == "") {
@@ -100,7 +113,17 @@ export default class PipelineProgramInventory extends Component {
                 this.el.setComments(col, "");
             }
         }
-
+        if (x == 2) {
+            var col = ("C").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+        }
         if (x == 3) {
             var col = ("D").concat(parseInt(y) + 1);
             if (value == "") {
@@ -134,16 +157,36 @@ export default class PipelineProgramInventory extends Component {
                 this.el.setComments(col, (list[y].dataSourceId).concat(i18n.t('static.message.notExist')));
             }
 
-            var col = ("D").concat(parseInt(y) + 1);
-            var value = map.get("3");
-            if (value != "" && !isNaN(parseInt(value))) {
+            var col = ("C").concat(parseInt(y) + 1);
+            var value = (this.el.getRowData(y)[2]).toString();
+            if (value != "" && value > 0) {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
             } else {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                // this.el.setComments(col, (list[y].dataSourceId).concat(" Does not exist."));
+                this.el.setComments(col, (list[y].regionId).concat(i18n.t('static.message.notExist')));
+            }
+
+            var col = ("D").concat(parseInt(y) + 1);
+            // var value = map.get("3");
+            var value = (this.el.getRowData(y)[3]).toString();
+            // if (value != "" && !isNaN(parseInt(value))) {
+            //     this.el.setStyle(col, "background-color", "transparent");
+            //     this.el.setComments(col, "");
+            // } else {
+            //     this.el.setStyle(col, "background-color", "transparent");
+            //     this.el.setStyle(col, "background-color", "yellow");
+            //     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            //     // this.el.setComments(col, (list[y].dataSourceId).concat(" Does not exist."));
+            // }
+            if (value != "" && value > 0) {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, (list[y].realmCountryPlanningUnitId).concat(i18n.t('static.message.notExist')));
             }
         }
 
@@ -328,7 +371,8 @@ export default class PipelineProgramInventory extends Component {
                                             type: 'text'
                                         }
                                     ], 
-                                    pagination: 10,
+                                    pagination:localStorage.getItem("sesRecordCount"),
+                                    contextMenu: false,
                                     search: true,
                                     columnSorting: true,
                                     tableOverflow: true,
@@ -339,10 +383,10 @@ export default class PipelineProgramInventory extends Component {
                                     onchange: this.changed,
                                     oneditionend: this.onedit,
                                     copyCompatibility: true,
-                                    paginationOptions: [10, 25, 50],
+                                    paginationOptions: JEXCEL_PAGINATION_OPTION,
                                     position: 'top',
                                     text: {
-                                        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
+                                        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')} `,
                                         show: '',
                                         entries: '',
                                     },

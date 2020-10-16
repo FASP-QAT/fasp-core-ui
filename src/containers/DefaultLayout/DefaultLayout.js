@@ -300,7 +300,8 @@ const routes = [
   { path: '/program/editProgram/:programId', name: 'static.breadcrum.edit', entityname: 'static.programHead.program', component: EditProgram },
 
   { path: '/productCategory/addProductCategory', name: 'Add Product Category', component: AddProductCategory },
-  { path: '/programProduct/addProgramProduct/:programId', name: 'static.breadcrum.add', entityname: 'static.dashboard.programPlanningUnit', component: AddProgramProduct },
+  // { path: '/programProduct/addProgramProduct', name: 'static.breadcrum.add', entityname: 'static.dashboard.programPlanningUnit', component: AddProgramProduct },
+  { path: '/programProduct/addProgramProduct', name: 'static.Update.PlanningUnits', component: AddProgramProduct },
 
 
   { path: '/procurementAgent/addProcurementAgentPlanningUnit/:procurementAgentId', name: 'static.breadcrum.add', entityname: 'static.dashboard.procurementAgentPlanningUnit', component: AddProcurementAgentPlanningUnit },
@@ -1014,10 +1015,11 @@ class DefaultLayout extends Component {
                           // },
                           {
                             name: i18n.t('static.Update.PlanningUnits'),
-                            url: '/program/listProgram',
+                            // url: '/program/listProgram',
+                            url: '/programProduct/addProgramProduct',
                             icon: 'fa fa-list-alt',
-                            // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_PROGRAM') ? false : true) }
-
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_EDIT_PROGRAM') ? false : true) }
+                      
                           },
 
                           {
@@ -1051,6 +1053,13 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-trash',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DELETE_LOCAL_PROGRAM') ? false : true) }
                             // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DOWNLOAD_PROGARM') ? false : true) }
+                          },
+                          {
+                            name: i18n.t('static.dashboard.programimport'),
+                            // url: '/pipeline/pipelineProgramImport',
+                            url: '/pipeline/pieplineProgramList',
+                            icon: 'fa fa-sitemap',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PIPELINE_PROGRAM_IMPORT') ? false : true) }
                           },
 
 
@@ -1818,13 +1827,13 @@ class DefaultLayout extends Component {
                       // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
 
                       // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
-                      {
-                        name: i18n.t('static.dashboard.programimport'),
-                        // url: '/pipeline/pipelineProgramImport',
-                        url: '/pipeline/pieplineProgramList',
-                        icon: 'fa fa-sitemap',
-                        attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PIPELINE_PROGRAM_IMPORT') ? false : true) }
-                      },
+                      // {
+                      //   name: i18n.t('static.dashboard.programimport'),
+                      //   // url: '/pipeline/pipelineProgramImport',
+                      //   url: '/pipeline/pieplineProgramList',
+                      //   icon: 'fa fa-sitemap',
+                      //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PIPELINE_PROGRAM_IMPORT') ? false : true) }
+                      // },
 
                       // {
                       //   name: i18n.t('static.quantimed.quantimedImport'),                        

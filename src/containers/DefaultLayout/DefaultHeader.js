@@ -10,6 +10,8 @@ import QAT from '../../assets/img/brand/QAT-minimize.png'
 import i18n from '../../i18n'
 import { Online, Offline } from 'react-detect-offline';
 import AuthenticationService from '../../views/Common/AuthenticationService';
+import imageUsermanual from '../../assets/img/User-manual-icon.png';
+import { API_URL } from '../../Constants';
 
 const propTypes = {
   children: PropTypes.node,
@@ -27,6 +29,8 @@ class DefaultHeader extends Component {
     i18n.changeLanguage(lang)
     window.location.reload(false);
   }
+  
+  
   render() {
 
     // eslint-disable-next-line
@@ -83,6 +87,13 @@ class DefaultHeader extends Component {
             </DropdownMenu>
           </UncontrolledDropdown> */}
           <DefaultHeaderDropdown mssgs/>
+          <NavItem className="">
+            <span className="nav-link">
+              <a href={`${API_URL}/file/qatUserGuide`}>
+                <img src={imageUsermanual} className="HelpIcon" title={i18n.t('static.user.usermanual')} />
+                </a>
+              </span>
+          </NavItem>
           <NavItem className="">
             <NavLink to="#" className="nav-link">
               <span className="icon-wrapper icon-wrapper-alt rounded-circle ">

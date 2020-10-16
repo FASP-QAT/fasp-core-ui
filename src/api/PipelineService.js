@@ -115,6 +115,10 @@ class PipelineService {
         return axios.put(`${API_URL}/api/pipeline/procurementagent/${pipelineId}`, json, {}
         );
     }
+    createRealmCountryPlanningUnits(pipelineId) {
+        return axios.put(`${API_URL}/api/pipeline/realmCountryPlanningUnit/${pipelineId}`, {}
+        );
+    }
 }
 
 export default new PipelineService();

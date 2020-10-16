@@ -10,6 +10,7 @@ import { textFilter } from 'react-bootstrap-table2-filter';
 import { jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunction, jExcelLoadedFunctionPipeline } from '../../CommonComponent/JExcelCommonFunctions.js'
 import DataSourceTypeService from '../../api/DataSourceTypeService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { JEXCEL_PAGINATION_OPTION} from '../../Constants.js';
 export default class PipelineProgramDataSource extends Component {
     constructor(props) {
         super(props);
@@ -63,8 +64,22 @@ export default class PipelineProgramDataSource extends Component {
 
     changed = function (instance, cell, x, y, value) {
 
+        // Data source type
+        if (x == 2) {
+            var col = ("C").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+            var columnName = jexcel.getColumnNameFromId([parseInt(x) + 1, y]);
+            instance.jexcel.setValue(columnName, '');
+        }
 
-        //Planning Unit
+        //Data source
         if (x == 3) {
             var json = this.el.getJson();
             var col = ("D").concat(parseInt(y) + 1);
@@ -127,7 +142,7 @@ export default class PipelineProgramDataSource extends Component {
     }
 
     saveDataSource() {
-        var list = this.state.DataSourceList;
+        var list = this.state.dataSourceList;
         var json = this.el.getJson();
         var dataSourceArray = []
         console.log(json.length)
@@ -192,6 +207,8 @@ export default class PipelineProgramDataSource extends Component {
                 DataSourceService.getActiveDataSourceList()
                     .then(response => {
                         if (response.status == 200) {
+                            console.log("data source====>",response.data);
+
                             // dataSourceListQat = response.data
                             this.setState({ activeDataSourceList: response.data });
                             for (var k = 0; k < (response.data).length; k++) {
@@ -268,12 +285,13 @@ export default class PipelineProgramDataSource extends Component {
                                                         readonly: true
                                                     }
                                                 ],
-                                                pagination: 10,
+                                                pagination:localStorage.getItem("sesRecordCount"),
+                                                contextMenu: false,
                                                 search: true,
                                                 columnSorting: true,
                                                 tableOverflow: true,
                                                 wordWrap: true,
-                                                paginationOptions: [10, 25, 50],
+                                                paginationOptions: JEXCEL_PAGINATION_OPTION,
                                                 // position: 'top',
                                                 allowInsertColumn: false,
                                                 allowManualInsertColumn: false,
@@ -284,7 +302,7 @@ export default class PipelineProgramDataSource extends Component {
                                                 // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
 
                                                 text: {
-                                                    showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
+                                                    showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')} `,
                                                     show: '',
                                                     entries: '',
                                                 },

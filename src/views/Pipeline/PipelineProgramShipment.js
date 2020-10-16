@@ -16,6 +16,7 @@ import { Link } from 'react-router-dom';
 import { jExcelLoadedFunction, jExcelLoadedFunctionPipeline } from '../../CommonComponent/JExcelCommonFunctions.js'
 import { CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, JEXCEL_DATE_FORMAT } from '../../Constants.js'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { JEXCEL_PAGINATION_OPTION} from '../../Constants.js';
 
 export default class PipelineProgramShipment extends Component {
 
@@ -408,7 +409,7 @@ export default class PipelineProgramShipment extends Component {
             }
         }
         if (x == 7) {
-
+            var reg = /^[0-9\b]+$/;
             var col = ("H").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -443,6 +444,7 @@ export default class PipelineProgramShipment extends Component {
             }
         }
         if (x == 9) {
+            var reg = /^[0-9\b]+$/;
             var col = ("J").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -1098,12 +1100,14 @@ export default class PipelineProgramShipment extends Component {
                 }, {
                     title: i18n.t('static.supplyPlan.submittedDate'),
                     type: 'calendar',
-                    options: { format: JEXCEL_DATE_FORMAT }
+                    options: { format: JEXCEL_DATE_FORMAT },
+                    type: 'hidden',
 
                 }, {
                     title: i18n.t('static.supplyPlan.approvedDate'),
                     type: 'calendar',
-                    options: { format: JEXCEL_DATE_FORMAT }
+                    options: { format: JEXCEL_DATE_FORMAT },
+                    type: 'hidden',
 
                 }, {
                     title: i18n.t('static.shipment.shipdate'),
@@ -1113,7 +1117,8 @@ export default class PipelineProgramShipment extends Component {
                 }, {
                     title: i18n.t('static.supplyPlan.arrivedDate'),
                     type: 'calendar',
-                    options: { format: JEXCEL_DATE_FORMAT }
+                    options: { format: JEXCEL_DATE_FORMAT },
+                    type: 'hidden',
 
                 }, {
                     title: i18n.t('static.shipment.receiveddate'),
@@ -1133,12 +1138,12 @@ export default class PipelineProgramShipment extends Component {
                 }
 
             ],
-            pagination: 10,
+            pagination:localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
             tableOverflow: true,
             wordWrap: true,
-            paginationOptions: [10, 25, 50],
+            paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             allowInsertColumn: false,
             allowManualInsertColumn: false,
@@ -1146,8 +1151,9 @@ export default class PipelineProgramShipment extends Component {
             onchange: this.changed,
             oneditionend: this.onedit,
             copyCompatibility: true,
+            contextMenu: false,
             text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
+                showingPage:`${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')} `,
                 show: '',
                 entries: '',
             },
