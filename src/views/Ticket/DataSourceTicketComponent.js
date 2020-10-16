@@ -34,7 +34,7 @@ const validationSchema = function (values) {
         dataSourceType: Yup.string()
             .required(i18n.t('static.datasource.datasourcetypetext')),
         dataSourceName: Yup.string()
-            .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.datasource.datasourcetext')),
         // notes: Yup.string()
         //     .required(i18n.t('static.common.notestext'))
@@ -76,6 +76,7 @@ export default class DataSourceTicketComponent extends Component {
                 dataSourceName: "",
                 notes: ""
             },
+            lang: localStorage.getItem('lang'),
             message: '',
             realms: [],
             programs: [],
@@ -98,19 +99,19 @@ export default class DataSourceTicketComponent extends Component {
             dataSource.summary = event.target.value;
         }
         if (event.target.name == "realmName") {
-            dataSource.realmName = event.target.options[event.target.selectedIndex].innerHTML;
+            dataSource.realmName = this.state.realms.filter(c => c.realmId == event.target.value)[0].label.label_en;
             this.setState({
                 realmId: event.target.value
             })
         }
         if (event.target.name == "programName") {
-            dataSource.programName = event.target.options[event.target.selectedIndex].innerHTML;
+            dataSource.programName = this.state.programs.filter(c => c.programId == event.target.value)[0].label.label_en;
             this.setState({
                 programId: event.target.value
             })
         }
         if (event.target.name == "dataSourceType") {
-            dataSource.dataSourceType = event.target.options[event.target.selectedIndex].innerHTML;
+            dataSource.dataSourceType = this.state.dataSourceTypes.filter(c => c.dataSourceTypeId == event.target.value)[0].label.label_en;
             this.setState({
                 dataSourceTypeId: event.target.value
             })
@@ -228,7 +229,7 @@ export default class DataSourceTicketComponent extends Component {
             && realms.map((item, i) => {
                 return (
                     <option key={i} value={item.realmId}>
-                        {item.label.label_en}
+                        {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);
@@ -236,7 +237,7 @@ export default class DataSourceTicketComponent extends Component {
         let dataSourceTypeList = dataSourceTypes.length > 0
             && dataSourceTypes.map((item, i) => {
                 return (
-                    <option key={i} value={item.dataSourceTypeId}>{item.label.label_en}</option>
+                    <option key={i} value={item.dataSourceTypeId}>{getLabelText(item.label, this.state.lang)}</option>
                 )
             }, this);
 

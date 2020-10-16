@@ -65,6 +65,7 @@ export default class ProductCategoryTicketComponent extends Component {
                 productCategoryName: "",
                 notes: ""
             },
+            lang: localStorage.getItem('lang'),
             message: '',
             realms: [],
             realmId: '',
@@ -81,7 +82,7 @@ export default class ProductCategoryTicketComponent extends Component {
             productCategory.summary = event.target.value;
         }
         if (event.target.name == "realmName") {
-            productCategory.realmName = event.target.options[event.target.selectedIndex].innerHTML;
+            productCategory.realmName = this.state.realms.filter(c => c.realmId == event.target.value)[0].label.label_en;
             this.setState({
                 realmId: event.target.value
             })

@@ -18,7 +18,7 @@ import CurrencyService from '../../api/CurrencyService';
 import getLabelText from '../../CommonComponent/getLabelText';
 
 const initialValues = {
-    summary: "static.common.add",
+    summary: "Add Budget",
     programName: "",
     fundingSourceName: "",
     budgetName: "",
@@ -39,13 +39,14 @@ const validationSchema = function (values) {
             .required(i18n.t('static.fundingSource.selectFundingSource').concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?', i18n.t('static.budget.fundingsource')))),
         budgetName: Yup.string()
             .required(i18n.t('static.budget.budgetamountdesc')),
-        // budgetCode: Yup.string()
-        //     .max(10, i18n.t('static.common.max10digittext'))
-        //     .required(i18n.t('static.budget.budgetCodeText')),
+        budgetCode: Yup.string()
+            .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly'))
+            .max(30, i18n.t('static.common.max30digittext'))
+            .required(i18n.t('static.budget.budgetDisplayNameText')),
         currency: Yup.string()
             .required(i18n.t('static.country.currencytext')),
         budgetAmount: Yup.string()
-            .matches(/^[0-9]+([,\.][0-9]+)?/, i18n.t('static.program.validBudgetAmount'))
+            .matches(/^\s*(?=.*[1-9])\d{1,10}(?:\.\d{1,2})?\s*$/, i18n.t('static.program.validBudgetAmount'))
             .required(i18n.t('static.budget.budgetamounttext')),
         // notes: Yup.string()
         //     .required(i18n.t('static.common.notestext'))
@@ -91,6 +92,7 @@ export default class BudgetTicketComponent extends Component {
                 stopDate: "",
                 notes: ""
             },
+            lang: localStorage.getItem('lang'),
             message: '',
             programs: [],
             fundingSources: [],
@@ -118,13 +120,13 @@ export default class BudgetTicketComponent extends Component {
             budget.budgetName = event.target.value;
         }
         if (event.target.name === "programName") {
-            budget.programName = event.target.options[event.target.selectedIndex].innerHTML;
+            budget.programName = this.state.programs.filter(c => c.programId == event.target.value)[0].label.label_en;
             this.setState({
                 programId: event.target.value
             })
         }
         if (event.target.name === "fundingSourceName") {
-            budget.fundingSourceName = event.target.options[event.target.selectedIndex].innerHTML;
+            budget.fundingSourceName = this.state.fundingSources.filter(c => c.fundingSourceId == event.target.value)[0].label.label_en;
             this.setState({
                 fundingSourceId: event.target.value
             })
@@ -136,7 +138,7 @@ export default class BudgetTicketComponent extends Component {
             budget.budgetCode = event.target.value.toUpperCase();
         }
         if (event.target.name === "currency") {
-            budget.currency = event.target.options[event.target.selectedIndex].innerHTML;
+            budget.currency = this.state.currencies.filter(c => c.currencyId == event.target.value)[0].label.label_en;
             this.setState({
                 currencyId: event.target.value
             })
@@ -299,7 +301,7 @@ export default class BudgetTicketComponent extends Component {
 
         let currencyList = currencies.length > 0 && currencies.map((item, i) => {
             return (
-                <option key={i} value={item.currencyId + "~" + item.conversionRateToUsd}>
+                <option key={i} value={item.currencyId}>
                     {getLabelText(item.label, this.state.lang)}
                 </option>
             )
@@ -431,13 +433,13 @@ export default class BudgetTicketComponent extends Component {
                                             <FormFeedback className="red">{errors.budgetName}</FormFeedback>
                                         </FormGroup>
                                         <FormGroup>
-                                            <Label for="budget">{i18n.t('static.budget.budgetCode')}</Label>
+                                            <Label for="budget">{i18n.t('static.budget.budgetCode')}<span className="red Reqasterisk">*</span></Label>
                                             <Input type="text"
                                                 name="budgetCode"
                                                 id="budgetCode"
                                                 bsSize="sm"
-                                                // valid={!errors.budgetCode && this.state.budget.budgetCode != ''}
-                                                // invalid={touched.budgetCode && !!errors.budgetCode}
+                                                valid={!errors.budgetCode && this.state.budget.budgetCode != ''}
+                                                invalid={touched.budgetCode && !!errors.budgetCode}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                 onBlur={handleBlur}
                                                 value={this.state.budget.budgetCode}

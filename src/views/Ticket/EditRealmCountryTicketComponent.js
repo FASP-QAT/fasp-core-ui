@@ -64,6 +64,7 @@ export default class EditRealmCountryTicketComponent extends Component {
                 realmCountryName: "",
                 notes: ""
             },
+            lang: localStorage.getItem('lang'),
             message: '',
             realmCountries: [],
             realmCountryId: '',
@@ -208,7 +209,7 @@ export default class EditRealmCountryTicketComponent extends Component {
             && realmCountries.map((item, i) => {
                 return (
                     <option key={i} value={item.realmCountryId}>
-                        {getLabelText(item.realm.label, this.state.lang) + " : " + getLabelText(item.country.label, this.state.lang)}
+                        {getLabelText(item.realm.label, this.state.lang) + " | " + getLabelText(item.country.label, this.state.lang)}
                     </option>
                 )
             }, this);
@@ -218,7 +219,7 @@ export default class EditRealmCountryTicketComponent extends Component {
         return (
             <div className="col-md-12">
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
-                <h4>{i18n.t('static.dashboard.realmcountry')}</h4>
+                <h4>{i18n.t('static.program.realmcountrydashboard')}</h4>
                 <br></br>
                 <div style={{ display: this.state.loading ? "none" : "block" }}>
                     <Formik

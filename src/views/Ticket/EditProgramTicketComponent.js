@@ -65,6 +65,7 @@ export default class EditProgramTicketComponent extends Component {
                 programName: '',
                 notes: ""
             },
+            lang: localStorage.getItem('lang'),
             message: '',
             programId: '',
             programList: [],
@@ -209,7 +210,7 @@ export default class EditProgramTicketComponent extends Component {
             && programList.map((item, i) => {
                 return (
                     <option key={i} value={item.programId}>
-                        {getLabelText(item.label, this.state.lang)}
+                        {getLabelText(item.realmCountry.realm.label, this.state.lang) + " | " + getLabelText(item.label, this.state.lang) + " | " + item.programCode}
                     </option>
                 )
             }, this);

@@ -64,6 +64,7 @@ export default class EditDataSourceTicketComponent extends Component {
                 dataSourceName: "",
                 notes: ""
             },
+            lang: localStorage.getItem('lang'),
             message: '',
             dataSources: [],
             dataSourceId: '',
@@ -200,7 +201,7 @@ export default class EditDataSourceTicketComponent extends Component {
             && dataSources.map((item, i) => {
                 return (
                     <option key={i} value={item.dataSourceId}>
-                        {getLabelText(item.dataSourceType.label, this.state.lang) + " : " + getLabelText(item.label, this.state.lang)}
+                        {getLabelText(item.dataSourceType.label, this.state.lang) + " | " + getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);

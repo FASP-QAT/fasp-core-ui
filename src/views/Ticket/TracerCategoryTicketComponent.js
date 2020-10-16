@@ -66,6 +66,7 @@ export default class TracerCategoryTicketComponent extends Component {
                 tracerCategoryName: "",
                 notes: ""
             },
+            lang: localStorage.getItem('lang'),
             message: '',
             realms: [],
             realmId: '',
@@ -82,7 +83,7 @@ export default class TracerCategoryTicketComponent extends Component {
             tracerCategory.summary = event.target.value;
         }
         if (event.target.name == "realmName") {
-            tracerCategory.realmName = event.target.options[event.target.selectedIndex].innerHTML;
+            tracerCategory.realmName = this.state.realms.filter(c => c.realmId == event.target.value)[0].label.label_en;
             this.setState({
                 realmId: event.target.value
             })

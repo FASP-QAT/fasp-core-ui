@@ -120,6 +120,7 @@ export default class QunatimedImportStepFour extends Component {
 
     formSubmit() {
         confirmAlert({
+            title: i18n.t('static.program.confirmsubmit'),
             message: i18n.t('static.quantimed.quantimedImportFinalConfirmText'),
             buttons: [
                 {
@@ -392,7 +393,7 @@ export default class QunatimedImportStepFour extends Component {
                         i18n.t('static.quantimed.consumptionDate'),
                         i18n.t('static.quantimed.existingconsupmtionqty'),
                         i18n.t('static.quantimed.newconsupmtionqty'),
-                        'Import Data'
+                        i18n.t('static.quantimed.importData')
                     ],
                     colWidths: [30, 80, 80, 30, 30, 30, 20],
                     columns: [

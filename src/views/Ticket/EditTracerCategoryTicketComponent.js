@@ -63,6 +63,7 @@ export default class EditTracerCategoryTicketComponent extends Component {
                 tracerCategoryName: "",
                 notes: ""
             },
+            lang: localStorage.getItem('lang'),
             message: '',
             tracerCategories: [],
             tracerCategoryId: '',
@@ -195,7 +196,7 @@ export default class EditTracerCategoryTicketComponent extends Component {
             && tracerCategories.map((item, i) => {
                 return (
                     <option key={i} value={item.tracerCategoryId}>
-                        {getLabelText(item.realm.label, this.state.lang) + " : " + getLabelText(item.label, this.state.lang)}
+                        {getLabelText(item.realm.label, this.state.lang) + " | " + getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);

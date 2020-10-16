@@ -25,6 +25,7 @@ const validationSchema = function (values) {
             .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.common.summarytext')),
         realmName: Yup.string()
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.realm.realmNameText')),
         // realmCode: Yup.string()
         //     .required(i18n.t('static.realm.realmCodeText')),
@@ -84,6 +85,7 @@ export default class RealmTicketComponent extends Component {
                 maxMosMaxGaurdrail: "",
                 notes: ""
             },
+            lang: localStorage.getItem('lang'),
             message: '',
             loading: false
         }

@@ -11,6 +11,7 @@ import UnitService from '../../api/UnitService';
 import ForecastingUnitService from '../../api/ForecastingUnitService';
 import { SPACE_REGEX } from '../../Constants';
 import PlanningUnitService from '../../api/PlanningUnitService';
+import getLabelText from '../../CommonComponent/getLabelText';
 
 const initialValues = {
     summary: "Edit Planning Unit",
@@ -62,6 +63,7 @@ export default class EditPlanningUnitTicketComponent extends Component {
                 planningUnitName: '',
                 notes: ''
             },
+            lang: localStorage.getItem('lang'),
             message: '',
             planningUnits: [],
             planningUnitId: '',
@@ -244,7 +246,7 @@ export default class EditPlanningUnitTicketComponent extends Component {
             && planningUnits.map((item, i) => {
                 return (
                     <option key={i} value={item.planningUnitId}>
-                        {item.label.label_en}
+                        {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);

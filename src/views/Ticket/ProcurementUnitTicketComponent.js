@@ -129,6 +129,7 @@ export default class ProcurementUnitTicketComponent extends Component {
                 unitsPerContainer: 0,
                 notes: ''
             },
+            lang: localStorage.getItem('lang'),
             message: '',
             planningUnitList: [],
             unitList: [],

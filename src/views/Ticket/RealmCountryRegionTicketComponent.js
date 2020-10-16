@@ -81,6 +81,7 @@ export default class RealmCountryRegionTicketComponent extends Component {
                 glnCode: "",
                 notes: ""
             },
+            lang: localStorage.getItem('lang'),
             message: '',
             realmCountries: [],
             realmCountryId: '',
@@ -100,13 +101,13 @@ export default class RealmCountryRegionTicketComponent extends Component {
             realmCountryRegion.summary = event.target.value;
         }
         if (event.target.name == "realmId") {            
-            realmCountryRegion.realmId = event.target.options[event.target.selectedIndex].innerHTML;
+            realmCountryRegion.realmId = this.state.realmList.filter(c => c.realmId == event.target.value)[0].label.label_en;
             // this.setState({
                 this.state.realmId = event.target.value
             // })            
         }
         if (event.target.name == "realmCountryId") {
-            realmCountryRegion.realmCountryId = event.target.options[event.target.selectedIndex].innerHTML;
+            realmCountryRegion.realmCountryId = this.state.realmCountries.filter(c => c.realmCountryId == event.target.value)[0].country.label.label_en;
             this.setState({
                 realmCountryId: event.target.value
             })
@@ -251,7 +252,7 @@ export default class RealmCountryRegionTicketComponent extends Component {
                         this.setState({
                             loading: true
                         })
-                        JiraTikcetService.addEmailRequestIssue(values).then(response => {                            
+                        JiraTikcetService.addEmailRequestIssue(this.state.realmCountryRegion).then(response => {                            
                             console.log("Response :",response.status, ":" ,JSON.stringify(response.data));
                             if (response.status == 200 || response.status == 201) {
                                 var msg = response.data.key;
@@ -341,7 +342,7 @@ export default class RealmCountryRegionTicketComponent extends Component {
                                             <FormFeedback className="red">{errors.realmCountryId}</FormFeedback>
                                         </FormGroup>
                                         < FormGroup >
-                                            <Label for="regionId">{i18n.t('static.region.region')}<span class="red Reqasterisk">*</span></Label>
+                                            <Label for="regionId">{i18n.t('static.region.regionName')}<span class="red Reqasterisk">*</span></Label>
                                             <Input type="text" name="regionId" id="regionId"
                                                 bsSize="sm"
                                                 valid={!errors.regionId && this.state.realmCountryRegion.regionId != ''}

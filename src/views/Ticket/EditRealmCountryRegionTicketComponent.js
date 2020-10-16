@@ -64,6 +64,7 @@ export default class EditRealmCountryRegionTicketComponent extends Component {
                 realmCountryRegionName: '',
                 notes: ""
             },
+            lang: localStorage.getItem('lang'),
             message: '',
             loading: false,
             realmCountryRegionId: '',
@@ -205,7 +206,15 @@ export default class EditRealmCountryRegionTicketComponent extends Component {
     render() {
         const { realmCountryRegionList } = this.state;
         console.log("realmCountryRegionList",this.state.realmCountryRegionList)
-        let realmCountryRegions = [];
+        
+        let realmCountryRegions = realmCountryRegionList.length > 0
+            && realmCountryRegionList.map((item, i) => {
+                return (
+                    <option key={i} value={item.regionId}>
+                        {getLabelText(item.realmCountry.realm.label, this.state.lang) + " | " + getLabelText(item.realmCountry.country.label, this.state.lang) + " | " + getLabelText(item.label, this.state.lang)}
+                    </option>
+                )
+            }, this);
 
         return (
             <div className="col-md-12">

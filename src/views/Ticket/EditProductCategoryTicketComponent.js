@@ -62,6 +62,7 @@ export default class EditProductCategoryTicketComponent extends Component {
                 planningUnitCategoryName: "",
                 notes: ""
             },
+            lang: localStorage.getItem('lang'),
             message: '',
             planningUnitCategories: [],
             planningUnitCategoryId: '',
@@ -202,16 +203,14 @@ export default class EditProductCategoryTicketComponent extends Component {
 
         const { planningUnitCategories } = this.state;
         
-        // let planningUnitCategoryList = planningUnitCategories.length > 0
-        //     && planningUnitCategories.map((item, i) => {
-        //         return (
-        //             <option key={i} value={item.productCategoryId}>
-        //                 {item.label.label_en}
-        //             </option>
-        //         )
-        //     }, this);
-
-        let planningUnitCategoryList = [];
+        let planningUnitCategoryList = planningUnitCategories.length > 0
+            && planningUnitCategories.map((item, i) => {
+                return (
+                    <option key={i} value={item.payloadId}>
+                        {getLabelText(item.payload.realm.label, this.state.lang) + " | " + getLabelText(item.payload.label, this.state.lang)}
+                    </option>
+                )
+            }, this);        
             
 
         return (

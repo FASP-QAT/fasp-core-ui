@@ -195,6 +195,17 @@ export default class QunatimedImportStepTwo extends Component {
     checkValidation = function () {
         var valid = true;
         var json = this.el.getJson();
+        var totalDoNotImport = 0;
+
+        for (var y = 0; y < json.length; y++) {
+            var col = ("C").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(2, y);
+            if (value == "-1") {
+                totalDoNotImport = totalDoNotImport + 1;
+            }
+        }
+        console.log("totalDoNotImport",totalDoNotImport)
+        console.log("json",json.length)
 
         for (var y = 0; y < json.length; y++) {
             // var value = this.el.getValueFromCoords(2, y);            
@@ -214,6 +225,12 @@ export default class QunatimedImportStepTwo extends Component {
             }
             // }
         }
+
+        if(totalDoNotImport == (json.length)) {
+            alert(i18n.t("static.quantimed.mapAtLeastOnePlanningUnitValidationText"));
+            valid = false;
+        }
+                
         return valid;
     }
 
@@ -381,12 +398,12 @@ export default class QunatimedImportStepTwo extends Component {
 
                         if (programPlanningUnits.length > 0) {
                             var paJson = {
-                                name: 'Do not import',
+                                name: i18n.t("static.quantimed.doNotImport"),
                                 id: -1,
                                 active: true
                             }
                             var paJson_1 = {
-                                name: 'Planning Unit Not Found',
+                                name: i18n.t("static.quantimed.planningUnitNotFoundText"),
                                 id: -2,
                                 active: true
                             }
@@ -440,9 +457,9 @@ export default class QunatimedImportStepTwo extends Component {
                                 i18n.t('static.supplyPlan.qatProduct'),
                                 'Previous Program Planning Unit',
                             ],
-                            colWidths: [80, 80, 80, 80],
+                            colWidths: [30, 80, 80, 80],
                             columns: [
-                                { type: 'hidden' },
+                                { type: 'text', readOnly: true },
                                 { type: 'text', readOnly: true },
                                 { type: 'dropdown', source: programPlanningUnitsArr },
                                 { type: 'hidden' }

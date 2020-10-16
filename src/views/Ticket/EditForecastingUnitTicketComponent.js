@@ -65,6 +65,7 @@ export default class EditForecastingUnitTicketComponent extends Component {
                 forecastingUnitName: "",
                 notes: ''
             },
+            lang: localStorage.getItem('lang'),
             message: '',
             forecastingUnits: [],
             forecastingUnitId: '',
@@ -273,7 +274,7 @@ export default class EditForecastingUnitTicketComponent extends Component {
             && forecastingUnits.map((item, i) => {
                 return (
                     <option key={i} value={item.forecastingUnitId}>
-                        {getLabelText(item.label, this.state.lang)}
+                        {getLabelText(item.realm.label, this.state.lang) + " | " + getLabelText(item.productCategory.label, this.state.lang) + " | " + getLabelText(item.tracerCategory.label, this.state.lang) + " | " + getLabelText(item.unit.label, this.state.lang) + " | " + getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);

@@ -9,6 +9,7 @@ import * as Yup from 'yup';
 import JiraTikcetService from '../../api/JiraTikcetService';
 import { SPACE_REGEX } from '../../Constants';
 import RealmService from '../../api/RealmService';
+import getLabelText from '../../CommonComponent/getLabelText';
 
 const initialValues = {
     summary: "Edit Realm",
@@ -60,6 +61,7 @@ export default class EditRealmTicketComponent extends Component {
                 realmName: "",
                 notes: ""
             },
+            lang: localStorage.getItem('lang'),
             message: '',
             realms: [],
             realmId: '',
@@ -181,7 +183,7 @@ export default class EditRealmTicketComponent extends Component {
             && realms.map((item, i) => {
                 return (
                     <option key={i} value={item.realmId}>
-                        {item.label.label_en}
+                        {getLabelText(item.label, this.state.lang) + " | " + item.realmCode}
                     </option>
                 )
             }, this);

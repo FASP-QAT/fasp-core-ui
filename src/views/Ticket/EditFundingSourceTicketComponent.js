@@ -10,6 +10,7 @@ import JiraTikcetService from '../../api/JiraTikcetService';
 import RealmService from '../../api/RealmService';
 import { LABEL_REGEX, SPACE_REGEX } from '../../Constants';
 import FundingSourceService from '../../api/FundingSourceService';
+import getLabelText from '../../CommonComponent/getLabelText';
 
 const initialValues = {
     summary: "Edit Funding Source",
@@ -61,6 +62,7 @@ export default class EditFundingSourceTicketComponent extends Component {
                 fundingSourceName: "",
                 notes: ""
             },
+            lang: localStorage.getItem('lang'),
             message: '',
             fundingSources: [],
             fundingSourceId: '',
@@ -206,7 +208,7 @@ export default class EditFundingSourceTicketComponent extends Component {
             && fundingSources.map((item, i) => {
                 return (
                     <option key={i} value={item.fundingSourceId}>
-                        {item.label.label_en}
+                        {getLabelText(item.realm.label, this.state.lang) + " | " + getLabelText(item.label, this.state.lang) + " | " + item.fundingSourceCode}
                     </option>
                 )
             }, this);

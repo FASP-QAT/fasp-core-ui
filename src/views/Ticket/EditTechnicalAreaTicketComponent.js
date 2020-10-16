@@ -68,6 +68,7 @@ export default class EditTechnicalAreaTicketComponent extends Component {
                 technicalAreaName: "",
                 notes: ""
             },
+            lang: localStorage.getItem('lang'),
             message: '',
             technicalAreas: [],
             technicalAreaId: '',
@@ -218,7 +219,7 @@ export default class EditTechnicalAreaTicketComponent extends Component {
             && technicalAreas.map((item, i) => {
                 return (
                     <option key={i} value={item.healthareaId}>
-                        {getLabelText(item.realm.label, this.state.lang) + " : " + getLabelText(item.label, this.state.lang)}
+                        {getLabelText(item.realm.label, this.state.lang) + " | " + getLabelText(item.label, this.state.lang) + " | " + item.healthAreaCode}
                     </option>
                 )
             }, this);

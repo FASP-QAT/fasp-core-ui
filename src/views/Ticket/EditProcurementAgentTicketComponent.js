@@ -10,6 +10,7 @@ import JiraTikcetService from '../../api/JiraTikcetService';
 import RealmService from '../../api/RealmService';
 import { SPACE_REGEX } from '../../Constants';
 import ProcurementAgentService from '../../api/ProcurementAgentService';
+import getLabelText from '../../CommonComponent/getLabelText';
 
 const initialValues = {
     summary: "Edit Procurement Agent",
@@ -61,6 +62,7 @@ export default class EditProcurementAgentTicketComponent extends Component {
                 procurementAgentName: "",
                 notes: ""
             },
+            lang: localStorage.getItem('lang'),
             message: '',
             procurementAgents: [],
             procurementAgentId: '',
@@ -203,7 +205,7 @@ export default class EditProcurementAgentTicketComponent extends Component {
             && procurementAgents.map((item, i) => {
                 return (
                     <option key={i} value={item.procurementAgentId}>
-                        {item.label.label_en}
+                        {getLabelText(item.realm.label, this.state.lang) + " | " + getLabelText(item.label, this.state.lang) + " | " + item.procurementAgentCode}
                     </option>
                 )
             }, this);

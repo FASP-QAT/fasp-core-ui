@@ -68,6 +68,7 @@ export default class EditBudgetTicketComponent extends Component {
                 budgetName: "",
                 notes: ""
             },
+            lang: localStorage.getItem('lang'),
             message: '',
             budgets: [],
             budgetId: '',
@@ -211,7 +212,7 @@ export default class EditBudgetTicketComponent extends Component {
         let programList = budgets.length > 0 && budgets.map((item, i) => {
             return (
                 <option key={i} value={item.budgetId}>
-                    {getLabelText(item.program.label, this.state.lang) + " : " + getLabelText(item.label, this.state.lang)}
+                    {getLabelText(item.program.label, this.state.lang) + " | " + getLabelText(item.label, this.state.lang) + " | " + item.budgetCode}
                 </option>
             )
         }, this);

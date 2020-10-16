@@ -15,6 +15,7 @@ import 'react-select/dist/react-select.min.css';
 import classNames from 'classnames';
 import { SPACE_REGEX, ALPHABET_NUMBER_REGEX } from '../../Constants';
 import OrganisationService from '../../api/OrganisationService';
+import getLabelText from '../../CommonComponent/getLabelText';
 
 const initialValues = {
     summary: 'Edit Organization',
@@ -66,6 +67,7 @@ export default class EditOrganisationTicketComponent extends Component {
                 organizationName: "",
                 notes: ""
             },
+            lang: localStorage.getItem('lang'),
             message: '',
             organizations: [],
             organizationId: '',
@@ -200,7 +202,7 @@ export default class EditOrganisationTicketComponent extends Component {
             && organizations.map((item, i) => {
                 return (
                     <option key={i} value={item.organisationId}>
-                        {item.label.label_en}
+                        {getLabelText(item.realm.label, this.state.lang) + " | " + getLabelText(item.label, this.state.lang) + " | " + item.organisationCode}
                     </option>
                 )
             }, this);
