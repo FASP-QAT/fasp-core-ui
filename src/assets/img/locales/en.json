@@ -1403,6 +1403,6 @@
     "static.pipeline.pipelineConvertorWindows":"Download converter for windows.",
     "static.message.planningUnitUpdate": "Planning unit added/updated successfully",
     "static.program.arrivedToReceivedLeadTime": "Enter 'Arrived to Received' lead time (in months)",
-    "static.user.usermanual" :"User Manual",
+    "static.user.usermanual" :"User Manual"
     
 }
