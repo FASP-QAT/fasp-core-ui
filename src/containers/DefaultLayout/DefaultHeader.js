@@ -88,9 +88,11 @@ class DefaultHeader extends Component {
           </UncontrolledDropdown> */}
           <DefaultHeaderDropdown mssgs/>
           <NavItem className="">
-            <NavLink to="#" className="nav-link">
-            <img src={imageUsermanual} className="HelpIcon" title={i18n.t('static.user.usermanual')} onClick={()=>window.location=`${API_URL}/file/qatUserGuide`}/>
-           </NavLink>
+            <span className="nav-link">
+              <a href={`${API_URL}/file/qatUserGuide`}>
+                <img src={imageUsermanual} className="HelpIcon" title={i18n.t('static.user.usermanual')} />
+                </a>
+              </span>
           </NavItem>
           <NavItem className="">
             <NavLink to="#" className="nav-link">

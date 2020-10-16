@@ -99,7 +99,7 @@ export default class PipelineProgramFundingSource extends Component {
     }
 
     saveFundingSource() {
-        var list = this.state.FundingSourceList;
+        var list = this.state.fundingSourceList;
         var json = this.el.getJson();
         var fundingSourceArray = []
         console.log(json.length)
