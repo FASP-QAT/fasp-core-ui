@@ -1397,5 +1397,8 @@
     "static.report.expiredQty": "Expired/Expiring Quantity",
     "static.report.batchstartdt": " Batch Start Date",
     "static.report.actualInv": "Actual Inventory Count",
-    "static.inventory.adjustmentdetils": "Adjustment details"
+    "static.inventory.adjustmentdetils": "Adjustment details",
+    "static.pipeline.downLoadConverter":"Download Pipeline Converter",
+    "static.pipeline.pipelineConvertorLinux":"Download converter for linux.",
+    "static.pipeline.pipelineConvertorWindows":"Download converter for windows."
 }
