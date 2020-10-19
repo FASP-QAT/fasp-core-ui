@@ -153,7 +153,7 @@ class SupplierLeadTimes extends Component {
                 //     readOnly: true
                 // },
                 {
-                    title: i18n.t('static.program.submittoapproveleadtime'),
+                    title: i18n.t('static.procurementagent.procurementagentapprovetosubmittime'),
                     type: 'text',
                     readOnly: true
                 },
@@ -163,17 +163,17 @@ class SupplierLeadTimes extends Component {
                     readOnly: true
                 },
                 {
-                    title: i18n.t('static.realmcountry.shippedToArrivedSeaLeadTime'),
+                    title: i18n.t('static.report.shippedToArrivedSeaLeadTime'),
                     type: 'text',
                     readOnly: true
                 },
                 {
-                    title: i18n.t('static.realmcountry.shippedToArrivedAirLeadTime'),
+                    title: i18n.t('static.report.shippedToArrivedAirLeadTime'),
                     type: 'text',
                     readOnly: true
                 },
                 {
-                    title: i18n.t('static.realmcountry.arrivedToDeliveredLeadTime'),
+                    title: i18n.t('static.shipment.arrivedToreceivedLeadTime'),
                     type: 'text',
                     readOnly: true
                 },
@@ -192,6 +192,25 @@ class SupplierLeadTimes extends Component {
                     type: 'text',
                     readOnly: true
                 },
+            ],
+            nestedHeaders:[
+               
+                [{
+                    title: '',
+                    rowspan: '1',
+                },{
+                    title: '',
+                    rowspan: '1',
+                },{
+                    title: '',
+                    rowspan: '1',
+                },
+                    {
+                        title: i18n.t('static.dashboard.months'),
+                        colspan: '9',
+                    },
+                ],
+               
             ],
             text: {
                 showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
@@ -1260,7 +1279,7 @@ class SupplierLeadTimes extends Component {
             },
             {
                 dataField: 'shippedToArrivedBySeaLeadTime',
-                text: i18n.t('static.realmcountry.shippedToArrivedSeaLeadTime'),
+                text: i18n.t('static.report.shippedToArrivedSeaLeadTime'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -1269,7 +1288,7 @@ class SupplierLeadTimes extends Component {
             },
             {
                 dataField: 'shippedToArrivedByAirLeadTime',
-                text: i18n.t('static.realmcountry.shippedToArrivedAirLeadTime'),
+                text: i18n.t('static.report.shippedToArrivedAirLeadTime'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',

@@ -1598,7 +1598,8 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
+                // if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
+                if (!(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -1687,7 +1688,8 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
+                // if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
+                if (!(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -1708,7 +1710,8 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
+                // if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
+                if (!(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -1800,7 +1803,8 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
                 } else {
-                    if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
+                    // if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
+                    if (!(reg.test(value))) {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
                         this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -1921,7 +1925,8 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
                 } else {
-                    if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
+                    // if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
+                    if (!(reg.test(value))) {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
                         this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -1956,7 +1961,8 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
                 } else {
-                    if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
+                    // if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
+                    if (!(reg.test(value))) {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
                         this.el.setComments(col, i18n.t('static.message.invalidnumber'));

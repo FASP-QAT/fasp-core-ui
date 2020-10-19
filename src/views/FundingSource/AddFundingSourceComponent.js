@@ -11,10 +11,11 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import { LABEL_REGEX } from '../../Constants.js';
 
 import i18n from '../../i18n'
-const initialValues = {
+let initialValues = {
   fundingSourceId: [],
   subFundingSource: "",
   fundingSourceCode: "",
+  realmId: []
 }
 const entityname = i18n.t('static.fundingsource.fundingsource');
 const validationSchema = function (values) {
@@ -259,7 +260,14 @@ class AddFundingSourceComponent extends Component {
     RealmService.getRealmListAll()
       .then(response => {
         if (response.status == 200) {
-          this.setState({ realms: response.data, loading: false })
+          let { fundingSource } = this.state;
+          fundingSource.realm.id = (response.data.length == 1 ? response.data[0].realmId : "");
+          this.setState({ realms: response.data, loading: false },
+            () => {
+              initialValues = {
+                realmId: (response.data.length == 1 ? response.data[0].realmId : "")
+              }
+            })
         } else {
           this.setState({ message: response.data.messageCode, loading: false })
         }
