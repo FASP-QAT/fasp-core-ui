@@ -380,7 +380,8 @@ export default class FundingSourceTicketComponent extends Component {
                             this.setState({
                                 loading: true
                             })
-                            this.state.fundingSource.summary = summaryText_2
+                            this.state.fundingSource.summary = summaryText_2;
+                            this.state.fundingSource.userLanguageCode = this.state.lang;
                             JiraTikcetService.addEmailRequestIssue(this.state.fundingSource).then(response => {
                                 console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {

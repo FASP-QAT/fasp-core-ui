@@ -243,7 +243,8 @@ export default class ProductCategoryTicketComponent extends Component {
                             this.setState({
                                 loading: true
                             })
-                            this.state.productCategory.summary = summaryText_2
+                            this.state.productCategory.summary = summaryText_2;
+                            this.state.productCategory.userLanguageCode = this.state.lang;
                             JiraTikcetService.addEmailRequestIssue(this.state.productCategory).then(response => {
                                 console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {

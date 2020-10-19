@@ -766,7 +766,8 @@ export default class ProgramTicketComponent extends Component {
                             this.setState({
                                 loading: true
                             })
-                            this.state.program.summary = summaryText_2
+                            this.state.program.summary = summaryText_2;
+                            this.state.program.userLanguageCode = this.state.lang;
                             JiraTikcetService.addEmailRequestIssue(this.state.program).then(response => {
                                 console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {

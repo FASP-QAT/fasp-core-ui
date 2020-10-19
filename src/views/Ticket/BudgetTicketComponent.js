@@ -440,7 +440,8 @@ export default class BudgetTicketComponent extends Component {
                             this.setState({
                                 loading: true
                             })
-                            this.state.budget.summary = summaryText_2
+                            this.state.budget.summary = summaryText_2;
+                            this.state.budget.userLanguageCode = this.state.lang;
                             JiraTikcetService.addEmailRequestIssue(this.state.budget).then(response => {
                                 console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
@@ -583,7 +584,7 @@ export default class BudgetTicketComponent extends Component {
                                             <FormFeedback className="red">{errors.budgetName}</FormFeedback>
                                         </FormGroup>
                                         <FormGroup>
-                                            <Label for="budget">{i18n.t('static.budget.budgetCode')}<span className="red Reqasterisk">*</span></Label>
+                                            <Label for="budget">{i18n.t('static.budget.budgetDisplayName')}<span className="red Reqasterisk">*</span></Label>
                                             <Input type="text"
                                                 name="budgetCode"
                                                 id="budgetCode"

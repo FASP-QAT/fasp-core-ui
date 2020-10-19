@@ -532,7 +532,8 @@ export default class TechnicalAreaTicketComponent extends Component {
                             this.setState({
                                 loading: true
                             })
-                            this.state.technicalArea.summary = summaryText_2
+                            this.state.technicalArea.summary = summaryText_2;
+                            this.state.technicalArea.userLanguageCode = this.state.lang;
                             JiraTikcetService.addEmailRequestIssue(this.state.technicalArea).then(response => {
                                 console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {

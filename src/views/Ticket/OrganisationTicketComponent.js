@@ -530,7 +530,8 @@ export default class OrganisationTicketComponent extends Component {
                             this.setState({
                                 loading: true
                             })
-                            this.state.organisation.summary = summaryText_2
+                            this.state.organisation.summary = summaryText_2;
+                            this.state.organisation.userLanguageCode = this.state.lang;
                             JiraTikcetService.addEmailRequestIssue(this.state.organisation).then(response => {
                                 console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {

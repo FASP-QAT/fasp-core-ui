@@ -11,8 +11,10 @@ import { SPACE_REGEX } from '../../Constants';
 import RealmService from '../../api/RealmService';
 import getLabelText from '../../CommonComponent/getLabelText';
 
+let summaryText_1 = (i18n.t("static.common.edit") + " " + i18n.t("static.realm.realm"))
+let summaryText_2 = "Edit Realm"
 const initialValues = {
-    summary: "Edit Realm",
+    summary: summaryText_1,
     realmName: "",
     notes: ""
 }
@@ -57,7 +59,7 @@ export default class EditRealmTicketComponent extends Component {
         super(props);
         this.state = {
             realm: {
-                summary: "Edit Realm",
+                summary: summaryText_1,
                 realmName: "",
                 notes: ""
             },
@@ -78,7 +80,12 @@ export default class EditRealmTicketComponent extends Component {
             realm.summary = event.target.value;
         }
         if (event.target.name == "realmName") {
-            realm.realmName = event.target.options[event.target.selectedIndex].innerHTML;
+            var outText = "";
+            if(event.target.value !== "") {
+                var realmT = this.state.realms.filter(c => c.realmId == event.target.value)[0];
+                outText = realmT.label.label_en + " | " + realmT.realmCode;
+            }            
+            realm.realmName = outText;
             this.setState({
                 realmId: event.target.value
             })
@@ -201,7 +208,9 @@ export default class EditRealmTicketComponent extends Component {
                             this.setState({
                                 loading: true
                             })
-                            JiraTikcetService.addEmailRequestIssue(values).then(response => {
+                            this.state.realm.summary = summaryText_2;
+                            this.state.realm.userLanguageCode = this.state.lang;
+                            JiraTikcetService.addEmailRequestIssue(this.state.realm).then(response => {
                                 console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
                                     var msg = response.data.key;

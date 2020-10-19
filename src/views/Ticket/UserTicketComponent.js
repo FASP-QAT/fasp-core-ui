@@ -104,8 +104,7 @@ export default class UserTicketComponent extends Component {
 
     constructor(props) {
         super(props);
-        this.state = {
-            lang: localStorage.getItem('lang'),
+        this.state = {            
             user: {
                 summary: summaryText_1,
                 realm: "",
@@ -477,7 +476,8 @@ export default class UserTicketComponent extends Component {
                             this.setState({
                                 loading: true
                             })
-                            this.state.user.summary = summaryText_2
+                            this.state.user.summary = summaryText_2;
+                            this.state.user.userLanguageCode = this.state.lang;
                             JiraTikcetService.addUpdateUserRequest(this.state.user).then(response => {
                                 console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {

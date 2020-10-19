@@ -349,7 +349,8 @@ export default class RealmCountryRegionTicketComponent extends Component {
                             this.setState({
                                 loading: true
                             })
-                            this.state.realmCountryRegion.summary = summaryText_2
+                            this.state.realmCountryRegion.summary = summaryText_2;
+                            this.state.realmCountryRegion.userLanguageCode = this.state.lang;
                             JiraTikcetService.addEmailRequestIssue(this.state.realmCountryRegion).then(response => {
                                 console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
