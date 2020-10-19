@@ -29,70 +29,6 @@ import { Link } from 'react-router-dom';
 // import { NavLink } from 'react-router-dom';
 
 const entityname = i18n.t('static.program.program');
-const chartOptions = {
-    title: {
-        display: true,
-        text: i18n.t('static.dashboard.stockstatus')
-    },
-    scales: {
-        yAxes: [{
-            id: 'A',
-            scaleLabel: {
-                display: true,
-                labelString: i18n.t('static.dashboard.unit'),
-                fontColor: 'black'
-            },
-            stacked: false,
-            ticks: {
-                beginAtZero: true,
-                fontColor: 'black',
-                callback: function (value) {
-                    return value.toLocaleString();
-                }
-            },
-            position: 'left',
-        },
-        {
-            id: 'B',
-            scaleLabel: {
-                display: true,
-                labelString: i18n.t('static.dashboard.months'),
-                fontColor: 'black'
-            },
-            stacked: false,
-            ticks: {
-                beginAtZero: true,
-                fontColor: 'black'
-            },
-            position: 'right',
-        }
-        ],
-        xAxes: [{
-            ticks: {
-                fontColor: 'black'
-            },
-        }]
-    },
-    tooltips: {
-        callbacks: {
-            label: function (tooltipItems, data) {
-                return (tooltipItems.yLabel.toLocaleString());
-            }
-        },
-        enabled: false,
-        custom: CustomTooltips
-    },
-    maintainAspectRatio: false
-    ,
-    legend: {
-        display: true,
-        position: 'bottom',
-        labels: {
-            usePointStyle: true,
-            fontColor: 'black'
-        }
-    }
-}
 
 const validationSchema = function (values) {
     return Yup.object().shape({
@@ -1816,6 +1752,80 @@ class EditSupplyPlanStatus extends Component {
     }
 
     tabPane() {
+        const chartOptions = {
+            title: {
+                display: true,
+                text: this.state.planningUnitName != "" && this.state.planningUnitName != undefined && this.state.planningUnitName != null ? entityname + " - " + this.state.planningUnitName : entityname
+            },
+            scales: {
+                yAxes: [{
+                    id: 'A',
+                    scaleLabel: {
+                        display: true,
+                        labelString: i18n.t('static.dashboard.unit'),
+                        fontColor: 'black'
+                    },
+                    stacked: false,
+                    ticks: {
+                        beginAtZero: true,
+                        fontColor: 'black',
+                        callback: function (value) {
+                            return value.toLocaleString();
+                        }
+                    },
+                    gridLines: {
+                        drawBorder: true, lineWidth: 0
+                    },
+                    position: 'left',
+                },
+                {
+                    id: 'B',
+                    scaleLabel: {
+                        display: true,
+                        labelString: i18n.t('static.dashboard.months'),
+                        fontColor: 'black'
+                    },
+                    stacked: false,
+                    ticks: {
+                        beginAtZero: true,
+                        fontColor: 'black'
+                    },
+                    gridLines: {
+                        drawBorder: true, lineWidth: 0
+                    },
+                    position: 'right',
+                }
+                ],
+                xAxes: [{
+                    ticks: {
+                        fontColor: 'black'
+                    },
+                    gridLines: {
+                        drawBorder: true, lineWidth: 0
+                    }
+                }]
+            },
+            tooltips: {
+                callbacks: {
+                    label: function (tooltipItems, data) {
+                        return (tooltipItems.yLabel.toLocaleString());
+                    }
+                },
+                enabled: false,
+                custom: CustomTooltips
+            },
+            maintainAspectRatio: false
+            ,
+            legend: {
+                display: true,
+                position: 'bottom',
+                labels: {
+                    usePointStyle: true,
+                    fontColor: 'black'
+                }
+            }
+        }
+
         const { planningUnits } = this.state;
         let planningUnitList = planningUnits.length > 0
             && planningUnits.map((item, i) => {

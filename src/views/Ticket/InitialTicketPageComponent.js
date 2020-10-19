@@ -40,6 +40,7 @@ import EditRealmCountryTicketComponent from './EditRealmCountryTicketComponent';
 import EditRealmCountryRegionTicketComponent from './EditRealmCountryRegionTicketComponent';
 import EditTechnicalAreaTicketComponent from './EditTechnicalAreaTicketComponent';
 import EditTracerCategoryTicketComponent from './EditTracerCategoryTicketComponent';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 
 export default class InitialTicketPageComponent extends Component {
 
@@ -705,6 +706,7 @@ export default class InitialTicketPageComponent extends Component {
 
 
         <Modal isOpen={this.state.help} toggle={this.togglehelp} className={this.props.className} backdrop="static">
+        <AuthenticationServiceComponent history={this.props.history} />
           {/* className={'modal-info ' + this.props.className}> */}
           <ModalHeader toggle={this.togglehelp} className="ModalHead modal-info-Headher"><strong>{i18n.t('static.ticket.help')}</strong></ModalHeader>
           <ModalBody className="pb-0">

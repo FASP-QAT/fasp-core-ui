@@ -120,7 +120,7 @@ export default class EditRealmCountryRegionTicketComponent extends Component {
     }
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         RegionService.getRegionList()
             .then(response => {
                 if (response.status == 200) {
@@ -128,7 +128,7 @@ export default class EditRealmCountryRegionTicketComponent extends Component {
                         realmCountryRegionList: response.data,
                         loading: false
                     }, () => {
-                        console.log("realmCountryRegionList",this.state.realmCountryRegionList)
+                        console.log("realmCountryRegionList", this.state.realmCountryRegionList)
                     });
                 } else {
                     this.setState({
@@ -205,8 +205,8 @@ export default class EditRealmCountryRegionTicketComponent extends Component {
 
     render() {
         const { realmCountryRegionList } = this.state;
-        console.log("realmCountryRegionList",this.state.realmCountryRegionList)
-        
+        console.log("realmCountryRegionList", this.state.realmCountryRegionList)
+
         let realmCountryRegions = realmCountryRegionList.length > 0
             && realmCountryRegionList.map((item, i) => {
                 return (
@@ -250,17 +250,46 @@ export default class EditRealmCountryRegionTicketComponent extends Component {
                                 }
                                 this.props.togglehelp();
                                 this.props.toggleSmall(this.state.message);
-                            })
-                                .catch(
-                                    error => {
+                            }).catch(
+                                error => {
+                                    if (error.message === "Network Error") {
                                         this.setState({
-                                            message: i18n.t('static.unkownError'), loading: false
-                                        },
-                                            () => {
-                                                this.hideSecondComponent();
-                                            });
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                    } else {
+                                        switch (error.response ? error.response.status : "") {
+
+                                            case 401:
+                                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                                break;
+                                            case 403:
+                                                this.props.history.push(`/accessDenied`)
+                                                break;
+                                            case 500:
+                                            case 404:
+                                            case 406:
+                                                this.setState({
+                                                    message: error.response.data.messageCode,
+                                                    loading: false
+                                                });
+                                                break;
+                                            case 412:
+                                                this.setState({
+                                                    message: error.response.data.messageCode,
+                                                    loading: false
+                                                });
+                                                break;
+                                            default:
+                                                this.setState({
+                                                    message: 'static.unkownError',
+                                                    loading: false
+                                                });
+                                                break;
+                                        }
                                     }
-                                );
+                                }
+                            );
                         }}
                         render={
                             ({

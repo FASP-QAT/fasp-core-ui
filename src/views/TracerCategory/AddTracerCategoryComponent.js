@@ -317,7 +317,7 @@ import { BUDGET_NAME_REGEX } from '../../Constants.js';
 const entityname = i18n.t('static.tracercategory.tracercategory');
 
 
-const initialValues = {
+let initialValues = {
     realmId: [],
     tracerCategoryCode: "",
     tracerCategoryName: "",
@@ -446,9 +446,16 @@ class AddTracerCategoryComponent extends Component {
         RealmService.getRealmListAll()
             .then(response => {
                 if (response.status == 200) {
+                    let { tracerCategory } = this.state;
+                    tracerCategory.realm.id = (response.data.length == 1 ? response.data[0].realmId : "")
                     this.setState({
                         realms: response.data, loading: false
-                    })
+                    },
+                        () => {
+                            initialValues = {
+                                realmId: (response.data.length == 1 ? response.data[0].realmId : "")
+                            }
+                        })
                 } else {
                     this.setState({
                         message: response.data.messageCode, loading: false
@@ -524,6 +531,7 @@ class AddTracerCategoryComponent extends Component {
                                 <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
                             </CardHeader> */}
                             <Formik
+                                enableReinitialize={true}
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
