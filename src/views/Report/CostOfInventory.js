@@ -58,9 +58,9 @@ export default class CostOfInventory extends Component {
             versions: [],
             message: '',
             singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
-            minDate:{year:  new Date().getFullYear()-3, month: new Date().getMonth()},
-            maxDate:{year:  new Date().getFullYear()+3, month: new Date().getMonth()+1},
-           loading: true
+            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() },
+            maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() + 1 },
+            loading: true
 
         }
         this.formSubmit = this.formSubmit.bind(this);
@@ -91,23 +91,66 @@ export default class CostOfInventory extends Component {
                             programs: [], loading: false
                         }, () => { this.consolidatedProgramList() })
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message, loading: false });
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
                         } else {
                             switch (error.response ? error.response.status : "") {
-                                case 500:
+
                                 case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
                                 case 404:
                                 case 406:
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                        loading: false
+                                    });
+                                    break;
                                 case 412:
-                                    this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                        loading: false
+                                    });
                                     break;
                                 default:
-                                    this.setState({ message: 'static.unkownError', loading: false });
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
                                     break;
                             }
                         }
                     }
                 );
+            // .catch(
+            //     error => {
+            //         this.setState({
+            //             programs: [], loading: false
+            //         }, () => { this.consolidatedProgramList() })
+            //         if (error.message === "Network Error") {
+            //             this.setState({ message: error.message, loading: false });
+            //         } else {
+            //             switch (error.response ? error.response.status : "") {
+            //                 case 500:
+            //                 case 401:
+            //                 case 404:
+            //                 case 406:
+            //                 case 412:
+            //                     this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+            //                     break;
+            //                 default:
+            //                     this.setState({ message: 'static.unkownError', loading: false });
+            //                     break;
+            //             }
+            //         }
+            //     }
+            // );
 
         } else {
             console.log('offline')
@@ -307,9 +350,9 @@ export default class CostOfInventory extends Component {
         return x1 + x2;
     }
 
-    addDoubleQuoteToRowContent=(arr)=>{
-        return arr.map(ele=>'"'+ele+'"')
-     }
+    addDoubleQuoteToRowContent = (arr) => {
+        return arr.map(ele => '"' + ele + '"')
+    }
     exportCSV = (columns) => {
 
         var csvRow = [];
@@ -328,7 +371,7 @@ export default class CostOfInventory extends Component {
         columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ', '%20') });
 
         var A = [this.addDoubleQuoteToRowContent(headers)]
-        this.state.costOfInventory.map(ele => A.push(this.addDoubleQuoteToRowContent([ele.planningUnit.id,(getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.stock, (ele.calculated? i18n.t('static.program.no'):i18n.t('static.program.yes')), ele.catalogPrice, ele.cost])));
+        this.state.costOfInventory.map(ele => A.push(this.addDoubleQuoteToRowContent([ele.planningUnit.id, (getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.stock, (ele.calculated ? i18n.t('static.program.no') : i18n.t('static.program.yes')), ele.catalogPrice, ele.cost])));
 
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
@@ -415,7 +458,7 @@ export default class CostOfInventory extends Component {
         // doc.addImage(canvasImg, 'png', 50, 200, 750, 290, 'CANVAS');
 
         const headers = columns.map((item, idx) => (item.text));
-        const data = this.state.costOfInventory.map(ele => [ele.planningUnit.id,getLabelText(ele.planningUnit.label), this.formatter(ele.stock), (ele.calculated? i18n.t('static.program.no'):i18n.t('static.program.yes')), this.formatter(ele.catalogPrice), this.formatter(ele.cost)]);
+        const data = this.state.costOfInventory.map(ele => [ele.planningUnit.id, getLabelText(ele.planningUnit.label), this.formatter(ele.stock), (ele.calculated ? i18n.t('static.program.no') : i18n.t('static.program.yes')), this.formatter(ele.catalogPrice), this.formatter(ele.cost)]);
 
         let content = {
             margin: { top: 80, bottom: 50 },
@@ -480,7 +523,7 @@ export default class CostOfInventory extends Component {
             data = [];
             data[0] = getLabelText(costOfInventory[j].planningUnit.label, this.state.lang)
             data[1] = this.formatter(costOfInventory[j].stock)
-            data[2] = (costOfInventory[j].calculated? i18n.t('static.program.no'):i18n.t('static.program.yes'))
+            data[2] = (costOfInventory[j].calculated ? i18n.t('static.program.no') : i18n.t('static.program.yes'))
             data[3] = this.formatterDouble(costOfInventory[j].catalogPrice);
             data[4] = this.formatterDouble(costOfInventory[j].cost);
 
@@ -520,7 +563,7 @@ export default class CostOfInventory extends Component {
                     readOnly: true
                 },
                 {
-                    title:  i18n.t('static.procurementAgentPlanningUnit.catalogPrice'),
+                    title: i18n.t('static.procurementAgentPlanningUnit.catalogPrice'),
                     type: 'text',
                     readOnly: true
                 },
@@ -584,7 +627,7 @@ export default class CostOfInventory extends Component {
                 openRequest.onerror = function (event) {
                     this.setState({
                         message: i18n.t('static.program.errortext'),
-                        loading:false
+                        loading: false
                     })
                 }.bind(this);
                 openRequest.onsuccess = function (e) {
@@ -600,7 +643,7 @@ export default class CostOfInventory extends Component {
                     programRequest.onerror = function (event) {
                         this.setState({
                             message: i18n.t('static.program.errortext'),
-                            loading:false
+                            loading: false
                         })
                     }.bind(this);
                     programRequest.onsuccess = function (e) {
@@ -616,7 +659,7 @@ export default class CostOfInventory extends Component {
                         planningunitRequest.onerror = function (event) {
                             // Handle errors!
                             this.setState({
-                                loading:false
+                                loading: false
                             })
                         };
                         planningunitRequest.onsuccess = function (e) {
@@ -631,29 +674,29 @@ export default class CostOfInventory extends Component {
                             var data = []
 
                             proList.map(planningUnit => {
-                              
-                                 var dtstr = this.state.singleValue2.year + "-" + String(this.state.singleValue2.month).padStart(2, '0') + "-01"
-                               var list = programJson.supplyPlan.filter(c => c.planningUnitId == planningUnit.planningUnit.id && c.transDate == dtstr)
+
+                                var dtstr = this.state.singleValue2.year + "-" + String(this.state.singleValue2.month).padStart(2, '0') + "-01"
+                                var list = programJson.supplyPlan.filter(c => c.planningUnitId == planningUnit.planningUnit.id && c.transDate == dtstr)
                                 if (list.length > 0) {
                                     console.log(list)
-                                var json = {
-                                    planningUnit: planningUnit.planningUnit,
-                                    stock: document.getElementById("includePlanningShipments").value.toString() == 'true'?list[0].closingBalance:list[0].closingBalanceWps,
-                                    catalogPrice: planningUnit.catalogPrice,
-                                    cost: this.roundN(document.getElementById("includePlanningShipments").value.toString() == 'true'?list[0].closingBalance  * planningUnit.catalogPrice:list[0].closingBalanceWps * planningUnit.catalogPrice),
-                               calculated:list[0].regionCount>list[0].regionCountForStock?1:0
+                                    var json = {
+                                        planningUnit: planningUnit.planningUnit,
+                                        stock: document.getElementById("includePlanningShipments").value.toString() == 'true' ? list[0].closingBalance : list[0].closingBalanceWps,
+                                        catalogPrice: planningUnit.catalogPrice,
+                                        cost: this.roundN(document.getElementById("includePlanningShipments").value.toString() == 'true' ? list[0].closingBalance * planningUnit.catalogPrice : list[0].closingBalanceWps * planningUnit.catalogPrice),
+                                        calculated: list[0].regionCount > list[0].regionCountForStock ? 1 : 0
+                                    }
+                                    data.push(json)
+                                } else {
+                                    var json = {
+                                        planningUnit: planningUnit.planningUnit,
+                                        stock: 0,
+                                        catalogPrice: planningUnit.catalogPrice,
+                                        cost: 0,
+                                        calculated: 0
+                                    }
+                                    data.push(json)
                                 }
-                                data.push(json)
-                            }else{
-                                var json = {
-                                    planningUnit: planningUnit.planningUnit,
-                                    stock: 0,
-                                    catalogPrice: planningUnit.catalogPrice,
-                                    cost: 0,
-                               calculated:0
-                                }
-                                data.push(json)
-                            }
                             })
 
 
@@ -673,7 +716,7 @@ export default class CostOfInventory extends Component {
                     "programId": programId,
                     "versionId": versionId,
                     "dt": moment(new Date(this.state.singleValue2.year, (this.state.singleValue2.month - 1), 1)).startOf('month').format('YYYY-MM-DD'),
-                    "includePlannedShipments": document.getElementById("includePlanningShipments").value.toString()=="true" ? 1 : 0
+                    "includePlannedShipments": document.getElementById("includePlanningShipments").value.toString() == "true" ? 1 : 0
                 }
                 // AuthenticationService.setupAxiosInterceptors();
                 ReportService.costOfInventory(inputjson).then(response => {
@@ -683,7 +726,46 @@ export default class CostOfInventory extends Component {
                     }, () => {
                         this.buildJExcel();
                     });
-                });
+                }).catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
+                                    break;
+                            }
+                        }
+                    }
+                );
             }
         } else if (this.state.CostOfInventoryInput.programId == 0) {
             this.setState({ costOfInventory: [], message: i18n.t('static.common.selectProgram') }, () => {
@@ -761,7 +843,7 @@ export default class CostOfInventory extends Component {
                 headerAlign: 'center',
                 style: { align: 'center' },
                 formatter: this.formatter
-            },{
+            }, {
                 dataField: 'calculated',
                 text: i18n.t('static.report.actualInv'),
                 sort: true,
@@ -770,7 +852,7 @@ export default class CostOfInventory extends Component {
                 style: { align: 'center' },
                 formatter: (cellContent, row) => {
                     return (
-                        (row.calculated? i18n.t('static.program.no'):i18n.t('static.program.yes'))
+                        (row.calculated ? i18n.t('static.program.no') : i18n.t('static.program.yes'))
                         // (row.lastLoginDate ? moment(row.lastLoginDate).format('DD-MMM-YY hh:mm A') : null)
                     );
                 }
@@ -821,11 +903,7 @@ export default class CostOfInventory extends Component {
         }
         return (
             <div className="animated fadeIn" >
-                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
-                    this.setState({ message: message })
-                }} loading={(loading) => {
-                    this.setState({ loading: loading })
-                }} />
+                <AuthenticationServiceComponent history={this.props.history} />
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
                 <SupplyPlanFormulas ref="formulaeChild" />
@@ -846,95 +924,95 @@ export default class CostOfInventory extends Component {
                     </div>
                     <CardBody className="pb-lg-1 pt-lg-1 ">
                         {/* <div className="" > */}
-                            <div ref={ref}>
+                        <div ref={ref}>
 
-                                <Form >
-                                    <div className=" pl-0">
-                                        <div className="row ">
+                            <Form >
+                                <div className=" pl-0">
+                                    <div className="row ">
                                         <FormGroup className="col-md-3 pl-0">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.month')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
-                                                <div className="controls edit">
-                                                    <Picker
-                                                        ref="pickAMonth2"
-                                                        years={{min: this.state.minDate, max: this.state.maxDate}}
-                                                        value={singleValue2}
-                                                        lang={pickerLang.months}
-                                                        theme="dark"
-                                                        onChange={this.handleAMonthChange2}
-                                                        onDismiss={this.handleAMonthDissmis2}
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.month')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                                            <div className="controls edit">
+                                                <Picker
+                                                    ref="pickAMonth2"
+                                                    years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                                    value={singleValue2}
+                                                    lang={pickerLang.months}
+                                                    theme="dark"
+                                                    onChange={this.handleAMonthChange2}
+                                                    onDismiss={this.handleAMonthDissmis2}
+                                                >
+                                                    <MonthBox value={this.makeText(singleValue2)} onClick={this.handleClickMonthBox2} />
+                                                </Picker>
+                                            </div>
+
+                                        </FormGroup>
+                                        <FormGroup className="col-md-3">
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.program.programMaster')}</Label>
+                                            <div className="controls ">
+                                                <InputGroup>
+                                                    <Input
+                                                        type="select"
+                                                        name="programId"
+                                                        id="programId"
+                                                        bsSize="sm"
+                                                        onChange={(e) => { this.dataChange(e); this.filterVersion(); this.formSubmit() }}
                                                     >
-                                                        <MonthBox value={this.makeText(singleValue2)} onClick={this.handleClickMonthBox2} />
-                                                    </Picker>
-                                                </div>
+                                                        <option value="0">{i18n.t('static.common.select')}</option>
+                                                        {programList}
+                                                    </Input>
 
-                                            </FormGroup>
-                                            <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.program.programMaster')}</Label>
-                                                <div className="controls ">
-                                                    <InputGroup>
-                                                        <Input
-                                                            type="select"
-                                                            name="programId"
-                                                            id="programId"
-                                                            bsSize="sm"
-                                                            onChange={(e) => { this.dataChange(e); this.filterVersion(); this.formSubmit() }}
-                                                        >
-                                                            <option value="0">{i18n.t('static.common.select')}</option>
-                                                            {programList}
-                                                        </Input>
+                                                </InputGroup>
+                                            </div>
+                                        </FormGroup>
+                                        <FormGroup className="col-md-3">
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
+                                            <div className="controls ">
+                                                <InputGroup>
+                                                    <Input
+                                                        type="select"
+                                                        name="versionId"
+                                                        id="versionId"
+                                                        bsSize="sm"
+                                                        onChange={(e) => { this.dataChange(e); this.formSubmit() }}
+                                                    >
+                                                        <option value="0">{i18n.t('static.common.select')}</option>
+                                                        {versionList}
+                                                    </Input>
 
-                                                    </InputGroup>
-                                                </div>
-                                            </FormGroup>
-                                            <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
-                                                <div className="controls ">
-                                                    <InputGroup>
-                                                        <Input
-                                                            type="select"
-                                                            name="versionId"
-                                                            id="versionId"
-                                                            bsSize="sm"
-                                                            onChange={(e) => { this.dataChange(e); this.formSubmit() }}
-                                                        >
-                                                            <option value="0">{i18n.t('static.common.select')}</option>
-                                                            {versionList}
-                                                        </Input>
-
-                                                    </InputGroup>
-                                                </div>
-                                            </FormGroup>
+                                                </InputGroup>
+                                            </div>
+                                        </FormGroup>
 
 
-                                            <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.program.isincludeplannedshipment')}</Label>
-                                                <div className="controls ">
-                                                    <InputGroup>
-                                                        <Input
-                                                            type="select"
-                                                            name="includePlanningShipments"
-                                                            id="includePlanningShipments"
-                                                            bsSize="sm"
-                                                            onChange={(e) => { this.dataChange(e); this.formSubmit() }}
-                                                        >
-                                                            <option value="true">{i18n.t('static.program.yes')}</option>
-                                                            <option value="false">{i18n.t('static.program.no')}</option>
-                                                        </Input>
+                                        <FormGroup className="col-md-3">
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.program.isincludeplannedshipment')}</Label>
+                                            <div className="controls ">
+                                                <InputGroup>
+                                                    <Input
+                                                        type="select"
+                                                        name="includePlanningShipments"
+                                                        id="includePlanningShipments"
+                                                        bsSize="sm"
+                                                        onChange={(e) => { this.dataChange(e); this.formSubmit() }}
+                                                    >
+                                                        <option value="true">{i18n.t('static.program.yes')}</option>
+                                                        <option value="false">{i18n.t('static.program.no')}</option>
+                                                    </Input>
 
-                                                    </InputGroup>
-                                                </div>
-                                            </FormGroup>
+                                                </InputGroup>
+                                            </div>
+                                        </FormGroup>
 
 
-                                           
-                                        </div>
+
                                     </div>
-                                </Form>
-                            </div>
+                                </div>
+                            </Form>
+                        </div>
                         {/* </div> */}
                         <div className="">
-                        <div id="tableDiv" className="jexcelremoveReadonlybackground">
-                        </div>
+                            <div id="tableDiv" className="jexcelremoveReadonlybackground">
+                            </div>
                         </div>
 
 

@@ -37,10 +37,10 @@ class DefaultHeader extends Component {
       <React.Fragment>
         <AppSidebarToggler className="d-lg-none" display="md" mobile />
         <NavLink to="#" >
-        <AppNavbarBrand onClick={this.props.onChangeDashboard}
-          full={{ src: logo, width: 180, height: 50, alt: 'QAT Logo' }}
-          minimized={{ src: QAT, width: 50, height: 50, alt: 'QAT Logo' }}
-        />
+          <AppNavbarBrand onClick={this.props.onChangeDashboard}
+            full={{ src: logo, width: 180, height: 50, alt: 'QAT Logo' }}
+            minimized={{ src: QAT, width: 50, height: 50, alt: 'QAT Logo' }}
+          />
         </NavLink>
         <AppSidebarToggler className="d-md-down-none" display="lg" />
         {/* <Nav className="d-md-down-none" navbar>
@@ -83,10 +83,21 @@ class DefaultHeader extends Component {
               <DropdownItem onClick={this.changeLanguage.bind(this, 'pr')}> {i18n.t('static.language.Portuguese')}</DropdownItem>
             </DropdownMenu>
           </UncontrolledDropdown> */}
-          <DefaultHeaderDropdown mssgs/>
+          <DefaultHeaderDropdown mssgs />
+
           <NavItem className="">
             <NavLink to="#" className="nav-link">
-            <img src={imageUsermanual} className="HelpIcon" title={i18n.t('static.user.usermanual')} />
+              <img src={imageUsermanual} className="HelpIcon" title={i18n.t('static.user.usermanual')} />
+            </NavLink>
+          </NavItem>
+          <NavItem className="">
+            <NavLink to="#" className="nav-link">
+              <img src={imageUsermanual} className="HelpIcon" title={i18n.t('static.header.notLatestVersion')} />
+            </NavLink>
+          </NavItem>
+          <NavItem className="">
+            <NavLink to="#" className="nav-link">
+              <img src={imageUsermanual} className="HelpIcon" title={i18n.t('static.user.changesInLocalVersion')} />
             </NavLink>
           </NavItem>
           <NavItem className="">

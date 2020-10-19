@@ -59,11 +59,11 @@ const chartoptions =
                     var x2 = x.length > 1 ? '.' + x[1] : '';
                     var rgx = /(\d+)(\d{3})/;
                     while (rgx.test(x1)) {
-                      x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                        x1 = x1.replace(rgx, '$1' + ',' + '$2');
                     }
                     return x1 + x2;
-          
-                  }
+
+                }
             }
         }]
     },
@@ -73,22 +73,23 @@ const chartoptions =
         custom: CustomTooltips,
         callbacks: {
             label: function (tooltipItem, data) {
-      
-              let label = data.labels[tooltipItem.index];
-              let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
-      
-              var cell1 = value
-              cell1 += '';
-              var x = cell1.split('.');
-              var x1 = x[0];
-              var x2 = x.length > 1 ? '.' + x[1] : '';
-              var rgx = /(\d+)(\d{3})/;
-              while (rgx.test(x1)) {
-                x1 = x1.replace(rgx, '$1' + ',' + '$2');
-              }
-              return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
+
+                let label = data.labels[tooltipItem.index];
+                let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+
+                var cell1 = value
+                cell1 += '';
+                var x = cell1.split('.');
+                var x1 = x[0];
+                var x2 = x.length > 1 ? '.' + x[1] : '';
+                var rgx = /(\d+)(\d{3})/;
+                while (rgx.test(x1)) {
+                    x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                }
+                return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
             }
-    }},
+        }
+    },
     maintainAspectRatio: false,
     legend: {
         display: true,
@@ -150,9 +151,9 @@ class Budgets extends Component {
         }
         return x1 + x2;
     }
-    addDoubleQuoteToRowContent=(arr)=>{
-        return arr.map(ele=>'"'+ele+'"')
-     }
+    addDoubleQuoteToRowContent = (arr) => {
+        return arr.map(ele => '"' + ele + '"')
+    }
     exportCSV = (columns) => {
 
         var csvRow = [];
@@ -168,7 +169,7 @@ class Budgets extends Component {
         columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ', '%20') });
 
         var A = [this.addDoubleQuoteToRowContent(headers)]
-        this.state.selBudget.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.budget.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), (ele.budget.code.replaceAll(',', ' ')).replaceAll(' ', '%20') , (ele.fundingSource.code.replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.currency.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), this.roundN(ele.budgetAmt), this.roundN(ele.plannedBudgetAmt), this.roundN(ele.orderedBudgetAmt), this.roundN((ele.budgetAmt - (ele.plannedBudgetAmt + ele.orderedBudgetAmt))), this.formatDate(ele.startDate), this.formatDate(ele.stopDate)])));
+        this.state.selBudget.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.budget.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), (ele.budget.code.replaceAll(',', ' ')).replaceAll(' ', '%20'), (ele.fundingSource.code.replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.currency.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), this.roundN(ele.budgetAmt), this.roundN(ele.plannedBudgetAmt), this.roundN(ele.orderedBudgetAmt), this.roundN((ele.budgetAmt - (ele.plannedBudgetAmt + ele.orderedBudgetAmt))), this.formatDate(ele.startDate), this.formatDate(ele.stopDate)])));
 
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
@@ -321,16 +322,17 @@ class Budgets extends Component {
                             for (var l = 0; l < budgetList.length; l++) {
                                 var shipmentList = programJson.shipmentList.filter(s => s.budget.id == budgetList[l].budgetId);
                                 var plannedShipmentbudget = 0;
-                                (shipmentList.filter(s => (s.shipmentStatus.id == 1 || s.shipmentStatus.id == 2 || s.shipmentStatus.id == 3 || s.shipmentStatus.id == 9))).map(ele =>{
-                                    console.log(ele) 
-                                    plannedShipmentbudget = plannedShipmentbudget + (parseFloat(ele.productCost) + parseFloat(ele.freightCost)) * parseFloat(ele.currency.conversionRateToUsd)});
-console.log(plannedShipmentbudget)
+                                (shipmentList.filter(s => (s.shipmentStatus.id == 1 || s.shipmentStatus.id == 2 || s.shipmentStatus.id == 3 || s.shipmentStatus.id == 9))).map(ele => {
+                                    console.log(ele)
+                                    plannedShipmentbudget = plannedShipmentbudget + (parseFloat(ele.productCost) + parseFloat(ele.freightCost)) * parseFloat(ele.currency.conversionRateToUsd)
+                                });
+                                console.log(plannedShipmentbudget)
                                 var OrderedShipmentbudget = 0;
                                 var shiplist = (shipmentList.filter(s => (s.shipmentStatus.id == 4 || s.shipmentStatus.id == 5 || s.shipmentStatus.id == 6 || s.shipmentStatus.id == 7)))
                                 console.log(shiplist)
                                 shiplist.map(ele => {
                                     console.log(OrderedShipmentbudget, '+', ele.productCost + ele.freightCost)
-                                    OrderedShipmentbudget = OrderedShipmentbudget +  (parseFloat(ele.productCost) + parseFloat(ele.freightCost)) * parseFloat(ele.currency.conversionRateToUsd)
+                                    OrderedShipmentbudget = OrderedShipmentbudget + (parseFloat(ele.productCost) + parseFloat(ele.freightCost)) * parseFloat(ele.currency.conversionRateToUsd)
                                 });
                                 console.log(OrderedShipmentbudget)
                                 console.log("budget list==>", budgetList[l]);
@@ -376,25 +378,68 @@ console.log(plannedShipmentbudget)
                             this.setState({
                                 selBudget: [], loading: false
                             })
-
                             if (error.message === "Network Error") {
-                                this.setState({ message: error.message });
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
                             } else {
                                 switch (error.response ? error.response.status : "") {
-                                    case 500:
+
                                     case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
                                     case 404:
                                     case 406:
+                                        this.setState({
+                                            message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                            loading: false
+                                        });
+                                        break;
                                     case 412:
-                                        this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                        this.setState({
+                                            message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                            loading: false
+                                        });
                                         break;
                                     default:
-                                        this.setState({ loading: false, message: 'static.unkownError' });
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
                                         break;
                                 }
                             }
                         }
                     );
+                // .catch(
+                //     error => {
+                //         this.setState({
+                //             selBudget: [], loading: false
+                //         })
+
+                //         if (error.message === "Network Error") {
+                //             this.setState({ message: error.message });
+                //         } else {
+                //             switch (error.response ? error.response.status : "") {
+                //                 case 500:
+                //                 case 401:
+                //                 case 404:
+                //                 case 406:
+                //                 case 412:
+                //                     this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                //                     break;
+                //                 default:
+                //                     this.setState({ loading: false, message: 'static.unkownError' });
+                //                     break;
+                //             }
+                //         }
+                //     }
+                // );
 
             }
         } else if (programId == 0) {
@@ -428,23 +473,66 @@ console.log(plannedShipmentbudget)
                             programs: [], loading: false
                         }, () => { this.consolidatedProgramList() })
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message, loading: false });
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
                         } else {
                             switch (error.response ? error.response.status : "") {
-                                case 500:
+
                                 case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
                                 case 404:
                                 case 406:
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                        loading: false
+                                    });
+                                    break;
                                 case 412:
-                                    this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                        loading: false
+                                    });
                                     break;
                                 default:
-                                    this.setState({ loading: false, message: 'static.unkownError' });
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
                                     break;
                             }
                         }
                     }
                 );
+            // .catch(
+            //     error => {
+            //         this.setState({
+            //             programs: [], loading: false
+            //         }, () => { this.consolidatedProgramList() })
+            //         if (error.message === "Network Error") {
+            //             this.setState({ message: error.message, loading: false });
+            //         } else {
+            //             switch (error.response ? error.response.status : "") {
+            //                 case 500:
+            //                 case 401:
+            //                 case 404:
+            //                 case 406:
+            //                 case 412:
+            //                     this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+            //                     break;
+            //                 default:
+            //                     this.setState({ loading: false, message: 'static.unkownError' });
+            //                     break;
+            //             }
+            //         }
+            //     }
+            // );
 
         } else {
             console.log('offline')
@@ -907,11 +995,7 @@ console.log(plannedShipmentbudget)
         }
         return (
             <div className="animated">
-                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
-                    this.setState({ message: message })
-                }} loading={(loading) => {
-                    this.setState({ loading: loading })
-                }} />
+                <AuthenticationServiceComponent history={this.props.history} />
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>

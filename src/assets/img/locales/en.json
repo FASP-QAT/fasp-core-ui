@@ -1398,5 +1398,7 @@
     "static.report.batchstartdt": " Batch Start Date",
     "static.report.actualInv": "Actual Inventory Count",
     "static.user.usermanual" :"User Manual",
+    "static.header.notLatestVersion" :"Not latest version",
+    "static.user.changesInLocalVersion" :"Changes in local version",
     "static.inventory.adjustmentdetils": "Adjustment details"
 }

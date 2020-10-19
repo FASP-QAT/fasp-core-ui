@@ -62,8 +62,8 @@ class ProcurementAgentExport extends Component {
             data: [],
             lang: localStorage.getItem('lang'),
             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth()+2 },
-            maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth()  },
+            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
+            maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
             loading: true
         }
         this.formatLabel = this.formatLabel.bind(this);
@@ -93,23 +93,66 @@ class ProcurementAgentExport extends Component {
                             programs: [], loading: false
                         }, () => { this.consolidatedProgramList() })
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message, loading: false });
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
                         } else {
                             switch (error.response ? error.response.status : "") {
-                                case 500:
+
                                 case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
                                 case 404:
                                 case 406:
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                        loading: false
+                                    });
+                                    break;
                                 case 412:
-                                    this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                        loading: false
+                                    });
                                     break;
                                 default:
-                                    this.setState({ message: 'static.unkownError', loading: false });
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
                                     break;
                             }
                         }
                     }
                 );
+            // .catch(
+            //     error => {
+            //         this.setState({
+            //             programs: [], loading: false
+            //         }, () => { this.consolidatedProgramList() })
+            //         if (error.message === "Network Error") {
+            //             this.setState({ message: error.message, loading: false });
+            //         } else {
+            //             switch (error.response ? error.response.status : "") {
+            //                 case 500:
+            //                 case 401:
+            //                 case 404:
+            //                 case 406:
+            //                 case 412:
+            //                     this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+            //                     break;
+            //                 default:
+            //                     this.setState({ message: 'static.unkownError', loading: false });
+            //                     break;
+            //             }
+            //         }
+            //     }
+            // );
 
         } else {
             console.log('offline')
@@ -189,23 +232,66 @@ class ProcurementAgentExport extends Component {
                             procurementAgents: [], loading: false
                         }, () => { this.consolidatedProcurementAgentList() })
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message, loading: false });
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
                         } else {
                             switch (error.response ? error.response.status : "") {
-                                case 500:
+
                                 case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
                                 case 404:
                                 case 406:
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                        loading: false
+                                    });
+                                    break;
                                 case 412:
-                                    this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                        loading: false
+                                    });
                                     break;
                                 default:
-                                    this.setState({ message: 'static.unkownError', loading: false });
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
                                     break;
                             }
                         }
                     }
                 );
+            // .catch(
+            //     error => {
+            //         this.setState({
+            //             procurementAgents: [], loading: false
+            //         }, () => { this.consolidatedProcurementAgentList() })
+            //         if (error.message === "Network Error") {
+            //             this.setState({ message: error.message, loading: false });
+            //         } else {
+            //             switch (error.response ? error.response.status : "") {
+            //                 case 500:
+            //                 case 401:
+            //                 case 404:
+            //                 case 406:
+            //                 case 412:
+            //                     this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+            //                     break;
+            //                 default:
+            //                     this.setState({ message: 'static.unkownError', loading: false });
+            //                     break;
+            //             }
+            //         }
+            //     }
+            // );
 
         } else {
             console.log('offline')
@@ -420,30 +506,72 @@ class ProcurementAgentExport extends Component {
                         }, () => {
                             this.fetchData();
                         })
-                    })
-                        .catch(
-                            error => {
+                    }).catch(
+                        error => {
+                            this.setState({
+                                planningUnits: [],
+                            })
+                            if (error.message === "Network Error") {
                                 this.setState({
-                                    planningUnits: [],
-                                })
-                                if (error.message === "Network Error") {
-                                    this.setState({ message: error.message });
-                                } else {
-                                    switch (error.response ? error.response.status : "") {
-                                        case 500:
-                                        case 401:
-                                        case 404:
-                                        case 406:
-                                        case 412:
-                                            this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
-                                            break;
-                                        default:
-                                            this.setState({ message: 'static.unkownError' });
-                                            break;
-                                    }
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
+
+                                    case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
+                                    case 404:
+                                    case 406:
+                                        this.setState({
+                                            message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
+                                            loading: false
+                                        });
+                                        break;
+                                    case 412:
+                                        this.setState({
+                                            message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
+                                            loading: false
+                                        });
+                                        break;
+                                    default:
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                        break;
                                 }
                             }
-                        );
+                        }
+                    );
+                    // .catch(
+                    //     error => {
+                    //         this.setState({
+                    //             planningUnits: [],
+                    //         })
+                    //         if (error.message === "Network Error") {
+                    //             this.setState({ message: error.message });
+                    //         } else {
+                    //             switch (error.response ? error.response.status : "") {
+                    //                 case 500:
+                    //                 case 401:
+                    //                 case 404:
+                    //                 case 406:
+                    //                 case 412:
+                    //                     this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
+                    //                     break;
+                    //                 default:
+                    //                     this.setState({ message: 'static.unkownError' });
+                    //                     break;
+                    //             }
+                    //         }
+                    //     }
+                    // );
                 }
             }
         });
@@ -490,9 +618,9 @@ class ProcurementAgentExport extends Component {
         }
         return x1 + x2;
     }
-    addDoubleQuoteToRowContent=(arr)=>{
-        return arr.map(ele=>'"'+ele+'"')
-     }
+    addDoubleQuoteToRowContent = (arr) => {
+        return arr.map(ele => '"' + ele + '"')
+    }
     exportCSV(columns) {
 
         let viewby = document.getElementById("viewById").value;
@@ -534,7 +662,7 @@ class ProcurementAgentExport extends Component {
         } else if (viewby == 2) {
             this.state.data.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.fundingSource.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (ele.fundingSource.code.replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.qty, ele.productCost, ele.freightPerc, ele.freightCost, ele.totalCost])));
         } else {
-            this.state.data.map(ele => A.push(this.addDoubleQuoteToRowContent([ele.planningUnit.id,(getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.qty, ele.productCost, ele.freightPerc, ele.freightCost, ele.totalCost])));
+            this.state.data.map(ele => A.push(this.addDoubleQuoteToRowContent([ele.planningUnit.id, (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.qty, ele.productCost, ele.freightPerc, ele.freightCost, ele.totalCost])));
         }
 
         // this.state.data.map(ele => [(ele.procurementAgent).replaceAll(',', ' ').replaceAll(' ', '%20'), (ele.planningUnit).replaceAll(',', ' ').replaceAll(' ', '%20'), ele.qty, ele.totalProductCost, ele.freightPer,ele.freightCost, ele.totalCost]);
@@ -643,14 +771,14 @@ class ProcurementAgentExport extends Component {
         let data = [];
         if (viewby == 1) {
             columns.map((item, idx) => { headers[idx] = (item.text) });
-            data = this.state.data.map(ele => [getLabelText(ele.procurementAgent.label, this.state.lang), ele.procurementAgent.code,ele.planningUnit.id, getLabelText(ele.planningUnit.label, this.state.lang), (ele.qty).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.productCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (parseFloat(ele.freightPerc).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.freightCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.totalCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")]);
+            data = this.state.data.map(ele => [getLabelText(ele.procurementAgent.label, this.state.lang), ele.procurementAgent.code, ele.planningUnit.id, getLabelText(ele.planningUnit.label, this.state.lang), (ele.qty).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.productCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (parseFloat(ele.freightPerc).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.freightCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.totalCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")]);
         } else if (viewby == 2) {
             columns.map((item, idx) => { headers[idx] = (item.text) });
-            data = this.state.data.map(ele => [getLabelText(ele.fundingSource.label, this.state.lang), ele.fundingSource.code,ele.planningUnit.id, getLabelText(ele.planningUnit.label, this.state.lang), (ele.qty).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.productCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (parseFloat(ele.freightPerc).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.freightCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.totalCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")]);
+            data = this.state.data.map(ele => [getLabelText(ele.fundingSource.label, this.state.lang), ele.fundingSource.code, ele.planningUnit.id, getLabelText(ele.planningUnit.label, this.state.lang), (ele.qty).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.productCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (parseFloat(ele.freightPerc).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.freightCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.totalCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")]);
         } else {
             columns.splice(0, 2);
             columns.map((item, idx) => { headers[idx] = (item.text) });
-            data = this.state.data.map(ele => [ele.planningUnit.id,getLabelText(ele.planningUnit.label, this.state.lang), (ele.qty).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.productCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (parseFloat(ele.freightPerc).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.freightCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.totalCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")]);
+            data = this.state.data.map(ele => [ele.planningUnit.id, getLabelText(ele.planningUnit.label, this.state.lang), (ele.qty).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.productCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (parseFloat(ele.freightPerc).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.freightCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.totalCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")]);
         }
         let startY = 200 + (this.state.planningUnitValues.length * 3)
         let content = {
@@ -933,7 +1061,7 @@ class ProcurementAgentExport extends Component {
                                 })
                             }.bind(this);
                             program1Request.onsuccess = function (event) {
-                                
+
                                 var programResult = [];
                                 programResult = program1Request.result;
                                 let airFreight = 0;
@@ -1089,23 +1217,71 @@ class ProcurementAgentExport extends Component {
                                     this.el.destroy();
                                 })
                                 if (error.message === "Network Error") {
-                                    this.setState({ message: error.message, loading: false });
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
                                 } else {
                                     switch (error.response ? error.response.status : "") {
-                                        case 500:
+
                                         case 401:
+                                            this.props.history.push(`/login/static.message.sessionExpired`)
+                                            break;
+                                        case 403:
+                                            this.props.history.push(`/accessDenied`)
+                                            break;
+                                        case 500:
                                         case 404:
                                         case 406:
+                                            this.setState({
+                                                message: i18n.t(error.response.data.messageCode),
+                                                loading: false
+                                            });
+                                            break;
                                         case 412:
-                                            this.setState({ loading: false, message: i18n.t(error.response.data.messageCode) });
+                                            this.setState({
+                                                message: i18n.t(error.response.data.messageCode),
+                                                loading: false
+                                            });
                                             break;
                                         default:
-                                            this.setState({ message: 'static.unkownError', loading: false });
+                                            this.setState({
+                                                message: 'static.unkownError',
+                                                loading: false
+                                            });
                                             break;
                                     }
                                 }
                             }
                         );
+                    // .catch(
+                    //     error => {
+                    //         this.setState({
+                    //             data: [], loading: false
+                    //         }, () => {
+                    //             this.consolidatedProgramList();
+                    //             this.consolidatedProcurementAgentList();
+                    //             this.el = jexcel(document.getElementById("tableDiv"), '');
+                    //             this.el.destroy();
+                    //         })
+                    //         if (error.message === "Network Error") {
+                    //             this.setState({ message: error.message, loading: false });
+                    //         } else {
+                    //             switch (error.response ? error.response.status : "") {
+                    //                 case 500:
+                    //                 case 401:
+                    //                 case 404:
+                    //                 case 406:
+                    //                 case 412:
+                    //                     this.setState({ loading: false, message: i18n.t(error.response.data.messageCode) });
+                    //                     break;
+                    //                 default:
+                    //                     this.setState({ message: 'static.unkownError', loading: false });
+                    //                     break;
+                    //             }
+                    //         }
+                    //     }
+                    // );
 
 
                 }
@@ -1186,7 +1362,7 @@ class ProcurementAgentExport extends Component {
                                 })
                             }.bind(this);
                             program1Request.onsuccess = function (event) {
-                                
+
                                 var programResult = [];
                                 programResult = program1Request.result;
                                 let airFreight = 0;
@@ -1342,23 +1518,72 @@ class ProcurementAgentExport extends Component {
 
                                 })
                                 if (error.message === "Network Error") {
-                                    this.setState({ message: error.message, loading: false });
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
                                 } else {
                                     switch (error.response ? error.response.status : "") {
-                                        case 500:
+
                                         case 401:
+                                            this.props.history.push(`/login/static.message.sessionExpired`)
+                                            break;
+                                        case 403:
+                                            this.props.history.push(`/accessDenied`)
+                                            break;
+                                        case 500:
                                         case 404:
                                         case 406:
+                                            this.setState({
+                                                message: i18n.t(error.response.data.messageCode),
+                                                loading: false
+                                            });
+                                            break;
                                         case 412:
-                                            this.setState({ loading: false, message: i18n.t(error.response.data.messageCode) });
+                                            this.setState({
+                                                message: i18n.t(error.response.data.messageCode),
+                                                loading: false
+                                            });
                                             break;
                                         default:
-                                            this.setState({ message: 'static.unkownError', loading: false });
+                                            this.setState({
+                                                message: 'static.unkownError',
+                                                loading: false
+                                            });
                                             break;
                                     }
                                 }
                             }
                         );
+                    // .catch(
+                    //     error => {
+                    //         this.setState({
+                    //             data: [], loading: false
+                    //         }, () => {
+                    //             this.consolidatedProgramList();
+                    //             this.consolidatedFundingSourceList();
+                    //             this.el = jexcel(document.getElementById("tableDiv"), '');
+                    //             this.el.destroy();
+
+                    //         })
+                    //         if (error.message === "Network Error") {
+                    //             this.setState({ message: error.message, loading: false });
+                    //         } else {
+                    //             switch (error.response ? error.response.status : "") {
+                    //                 case 500:
+                    //                 case 401:
+                    //                 case 404:
+                    //                 case 406:
+                    //                 case 412:
+                    //                     this.setState({ loading: false, message: i18n.t(error.response.data.messageCode) });
+                    //                     break;
+                    //                 default:
+                    //                     this.setState({ message: 'static.unkownError', loading: false });
+                    //                     break;
+                    //             }
+                    //         }
+                    //     }
+                    // );
 
 
                 }
@@ -1440,7 +1665,7 @@ class ProcurementAgentExport extends Component {
                                 })
                             }.bind(this);
                             program1Request.onsuccess = function (event) {
-                                
+
                                 var programResult = [];
                                 programResult = program1Request.result;
                                 let airFreight = 0;
@@ -1585,23 +1810,71 @@ class ProcurementAgentExport extends Component {
                                     this.el.destroy();
                                 })
                                 if (error.message === "Network Error") {
-                                    this.setState({ message: error.message, loading: false });
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
                                 } else {
                                     switch (error.response ? error.response.status : "") {
-                                        case 500:
+
                                         case 401:
+                                            this.props.history.push(`/login/static.message.sessionExpired`)
+                                            break;
+                                        case 403:
+                                            this.props.history.push(`/accessDenied`)
+                                            break;
+                                        case 500:
                                         case 404:
                                         case 406:
+                                            this.setState({
+                                                message: i18n.t(error.response.data.messageCode),
+                                                loading: false
+                                            });
+                                            break;
                                         case 412:
-                                            this.setState({ loading: false, message: i18n.t(error.response.data.messageCode) });
+                                            this.setState({
+                                                message: i18n.t(error.response.data.messageCode),
+                                                loading: false
+                                            });
                                             break;
                                         default:
-                                            this.setState({ message: 'static.unkownError', loading: false });
+                                            this.setState({
+                                                message: 'static.unkownError',
+                                                loading: false
+                                            });
                                             break;
                                     }
                                 }
                             }
                         );
+                    // .catch(
+                    //     error => {
+                    //         this.setState({
+                    //             data: [], loading: false
+                    //         }, () => {
+                    //             this.consolidatedProgramList();
+                    //             this.consolidatedProcurementAgentList();
+                    //             this.el = jexcel(document.getElementById("tableDiv"), '');
+                    //             this.el.destroy();
+                    //         })
+                    //         if (error.message === "Network Error") {
+                    //             this.setState({ message: error.message, loading: false });
+                    //         } else {
+                    //             switch (error.response ? error.response.status : "") {
+                    //                 case 500:
+                    //                 case 401:
+                    //                 case 404:
+                    //                 case 406:
+                    //                 case 412:
+                    //                     this.setState({ loading: false, message: i18n.t(error.response.data.messageCode) });
+                    //                     break;
+                    //                 default:
+                    //                     this.setState({ message: 'static.unkownError', loading: false });
+                    //                     break;
+                    //             }
+                    //         }
+                    //     }
+                    // );
 
 
                 }
@@ -1706,23 +1979,66 @@ class ProcurementAgentExport extends Component {
                             fundingSources: [], loading: false
                         }, () => { this.consolidatedFundingSourceList() })
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message, loading: false });
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
                         } else {
                             switch (error.response ? error.response.status : "") {
-                                case 500:
+
                                 case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
                                 case 404:
                                 case 406:
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                        loading: false
+                                    });
+                                    break;
                                 case 412:
-                                    this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                        loading: false
+                                    });
                                     break;
                                 default:
-                                    this.setState({ message: 'static.unkownError', loading: false });
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
                                     break;
                             }
                         }
                     }
                 );
+            // .catch(
+            //     error => {
+            //         this.setState({
+            //             fundingSources: [], loading: false
+            //         }, () => { this.consolidatedFundingSourceList() })
+            //         if (error.message === "Network Error") {
+            //             this.setState({ message: error.message, loading: false });
+            //         } else {
+            //             switch (error.response ? error.response.status : "") {
+            //                 case 500:
+            //                 case 401:
+            //                 case 404:
+            //                 case 406:
+            //                 case 412:
+            //                     this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+            //                     break;
+            //                 default:
+            //                     this.setState({ message: 'static.unkownError', loading: false });
+            //                     break;
+            //             }
+            //         }
+            //     }
+            // );
 
         } else {
             console.log('offline')
@@ -1991,11 +2307,7 @@ class ProcurementAgentExport extends Component {
         }
         return (
             <div className="animated">
-                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
-                    this.setState({ message: message })
-                }} loading={(loading) => {
-                    this.setState({ loading: loading })
-                }} />
+                <AuthenticationServiceComponent history={this.props.history} />
                 <h5>{i18n.t(this.props.match.params.message)}</h5>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
                 <SupplyPlanFormulas ref="formulaeChild" />

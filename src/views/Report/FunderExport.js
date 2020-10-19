@@ -1346,8 +1346,8 @@ class FunderExport extends Component {
             data: [],
             lang: localStorage.getItem('lang'),
             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate:{year:  new Date().getFullYear()-3, month: new Date().getMonth()+2},
-            maxDate:{year:  new Date().getFullYear()+3, month: new Date().getMonth()},
+            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
+            maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
             loading: false
         }
         this.formatLabel = this.formatLabel.bind(this);
@@ -1376,23 +1376,66 @@ class FunderExport extends Component {
                             programs: []
                         }, () => { this.consolidatedProgramList() })
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
                         } else {
                             switch (error.response ? error.response.status : "") {
-                                case 500:
+
                                 case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
                                 case 404:
                                 case 406:
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                        loading: false
+                                    });
+                                    break;
                                 case 412:
-                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                        loading: false
+                                    });
                                     break;
                                 default:
-                                    this.setState({ message: 'static.unkownError' });
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
                                     break;
                             }
                         }
                     }
                 );
+            // .catch(
+            //     error => {
+            //         this.setState({
+            //             programs: []
+            //         }, () => { this.consolidatedProgramList() })
+            //         if (error.message === "Network Error") {
+            //             this.setState({ message: error.message });
+            //         } else {
+            //             switch (error.response ? error.response.status : "") {
+            //                 case 500:
+            //                 case 401:
+            //                 case 404:
+            //                 case 406:
+            //                 case 412:
+            //                     this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+            //                     break;
+            //                 default:
+            //                     this.setState({ message: 'static.unkownError' });
+            //                     break;
+            //             }
+            //         }
+            //     }
+            // );
 
         } else {
             console.log('offline')
@@ -1471,23 +1514,66 @@ class FunderExport extends Component {
                             fundingSources: []
                         }, () => { this.consolidatedFundingSourceList() })
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
                         } else {
                             switch (error.response ? error.response.status : "") {
-                                case 500:
+
                                 case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
                                 case 404:
                                 case 406:
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                        loading: false
+                                    });
+                                    break;
                                 case 412:
-                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                        loading: false
+                                    });
                                     break;
                                 default:
-                                    this.setState({ message: 'static.unkownError' });
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
                                     break;
                             }
                         }
                     }
                 );
+            // .catch(
+            //     error => {
+            //         this.setState({
+            //             fundingSources: []
+            //         }, () => { this.consolidatedFundingSourceList() })
+            //         if (error.message === "Network Error") {
+            //             this.setState({ message: error.message });
+            //         } else {
+            //             switch (error.response ? error.response.status : "") {
+            //                 case 500:
+            //                 case 401:
+            //                 case 404:
+            //                 case 406:
+            //                 case 412:
+            //                     this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+            //                     break;
+            //                 default:
+            //                     this.setState({ message: 'static.unkownError' });
+            //                     break;
+            //             }
+            //         }
+            //     }
+            // );
 
         } else {
             console.log('offline')
@@ -1689,30 +1775,72 @@ class FunderExport extends Component {
                     }, () => {
                         this.fetchData();
                     })
-                })
-                    .catch(
-                        error => {
+                }).catch(
+                    error => {
+                        this.setState({
+                            planningUnits: [],
+                        })
+                        if (error.message === "Network Error") {
                             this.setState({
-                                planningUnits: [],
-                            })
-                            if (error.message === "Network Error") {
-                                this.setState({ message: error.message });
-                            } else {
-                                switch (error.response ? error.response.status : "") {
-                                    case 500:
-                                    case 401:
-                                    case 404:
-                                    case 406:
-                                    case 412:
-                                        this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
-                                        break;
-                                    default:
-                                        this.setState({ message: 'static.unkownError' });
-                                        break;
-                                }
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
+                                        loading: false
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
+                                        loading: false
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
+                                    break;
                             }
                         }
-                    );
+                    }
+                );
+                // .catch(
+                //     error => {
+                //         this.setState({
+                //             planningUnits: [],
+                //         })
+                //         if (error.message === "Network Error") {
+                //             this.setState({ message: error.message });
+                //         } else {
+                //             switch (error.response ? error.response.status : "") {
+                //                 case 500:
+                //                 case 401:
+                //                 case 404:
+                //                 case 406:
+                //                 case 412:
+                //                     this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
+                //                     break;
+                //                 default:
+                //                     this.setState({ message: 'static.unkownError' });
+                //                     break;
+                //             }
+                //         }
+                //     }
+                // );
             }
         });
 
@@ -1754,9 +1882,9 @@ class FunderExport extends Component {
         }
         return x1 + x2;
     }
-    addDoubleQuoteToRowContent=(arr)=>{
-        return arr.map(ele=>'"'+ele+'"')
-     }
+    addDoubleQuoteToRowContent = (arr) => {
+        return arr.map(ele => '"' + ele + '"')
+    }
 
     exportCSV(columns) {
 
@@ -1780,7 +1908,7 @@ class FunderExport extends Component {
 
         var A = [this.addDoubleQuoteToRowContent(headers)]
         // this.state.data.map(ele => A.push([(getLabelText(ele.program.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (new moment(ele.inventoryDate).format('MMM YYYY')).replaceAll(' ', '%20'), ele.stockAdjustemntQty, ele.lastModifiedBy.username, new moment(ele.lastModifiedDate).format('MMM-DD-YYYY'), ele.notes]));
-        this.state.data.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.fundingSource.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),(ele.fundingSource.code.replaceAll(',', ' ')).replaceAll(' ', '%20') ,ele.planningUnit.id, (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.qty, ele.totalProductCost, ele.freightPer, ele.freightCost, ele.totalCost])));
+        this.state.data.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.fundingSource.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (ele.fundingSource.code.replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.planningUnit.id, (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.qty, ele.totalProductCost, ele.freightPer, ele.freightCost, ele.totalCost])));
         // this.state.data.map(ele => [(ele.procurementAgent).replaceAll(',', ' ').replaceAll(' ', '%20'), (ele.planningUnit).replaceAll(',', ' ').replaceAll(' ', '%20'), ele.qty, ele.totalProductCost, ele.freightPer,ele.freightCost, ele.totalCost]);
         for (var i = 0; i < A.length; i++) {
             console.log(A[i])
@@ -1874,9 +2002,9 @@ class FunderExport extends Component {
 
         const headers = [];
         columns.map((item, idx) => { headers[idx] = (item.text) });
-        let data = this.state.data.map(ele => [getLabelText(ele.fundingSource.label, this.state.lang), ele.fundingSource.code,ele.planningUnit.id, getLabelText(ele.planningUnit.label, this.state.lang), ele.qty, ele.totalProductCost, ele.freightPer, ele.freightCost, ele.totalCost]);
+        let data = this.state.data.map(ele => [getLabelText(ele.fundingSource.label, this.state.lang), ele.fundingSource.code, ele.planningUnit.id, getLabelText(ele.planningUnit.label, this.state.lang), ele.qty, ele.totalProductCost, ele.freightPer, ele.freightCost, ele.totalCost]);
         let content = {
-            margin: { top: 40 ,bottom:50},
+            margin: { top: 40, bottom: 50 },
             startY: 220,
             head: [headers],
             body: data,
@@ -2023,9 +2151,9 @@ class FunderExport extends Component {
                     message: ''
                 })
                 let includePlannedShipments = true;
-                if(isPlannedShipmentId == 1){
+                if (isPlannedShipmentId == 1) {
                     includePlannedShipments = true;
-                }else{
+                } else {
                     includePlannedShipments = false;
                 }
                 var inputjson = {
@@ -2056,23 +2184,69 @@ class FunderExport extends Component {
                                 this.consolidatedFundingSourceList();
                             })
                             if (error.message === "Network Error") {
-                                this.setState({ message: error.message });
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
                             } else {
                                 switch (error.response ? error.response.status : "") {
-                                    case 500:
+
                                     case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
                                     case 404:
                                     case 406:
+                                        this.setState({
+                                            message: i18n.t(error.response.data.messageCode),
+                                            loading: false
+                                        });
+                                        break;
                                     case 412:
-                                        this.setState({ message: i18n.t(error.response.data.messageCode) });
+                                        this.setState({
+                                            message: i18n.t(error.response.data.messageCode),
+                                            loading: false
+                                        });
                                         break;
                                     default:
-                                        this.setState({ message: 'static.unkownError' });
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
                                         break;
                                 }
                             }
                         }
                     );
+                // .catch(
+                //     error => {
+                //         this.setState({
+                //             data: []
+                //         }, () => {
+                //             this.consolidatedProgramList();
+                //             this.consolidatedFundingSourceList();
+                //         })
+                //         if (error.message === "Network Error") {
+                //             this.setState({ message: error.message });
+                //         } else {
+                //             switch (error.response ? error.response.status : "") {
+                //                 case 500:
+                //                 case 401:
+                //                 case 404:
+                //                 case 406:
+                //                 case 412:
+                //                     this.setState({ message: i18n.t(error.response.data.messageCode) });
+                //                     break;
+                //                 default:
+                //                     this.setState({ message: 'static.unkownError' });
+                //                     break;
+                //             }
+                //         }
+                //     }
+                // );
 
 
             }
@@ -2112,11 +2286,11 @@ class FunderExport extends Component {
         var x2 = x.length > 1 ? '.' + x[1] : '';
         var rgx = /(\d+)(\d{3})/;
         while (rgx.test(x1)) {
-          x1 = x1.replace(rgx, '$1' + ',' + '$2');
+            x1 = x1.replace(rgx, '$1' + ',' + '$2');
         }
         // return "(" + currencyCode + ")" + "  " + x1 + x2;
         return x1 + x2;
-      }
+    }
 
     render() {
 
@@ -2168,7 +2342,7 @@ class FunderExport extends Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-            },   {
+            }, {
                 dataField: 'planningUnit.id',
                 text: i18n.t('static.report.qatPID'),
                 sort: true,
@@ -2258,9 +2432,7 @@ class FunderExport extends Component {
         }
         return (
             <div className="animated">
-                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
-                    this.setState({ message: message })
-                }} />
+                <AuthenticationServiceComponent history={this.props.history} />
                 <h5>{i18n.t(this.props.match.params.message)}</h5>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
@@ -2303,7 +2475,7 @@ class FunderExport extends Component {
                                         <InputGroup>
                                             <Picker
                                                 ref="pickRange"
-                                                years={{min: this.state.minDate, max: this.state.maxDate}}
+                                                years={{ min: this.state.minDate, max: this.state.maxDate }}
                                                 value={rangeValue}
                                                 lang={pickerLang}
                                                 //theme="light"

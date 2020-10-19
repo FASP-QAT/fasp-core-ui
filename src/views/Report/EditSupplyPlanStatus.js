@@ -24,6 +24,7 @@ import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import BootstrapTable from 'react-bootstrap-table-next';
 import paginationFactory from 'react-bootstrap-table2-paginator';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 // import { NavLink } from 'react-router-dom';
 
 const entityname = i18n.t('static.program.program');
@@ -1703,30 +1704,72 @@ class EditSupplyPlanStatus extends Component {
             this.setState({
                 planningUnits: response.data, message: ''
             })
-        })
-            .catch(
-                error => {
+        }).catch(
+            error => {
+                this.setState({
+                    planningUnits: [],
+                })
+                if (error.message === "Network Error") {
                     this.setState({
-                        planningUnits: [],
-                    })
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
+                        message: 'static.unkownError',
+                        loading: false
+                    });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+
+                        case 401:
+                            this.props.history.push(`/login/static.message.sessionExpired`)
+                            break;
+                        case 403:
+                            this.props.history.push(`/accessDenied`)
+                            break;
+                        case 500:
+                        case 404:
+                        case 406:
+                            this.setState({
+                                message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
+                                loading: false
+                            });
+                            break;
+                        case 412:
+                            this.setState({
+                                message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
+                                loading: false
+                            });
+                            break;
+                        default:
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                            break;
                     }
                 }
-            );
+            }
+        );
+        // .catch(
+        //     error => {
+        //         this.setState({
+        //             planningUnits: [],
+        //         })
+        //         if (error.message === "Network Error") {
+        //             this.setState({ message: error.message });
+        //         } else {
+        //             switch (error.response ? error.response.status : "") {
+        //                 case 500:
+        //                 case 401:
+        //                 case 404:
+        //                 case 406:
+        //                 case 412:
+        //                     this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
+        //                     break;
+        //                 default:
+        //                     this.setState({ message: 'static.unkownError' });
+        //                     break;
+        //             }
+        //         }
+        //     }
+        // );
     }
 
     getDatasource = () => {
@@ -1818,23 +1861,62 @@ class EditSupplyPlanStatus extends Component {
                     }
                 })
 
-            })
-            .catch(
+            }).catch(
                 error => {
-                    switch (error.message) {
-                        case "Network Error":
-                            this.setState({
-                                message: error.message
-                            })
-                            break
-                        default:
-                            this.setState({
-                                message: error.response
-                            })
-                            break
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
                     }
                 }
-            )
+            );
+        // .catch(
+        //     error => {
+        //         switch (error.message) {
+        //             case "Network Error":
+        //                 this.setState({
+        //                     message: error.message
+        //                 })
+        //                 break
+        //             default:
+        //                 this.setState({
+        //                     message: error.response
+        //                 })
+        //                 break
+        //         }
+        //     }
+        // )
 
         // AuthenticationService.setupAxiosInterceptors();
         ProgramService.getVersionStatusList().then(response => {
@@ -1842,30 +1924,72 @@ class EditSupplyPlanStatus extends Component {
             this.setState({
                 statuses: response.data,
             })
-        })
-            .catch(
-                error => {
+        }).catch(
+            error => {
+                this.setState({
+                    statuses: [],
+                })
+                if (error.message === "Network Error") {
                     this.setState({
-                        statuses: [],
-                    })
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
+                        message: 'static.unkownError',
+                        loading: false
+                    });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+
+                        case 401:
+                            this.props.history.push(`/login/static.message.sessionExpired`)
+                            break;
+                        case 403:
+                            this.props.history.push(`/accessDenied`)
+                            break;
+                        case 500:
+                        case 404:
+                        case 406:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        case 412:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        default:
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                            break;
                     }
                 }
-            );
+            }
+        );
+        // .catch(
+        //     error => {
+        //         this.setState({
+        //             statuses: [],
+        //         })
+        //         if (error.message === "Network Error") {
+        //             this.setState({ message: error.message });
+        //         } else {
+        //             switch (error.response ? error.response.status : "") {
+        //                 case 500:
+        //                 case 401:
+        //                 case 404:
+        //                 case 406:
+        //                 case 412:
+        //                     this.setState({ message: error.response.data.messageCode });
+        //                     break;
+        //                 default:
+        //                     this.setState({ message: 'static.unkownError' });
+        //                     break;
+        //             }
+        //         }
+        //     }
+        // );
 
         const lan = localStorage.getItem("lang");
         var db1;
@@ -2942,6 +3066,7 @@ class EditSupplyPlanStatus extends Component {
 
         return (
             <div className="animated fadeIn">
+                <AuthenticationServiceComponent history={this.props.history} />
                 <h5 className="red" id="div2">{i18n.t(this.state.message, { entityname })}</h5>
 
                 <Col sm={12} sm={12} style={{ flexBasis: 'auto' }}>
@@ -3497,27 +3622,105 @@ class EditSupplyPlanStatus extends Component {
                                     .then(response => {
                                         console.log("messageCode", response)
                                         this.props.history.push(`/report/supplyPlanVersionAndReview/` + 'green/' + i18n.t("static.message.supplyplanversionapprovedsuccess"))
-                                    })
-                                    .catch(
+                                    }).catch(
                                         error => {
                                             if (error.message === "Network Error") {
-                                                this.setState({ message: error.message });
+                                                this.setState({
+                                                    message: 'static.unkownError',
+                                                    loading: false
+                                                });
                                             } else {
                                                 switch (error.response ? error.response.status : "") {
-                                                    case 500:
+
                                                     case 401:
+                                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                                            .catch(
+                                                                error => {
+                                                                    if (error.message === "Network Error") {
+                                                                        this.setState({
+                                                                            message: 'static.unkownError',
+                                                                            loading: false
+                                                                        });
+                                                                    } else {
+                                                                        switch (error.response ? error.response.status : "") {
+
+                                                                            case 401:
+                                                                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                                                                break;
+                                                                            case 403:
+                                                                                this.props.history.push(`/accessDenied`)
+                                                                                break;
+                                                                            case 500:
+                                                                            case 404:
+                                                                            case 406:
+                                                                                this.setState({
+                                                                                    message: error.response.data.messageCode,
+                                                                                    loading: false
+                                                                                });
+                                                                                break;
+                                                                            case 412:
+                                                                                this.setState({
+                                                                                    message: error.response.data.messageCode,
+                                                                                    loading: false
+                                                                                });
+                                                                                break;
+                                                                            default:
+                                                                                this.setState({
+                                                                                    message: 'static.unkownError',
+                                                                                    loading: false
+                                                                                });
+                                                                                break;
+                                                                        }
+                                                                    }
+                                                                }
+                                                            ); break;
+                                                    case 403:
+                                                        this.props.history.push(`/accessDenied`)
+                                                        break;
+                                                    case 500:
                                                     case 404:
                                                     case 406:
+                                                        this.setState({
+                                                            message: error.response.data.messageCode,
+                                                            loading: false
+                                                        });
+                                                        break;
                                                     case 412:
-                                                        this.setState({ message: error.response.data.messageCode });
+                                                        this.setState({
+                                                            message: error.response.data.messageCode,
+                                                            loading: false
+                                                        });
                                                         break;
                                                     default:
-                                                        this.setState({ message: 'static.unkownError' });
+                                                        this.setState({
+                                                            message: 'static.unkownError',
+                                                            loading: false
+                                                        });
                                                         break;
                                                 }
                                             }
                                         }
                                     );
+                                // .catch(
+                                //     error => {
+                                //         if (error.message === "Network Error") {
+                                //             this.setState({ message: error.message });
+                                //         } else {
+                                //             switch (error.response ? error.response.status : "") {
+                                //                 case 500:
+                                //                 case 401:
+                                //                 case 404:
+                                //                 case 406:
+                                //                 case 412:
+                                //                     this.setState({ message: error.response.data.messageCode });
+                                //                     break;
+                                //                 default:
+                                //                     this.setState({ message: 'static.unkownError' });
+                                //                     break;
+                                //             }
+                                //         }
+                                //     }
+                                // );
 
 
                             }}
@@ -3633,7 +3836,46 @@ class EditSupplyPlanStatus extends Component {
                 this.setState({
                     program
                 })
-            })
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
 
 
     }

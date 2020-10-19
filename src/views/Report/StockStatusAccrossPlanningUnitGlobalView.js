@@ -166,8 +166,8 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
       countrys: [],
       countryValues: [],
       countryLabels: [],
-      tracerCategoryValues:[],
-      tracerCategoryLabels:[],
+      tracerCategoryValues: [],
+      tracerCategoryLabels: [],
       realmList: [],
       programs: [],
       planningUnits: [],
@@ -218,24 +218,64 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
       }).catch(
         error => {
           if (error.message === "Network Error") {
-            this.setState({ loading: false, message: error.message });
+            this.setState({
+              message: 'static.unkownError',
+              loading: false
+            });
           } else {
-            switch (error.response.status) {
-              case 500:
+            switch (error.response ? error.response.status : "") {
+
               case 401:
+                this.props.history.push(`/login/static.message.sessionExpired`)
+                break;
+              case 403:
+                this.props.history.push(`/accessDenied`)
+                break;
+              case 500:
               case 404:
               case 406:
+                this.setState({
+                  message: error.response.data.messageCode,
+                  loading: false
+                });
+                break;
               case 412:
-                this.setState({ loading: false, message: error.response.data.messageCode });
+                this.setState({
+                  message: error.response.data.messageCode,
+                  loading: false
+                });
                 break;
               default:
-                this.setState({ loading: false, message: 'static.unkownError' });
-                console.log("Error code unkown");
+                this.setState({
+                  message: 'static.unkownError',
+                  loading: false
+                });
                 break;
             }
           }
         }
       );
+    // .catch(
+    //   error => {
+    //     if (error.message === "Network Error") {
+    //       this.setState({ loading: false, message: error.message });
+    //     } else {
+    //       switch (error.response.status) {
+    //         case 500:
+    //         case 401:
+    //         case 404:
+    //         case 406:
+    //         case 412:
+    //           this.setState({ loading: false, message: error.response.data.messageCode });
+    //           break;
+    //         default:
+    //           this.setState({ loading: false, message: 'static.unkownError' });
+    //           console.log("Error code unkown");
+    //           break;
+    //       }
+    //     }
+    //   }
+    // );
 
   }
 
@@ -258,9 +298,9 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
       csvRow.push(i18n.t('static.dashboard.country') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
     this.state.tracerCategoryLabels.map(ele =>
       csvRow.push((i18n.t('static.tracercategory.tracercategory')).replaceAll(' ', '%20') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
-      csvRow.push('"' +((i18n.t('static.report.includeapproved') + ' : ' + document.getElementById("includeApprovedVersions").selectedOptions[0].text).replaceAll(' ', '%20')+'"'))
-     
-      csvRow.push('')
+    csvRow.push('"' + ((i18n.t('static.report.includeapproved') + ' : ' + document.getElementById("includeApprovedVersions").selectedOptions[0].text).replaceAll(' ', '%20') + '"'))
+
+    csvRow.push('')
     csvRow.push('')
     csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
     csvRow.push('')
@@ -364,8 +404,8 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
           })
           doc.text(i18n.t('static.report.includeapproved') + ' : ' + document.getElementById("includeApprovedVersions").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
             align: 'left'
-        })
-      
+          })
+
           var planningText = doc.splitTextToSize(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.join(' , '), doc.internal.pageSize.width * 3 / 4);
           doc.text(doc.internal.pageSize.width / 8, 150, planningText)
 
@@ -417,7 +457,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
 
 
 
-  handleTracerCategoryChange=(tracerCategoryIds)=>{
+  handleTracerCategoryChange = (tracerCategoryIds) => {
     tracerCategoryIds = tracerCategoryIds.sort(function (a, b) {
       return parseInt(a.value) - parseInt(b.value);
     })
@@ -463,7 +503,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
     let realmId = document.getElementById('realmId').value
     let date = moment(new Date(this.state.singleValue2.year, this.state.singleValue2.month, 0)).startOf('month').format('YYYY-MM-DD')
     let useApprovedVersion = document.getElementById("includeApprovedVersions").value
-    
+
     console.log(realmId)
     if (realmId > 0 && this.state.countryValues.length > 0 && this.state.tracerCategoryValues.length > 0) {
       this.setState({ loading: true })
@@ -471,7 +511,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
         "realmCountryIds": countrysId,
         "tracerCategoryIds": tracercategory,
         "realmId": realmId,
-        "dt": date,"useApprovedSupplyPlanOnly": useApprovedVersion
+        "dt": date, "useApprovedSupplyPlanOnly": useApprovedVersion
 
       }
       // AuthenticationService.setupAxiosInterceptors();
@@ -509,25 +549,68 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
             this.setState({
               data: [], loading: false
             })
-
             if (error.message === "Network Error") {
-              this.setState({ message: error.message, loading: false });
+              this.setState({
+                message: 'static.unkownError',
+                loading: false
+              });
             } else {
               switch (error.response ? error.response.status : "") {
-                case 500:
+
                 case 401:
+                  this.props.history.push(`/login/static.message.sessionExpired`)
+                  break;
+                case 403:
+                  this.props.history.push(`/accessDenied`)
+                  break;
+                case 500:
                 case 404:
                 case 406:
+                  this.setState({
+                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                    loading: false
+                  });
+                  break;
                 case 412:
-                  this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                  this.setState({
+                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                    loading: false
+                  });
                   break;
                 default:
-                  this.setState({ loading: false, message: 'static.unkownError' });
+                  this.setState({
+                    message: 'static.unkownError',
+                    loading: false
+                  });
                   break;
               }
             }
           }
         );
+      // .catch(
+      //   error => {
+      //     this.setState({
+      //       data: [], loading: false
+      //     })
+
+      //     if (error.message === "Network Error") {
+      //       this.setState({ message: error.message, loading: false });
+      //     } else {
+      //       switch (error.response ? error.response.status : "") {
+      //         case 500:
+      //         case 401:
+      //         case 404:
+      //         case 406:
+      //         case 412:
+      //           this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+      //           break;
+      //         default:
+      //           this.setState({ loading: false, message: 'static.unkownError' });
+      //           break;
+      //       }
+      //     }
+      //   }
+      // );
     }
     else if (realmId <= 0) {
       this.setState({ message: i18n.t('static.common.realmtext'), data: [] });
@@ -548,7 +631,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
     RealmCountryService.getRealmCountryForProgram(realmId)
       .then(response => {
         this.setState({
-          countrys: response.data.map(ele=>ele.realmCountry)
+          countrys: response.data.map(ele => ele.realmCountry)
         })
       }).catch(
         error => {
@@ -556,23 +639,66 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
             countrys: []
           })
           if (error.message === "Network Error") {
-            this.setState({ message: error.message });
+            this.setState({
+              message: 'static.unkownError',
+              loading: false
+            });
           } else {
             switch (error.response ? error.response.status : "") {
-              case 500:
+
               case 401:
+                this.props.history.push(`/login/static.message.sessionExpired`)
+                break;
+              case 403:
+                this.props.history.push(`/accessDenied`)
+                break;
+              case 500:
               case 404:
               case 406:
-              case 412:
-              default:
-                this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }) });
+                this.setState({
+                  message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
+                  loading: false
+                });
                 break;
-                this.setState({ message: 'static.unkownError' });
+              case 412:
+                this.setState({
+                  message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
+                  loading: false
+                });
+                break;
+              default:
+                this.setState({
+                  message: 'static.unkownError',
+                  loading: false
+                });
                 break;
             }
           }
         }
       );
+    // .catch(
+    //   error => {
+    //     this.setState({
+    //       countrys: []
+    //     })
+    //     if (error.message === "Network Error") {
+    //       this.setState({ message: error.message });
+    //     } else {
+    //       switch (error.response ? error.response.status : "") {
+    //         case 500:
+    //         case 401:
+    //         case 404:
+    //         case 406:
+    //         case 412:
+    //         default:
+    //           this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }) });
+    //           break;
+    //           this.setState({ message: 'static.unkownError' });
+    //           break;
+    //       }
+    //     }
+    //   }
+    // );
 
   }
 
@@ -588,25 +714,65 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
         })
       }
 
-    }).catch(error => {
-      if (error.message === "Network Error") {
-        this.setState({ message: error.message });
-      } else {
-        switch (error.response ? error.response.status : "") {
-          case 500:
-          case 401:
-          case 404:
-          case 406:
-          case 412:
-            this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }) });
-            break;
-          default:
-            this.setState({ message: 'static.unkownError' });
-            break;
+    }).catch(
+      error => {
+        if (error.message === "Network Error") {
+          this.setState({
+            message: 'static.unkownError',
+            loading: false
+          });
+        } else {
+          switch (error.response ? error.response.status : "") {
+
+            case 401:
+              this.props.history.push(`/login/static.message.sessionExpired`)
+              break;
+            case 403:
+              this.props.history.push(`/accessDenied`)
+              break;
+            case 500:
+            case 404:
+            case 406:
+              this.setState({
+                message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
+                loading: false
+              });
+              break;
+            case 412:
+              this.setState({
+                message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
+                loading: false
+              });
+              break;
+            default:
+              this.setState({
+                message: 'static.unkownError',
+                loading: false
+              });
+              break;
+          }
         }
       }
-    }
     );
+    // .catch(error => {
+    //   if (error.message === "Network Error") {
+    //     this.setState({ message: error.message });
+    //   } else {
+    //     switch (error.response ? error.response.status : "") {
+    //       case 500:
+    //       case 401:
+    //       case 404:
+    //       case 406:
+    //       case 412:
+    //         this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }) });
+    //         break;
+    //       default:
+    //         this.setState({ message: 'static.unkownError' });
+    //         break;
+    //     }
+    //   }
+    // }
+    // );
 
   }
 
@@ -670,11 +836,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
 
     return (
       <div className="animated fadeIn" >
-        <AuthenticationServiceComponent history={this.props.history} message={(message) => {
-          this.setState({ message: message })
-        }} loading={(loading) => {
-          this.setState({ loading: loading })
-        }} />
+        <AuthenticationServiceComponent history={this.props.history} />
         <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
         <h5 className="red">{i18n.t(this.state.message)}</h5>
 
@@ -765,28 +927,28 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
                             && tracerCategories.map((item, i) => {
                               return ({ label: getLabelText(item.label, this.state.lang), value: item.tracerCategoryId })
 
-                            }, this)}/>
+                            }, this)} />
 
                       </div>
                     </FormGroup>
                     <FormGroup className="col-md-3">
-                                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.includeapproved')}</Label>
-                                            <div className="controls ">
-                                                <InputGroup>
-                                                    <Input
-                                                        type="select"
-                                                        name="includeApprovedVersions"
-                                                        id="includeApprovedVersions"
-                                                        bsSize="sm"
-                                                        onChange={(e) => { this.filterData() }}
-                                                    >
-                                                        <option value="true">{i18n.t('static.program.yes')}</option>
-                                                        <option value="false">{i18n.t('static.program.no')}</option>
-                                                    </Input>
+                      <Label htmlFor="appendedInputButton">{i18n.t('static.report.includeapproved')}</Label>
+                      <div className="controls ">
+                        <InputGroup>
+                          <Input
+                            type="select"
+                            name="includeApprovedVersions"
+                            id="includeApprovedVersions"
+                            bsSize="sm"
+                            onChange={(e) => { this.filterData() }}
+                          >
+                            <option value="true">{i18n.t('static.program.yes')}</option>
+                            <option value="false">{i18n.t('static.program.no')}</option>
+                          </Input>
 
-                                                </InputGroup>
-                                            </div>
-                                        </FormGroup>
+                        </InputGroup>
+                      </div>
+                    </FormGroup>
 
                     <FormGroup className="col-md-12 mt-2 " style={{ display: this.state.display }}>
                       <ul className="legendcommitversion list-group">

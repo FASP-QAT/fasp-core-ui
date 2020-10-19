@@ -1600,9 +1600,7 @@ export default class ConsumptionDetails extends React.Component {
 
             <div className="animated">
                 <QatProblemActions ref="problemListChild" updateState={this.updateState} fetchData={this.fetchData}></QatProblemActions>
-                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
-                    this.setState({ message: message })
-                }} />
+                <AuthenticationServiceComponent history={this.props.history} />
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
                 {/* <Card style={{ display: this.state.loading ? "none" : "block" }}> */}
