@@ -2,19 +2,19 @@ import React, { Component } from "react";
 import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
 import {
-    Card, CardBody, CardHeader,
+    Card, CardBody, CardHeader, InputGroup,
     Label, Input, FormGroup,
     CardFooter, Button, Table, Badge, Col, Row, Form, FormFeedback
 
 } from 'reactstrap';
-
+import getLabelText from '../../CommonComponent/getLabelText';
 import ProgramService from "../../api/ProgramService";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import PlanningUnitService from "../../api/PlanningUnitService";
 import i18n from '../../i18n';
 import ProductCategoryServcie from '../../api/PoroductCategoryService.js';
 import { jExcelLoadedFunction } from "../../CommonComponent/JExcelCommonFunctions";
-import { DECIMAL_NO_REGEX, JEXCEL_PAGINATION_OPTION } from "../../Constants";
+import { JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_DECIMAL_CATELOG_PRICE, DECIMAL_NO_REGEX, JEXCEL_PAGINATION_OPTION } from "../../Constants";
 const entityname = i18n.t('static.dashboard.programPlanningUnit');
 
 
@@ -41,14 +41,16 @@ class AddprogramPlanningUnit extends Component {
             rowErrorMessage: '',
             programPlanningUnitId: 0,
             isNew: true,
-            programId: this.props.match.params.programId,
+            // programId: this.props.match.params.programId,
             updateRowStatus: 0,
             lang: localStorage.getItem('lang'),
             batchNoRequired: false,
             localProcurementLeadTime: '',
             isValidData: true,
             loading: true,
-            productCategoryList: []
+            productCategoryList: [],
+            programs: [],
+            programId: 0
 
         }
         // this.addRow = this.addRow.bind(this);
@@ -64,6 +66,8 @@ class AddprogramPlanningUnit extends Component {
         this.addRowInJexcel = this.addRowInJexcel.bind(this);
         this.changed = this.changed.bind(this);
         this.dropdownFilter = this.dropdownFilter.bind(this);
+        this.buildJexcel = this.buildJexcel.bind(this);
+
     }
 
     dropdownFilter = function (instance, cell, c, r, source) {
@@ -109,588 +113,661 @@ class AddprogramPlanningUnit extends Component {
     }
 
     componentDidMount() {
-        var list = [];
-        var productCategoryListNew = [];
-        var programObj;
-        // var realmId = document.getElementById("realmId").value;
+        ProgramService.getProgramList()
+            .then(response => {
+                if (response.status == 200) {
+                    this.setState({
+                        programs: response.data, loading: false
+                    })
+                }
 
-        // AuthenticationService.setupAxiosInterceptors();
+                else {
 
-        ProgramService.getProgramById(this.props.match.params.programId).then(response => {
-            if (response.status == 200) {
-                programObj = response.data;
-                var realmId = programObj.realmCountry.realm.realmId
-                console.log("problemObj====>", programObj, "realmId======", realmId);
-                ProductCategoryServcie.getProductCategoryListByRealmId(realmId)
-                    .then(response => {
+                    this.setState({
+                        message: response.data.messageCode, loading: false
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
+                }
 
-                        if (response.status == 200) {
-                            console.log("productCategory response----->", response.data);
-                            for (var k = 0; k < (response.data).length; k++) {
-                                var spaceCount = response.data[k].sortOrder.split(".").length;
-                                console.log("spaceCOunt--->", spaceCount);
-                                var indendent = "";
-                                for (var p = 1; p <= spaceCount - 1; p++) {
-                                    if (p == 1) {
-                                        indendent = indendent.concat("|_");
-                                    } else {
-                                        indendent = indendent.concat("_");
-                                    }
-                                }
-                                console.log("ind", indendent);
-                                console.log("indendent.concat(response.data[k].payload.label.label_en)-->", indendent.concat(response.data[k].payload.label.label_en));
+            })
+            .catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
 
-                                var productCategoryJson = {};
-                                if (response.data[k].payload.productCategoryId == 0) {
-                                    productCategoryJson = {
-                                        name: (response.data[k].payload.label.label_en),
-                                        id: -1
-                                    }
-                                } else {
-                                    productCategoryJson = {
-                                        name: (response.data[k].payload.label.label_en),
-                                        id: response.data[k].payload.productCategoryId
-                                    }
-                                }
-
-                                productCategoryListNew.push(productCategoryJson);
-
-                            }
-                            console.log("constant product category list====>", productCategoryListNew);
-                            this.setState({ productCategoryList: response.data });
-
-                            // PlanningUnitService.getAllPlanningUnitList()
-                            PlanningUnitService.getActivePlanningUnitList()
-                                .then(response => {
-                                    if (response.status == 200) {
-                                        this.setState({
-                                            planningUnitList: response.data
-                                        });
-                                        for (var k = 0; k < (response.data).length; k++) {
-                                            var planningUnitJson = {
-                                                name: response.data[k].label.label_en,
-                                                id: response.data[k].planningUnitId,
-                                                active: response.data[k].active
-                                            }
-                                            list.push(planningUnitJson);
-                                        }
-
-
-                                        // AuthenticationService.setupAxiosInterceptors();
-                                        ProgramService.getProgramPlaningUnitListByProgramId(this.state.programId)
-                                            .then(response => {
-                                                if (response.status == 200) {
-                                                    // alert("hi");
-                                                    let myReasponse = response.data;
-                                                    var productDataArr = []
-                                                    // if (myReasponse.length > 0) {
-                                                    this.setState({ rows: myReasponse });
-                                                    var data = [];
-                                                    if (myReasponse.length != 0) {
-                                                        for (var j = 0; j < myReasponse.length; j++) {
-                                                            console.log("myReasponse[j]---", myReasponse[j]);
-                                                            data = [];
-                                                            data[0] = myReasponse[j].productCategory.id;
-                                                            data[1] = myReasponse[j].planningUnit.id;
-                                                            data[2] = myReasponse[j].reorderFrequencyInMonths;
-                                                            data[3] = myReasponse[j].minMonthsOfStock;
-                                                            data[4] = myReasponse[j].monthsInFutureForAmc;
-                                                            data[5] = myReasponse[j].monthsInPastForAmc;
-                                                            data[6] = myReasponse[j].localProcurementLeadTime;
-                                                            data[7] = myReasponse[j].shelfLife;
-                                                            data[8] = myReasponse[j].catalogPrice;
-                                                            data[9] = myReasponse[j].programPlanningUnitId;
-                                                            data[10] = myReasponse[j].active;
-                                                            data[11] = 0;
-                                                            data[12] = myReasponse[j].program.id;
-                                                            productDataArr.push(data);
-                                                        }
-                                                    }
-
-                                                    if (productDataArr.length == 0) {
-                                                        data = [];
-                                                        data[0] = 0;
-                                                        data[1] = "";
-                                                        data[2] = "";
-                                                        data[3] = "";
-                                                        data[4] = "";
-                                                        data[5] = "";
-                                                        data[6] = "";
-                                                        data[7] = "";
-                                                        data[8] = 0;
-                                                        data[9] = 0;
-                                                        data[10] = 1;
-                                                        data[11] = 1;
-                                                        data[12] = this.props.match.params.programId;
-                                                        productDataArr[0] = data;
-                                                    }
-
-
-                                                    this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
-                                                    this.el.destroy();
-                                                    var json = [];
-                                                    var data = productDataArr;
-                                                    var options = {
-                                                        data: data,
-                                                        columnDrag: true,
-                                                        colWidths: [290, 290, 100, 100, 100, 100, 100, 100, 100, 100, 100],
-                                                        columns: [
-                                                            {
-                                                                title: i18n.t('static.productCategory.productCategory'),
-                                                                type: 'dropdown',
-                                                                source: productCategoryListNew
-                                                            },
-                                                            {
-                                                                title: i18n.t('static.dashboard.product'),
-                                                                type: 'autocomplete',
-                                                                source: list,
-                                                                filter: this.dropdownFilter
-                                                            },
-                                                            {
-                                                                title: i18n.t('static.product.reorderFrequency'),
-                                                                type: 'number',
-
-                                                            },
-                                                            {
-                                                                title: i18n.t('static.product.minMonthOfStock'),
-                                                                type: 'number'
-                                                            },
-                                                            {
-                                                                title: i18n.t('static.program.monthfutureamc'),
-                                                                type: 'number'
-                                                            },
-                                                            {
-                                                                title: i18n.t('static.program.monthpastamc'),
-                                                                type: 'number'
-                                                            },
-                                                            {
-                                                                title: i18n.t('static.product.localProcurementAgentLeadTime'),
-                                                                type: 'number'
-                                                            },
-                                                            {
-                                                                title: i18n.t('static.report.shelfLife'),
-                                                                type: 'number'
-                                                            },
-                                                            {
-                                                                title: i18n.t('static.procurementAgentPlanningUnit.catalogPrice'),
-                                                                type: 'number'
-                                                            },
-                                                            {
-                                                                title: 'Id',
-                                                                type: 'hidden'
-                                                            },
-                                                            {
-                                                                title: 'Active',
-                                                                type: 'hidden'
-                                                            },
-                                                            {
-                                                                title: 'Changed Flag',
-                                                                type: 'hidden'
-                                                            },
-                                                            {
-                                                                title: 'ProgramId',
-                                                                type: 'hidden'
-                                                            }
-
-
-                                                        ],
-                                                        updateTable: function (el, cell, x, y, source, value, id) {
-                                                            var elInstance = el.jexcel;
-                                                            var rowData = elInstance.getRowData(y);
-                                                            // var productCategoryId = rowData[0];
-                                                            var programPlanningUnitId = rowData[9];
-                                                            if (programPlanningUnitId == 0) {
-                                                                var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
-                                                                cell1.classList.remove('readonly');
-
-                                                                var cell2 = elInstance.getCell(`A${parseInt(y) + 1}`)
-                                                                cell2.classList.remove('readonly');
-
-
-                                                            } else {
-                                                                var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
-                                                                cell1.classList.add('readonly');
-
-                                                                var cell2 = elInstance.getCell(`A${parseInt(y) + 1}`)
-                                                                cell2.classList.add('readonly');
-
-
-                                                            }
-                                                        },
-                                                        pagination: localStorage.getItem("sesRecordCount"),
-                                                        search: true,
-                                                        columnSorting: true,
-                                                        tableOverflow: true,
-                                                        wordWrap: true,
-                                                        paginationOptions: JEXCEL_PAGINATION_OPTION,
-                                                        position: 'top',
-                                                        allowInsertColumn: false,
-                                                        allowManualInsertColumn: false,
-                                                        allowDeleteRow: true,
-                                                        onchange: this.changed,
-                                                        oneditionend: this.onedit,
-                                                        copyCompatibility: true,
-                                                        allowManualInsertRow: false,
-                                                        text: {
-                                                            // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                                                            showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                                                            show: '',
-                                                            entries: '',
-                                                        },
-                                                        onload: this.loaded,
-                                                        contextMenu: function (obj, x, y, e) {
-                                                            var items = [];
-                                                            //Add consumption batch info
-
-
-                                                            if (y == null) {
-                                                                // Insert a new column
-                                                                if (obj.options.allowInsertColumn == true) {
-                                                                    items.push({
-                                                                        title: obj.options.text.insertANewColumnBefore,
-                                                                        onclick: function () {
-                                                                            obj.insertColumn(1, parseInt(x), 1);
-                                                                        }
-                                                                    });
-                                                                }
-
-                                                                if (obj.options.allowInsertColumn == true) {
-                                                                    items.push({
-                                                                        title: obj.options.text.insertANewColumnAfter,
-                                                                        onclick: function () {
-                                                                            obj.insertColumn(1, parseInt(x), 0);
-                                                                        }
-                                                                    });
-                                                                }
-
-                                                                // Delete a column
-                                                                // if (obj.options.allowDeleteColumn == true) {
-                                                                //     items.push({
-                                                                //         title: obj.options.text.deleteSelectedColumns,
-                                                                //         onclick: function () {
-                                                                //             obj.deleteColumn(obj.getSelectedColumns().length ? undefined : parseInt(x));
-                                                                //         }
-                                                                //     });
-                                                                // }
-
-                                                                // Rename column
-                                                                // if (obj.options.allowRenameColumn == true) {
-                                                                //     items.push({
-                                                                //         title: obj.options.text.renameThisColumn,
-                                                                //         onclick: function () {
-                                                                //             obj.setHeader(x);
-                                                                //         }
-                                                                //     });
-                                                                // }
-
-                                                                // Sorting
-                                                                if (obj.options.columnSorting == true) {
-                                                                    // Line
-                                                                    items.push({ type: 'line' });
-
-                                                                    items.push({
-                                                                        title: obj.options.text.orderAscending,
-                                                                        onclick: function () {
-                                                                            obj.orderBy(x, 0);
-                                                                        }
-                                                                    });
-                                                                    items.push({
-                                                                        title: obj.options.text.orderDescending,
-                                                                        onclick: function () {
-                                                                            obj.orderBy(x, 1);
-                                                                        }
-                                                                    });
-                                                                }
-                                                            } else {
-                                                                // Insert new row before
-                                                                if (obj.options.allowInsertRow == true) {
-                                                                    items.push({
-                                                                        title: i18n.t('static.common.insertNewRowBefore'),
-                                                                        onclick: function () {
-                                                                            var data = [];
-                                                                            data[0] = 0;
-                                                                            data[1] = "";
-                                                                            data[2] = "";
-                                                                            data[3] = "";
-                                                                            data[4] = "";
-                                                                            data[5] = "";
-                                                                            data[6] = "";
-                                                                            data[7] = "";
-                                                                            data[8] = 0;
-                                                                            data[9] = 0;
-                                                                            data[10] = 1;
-                                                                            data[11] = 1;
-                                                                            data[12] = this.props.match.params.programId;
-                                                                            obj.insertRow(data, parseInt(y), 1);
-                                                                        }.bind(this)
-                                                                    });
-                                                                }
-                                                                // after
-                                                                if (obj.options.allowInsertRow == true) {
-                                                                    items.push({
-                                                                        title: i18n.t('static.common.insertNewRowAfter'),
-                                                                        onclick: function () {
-                                                                            var data = [];
-                                                                            data[0] = 0;
-                                                                            data[1] = "";
-                                                                            data[2] = "";
-                                                                            data[3] = "";
-                                                                            data[4] = "";
-                                                                            data[5] = "";
-                                                                            data[6] = "";
-                                                                            data[7] = "";
-                                                                            data[8] = 0;
-                                                                            data[9] = 0;
-                                                                            data[10] = 1;
-                                                                            data[11] = 1;
-                                                                            data[12] = this.props.match.params.programId;
-                                                                            obj.insertRow(data, parseInt(y));
-                                                                        }.bind(this)
-                                                                    });
-                                                                }
-                                                                // Delete a row
-                                                                if (obj.options.allowDeleteRow == true) {
-                                                                    // region id
-                                                                    if (obj.getRowData(y)[9] == 0) {
-                                                                        items.push({
-                                                                            title: i18n.t("static.common.deleterow"),
-                                                                            onclick: function () {
-                                                                                obj.deleteRow(parseInt(y));
-                                                                            }
-                                                                        });
-                                                                    }
-                                                                }
-
-                                                                if (x) {
-                                                                    if (obj.options.allowComments == true) {
-                                                                        items.push({ type: 'line' });
-
-                                                                        var title = obj.records[y][x].getAttribute('title') || '';
-
-                                                                        items.push({
-                                                                            title: title ? obj.options.text.editComments : obj.options.text.addComments,
-                                                                            onclick: function () {
-                                                                                obj.setComments([x, y], prompt(obj.options.text.comments, title));
-                                                                            }
-                                                                        });
-
-                                                                        if (title) {
-                                                                            items.push({
-                                                                                title: obj.options.text.clearComments,
-                                                                                onclick: function () {
-                                                                                    obj.setComments([x, y], '');
-                                                                                }
-                                                                            });
-                                                                        }
-                                                                    }
-                                                                }
-                                                            }
-
-                                                            // Line
-                                                            items.push({ type: 'line' });
-
-                                                            // // Save
-                                                            // if (obj.options.allowExport) {
-                                                            //     items.push({
-                                                            //         title: i18n.t('static.supplyPlan.exportAsCsv'),
-                                                            //         shortcut: 'Ctrl + S',
-                                                            //         onclick: function () {
-                                                            //             obj.download(true);
-                                                            //         }
-                                                            //     });
-                                                            // }
-
-                                                            return items;
-                                                        }.bind(this)
-                                                    };
-                                                    var elVar = jexcel(document.getElementById("mapPlanningUnit"), options);
-                                                    this.el = elVar;
-                                                    this.setState({ mapPlanningUnitEl: elVar, loading: false });
-                                                    // }
-                                                } else {
-                                                    this.setState({
-                                                        message: response.data.messageCode, loading: false
-                                                    })
-                                                }
-                                            }).catch(
-                                                error => {
-                                                    if (error.message === "Network Error") {
-                                                        this.setState({
-                                                            message: 'static.unkownError',
-                                                            loading: false
-                                                        });
-                                                    } else {
-                                                        switch (error.response ? error.response.status : "") {
-
-                                                            case 401:
-                                                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                                                break;
-                                                            case 403:
-                                                                this.props.history.push(`/accessDenied`)
-                                                                break;
-                                                            case 500:
-                                                            case 404:
-                                                            case 406:
-                                                                this.setState({
-                                                                    message: error.response.data.messageCode,
-                                                                    loading: false
-                                                                });
-                                                                break;
-                                                            case 412:
-                                                                this.setState({
-                                                                    message: error.response.data.messageCode,
-                                                                    loading: false
-                                                                });
-                                                                break;
-                                                            default:
-                                                                this.setState({
-                                                                    message: 'static.unkownError',
-                                                                    loading: false
-                                                                });
-                                                                break;
-                                                        }
-                                                    }
-                                                }
-                                            );
-                                    } else {
-                                        list = [];
-                                        this.setState({ loading: false });
-                                    }
-                                }).catch(
-                                    error => {
-                                        if (error.message === "Network Error") {
-                                            this.setState({
-                                                message: 'static.unkownError',
-                                                loading: false
-                                            });
-                                        } else {
-                                            switch (error.response ? error.response.status : "") {
-
-                                                case 401:
-                                                    this.props.history.push(`/login/static.message.sessionExpired`)
-                                                    break;
-                                                case 403:
-                                                    this.props.history.push(`/accessDenied`)
-                                                    break;
-                                                case 500:
-                                                case 404:
-                                                case 406:
-                                                    this.setState({
-                                                        message: error.response.data.messageCode,
-                                                        loading: false
-                                                    });
-                                                    break;
-                                                case 412:
-                                                    this.setState({
-                                                        message: error.response.data.messageCode,
-                                                        loading: false
-                                                    });
-                                                    break;
-                                                default:
-                                                    this.setState({
-                                                        message: 'static.unkownError',
-                                                        loading: false
-                                                    });
-                                                    break;
-                                            }
-                                        }
-                                    }
-                                );
-                        } else {
-                            productCategoryListNew = []
-                            this.setState({
-                                message: response.data.messageCode,
-                                loading: false
-                            })
-                        }
-                    }).catch(
-                        error => {
-                            if (error.message === "Network Error") {
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
                                 this.setState({
                                     message: 'static.unkownError',
                                     loading: false
                                 });
-                            } else {
-                                switch (error.response ? error.response.status : "") {
-
-                                    case 401:
-                                        this.props.history.push(`/login/static.message.sessionExpired`)
-                                        break;
-                                    case 403:
-                                        this.props.history.push(`/accessDenied`)
-                                        break;
-                                    case 500:
-                                    case 404:
-                                    case 406:
-                                        this.setState({
-                                            message: error.response.data.messageCode,
-                                            loading: false
-                                        });
-                                        break;
-                                    case 412:
-                                        this.setState({
-                                            message: error.response.data.messageCode,
-                                            loading: false
-                                        });
-                                        break;
-                                    default:
-                                        this.setState({
-                                            message: 'static.unkownError',
-                                            loading: false
-                                        });
-                                        break;
-                                }
-                            }
+                                break;
                         }
-                    );
-            } else {
-                productCategoryListNew = []
-                this.setState({
-                    message: response.data.messageCode,
-                    loading: false
-                })
-            }
-
-        }).catch(
-            error => {
-                if (error.message === "Network Error") {
-                    this.setState({
-                        message: 'static.unkownError',
-                        loading: false
-                    });
-                } else {
-                    switch (error.response ? error.response.status : "") {
-
-                        case 401:
-                            this.props.history.push(`/login/static.message.sessionExpired`)
-                            break;
-                        case 403:
-                            this.props.history.push(`/accessDenied`)
-                            break;
-                        case 500:
-                        case 404:
-                        case 406:
-                            this.setState({
-                                message: error.response.data.messageCode,
-                                loading: false
-                            });
-                            break;
-                        case 412:
-                            this.setState({
-                                message: error.response.data.messageCode,
-                                loading: false
-                            });
-                            break;
-                        default:
-                            this.setState({
-                                message: 'static.unkownError',
-                                loading: false
-                            });
-                            break;
                     }
                 }
-            }
-        );
+            );
+        // this.buildJexcel();
+    }
+
+    buildJexcel() {
+        var list = [];
+        var productCategoryListNew = [];
+        var programObj;
+        var programId = document.getElementById("programId").value;
+        this.setState({
+            programId: programId
+        });
+        // AuthenticationService.setupAxiosInterceptors();
+
+        if (programId != 0) {
+
+            ProgramService.getProgramById(programId).then(response => {
+                if (response.status == 200) {
+                    programObj = response.data;
+                    var realmId = programObj.realmCountry.realm.realmId
+                    console.log("problemObj====>", programObj, "realmId======", realmId);
+                    ProductCategoryServcie.getProductCategoryListByRealmId(realmId)
+                        .then(response => {
+
+                            if (response.status == 200) {
+                                console.log("productCategory response----->", response.data);
+                                for (var k = 0; k < (response.data).length; k++) {
+                                    var spaceCount = response.data[k].sortOrder.split(".").length;
+                                    console.log("spaceCOunt--->", spaceCount);
+                                    var indendent = "";
+                                    for (var p = 1; p <= spaceCount - 1; p++) {
+                                        if (p == 1) {
+                                            indendent = indendent.concat("|_");
+                                        } else {
+                                            indendent = indendent.concat("_");
+                                        }
+                                    }
+                                    console.log("ind", indendent);
+                                    console.log("indendent.concat(response.data[k].payload.label.label_en)-->", indendent.concat(response.data[k].payload.label.label_en));
+
+                                    var productCategoryJson = {};
+                                    if (response.data[k].payload.productCategoryId == 0) {
+                                        productCategoryJson = {
+                                            name: (response.data[k].payload.label.label_en),
+                                            id: -1
+                                        }
+                                    } else {
+                                        productCategoryJson = {
+                                            name: (response.data[k].payload.label.label_en),
+                                            id: response.data[k].payload.productCategoryId
+                                        }
+                                    }
+
+                                    productCategoryListNew.push(productCategoryJson);
+
+                                }
+                                console.log("constant product category list====>", productCategoryListNew);
+                                this.setState({ productCategoryList: response.data });
+
+                                // PlanningUnitService.getAllPlanningUnitList()
+                                PlanningUnitService.getActivePlanningUnitList()
+                                    .then(response => {
+                                        if (response.status == 200) {
+                                            this.setState({
+                                                planningUnitList: response.data
+                                            });
+                                            for (var k = 0; k < (response.data).length; k++) {
+                                                var planningUnitJson = {
+                                                    name: response.data[k].label.label_en,
+                                                    id: response.data[k].planningUnitId,
+                                                    active: response.data[k].active
+                                                }
+                                                list.push(planningUnitJson);
+                                            }
+
+
+                                            // AuthenticationService.setupAxiosInterceptors();
+                                            ProgramService.getProgramPlaningUnitListByProgramId(this.state.programId)
+                                                .then(response => {
+                                                    if (response.status == 200) {
+                                                        // alert("hi");
+                                                        let myReasponse = response.data;
+                                                        var productDataArr = []
+                                                        // if (myReasponse.length > 0) {
+                                                        this.setState({ rows: myReasponse });
+                                                        var data = [];
+                                                        if (myReasponse.length != 0) {
+                                                            for (var j = 0; j < myReasponse.length; j++) {
+                                                                console.log("myReasponse[j]---", myReasponse[j]);
+                                                                data = [];
+                                                                data[0] = myReasponse[j].productCategory.id;
+                                                                data[1] = myReasponse[j].planningUnit.id;
+                                                                data[2] = myReasponse[j].reorderFrequencyInMonths;
+                                                                data[3] = myReasponse[j].minMonthsOfStock;
+                                                                data[4] = myReasponse[j].monthsInFutureForAmc;
+                                                                data[5] = myReasponse[j].monthsInPastForAmc;
+                                                                data[6] = myReasponse[j].localProcurementLeadTime;
+                                                                data[7] = myReasponse[j].shelfLife;
+                                                                data[8] = myReasponse[j].catalogPrice;
+                                                                data[9] = myReasponse[j].programPlanningUnitId;
+                                                                data[10] = myReasponse[j].active;
+                                                                data[11] = 0;
+                                                                data[12] = myReasponse[j].program.id;
+                                                                productDataArr.push(data);
+                                                            }
+                                                        }
+
+                                                        if (productDataArr.length == 0) {
+                                                            data = [];
+                                                            data[0] = 0;
+                                                            data[1] = "";
+                                                            data[2] = "";
+                                                            data[3] = "";
+                                                            data[4] = "";
+                                                            data[5] = "";
+                                                            data[6] = "";
+                                                            data[7] = "";
+                                                            data[8] = 0;
+                                                            data[9] = 0;
+                                                            data[10] = 1;
+                                                            data[11] = 1;
+                                                            data[12] = programId;
+                                                            productDataArr[0] = data;
+                                                        }
+
+
+                                                        this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
+                                                        this.el.destroy();
+                                                        var json = [];
+                                                        var data = productDataArr;
+                                                        var options = {
+                                                            data: data,
+                                                            columnDrag: true,
+                                                            colWidths: [290, 290, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+                                                            columns: [
+                                                                {
+                                                                    title: i18n.t('static.productCategory.productCategory'),
+                                                                    type: 'dropdown',
+                                                                    source: productCategoryListNew
+                                                                },
+                                                                {
+                                                                    title: i18n.t('static.dashboard.product'),
+                                                                    type: 'autocomplete',
+                                                                    source: list,
+                                                                    filter: this.dropdownFilter
+                                                                },
+                                                                {
+                                                                    title: i18n.t('static.product.reorderFrequency'),
+                                                                    type: 'number',
+
+                                                                },
+                                                                {
+                                                                    title: i18n.t('static.product.minMonthOfStock'),
+                                                                    type: 'number'
+                                                                },
+                                                                {
+                                                                    title: i18n.t('static.program.monthfutureamc'),
+                                                                    type: 'number'
+                                                                },
+                                                                {
+                                                                    title: i18n.t('static.program.monthpastamc'),
+                                                                    type: 'number'
+                                                                },
+                                                                {
+                                                                    title: i18n.t('static.product.localProcurementAgentLeadTime'),
+                                                                    type: 'number'
+                                                                },
+                                                                {
+                                                                    title: i18n.t('static.report.shelfLife'),
+                                                                    type: 'number'
+                                                                },
+                                                                {
+                                                                    title: i18n.t('static.procurementAgentPlanningUnit.catalogPrice'),
+                                                                    type: 'number'
+                                                                },
+                                                                {
+                                                                    title: 'Id',
+                                                                    type: 'hidden'
+                                                                },
+                                                                {
+                                                                    title: 'Active',
+                                                                    type: 'hidden'
+                                                                },
+                                                                {
+                                                                    title: 'Changed Flag',
+                                                                    type: 'hidden'
+                                                                },
+                                                                {
+                                                                    title: 'ProgramId',
+                                                                    type: 'hidden'
+                                                                }
+
+
+                                                            ],
+                                                            updateTable: function (el, cell, x, y, source, value, id) {
+                                                                var elInstance = el.jexcel;
+                                                                var rowData = elInstance.getRowData(y);
+                                                                // var productCategoryId = rowData[0];
+                                                                var programPlanningUnitId = rowData[9];
+                                                                if (programPlanningUnitId == 0) {
+                                                                    var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
+                                                                    cell1.classList.remove('readonly');
+
+                                                                    var cell2 = elInstance.getCell(`A${parseInt(y) + 1}`)
+                                                                    cell2.classList.remove('readonly');
+
+
+                                                                } else {
+                                                                    var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
+                                                                    cell1.classList.add('readonly');
+
+                                                                    var cell2 = elInstance.getCell(`A${parseInt(y) + 1}`)
+                                                                    cell2.classList.add('readonly');
+
+
+                                                                }
+                                                            },
+                                                            pagination: localStorage.getItem("sesRecordCount"),
+                                                            search: true,
+                                                            columnSorting: true,
+                                                            tableOverflow: true,
+                                                            wordWrap: true,
+                                                            paginationOptions: JEXCEL_PAGINATION_OPTION,
+                                                            position: 'top',
+                                                            allowInsertColumn: false,
+                                                            allowManualInsertColumn: false,
+                                                            allowDeleteRow: true,
+                                                            onchange: this.changed,
+                                                            oneditionend: this.onedit,
+                                                            copyCompatibility: true,
+                                                            allowManualInsertRow: false,
+                                                            text: {
+                                                                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                                                                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                                                                show: '',
+                                                                entries: '',
+                                                            },
+                                                            onload: this.loaded,
+                                                            contextMenu: function (obj, x, y, e) {
+                                                                var items = [];
+                                                                //Add consumption batch info
+
+
+                                                                if (y == null) {
+                                                                    // Insert a new column
+                                                                    if (obj.options.allowInsertColumn == true) {
+                                                                        items.push({
+                                                                            title: obj.options.text.insertANewColumnBefore,
+                                                                            onclick: function () {
+                                                                                obj.insertColumn(1, parseInt(x), 1);
+                                                                            }
+                                                                        });
+                                                                    }
+
+                                                                    if (obj.options.allowInsertColumn == true) {
+                                                                        items.push({
+                                                                            title: obj.options.text.insertANewColumnAfter,
+                                                                            onclick: function () {
+                                                                                obj.insertColumn(1, parseInt(x), 0);
+                                                                            }
+                                                                        });
+                                                                    }
+
+                                                                    // Delete a column
+                                                                    // if (obj.options.allowDeleteColumn == true) {
+                                                                    //     items.push({
+                                                                    //         title: obj.options.text.deleteSelectedColumns,
+                                                                    //         onclick: function () {
+                                                                    //             obj.deleteColumn(obj.getSelectedColumns().length ? undefined : parseInt(x));
+                                                                    //         }
+                                                                    //     });
+                                                                    // }
+
+                                                                    // Rename column
+                                                                    // if (obj.options.allowRenameColumn == true) {
+                                                                    //     items.push({
+                                                                    //         title: obj.options.text.renameThisColumn,
+                                                                    //         onclick: function () {
+                                                                    //             obj.setHeader(x);
+                                                                    //         }
+                                                                    //     });
+                                                                    // }
+
+                                                                    // Sorting
+                                                                    if (obj.options.columnSorting == true) {
+                                                                        // Line
+                                                                        items.push({ type: 'line' });
+
+                                                                        items.push({
+                                                                            title: obj.options.text.orderAscending,
+                                                                            onclick: function () {
+                                                                                obj.orderBy(x, 0);
+                                                                            }
+                                                                        });
+                                                                        items.push({
+                                                                            title: obj.options.text.orderDescending,
+                                                                            onclick: function () {
+                                                                                obj.orderBy(x, 1);
+                                                                            }
+                                                                        });
+                                                                    }
+                                                                } else {
+                                                                    // Insert new row before
+                                                                    if (obj.options.allowInsertRow == true) {
+                                                                        items.push({
+                                                                            title: i18n.t('static.common.insertNewRowBefore'),
+                                                                            onclick: function () {
+                                                                                var data = [];
+                                                                                data[0] = 0;
+                                                                                data[1] = "";
+                                                                                data[2] = "";
+                                                                                data[3] = "";
+                                                                                data[4] = "";
+                                                                                data[5] = "";
+                                                                                data[6] = "";
+                                                                                data[7] = "";
+                                                                                data[8] = 0;
+                                                                                data[9] = 0;
+                                                                                data[10] = 1;
+                                                                                data[11] = 1;
+                                                                                data[12] = programId;
+                                                                                obj.insertRow(data, parseInt(y), 1);
+                                                                            }.bind(this)
+                                                                        });
+                                                                    }
+                                                                    // after
+                                                                    if (obj.options.allowInsertRow == true) {
+                                                                        items.push({
+                                                                            title: i18n.t('static.common.insertNewRowAfter'),
+                                                                            onclick: function () {
+                                                                                var data = [];
+                                                                                data[0] = 0;
+                                                                                data[1] = "";
+                                                                                data[2] = "";
+                                                                                data[3] = "";
+                                                                                data[4] = "";
+                                                                                data[5] = "";
+                                                                                data[6] = "";
+                                                                                data[7] = "";
+                                                                                data[8] = 0;
+                                                                                data[9] = 0;
+                                                                                data[10] = 1;
+                                                                                data[11] = 1;
+                                                                                data[12] = programId;
+                                                                                obj.insertRow(data, parseInt(y));
+                                                                            }.bind(this)
+                                                                        });
+                                                                    }
+                                                                    // Delete a row
+                                                                    if (obj.options.allowDeleteRow == true) {
+                                                                        // region id
+                                                                        if (obj.getRowData(y)[9] == 0) {
+                                                                            items.push({
+                                                                                title: i18n.t("static.common.deleterow"),
+                                                                                onclick: function () {
+                                                                                    obj.deleteRow(parseInt(y));
+                                                                                }
+                                                                            });
+                                                                        }
+                                                                    }
+
+                                                                    if (x) {
+                                                                        if (obj.options.allowComments == true) {
+                                                                            items.push({ type: 'line' });
+
+                                                                            var title = obj.records[y][x].getAttribute('title') || '';
+
+                                                                            items.push({
+                                                                                title: title ? obj.options.text.editComments : obj.options.text.addComments,
+                                                                                onclick: function () {
+                                                                                    obj.setComments([x, y], prompt(obj.options.text.comments, title));
+                                                                                }
+                                                                            });
+
+                                                                            if (title) {
+                                                                                items.push({
+                                                                                    title: obj.options.text.clearComments,
+                                                                                    onclick: function () {
+                                                                                        obj.setComments([x, y], '');
+                                                                                    }
+                                                                                });
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+
+                                                                // Line
+                                                                items.push({ type: 'line' });
+
+                                                                // // Save
+                                                                // if (obj.options.allowExport) {
+                                                                //     items.push({
+                                                                //         title: i18n.t('static.supplyPlan.exportAsCsv'),
+                                                                //         shortcut: 'Ctrl + S',
+                                                                //         onclick: function () {
+                                                                //             obj.download(true);
+                                                                //         }
+                                                                //     });
+                                                                // }
+
+                                                                return items;
+                                                            }.bind(this)
+                                                        };
+                                                        var elVar = jexcel(document.getElementById("mapPlanningUnit"), options);
+                                                        this.el = elVar;
+                                                        this.setState({ mapPlanningUnitEl: elVar, loading: false });
+                                                        // }
+                                                    } else {
+                                                        this.setState({
+                                                            message: response.data.messageCode, loading: false
+                                                        })
+                                                    }
+                                                }).catch(
+                                                    error => {
+                                                        if (error.message === "Network Error") {
+                                                            this.setState({
+                                                                message: 'static.unkownError',
+                                                                loading: false
+                                                            });
+                                                        } else {
+                                                            switch (error.response ? error.response.status : "") {
+
+                                                                case 401:
+                                                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                                                    break;
+                                                                case 403:
+                                                                    this.props.history.push(`/accessDenied`)
+                                                                    break;
+                                                                case 500:
+                                                                case 404:
+                                                                case 406:
+                                                                    this.setState({
+                                                                        message: error.response.data.messageCode,
+                                                                        loading: false
+                                                                    });
+                                                                    break;
+                                                                case 412:
+                                                                    this.setState({
+                                                                        message: error.response.data.messageCode,
+                                                                        loading: false
+                                                                    });
+                                                                    break;
+                                                                default:
+                                                                    this.setState({
+                                                                        message: 'static.unkownError',
+                                                                        loading: false
+                                                                    });
+                                                                    break;
+                                                            }
+                                                        }
+                                                    }
+                                                );
+                                        } else {
+                                            list = [];
+                                            this.setState({ loading: false });
+                                        }
+                                    }).catch(
+                                        error => {
+                                            if (error.message === "Network Error") {
+                                                this.setState({
+                                                    message: 'static.unkownError',
+                                                    loading: false
+                                                });
+                                            } else {
+                                                switch (error.response ? error.response.status : "") {
+
+                                                    case 401:
+                                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                                        break;
+                                                    case 403:
+                                                        this.props.history.push(`/accessDenied`)
+                                                        break;
+                                                    case 500:
+                                                    case 404:
+                                                    case 406:
+                                                        this.setState({
+                                                            message: error.response.data.messageCode,
+                                                            loading: false
+                                                        });
+                                                        break;
+                                                    case 412:
+                                                        this.setState({
+                                                            message: error.response.data.messageCode,
+                                                            loading: false
+                                                        });
+                                                        break;
+                                                    default:
+                                                        this.setState({
+                                                            message: 'static.unkownError',
+                                                            loading: false
+                                                        });
+                                                        break;
+                                                }
+                                            }
+                                        }
+                                    );
+                            } else {
+                                productCategoryListNew = []
+                                this.setState({
+                                    message: response.data.messageCode,
+                                    loading: false
+                                })
+                            }
+                        }).catch(
+                            error => {
+                                if (error.message === "Network Error") {
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
+                                } else {
+                                    switch (error.response ? error.response.status : "") {
+
+                                        case 401:
+                                            this.props.history.push(`/login/static.message.sessionExpired`)
+                                            break;
+                                        case 403:
+                                            this.props.history.push(`/accessDenied`)
+                                            break;
+                                        case 500:
+                                        case 404:
+                                        case 406:
+                                            this.setState({
+                                                message: error.response.data.messageCode,
+                                                loading: false
+                                            });
+                                            break;
+                                        case 412:
+                                            this.setState({
+                                                message: error.response.data.messageCode,
+                                                loading: false
+                                            });
+                                            break;
+                                        default:
+                                            this.setState({
+                                                message: 'static.unkownError',
+                                                loading: false
+                                            });
+                                            break;
+                                    }
+                                }
+                            }
+                        );
+                } else {
+                    productCategoryListNew = []
+                    this.setState({
+                        message: response.data.messageCode,
+                        loading: false
+                    })
+                }
+
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
+        } else {
+            this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
+            this.el.destroy();
+        }
+
+
 
     }
 
@@ -709,7 +786,7 @@ class AddprogramPlanningUnit extends Component {
         data[9] = 0;
         data[10] = 1;
         data[11] = 1;
-        data[12] = this.props.match.params.programId;
+        data[12] = this.state.programId;
         this.el.insertRow(
             data, 0, 1
         );
@@ -768,7 +845,8 @@ class AddprogramPlanningUnit extends Component {
                 //Reorder frequency
                 var col = ("C").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(2, y);
-                var reg = /^[0-9\b]+$/;
+                // var reg = /^[0-9\b]+$/;
+                var reg = JEXCEL_INTEGER_REGEX
                 // console.log("value-----", value);
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
@@ -790,7 +868,8 @@ class AddprogramPlanningUnit extends Component {
                 //Min months of stock
                 var col = ("D").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(3, y);
-                var reg = /^[0-9\b]+$/;
+                // var reg = /^[0-9\b]+$/;
+                var reg = JEXCEL_INTEGER_REGEX
                 // console.log("value-----", value);
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
@@ -812,7 +891,8 @@ class AddprogramPlanningUnit extends Component {
                 //Months in future for AMC
                 var col = ("E").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(4, y);
-                var reg = /^[0-9\b]+$/;
+                // var reg = /^[0-9\b]+$/;
+                var reg = JEXCEL_INTEGER_REGEX
                 // console.log("value-----", value);
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
@@ -834,7 +914,8 @@ class AddprogramPlanningUnit extends Component {
                 //Months in past for AMC
                 var col = ("F").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(5, y);
-                var reg = /^[0-9\b]+$/;
+                // var reg = /^[0-9\b]+$/;
+                var reg = JEXCEL_INTEGER_REGEX
                 // console.log("value-----", value);
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
@@ -856,7 +937,8 @@ class AddprogramPlanningUnit extends Component {
                 //Local procurement lead time
                 var col = ("G").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(6, y);
-                var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
+                // var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
+                var reg = JEXCEL_DECIMAL_LEAD_TIME
                 // console.log("value-----", value);
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
@@ -864,7 +946,8 @@ class AddprogramPlanningUnit extends Component {
                     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
                 } else {
-                    if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    // if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    if (!(reg.test(value))) {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
                         this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -879,7 +962,8 @@ class AddprogramPlanningUnit extends Component {
                 //Shelf life
                 var col = ("H").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(7, y);
-                var reg = /^[0-9\b]+$/;
+                // var reg = /^[0-9\b]+$/;
+                var reg = JEXCEL_INTEGER_REGEX
                 // console.log("value-----", value);
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
@@ -903,7 +987,8 @@ class AddprogramPlanningUnit extends Component {
                 var col = ("I").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(8, y);
                 // var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
-                var reg = DECIMAL_NO_REGEX;
+                // var reg = DECIMAL_NO_REGEX;
+                var reg = JEXCEL_DECIMAL_CATELOG_PRICE
                 // console.log("value-----", value);
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
@@ -911,7 +996,8 @@ class AddprogramPlanningUnit extends Component {
                     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
                 } else {
-                    if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    // if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    if (!(reg.test(value))) {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
                         this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -1001,7 +1087,8 @@ class AddprogramPlanningUnit extends Component {
         //Reorder frequency
         if (x == 2) {
             console.log("changed 4");
-            var reg = /^[0-9\b]+$/;
+            // var reg = /^[0-9\b]+$/;
+            var reg = JEXCEL_INTEGER_REGEX
             var col = ("C").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -1027,7 +1114,8 @@ class AddprogramPlanningUnit extends Component {
         //Min months of stock
         if (x == 3) {
             console.log("changed 5");
-            var reg = /^[0-9\b]+$/;
+            // var reg = /^[0-9\b]+$/;
+            var reg = JEXCEL_INTEGER_REGEX
             var col = ("D").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -1053,7 +1141,8 @@ class AddprogramPlanningUnit extends Component {
         //Months in future for AMC
         if (x == 4) {
             console.log("changed 6");
-            var reg = /^[0-9\b]+$/;
+            // var reg = /^[0-9\b]+$/;
+            var reg = JEXCEL_INTEGER_REGEX
             var col = ("E").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -1079,7 +1168,8 @@ class AddprogramPlanningUnit extends Component {
         //Months in past for AMC
         if (x == 5) {
             console.log("changed 7");
-            var reg = /^[0-9\b]+$/;
+            // var reg = /^[0-9\b]+$/;
+            var reg = JEXCEL_INTEGER_REGEX
             var col = ("F").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -1105,7 +1195,8 @@ class AddprogramPlanningUnit extends Component {
         //Local procurement lead time
         if (x == 6) {
             console.log("changed 8");
-            var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
+            // var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
+            var reg = JEXCEL_DECIMAL_LEAD_TIME
             var col = ("G").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -1114,7 +1205,8 @@ class AddprogramPlanningUnit extends Component {
                 this.el.setValueFromCoords(11, y, 1, true);
                 valid = false;
             } else {
-                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                // if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                if (!(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -1131,7 +1223,8 @@ class AddprogramPlanningUnit extends Component {
         //Shelf life
         if (x == 7) {
             console.log("changed 9");
-            var reg = /^[0-9\b]+$/;
+            // var reg = /^[0-9\b]+$/;
+            var reg = JEXCEL_INTEGER_REGEX
             var col = ("H").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -1158,7 +1251,7 @@ class AddprogramPlanningUnit extends Component {
         if (x == 8) {
             console.log("changed 10");
             // var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
-            var reg = DECIMAL_NO_REGEX;
+            var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
             var col = ("I").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -1167,7 +1260,8 @@ class AddprogramPlanningUnit extends Component {
                 this.el.setValueFromCoords(11, y, 1, true);
                 valid = false;
             } else {
-                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                // if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                if (!(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -1234,7 +1328,13 @@ class AddprogramPlanningUnit extends Component {
             ProgramService.addprogramPlanningUnitMapping(planningUnitArray)
                 .then(response => {
                     if (response.status == "200") {
-                        this.props.history.push(`/program/listProgram/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
+                        this.setState({
+                            message: i18n.t('static.message.planningUnitUpdate'), loading: false
+                        },
+                            () => {
+                                this.hideSecondComponent();
+                            })
+                        // this.props.history.push(`/programProduct/addProgramProduct/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                     } else {
                         this.setState({
                             message: response.data.messageCode, loading: false
@@ -1307,17 +1407,27 @@ class AddprogramPlanningUnit extends Component {
     }
 
     render() {
-
+        const { programs } = this.state;
+        let programList = programs.length > 0
+            && programs.map((item, i) => {
+                return (
+                    <option key={i} value={item.programId}>
+                        {getLabelText(item.label, this.state.lang)}
+                    </option>
+                )
+            }, this);
         return (
             <div className="animated fadeIn">
-                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
+                {/* <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5> */}
+                <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
+                <h5 style={{ color: "green" }} id="div2">{this.state.message}</h5>
 
                 <div style={{ flexBasis: 'auto' }}>
                     <Card style={{ display: this.state.loading ? "none" : "block" }}>
                         {/* <CardHeader>
                                 <strong>{i18n.t('static.program.mapPlanningUnit')}</strong>
                             </CardHeader> */}
-                        <CardBody className="p-0">
+                        {/* <CardBody className="p-0">
                             <Col sm={12} md={12}>
                                 <h4 className="red">{this.props.message}</h4>
                                 <div className="table-responsive" >
@@ -1325,13 +1435,47 @@ class AddprogramPlanningUnit extends Component {
                                     </div>
                                 </div>
                             </Col>
+                        </CardBody> */}
+                        <CardBody className="pb-lg-5">
+                            <Col md="3 pl-0">
+
+                                <FormGroup className="Selectdiv mt-md-2 mb-md-0">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
+                                    <div className="controls SelectGo">
+                                        <InputGroup>
+                                            <Input
+                                                type="select"
+                                                name="programId"
+                                                id="programId"
+                                                bsSize="sm"
+                                                onChange={this.buildJexcel}
+                                            >
+                                                <option value="0">{i18n.t('static.common.select')}</option>
+                                                {programList}
+                                            </Input>
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
+
+                            </Col>
+                            {/* <div id="mapPlanningUnit" className="RowheightForaddprogaddRow">
+                            </div> */}
+                            <div >
+                                <h4 className="red">{this.props.message}</h4>
+                                <div className="table-responsive" >
+                                    <div id="mapPlanningUnit" className="RowheightForaddprogaddRow">
+                                    </div>
+                                </div>
+                            </div>
+
                         </CardBody>
+
                         <CardFooter>
                             <FormGroup>
-                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                {this.state.isValidData && <Button type="submit" size="md" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
+                                {/* <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
+                                {this.state.isValidData && this.state.programId != 0 && <Button type="submit" size="md" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
                                 &nbsp;
-                                    <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.addRowInJexcel}> <i className="fa fa-plus"></i> Add Row</Button>
+                                {this.state.isValidData && this.state.programId != 0 && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.addRowInJexcel}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>}
                                 &nbsp;
                                 </FormGroup>
                         </CardFooter>
@@ -1354,7 +1498,7 @@ class AddprogramPlanningUnit extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/program/listProgram/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/programProduct/addProgramProduct/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
 }

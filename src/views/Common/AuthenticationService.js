@@ -888,7 +888,8 @@ class AuthenticationService {
                         return true;
                     }
                     break;
-                case "/programProduct/addProgramProduct/:programId":
+                // case "/programProduct/addProgramProduct/:programId":
+                case "/programProduct/addProgramProduct":
                     if (bfunction.includes("ROLE_BF_EDIT_PROGRAM")) {
                         return true;
                     }
@@ -1252,8 +1253,10 @@ class AuthenticationService {
         }
     }
     setRecordCount(count) {
+        var startDate = moment(Date.now()).subtract(6, 'months').startOf('month').format("YYYY-MM-DD");
+        var endDate = moment(Date.now()).add(18, 'months').startOf('month').format("YYYY-MM-DD")
         localStorage.setItem('sesRecordCount', count);
-        localStorage.setItem('sesRangeValue', "");
+        localStorage.setItem('sesRangeValue', JSON.stringify({ from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() }, to: { year: new Date(endDate).getFullYear(), month: new Date(endDate).getMonth() } }));
         localStorage.setItem('sesProgramId', "");
         localStorage.setItem('sesPlanningUnitId', "");
     }

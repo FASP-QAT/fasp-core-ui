@@ -13,7 +13,7 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import ProcurementUnitService from "../../api/ProcurementUnitService";
 import i18n from '../../i18n';
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions';
-import { DECIMAL_NO_REGEX, INTEGER_NO_REGEX, JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
+import { JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_DECIMAL_LEAD_TIME, DECIMAL_NO_REGEX, INTEGER_NO_REGEX, JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
 const entityname = i18n.t('static.dashboard.procurementAgentProcurementUnit')
 
 
@@ -264,34 +264,76 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                 }
 
 
+                // var col = ("D").concat(parseInt(y) + 1);
+                // var value = this.el.getValueFromCoords(3, y);
+                // var reg = DECIMAL_NO_REGEX;
+                // // console.log("---------VAL----------", value);
+                // if (value == "" || isNaN(Number.parseFloat(value)) || value < 0) {
+                //     this.el.setStyle(col, "background-color", "transparent");
+                //     this.el.setStyle(col, "background-color", "yellow");
+                //     valid = false;
+                //     if (isNaN(Number.parseInt(value)) || value < 0) {
+                //         this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                //     } else {
+                //         this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                //     }
+                // } else {
+                //     this.el.setStyle(col, "background-color", "transparent");
+                //     this.el.setComments(col, "");
+                // }
+
+
+                // var col = ("E").concat(parseInt(y) + 1);
+                // var value = this.el.getValueFromCoords(4, y);
+                // if (value == "") {
+                //     this.el.setStyle(col, "background-color", "transparent");
+                //     this.el.setStyle(col, "background-color", "yellow");
+                //     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                //     valid = false;
+                // } else {
+                //     if (isNaN(Number.parseInt(value)) || value < 0) {
+                //         this.el.setStyle(col, "background-color", "transparent");
+                //         this.el.setStyle(col, "background-color", "yellow");
+                //         this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                //         valid = false;
+                //     } else {
+                //         this.el.setStyle(col, "background-color", "transparent");
+                //         this.el.setComments(col, "");
+                //     }
+                // }
+
                 var col = ("D").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(3, y);
-                var reg = DECIMAL_NO_REGEX;
-                // console.log("---------VAL----------", value);
-                if (value == "" || isNaN(Number.parseFloat(value)) || value < 0) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    valid = false;
-                    if (isNaN(Number.parseInt(value)) || value < 0) {
-                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                    } else {
-                        this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                    }
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                }
-
-
-                var col = ("E").concat(parseInt(y) + 1);
-                var value = this.el.getValueFromCoords(4, y);
+                var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
                 } else {
-                    if (isNaN(Number.parseInt(value)) || value < 0) {
+                    // if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    if (!(reg.test(value))) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                }
+
+                var col = ("E").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(4, y);
+                var reg = JEXCEL_DECIMAL_LEAD_TIME;
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    // if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    if (!(reg.test(value))) {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
                         this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -361,53 +403,96 @@ export default class AddProcurementAgentProcurementUnit extends Component {
             }
         }
 
-        if (x == 3) {
-            var reg = /^[0-9\b]+$/;
-            var col = ("D").concat(parseInt(y) + 1);
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
-                this.el.setValueFromCoords(7, y, 1, true);
+        // if (x == 3) {
+        //     var reg = /^[0-9\b]+$/;
+        //     var col = ("D").concat(parseInt(y) + 1);
+        //     if (value == "") {
+        //         this.el.setStyle(col, "background-color", "transparent");
+        //         this.el.setComments(col, "");
+        //         this.el.setValueFromCoords(7, y, 1, true);
 
-                // this.el.setStyle(col, "background-color", "transparent");
-                // this.el.setStyle(col, "background-color", "yellow");
-                // this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                // valid = false;
-            } else {
-                if (isNaN(Number.parseInt(value)) || value < 0) {
+        //         // this.el.setStyle(col, "background-color", "transparent");
+        //         // this.el.setStyle(col, "background-color", "yellow");
+        //         // this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+        //         // valid = false;
+        //     } else {
+        //         if (isNaN(Number.parseInt(value)) || value < 0) {
+        //             this.el.setStyle(col, "background-color", "transparent");
+        //             this.el.setStyle(col, "background-color", "yellow");
+        //             this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+
+        //         } else {
+        //             this.el.setStyle(col, "background-color", "transparent");
+        //             this.el.setComments(col, "");
+
+        //         }
+        //     }
+        // }
+
+        // if (x == 4) {
+        //     var reg = /^[0-9\b]+$/;
+        //     var col = ("E").concat(parseInt(y) + 1);
+        //     if (value == "") {
+        //         this.el.setStyle(col, "background-color", "transparent");
+        //         this.el.setStyle(col, "background-color", "yellow");
+        //         this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+
+        //     } else {
+        //         if (isNaN(Number.parseInt(value)) || value < 0) {
+        //             this.el.setStyle(col, "background-color", "transparent");
+        //             this.el.setStyle(col, "background-color", "yellow");
+        //             this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+
+        //         } else {
+        //             this.el.setStyle(col, "background-color", "transparent");
+        //             this.el.setComments(col, "");
+
+        //         }
+        //     }
+        // }
+
+        if (x == 3) {
+            var col = ("D").concat(parseInt(y) + 1);
+            // var reg = /^[0-9\b]+$/;
+            var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
+            if (this.el.getValueFromCoords(x, y) != "") {
+                // if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                if (!(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
-
                 }
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             }
         }
 
         if (x == 4) {
-            var reg = /^[0-9\b]+$/;
             var col = ("E").concat(parseInt(y) + 1);
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-
-            } else {
-                if (isNaN(Number.parseInt(value)) || value < 0) {
+            // var reg = /^[0-9\b]+$/;
+            var reg = JEXCEL_DECIMAL_LEAD_TIME;
+            if (this.el.getValueFromCoords(x, y) != "") {
+                // if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                if (!(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
-
                 }
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             }
         }
+
 
         if (x == 5) {
             // var json = this.el.getJson();
@@ -539,7 +624,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
 
                                             },
                                             {
-                                                title: i18n.t('static.procurementAgentProcurementUnit.approvedToShippedLeadTime'),
+                                                title: i18n.t('static.program.approvetoshipleadtime'),
                                                 type: 'numeric',
                                             },
                                             {

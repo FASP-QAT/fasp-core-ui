@@ -694,7 +694,7 @@ import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
 import moment from "moment";
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { JEXCEL_DATE_FORMAT, JEXCEL_PAGINATION_OPTION } from "../../Constants";
+import { JEXCEL_DECIMAL_NO_REGEX, JEXCEL_DATE_FORMAT, JEXCEL_PAGINATION_OPTION } from "../../Constants";
 
 let initialValues = {
     startDate: '',
@@ -1453,14 +1453,30 @@ class PlanningUnitCapacity extends Component {
 
 
         //Capacity
+        // if (x == 4) {
+        //     var col = ("E").concat(parseInt(y) + 1);
+        //     if (value == "") {
+        //         this.el.setStyle(col, "background-color", "transparent");
+        //         this.el.setStyle(col, "background-color", "yellow");
+        //         this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+        //     } else {
+        //         if (isNaN(Number.parseInt(value)) || value < 0) {
+        //             this.el.setStyle(col, "background-color", "transparent");
+        //             this.el.setStyle(col, "background-color", "yellow");
+        //             this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+        //         } else {
+        //             this.el.setStyle(col, "background-color", "transparent");
+        //             this.el.setComments(col, "");
+        //         }
+
+        //     }
+        // }
         if (x == 4) {
             var col = ("E").concat(parseInt(y) + 1);
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                if (isNaN(Number.parseInt(value)) || value < 0) {
+            var reg = JEXCEL_DECIMAL_NO_REGEX;
+            if (this.el.getValueFromCoords(x, y) != "") {
+                // if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                if (!(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -1468,7 +1484,6 @@ class PlanningUnitCapacity extends Component {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
                 }
-
             }
         }
 
@@ -1567,20 +1582,41 @@ class PlanningUnitCapacity extends Component {
 
 
                 //Capacity
+                // var col = ("E").concat(parseInt(y) + 1);
+                // var value = this.el.getValueFromCoords(4, y);
+                // if (value == "" || isNaN(Number.parseFloat(value)) || value < 0) {
+                //     this.el.setStyle(col, "background-color", "transparent");
+                //     this.el.setStyle(col, "background-color", "yellow");
+                //     valid = false;
+                //     if (isNaN(Number.parseInt(value)) || value < 0) {
+                //         this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                //     } else {
+                //         this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                //     }
+                // } else {
+                //     this.el.setStyle(col, "background-color", "transparent");
+                //     this.el.setComments(col, "");
+                // }
+
                 var col = ("E").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(4, y);
-                if (value == "" || isNaN(Number.parseFloat(value)) || value < 0) {
+                var reg = JEXCEL_DECIMAL_NO_REGEX;
+                if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
-                    if (isNaN(Number.parseInt(value)) || value < 0) {
-                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                    } else {
-                        this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                    }
                 } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
+                    // if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    if (!(reg.test(value))) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
                 }
             }
         }

@@ -35,6 +35,7 @@ export default class SyncMasterData extends Component {
         this.syncMasters = this.syncMasters.bind(this);
         this.retryClicked = this.retryClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.updateState=this.updateState.bind(this);
     }
     hideSecondComponent() {
         setTimeout(function () {
@@ -55,7 +56,7 @@ export default class SyncMasterData extends Component {
             setTimeout(function () { //Start the timer
                 // this.setState({render: true}) //After 1 second, set render to true
                 this.syncMasters();
-            }.bind(this), 500)
+            }.bind(this), 5)
 
         })
 
@@ -287,6 +288,10 @@ export default class SyncMasterData extends Component {
         }
         console.log("Valid", valid);
         return valid;
+    }
+
+    updateState(){
+
     }
 
 

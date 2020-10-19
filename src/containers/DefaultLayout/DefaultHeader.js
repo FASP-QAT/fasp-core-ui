@@ -11,6 +11,7 @@ import i18n from '../../i18n'
 import { Online, Offline } from 'react-detect-offline';
 import AuthenticationService from '../../views/Common/AuthenticationService';
 import imageUsermanual from '../../assets/img/User-manual-icon.png';
+import { API_URL } from '../../Constants';
 
 const propTypes = {
   children: PropTypes.node,
@@ -28,6 +29,8 @@ class DefaultHeader extends Component {
     i18n.changeLanguage(lang)
     window.location.reload(false);
   }
+
+
   render() {
 
     // eslint-disable-next-line
@@ -85,20 +88,22 @@ class DefaultHeader extends Component {
           </UncontrolledDropdown> */}
           <DefaultHeaderDropdown mssgs />
 
-          <NavItem className="">
+          {/* <NavItem className="">
             <NavLink to="#" className="nav-link">
-              <img src={imageUsermanual} className="HelpIcon" title={i18n.t('static.user.usermanual')} />
+              <img src={imageUsermanual} className="HelpIcon" title={i18n.t('static.user.changesInLocalVersion')} />
             </NavLink>
           </NavItem>
           <NavItem className="">
             <NavLink to="#" className="nav-link">
               <img src={imageUsermanual} className="HelpIcon" title={i18n.t('static.header.notLatestVersion')} />
             </NavLink>
-          </NavItem>
+          </NavItem> */}
           <NavItem className="">
-            <NavLink to="#" className="nav-link">
-              <img src={imageUsermanual} className="HelpIcon" title={i18n.t('static.user.changesInLocalVersion')} />
-            </NavLink>
+            <span className="nav-link">
+              <a href={`${API_URL}/file/qatUserGuide`}>
+                <img src={imageUsermanual} className="HelpIcon" title={i18n.t('static.user.usermanual')} style={{ width: '30px', height: '30px' }} />
+              </a>
+            </span>
           </NavItem>
           <NavItem className="">
             <NavLink to="#" className="nav-link">

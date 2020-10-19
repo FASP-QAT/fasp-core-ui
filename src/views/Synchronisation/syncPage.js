@@ -21,6 +21,7 @@ import 'react-select/dist/react-select.min.css';
 import getSuggestion from '../../CommonComponent/getSuggestion';
 import getProblemDesc from '../../CommonComponent/getProblemDesc';
 import { calculateSupplyPlan } from '../SupplyPlan/SupplyPlanCalculations';
+import QatProblemActions from '../../CommonComponent/QatProblemActions'
 
 const entityname = i18n.t('static.dashboard.commitVersion')
 
@@ -66,6 +67,7 @@ export default class syncPage extends Component {
 
     this.hideFirstComponent = this.hideFirstComponent.bind(this);
     this.hideSecondComponent = this.hideSecondComponent.bind(this);
+    this.fetchData = this.fetchData.bind(this)
 
     // this.checkValidations = this.checkValidations.bind(this);
   }
@@ -218,7 +220,7 @@ export default class syncPage extends Component {
     consumptionInstance.setRowData(index, resolveConflictsInstance.getRowData(0));
     var jsonData = resolveConflictsInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R']
-    for (var j = 1; j < 13; j++) {
+    for (var j = 0; j < 13; j++) {
       var col = (colArr[j]).concat(parseInt(index) + 1);
       var valueToCompare = (jsonData[0])[j];
       var valueToCompareWith = (jsonData[1])[j];
@@ -255,7 +257,7 @@ export default class syncPage extends Component {
     consumptionInstance.setRowData(index, resolveConflictsInstance.getRowData(1));
     var jsonData = resolveConflictsInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R']
-    for (var j = 1; j < 13; j++) {
+    for (var j = 0; j < 13; j++) {
       var col = (colArr[j]).concat(parseInt(index) + 1);
       var valueToCompare = (jsonData[0])[j];
       var valueToCompareWith = (jsonData[1])[j];
@@ -381,7 +383,7 @@ export default class syncPage extends Component {
     inventoryInstance.setRowData(index, resolveConflictsInstance.getRowData(0));
     var jsonData = resolveConflictsInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S']
-    for (var j = 1; j < 14; j++) {
+    for (var j = 0; j < 14; j++) {
       var col = (colArr[j]).concat(parseInt(index) + 1);
       var valueToCompare = (jsonData[0])[j];
       var valueToCompareWith = (jsonData[1])[j];
@@ -418,7 +420,7 @@ export default class syncPage extends Component {
     inventoryInstance.setRowData(index, resolveConflictsInstance.getRowData(1));
     var jsonData = resolveConflictsInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S']
-    for (var j = 1; j < 14; j++) {
+    for (var j = 0; j < 14; j++) {
       var col = (colArr[j]).concat(parseInt(index) + 1);
       var valueToCompare = (jsonData[0])[j];
       var valueToCompareWith = (jsonData[1])[j];
@@ -556,7 +558,7 @@ export default class syncPage extends Component {
     shipmentInstance.setRowData(index, resolveConflictsInstance.getRowData(0));
     var jsonData = resolveConflictsInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF']
-    for (var j = 1; j < 26; j++) {
+    for (var j = 0; j < 26; j++) {
       var col = (colArr[j]).concat(parseInt(index) + 1);
       var valueToCompare = (jsonData[0])[j];
       var valueToCompareWith = (jsonData[1])[j];
@@ -593,7 +595,7 @@ export default class syncPage extends Component {
     shipmentInstance.setRowData(index, resolveConflictsInstance.getRowData(1));
     var jsonData = resolveConflictsInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF']
-    for (var j = 1; j < 26; j++) {
+    for (var j = 0; j < 26; j++) {
       var col = (colArr[j]).concat(parseInt(index) + 1);
       var valueToCompare = (jsonData[0])[j];
       var valueToCompareWith = (jsonData[1])[j];
@@ -1490,207 +1492,6 @@ export default class syncPage extends Component {
                                   this.setState({
                                     mergedShipmentJexcel: mergedShipmentJexcel,
                                   })
-
-                                  // Problem list
-                                  var latestProgramDataProblemList = latestProgramData.problemReportList;
-                                  var oldProgramDataProblemList = oldProgramData.problemReportList;
-                                  var downloadedProgramDataProblemList = downloadedProgramData.problemReportList;
-                                  var mergedProblemListData = [];
-                                  var existingProblemReportId = [];
-                                  for (var c = 0; c < oldProgramDataProblemList.length; c++) {
-                                    if (oldProgramDataProblemList[c].problemReportId != 0) {
-                                      mergedProblemListData.push(oldProgramDataProblemList[c]);
-                                      existingProblemReportId.push(oldProgramDataProblemList[c].problemReportId);
-                                    } else {
-                                      // If 0 check whether that exists in latest version or not
-                                      var index = 0;
-                                      if (oldProgramDataProblemList[c].realmProblem.problem.problemId == 1 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 2 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 8 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 10 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 14 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 15 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 21) {
-                                        index = latestProgramDataProblemList.findIndex(
-                                          f => moment(f.dt).format("YYYY-MM") == moment(oldProgramDataProblemList[c].dt).format("YYYY-MM")
-                                            && f.region.id == oldProgramDataProblemList[c].region.id
-                                            && f.planningUnit.id == oldProgramDataProblemList[c].planningUnit.id
-                                            && f.realmProblem.problem.problemId == oldProgramDataProblemList[c].realmProblem.problem.problemId);
-                                      } else if (oldProgramDataProblemList[c].realmProblem.problem.problemId == 13) {
-                                        index = -1;
-                                      } else if (oldProgramDataProblemList[c].realmProblem.problem.problemId == 3 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 4 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 5 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 6 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 7) {
-                                        index = latestProgramDataProblemList.findIndex(
-                                          f => f.planningUnit.id == oldProgramDataProblemList[c].planningUnit.id
-                                            && f.realmProblem.problem.problemId == oldProgramDataProblemList[c].realmProblem.problem.problemId
-                                            && oldProgramDataProblemList[c].newAdded != true
-                                            && f.shipmentId == oldProgramDataProblemList[c].shipmentId);
-                                      } else if (oldProgramDataProblemList[c].realmProblem.problem.problemId == 11 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 16 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 17 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 18 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 19 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 20) {
-                                        index = latestProgramDataProblemList.findIndex(
-                                          f => moment(f.dt).format("YYYY-MM") == moment(oldProgramDataProblemList[c].dt).format("YYYY-MM")
-                                            && f.planningUnit.id == oldProgramDataProblemList[c].planningUnit.id
-                                            && f.realmProblem.problem.problemId == oldProgramDataProblemList[c].realmProblem.problem.problemId);
-                                      }
-                                      // var index = -1;
-                                      if (index == -1) {
-                                        mergedProblemListData.push(oldProgramDataProblemList[c]);
-                                      } else {
-                                        oldProgramDataProblemList[c].problemReportId = latestProgramDataProblemList[index].problemReportId;
-                                        existingProblemReportId.push(latestProgramDataProblemList[index].problemReportId);
-                                        mergedProblemListData.push(oldProgramDataProblemList[c]);
-                                      }
-                                    }
-                                  }
-                                  // Getting other entries of latest problemList data
-                                  var latestOtherProblemListEntries = latestProgramDataProblemList.filter(c => !(existingProblemReportId.includes(c.problemReportId)));
-                                  mergedProblemListData = mergedProblemListData.concat(latestOtherProblemListEntries);
-
-                                  var data = [];
-                                  var mergedProblemListJexcel = [];
-                                  for (var cd = 0; cd < mergedProblemListData.length; cd++) {
-                                    data = []
-                                    data[0] = mergedProblemListData[cd].problemReportId
-                                    data[1] = 1;
-                                    data[2] = mergedProblemListData[cd].program.code
-                                    data[3] = 1;
-                                    data[4] = (mergedProblemListData[cd].region.label != null) ? (getLabelText(mergedProblemListData[cd].region.label, this.state.lang)) : ''
-                                    data[5] = getLabelText(mergedProblemListData[cd].planningUnit.label, this.state.lang)
-                                    data[6] = (mergedProblemListData[cd].dt != null) ? (moment(mergedProblemListData[cd].dt).format('MMM-YY')) : ''
-                                    data[7] = moment(mergedProblemListData[cd].createdDate).format('MMM-YY')
-                                    data[8] = getProblemDesc(mergedProblemListData[cd], this.state.lang)
-                                    data[9] = getSuggestion(mergedProblemListData[cd], this.state.lang)
-                                    data[10] = getLabelText(mergedProblemListData[cd].problemStatus.label, this.state.lang)
-                                    data[11] = this.getNote(mergedProblemListData[cd], this.state.lang)
-                                    data[12] = mergedProblemListData[cd].problemStatus.id
-                                    data[13] = mergedProblemListData[cd].planningUnit.id
-                                    data[14] = mergedProblemListData[cd].realmProblem.problem.problemId
-                                    data[15] = mergedProblemListData[cd].realmProblem.problem.actionUrl
-                                    data[16] = mergedProblemListData[cd].realmProblem.criticality.id
-                                    var oldDataList = oldProgramDataProblemList.filter(c => c.problemReportId == mergedProblemListData[cd].problemReportId);
-                                    var oldData = ""
-                                    if (oldDataList.length > 0) {
-                                      oldData = [oldDataList[0].problemReportId, 1, oldDataList[0].program.code, 1, (oldDataList[0].region.label != null) ? (getLabelText(oldDataList[0].region.label, this.state.lang)) : '', getLabelText(oldDataList[0].planningUnit.label, this.state.lang), (oldDataList[0].dt != null) ? (moment(oldDataList[0].dt).format('MMM-YY')) : '', moment(oldDataList[0].createdDate).format('MMM-YY'), getProblemDesc(oldDataList[0], this.state.lang), getSuggestion(oldDataList[0], this.state.lang), getLabelText(oldDataList[0].problemStatus.label, this.state.lang), this.getNote(oldDataList[0], this.state.lang), oldDataList[0].problemStatus.id, oldDataList[0].planningUnit.id, oldDataList[0].realmProblem.problem.problemId, oldDataList[0].realmProblem.problem.actionUrl, oldDataList[0].realmProblem.criticality.id, "", "", "", 4];
-                                    }
-                                    data[17] = oldData;//Old data
-                                    var latestDataList = latestProgramDataProblemList.filter(c => mergedProblemListData[cd].problemReportId != 0 && c.problemReportId == mergedProblemListData[cd].problemReportId);
-                                    console.log("Latest data list", latestDataList);
-                                    var latestData = ""
-                                    if (latestDataList.length > 0) {
-                                      latestData = [latestDataList[0].problemReportId, 1, latestDataList[0].program.code, 1, (latestDataList[0].region.label != null) ? (getLabelText(latestDataList[0].region.label, this.state.lang)) : '', getLabelText(latestDataList[0].planningUnit.label, this.state.lang), (latestDataList[0].dt != null) ? (moment(latestDataList[0].dt).format('MMM-YY')) : '', moment(latestDataList[0].createdDate).format('MMM-YY'), getProblemDesc(latestDataList[0], this.state.lang), getSuggestion(latestDataList[0], this.state.lang), getLabelText(latestDataList[0].problemStatus.label, this.state.lang), this.getNote(latestDataList[0], this.state.lang), latestDataList[0].problemStatus.id, latestDataList[0].planningUnit.id, latestDataList[0].realmProblem.problem.problemId, latestDataList[0].realmProblem.problem.actionUrl, latestDataList[0].realmProblem.criticality.id, "", "", "", 4];
-                                    }
-                                    data[18] = latestData;//Latest data
-                                    var downloadedDataList = downloadedProgramDataProblemList.filter(c => mergedProblemListData[cd].problemListId != 0 && c.problemListId == mergedProblemListData[cd].problemListId);
-                                    var downloadedData = "";
-                                    if (downloadedDataList.length > 0) {
-                                      downloadedData = [downloadedDataList[0].problemReportId, 1, downloadedDataList[0].program.code, 1, (downloadedDataList[0].region.label != null) ? (getLabelText(downloadedDataList[0].region.label, this.state.lang)) : '', getLabelText(downloadedDataList[0].planningUnit.label, this.state.lang), (downloadedDataList[0].dt != null) ? (moment(downloadedDataList[0].dt).format('MMM-YY')) : '', moment(downloadedDataList[0].createdDate).format('MMM-YY'), getProblemDesc(downloadedDataList[0], this.state.lang), getSuggestion(downloadedDataList[0], this.state.lang), getLabelText(downloadedDataList[0].problemStatus.label, this.state.lang), this.getNote(downloadedDataList[0], this.state.lang), downloadedDataList[0].problemStatus.id, downloadedDataList[0].planningUnit.id, downloadedDataList[0].realmProblem.problem.problemId, downloadedDataList[0].realmProblem.problem.actionUrl, downloadedDataList[0].realmProblem.criticality.id, "", "", "", 4];
-                                    }
-                                    data[19] = downloadedData;//Downloaded data
-                                    data[20] = 4;
-                                    mergedProblemListJexcel.push(data);
-                                  }
-                                  console.log("MergedProblem list jexcel", mergedProblemListJexcel);
-                                  var options = {
-                                    data: mergedProblemListJexcel,
-                                    columnDrag: true,
-                                    colWidths: [100, 10, 50, 50, 10, 10, 10, 50, 200, 200, 70, 70],
-                                    colHeaderClasses: ["Reqasterisk"],
-                                    columns: [
-                                      {
-                                        title: 'problemReportId',
-                                        type: 'hidden',
-                                      },
-                                      {
-                                        title: 'problemActionIndex',
-                                        type: 'hidden',
-                                      },
-                                      {
-                                        title: i18n.t('static.program.programCode'),
-                                        type: 'text',
-                                      },
-                                      {
-                                        title: i18n.t('static.program.versionId'),
-                                        type: 'hidden',
-                                      },
-                                      {
-                                        title: i18n.t('static.region.region'),
-                                        type: 'hidden',
-                                      },
-                                      {
-                                        title: i18n.t('static.planningunit.planningunit'),
-                                        type: 'hidden',
-                                      },
-                                      {
-                                        title: i18n.t('static.report.month'),
-                                        type: 'hidden',
-                                      },
-                                      {
-                                        title: i18n.t('static.report.createdDate'),
-                                        type: 'text',
-                                      },
-                                      {
-                                        title: i18n.t('static.report.problemDescription'),
-                                        type: 'text',
-                                      },
-                                      {
-                                        title: i18n.t('static.report.suggession'),
-                                        type: 'text',
-                                      },
-                                      {
-                                        title: i18n.t('static.report.problemStatus'),
-                                        type: 'text',
-                                      },
-                                      {
-                                        title: i18n.t('static.program.notes'),
-                                        type: 'text',
-                                      },
-                                      {
-                                        title: i18n.t('static.common.action'),
-                                        type: 'hidden',
-                                      },
-                                      {
-                                        title: 'planningUnitId',
-                                        type: 'hidden',
-                                      },
-                                      {
-                                        title: 'problemId',
-                                        type: 'hidden',
-                                      },
-                                      {
-                                        title: 'actionUrl',
-                                        type: 'hidden',
-                                      },
-                                      {
-                                        title: 'criticalitiId',
-                                        type: 'hidden',
-                                      },
-                                      { type: 'hidden', title: 'Old data' },
-                                      { type: 'hidden', title: 'latest data' },
-                                      { type: 'hidden', title: 'downloaded data' },
-                                      { type: 'hidden', title: 'result of compare' },
-                                    ],
-                                    pagination: localStorage.getItem("sesRecordCount"),
-                                    paginationOptions: JEXCEL_PAGINATION_OPTION,
-                                    search: true,
-                                    columnSorting: true,
-                                    tableOverflow: true,
-                                    wordWrap: true,
-                                    allowInsertColumn: false,
-                                    allowManualInsertColumn: false,
-                                    allowDeleteRow: false,
-                                    editable: false,
-                                    onload: this.loadedFunctionForMergeProblemList,
-                                    text: {
-                                      showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                                      show: '',
-                                      entries: '',
-                                    },
-                                    contextMenu: function (obj, x, y, e) {
-                                      var items = [];
-                                      return items;
-                                    }.bind(this)
-                                  };
-
-                                  var mergedProblemListJexcel = jexcel(document.getElementById("mergedVersionProblemList"), options);
-                                  this.el = mergedProblemListJexcel;
-                                  this.setState({
-                                    mergedProblemListJexcel: mergedProblemListJexcel,
-                                  })
-
-
-
                                   this.setState({
                                     oldProgramDataConsumption: oldProgramDataConsumption,
                                     oldProgramDataInventory: oldProgramDataInventory,
@@ -1698,12 +1499,15 @@ export default class syncPage extends Component {
                                     latestProgramDataConsumption: latestProgramDataConsumption,
                                     latestProgramDataInventory: latestProgramDataInventory,
                                     latestProgramDataShipment: latestProgramDataShipment,
-                                    oldProgramDataProblemList: oldProgramDataProblemList,
-                                    latestProgramDataProblemList: latestProgramDataProblemList,
-                                    mergedProblemListData: mergedProblemListData,
                                     oldProgramDataBatchInfo: oldProgramDataBatchInfo,
                                     latestProgramDataBatchInfo: latestProgramDataBatchInfo,
+                                    latestProgramData: latestProgramData,
+                                    oldProgramData: oldProgramData,
+                                    downloadedProgramData: downloadedProgramData,
                                     loading: false
+                                  }, () => {
+                                    // Problem list
+                                    this.refs.problemListChild.qatProblemActions((this.state.programId).value);
                                   })
                                 }.bind(this)
                               }.bind(this)
@@ -2155,16 +1959,16 @@ export default class syncPage extends Component {
               elInstance.setValueFromCoords(20, c, 2, true);
               (jsonData[c])[20] = 2;
             } else {
-              this.setState({
-                conflictsCount: this.state.conflictsCount + 1
-              })
-              elInstance.setValueFromCoords(20, c, 1, true);
-              (jsonData[c])[20] = 1;
-              for (var j = 0; j < colArr.length; j++) {
-                var col = (colArr[j]).concat(parseInt(c) + 1);
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-              }
+              // this.setState({
+              //   conflictsCount: this.state.conflictsCount + 1
+              // })
+              // elInstance.setValueFromCoords(20, c, 1, true);
+              // (jsonData[c])[20] = 1;
+              // for (var j = 0; j < colArr.length; j++) {
+              //   var col = (colArr[j]).concat(parseInt(c) + 1);
+              //   elInstance.setStyle(col, "background-color", "transparent");
+              //   elInstance.setStyle(col, "background-color", "yellow");
+              // }
             }
           }
         }
@@ -2236,6 +2040,7 @@ export default class syncPage extends Component {
     return (
       <div className="animated fadeIn">
         <AuthenticationServiceComponent history={this.props.history} />
+        <QatProblemActions ref="problemListChild" updateState={this.updateState} fetchData={this.fetchData} objectStore="programData"/>
         <h5 id="div1" className={this.state.color}>{i18n.t(this.state.message, { entityname })}</h5>
         <h5 className="red" id="div2">{this.state.noFundsBudgetError || this.state.commitVersionError}</h5>
         <Row style={{ display: this.state.loading ? "none" : "block" }}>
@@ -2572,6 +2377,7 @@ export default class syncPage extends Component {
           programJson.notes = document.getElementById("notes").value;
           console.log("Program json", programJson);
           ProgramService.saveProgramData(programJson).then(response => {
+            console.log("Response", response);
             if (response.status == 200) {
               var programDataTransaction1 = db1.transaction(['programData'], 'readwrite');
               var programDataOs1 = programDataTransaction1.objectStore('programData');
@@ -2628,10 +2434,14 @@ export default class syncPage extends Component {
           })
             .catch(
               error => {
+                console.log("Error--->", error);
                 if (error.message === "Network Error") {
                   this.setState({
                     message: 'static.unkownError',
+                    color: "red",
                     loading: false
+                  }, () => {
+                    this.hideFirstComponent();
                   });
                 } else {
                   switch (error.response ? error.response.status : "") {
@@ -2647,19 +2457,28 @@ export default class syncPage extends Component {
                     case 406:
                       this.setState({
                         message: error.response.data.messageCode,
+                        color: "red",
                         loading: false
+                      }, () => {
+                        this.hideFirstComponent()
                       });
                       break;
                     case 412:
                       this.setState({
                         message: error.response.data.messageCode,
-                        loading: false
+                        loading: false,
+                        color: "red"
+                      }, () => {
+                        this.hideFirstComponent()
                       });
                       break;
                     default:
                       this.setState({
                         message: 'static.unkownError',
-                        loading: false
+                        loading: false,
+                        color: "red"
+                      }, () => {
+                        this.hideFirstComponent()
                       });
                       break;
                   }
@@ -2691,5 +2510,238 @@ export default class syncPage extends Component {
     this.setState({
       [parameterName]: value
     })
+  }
+
+  fetchData() {
+    var db1;
+    getDatabase();
+    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+    openRequest.onerror = function (event) {
+      this.setState({
+        commitVersionError: i18n.t('static.program.errortext'),
+        loading: false
+      })
+      this.hideSecondComponent()
+    }.bind(this);
+    openRequest.onsuccess = function (e) {
+      db1 = e.target.result;
+      var programDataTransaction = db1.transaction(['programData'], 'readwrite');
+      var programDataOs = programDataTransaction.objectStore('programData');
+      var value = (this.state.programId);
+      console.log("Value------------>", value);
+      var programRequest = programDataOs.get(value != "" && value != undefined ? value.value : 0);
+      programRequest.onerror = function (event) {
+        this.setState({
+          commitVersionError: i18n.t('static.program.errortext'),
+          loading: false
+        })
+        this.hideSecondComponent()
+      }.bind(this);
+      programRequest.onsuccess = function (e) {
+        var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+        var programJson = JSON.parse(programData);
+        var oldProgramData = programJson;
+        var latestProgramDataProblemList = this.state.latestProgramData.problemReportList;
+        var oldProgramDataProblemList = oldProgramData.problemReportList;
+        var downloadedProgramDataProblemList = this.state.downloadedProgramData.problemReportList;
+        var mergedProblemListData = [];
+        var existingProblemReportId = [];
+        for (var c = 0; c < oldProgramDataProblemList.length; c++) {
+          if (oldProgramDataProblemList[c].problemReportId != 0) {
+            mergedProblemListData.push(oldProgramDataProblemList[c]);
+            existingProblemReportId.push(oldProgramDataProblemList[c].problemReportId);
+          } else {
+            // If 0 check whether that exists in latest version or not
+            var index = 0;
+            if (oldProgramDataProblemList[c].realmProblem.problem.problemId == 1 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 2 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 8 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 10 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 14 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 15 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 21) {
+              index = latestProgramDataProblemList.findIndex(
+                f => moment(f.dt).format("YYYY-MM") == moment(oldProgramDataProblemList[c].dt).format("YYYY-MM")
+                  && f.region.id == oldProgramDataProblemList[c].region.id
+                  && f.planningUnit.id == oldProgramDataProblemList[c].planningUnit.id
+                  && f.realmProblem.problem.problemId == oldProgramDataProblemList[c].realmProblem.problem.problemId);
+            } else if (oldProgramDataProblemList[c].realmProblem.problem.problemId == 13) {
+              index = -1;
+            } else if (oldProgramDataProblemList[c].realmProblem.problem.problemId == 3 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 4 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 5 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 6 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 7) {
+              index = latestProgramDataProblemList.findIndex(
+                f => f.planningUnit.id == oldProgramDataProblemList[c].planningUnit.id
+                  && f.realmProblem.problem.problemId == oldProgramDataProblemList[c].realmProblem.problem.problemId
+                  && oldProgramDataProblemList[c].newAdded != true
+                  && f.shipmentId == oldProgramDataProblemList[c].shipmentId);
+            } else if (oldProgramDataProblemList[c].realmProblem.problem.problemId == 11 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 16 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 17 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 18 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 19 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 20) {
+              index = latestProgramDataProblemList.findIndex(
+                f => moment(f.dt).format("YYYY-MM") == moment(oldProgramDataProblemList[c].dt).format("YYYY-MM")
+                  && f.planningUnit.id == oldProgramDataProblemList[c].planningUnit.id
+                  && f.realmProblem.problem.problemId == oldProgramDataProblemList[c].realmProblem.problem.problemId);
+            }
+            // var index = -1;
+            if (index == -1) {
+              mergedProblemListData.push(oldProgramDataProblemList[c]);
+            } else {
+              oldProgramDataProblemList[c].problemReportId = latestProgramDataProblemList[index].problemReportId;
+              existingProblemReportId.push(latestProgramDataProblemList[index].problemReportId);
+              mergedProblemListData.push(oldProgramDataProblemList[c]);
+            }
+          }
+        }
+        // Getting other entries of latest problemList data
+        var latestOtherProblemListEntries = latestProgramDataProblemList.filter(c => !(existingProblemReportId.includes(c.problemReportId)));
+        mergedProblemListData = mergedProblemListData.concat(latestOtherProblemListEntries);
+
+        var data = [];
+        var mergedProblemListJexcel = [];
+        for (var cd = 0; cd < mergedProblemListData.length; cd++) {
+          data = []
+          data[0] = mergedProblemListData[cd].problemReportId
+          data[1] = 1;
+          data[2] = mergedProblemListData[cd].program.code
+          data[3] = 1;
+          data[4] = (mergedProblemListData[cd].region.label != null) ? (getLabelText(mergedProblemListData[cd].region.label, this.state.lang)) : ''
+          data[5] = getLabelText(mergedProblemListData[cd].planningUnit.label, this.state.lang)
+          data[6] = (mergedProblemListData[cd].dt != null) ? (moment(mergedProblemListData[cd].dt).format('MMM-YY')) : ''
+          data[7] = moment(mergedProblemListData[cd].createdDate).format('MMM-YY')
+          data[8] = getProblemDesc(mergedProblemListData[cd], this.state.lang)
+          data[9] = getSuggestion(mergedProblemListData[cd], this.state.lang)
+          data[10] = getLabelText(mergedProblemListData[cd].problemStatus.label, this.state.lang)
+          data[11] = this.getNote(mergedProblemListData[cd], this.state.lang)
+          data[12] = mergedProblemListData[cd].problemStatus.id
+          data[13] = mergedProblemListData[cd].planningUnit.id
+          data[14] = mergedProblemListData[cd].realmProblem.problem.problemId
+          data[15] = mergedProblemListData[cd].realmProblem.problem.actionUrl
+          data[16] = mergedProblemListData[cd].realmProblem.criticality.id
+          var oldDataList = oldProgramDataProblemList.filter(c => c.problemReportId == mergedProblemListData[cd].problemReportId);
+          var oldData = ""
+          if (oldDataList.length > 0) {
+            oldData = [oldDataList[0].problemReportId, 1, oldDataList[0].program.code, 1, (oldDataList[0].region.label != null) ? (getLabelText(oldDataList[0].region.label, this.state.lang)) : '', getLabelText(oldDataList[0].planningUnit.label, this.state.lang), (oldDataList[0].dt != null) ? (moment(oldDataList[0].dt).format('MMM-YY')) : '', moment(oldDataList[0].createdDate).format('MMM-YY'), getProblemDesc(oldDataList[0], this.state.lang), getSuggestion(oldDataList[0], this.state.lang), getLabelText(oldDataList[0].problemStatus.label, this.state.lang), this.getNote(oldDataList[0], this.state.lang), oldDataList[0].problemStatus.id, oldDataList[0].planningUnit.id, oldDataList[0].realmProblem.problem.problemId, oldDataList[0].realmProblem.problem.actionUrl, oldDataList[0].realmProblem.criticality.id, "", "", "", 4];
+          }
+          data[17] = oldData;//Old data
+          var latestDataList = latestProgramDataProblemList.filter(c => mergedProblemListData[cd].problemReportId != 0 && c.problemReportId == mergedProblemListData[cd].problemReportId);
+          console.log("Latest data list", latestDataList);
+          var latestData = ""
+          if (latestDataList.length > 0) {
+            latestData = [latestDataList[0].problemReportId, 1, latestDataList[0].program.code, 1, (latestDataList[0].region.label != null) ? (getLabelText(latestDataList[0].region.label, this.state.lang)) : '', getLabelText(latestDataList[0].planningUnit.label, this.state.lang), (latestDataList[0].dt != null) ? (moment(latestDataList[0].dt).format('MMM-YY')) : '', moment(latestDataList[0].createdDate).format('MMM-YY'), getProblemDesc(latestDataList[0], this.state.lang), getSuggestion(latestDataList[0], this.state.lang), getLabelText(latestDataList[0].problemStatus.label, this.state.lang), this.getNote(latestDataList[0], this.state.lang), latestDataList[0].problemStatus.id, latestDataList[0].planningUnit.id, latestDataList[0].realmProblem.problem.problemId, latestDataList[0].realmProblem.problem.actionUrl, latestDataList[0].realmProblem.criticality.id, "", "", "", 4];
+          }
+          data[18] = latestData;//Latest data
+          var downloadedDataList = downloadedProgramDataProblemList.filter(c => mergedProblemListData[cd].problemListId != 0 && c.problemListId == mergedProblemListData[cd].problemListId);
+          var downloadedData = "";
+          if (downloadedDataList.length > 0) {
+            downloadedData = [downloadedDataList[0].problemReportId, 1, downloadedDataList[0].program.code, 1, (downloadedDataList[0].region.label != null) ? (getLabelText(downloadedDataList[0].region.label, this.state.lang)) : '', getLabelText(downloadedDataList[0].planningUnit.label, this.state.lang), (downloadedDataList[0].dt != null) ? (moment(downloadedDataList[0].dt).format('MMM-YY')) : '', moment(downloadedDataList[0].createdDate).format('MMM-YY'), getProblemDesc(downloadedDataList[0], this.state.lang), getSuggestion(downloadedDataList[0], this.state.lang), getLabelText(downloadedDataList[0].problemStatus.label, this.state.lang), this.getNote(downloadedDataList[0], this.state.lang), downloadedDataList[0].problemStatus.id, downloadedDataList[0].planningUnit.id, downloadedDataList[0].realmProblem.problem.problemId, downloadedDataList[0].realmProblem.problem.actionUrl, downloadedDataList[0].realmProblem.criticality.id, "", "", "", 4];
+          }
+          data[19] = downloadedData;//Downloaded data
+          data[20] = 4;
+          mergedProblemListJexcel.push(data);
+        }
+        console.log("MergedProblem list jexcel", mergedProblemListJexcel);
+        var options = {
+          data: mergedProblemListJexcel,
+          columnDrag: true,
+          colWidths: [100, 10, 50, 50, 10, 10, 10, 50, 200, 200, 70, 70],
+          colHeaderClasses: ["Reqasterisk"],
+          columns: [
+            {
+              title: 'problemReportId',
+              type: 'hidden',
+            },
+            {
+              title: 'problemActionIndex',
+              type: 'hidden',
+            },
+            {
+              title: i18n.t('static.program.programCode'),
+              type: 'text',
+            },
+            {
+              title: i18n.t('static.program.versionId'),
+              type: 'hidden',
+            },
+            {
+              title: i18n.t('static.region.region'),
+              type: 'hidden',
+            },
+            {
+              title: i18n.t('static.planningunit.planningunit'),
+              type: 'hidden',
+            },
+            {
+              title: i18n.t('static.report.month'),
+              type: 'hidden',
+            },
+            {
+              title: i18n.t('static.report.createdDate'),
+              type: 'text',
+            },
+            {
+              title: i18n.t('static.report.problemDescription'),
+              type: 'text',
+            },
+            {
+              title: i18n.t('static.report.suggession'),
+              type: 'text',
+            },
+            {
+              title: i18n.t('static.report.problemStatus'),
+              type: 'text',
+            },
+            {
+              title: i18n.t('static.program.notes'),
+              type: 'text',
+            },
+            {
+              title: i18n.t('static.common.action'),
+              type: 'hidden',
+            },
+            {
+              title: 'planningUnitId',
+              type: 'hidden',
+            },
+            {
+              title: 'problemId',
+              type: 'hidden',
+            },
+            {
+              title: 'actionUrl',
+              type: 'hidden',
+            },
+            {
+              title: 'criticalitiId',
+              type: 'hidden',
+            },
+            { type: 'hidden', title: 'Old data' },
+            { type: 'hidden', title: 'latest data' },
+            { type: 'hidden', title: 'downloaded data' },
+            { type: 'hidden', title: 'result of compare' },
+          ],
+          pagination: localStorage.getItem("sesRecordCount"),
+          paginationOptions: JEXCEL_PAGINATION_OPTION,
+          search: true,
+          columnSorting: true,
+          tableOverflow: true,
+          wordWrap: true,
+          allowInsertColumn: false,
+          allowManualInsertColumn: false,
+          allowDeleteRow: false,
+          editable: false,
+          onload: this.loadedFunctionForMergeProblemList,
+          text: {
+            showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            show: '',
+            entries: '',
+          },
+          contextMenu: function (obj, x, y, e) {
+            var items = [];
+            return items;
+          }.bind(this)
+        };
+
+        var mergedProblemListJexcel = jexcel(document.getElementById("mergedVersionProblemList"), options);
+        this.el = mergedProblemListJexcel;
+        this.setState({
+          mergedProblemListJexcel: mergedProblemListJexcel,
+          oldProgramDataProblemList: oldProgramDataProblemList,
+          latestProgramDataProblemList: latestProgramDataProblemList,
+          mergedProblemListData: mergedProblemListData,
+        })
+      }.bind(this)
+    }.bind(this)
   }
 }

@@ -25,5 +25,9 @@ class DashboardService {
         });
     }
 
+    openIssues() {
+        return axios.get(`${API_URL}/api/ticket/openIssues/`, {
+        });
+    }
 }
 export default new DashboardService();

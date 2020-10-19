@@ -297,10 +297,11 @@ const routes = [
   { path: '/program/listProgram', exact: true, name: 'static.breadcrum.list', entityname: 'static.programHead.program', component: Programs },
   // { path: '/program/listProgram/:message', component: Programs },
   { path: '/program/listProgram/:color/:message', name: 'static.breadcrum.list', entityname: 'static.programHead.program', component: Programs },
-  { path: '/program/editProgram/:programId', name: 'static.breadcrum.edit', entityname: 'static.programHead.program', component: EditProgram },
+  { path: '/program/editProgram/:programId', name: 'static.programHead.program', entityname: 'static.programHead.program', component: EditProgram },
 
   { path: '/productCategory/addProductCategory', name: 'Add Product Category', component: AddProductCategory },
-  { path: '/programProduct/addProgramProduct/:programId', name: 'static.breadcrum.add', entityname: 'static.dashboard.programPlanningUnit', component: AddProgramProduct },
+  // { path: '/programProduct/addProgramProduct', name: 'static.breadcrum.add', entityname: 'static.dashboard.programPlanningUnit', component: AddProgramProduct },
+  { path: '/programProduct/addProgramProduct', name: 'static.Update.PlanningUnits', component: AddProgramProduct },
 
 
   { path: '/procurementAgent/addProcurementAgentPlanningUnit/:procurementAgentId', name: 'static.breadcrum.add', entityname: 'static.dashboard.procurementAgentPlanningUnit', component: AddProcurementAgentPlanningUnit },
@@ -1014,10 +1015,10 @@ class DefaultLayout extends Component {
                           // },
                           {
                             name: i18n.t('static.Update.PlanningUnits'),
-                            url: '/program/listProgram',
+                            // url: '/program/listProgram',
+                            url: '/programProduct/addProgramProduct',
                             icon: 'fa fa-list-alt',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_EDIT_PROGRAM') ? false : true) }
-
                           },
 
                           {

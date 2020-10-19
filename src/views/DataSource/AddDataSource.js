@@ -14,7 +14,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { ALPHABET_NUMBER_REGEX, SPACE_REGEX } from '../../Constants.js';
 
-const initialValues = {
+let initialValues = {
     realmId: [],
     label: '',
     dataSourceTypeId: '',
@@ -99,6 +99,7 @@ export default class AddDataSource extends Component {
         this.getDataSourceTypeByRealmId = this.getDataSourceTypeByRealmId.bind(this);
         this.getProgramByRealmId = this.getProgramByRealmId.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.setFirstDropdown = this.setFirstDropdown.bind(this);
     }
 
     dataChange(event) {
@@ -146,14 +147,46 @@ export default class AddDataSource extends Component {
         }
     }
 
+    setFirstDropdown() {
+        let realms = this.state.realms;
+        let dataSourceTypeList = this.state.dataSourceTypeList;
+        let programs = this.state.programs;
+
+        let realmId = (realms.length == 1 ? realms[0].realmId : "")
+        let dataSourceTypeId = (dataSourceTypeList.length == 1 ? dataSourceTypeList[0].dataSourceTypeId : "")
+        let programId = (programs.length == 1 ? programs[0].programId : "")
+        console.log("realmId-------------", this.state.realms)
+        console.log("dataSourceTypeId-----------", dataSourceTypeId)
+        initialValues = {
+            realmId: realmId,
+            dataSourceTypeId: dataSourceTypeId,
+            programId: programId
+        }
+    }
+
     componentDidMount() {
         // AuthenticationService.setupAxiosInterceptors();
 
         RealmService.getRealmListAll()
             .then(response => {
+                console.log("RealmService--->", response.data);
+                let { realm } = this.state
+                realm.id = (response.data.length == 1 ? response.data[0].realmId : "")
+                console.log("FIRST-------------------")
                 this.setState({
-                    realms: response.data, loading: false
-                })
+                    realms: response.data, loading: false, realm
+                },
+                    () => {
+                        // initialValues = {
+                        //     realmId: (response.data.length == 1 ? response.data[0].realmId : "")
+                        // }
+                        if (response.data.length == 1) {
+                            this.getDataSourceTypeByRealmId();
+                            this.getProgramByRealmId();
+                        }
+
+                    })
+
             })
             .catch(
                 error => {
@@ -203,13 +236,15 @@ export default class AddDataSource extends Component {
     }
 
 
-    getDataSourceTypeByRealmId(e) {
-
+    getDataSourceTypeByRealmId() {
         // AuthenticationService.setupAxiosInterceptors();
-        if (e.target.value != 0) {
-            DataSourceTypeService.getDataSourceTypeByRealmId(e.target.value)
+        let realmId = this.state.realm.id;
+        if (realmId != "") {
+            DataSourceTypeService.getDataSourceTypeByRealmId(realmId)
                 .then(response => {
                     console.log("getDataSourceTypeByRealmId---", response.data);
+                    let { dataSourceType } = this.state;
+                    dataSourceType.id = (response.data.length == 1 ? response.data[0].dataSourceTypeId : "")
                     this.setState({
                         dataSourceTypeList: response.data, loading: false
                     })
@@ -262,16 +297,22 @@ export default class AddDataSource extends Component {
         }
     }
 
-    getProgramByRealmId(e) {
+    getProgramByRealmId() {
         // AuthenticationService.setupAxiosInterceptors();
-        console.log("e.target.value---", e.target.value);
-        if (e.target.value != 0) {
-            ProgramService.getProgramList(e.target.value)
+        // console.log("e.target.value---", e.target.value);
+        let realmId = this.state.realm.id;
+        if (realmId != "") {
+            ProgramService.getProgramList(realmId)
                 .then(response => {
                     console.log("getProgramByRealmId---", response.data);
+                    let { program } = this.state;
+                    program.id = (response.data.length == 1 ? response.data[0].programId : "")
                     this.setState({
                         programs: (response.data).filter(c => c.active.toString() == "true"), loading: false
-                    })
+                    },
+                        () => {
+                            this.setFirstDropdown();
+                        })
                 })
                 .catch(
                     error => {
@@ -371,6 +412,7 @@ export default class AddDataSource extends Component {
                                 <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
                             </CardHeader> */}
                             <Formik
+                                enableReinitialize={true}
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -459,7 +501,10 @@ export default class AddDataSource extends Component {
                                                             bsSize="sm"
                                                             valid={!errors.realmId && this.state.realm.id != ''}
                                                             invalid={touched.realmId && !!errors.realmId}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.getDataSourceTypeByRealmId(e); this.getProgramByRealmId(e) }}
+                                                            onChange={(e) => {
+                                                                handleChange(e); this.dataChange(e);
+                                                                this.getDataSourceTypeByRealmId(e); this.getProgramByRealmId(e)
+                                                            }}
                                                             onBlur={handleBlur}
                                                             required
                                                             value={this.state.realm.id}

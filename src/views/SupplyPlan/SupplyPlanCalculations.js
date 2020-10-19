@@ -437,7 +437,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                             console.log("In if for length 0");
                             consumptionQty = "";
                             consumptionType = "";
-                        } else if (((totalNoOfRegions == noOfRegionsReportingActualConsumption) || (actualConsumptionQty >= forecastedConsumptionQty)) && (noOfRegionsReportingActualConsumption>0)) {
+                        } else if (((totalNoOfRegions == noOfRegionsReportingActualConsumption) || (actualConsumptionQty >= forecastedConsumptionQty)) && (noOfRegionsReportingActualConsumption > 0)) {
                             console.log("In if for considering actual consumption", actualConsumptionQty);
                             // Considering actual consumption if consumption for all regions is given or if actual consumption qty is greater than forecasted consumption qty
                             consumptionQty = actualConsumptionQty;
@@ -756,7 +756,8 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                             nationalAdjustment: nationalAdjustment,
                             nationalAdjustmentWps: nationalAdjustmentWps,
                             expectedStock: expectedStock,
-                            expectedStockWps: expectedStockWps
+                            expectedStockWps: expectedStockWps,
+                            regionCountForStock:regionsReportingActualInventory
                         }
                         console.log("Json", json);
                         supplyPlanData.push(json);

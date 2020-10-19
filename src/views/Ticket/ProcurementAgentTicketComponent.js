@@ -9,10 +9,15 @@ import * as Yup from 'yup';
 import JiraTikcetService from '../../api/JiraTikcetService';
 import RealmService from '../../api/RealmService';
 import { SPACE_REGEX } from '../../Constants';
+import ProcurementAgentService from '../../api/ProcurementAgentService';
+import getLabelText from '../../CommonComponent/getLabelText';
 
+let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.procurementagent.procurementagent"))
+let summaryText_2 = "Add Procurement Agent"
+const selectedRealm = (AuthenticationService.getRealmId() !== "" && AuthenticationService.getRealmId() !== -1) ? AuthenticationService.getRealmId() : ""
 const initialValues = {
-    summary: "Add / Update Procurement Agent",
-    realmName: "",
+    summary: summaryText_1,
+    realmName: selectedRealm,
     procurementAgentName: '',
     procurementAgentCode: '',
     submittedToApprovedLeadTime: '',
@@ -34,11 +39,11 @@ const validationSchema = function (values) {
             .required(i18n.t('static.procurementAgent.procurementagentnametext')),
         submittedToApprovedLeadTime: Yup.string()
             .min(0, i18n.t('static.program.validvaluetext'))
-            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount'))
+            .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
             .required(i18n.t('static.procurementagent.submitToApproveLeadTime')),
         approvedToShippedLeadTime: Yup.string()
             .min(0, i18n.t('static.program.validvaluetext'))
-            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount'))
+            .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
             .required(i18n.t('static.procurementagent.approvedToShippedLeadTime')),
         // notes: Yup.string()
         //     .required(i18n.t('static.common.notestext'))
@@ -73,7 +78,7 @@ export default class ProcurementAgentTicketComponent extends Component {
         super(props);
         this.state = {
             procurementAgent: {
-                summary: "Add / Update Procurement Agent",
+                summary: summaryText_1,
                 realmName: "",
                 procurementAgentName: "",
                 procurementAgentCode: "",
@@ -82,6 +87,7 @@ export default class ProcurementAgentTicketComponent extends Component {
                 localProcurementAgent: false,
                 notes: ""
             },
+            lang: localStorage.getItem('lang'),
             message: '',
             realms: [],
             realmId: '',
@@ -90,6 +96,8 @@ export default class ProcurementAgentTicketComponent extends Component {
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.getDisplayName = this.getDisplayName.bind(this);
+        this.Capitalize = this.Capitalize.bind(this);
     }
 
     dataChange(event) {
@@ -98,7 +106,7 @@ export default class ProcurementAgentTicketComponent extends Component {
             procurementAgent.summary = event.target.value;
         }
         if (event.target.name == "realmName") {
-            procurementAgent.realmName = event.target.options[event.target.selectedIndex].innerHTML;
+            procurementAgent.realmName = event.target.value !== "" ? this.state.realms.filter(c => c.realmId == event.target.value)[0].label.label_en : "";
             this.setState({
                 realmId: event.target.value
             })
@@ -154,13 +162,66 @@ export default class ProcurementAgentTicketComponent extends Component {
     }
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         RealmService.getRealmListAll()
             .then(response => {
                 this.setState({
-                    realms: response.data
-                })
-            })
+                    realms: response.data,
+                    realmId: selectedRealm
+                });
+                if (selectedRealm !== "") {
+                    this.setState({
+                        realms: (response.data).filter(c => c.realmId == selectedRealm)
+                    })
+
+                    let { procurementAgent } = this.state;
+                    procurementAgent.realmName = (response.data).filter(c => c.realmId == selectedRealm)[0].label.label_en;
+                    this.setState({
+                        procurementAgent
+                    }, () => {
+
+                    })
+                }
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
     }
 
     hideSecondComponent() {
@@ -188,6 +249,133 @@ export default class ProcurementAgentTicketComponent extends Component {
             () => { });
     }
 
+    Capitalize(str) {
+        if (str != null && str != "") {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        } else {
+            return "";
+        }
+    }
+
+    getDisplayName() {
+        let realmId = this.state.realmId;
+        // let realmId = 1;
+        let procurementAgentValue = this.state.procurementAgent.procurementAgentName;
+        // let procurementAgentValue = "USAID"
+        procurementAgentValue = procurementAgentValue.replace(/[^A-Za-z0-9]/g, "");
+        procurementAgentValue = procurementAgentValue.trim().toUpperCase();
+        if (realmId != '' && procurementAgentValue.length != 0) {
+
+            if (procurementAgentValue.length >= 10) {//minus 2
+                procurementAgentValue = procurementAgentValue.slice(0, 8);
+                console.log("DISPLAYNAME-BEF----->", procurementAgentValue);
+                ProcurementAgentService.getProcurementAgentDisplayName(realmId, procurementAgentValue)
+                    .then(response => {
+                        console.log("DISPLAYNAME-RESP----->", response);
+                        let { procurementAgent } = this.state;
+                        procurementAgent.procurementAgentCode = response.data;
+                        this.setState({
+                            procurementAgent
+                        });
+
+                    }).catch(
+                        error => {
+                            if (error.message === "Network Error") {
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
+
+                                    case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
+                                    case 404:
+                                    case 406:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    case 412:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    default:
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                        break;
+                                }
+                            }
+                        }
+                    );
+
+            } else {// not need to minus
+                console.log("DISPLAYNAME-BEF-else----->", procurementAgentValue);
+                ProcurementAgentService.getProcurementAgentDisplayName(realmId, procurementAgentValue)
+                    .then(response => {
+                        console.log("DISPLAYNAME-RESP-else----->", response);
+                        let { procurementAgent } = this.state;
+                        procurementAgent.procurementAgentCode = response.data;
+                        this.setState({
+                            procurementAgent
+                        });
+
+                    }).catch(
+                        error => {
+                            if (error.message === "Network Error") {
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
+
+                                    case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
+                                    case 404:
+                                    case 406:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    case 412:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    default:
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                        break;
+                                }
+                            }
+                        }
+                    );
+            }
+
+        }
+
+    }
+
     render() {
 
         const { realms } = this.state;
@@ -195,7 +383,7 @@ export default class ProcurementAgentTicketComponent extends Component {
             && realms.map((item, i) => {
                 return (
                     <option key={i} value={item.realmId}>
-                        {item.label.label_en}
+                        {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);
@@ -213,6 +401,8 @@ export default class ProcurementAgentTicketComponent extends Component {
                             this.setState({
                                 loading: true
                             })
+                            this.state.procurementAgent.summary = summaryText_2;
+                            this.state.procurementAgent.userLanguageCode = this.state.lang;
                             JiraTikcetService.addEmailRequestIssue(this.state.procurementAgent).then(response => {
                                 console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
@@ -234,17 +424,46 @@ export default class ProcurementAgentTicketComponent extends Component {
                                 }
                                 this.props.togglehelp();
                                 this.props.toggleSmall(this.state.message);
-                            })
-                                .catch(
-                                    error => {
+                            }).catch(
+                                error => {
+                                    if (error.message === "Network Error") {
                                         this.setState({
-                                            message: i18n.t('static.unkownError'), loading: false
-                                        },
-                                            () => {
-                                                this.hideSecondComponent();
-                                            });
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                    } else {
+                                        switch (error.response ? error.response.status : "") {
+                
+                                            case 401:
+                                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                                break;
+                                            case 403:
+                                                this.props.history.push(`/accessDenied`)
+                                                break;
+                                            case 500:
+                                            case 404:
+                                            case 406:
+                                                this.setState({
+                                                    message: error.response.data.messageCode,
+                                                    loading: false
+                                                });
+                                                break;
+                                            case 412:
+                                                this.setState({
+                                                    message: error.response.data.messageCode,
+                                                    loading: false
+                                                });
+                                                break;
+                                            default:
+                                                this.setState({
+                                                    message: 'static.unkownError',
+                                                    loading: false
+                                                });
+                                                break;
+                                        }
                                     }
-                                );
+                                }
+                            );
                         }}
                         render={
                             ({
@@ -300,7 +519,7 @@ export default class ProcurementAgentTicketComponent extends Component {
                                                 id="procurementAgentName"
                                                 valid={!errors.procurementAgentName && this.state.procurementAgent.procurementAgentName != ''}
                                                 invalid={touched.procurementAgentName && !!errors.procurementAgentName}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value); this.getDisplayName() }}
                                                 onBlur={handleBlur}
                                                 required
                                                 value={this.state.procurementAgent.procurementAgentName}
@@ -309,8 +528,8 @@ export default class ProcurementAgentTicketComponent extends Component {
                                             <FormFeedback className="red">{errors.procurementAgentName}</FormFeedback>
                                         </FormGroup>
                                         <FormGroup>
-                                            <Label for="procurementAgentCode">{i18n.t('static.procurementagent.procurementagentcode')}</Label>
-                                            <Input type="text"
+                                            <Label for="procurementAgentCode">{i18n.t('static.procurementagent.procurementagentcode')}<span className="red Reqasterisk">*</span></Label>
+                                            <Input type="text" readOnly={true}
                                                 bsSize="sm"
                                                 name="procurementAgentCode"
                                                 id="procurementAgentCode"
@@ -326,7 +545,7 @@ export default class ProcurementAgentTicketComponent extends Component {
                                             <FormFeedback className="red">{errors.procurementAgentCode}</FormFeedback>
                                         </FormGroup>
                                         <FormGroup>
-                                            <Label for="submittedToApprovedLeadTime">{i18n.t('static.procurementagent.procurementagentsubmittoapprovetime')}<span className="red Reqasterisk">*</span></Label>
+                                            <Label for="submittedToApprovedLeadTime">{i18n.t('static.procurementagent.procurementagentsubmittoapprovetimeLabel')}<span className="red Reqasterisk">*</span></Label>
                                             <Input type="number"
                                                 bsSize="sm"
                                                 name="submittedToApprovedLeadTime"
@@ -343,7 +562,7 @@ export default class ProcurementAgentTicketComponent extends Component {
                                             <FormFeedback className="red">{errors.submittedToApprovedLeadTime}</FormFeedback>
                                         </FormGroup>
                                         <FormGroup>
-                                            <Label for="approvedToShippedLeadTime">{i18n.t('static.procurementagent.procurementagentapprovetoshippedtime')}<span className="red Reqasterisk">*</span></Label>
+                                            <Label for="approvedToShippedLeadTime">{i18n.t('static.procurementagent.procurementagentapprovetoshippedtimeLabel')}<span className="red Reqasterisk">*</span></Label>
                                             <Input type="number"
                                                 bsSize="sm"
                                                 name="approvedToShippedLeadTime"
