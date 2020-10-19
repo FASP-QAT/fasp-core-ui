@@ -108,7 +108,7 @@ class ProductCatalog extends Component {
         var A = [this.addDoubleQuoteToRowContent(headers)];
         this.state.outPutList.map(
             ele => A.push(this.addDoubleQuoteToRowContent([
-               getLabelText(ele.program.label, this.state.lang).replaceAll(' ', '%20'),
+                getLabelText(ele.program.label, this.state.lang).replaceAll(' ', '%20'),
                 getLabelText(ele.productCategory.label, this.state.lang).replaceAll(' ', '%20'),
                 getLabelText(ele.tracerCategory.label, this.state.lang).replaceAll(' ', '%20'),
                 getLabelText(ele.forecastingUnit.label, this.state.lang).replaceAll(' ', '%20'),
@@ -238,7 +238,7 @@ class ProductCatalog extends Component {
         if (programId > 0) {
 
 
-            AuthenticationService.setupAxiosInterceptors();
+            // AuthenticationService.setupAxiosInterceptors();
             let realmId = AuthenticationService.getRealmId();
             TracerCategoryService.getTracerCategoryByProgramId(realmId, programId).then(response => {
 
@@ -248,25 +248,65 @@ class ProductCatalog extends Component {
                     })
                 }
 
-            }).catch(error => {
-                if (error.message === "Network Error") {
-                    this.setState({ message: error.message });
-                } else {
-                    switch (error.response ? error.response.status : "") {
-                        case 500:
-                        case 401:
-                        case 404:
-                        case 406:
-                        case 412:
-                            this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }) });
-                            break;
-                        default:
-                            this.setState({ message: 'static.unkownError' });
-                            break;
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
                     }
                 }
-            }
             );
+            // .catch(error => {
+            //     if (error.message === "Network Error") {
+            //         this.setState({ message: error.message });
+            //     } else {
+            //         switch (error.response ? error.response.status : "") {
+            //             case 500:
+            //             case 401:
+            //             case 404:
+            //             case 406:
+            //             case 412:
+            //                 this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }) });
+            //                 break;
+            //             default:
+            //                 this.setState({ message: 'static.unkownError' });
+            //                 break;
+            //         }
+            //     }
+            // }
+            // );
 
         } else {
             this.setState({
@@ -281,7 +321,7 @@ class ProductCatalog extends Component {
 
     getPrograms() {
 
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         let realmId = AuthenticationService.getRealmId();
         // ProgramService.getProgramByRealmId(realmId)
         ProgramService.getProgramList()
@@ -294,37 +334,80 @@ class ProductCatalog extends Component {
                 error => {
                     this.setState({
                         programs: [], loading: false
-                    }, () => {})
+                    }, () => { })
                     if (error.message === "Network Error") {
-                        this.setState({ message: error.message, loading: false });
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
                     } else {
                         switch (error.response ? error.response.status : "") {
-                            case 500:
+
                             case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
                             case 404:
                             case 406:
+                                this.setState({
+                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                    loading: false
+                                });
+                                break;
                             case 412:
-                                this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }), loading: false });
+                                this.setState({
+                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                    loading: false
+                                });
                                 break;
                             default:
-                                this.setState({ message: 'static.unkownError', loading: false });
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
                                 break;
                         }
                     }
                 }
             );
+        // .catch(
+        //     error => {
+        //         this.setState({
+        //             programs: [], loading: false
+        //         }, () => { })
+        //         if (error.message === "Network Error") {
+        //             this.setState({ message: error.message, loading: false });
+        //         } else {
+        //             switch (error.response ? error.response.status : "") {
+        //                 case 500:
+        //                 case 401:
+        //                 case 404:
+        //                 case 406:
+        //                 case 412:
+        //                     this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }), loading: false });
+        //                     break;
+        //                 default:
+        //                     this.setState({ message: 'static.unkownError', loading: false });
+        //                     break;
+        //             }
+        //         }
+        //     }
+        // );
     }
 
 
 
     getProductCategories() {
 
-     
+
         let programId = document.getElementById("programId").value
         console.log(programId)
         if (programId > 0) {
 
-            AuthenticationService.setupAxiosInterceptors();
+            // AuthenticationService.setupAxiosInterceptors();
             let realmId = AuthenticationService.getRealmId();
 
             ProductService.getProductCategoryListByProgram(realmId, programId)
@@ -553,25 +636,73 @@ class ProductCatalog extends Component {
                                     this.el = jexcel(document.getElementById("tableDiv"), '');
                                     this.el.destroy();
                                 })
-
                             if (error.message === "Network Error") {
-                                this.setState({ message: error.message, loading: false });
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
                             } else {
                                 switch (error.response ? error.response.status : "") {
-                                    case 500:
+
                                     case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
                                     case 404:
                                     case 406:
+                                        this.setState({
+                                            message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                            loading: false
+                                        });
+                                        break;
                                     case 412:
-                                        this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                        this.setState({
+                                            message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                            loading: false
+                                        });
                                         break;
                                     default:
-                                        this.setState({ loading: false, message: 'static.unkownError' });
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
                                         break;
                                 }
                             }
                         }
                     );
+                // .catch(
+                //     error => {
+                //         this.setState({
+                //             outPutList: [],
+                //             loading: false
+                //         },
+                //             () => {
+                //                 this.el = jexcel(document.getElementById("tableDiv"), '');
+                //                 this.el.destroy();
+                //             })
+
+                //         if (error.message === "Network Error") {
+                //             this.setState({ message: error.message, loading: false });
+                //         } else {
+                //             switch (error.response ? error.response.status : "") {
+                //                 case 500:
+                //                 case 401:
+                //                 case 404:
+                //                 case 406:
+                //                 case 412:
+                //                     this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                //                     break;
+                //                 default:
+                //                     this.setState({ loading: false, message: 'static.unkownError' });
+                //                     break;
+                //             }
+                //         }
+                //     }
+                // );
             } else {
                 this.setState({ loading: true })
                 var db1;
@@ -939,11 +1070,7 @@ class ProductCatalog extends Component {
 
         return (
             <div className="animated fadeIn" >
-                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
-                    this.setState({ message: message })
-                }} loading={(loading) => {
-                    this.setState({ loading: loading })
-                }} />
+                <AuthenticationServiceComponent history={this.props.history} />
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
 

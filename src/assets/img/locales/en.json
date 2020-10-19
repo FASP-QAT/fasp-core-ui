@@ -1406,6 +1406,8 @@
     "static.message.planningUnitUpdate": "Planning unit added/updated successfully",
     "static.program.arrivedToReceivedLeadTime": "Enter 'Arrived to Received' lead time (in months)",
     "static.user.usermanual" :"User Manual",
+    "static.header.notLatestVersion" :"Not latest version",
+    "static.user.changesInLocalVersion" :"Changes in local version",
     "static.ticket.requestNewTo": "Request a new...",
     "static.ticket.requestUpdateTo": "Request an update to...",
     "static.ticket.addMasters": "Add Masters",
