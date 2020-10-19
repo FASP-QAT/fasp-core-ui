@@ -17,9 +17,12 @@ import { SPACE_REGEX, ALPHABET_NUMBER_REGEX } from '../../Constants';
 import OrganisationService from '../../api/OrganisationService';
 import getLabelText from '../../CommonComponent/getLabelText';
 
+let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.organisation.organisation"))
+let summaryText_2 = "Add Organisation"
+const selectedRealm = (AuthenticationService.getRealmId() !== "" && AuthenticationService.getRealmId() !== -1) ? AuthenticationService.getRealmId() : ""
 const initialValues = {
-    summary: 'Add Organization',
-    realmId: '',
+    summary: summaryText_1,
+    realmId: selectedRealm,
     realmCountryId: '',
     organisationCode: '',
     organisationName: '',
@@ -76,7 +79,7 @@ export default class OrganisationTicketComponent extends Component {
         super(props);
         this.state = {
             organisation: {
-                summary: "Add Organization",
+                summary: summaryText_1,
                 realmId: "",
                 realmCountryId: [],
                 organisationCode: "",
@@ -114,7 +117,7 @@ export default class OrganisationTicketComponent extends Component {
             organisation.organisationCode = event.target.value.toUpperCase();
         }
         if (event.target.name === "realmId") {
-            organisation.realmId = this.state.realms.filter(c => c.realmId == event.target.value)[0].label.label_en;
+            organisation.realmId = event.target.value !== "" ? this.state.realms.filter(c => c.realmId == event.target.value)[0].label.label_en : "";
             this.setState({
                 realm: event.target.value
             })
@@ -342,8 +345,24 @@ export default class OrganisationTicketComponent extends Component {
         UserService.getRealmList()
             .then(response => {
                 this.setState({
-                    realms: response.data
-                })
+                    realms: response.data,
+                    realm: selectedRealm
+                });
+                if (selectedRealm !== "") {
+                    this.setState({
+                        realms: (response.data).filter(c => c.realmId == selectedRealm)
+                    })
+
+                    let { organisation } = this.state;
+                    organisation.realmId = (response.data).filter(c => c.realmId == selectedRealm)[0].label.label_en;
+                    this.setState({
+                        organisation
+                    }, () => {
+
+                        this.getRealmCountryList(selectedRealm);
+
+                    })
+                }
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
@@ -398,65 +417,67 @@ export default class OrganisationTicketComponent extends Component {
         this.setState({ organisation: organisation });
     }
 
-    getRealmCountryList(e) {
+    getRealmCountryList(realmId) {
         // AuthenticationService.setupAxiosInterceptors();
-        HealthAreaService.getRealmCountryList(e.target.value)
-            .then(response => {
-                if (response.status == 200) {
-                    var json = response.data;
-                    var regList = [];
-                    for (var i = 0; i < json.length; i++) {
-                        regList[i] = { value: json[i].realmCountryId, label: json[i].country.label.label_en }
-                    }
-                    this.setState({
-                        countryId: '',
-                        realmCountryList: regList
-                    })
-                } else {
-                    this.setState({
-                        message: response.data.messageCode
-                    })
-                }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
+        if (realmId != "") {
+            HealthAreaService.getRealmCountryList(realmId)
+                .then(response => {
+                    if (response.status == 200) {
+                        var json = response.data;
+                        var regList = [];
+                        for (var i = 0; i < json.length; i++) {
+                            regList[i] = { value: json[i].realmCountryId, label: json[i].country.label.label_en }
+                        }
                         this.setState({
-                            message: 'static.unkownError',
-                            loading: false
-                        });
+                            countryId: '',
+                            realmCountryList: regList
+                        })
                     } else {
-                        switch (error.response ? error.response.status : "") {
+                        this.setState({
+                            message: response.data.messageCode
+                        })
+                    }
+                }).catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
 
-                            case 401:
-                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                break;
-                            case 403:
-                                this.props.history.push(`/accessDenied`)
-                                break;
-                            case 500:
-                            case 404:
-                            case 406:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            case 412:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            default:
-                                this.setState({
-                                    message: 'static.unkownError',
-                                    loading: false
-                                });
-                                break;
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
+                                    break;
+                            }
                         }
                     }
-                }
-            );
+                );
+        }
     }
 
     hideSecondComponent() {
@@ -509,6 +530,8 @@ export default class OrganisationTicketComponent extends Component {
                             this.setState({
                                 loading: true
                             })
+                            this.state.organisation.summary = summaryText_2;
+                            this.state.organisation.userLanguageCode = this.state.lang;
                             JiraTikcetService.addEmailRequestIssue(this.state.organisation).then(response => {
                                 console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
@@ -605,7 +628,7 @@ export default class OrganisationTicketComponent extends Component {
                                                 bsSize="sm"
                                                 valid={!errors.realmId && this.state.organisation.realmId != ''}
                                                 invalid={touched.realmId && !!errors.realmId}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); this.getRealmCountryList(e) }}
+                                                onChange={(e) => { handleChange(e); this.dataChange(e); this.getRealmCountryList(e.target.value) }}
                                                 onBlur={handleBlur}
                                                 value={this.state.realm}
                                                 required >

@@ -12,8 +12,10 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import { SPACE_REGEX } from '../../Constants';
 import PoroductCategoryService from '../../api/PoroductCategoryService';
 
+let summaryText_1 = (i18n.t("static.common.edit") + " " + i18n.t("static.product.productcategory"))
+let summaryText_2 = "Edit Planning Unit Category"
 const initialValues = {
-    summary: "Edit Planning Unit Category",
+    summary: summaryText_1,
     planningUnitCategoryName: "",
     notes: ""
 }
@@ -57,8 +59,8 @@ export default class EditProductCategoryTicketComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            productCategory: {
-                summary: "Edit Planning Unit Category",
+            planningUnitCategory: {
+                summary: summaryText_1,
                 planningUnitCategoryName: "",
                 notes: ""
             },
@@ -74,22 +76,27 @@ export default class EditProductCategoryTicketComponent extends Component {
     }
 
     dataChange(event) {
-        let { productCategory } = this.state
+        let { planningUnitCategory } = this.state
         if (event.target.name == "summary") {
-            productCategory.summary = event.target.value;
+            planningUnitCategory.summary = event.target.value;
         }
         if (event.target.name == "planningUnitCategoryName") {
-            productCategory.planningUnitCategoryName = event.target.options[event.target.selectedIndex].innerHTML;
+            var outText = "";
+            if(event.target.value !== "") {
+                var planningUnitCategoryT = this.state.planningUnitCategories.filter(c => c.payloadId == event.target.value)[0];
+                outText = planningUnitCategoryT.payload.realm.label.label_en + " | " + planningUnitCategoryT.payload.label.label_en;
+            }
+            planningUnitCategory.planningUnitCategoryName = outText;
             this.setState({
                 planningUnitCategoryId: event.target.value
             })
         }
 
         if (event.target.name == "notes") {
-            productCategory.notes = event.target.value;
+            planningUnitCategory.notes = event.target.value;
         }
         this.setState({
-            productCategory
+            planningUnitCategory
         }, () => { })
     };
 
@@ -189,12 +196,12 @@ export default class EditProductCategoryTicketComponent extends Component {
     }
 
     resetClicked() {
-        let { productCategory } = this.state;
-        // productCategory.summary = '';
-        productCategory.planningUnitCategoryName = '';
-        productCategory.notes = '';
+        let { planningUnitCategory } = this.state;
+        // planningUnitCategory.summary = '';
+        planningUnitCategory.planningUnitCategoryName = '';
+        planningUnitCategory.notes = '';
         this.setState({
-            productCategory
+            planningUnitCategory
         },
             () => { });
     }
@@ -207,7 +214,7 @@ export default class EditProductCategoryTicketComponent extends Component {
             && planningUnitCategories.map((item, i) => {
                 return (
                     <option key={i} value={item.payloadId}>
-                        {getLabelText(item.payload.realm.label, this.state.lang) + " | " + getLabelText(item.payload.label, this.state.lang)}
+                        {getLabelText(item.payload.label, this.state.lang)}
                     </option>
                 )
             }, this);
@@ -226,7 +233,9 @@ export default class EditProductCategoryTicketComponent extends Component {
                             this.setState({
                                 loading: true
                             })
-                            JiraTikcetService.addEmailRequestIssue(this.state.productCategory).then(response => {
+                            this.state.planningUnitCategory.summary = summaryText_2;
+                            this.state.planningUnitCategory.userLanguageCode = this.state.lang;
+                            JiraTikcetService.addEmailRequestIssue(this.state.planningUnitCategory).then(response => {
                                 console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
                                     var msg = response.data.key;
@@ -306,11 +315,11 @@ export default class EditProductCategoryTicketComponent extends Component {
                                             <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
                                             <Input type="text" name="summary" id="summary" readOnly={true}
                                                 bsSize="sm"
-                                                valid={!errors.summary && this.state.productCategory.summary != ''}
+                                                valid={!errors.summary && this.state.planningUnitCategory.summary != ''}
                                                 invalid={touched.summary && !!errors.summary}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                 onBlur={handleBlur}
-                                                value={this.state.productCategory.summary}
+                                                value={this.state.planningUnitCategory.summary}
                                                 required />
                                             <FormFeedback className="red">{errors.summary}</FormFeedback>
                                         </FormGroup>
@@ -318,7 +327,7 @@ export default class EditProductCategoryTicketComponent extends Component {
                                             <Label for="planningUnitCategoryName">{i18n.t('static.product.productcategory')}<span class="red Reqasterisk">*</span></Label>
                                             <Input type="select" name="planningUnitCategoryName" id="planningUnitCategoryName"
                                                 bsSize="sm"
-                                                valid={!errors.planningUnitCategoryName && this.state.productCategory.planningUnitCategoryName != ''}
+                                                valid={!errors.planningUnitCategoryName && this.state.planningUnitCategory.planningUnitCategoryName != ''}
                                                 invalid={touched.planningUnitCategoryName && !!errors.planningUnitCategoryName}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                 onBlur={handleBlur}
@@ -333,11 +342,11 @@ export default class EditProductCategoryTicketComponent extends Component {
                                             <Label for="notes">{i18n.t('static.common.notes')}<span class="red Reqasterisk">*</span></Label>
                                             <Input type="textarea" name="notes" id="notes"
                                                 bsSize="sm"
-                                                valid={!errors.notes && this.state.productCategory.notes != ''}
+                                                valid={!errors.notes && this.state.planningUnitCategory.notes != ''}
                                                 invalid={touched.notes && !!errors.notes}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                 onBlur={handleBlur}
-                                                value={this.state.productCategory.notes}
+                                                value={this.state.planningUnitCategory.notes}
                                             // required 
                                             />
                                             <FormFeedback className="red">{errors.notes}</FormFeedback>

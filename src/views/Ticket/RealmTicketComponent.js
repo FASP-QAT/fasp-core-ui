@@ -9,8 +9,10 @@ import * as Yup from 'yup';
 import JiraTikcetService from '../../api/JiraTikcetService';
 import { SPACE_REGEX } from '../../Constants';
 
+let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.realm.realm"))
+let summaryText_2 = "Add Realm"
 const initialValues = {
-    summary: "Add Realm",
+    summary: summaryText_1,
     realmName: "",
     realmCode: "",
     minMosMinGaurdrail: "",
@@ -77,7 +79,7 @@ export default class RealmTicketComponent extends Component {
         super(props);
         this.state = {
             realm: {
-                summary: "Add Realm",
+                summary: summaryText_1,
                 realmName: "",
                 realmCode: "",
                 minMosMinGaurdrail: "",
@@ -194,6 +196,8 @@ export default class RealmTicketComponent extends Component {
                             this.setState({
                                 loading: true
                             })
+                            this.state.realm.summary = summaryText_2;
+                            this.state.realm.userLanguageCode = this.state.lang;
                             JiraTikcetService.addEmailRequestIssue(values).then(response => {
                                 console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
