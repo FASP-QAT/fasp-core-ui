@@ -13,8 +13,10 @@ import { SPACE_REGEX } from '../../Constants';
 import PlanningUnitService from '../../api/PlanningUnitService';
 import getLabelText from '../../CommonComponent/getLabelText';
 
+let summaryText_1 = (i18n.t("static.common.edit") + " " + i18n.t("static.planningunit.planningunit"))
+let summaryText_2 = "Edit Planning Unit"
 const initialValues = {
-    summary: "Edit Planning Unit",
+    summary: summaryText_1,
     planningUnitName: "",
     notes: ""
 }
@@ -59,7 +61,7 @@ export default class EditPlanningUnitTicketComponent extends Component {
         super(props);
         this.state = {
             planningUnit: {
-                summary: 'Edit Planning Unit',
+                summary: summaryText_1,
                 planningUnitName: '',
                 notes: ''
             },
@@ -81,7 +83,12 @@ export default class EditPlanningUnitTicketComponent extends Component {
         }
 
         if (event.target.name == "planningUnitName") {
-            planningUnit.planningUnitName = event.target.options[event.target.selectedIndex].innerHTML;
+            var outText = "";
+            if(event.target.value !== "") {
+                var planningUnitT = this.state.planningUnits.filter(c => c.planningUnitId == event.target.value)[0];
+                outText = planningUnitT.label.label_en;
+            }
+            planningUnit.planningUnitName = outText;
             this.setState({
                 planningUnitId: event.target.value
             })
@@ -119,7 +126,7 @@ export default class EditPlanningUnitTicketComponent extends Component {
     }
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         if (AuthenticationService.getRealmId() != -1) {
             PlanningUnitService.getPlanningUnitByRealmId(AuthenticationService.getRealmId()).then(response => {
                 console.log(response.data)
@@ -264,6 +271,8 @@ export default class EditPlanningUnitTicketComponent extends Component {
                             this.setState({
                                 loading: true
                             })
+                            this.state.planningUnit.summary = summaryText_2;
+                            this.state.planningUnit.userLanguageCode = this.state.lang;
                             JiraTikcetService.addEmailRequestIssue(this.state.planningUnit).then(response => {
                                 console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
@@ -285,17 +294,46 @@ export default class EditPlanningUnitTicketComponent extends Component {
                                 }
                                 this.props.togglehelp();
                                 this.props.toggleSmall(this.state.message);
-                            })
-                                .catch(
-                                    error => {
+                            }).catch(
+                                error => {
+                                    if (error.message === "Network Error") {
                                         this.setState({
-                                            message: i18n.t('static.unkownError'), loading: false
-                                        },
-                                            () => {
-                                                this.hideSecondComponent();
-                                            });
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                    } else {
+                                        switch (error.response ? error.response.status : "") {
+
+                                            case 401:
+                                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                                break;
+                                            case 403:
+                                                this.props.history.push(`/accessDenied`)
+                                                break;
+                                            case 500:
+                                            case 404:
+                                            case 406:
+                                                this.setState({
+                                                    message: error.response.data.messageCode,
+                                                    loading: false
+                                                });
+                                                break;
+                                            case 412:
+                                                this.setState({
+                                                    message: error.response.data.messageCode,
+                                                    loading: false
+                                                });
+                                                break;
+                                            default:
+                                                this.setState({
+                                                    message: 'static.unkownError',
+                                                    loading: false
+                                                });
+                                                break;
+                                        }
                                     }
-                                );
+                                }
+                            );
                         }}
                         render={
                             ({

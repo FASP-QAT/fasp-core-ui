@@ -214,9 +214,9 @@ export default class PipelineProgramImport extends Component {
                                     </div>
                                 </div>
                             </div>
-                            <CardBody>
+                            <CardBody className="pt-lg-0">
 
-                                <FormGroup id="fileImportDiv">
+                                <FormGroup id="fileImportDiv" className="pipelineimportfile">
                                     <Col md="3">
                                         <Label className="uploadfilelable" htmlFor="file-input">{i18n.t('static.program.fileinputjson')}</Label>
                                     </Col>
@@ -258,8 +258,8 @@ export default class PipelineProgramImport extends Component {
                 </Row>
                 {/*  download exe Modal */}
                 <Modal isOpen={this.state.toggelView}
-                    className={'modal-lg ' + this.props.className, "modalWidth"}>
-                    <ModalHeader toggle={() => this.toggleModalView()} className="modalHeaderSupplyPlan">
+                    className={'modal-lg ' + this.props.className, ""}>
+                    <ModalHeader toggle={() => this.toggleModalView()} className="ModalHead modal-info-Headher">
                         <strong>{i18n.t('static.pipeline.downLoadConverter')}</strong>
                     </ModalHeader>
                     <div>
@@ -269,7 +269,7 @@ export default class PipelineProgramImport extends Component {
                             <h5><a href={`${API_URL}/file/pipelineConvertorWindows`}>{i18n.t('static.pipeline.pipelineConvertorWindows')}</a></h5>
                         </ModalBody>
                         <ModalFooter>
-                            <FormGroup>
+                            <FormGroup className="mb-lg-0">
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.toggleModalView}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 &nbsp;
                                     </FormGroup>

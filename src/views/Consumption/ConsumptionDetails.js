@@ -28,7 +28,7 @@ export default class ConsumptionDetails extends React.Component {
         super(props);
         this.options = props.options;
         var startDate = moment(Date.now()).subtract(6, 'months').startOf('month').format("YYYY-MM-DD");
-        var endDate=moment(Date.now()).add(18,'months').startOf('month').format("YYYY-MM-DD")
+        var endDate = moment(Date.now()).add(18, 'months').startOf('month').format("YYYY-MM-DD")
         this.state = {
             loading: true,
             programList: [],
@@ -39,7 +39,7 @@ export default class ConsumptionDetails extends React.Component {
             timeout: 0,
             showConsumption: 0,
             consumptionChangedFlag: 0,
-            rangeValue: { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() }, to: { year: new Date(endDate).getFullYear(), month: new Date(endDate).getMonth() } },
+            rangeValue: localStorage.getItem("sesRangeValue") != "" ? JSON.parse(localStorage.getItem("sesRangeValue")) : { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() }, to: { year: new Date(endDate).getFullYear(), month: new Date(endDate).getMonth() } },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() },
             regionList: [],
@@ -81,6 +81,7 @@ export default class ConsumptionDetails extends React.Component {
         }
         if (cont == true) {
             this.setState({ rangeValue: value, consumptionChangedFlag: 0 })
+            localStorage.setItem("sesRangeValue", JSON.stringify(value));
             this.formSubmit(this.state.planningUnit, value);
         }
     }
@@ -185,7 +186,7 @@ export default class ConsumptionDetails extends React.Component {
                 if (document.getElementById("addRowButtonId") != null) {
                     document.getElementById("addRowButtonId").style.display = "none";
                 }
-                var programIdd = this.props.match.params.programId;
+                var programIdd = this.props.match.params.programId || localStorage.getItem("sesProgramId");
                 if (programIdd != '' && programIdd != undefined) {
                     var programSelect = { value: programIdd, label: proList.filter(c => c.value == programIdd)[0].label };
                     this.setState({
@@ -228,6 +229,7 @@ export default class ConsumptionDetails extends React.Component {
                 planningUnit: "",
             })
             if (programId != 0) {
+                localStorage.setItem("sesProgramId", programId);
                 var db1;
                 var storeOS;
                 var regionList = [];
@@ -297,7 +299,7 @@ export default class ConsumptionDetails extends React.Component {
                                 regionList: regionList, loading: false
                             })
 
-                            var planningUnitIdProp = this.props.match.params.planningUnitId;
+                            var planningUnitIdProp = this.props.match.params.planningUnitId || localStorage.getItem("sesPlanningUnitId");
                             if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
                                 var planningUnit = { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label };
                                 this.setState({
@@ -344,9 +346,15 @@ export default class ConsumptionDetails extends React.Component {
             var consumptionType = document.getElementById("consumptionType").value;
             var showActive = document.getElementById("showActive").value;
             if (planningUnitId != 0) {
+                localStorage.setItem("sesPlanningUnitId", planningUnitId);
                 document.getElementById("consumptionTableDiv").style.display = "block";
                 if (document.getElementById("addRowButtonId") != null) {
                     document.getElementById("addRowButtonId").style.display = "block";
+                    var roleList = AuthenticationService.getLoggedInUserRole();
+                    console.log("RoleList------------>", roleList);
+                    if (roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') {
+                        document.getElementById("addRowButtonId").style.display = "none";
+                    }
                 }
                 var db1;
                 getDatabase();

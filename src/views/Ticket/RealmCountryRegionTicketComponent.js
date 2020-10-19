@@ -13,9 +13,12 @@ import { SPACE_REGEX } from '../../Constants';
 import ProgramService from '../../api/ProgramService';
 import HealthAreaService from '../../api/HealthAreaService';
 
+let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.dashboad.regioncountry"))
+let summaryText_2 = "Add Realm Country Region"
+const selectedRealm = (AuthenticationService.getRealmId() !== "" && AuthenticationService.getRealmId() !== -1) ? AuthenticationService.getRealmId() : ""
 const initialValues = {
-    summary: "Add Realm Country Region",
-    realmId: '',
+    summary: summaryText_1,
+    realmId: selectedRealm,
     realmCountryId: "",
     regionId: "",
     capacity: "",
@@ -29,7 +32,7 @@ const validationSchema = function (values) {
             .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.common.summarytext')),
         realmId: Yup.string()
-            .required(i18n.t('static.common.realmtext').concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?',i18n.t('static.realm.realmName')))),
+            .required(i18n.t('static.common.realmtext').concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?', i18n.t('static.realm.realmName')))),
         realmCountryId: Yup.string()
             .required(i18n.t('static.healtharea.countrytext')),
         regionId: Yup.string()
@@ -73,7 +76,7 @@ export default class RealmCountryRegionTicketComponent extends Component {
         super(props);
         this.state = {
             realmCountryRegion: {
-                summary: "Add Realm Country Region",
+                summary: summaryText_1,
                 realmId: '',
                 realmCountryId: "",
                 regionId: "",
@@ -100,14 +103,14 @@ export default class RealmCountryRegionTicketComponent extends Component {
         if (event.target.name == "summary") {
             realmCountryRegion.summary = event.target.value;
         }
-        if (event.target.name == "realmId") {            
-            realmCountryRegion.realmId = this.state.realmList.filter(c => c.realmId == event.target.value)[0].label.label_en;
+        if (event.target.name == "realmId") {
+            realmCountryRegion.realmId = event.target.value !== "" ? this.state.realmList.filter(c => c.realmId == event.target.value)[0].label.label_en : "";
             // this.setState({
-                this.state.realmId = event.target.value
+            this.state.realmId = event.target.value
             // })            
         }
         if (event.target.name == "realmCountryId") {
-            realmCountryRegion.realmCountryId = this.state.realmCountries.filter(c => c.realmCountryId == event.target.value)[0].country.label.label_en;
+            realmCountryRegion.realmCountryId = event.target.value !== "" ? this.state.realmCountries.filter(c => c.realmCountryId == event.target.value)[0].country.label.label_en : "";
             this.setState({
                 realmCountryId: event.target.value
             })
@@ -130,22 +133,61 @@ export default class RealmCountryRegionTicketComponent extends Component {
     };
 
 
-    getDependentLists(e) {        
-        AuthenticationService.setupAxiosInterceptors();        
+    getDependentLists(realmId) {
+        // AuthenticationService.setupAxiosInterceptors();        
+        if (realmId != "") {
+            ProgramService.getRealmCountryList(realmId)
+                .then(response => {
+                    if (response.status == 200) {
+                        this.setState({
+                            realmCountries: response.data
+                        })
+                    } else {
+                        this.setState({
+                            message: response.data.messageCode
+                        })
+                    }
+                }).catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
 
-        ProgramService.getRealmCountryList(e.target.value)
-            .then(response => {                
-                if (response.status == 200) {
-                    this.setState({
-                        realmCountries: response.data
-                    })
-                } else {
-                    this.setState({
-                        message: response.data.messageCode
-                    })
-                }
-            })
-        
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
+                                    break;
+                            }
+                        }
+                    }
+                );
+        }
     }
 
     touchAll(setTouched, errors) {
@@ -176,19 +218,74 @@ export default class RealmCountryRegionTicketComponent extends Component {
     }
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         HealthAreaService.getRealmList()
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        realmList: response.data
-                    })
+                        realmList: response.data,
+                        realmId: selectedRealm
+                    });
+                    if (selectedRealm !== "") {
+                        this.setState({
+                            realms: (response.data).filter(c => c.realmId == selectedRealm)
+                        })
+
+                        let { realmCountryRegion } = this.state;
+                        realmCountryRegion.realmId = (response.data).filter(c => c.realmId == selectedRealm)[0].label.label_en;
+                        this.setState({
+                            realmCountryRegion
+                        }, () => {
+
+                            this.getDependentLists(selectedRealm);
+
+                        })
+                    }
                 } else {
                     this.setState({
                         message: response.data.messageCode
                     })
                 }
-            })
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
     }
 
     hideSecondComponent() {
@@ -245,97 +342,128 @@ export default class RealmCountryRegionTicketComponent extends Component {
                 <h4>{i18n.t('static.dashboad.regioncountry')}</h4>
                 <br></br>
                 <div style={{ display: this.state.loading ? "none" : "block" }}>
-                <Formik
-                    initialValues={initialValues}
-                    validate={validate(validationSchema)}
-                    onSubmit={(values, { setSubmitting, setErrors }) => {
-                        this.setState({
-                            loading: true
-                        })
-                        JiraTikcetService.addEmailRequestIssue(this.state.realmCountryRegion).then(response => {                            
-                            console.log("Response :",response.status, ":" ,JSON.stringify(response.data));
-                            if (response.status == 200 || response.status == 201) {
-                                var msg = response.data.key;
-                                this.setState({
-                                    message: msg, loading: false
-                                },
-                                    () => {
-                                        this.resetClicked();
-                                        this.hideSecondComponent();
-                                    })                                
-                            } else {
-                                this.setState({                                    
-                                    message: i18n.t('static.unkownError'), loading: false
-                                },
-                                    () => {                                        
-                                        this.hideSecondComponent();
-                                    })                                
-                            }                            
-                            this.props.togglehelp();
-                            this.props.toggleSmall(this.state.message);
-                        })
-                        .catch(
-                            error => {
-                                this.setState({                                        
-                                    message: i18n.t('static.unkownError'), loading: false
-                                },
-                                () => {                                        
-                                    this.hideSecondComponent();                                     
-                                });                                    
-                            }
-                        );
-                    }}
-                    render={
-                        ({
-                            values,
-                            errors,
-                            touched,
-                            handleChange,
-                            handleBlur,
-                            handleSubmit,
-                            isSubmitting,
-                            isValid,
-                            setTouched,
-                            handleReset
-                        }) => (
-                                <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm' autocomplete="off">
-                                    < FormGroup >
-                                        <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
-                                        <Input type="text" name="summary" id="summary" readOnly = {true}
-                                            bsSize="sm"
-                                            valid={!errors.summary && this.state.realmCountryRegion.summary != ''}
-                                            invalid={touched.summary && !!errors.summary}
-                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                            onBlur={handleBlur}
-                                            value={this.state.realmCountryRegion.summary}
-                                            required />
-                                        <FormFeedback className="red">{errors.summary}</FormFeedback>
-                                    </FormGroup>
-                                    < FormGroup >
-                                        <Label for="realmId">{i18n.t('static.program.realm')}<span class="red Reqasterisk">*</span></Label>
-                                        <Input type="select" name="realmId" id="realmId"
-                                            bsSize="sm"
-                                            valid={!errors.realmId && this.state.realmCountryRegion.realmId != ''}
-                                            invalid={touched.realmId && !!errors.realmId}
-                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.getDependentLists(e)}}
-                                            onBlur={handleBlur}
-                                            value={this.state.realmId}
-                                            required >
+                    <Formik
+                        initialValues={initialValues}
+                        validate={validate(validationSchema)}
+                        onSubmit={(values, { setSubmitting, setErrors }) => {
+                            this.setState({
+                                loading: true
+                            })
+                            this.state.realmCountryRegion.summary = summaryText_2;
+                            this.state.realmCountryRegion.userLanguageCode = this.state.lang;
+                            JiraTikcetService.addEmailRequestIssue(this.state.realmCountryRegion).then(response => {
+                                console.log("Response :", response.status, ":", JSON.stringify(response.data));
+                                if (response.status == 200 || response.status == 201) {
+                                    var msg = response.data.key;
+                                    this.setState({
+                                        message: msg, loading: false
+                                    },
+                                        () => {
+                                            this.resetClicked();
+                                            this.hideSecondComponent();
+                                        })
+                                } else {
+                                    this.setState({
+                                        message: i18n.t('static.unkownError'), loading: false
+                                    },
+                                        () => {
+                                            this.hideSecondComponent();
+                                        })
+                                }
+                                this.props.togglehelp();
+                                this.props.toggleSmall(this.state.message);
+                            }).catch(
+                                error => {
+                                    if (error.message === "Network Error") {
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                    } else {
+                                        switch (error.response ? error.response.status : "") {
+
+                                            case 401:
+                                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                                break;
+                                            case 403:
+                                                this.props.history.push(`/accessDenied`)
+                                                break;
+                                            case 500:
+                                            case 404:
+                                            case 406:
+                                                this.setState({
+                                                    message: error.response.data.messageCode,
+                                                    loading: false
+                                                });
+                                                break;
+                                            case 412:
+                                                this.setState({
+                                                    message: error.response.data.messageCode,
+                                                    loading: false
+                                                });
+                                                break;
+                                            default:
+                                                this.setState({
+                                                    message: 'static.unkownError',
+                                                    loading: false
+                                                });
+                                                break;
+                                        }
+                                    }
+                                }
+                            );
+                        }}
+                        render={
+                            ({
+                                values,
+                                errors,
+                                touched,
+                                handleChange,
+                                handleBlur,
+                                handleSubmit,
+                                isSubmitting,
+                                isValid,
+                                setTouched,
+                                handleReset
+                            }) => (
+                                    <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm' autocomplete="off">
+                                        < FormGroup >
+                                            <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
+                                            <Input type="text" name="summary" id="summary" readOnly={true}
+                                                bsSize="sm"
+                                                valid={!errors.summary && this.state.realmCountryRegion.summary != ''}
+                                                invalid={touched.summary && !!errors.summary}
+                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                onBlur={handleBlur}
+                                                value={this.state.realmCountryRegion.summary}
+                                                required />
+                                            <FormFeedback className="red">{errors.summary}</FormFeedback>
+                                        </FormGroup>
+                                        < FormGroup >
+                                            <Label for="realmId">{i18n.t('static.program.realm')}<span class="red Reqasterisk">*</span></Label>
+                                            <Input type="select" name="realmId" id="realmId"
+                                                bsSize="sm"
+                                                valid={!errors.realmId && this.state.realmCountryRegion.realmId != ''}
+                                                invalid={touched.realmId && !!errors.realmId}
+                                                onChange={(e) => { handleChange(e); this.dataChange(e); this.getDependentLists(e.target.value) }}
+                                                onBlur={handleBlur}
+                                                value={this.state.realmId}
+                                                required >
                                                 <option value="">{i18n.t('static.common.select')}</option>
                                                 {realms}
                                             </Input>
-                                        <FormFeedback className="red">{errors.realmId}</FormFeedback>
-                                    </FormGroup>
-                                    <FormGroup>
-                                        <Label for="realmCountryId">{i18n.t('static.dashboard.realmcountry')}<span class="red Reqasterisk">*</span></Label>
-                                        <Input type="select" name="realmCountryId" id="realmCountryId"
-                                            bsSize="sm"
-                                            valid={!errors.realmCountryId && this.state.realmCountryRegion.realmCountryId != ''}
-                                            invalid={touched.realmCountryId && !!errors.realmCountryId}
-                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                            onBlur={handleBlur}
-                                            value={this.state.realmCountryId}
-                                            required >
+                                            <FormFeedback className="red">{errors.realmId}</FormFeedback>
+                                        </FormGroup>
+                                        <FormGroup>
+                                            <Label for="realmCountryId">{i18n.t('static.dashboard.realmcountry')}<span class="red Reqasterisk">*</span></Label>
+                                            <Input type="select" name="realmCountryId" id="realmCountryId"
+                                                bsSize="sm"
+                                                valid={!errors.realmCountryId && this.state.realmCountryRegion.realmCountryId != ''}
+                                                invalid={touched.realmCountryId && !!errors.realmCountryId}
+                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                onBlur={handleBlur}
+                                                value={this.state.realmCountryId}
+                                                required >
                                                 <option value="">{i18n.t('static.common.select')}</option>
                                                 {realmCountryList}
                                             </Input>

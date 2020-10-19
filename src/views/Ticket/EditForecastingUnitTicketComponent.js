@@ -15,8 +15,10 @@ import RealmService from '../../api/RealmService';
 import { SPACE_REGEX } from '../../Constants';
 import ForecastingUnitService from '../../api/ForecastingUnitService';
 
+let summaryText_1 = (i18n.t("static.common.edit") + " " + i18n.t("static.forecastingunit.forecastingunit"))
+let summaryText_2 = "Edit Forecasting Unit"
 const initialValues = {
-    summary: "Edit Forecasting Unit",
+    summary: summaryText_1,
     forecastingUnitName: "",
     notes: ""
 }
@@ -61,7 +63,7 @@ export default class EditForecastingUnitTicketComponent extends Component {
         super(props);
         this.state = {
             forecastingUnit: {
-                summary: 'Edit Forecasting Unit',
+                summary: summaryText_1,
                 forecastingUnitName: "",
                 notes: ''
             },
@@ -82,7 +84,12 @@ export default class EditForecastingUnitTicketComponent extends Component {
             forecastingUnit.summary = event.target.value;
         }
         if (event.target.name == "forecastingUnitName") {
-            forecastingUnit.forecastingUnitName = event.target.options[event.target.selectedIndex].innerHTML;
+            var outText = "";
+            if(event.target.value !== "") {
+                var forecastingUnitT = this.state.forecastingUnits.filter(c => c.forecastingUnitId == event.target.value)[0];
+                outText = forecastingUnitT.realm.label.label_en + " | " + forecastingUnitT.label.label_en;
+            }
+            forecastingUnit.forecastingUnitName = outText;            
             this.setState({
                 forecastingUnitId: event.target.value
             })
@@ -120,7 +127,7 @@ export default class EditForecastingUnitTicketComponent extends Component {
     }
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
 
         if (AuthenticationService.getRealmId() != -1) {
             ForecastingUnitService.getForcastingUnitByRealmId(AuthenticationService.getRealmId()).then(response => {
@@ -274,7 +281,7 @@ export default class EditForecastingUnitTicketComponent extends Component {
             && forecastingUnits.map((item, i) => {
                 return (
                     <option key={i} value={item.forecastingUnitId}>
-                        {getLabelText(item.realm.label, this.state.lang) + " | " + getLabelText(item.productCategory.label, this.state.lang) + " | " + getLabelText(item.tracerCategory.label, this.state.lang) + " | " + getLabelText(item.unit.label, this.state.lang) + " | " + getLabelText(item.label, this.state.lang)}
+                        {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);
@@ -292,6 +299,8 @@ export default class EditForecastingUnitTicketComponent extends Component {
                             this.setState({
                                 loading: true
                             })
+                            this.state.forecastingUnit.summary = summaryText_2
+                            this.state.forecastingUnit.userLanguageCode = this.state.lang;
                             JiraTikcetService.addEmailRequestIssue(this.state.forecastingUnit).then(response => {
                                 console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
@@ -313,17 +322,46 @@ export default class EditForecastingUnitTicketComponent extends Component {
                                 }
                                 this.props.togglehelp();
                                 this.props.toggleSmall(this.state.message);
-                            })
-                                .catch(
-                                    error => {
+                            }).catch(
+                                error => {
+                                    if (error.message === "Network Error") {
                                         this.setState({
-                                            message: i18n.t('static.unkownError'), loading: false
-                                        },
-                                            () => {
-                                                this.hideSecondComponent();
-                                            });
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                    } else {
+                                        switch (error.response ? error.response.status : "") {
+
+                                            case 401:
+                                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                                break;
+                                            case 403:
+                                                this.props.history.push(`/accessDenied`)
+                                                break;
+                                            case 500:
+                                            case 404:
+                                            case 406:
+                                                this.setState({
+                                                    message: error.response.data.messageCode,
+                                                    loading: false
+                                                });
+                                                break;
+                                            case 412:
+                                                this.setState({
+                                                    message: error.response.data.messageCode,
+                                                    loading: false
+                                                });
+                                                break;
+                                            default:
+                                                this.setState({
+                                                    message: 'static.unkownError',
+                                                    loading: false
+                                                });
+                                                break;
+                                        }
                                     }
-                                );
+                                }
+                            );
                         }}
                         render={
                             ({

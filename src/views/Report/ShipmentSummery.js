@@ -43,7 +43,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import RealmCountryService from '../../api/RealmCountryService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, DATE_FORMAT_CAP, INDEXED_DB_NAME, INDEXED_DB_VERSION,PLANNED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS,ON_HOLD_SHIPMENT_STATUS,DRAFT_SHIPMENT_STATUS } from '../../Constants.js'
+import { SECRET_KEY, DATE_FORMAT_CAP, INDEXED_DB_NAME, INDEXED_DB_VERSION, PLANNED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, DRAFT_SHIPMENT_STATUS } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
@@ -95,19 +95,19 @@ const options = {
                 beginAtZero: true,
                 fontColor: 'black',
                 callback: function (value) {
-                  var cell1 = value
-                  cell1 += '';
-                  var x = cell1.split('.');
-                  var x1 = x[0];
-                  var x2 = x.length > 1 ? '.' + x[1] : '';
-                  var rgx = /(\d+)(\d{3})/;
-                  while (rgx.test(x1)) {
-                    x1 = x1.replace(rgx, '$1' + ',' + '$2');
-                  }
-                  return x1 + x2;
-        
+                    var cell1 = value
+                    cell1 += '';
+                    var x = cell1.split('.');
+                    var x1 = x[0];
+                    var x2 = x.length > 1 ? '.' + x[1] : '';
+                    var rgx = /(\d+)(\d{3})/;
+                    while (rgx.test(x1)) {
+                        x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                    }
+                    return x1 + x2;
+
                 }
-              }
+            }
         }],
     },
     tooltips: {
@@ -115,22 +115,22 @@ const options = {
         custom: CustomTooltips,
         callbacks: {
             label: function (tooltipItem, data) {
-      
-              let label = data.labels[tooltipItem.index];
-              let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
-      
-              var cell1 = value
-              cell1 += '';
-              var x = cell1.split('.');
-              var x1 = x[0];
-              var x2 = x.length > 1 ? '.' + x[1] : '';
-              var rgx = /(\d+)(\d{3})/;
-              while (rgx.test(x1)) {
-                x1 = x1.replace(rgx, '$1' + ',' + '$2');
-              }
-              return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
+
+                let label = data.labels[tooltipItem.index];
+                let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+
+                var cell1 = value
+                cell1 += '';
+                var x = cell1.split('.');
+                var x1 = x[0];
+                var x2 = x.length > 1 ? '.' + x[1] : '';
+                var rgx = /(\d+)(\d{3})/;
+                while (rgx.test(x1)) {
+                    x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                }
+                return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
             }
-          }
+        }
     },
     maintainAspectRatio: false
     ,
@@ -257,8 +257,8 @@ class ShipmentSummery extends Component {
     dateFormatter = value => {
         return moment(value).format('MMM YY')
     }
-    addDoubleQuoteToRowContent=(arr)=>{
-       return arr.map(ele=>'"'+ele+'"')
+    addDoubleQuoteToRowContent = (arr) => {
+        return arr.map(ele => '"' + ele + '"')
     }
     exportCSV() {
 
@@ -282,7 +282,7 @@ class ShipmentSummery extends Component {
         var re;
         var A = [this.addDoubleQuoteToRowContent([(i18n.t('static.budget.fundingsource')).replaceAll(' ', '%20'), (i18n.t('static.report.orders')).replaceAll(' ', '%20'), (i18n.t('static.report.qtyBaseUnit')).replaceAll(' ', '%20'), (i18n.t('static.report.costUsd')).replaceAll(' ', '%20')])]
 
-        this.state.shipmentDetailsFundingSourceList.map(ele => A.push(this.addDoubleQuoteToRowContent([((getLabelText(ele.fundingSource.label, this.state.lang)).replaceAll(',', '%20')).replaceAll(' ', '%20'), ele.orderCount, ele.quantity, ele.cost])))
+        this.state.shipmentDetailsFundingSourceList.map(ele => A.push(this.addDoubleQuoteToRowContent([(ele.fundingSource.code).replaceAll(' ', '%20'), ele.orderCount, ele.quantity, ele.cost])))
 
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
@@ -293,7 +293,7 @@ class ShipmentSummery extends Component {
         csvRow.push('')
         csvRow.push('')
 
-        var B = [this.addDoubleQuoteToRowContent([(i18n.t('static.report.qatPIDFID')).replaceAll(' ', '%20'),(i18n.t('static.report.planningUnit/ForecastingUnit')).replaceAll(' ', '%20'), (i18n.t('static.report.id')).replaceAll(' ', '%20'), (i18n.t('static.report.procurementAgentName')).replaceAll(' ', '%20'),
+        var B = [this.addDoubleQuoteToRowContent([(i18n.t('static.report.qatPIDFID')).replaceAll(' ', '%20'),(i18n.t('static.report.planningUnit/ForecastingUnit')).replaceAll(' ', '%20'), (i18n.t('static.report.id')).replaceAll(' ', '%20'),i18n.t('static.supplyPlan.consideAsEmergencyOrder'), (i18n.t('static.report.procurementAgentName')).replaceAll(' ', '%20'),
         (i18n.t('static.budget.fundingsource')).replaceAll(' ', '%20'), (i18n.t('static.common.status')).replaceAll(' ', '%20'), (i18n.t('static.report.qty')).replaceAll(' ', '%20'),
         (i18n.t('static.report.expectedReceiveddate')).replaceAll(' ', '%20'), (i18n.t('static.report.productCost')).replaceAll(' ', '%20'), (i18n.t('static.report.freightCost')).replaceAll(' ', '%20'),
         (i18n.t('static.report.totalCost')).replaceAll(' ', '%20'), (i18n.t('static.program.notes')).replaceAll(' ', '%20')])]
@@ -303,7 +303,7 @@ class ShipmentSummery extends Component {
 
 
         for (var item = 0; item < re.length; item++) {
-            B.push(this.addDoubleQuoteToRowContent([re[item].planningUnit.id,(getLabelText(re[item].planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), re[item].shipmentId, (getLabelText(re[item].procurementAgent.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(re[item].fundingSource.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(re[item].shipmentStatus.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
+            B.push(this.addDoubleQuoteToRowContent([re[item].planningUnit.id,(getLabelText(re[item].planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), re[item].shipmentId,re[item].emergencyOrder==true?i18n.t('static.supplyPlan.consideAsEmergencyOrder'):'', (re[item].procurementAgent.code).replaceAll(' ', '%20'), (re[item].fundingSource.code).replaceAll(' ', '%20'), (getLabelText(re[item].shipmentStatus.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
             viewById == 1 ? re[item].shipmentQty : (parseFloat(re[item].shipmentQty) * re[item].multiplier).toFixed(2), (moment(re[item].expectedDeliveryDate, 'yyyy-MM-dd').format('MMM YYYY').replaceAll(',', ' ')).replaceAll(' ', '%20'),
             parseFloat(re[item].productCost).toFixed(2),
             parseFloat(re[item].freightCost).toFixed(2),
@@ -433,14 +433,14 @@ class ShipmentSummery extends Component {
             margin: { top: 80, bottom: 100 },
             startY: doc.autoTableEndPosY() + 50,
             pageBreak: 'auto',
-            styles: { lineWidth: 1, fontSize: 8, cellWidth: 65, halign: 'center' },
+            styles: { lineWidth: 1, fontSize: 8, cellWidth: 59, halign: 'center' },
             columnStyles: {
-                10: { cellWidth: 111.89 },
+                0: { cellWidth: 112.89 },
             },
             html: '#mytable2',
 
             didDrawCell: function (data) {
-                if (data.column.index === 11 && data.cell.section === 'body') {
+                if (data.column.index === 12 && data.cell.section === 'body') {
                     var td = data.cell.raw;
                     var img = td.getElementsByTagName('img')[0];
                     var dim = data.cell.height - data.cell.padding('vertical');
@@ -478,23 +478,66 @@ class ShipmentSummery extends Component {
                             programs: [], loading: false
                         }, () => { this.consolidatedProgramList() })
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message, loading: false });
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
                         } else {
                             switch (error.response ? error.response.status : "") {
-                                case 500:
+
                                 case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
                                 case 404:
                                 case 406:
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                        loading: false
+                                    });
+                                    break;
                                 case 412:
-                                    this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                        loading: false
+                                    });
                                     break;
                                 default:
-                                    this.setState({ message: 'static.unkownError', loading: false });
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
                                     break;
                             }
                         }
                     }
                 );
+            // .catch(
+            //     error => {
+            //         this.setState({
+            //             programs: [], loading: false
+            //         }, () => { this.consolidatedProgramList() })
+            //         if (error.message === "Network Error") {
+            //             this.setState({ message: error.message, loading: false });
+            //         } else {
+            //             switch (error.response ? error.response.status : "") {
+            //                 case 500:
+            //                 case 401:
+            //                 case 404:
+            //                 case 406:
+            //                 case 412:
+            //                     this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+            //                     break;
+            //                 default:
+            //                     this.setState({ message: 'static.unkownError', loading: false });
+            //                     break;
+            //             }
+            //         }
+            //     }
+            // );
 
         } else {
             console.log('offline')
@@ -715,30 +758,72 @@ class ShipmentSummery extends Component {
                         }, () => {
                             this.fetchData();
                         })
-                    })
-                        .catch(
-                            error => {
+                    }).catch(
+                        error => {
+                            this.setState({
+                                planningUnits: [],
+                            })
+                            if (error.message === "Network Error") {
                                 this.setState({
-                                    planningUnits: [],
-                                })
-                                if (error.message === "Network Error") {
-                                    this.setState({ message: error.message });
-                                } else {
-                                    switch (error.response ? error.response.status : "") {
-                                        case 500:
-                                        case 401:
-                                        case 404:
-                                        case 406:
-                                        case 412:
-                                            this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
-                                            break;
-                                        default:
-                                            this.setState({ message: 'static.unkownError' });
-                                            break;
-                                    }
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
+
+                                    case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
+                                    case 404:
+                                    case 406:
+                                        this.setState({
+                                            message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
+                                            loading: false
+                                        });
+                                        break;
+                                    case 412:
+                                        this.setState({
+                                            message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
+                                            loading: false
+                                        });
+                                        break;
+                                    default:
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                        break;
                                 }
                             }
-                        );
+                        }
+                    );
+                    // .catch(
+                    //     error => {
+                    //         this.setState({
+                    //             planningUnits: [],
+                    //         })
+                    //         if (error.message === "Network Error") {
+                    //             this.setState({ message: error.message });
+                    //         } else {
+                    //             switch (error.response ? error.response.status : "") {
+                    //                 case 500:
+                    //                 case 401:
+                    //                 case 404:
+                    //                 case 406:
+                    //                 case 412:
+                    //                     this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
+                    //                     break;
+                    //                 default:
+                    //                     this.setState({ message: 'static.unkownError' });
+                    //                     break;
+                    //             }
+                    //         }
+                    //     }
+                    // );
                 }
             }
         });
@@ -770,7 +855,7 @@ class ShipmentSummery extends Component {
 
         let planningUnitIds = this.state.planningUnitValues.length == this.state.planningUnits.length ? [] : this.state.planningUnitValues.map(ele => (ele.value));
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
-        let endDate = this.state.rangeValue.to.year + '-' + String(this.state.rangeValue.to.month).padStart(2, '0') + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month , 0).getDate();
+        let endDate = this.state.rangeValue.to.year + '-' + String(this.state.rangeValue.to.month).padStart(2, '0') + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
 
         console.log("versionId----", versionId);
         console.log("programId----", programId);
@@ -819,10 +904,10 @@ class ShipmentSummery extends Component {
                         console.log("shipmentList------>", shipmentList);
                         const activeFilter = shipmentList.filter(c => c.active == true);
                         // const activeFilter = shipmentList;
-                        console.log(startDate,endDate)
+                        console.log(startDate, endDate)
                         // let dateFilter = activeFilter.filter(c => moment(c.deliveredDate).isBetween(startDate, endDate, null, '[)'))
-                        let dateFilter = activeFilter.filter(c =>(c.receivedDate == null || c.receivedDate == "") ? ( c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate ):  (c.receivedDate >= startDate && c.receivedDate <= endDate))
-console.log(dateFilter)
+                        let dateFilter = activeFilter.filter(c => (c.receivedDate == null || c.receivedDate == "") ? (c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate) : (c.receivedDate >= startDate && c.receivedDate <= endDate))
+                        console.log(dateFilter)
                         let data = [];
                         let planningUnitFilter = [];
                         for (let i = 0; i < planningUnitIds.length; i++) {
@@ -880,7 +965,7 @@ console.log(dateFilter)
                                     "fundingSource": planningUnitFilter[i].fundingSource,
                                     "shipmentStatus": planningUnitFilter[i].shipmentStatus,
                                     "shipmentQty": planningUnitFilter[i].shipmentQty,
-                                    "expectedDeliveryDate": planningUnitFilter[i].receivedDate==null|| planningUnitFilter[i].receivedDate==''?planningUnitFilter[i].expectedDeliveryDate:planningUnitFilter[i].receivedDate,
+                                    "expectedDeliveryDate": planningUnitFilter[i].receivedDate == null || planningUnitFilter[i].receivedDate == '' ? planningUnitFilter[i].expectedDeliveryDate : planningUnitFilter[i].receivedDate,
                                     "productCost": planningUnitFilter[i].productCost * planningUnitFilter[i].currency.conversionRateToUsd,
                                     "freightCost": planningUnitFilter[i].freightCost * planningUnitFilter[i].currency.conversionRateToUsd,
                                     "totalCost": (planningUnitFilter[i].productCost * planningUnitFilter[i].currency.conversionRateToUsd) + (planningUnitFilter[i].freightCost * planningUnitFilter[i].currency.conversionRateToUsd),
@@ -891,33 +976,33 @@ console.log(dateFilter)
 
 
                             }
-                            data= data.sort(function (a, b) {
-                                            return parseInt(a.shipmentId) - parseInt(b.shipmentId);
-                                          })
-                            var shipmentDetailsFundingSourceList=[]
+                            data = data.sort(function (a, b) {
+                                return parseInt(a.shipmentId) - parseInt(b.shipmentId);
+                            })
+                            var shipmentDetailsFundingSourceList = []
                             const fundingSourceIds = [...new Set(data.map(q => q.fundingSource.id))];
-                            console.log('fundingSourceIds',fundingSourceIds)
-                            fundingSourceIds.map(ele=>{
-                              var fundingSourceList= data.filter(c=>c.fundingSource.id==ele)
-                              console.log('fundingSourceList',fundingSourceList)
-                              var cost=0;
-                              var quantity=0;
-                              console.log('fundingSourceList',fundingSourceList)
-                              fundingSourceList.map(c=>{
-                                cost=cost+ parseFloat(c.productCost) + parseFloat(c.freightCost)
-                                quantity=quantity+(viewById==1?parseInt(c.shipmentQty):(parseInt(c.shipmentQty)*c.multiplier))
-                              })
-                                var json={
-                                    "fundingSource":fundingSourceList[0].fundingSource,
-                                    "orderCount":fundingSourceList.length,
-                                    "cost":cost,
-                                    "quantity":quantity
+                            console.log('fundingSourceIds', fundingSourceIds)
+                            fundingSourceIds.map(ele => {
+                                var fundingSourceList = data.filter(c => c.fundingSource.id == ele)
+                                console.log('fundingSourceList', fundingSourceList)
+                                var cost = 0;
+                                var quantity = 0;
+                                console.log('fundingSourceList', fundingSourceList)
+                                fundingSourceList.map(c => {
+                                    cost = cost + parseFloat(c.productCost) + parseFloat(c.freightCost)
+                                    quantity = quantity + (viewById == 1 ? parseInt(c.shipmentQty) : (parseInt(c.shipmentQty) * c.multiplier))
+                                })
+                                var json = {
+                                    "fundingSource": fundingSourceList[0].fundingSource,
+                                    "orderCount": fundingSourceList.length,
+                                    "cost": cost,
+                                    "quantity": quantity
                                 }
                                 shipmentDetailsFundingSourceList.push(json)
                             })
                             console.log("data ofline----->", data);
                             console.log("shipmentDetailsFundingSourceList ofline----->", shipmentDetailsFundingSourceList);
-                           
+
                             var shipmentDetailsMonthList = [];
                             var monthstartfrom = this.state.rangeValue.from.month
                             for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++) {
@@ -929,36 +1014,36 @@ console.log(dateFilter)
                                     console.log(dtstr, ' ', enddtStr)
                                     var dt = dtstr
                                     var shiplist = planningUnitFilter.filter(c => c.receivedDate == null || c.receivedDate == "" ? (c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr) : (c.receivedDate >= dt && c.receivedDate <= enddtStr))
-    
+
                                     var onholdCost = 0
                                     var plannedCost = 0
                                     var receivedCost = 0
                                     var shippedCost = 0
-                                    var submittedCost=0
+                                    var submittedCost = 0
                                     var approvedCost = 0
-                                    var arrivedCost=0
+                                    var arrivedCost = 0
                                     var submittedCost = 0
                                     shiplist.map(ele => {
                                         console.log(ele)
-                                      if(ele.shipmentStatus.id==PLANNED_SHIPMENT_STATUS ){
-                                        plannedCost=plannedCost+(ele.productCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
-                                      }else if(ele.shipmentStatus.id==DRAFT_SHIPMENT_STATUS ){
-                                      //  plannedCost=plannedCost+(ele.sortproductCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
-                                      }else if(ele.shipmentStatus.id== SUBMITTED_SHIPMENT_STATUS ){
-                                        submittedCost=submittedCost+(ele.productCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
-                                      }else if(ele.shipmentStatus.id== APPROVED_SHIPMENT_STATUS ){
-                                        approvedCost=approvedCost+(ele.productCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
-                                      }else if(ele.shipmentStatus.id==SHIPPED_SHIPMENT_STATUS  ){
-                                        shippedCost=shippedCost+(ele.productCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
-                                      }else if(ele.shipmentStatus.id== ARRIVED_SHIPMENT_STATUS ){
-                                        arrivedCost=arrivedCost+(ele.productCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
-                                      }else if(ele.shipmentStatus.id==DELIVERED_SHIPMENT_STATUS ){
-                                        receivedCost=receivedCost+(ele.productCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
-                                      }else if(ele.shipmentStatus.id==ON_HOLD_SHIPMENT_STATUS  ){
-                                        onholdCost=onholdCost+(ele.productCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
-                                      }
+                                        if (ele.shipmentStatus.id == PLANNED_SHIPMENT_STATUS) {
+                                            plannedCost = plannedCost + (ele.productCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
+                                        } else if (ele.shipmentStatus.id == DRAFT_SHIPMENT_STATUS) {
+                                            //  plannedCost=plannedCost+(ele.sortproductCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
+                                        } else if (ele.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS) {
+                                            submittedCost = submittedCost + (ele.productCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
+                                        } else if (ele.shipmentStatus.id == APPROVED_SHIPMENT_STATUS) {
+                                            approvedCost = approvedCost + (ele.productCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
+                                        } else if (ele.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS) {
+                                            shippedCost = shippedCost + (ele.productCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
+                                        } else if (ele.shipmentStatus.id == ARRIVED_SHIPMENT_STATUS) {
+                                            arrivedCost = arrivedCost + (ele.productCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
+                                        } else if (ele.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS) {
+                                            receivedCost = receivedCost + (ele.productCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
+                                        } else if (ele.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS) {
+                                            onholdCost = onholdCost + (ele.productCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
+                                        }
                                     })
-    
+
                                     let json = {
                                         "dt": new Date(from, month - 1),
                                         "approvedCost": approvedCost,
@@ -971,7 +1056,7 @@ console.log(dateFilter)
                                     }
                                     shipmentDetailsMonthList.push(json)
                                     if (month == this.state.rangeValue.to.month && from == to) {
-                                        console.log('shipmentDetailsMonthList',shipmentDetailsMonthList)
+                                        console.log('shipmentDetailsMonthList', shipmentDetailsMonthList)
                                         this.setState({
                                             shipmentDetailsList: data,
                                             shipmentDetailsFundingSourceList: shipmentDetailsFundingSourceList,
@@ -981,13 +1066,13 @@ console.log(dateFilter)
                                         })
                                         return;
                                     }
-                                    
+
                                 }
                                 monthstartfrom = 1
-    
+
                             }
-    
-                           
+
+
                         }.bind(this)
                     }.bind(this);
                 }.bind(this)
@@ -1023,23 +1108,66 @@ console.log(dateFilter)
                                 data: [], loading: false
                             })
                             if (error.message === "Network Error") {
-                                this.setState({ message: error.message, loading: false });
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
                             } else {
                                 switch (error.response ? error.response.status : "") {
-                                    case 500:
+
                                     case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
                                     case 404:
                                     case 406:
+                                        this.setState({
+                                            message: i18n.t(error.response.data.messageCode),
+                                            loading: false
+                                        });
+                                        break;
                                     case 412:
-                                        this.setState({ loading: false, message: i18n.t(error.response.data.messageCode) });
+                                        this.setState({
+                                            message: i18n.t(error.response.data.messageCode),
+                                            loading: false
+                                        });
                                         break;
                                     default:
-                                        this.setState({ message: 'static.unkownError', loading: false });
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
                                         break;
                                 }
                             }
                         }
                     );
+                // .catch(
+                //     error => {
+                //         this.setState({
+                //             data: [], loading: false
+                //         })
+                //         if (error.message === "Network Error") {
+                //             this.setState({ message: error.message, loading: false });
+                //         } else {
+                //             switch (error.response ? error.response.status : "") {
+                //                 case 500:
+                //                 case 401:
+                //                 case 404:
+                //                 case 406:
+                //                 case 412:
+                //                     this.setState({ loading: false, message: i18n.t(error.response.data.messageCode) });
+                //                     break;
+                //                 default:
+                //                     this.setState({ message: 'static.unkownError', loading: false });
+                //                     break;
+                //             }
+                //         }
+                //     }
+                // );
 
 
             }
@@ -1298,7 +1426,7 @@ console.log(dateFilter)
                 data: this.state.shipmentDetailsMonthList.map((item, index) => (
                     item.receivedCost))
 
-            },{
+            }, {
                 label: i18n.t('static.report.arrived'),
                 backgroundColor: '#436e94',
                 borderColor: 'rgba(179,181,198,1)',
@@ -1312,7 +1440,7 @@ console.log(dateFilter)
                 ))
             },
             {
-                label:  i18n.t('static.report.shipped'),
+                label: i18n.t('static.report.shipped'),
                 stack: 1,
                 backgroundColor: '#1d97c2',
                 borderColor: 'rgba(179,181,198,1)',
@@ -1377,17 +1505,13 @@ console.log(dateFilter)
                     item.onholdCost
                 ))
             }
-            
-           ]
+
+            ]
         };
 
         return (
             <div className="animated fadeIn" >
-                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
-                    this.setState({ message: message })
-                }} loading={(loading) => {
-                    this.setState({ loading: loading })
-                }} />
+                <AuthenticationServiceComponent history={this.props.history} />
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
 
@@ -1531,28 +1655,28 @@ console.log(dateFilter)
 
                                 <Col md="12 pl-0">
                                     <div className="row">
-    {
-                                                this.state.shipmentDetailsMonthList.length > 0
-                                                &&
-                                                <div className="col-md-12 p-0">
-                                                    <div className="col-md-12">
-                                                        <div className="chart-wrapper chart-graph-report pl-5 ml-3" style={{ marginLeft: '50px' }}>
-                                                            {/* <Bar id="cool-canvas" data={bar} options={options} /> */}
-                                                            <Bar id="cool-canvas" data={bar} options={options} />
-                                                        </div>
+                                        {
+                                            this.state.shipmentDetailsMonthList.length > 0
+                                            &&
+                                            <div className="col-md-12 p-0">
+                                                <div className="col-md-12">
+                                                    <div className="chart-wrapper chart-graph-report pl-5 ml-3" style={{ marginLeft: '50px' }}>
+                                                        {/* <Bar id="cool-canvas" data={bar} options={options} /> */}
+                                                        <Bar id="cool-canvas" data={bar} options={options} />
                                                     </div>
-                                                    {/* <div className="col-md-12">
+                                                </div>
+                                                {/* <div className="col-md-12">
                                                         <button className="mr-1 mb-2 float-right btn btn-info btn-md showdatabtn" style={{ 'marginTop': '7px' }} onClick={this.toggledata}>
                                                             {this.state.show ? 'Hide Data' : 'Show Data'}
                                                         </button>
 
                                                     </div> */}
-                                                </div>
-                                            }
+                                            </div>
+                                        }
 
 
 
-                                        
+
                                     </div>
 
 
@@ -1608,7 +1732,7 @@ console.log(dateFilter)
                                                             <th style={{ 'text-align': 'center' }}>{i18n.t('static.report.planningUnit/ForecastingUnit')}</th>
                                                             <th style={{ 'width': '87px', 'text-align': 'center' }}>{i18n.t('static.report.id')}</th>
                                                             <th style={{ 'width': '87px', 'text-align': 'center' }}>{i18n.t('static.supplyPlan.consideAsEmergencyOrder')}</th>
-                                                             <th style={{ 'text-align': 'center' }}>{i18n.t('static.report.procurementAgentName')}</th>
+                                                            <th style={{ 'text-align': 'center' }}>{i18n.t('static.report.procurementAgentName')}</th>
                                                             <th style={{ 'text-align': 'center' }}>{i18n.t('static.budget.fundingsource')}</th>
                                                             <th style={{ 'text-align': 'center' }}>{i18n.t('static.common.status')}</th>
                                                             <th style={{ 'text-align': 'center' }}>{i18n.t('static.report.qty')}</th>
@@ -1675,8 +1799,8 @@ console.log(dateFilter)
                                                                     <td style={{ 'text-align': 'left' }}>{getLabelText(this.state.shipmentDetailsList[idx].planningUnit.label, this.state.lang)}</td>
                                                                     <td style={{ 'text-align': 'center' }}>{this.state.shipmentDetailsList[idx].shipmentId}</td>
                                                                     <td style={{ 'text-align': 'center' }}>{(this.state.shipmentDetailsList[idx].emergencyOrder==true?i18n.t('static.supplyPlan.consideAsEmergencyOrder'):'')}</td>
-                                                                    <td style={{ 'text-align': 'center' }}>{getLabelText(this.state.shipmentDetailsList[idx].procurementAgent.label, this.state.lang)}</td>
-                                                                    <td style={{ 'text-align': 'center' }}>{getLabelText(this.state.shipmentDetailsList[idx].fundingSource.label, this.state.lang)}</td>
+                                                                    <td style={{ 'text-align': 'center' }}>{this.state.shipmentDetailsList[idx].procurementAgent.code}</td>
+                                                                    <td style={{ 'text-align': 'center' }}>{this.state.shipmentDetailsList[idx].fundingSource.code}</td>
                                                                     <td style={{ 'text-align': 'center' }}>{getLabelText(this.state.shipmentDetailsList[idx].shipmentStatus.label, this.state.lang)}</td>
                                                                     <td style={{ 'text-align': 'center' }}>{viewById == 1 ? (this.state.shipmentDetailsList[idx].shipmentQty).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : (parseFloat(this.state.shipmentDetailsList[idx].shipmentQty) * this.state.shipmentDetailsList[idx].multiplier).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
                                                                     <td style={{ 'text-align': 'center' }}>{moment(this.state.shipmentDetailsList[idx].expectedDeliveryDate, 'yyyy-MM-dd').format('MMM YYYY')}</td>

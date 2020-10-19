@@ -12,8 +12,10 @@ import { LABEL_REGEX, SPACE_REGEX } from '../../Constants';
 import FundingSourceService from '../../api/FundingSourceService';
 import getLabelText from '../../CommonComponent/getLabelText';
 
+let summaryText_1 = (i18n.t("static.common.edit") + " " + i18n.t("static.fundingsource.fundingsource"))
+let summaryText_2 = "Edit Funding Source"
 const initialValues = {
-    summary: "Edit Funding Source",
+    summary: summaryText_1,
     fundingSourceName: "",
     notes: ""
 }
@@ -58,7 +60,7 @@ export default class EditFundingSourceTicketComponent extends Component {
         super(props);
         this.state = {
             fundingSource: {
-                summary: "Edit Funding Source",
+                summary: summaryText_1,
                 fundingSourceName: "",
                 notes: ""
             },
@@ -79,7 +81,12 @@ export default class EditFundingSourceTicketComponent extends Component {
             fundingSource.summary = event.target.value;
         }
         if (event.target.name == "fundingSourceName") {
-            fundingSource.fundingSourceName = event.target.options[event.target.selectedIndex].innerHTML;
+            var outText = "";
+            if(event.target.value !== "") {
+                var fundingSourceT = this.state.fundingSources.filter(c => c.fundingSourceId == event.target.value)[0];
+                outText = fundingSourceT.realm.label.label_en + " | " + fundingSourceT.label.label_en + " | " + fundingSourceT.fundingSourceCode;
+            }
+            fundingSource.fundingSourceName = outText;
             this.setState({
                 fundingSourceId: event.target.value
             })
@@ -117,7 +124,7 @@ export default class EditFundingSourceTicketComponent extends Component {
     }
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         FundingSourceService.getFundingSourceListAll()
             .then(response => {
                 if (response.status == 200) {
@@ -208,7 +215,7 @@ export default class EditFundingSourceTicketComponent extends Component {
             && fundingSources.map((item, i) => {
                 return (
                     <option key={i} value={item.fundingSourceId}>
-                        {getLabelText(item.realm.label, this.state.lang) + " | " + getLabelText(item.label, this.state.lang) + " | " + item.fundingSourceCode}
+                        {getLabelText(item.label, this.state.lang) + " | " + item.fundingSourceCode}
                     </option>
                 )
             }, this);
@@ -226,6 +233,8 @@ export default class EditFundingSourceTicketComponent extends Component {
                             this.setState({
                                 loading: true
                             })
+                            this.state.fundingSource.summary = summaryText_2;
+                            this.state.fundingSource.userLanguageCode = this.state.lang;
                             JiraTikcetService.addEmailRequestIssue(this.state.fundingSource).then(response => {
                                 console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
@@ -247,17 +256,46 @@ export default class EditFundingSourceTicketComponent extends Component {
                                 }
                                 this.props.togglehelp();
                                 this.props.toggleSmall(this.state.message);
-                            })
-                                .catch(
-                                    error => {
+                            }).catch(
+                                error => {
+                                    if (error.message === "Network Error") {
                                         this.setState({
-                                            message: i18n.t('static.unkownError'), loading: false
-                                        },
-                                            () => {
-                                                this.hideSecondComponent();
-                                            });
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                    } else {
+                                        switch (error.response ? error.response.status : "") {
+
+                                            case 401:
+                                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                                break;
+                                            case 403:
+                                                this.props.history.push(`/accessDenied`)
+                                                break;
+                                            case 500:
+                                            case 404:
+                                            case 406:
+                                                this.setState({
+                                                    message: error.response.data.messageCode,
+                                                    loading: false
+                                                });
+                                                break;
+                                            case 412:
+                                                this.setState({
+                                                    message: error.response.data.messageCode,
+                                                    loading: false
+                                                });
+                                                break;
+                                            default:
+                                                this.setState({
+                                                    message: 'static.unkownError',
+                                                    loading: false
+                                                });
+                                                break;
+                                        }
                                     }
-                                );
+                                }
+                            );
                         }}
                         render={
                             ({

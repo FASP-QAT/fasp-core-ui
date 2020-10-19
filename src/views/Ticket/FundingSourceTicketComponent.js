@@ -12,9 +12,12 @@ import { LABEL_REGEX, SPACE_REGEX } from '../../Constants';
 import FundingSourceService from '../../api/FundingSourceService';
 import getLabelText from '../../CommonComponent/getLabelText';
 
+let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.fundingsource.fundingsource"))
+let summaryText_2 = "Add Funding Source"
+const selectedRealm = (AuthenticationService.getRealmId() !== "" && AuthenticationService.getRealmId() !== -1) ? AuthenticationService.getRealmId() : ""
 const initialValues = {
-    summary: "Add Funding Source",
-    realmName: "",
+    summary: summaryText_1,
+    realmName: selectedRealm,
     fundingSourceName: "",
     fundingSourceCode: "",
     notes: ""
@@ -66,7 +69,7 @@ export default class FundingSourceTicketComponent extends Component {
         super(props);
         this.state = {
             fundingSource: {
-                summary: "Add Funding Source",
+                summary: summaryText_1,
                 realmName: "",
                 fundingSourceName: "",
                 fundingSourceCode: "",
@@ -92,7 +95,7 @@ export default class FundingSourceTicketComponent extends Component {
             fundingSource.summary = event.target.value;
         }
         if (event.target.name == "realmName") {
-            fundingSource.realmName = this.state.realms.filter(c => c.realmId == event.target.value)[0].label.label_en;
+            fundingSource.realmName = event.target.value !== "" ? this.state.realms.filter(c => c.realmId == event.target.value)[0].label.label_en : "";
             this.setState({
                 realmId: event.target.value
             })
@@ -140,13 +143,66 @@ export default class FundingSourceTicketComponent extends Component {
     }
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         RealmService.getRealmListAll()
             .then(response => {
                 this.setState({
-                    realms: response.data
-                })
-            })
+                    realms: response.data,
+                    realmId: selectedRealm
+                });
+                if (selectedRealm !== "") {
+                    this.setState({
+                        realms: (response.data).filter(c => c.realmId == selectedRealm)
+                    })
+
+                    let { fundingSource } = this.state;
+                    fundingSource.realmName = (response.data).filter(c => c.realmId == selectedRealm)[0].label.label_en;
+                    this.setState({
+                        fundingSource
+                    }, () => {                        
+
+                    })
+                }
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
     }
 
     hideSecondComponent() {
@@ -324,6 +380,8 @@ export default class FundingSourceTicketComponent extends Component {
                             this.setState({
                                 loading: true
                             })
+                            this.state.fundingSource.summary = summaryText_2;
+                            this.state.fundingSource.userLanguageCode = this.state.lang;
                             JiraTikcetService.addEmailRequestIssue(this.state.fundingSource).then(response => {
                                 console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
@@ -345,17 +403,46 @@ export default class FundingSourceTicketComponent extends Component {
                                 }
                                 this.props.togglehelp();
                                 this.props.toggleSmall(this.state.message);
-                            })
-                                .catch(
-                                    error => {
+                            }).catch(
+                                error => {
+                                    if (error.message === "Network Error") {
                                         this.setState({
-                                            message: i18n.t('static.unkownError'), loading: false
-                                        },
-                                            () => {
-                                                this.hideSecondComponent();
-                                            });
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                    } else {
+                                        switch (error.response ? error.response.status : "") {
+
+                                            case 401:
+                                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                                break;
+                                            case 403:
+                                                this.props.history.push(`/accessDenied`)
+                                                break;
+                                            case 500:
+                                            case 404:
+                                            case 406:
+                                                this.setState({
+                                                    message: error.response.data.messageCode,
+                                                    loading: false
+                                                });
+                                                break;
+                                            case 412:
+                                                this.setState({
+                                                    message: error.response.data.messageCode,
+                                                    loading: false
+                                                });
+                                                break;
+                                            default:
+                                                this.setState({
+                                                    message: 'static.unkownError',
+                                                    loading: false
+                                                });
+                                                break;
+                                        }
                                     }
-                                );
+                                }
+                            );
                         }}
                         render={
                             ({

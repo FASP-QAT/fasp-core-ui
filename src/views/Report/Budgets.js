@@ -19,6 +19,11 @@ import FundingSourceService from '../../api/FundingSourceService';
 import moment from 'moment';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 
+import MultiSelect from 'react-multi-select-component';
+
+import Picker from 'react-month-picker'
+import MonthBox from '../../CommonComponent/MonthBox.js'
+
 import CryptoJS from 'crypto-js'
 import { SECRET_KEY, DATE_FORMAT_CAP, INDEXED_DB_VERSION, INDEXED_DB_NAME } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
@@ -30,6 +35,10 @@ import "jspdf-autotable";
 import { LOGO } from '../../CommonComponent/Logo.js';
 const ref = React.createRef();
 const entityname = i18n.t('static.dashboard.budget');
+const pickerLang = {
+    months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
+    from: 'From', to: 'To',
+}
 const chartoptions =
 {
     scales: {
@@ -59,11 +68,11 @@ const chartoptions =
                     var x2 = x.length > 1 ? '.' + x[1] : '';
                     var rgx = /(\d+)(\d{3})/;
                     while (rgx.test(x1)) {
-                      x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                        x1 = x1.replace(rgx, '$1' + ',' + '$2');
                     }
                     return x1 + x2;
-          
-                  }
+
+                }
             }
         }]
     },
@@ -73,22 +82,23 @@ const chartoptions =
         custom: CustomTooltips,
         callbacks: {
             label: function (tooltipItem, data) {
-      
-              let label = data.labels[tooltipItem.index];
-              let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
-      
-              var cell1 = value
-              cell1 += '';
-              var x = cell1.split('.');
-              var x1 = x[0];
-              var x2 = x.length > 1 ? '.' + x[1] : '';
-              var rgx = /(\d+)(\d{3})/;
-              while (rgx.test(x1)) {
-                x1 = x1.replace(rgx, '$1' + ',' + '$2');
-              }
-              return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
+
+                let label = data.labels[tooltipItem.index];
+                let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+
+                var cell1 = value
+                cell1 += '';
+                var x = cell1.split('.');
+                var x1 = x[0];
+                var x2 = x.length > 1 ? '.' + x[1] : '';
+                var rgx = /(\d+)(\d{3})/;
+                while (rgx.test(x1)) {
+                    x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                }
+                return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
             }
-    }},
+        }
+    },
     maintainAspectRatio: false,
     legend: {
         display: true,
@@ -114,7 +124,13 @@ class Budgets extends Component {
             programs: [],
             versions: [],
             show: false,
-            loading: true
+            loading: true,
+            rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth()+2 },
+            maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
+            fundingSourceValues: [],
+            fundingSourceLabels: [],
+            fundingSources: []
         }
 
 
@@ -124,6 +140,131 @@ class Budgets extends Component {
         this.rowClassNameFormat = this.rowClassNameFormat.bind(this);
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+
+        this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
+        this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
+        this.handleRangeChange = this.handleRangeChange.bind(this);
+    }
+    show() {
+      
+    }
+    handleRangeChange(value, text, listIndex) {
+        //
+    }
+    handleRangeDissmis(value) {
+        this.setState({ rangeValue: value }, () => {
+            this.filterData();
+        })
+
+    }
+
+    _handleClickRangeBox(e) {
+        this.refs.pickRange.show()
+    }
+
+    getFundingSource = () => {
+        if (navigator.onLine) {
+            // AuthenticationService.setupAxiosInterceptors();
+            FundingSourceService.getFundingSourceListAll()
+                .then(response => {
+                    // console.log(JSON.stringify(response.data))
+                    this.setState({
+                        fundingSources: response.data, loading: false
+                    }, () => { this.consolidatedFundingSourceList() })
+                }).catch(
+                    error => {
+                        this.setState({
+                            fundingSources: [], loading: false
+                        }, () => { this.consolidatedFundingSourceList() })
+                        if (error.message === "Network Error") {
+                            this.setState({ message: error.message, loading: false });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+                                case 500:
+                                case 401:
+                                case 404:
+                                case 406:
+                                case 412:
+                                    this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                    break;
+                                default:
+                                    this.setState({ message: 'static.unkownError', loading: false });
+                                    break;
+                            }
+                        }
+                    }
+                );
+
+        } else {
+            console.log('offline')
+            this.consolidatedFundingSourceList()
+            this.setState({ loading: false })
+        }
+
+    }
+
+    consolidatedFundingSourceList = () => {
+        const lan = 'en';
+        const { fundingSources } = this.state
+        var proList = fundingSources;
+
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['fundingSource'], 'readwrite');
+            var fundingSource = transaction.objectStore('fundingSource');
+            var getRequest = fundingSource.getAll();
+
+            getRequest.onerror = function (event) {
+                // Handle errors!
+            };
+            getRequest.onsuccess = function (event) {
+                var myResult = [];
+                myResult = getRequest.result;
+                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                for (var i = 0; i < myResult.length; i++) {
+
+                    var f = 0
+                    for (var k = 0; k < this.state.fundingSources.length; k++) {
+                        if (this.state.fundingSources[k].fundingSourceId == myResult[i].fundingSourceId) {
+                            f = 1;
+                            console.log('already exist')
+                        }
+                    }
+                    var programData = myResult[i];
+                    if (f == 0) {
+                        proList.push(programData)
+                    }
+
+                }
+
+                this.setState({
+                    fundingSources: proList
+                })
+
+            }.bind(this);
+
+        }.bind(this);
+    }
+
+    makeText = m => {
+        if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
+        return '?'
+    }
+    handleFundingSourceChange = (fundingSourceIds) => {
+        fundingSourceIds = fundingSourceIds.sort(function (a, b) {
+            return parseInt(a.value) - parseInt(b.value);
+        })
+        this.setState({
+            fundingSourceValues: fundingSourceIds.map(ele => ele),
+            fundingSourceLabels: fundingSourceIds.map(ele => ele.label)
+        }, () => {
+
+            this.filterData()
+        })
     }
 
     hideFirstComponent() {
@@ -150,14 +291,18 @@ class Budgets extends Component {
         }
         return x1 + x2;
     }
-    addDoubleQuoteToRowContent=(arr)=>{
-        return arr.map(ele=>'"'+ele+'"')
-     }
+    addDoubleQuoteToRowContent = (arr) => {
+        return arr.map(ele => '"' + ele + '"')
+    }
     exportCSV = (columns) => {
 
         var csvRow = [];
-        csvRow.push((i18n.t('static.program.program') + ' , ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20')))
-        csvRow.push((i18n.t('static.report.version') + ' , ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20'))
+        csvRow.push('"' +(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' +(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' +(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        this.state.fundingSourceLabels.map(ele =>
+            csvRow.push('"' + (i18n.t('static.budget.fundingsource') + ' : ' + (ele.toString())).replaceAll(' ', '%20') + '"'))
+  
         csvRow.push('')
         csvRow.push('')
         csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
@@ -168,7 +313,7 @@ class Budgets extends Component {
         columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ', '%20') });
 
         var A = [this.addDoubleQuoteToRowContent(headers)]
-        this.state.selBudget.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.budget.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), (ele.budget.code.replaceAll(',', ' ')).replaceAll(' ', '%20') , (ele.fundingSource.code.replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.currency.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), this.roundN(ele.budgetAmt), this.roundN(ele.plannedBudgetAmt), this.roundN(ele.orderedBudgetAmt), this.roundN((ele.budgetAmt - (ele.plannedBudgetAmt + ele.orderedBudgetAmt))), this.formatDate(ele.startDate), this.formatDate(ele.stopDate)])));
+        this.state.selBudget.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.budget.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), (ele.budget.code.replaceAll(',', ' ')).replaceAll(' ', '%20'), (ele.fundingSource.code.replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.currency.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), this.roundN(ele.budgetAmt), this.roundN(ele.plannedBudgetAmt), this.roundN(ele.orderedBudgetAmt), this.roundN((ele.budgetAmt - (ele.plannedBudgetAmt + ele.orderedBudgetAmt))), this.formatDate(ele.startDate), this.formatDate(ele.stopDate)])));
 
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
@@ -218,13 +363,18 @@ class Budgets extends Component {
                 if (i == 1) {
                     doc.setFontSize(8)
                     doc.setFont('helvetica', 'normal')
-                    doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 90, {
+                    doc.text(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
+                    doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
                         align: 'left'
                     })
-
+                    doc.text(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
+                        align: 'left'
+                    })
+                    var fundingSourceText = doc.splitTextToSize((i18n.t('static.budget.fundingsource') + ' : ' + this.state.fundingSourceLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+                    doc.text(doc.internal.pageSize.width / 8, 150, fundingSourceText)
+                  
                 }
 
             }
@@ -277,10 +427,14 @@ class Budgets extends Component {
 
 
     filterData() {
+        let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
+        let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
         let programId = document.getElementById('programId').value
         let versionId = document.getElementById('versionId').value
+        let fundingSourceIds = this.state.fundingSourceValues.length == this.state.fundingSources.length ? [] : this.state.fundingSourceValues.map(ele => (ele.value).toString());
+      
         // console.log('programIds.length', programIds.length)
-        if (programId.length != 0 && versionId != 0) {
+        if (programId.length != 0 && versionId != 0 && this.state.fundingSourceValues.length>0) {
             if (versionId.includes('Local')) {
 
                 var db1;
@@ -300,8 +454,9 @@ class Budgets extends Component {
                     budgetRequest.onsuccess = function (event) {
                         var budgetResult = [];
                         budgetResult = budgetRequest.result;
+                        console.log('*******',budgetResult)
                         for (var k = 0, j = 0; k < budgetResult.length; k++) {
-                            if (budgetResult[k].program.id == programId)
+                            if (budgetResult[k].program.id == programId &&  moment(budgetResult[k].startDate).isBetween(startDate, endDate, null, '[)')&& (this.state.fundingSourceValues.filter(c=>c.value==budgetResult[k].fundingSource.fundingSourceId)).length>0 )
                                 budgetList[j++] = budgetResult[k]
                         }
                         var transaction = db1.transaction(['programData'], 'readwrite');
@@ -321,16 +476,17 @@ class Budgets extends Component {
                             for (var l = 0; l < budgetList.length; l++) {
                                 var shipmentList = programJson.shipmentList.filter(s => s.budget.id == budgetList[l].budgetId);
                                 var plannedShipmentbudget = 0;
-                                (shipmentList.filter(s => (s.shipmentStatus.id == 1 || s.shipmentStatus.id == 2 || s.shipmentStatus.id == 3 || s.shipmentStatus.id == 9))).map(ele =>{
-                                    console.log(ele) 
-                                    plannedShipmentbudget = plannedShipmentbudget + (parseFloat(ele.productCost) + parseFloat(ele.freightCost)) * parseFloat(ele.currency.conversionRateToUsd)});
-console.log(plannedShipmentbudget)
+                                (shipmentList.filter(s => (s.shipmentStatus.id == 1 || s.shipmentStatus.id == 2 || s.shipmentStatus.id == 3 || s.shipmentStatus.id == 9))).map(ele => {
+                                    console.log(ele)
+                                    plannedShipmentbudget = plannedShipmentbudget + (parseFloat(ele.productCost) + parseFloat(ele.freightCost)) * parseFloat(ele.currency.conversionRateToUsd)
+                                });
+                                console.log(plannedShipmentbudget)
                                 var OrderedShipmentbudget = 0;
                                 var shiplist = (shipmentList.filter(s => (s.shipmentStatus.id == 4 || s.shipmentStatus.id == 5 || s.shipmentStatus.id == 6 || s.shipmentStatus.id == 7)))
                                 console.log(shiplist)
                                 shiplist.map(ele => {
                                     console.log(OrderedShipmentbudget, '+', ele.productCost + ele.freightCost)
-                                    OrderedShipmentbudget = OrderedShipmentbudget +  (parseFloat(ele.productCost) + parseFloat(ele.freightCost)) * parseFloat(ele.currency.conversionRateToUsd)
+                                    OrderedShipmentbudget = OrderedShipmentbudget + (parseFloat(ele.productCost) + parseFloat(ele.freightCost)) * parseFloat(ele.currency.conversionRateToUsd)
                                 });
                                 console.log(OrderedShipmentbudget)
                                 console.log("budget list==>", budgetList[l]);
@@ -363,7 +519,7 @@ console.log(plannedShipmentbudget)
 
             } else {
                 this.setState({ loading: true })
-                var inputjson = { "programId": programId, "versionId": versionId }
+                var inputjson = { "programId": programId, "versionId": versionId ,"startDate":startDate,"stopDate":endDate,"fundingSourceIds":fundingSourceIds}
                 // AuthenticationService.setupAxiosInterceptors();
                 ReportService.budgetReport(inputjson)
                     .then(response => {
@@ -376,31 +532,76 @@ console.log(plannedShipmentbudget)
                             this.setState({
                                 selBudget: [], loading: false
                             })
-
                             if (error.message === "Network Error") {
-                                this.setState({ message: error.message });
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
                             } else {
                                 switch (error.response ? error.response.status : "") {
-                                    case 500:
+
                                     case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
                                     case 404:
                                     case 406:
+                                        this.setState({
+                                            message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                            loading: false
+                                        });
+                                        break;
                                     case 412:
-                                        this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                        this.setState({
+                                            message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                            loading: false
+                                        });
                                         break;
                                     default:
-                                        this.setState({ loading: false, message: 'static.unkownError' });
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
                                         break;
                                 }
                             }
                         }
                     );
+                // .catch(
+                //     error => {
+                //         this.setState({
+                //             selBudget: [], loading: false
+                //         })
+
+                //         if (error.message === "Network Error") {
+                //             this.setState({ message: error.message });
+                //         } else {
+                //             switch (error.response ? error.response.status : "") {
+                //                 case 500:
+                //                 case 401:
+                //                 case 404:
+                //                 case 406:
+                //                 case 412:
+                //                     this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                //                     break;
+                //                 default:
+                //                     this.setState({ loading: false, message: 'static.unkownError' });
+                //                     break;
+                //             }
+                //         }
+                //     }
+                // );
 
             }
         } else if (programId == 0) {
             this.setState({ selBudget: [], message: i18n.t('static.common.selectProgram') });
-        } else {
+        } else  if (versionId == 0){
             this.setState({ selBudget: [], message: i18n.t('static.program.validversion') });
+        }else {
+            this.setState({ selBudget: [], message: i18n.t('static.fundingSource.selectFundingSource') });
         }
     }
     formatDate(cell) {
@@ -428,23 +629,66 @@ console.log(plannedShipmentbudget)
                             programs: [], loading: false
                         }, () => { this.consolidatedProgramList() })
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message, loading: false });
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
                         } else {
                             switch (error.response ? error.response.status : "") {
-                                case 500:
+
                                 case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
                                 case 404:
                                 case 406:
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                        loading: false
+                                    });
+                                    break;
                                 case 412:
-                                    this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                        loading: false
+                                    });
                                     break;
                                 default:
-                                    this.setState({ loading: false, message: 'static.unkownError' });
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
                                     break;
                             }
                         }
                     }
                 );
+            // .catch(
+            //     error => {
+            //         this.setState({
+            //             programs: [], loading: false
+            //         }, () => { this.consolidatedProgramList() })
+            //         if (error.message === "Network Error") {
+            //             this.setState({ message: error.message, loading: false });
+            //         } else {
+            //             switch (error.response ? error.response.status : "") {
+            //                 case 500:
+            //                 case 401:
+            //                 case 404:
+            //                 case 406:
+            //                 case 412:
+            //                     this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+            //                     break;
+            //                 default:
+            //                     this.setState({ loading: false, message: 'static.unkownError' });
+            //                     break;
+            //             }
+            //         }
+            //     }
+            // );
 
         } else {
             console.log('offline')
@@ -609,6 +853,7 @@ console.log(plannedShipmentbudget)
 
     componentDidMount() {
         this.getPrograms()
+        this.getFundingSource();
     }
     // showSubFundingSourceLabel(cell, row) {
     //   return getLabelText(cell.label, this.state.lang);
@@ -689,7 +934,8 @@ console.log(plannedShipmentbudget)
             }, this);
         console.log('budget list', this.state.selBudget)
         var budgets = this.state.selBudget.map((item, index) => (item.budget))
-
+        const { fundingSources } = this.state;
+        const { rangeValue } = this.state
         console.log('budgets', budgets)
 
 
@@ -907,11 +1153,7 @@ console.log(plannedShipmentbudget)
         }
         return (
             <div className="animated">
-                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
-                    this.setState({ message: message })
-                }} loading={(loading) => {
-                    this.setState({ loading: loading })
-                }} />
+                <AuthenticationServiceComponent history={this.props.history} />
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
@@ -932,6 +1174,26 @@ console.log(plannedShipmentbudget)
 
                         <Col md="11 pl-0">
                             <div className="row">
+                            <FormGroup className="col-md-3">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon fa fa-sort-desc"></span></Label>
+                                    <div className="controls  Regioncalender">
+
+                                        <Picker
+                                            ref="pickRange"
+                                            years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                            value={rangeValue}
+                                            lang={pickerLang}
+                                            //theme="light"
+                                            onChange={this.handleRangeChange}
+                                            onDismiss={this.handleRangeDissmis}
+                                        >
+                                            <MonthBox value={this.makeText(rangeValue.from) + ' ~ ' + this.makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
+                                        </Picker>
+
+
+                                    </div>
+                                </FormGroup>
+
                                 <FormGroup className="col-md-3">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                     <div className="controls ">
@@ -968,6 +1230,27 @@ console.log(plannedShipmentbudget)
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
+                                <FormGroup className="col-md-3" >
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.budget.fundingsource')}</Label>
+                                    <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                                    <div className="controls">
+                                        <MultiSelect
+                                            name="fundingSourceId"
+                                            id="fundingSourceId"
+                                            bsSize="md"
+                                            value={this.state.fundingSourceValues}
+                                            onChange={(e) => { this.handleFundingSourceChange(e) }}
+                                            options={fundingSources.length > 0
+                                                && fundingSources.map((item, i) => {
+                                                    return (
+                                                        { label: item.fundingSourceCode, value: item.fundingSourceId }
+                                                    )
+                                                }, this)}
+                                        />
+
+                                    </div>
+                                </FormGroup>
+
 
                             </div>
                         </Col>

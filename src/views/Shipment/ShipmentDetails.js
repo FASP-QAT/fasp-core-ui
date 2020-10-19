@@ -45,7 +45,7 @@ export default class ShipmentDetails extends React.Component {
             shipmentChangedFlag: 0,
             shipmentModalTitle: "",
             shipmentType: { value: 1, label: i18n.t('static.shipment.manualShipments') },
-            rangeValue: { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() }, to: { year: new Date(endDate).getFullYear(), month: new Date(endDate).getMonth() } },
+            rangeValue: localStorage.getItem("sesRangeValue") != "" ? JSON.parse(localStorage.getItem("sesRangeValue")) : { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() }, to: { year: new Date(endDate).getFullYear(), month: new Date(endDate).getMonth() } },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() },
         }
@@ -85,6 +85,7 @@ export default class ShipmentDetails extends React.Component {
         }
         if (cont == true) {
             this.setState({ rangeValue: value, shipmentChangedFlag: 0 })
+            localStorage.setItem("sesRangeValue", JSON.stringify(value));
             this.formSubmit(this.state.planningUnit, value);
         }
     }
@@ -208,7 +209,7 @@ export default class ShipmentDetails extends React.Component {
                 if (document.getElementById("addRowButtonId") != null) {
                     document.getElementById("addRowButtonId").style.display = "none";
                 }
-                var programIdd = this.props.match.params.programId;
+                var programIdd = this.props.match.params.programId || localStorage.getItem("sesProgramId");
                 console.log("programIdd", programIdd);
                 if (programIdd != '' && programIdd != undefined) {
                     var programSelect = { value: programIdd, label: proList.filter(c => c.value == programIdd)[0].label };
@@ -251,6 +252,7 @@ export default class ShipmentDetails extends React.Component {
             })
             var programId = value != "" && value != undefined ? value.value : 0;
             if (programId != 0) {
+                localStorage.setItem("sesProgramId", programId);
                 var db1;
                 var storeOS;
                 getDatabase();
@@ -298,7 +300,7 @@ export default class ShipmentDetails extends React.Component {
                             planningUnitListAll: myResult,
                             loading: false
                         })
-                        var planningUnitIdProp = this.props.match.params.planningUnitId;
+                        var planningUnitIdProp = this.props.match.params.planningUnitId || localStorage.getItem("sesPlanningUnitId");
                         console.log("planningUnitIdProp===>", planningUnitIdProp);
                         if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
                             var planningUnit = { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label };
@@ -340,6 +342,7 @@ export default class ShipmentDetails extends React.Component {
             var planningUnitId = value != "" && value != undefined ? value.value : 0;
             var programId = document.getElementById("programId").value;
             if (planningUnitId != 0) {
+                localStorage.setItem("sesPlanningUnitId", planningUnitId);
                 document.getElementById("shipmentsDetailsTableDiv").style.display = "block";
                 console.log("(this.state.shipmentType).value", (this.state.shipmentType).value);
                 if (document.getElementById("addRowButtonId") != null) {
@@ -347,6 +350,11 @@ export default class ShipmentDetails extends React.Component {
                     if ((this.state.shipmentType).value == 1) {
                         console.log("in if 1")
                         document.getElementById("addRowButtonId").style.display = "block";
+                        var roleList = AuthenticationService.getLoggedInUserRole();
+                        console.log("RoleList------------>", roleList);
+                        if (roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') {
+                            document.getElementById("addRowButtonId").style.display = "none";
+                        }
                     } else {
                         console.log("in else")
                         document.getElementById("addRowButtonId").style.display = "none";
@@ -595,7 +603,7 @@ export default class ShipmentDetails extends React.Component {
                         </div>
 
                         <div className="shipmentconsumptionSearchMarginTop">
-                            {this.state.showShipments == 1 && <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} updateState={this.updateState} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} hideFourthComponent={this.hideFourthComponent} hideFifthComponent={this.hideFifthComponent} shipmentPage="shipmentDataEntry" />}
+                            <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} updateState={this.updateState} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} hideFourthComponent={this.hideFourthComponent} hideFifthComponent={this.hideFifthComponent} shipmentPage="shipmentDataEntry" />
                             <div className="table-responsive" id="shipmentsDetailsTableDiv">
                                 <div id="shipmentsDetailsTable" className="jexcelremoveReadonlybackground" />
                             </div>
@@ -639,7 +647,7 @@ export default class ShipmentDetails extends React.Component {
                     <ModalFooter>
                         <div id="showShipmentBatchInfoButtonsDiv" style={{ display: 'none' }} className="mr-0">
                             {this.state.shipmentBatchInfoChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right" onClick={() => this.refs.shipmentChild.saveShipmentBatchInfo()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBatchInfo')}</Button>}
-                            {this.refs.shipmentChild != undefined && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.refs.shipmentChild.addBatchRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
+                            {this.refs.shipmentChild != undefined && <Button color="info" id="addShipmentBatchRowId" size="md" className="float-right mr-1" type="button" onClick={this.refs.shipmentChild.addBatchRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
                         </div>
                         <div id="showSaveShipmentsDatesButtonsDiv" style={{ display: 'none' }} className="mr-0">
                             {this.state.shipmentDatesChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right" onClick={() => this.refs.shipmentChild.saveShipmentsDate()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveShipmentDates')}</Button>}

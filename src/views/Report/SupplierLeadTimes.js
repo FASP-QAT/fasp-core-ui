@@ -95,7 +95,7 @@ class SupplierLeadTimes extends Component {
             data = [];
             data[0] = getLabelText(outPutList[j].program.label, this.state.lang)
             data[1] = getLabelText(outPutList[j].planningUnit.label, this.state.lang)
-            data[2] =outPutList[j].procurementAgent.code 
+            data[2] = outPutList[j].procurementAgent.code
             data[3] = outPutList[j].plannedSubmittedLeadTime
             data[4] = outPutList[j].submittedToApprovedLeadTime
             data[5] = outPutList[j].approvedToShippedLeadTime
@@ -126,7 +126,7 @@ class SupplierLeadTimes extends Component {
             // colWidths: [150, 150, 100],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
-               {
+                {
                     title: i18n.t('static.program.program'),
                     type: 'text',
                     readOnly: true
@@ -153,7 +153,7 @@ class SupplierLeadTimes extends Component {
                 //     readOnly: true
                 // },
                 {
-                    title: i18n.t('static.program.submittoapproveleadtime'),
+                    title: i18n.t('static.procurementagent.procurementagentapprovetosubmittime'),
                     type: 'text',
                     readOnly: true
                 },
@@ -163,17 +163,17 @@ class SupplierLeadTimes extends Component {
                     readOnly: true
                 },
                 {
-                    title: i18n.t('static.realmcountry.shippedToArrivedSeaLeadTime'),
+                    title: i18n.t('static.report.shippedToArrivedSeaLeadTime'),
                     type: 'text',
                     readOnly: true
                 },
                 {
-                    title: i18n.t('static.realmcountry.shippedToArrivedAirLeadTime'),
+                    title: i18n.t('static.report.shippedToArrivedAirLeadTime'),
                     type: 'text',
                     readOnly: true
                 },
                 {
-                    title: i18n.t('static.realmcountry.arrivedToDeliveredLeadTime'),
+                    title: i18n.t('static.shipment.arrivedToreceivedLeadTime'),
                     type: 'text',
                     readOnly: true
                 },
@@ -192,6 +192,25 @@ class SupplierLeadTimes extends Component {
                     type: 'text',
                     readOnly: true
                 },
+            ],
+            nestedHeaders:[
+               
+                [{
+                    title: '',
+                    rowspan: '1',
+                },{
+                    title: '',
+                    rowspan: '1',
+                },{
+                    title: '',
+                    rowspan: '1',
+                },
+                    {
+                        title: i18n.t('static.dashboard.months'),
+                        colspan: '9',
+                    },
+                ],
+               
             ],
             text: {
                 showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
@@ -222,9 +241,9 @@ class SupplierLeadTimes extends Component {
         })
     }
 
-    addDoubleQuoteToRowContent=(arr)=>{
-        return arr.map(ele=>'"'+ele+'"')
-     }
+    addDoubleQuoteToRowContent = (arr) => {
+        return arr.map(ele => '"' + ele + '"')
+    }
 
     exportCSV(columns) {
         var csvRow = [];
@@ -262,11 +281,11 @@ class SupplierLeadTimes extends Component {
         console.log("output list--->", this.state.outPutList);
         this.state.outPutList.map(
             ele => A.push(this.addDoubleQuoteToRowContent([
-              //  (getLabelText(ele.country.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
+                //  (getLabelText(ele.country.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
                 (getLabelText(ele.program.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
                 ele.planningUnit.id,
                 getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(' ', '%20'),
-                (ele.procurementAgent.code== null ? '' : ele.procurementAgent.code.replaceAll(',', ' ')).replaceAll(' ', '%20'),
+                (ele.procurementAgent.code == null ? '' : ele.procurementAgent.code.replaceAll(',', ' ')).replaceAll(' ', '%20'),
                 ele.plannedSubmittedLeadTime,
                 // ele.draftToSubmittedLeadTime,
                 ele.submittedToApprovedLeadTime,
@@ -403,11 +422,11 @@ class SupplierLeadTimes extends Component {
         const headers = [];
         columns.map((item, idx) => { headers[idx] = (item.text) });
         let data = this.state.outPutList.map(ele => [
-          //  getLabelText(ele.country.label, this.state.lang),
+            //  getLabelText(ele.country.label, this.state.lang),
             getLabelText(ele.program.label, this.state.lang),
             ele.planningUnit.id,
             getLabelText(ele.planningUnit.label, this.state.lang),
-           ele.procurementAgent.code,
+            ele.procurementAgent.code,
             ele.plannedSubmittedLeadTime,
             // ele.draftToSubmittedLeadTime,
             ele.submittedToApprovedLeadTime,
@@ -496,25 +515,69 @@ class SupplierLeadTimes extends Component {
                             procurementAgents: [],
                             loading: false
                         })
-
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message, loading: false });
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
                         } else {
                             switch (error.response ? error.response.status : "") {
-                                case 500:
+
                                 case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
                                 case 404:
                                 case 406:
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
+                                        loading: false
+                                    });
+                                    break;
                                 case 412:
-                                    this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }) });
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
+                                        loading: false
+                                    });
                                     break;
                                 default:
-                                    this.setState({ message: 'static.unkownError', loading: false });
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
                                     break;
                             }
                         }
                     }
                 );
+            // .catch(
+            //     error => {
+            //         this.setState({
+            //             procurementAgents: [],
+            //             loading: false
+            //         })
+
+            //         if (error.message === "Network Error") {
+            //             this.setState({ message: error.message, loading: false });
+            //         } else {
+            //             switch (error.response ? error.response.status : "") {
+            //                 case 500:
+            //                 case 401:
+            //                 case 404:
+            //                 case 406:
+            //                 case 412:
+            //                     this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }) });
+            //                     break;
+            //                 default:
+            //                     this.setState({ message: 'static.unkownError', loading: false });
+            //                     break;
+            //             }
+            //         }
+            //     }
+            // );
         } else if (programIds.length == 0) {
             this.setState({ message: i18n.t('static.common.selectProgram'), procurementAgents: [] });
 
@@ -540,23 +603,66 @@ class SupplierLeadTimes extends Component {
                             programs: [], loading: false
                         }, () => { this.consolidatedProgramList() })
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message, loading: false });
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
                         } else {
                             switch (error.response ? error.response.status : "") {
-                                case 500:
+
                                 case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
                                 case 404:
                                 case 406:
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                        loading: false
+                                    });
+                                    break;
                                 case 412:
-                                    this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                        loading: false
+                                    });
                                     break;
                                 default:
-                                    this.setState({ message: 'static.unkownError', loading: false });
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
                                     break;
                             }
                         }
                     }
                 );
+            // .catch(
+            //     error => {
+            //         this.setState({
+            //             programs: [], loading: false
+            //         }, () => { this.consolidatedProgramList() })
+            //         if (error.message === "Network Error") {
+            //             this.setState({ message: error.message, loading: false });
+            //         } else {
+            //             switch (error.response ? error.response.status : "") {
+            //                 case 500:
+            //                 case 401:
+            //                 case 404:
+            //                 case 406:
+            //                 case 412:
+            //                     this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+            //                     break;
+            //                 default:
+            //                     this.setState({ message: 'static.unkownError', loading: false });
+            //                     break;
+            //             }
+            //         }
+            //     }
+            // );
         } else {
             console.log('offline')
             this.setState({ loading: false })
@@ -760,30 +866,72 @@ class SupplierLeadTimes extends Component {
                         }, () => {
                             this.fetchData();
                         })
-                    })
-                        .catch(
-                            error => {
+                    }).catch(
+                        error => {
+                            this.setState({
+                                planningUnits: [],
+                            })
+                            if (error.message === "Network Error") {
                                 this.setState({
-                                    planningUnits: [],
-                                })
-                                if (error.message === "Network Error") {
-                                    this.setState({ message: error.message });
-                                } else {
-                                    switch (error.response ? error.response.status : "") {
-                                        case 500:
-                                        case 401:
-                                        case 404:
-                                        case 406:
-                                        case 412:
-                                            this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
-                                            break;
-                                        default:
-                                            this.setState({ message: 'static.unkownError' });
-                                            break;
-                                    }
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
+
+                                    case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
+                                    case 404:
+                                    case 406:
+                                        this.setState({
+                                            message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
+                                            loading: false
+                                        });
+                                        break;
+                                    case 412:
+                                        this.setState({
+                                            message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
+                                            loading: false
+                                        });
+                                        break;
+                                    default:
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                        break;
                                 }
                             }
-                        );
+                        }
+                    );
+                    // .catch(
+                    //     error => {
+                    //         this.setState({
+                    //             planningUnits: [],
+                    //         })
+                    //         if (error.message === "Network Error") {
+                    //             this.setState({ message: error.message });
+                    //         } else {
+                    //             switch (error.response ? error.response.status : "") {
+                    //                 case 500:
+                    //                 case 401:
+                    //                 case 404:
+                    //                 case 406:
+                    //                 case 412:
+                    //                     this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
+                    //                     break;
+                    //                 default:
+                    //                     this.setState({ message: 'static.unkownError' });
+                    //                     break;
+                    //             }
+                    //         }
+                    //     }
+                    // );
                 }
             });
         } else {
@@ -804,8 +952,8 @@ class SupplierLeadTimes extends Component {
             ProcurementAgentService.getProcurementAgentListAll()
                 .then(response => {
                     // console.log(JSON.stringify(response.data))
-                    var procurementAgent=response.data
-                  //  procurementAgent.push({ procurementAgentCode: 'No Procurement Agent', procurementAgentId: 0 })
+                    var procurementAgent = response.data
+                    //  procurementAgent.push({ procurementAgentCode: 'No Procurement Agent', procurementAgentId: 0 })
                     this.setState({
                         procurementAgents: procurementAgent, loading: false
                     }, () => { this.consolidatedProcurementAgentList() })
@@ -815,23 +963,66 @@ class SupplierLeadTimes extends Component {
                             procurementAgents: [], loading: false
                         }, () => { this.consolidatedProcurementAgentList() })
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message, loading: false });
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
                         } else {
                             switch (error.response ? error.response.status : "") {
-                                case 500:
+
                                 case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
                                 case 404:
                                 case 406:
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                        loading: false
+                                    });
+                                    break;
                                 case 412:
-                                    this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                        loading: false
+                                    });
                                     break;
                                 default:
-                                    this.setState({ message: 'static.unkownError', loading: false });
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
                                     break;
                             }
                         }
                     }
                 );
+            // .catch(
+            //     error => {
+            //         this.setState({
+            //             procurementAgents: [], loading: false
+            //         }, () => { this.consolidatedProcurementAgentList() })
+            //         if (error.message === "Network Error") {
+            //             this.setState({ message: error.message, loading: false });
+            //         } else {
+            //             switch (error.response ? error.response.status : "") {
+            //                 case 500:
+            //                 case 401:
+            //                 case 404:
+            //                 case 406:
+            //                 case 412:
+            //                     this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+            //                     break;
+            //                 default:
+            //                     this.setState({ message: 'static.unkownError', loading: false });
+            //                     break;
+            //             }
+            //         }
+            //     }
+            // );
 
         } else {
             console.log('offline')
@@ -931,23 +1122,70 @@ class SupplierLeadTimes extends Component {
                                     this.el.destroy();
                                 })
                             if (error.message === "Network Error") {
-                                this.setState({ message: error.message, loading: false });
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
                             } else {
                                 switch (error.response ? error.response.status : "") {
-                                    case 500:
+
                                     case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
                                     case 404:
                                     case 406:
+                                        this.setState({
+                                            message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                            loading: false
+                                        });
+                                        break;
                                     case 412:
-                                        this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }), loading: false });
+                                        this.setState({
+                                            message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                            loading: false
+                                        });
                                         break;
                                     default:
-                                        this.setState({ message: 'static.unkownError', loading: false });
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
                                         break;
                                 }
                             }
                         }
                     );
+                // .catch(
+                //     error => {
+                //         this.setState({
+                //             outPutList: [], loading: false
+                //         },
+                //             () => {
+                //                 this.el = jexcel(document.getElementById("tableDiv"), '');
+                //                 this.el.destroy();
+                //             })
+                //         if (error.message === "Network Error") {
+                //             this.setState({ message: error.message, loading: false });
+                //         } else {
+                //             switch (error.response ? error.response.status : "") {
+                //                 case 500:
+                //                 case 401:
+                //                 case 404:
+                //                 case 406:
+                //                 case 412:
+                //                     this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }), loading: false });
+                //                     break;
+                //                 default:
+                //                     this.setState({ message: 'static.unkownError', loading: false });
+                //                     break;
+                //             }
+                //         }
+                //     }
+                // );
 
             } else {
                 planningUnitIds = this.state.planningUnitValues.map(ele => (ele.value).toString());
@@ -973,7 +1211,7 @@ class SupplierLeadTimes extends Component {
                     programRequest.onerror = function (event) {
                         this.setState({
                             message: i18n.t('static.program.errortext'),
-                            loading:false
+                            loading: false
                         })
                     }.bind(this);
 
@@ -987,7 +1225,7 @@ class SupplierLeadTimes extends Component {
                         ppuRequest.onerror = function (event) {
                             this.setState({
                                 message: i18n.t('static.program.errortext'),
-                                loading:false
+                                loading: false
                             })
                         }.bind(this);
                         ppuRequest.onsuccess = function (e) {
@@ -1012,7 +1250,7 @@ class SupplierLeadTimes extends Component {
                             papuRequest.onerror = function (event) {
                                 this.setState({
                                     message: i18n.t('static.program.errortext'),
-                                    loading:false
+                                    loading: false
                                 })
                             }.bind(this);
 
@@ -1037,7 +1275,7 @@ class SupplierLeadTimes extends Component {
                                 paRequest.onerror = function (event) {
                                     this.setState({
                                         message: i18n.t('static.program.errortext'),
-                                        loading:false
+                                        loading: false
                                     })
                                 }.bind(this);
 
@@ -1179,7 +1417,7 @@ class SupplierLeadTimes extends Component {
 
             }, this);
         const columns = [
-            
+
             {
                 dataField: 'program.label',
                 text: i18n.t('static.program.program'),
@@ -1190,7 +1428,7 @@ class SupplierLeadTimes extends Component {
                 formatter: (cell, row) => {
                     return getLabelText(cell, this.state.lang);
                 }
-            },{
+            }, {
                 dataField: 'planningUnit.id',
                 text: i18n.t('static.report.qatPID'),
                 sort: true,
@@ -1260,7 +1498,7 @@ class SupplierLeadTimes extends Component {
             },
             {
                 dataField: 'shippedToArrivedBySeaLeadTime',
-                text: i18n.t('static.realmcountry.shippedToArrivedSeaLeadTime'),
+                text: i18n.t('static.report.shippedToArrivedSeaLeadTime'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -1269,7 +1507,7 @@ class SupplierLeadTimes extends Component {
             },
             {
                 dataField: 'shippedToArrivedByAirLeadTime',
-                text: i18n.t('static.realmcountry.shippedToArrivedAirLeadTime'),
+                text: i18n.t('static.report.shippedToArrivedAirLeadTime'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -1346,11 +1584,7 @@ class SupplierLeadTimes extends Component {
 
         return (
             <div className="animated" >
-                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
-                    this.setState({ message: message })
-                }} loading={(loading) => {
-                    this.setState({ loading: loading })
-                }} />
+                <AuthenticationServiceComponent history={this.props.history} />
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
 

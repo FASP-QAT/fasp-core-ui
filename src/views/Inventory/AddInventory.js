@@ -24,7 +24,7 @@ export default class AddInventory extends Component {
     constructor(props) {
         super(props);
         var startDate = moment(Date.now()).subtract(6, 'months').startOf('month').format("YYYY-MM-DD");
-        var endDate=moment(Date.now()).add(18,'months').startOf('month').format("YYYY-MM-DD")
+        var endDate = moment(Date.now()).add(18, 'months').startOf('month').format("YYYY-MM-DD")
         this.state = {
             loading: true,
             programList: [],
@@ -37,7 +37,7 @@ export default class AddInventory extends Component {
             showInventory: 0,
             inventoryChangedFlag: 0,
             inventoryDataType: { value: 1, label: i18n.t('static.inventory.inventory') },
-            rangeValue: { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() }, to: { year: new Date(endDate).getFullYear(), month: new Date(endDate).getMonth() } },
+            rangeValue: localStorage.getItem("sesRangeValue") != "" ? JSON.parse(localStorage.getItem("sesRangeValue")) : { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() }, to: { year: new Date(endDate).getFullYear(), month: new Date(endDate).getMonth() } },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() },
         }
@@ -75,6 +75,7 @@ export default class AddInventory extends Component {
         }
         if (cont == true) {
             this.setState({ rangeValue: value, inventoryChangedFlag: 0 })
+            localStorage.setItem("sesRangeValue", JSON.stringify(value));
             this.formSubmit(this.state.planningUnit, value);
         }
     }
@@ -178,7 +179,7 @@ export default class AddInventory extends Component {
                 if (document.getElementById("addRowButtonId") != null) {
                     document.getElementById("addRowButtonId").style.display = "none";
                 }
-                var programIdd = this.props.match.params.programId;
+                var programIdd = this.props.match.params.programId || localStorage.getItem("sesProgramId");
                 console.log("programIdd", programIdd);
                 if (programIdd != '' && programIdd != undefined) {
                     var programSelect = { value: programIdd, label: proList.filter(c => c.value == programIdd)[0].label };
@@ -222,6 +223,7 @@ export default class AddInventory extends Component {
             })
             var programId = value != "" && value != undefined ? value.value : 0;
             if (programId != 0) {
+                localStorage.setItem("sesProgramId", programId);
                 var db1;
                 var storeOS;
                 var regionList = [];
@@ -295,7 +297,7 @@ export default class AddInventory extends Component {
                                 loading: false
                             })
 
-                            var planningUnitIdProp = this.props.match.params.planningUnitId;
+                            var planningUnitIdProp = this.props.match.params.planningUnitId || localStorage.getItem("sesPlanningUnitId");
                             console.log("planningUnitIdProp===>", planningUnitIdProp);
                             if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
                                 var planningUnit = { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label };
@@ -339,9 +341,15 @@ export default class AddInventory extends Component {
             var planningUnitId = value != "" && value != undefined ? value.value : 0;
             var programId = document.getElementById("programId").value;
             if (planningUnitId != 0) {
+                localStorage.setItem("sesPlanningUnitId", planningUnitId);
                 document.getElementById("adjustmentsTableDiv").style.display = "block";
                 if (document.getElementById("addRowButtonId") != null) {
                     document.getElementById("addRowButtonId").style.display = "block";
+                    var roleList = AuthenticationService.getLoggedInUserRole();
+                    if (roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') {
+                        console.log("In if");
+                        document.getElementById("addRowButtonId").style.display = "none";
+                    }
                 }
                 var db1;
                 getDatabase();
@@ -551,7 +559,7 @@ export default class AddInventory extends Component {
                                     )} />
 
                         <div>
-                            {this.state.showInventory == 1 && <InventoryInSupplyPlanComponent ref="inventoryChild" items={this.state} toggleLarge={this.toggleLarge} updateState={this.updateState} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} inventoryPage="inventoryDataEntry" />}
+                            <InventoryInSupplyPlanComponent ref="inventoryChild" items={this.state} toggleLarge={this.toggleLarge} updateState={this.updateState} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} inventoryPage="inventoryDataEntry" />
                             <div className="table-responsive" id="adjustmentsTableDiv">
                                 <div id="adjustmentsTable" />
                             </div>
@@ -617,6 +625,8 @@ export default class AddInventory extends Component {
         }
         if (cont == true) {
             let id = AuthenticationService.displayDashboardBasedOnRole();
+            var entityname = this.state.inventoryType == 1 ? i18n.t("static.inventoryDetailHead.inventoryDetail") : i18n.t("static.inventory.adjustmentdetails");
+            console.log("Entity name", entityname)
             this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
         }
     }

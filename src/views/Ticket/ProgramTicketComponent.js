@@ -15,11 +15,14 @@ import HealthAreaService from '../../api/HealthAreaService';
 import classNames from 'classnames';
 import { SPACE_REGEX } from '../../Constants';
 
+let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.program.programMaster"))
+let summaryText_2 = "Add Program"
+const selectedRealm = (AuthenticationService.getRealmId() !== "" && AuthenticationService.getRealmId() !== -1) ? AuthenticationService.getRealmId() : ""
 const initialValues = {
-    summary: "Add Program",
+    summary: summaryText_1,
     programName: '',
     programCode: '',
-    realmId: '',
+    realmId: selectedRealm,
     realmCountryId: '',
     regionId: '',
     organisationId: '',
@@ -122,7 +125,7 @@ export default class ProgramTicketComponent extends Component {
         super(props);
         this.state = {
             program: {
-                summary: "Add Program",
+                summary: summaryText_1,
                 programName: '',
                 programCode: '',
                 realmId: '',
@@ -178,13 +181,13 @@ export default class ProgramTicketComponent extends Component {
             program.programCode = event.target.value;
         }
         if (event.target.name == "realmId") {
-            program.realmId = this.state.realmList.filter(c => c.realmId == event.target.value)[0].label.label_en;
+            program.realmId = event.target.value !== "" ? this.state.realmList.filter(c => c.realmId == event.target.value)[0].label.label_en : "";
             // this.setState({
             this.state.realmId = event.target.value
             // })            
         }
         if (event.target.name == "realmCountryId") {
-            program.realmCountryId = this.state.realmCountryList.filter(c => c.realmCountryId == event.target.value)[0].country.label.label_en;
+            program.realmCountryId = event.target.value !== "" ? this.state.realmCountryList.filter(c => c.realmCountryId == event.target.value)[0].country.label.label_en : "";
             // this.setState({
             this.state.realmCountryId = event.target.value
             // })            
@@ -193,13 +196,13 @@ export default class ProgramTicketComponent extends Component {
             program.regionId = event.target.value;
         }
         if (event.target.name == "organisationId") {
-            program.organisationId = this.state.organisationList.filter(c => c.organisationId == event.target.value)[0].label.label_en;
+            program.organisationId = event.target.value !== "" ? this.state.organisationList.filter(c => c.organisationId == event.target.value)[0].label.label_en : "";
             // this.setState({
             this.state.organisationId = event.target.value
             // })            
         }
         if (event.target.name == "healthAreaId") {
-            program.healthAreaId = this.state.healthAreaList.filter(c => c.healthAreaId == event.target.value)[0].label.label_en;
+            program.healthAreaId = event.target.value !== "" ? this.state.healthAreaList.filter(c => c.healthAreaId == event.target.value)[0].label.label_en : "";
             // this.setState({
             this.state.healthAreaId = event.target.value
             // })            
@@ -242,63 +245,221 @@ export default class ProgramTicketComponent extends Component {
         }, () => { })
     };
 
-    getDependentLists(e) {
-        AuthenticationService.setupAxiosInterceptors();
-        ProgramService.getProgramManagerList(e.target.value)
-            .then(response => {
-                if (response.status == 200) {
-                    this.setState({
-                        programManagerList: response.data
-                    })
-                } else {
-                    this.setState({
-                        message: response.data.messageCode
-                    })
-                }
-            })
+    getDependentLists(realmId) {
+        // AuthenticationService.setupAxiosInterceptors();
+        if (realmId != "") {
+            ProgramService.getProgramManagerList(realmId)
+                .then(response => {
+                    if (response.status == 200) {
+                        this.setState({
+                            programManagerList: response.data
+                        })
+                    } else {
+                        this.setState({
+                            message: response.data.messageCode
+                        })
+                    }
+                }).catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
 
-        ProgramService.getRealmCountryList(e.target.value)
-            .then(response => {
-                if (response.status == 200) {
-                    this.setState({
-                        realmCountryList: response.data
-                    })
-                } else {
-                    this.setState({
-                        message: response.data.messageCode
-                    })
-                }
-            })
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
+                                    break;
+                            }
+                        }
+                    }
+                );
 
-        ProgramService.getOrganisationList(e.target.value)
-            .then(response => {
-                if (response.status == 200) {
-                    this.setState({
-                        organisationList: response.data
-                    })
-                } else {
-                    this.setState({
-                        message: response.data.messageCode
-                    })
-                }
-            })
+            ProgramService.getRealmCountryList(realmId)
+                .then(response => {
+                    if (response.status == 200) {
+                        this.setState({
+                            realmCountryList: response.data
+                        })
+                    } else {
+                        this.setState({
+                            message: response.data.messageCode
+                        })
+                    }
+                }).catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
 
-        ProgramService.getHealthAreaList(e.target.value)
-            .then(response => {
-                if (response.status == 200) {
-                    this.setState({
-                        healthAreaList: response.data
-                    })
-                } else {
-                    this.setState({
-                        message: response.data.messageCode
-                    })
-                }
-            })
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
+                                    break;
+                            }
+                        }
+                    }
+                );
+
+            ProgramService.getOrganisationList(realmId)
+                .then(response => {
+                    if (response.status == 200) {
+                        this.setState({
+                            organisationList: response.data
+                        })
+                    } else {
+                        this.setState({
+                            message: response.data.messageCode
+                        })
+                    }
+                }).catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
+                                    break;
+                            }
+                        }
+                    }
+                );
+
+            ProgramService.getHealthAreaList(realmId)
+                .then(response => {
+                    if (response.status == 200) {
+                        this.setState({
+                            healthAreaList: response.data
+                        })
+                    } else {
+                        this.setState({
+                            message: response.data.messageCode
+                        })
+                    }
+                }).catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
+                                    break;
+                            }
+                        }
+                    }
+                );
+        }
     }
 
     getRegionList(e) {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         ProgramService.getRegionList(e.target.value)
             .then(response => {
                 if (response.status == 200) {
@@ -316,7 +477,46 @@ export default class ProgramTicketComponent extends Component {
                         message: response.data.messageCode
                     })
                 }
-            })
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
     }
     updateFieldData(value) {
         let { program } = this.state;
@@ -370,19 +570,74 @@ export default class ProgramTicketComponent extends Component {
     }
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
         HealthAreaService.getRealmList()
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        realmList: response.data
-                    })
+                        realmList: response.data,
+                        realmId: selectedRealm
+                    });
+                    if (selectedRealm !== "") {
+                        this.setState({
+                            realmList: (response.data).filter(c => c.realmId == selectedRealm)
+                        })
+
+                        let { program } = this.state;
+                        program.realmId = (response.data).filter(c => c.realmId == selectedRealm)[0].label.label_en;
+                        this.setState({
+                            program
+                        }, () => {
+
+                            this.getDependentLists(selectedRealm);                            
+
+                        })
+                    }
                 } else {
                     this.setState({
                         message: response.data.messageCode
                     })
                 }
-            })
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
     }
 
     hideSecondComponent() {
@@ -511,6 +766,8 @@ export default class ProgramTicketComponent extends Component {
                             this.setState({
                                 loading: true
                             })
+                            this.state.program.summary = summaryText_2;
+                            this.state.program.userLanguageCode = this.state.lang;
                             JiraTikcetService.addEmailRequestIssue(this.state.program).then(response => {
                                 console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
@@ -532,17 +789,46 @@ export default class ProgramTicketComponent extends Component {
                                 }
                                 this.props.togglehelp();
                                 this.props.toggleSmall(this.state.message);
-                            })
-                                .catch(
-                                    error => {
+                            }).catch(
+                                error => {
+                                    if (error.message === "Network Error") {
                                         this.setState({
-                                            message: i18n.t('static.unkownError'), loading: false
-                                        },
-                                            () => {
-                                                this.hideSecondComponent();
-                                            });
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                    } else {
+                                        switch (error.response ? error.response.status : "") {
+
+                                            case 401:
+                                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                                break;
+                                            case 403:
+                                                this.props.history.push(`/accessDenied`)
+                                                break;
+                                            case 500:
+                                            case 404:
+                                            case 406:
+                                                this.setState({
+                                                    message: error.response.data.messageCode,
+                                                    loading: false
+                                                });
+                                                break;
+                                            case 412:
+                                                this.setState({
+                                                    message: error.response.data.messageCode,
+                                                    loading: false
+                                                });
+                                                break;
+                                            default:
+                                                this.setState({
+                                                    message: 'static.unkownError',
+                                                    loading: false
+                                                });
+                                                break;
+                                        }
                                     }
-                                );
+                                }
+                            );
                         }}
                         render={
                             ({
@@ -578,7 +864,7 @@ export default class ProgramTicketComponent extends Component {
                                                 bsSize="sm"
                                                 valid={!errors.realmId && this.state.program.realmId != ''}
                                                 invalid={touched.realmId && !!errors.realmId}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); this.getDependentLists(e) }}
+                                                onChange={(e) => { handleChange(e); this.dataChange(e); this.getDependentLists(e.target.value) }}
                                                 onBlur={handleBlur}
                                                 value={this.state.realmId}
                                                 required >

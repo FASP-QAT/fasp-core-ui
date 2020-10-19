@@ -14,8 +14,10 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import { SPACE_REGEX } from '../../Constants';
 import DataSourceService from '../../api/DataSourceService';
 
+let summaryText_1 = (i18n.t("static.common.edit") + " " + i18n.t("static.datasource.datasource"))
+let summaryText_2 = "Edit Data Source"
 const initialValues = {
-    summary: "Edit Data Source",
+    summary: summaryText_1,
     dataSourceName: "",
     notes: ""
 }
@@ -60,7 +62,7 @@ export default class EditDataSourceTicketComponent extends Component {
         super(props);
         this.state = {
             dataSource: {
-                summary: "Edit Data Source",
+                summary: summaryText_1,
                 dataSourceName: "",
                 notes: ""
             },
@@ -81,7 +83,12 @@ export default class EditDataSourceTicketComponent extends Component {
             dataSource.summary = event.target.value;
         }
         if (event.target.name == "dataSourceName") {
-            dataSource.dataSourceName = event.target.options[event.target.selectedIndex].innerHTML;
+            var outText = "";
+            if(event.target.value !== "") {
+                var dataSourceT = this.state.dataSources.filter(c => c.dataSourceId == event.target.value)[0];
+                outText = dataSourceT.dataSourceType.label.label_en + " | " + dataSourceT.label.label_en;
+            }
+            dataSource.dataSourceName = outText;
             this.setState({
                 dataSourceId: event.target.value
             })
@@ -119,7 +126,7 @@ export default class EditDataSourceTicketComponent extends Component {
     }
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
 
         DataSourceService.getAllDataSourceList().then(response => {
 
@@ -220,6 +227,8 @@ export default class EditDataSourceTicketComponent extends Component {
                             this.setState({
                                 loading: true
                             })
+                            this.state.dataSource.summary = summaryText_2;
+                            this.state.dataSource.userLanguageCode = this.state.lang;
                             JiraTikcetService.addEmailRequestIssue(this.state.dataSource).then(response => {
                                 console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
@@ -241,17 +250,46 @@ export default class EditDataSourceTicketComponent extends Component {
                                 }
                                 this.props.togglehelp();
                                 this.props.toggleSmall(this.state.message);
-                            })
-                                .catch(
-                                    error => {
+                            }).catch(
+                                error => {
+                                    if (error.message === "Network Error") {
                                         this.setState({
-                                            message: i18n.t('static.unkownError'), loading: false
-                                        },
-                                            () => {
-                                                this.hideSecondComponent();
-                                            });
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                    } else {
+                                        switch (error.response ? error.response.status : "") {
+
+                                            case 401:
+                                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                                break;
+                                            case 403:
+                                                this.props.history.push(`/accessDenied`)
+                                                break;
+                                            case 500:
+                                            case 404:
+                                            case 406:
+                                                this.setState({
+                                                    message: error.response.data.messageCode,
+                                                    loading: false
+                                                });
+                                                break;
+                                            case 412:
+                                                this.setState({
+                                                    message: error.response.data.messageCode,
+                                                    loading: false
+                                                });
+                                                break;
+                                            default:
+                                                this.setState({
+                                                    message: 'static.unkownError',
+                                                    loading: false
+                                                });
+                                                break;
+                                        }
                                     }
-                                );
+                                }
+                            );
                         }}
                         render={
                             ({

@@ -17,8 +17,10 @@ import { SPACE_REGEX, ALPHABET_NUMBER_REGEX } from '../../Constants';
 import OrganisationService from '../../api/OrganisationService';
 import getLabelText from '../../CommonComponent/getLabelText';
 
+let summaryText_1 = (i18n.t("static.common.edit") + " " + i18n.t("static.organisation.organisation"))
+let summaryText_2 = "Edit Organisation"
 const initialValues = {
-    summary: 'Edit Organization',
+    summary: summaryText_1,
     organizationName: '',
     notes: ''
 }
@@ -63,7 +65,7 @@ export default class EditOrganisationTicketComponent extends Component {
         super(props);
         this.state = {
             organisation: {
-                summary: "Edit Organization",
+                summary: summaryText_1,
                 organizationName: "",
                 notes: ""
             },
@@ -84,7 +86,12 @@ export default class EditOrganisationTicketComponent extends Component {
             organisation.summary = event.target.value;
         }
         if (event.target.name === "organizationName") {
-            organisation.organizationName = event.target.options[event.target.selectedIndex].innerHTML;
+            var outText = "";
+            if(event.target.value !== "") {
+                var organisationT = this.state.organizations.filter(c => c.organisationId == event.target.value)[0];
+                outText = organisationT.realm.label.label_en + " | " + organisationT.label.label_en + " | " + organisationT.organisationCode;
+            }
+            organisation.organizationName = outText;
             this.setState({
                 organizationId: event.target.value
             })
@@ -122,7 +129,7 @@ export default class EditOrganisationTicketComponent extends Component {
     }
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
 
         OrganisationService.getOrganisationList()
             .then(response => {
@@ -202,7 +209,7 @@ export default class EditOrganisationTicketComponent extends Component {
             && organizations.map((item, i) => {
                 return (
                     <option key={i} value={item.organisationId}>
-                        {getLabelText(item.realm.label, this.state.lang) + " | " + getLabelText(item.label, this.state.lang) + " | " + item.organisationCode}
+                        {getLabelText(item.label, this.state.lang) + " | " + item.organisationCode}
                     </option>
                 )
             }, this);
@@ -220,6 +227,8 @@ export default class EditOrganisationTicketComponent extends Component {
                             this.setState({
                                 loading: true
                             })
+                            this.state.organisation.summary = summaryText_2;
+                            this.state.organisation.userLanguageCode = this.state.lang;
                             JiraTikcetService.addEmailRequestIssue(this.state.organisation).then(response => {
                                 console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
@@ -241,17 +250,46 @@ export default class EditOrganisationTicketComponent extends Component {
                                 }
                                 this.props.togglehelp();
                                 this.props.toggleSmall(this.state.message);
-                            })
-                                .catch(
-                                    error => {
+                            }).catch(
+                                error => {
+                                    if (error.message === "Network Error") {
                                         this.setState({
-                                            message: i18n.t('static.unkownError'), loading: false
-                                        },
-                                            () => {
-                                                this.hideSecondComponent();
-                                            });
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                    } else {
+                                        switch (error.response ? error.response.status : "") {
+
+                                            case 401:
+                                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                                break;
+                                            case 403:
+                                                this.props.history.push(`/accessDenied`)
+                                                break;
+                                            case 500:
+                                            case 404:
+                                            case 406:
+                                                this.setState({
+                                                    message: error.response.data.messageCode,
+                                                    loading: false
+                                                });
+                                                break;
+                                            case 412:
+                                                this.setState({
+                                                    message: error.response.data.messageCode,
+                                                    loading: false
+                                                });
+                                                break;
+                                            default:
+                                                this.setState({
+                                                    message: 'static.unkownError',
+                                                    loading: false
+                                                });
+                                                break;
+                                        }
                                     }
-                                );
+                                }
+                            );
                         }}
                         render={
                             ({

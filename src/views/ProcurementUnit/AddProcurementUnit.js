@@ -688,7 +688,7 @@ import ProcurementUnitService from "../../api/ProcurementUnitService";
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 
 const entityname = i18n.t('static.procurementUnit.procurementUnit');
-const initialValues = {
+let initialValues = {
     procurementUnitName: '',
     planningUnitId: '',
     multiplier: '',
@@ -888,9 +888,14 @@ export default class AddProcurementUnit extends Component {
         PlanningUnitService.getActivePlanningUnitList()
             .then(response => {
                 if (response.status == 200) {
+                    let { procurementUnit } = this.state;
+                    procurementUnit.planningUnit.planningUnitId = (response.data.length == 1 ? response.data[0].planningUnitId : '')
                     this.setState({
-                        planningUnitList: response.data, loading: false
-                    })
+                        planningUnitList: response.data, loading: false, procurementUnit
+                    },
+                        () => {
+                            this.changePlanningUnit();
+                        })
                 } else {
                     this.setState({
                         message: response.data.messageCode, loading: false
@@ -944,8 +949,15 @@ export default class AddProcurementUnit extends Component {
         UnitService.getUnitListAll()
             .then(response => {
                 if (response.status == 200) {
+                    let { procurementUnit } = this.state;
+                    procurementUnit.unit.id = (response.data.length == 1 ? response.data[0].unitId : '')
+                    procurementUnit.lengthUnit.id = (response.data.length == 1 ? response.data[0].unitId : '')
+                    procurementUnit.weightUnit.id = (response.data.length == 1 ? response.data[0].unitId : '')
+                    procurementUnit.volumeUnit.id = (response.data.length == 1 ? response.data[0].unitId : '')
+
+
                     this.setState({
-                        unitList: response.data, loading: false
+                        unitList: response.data, loading: false, procurementUnit
                     })
                 } else {
                     this.setState({
@@ -1000,8 +1012,10 @@ export default class AddProcurementUnit extends Component {
         SupplierService.getSupplierListAll()
             .then(response => {
                 if (response.status == 200) {
+                    let { procurementUnit } = this.state;
+                    procurementUnit.supplier.id = (response.data.length == 1 ? response.data[0].supplierId : '')
                     this.setState({
-                        supplierList: response.data, loading: false
+                        supplierList: response.data, loading: false, procurementUnit
                     })
                 } else {
                     this.setState({

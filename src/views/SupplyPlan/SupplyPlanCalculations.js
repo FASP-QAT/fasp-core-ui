@@ -756,7 +756,8 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                             nationalAdjustment: nationalAdjustment,
                             nationalAdjustmentWps: nationalAdjustmentWps,
                             expectedStock: expectedStock,
-                            expectedStockWps: expectedStockWps
+                            expectedStockWps: expectedStockWps,
+                            regionCountForStock:regionsReportingActualInventory
                         }
                         console.log("Json", json);
                         supplyPlanData.push(json);

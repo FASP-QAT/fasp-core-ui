@@ -53,8 +53,9 @@ export default class QatProblemActions extends Component {
             var versionIDs = [];
 
             db1 = e.target.result;
-            var transaction = db1.transaction(['programData'], 'readwrite');
-            var program = transaction.objectStore('programData');
+            var objectStoreFromProps = this.props.objectStore;
+            var transaction = db1.transaction([objectStoreFromProps], 'readwrite');
+            var program = transaction.objectStore(objectStoreFromProps);
             var getRequest = program.get(programId.toString());
             getRequest.onerror = function (event) {
                 this.setState({
@@ -249,7 +250,7 @@ export default class QatProblemActions extends Component {
                                                             // console.log("filteredConsumptionList1====>", filteredConsumptionList1);
                                                             // console.log("index1====>", index1);
 
-                                                            if (filteredConsumptionList1.length > 0 && index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3 )) {
+                                                            if (filteredConsumptionList1.length > 0 && index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3)) {
                                                                 var filterObj = problemActionList[index1];
                                                                 var transList = filterObj.problemTransList;
                                                                 let tempProblemTransObj = {
@@ -385,7 +386,7 @@ export default class QatProblemActions extends Component {
                                                             }
 
                                                         } else {
-                                                            if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3 )) {
+                                                            if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3)) {
                                                                 // console.log("****** in logic to make isfound 0 consumption**********",problemActionList[index]====problemActionList[index].isFound = 0);
                                                                 var filterObj = problemActionList[index];
                                                                 var transList = filterObj.problemTransList;
@@ -465,7 +466,7 @@ export default class QatProblemActions extends Component {
                                                                 // && c.versionId == versionID
                                                             );
 
-                                                            if (filterInventoryList1.length > 0 && index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3 )) {
+                                                            if (filterInventoryList1.length > 0 && index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3)) {
 
                                                                 var filterObj = problemActionList[index1];
                                                                 var transList = filterObj.problemTransList;
@@ -595,7 +596,7 @@ export default class QatProblemActions extends Component {
                                                                 }
                                                             }
                                                         } else {
-                                                            if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3 )) {
+                                                            if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3)) {
                                                                 // problemActionList[index].isFound = 0;
                                                                 //console.log("****** in logic to make isfound 0 inventory**********", problemActionList[index]);
                                                                 var filterObj = problemActionList[index];
@@ -903,7 +904,7 @@ export default class QatProblemActions extends Component {
                                                                 // && c.versionId == versionID
                                                             );
 
-                                                            if (filteredConsumptionListTwo1.length == 18 && index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3 )) {
+                                                            if (filteredConsumptionListTwo1.length == 18 && index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3)) {
 
                                                                 var filterObj = problemActionList[index1];
                                                                 var transList = filterObj.problemTransList;
@@ -1030,7 +1031,7 @@ export default class QatProblemActions extends Component {
                                                             }
 
                                                         } else {
-                                                            if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3 )) {
+                                                            if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3)) {
                                                                 // problemActionList[index].isFound = 0;
                                                                 // console.log("****** in logic to make isfound 0 future 18 consumption**********", problemActionList[index]);
                                                                 var filterObj = problemActionList[index];
@@ -1085,7 +1086,7 @@ export default class QatProblemActions extends Component {
                                                     if (filteredShipmentList.length > 0) {
                                                         var shipmentIdsFromShipmnetList = [];
                                                         for (var s = 0; s < filteredShipmentList.length; s++) {
-                                                           
+
                                                             var papuResult = procurementAgentListForProblemActionreport.filter(c => c.procurementAgentId == filteredShipmentList[s].procurementAgent.id)[0];
                                                             var submittedDate = filteredShipmentList[s].submittedDate;
                                                             var approvedDate = filteredShipmentList[s].approvedDate;
@@ -1125,7 +1126,7 @@ export default class QatProblemActions extends Component {
                                                                 submittedDate = moment(approvedDate).subtract(parseInt(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                                                 // plannedDate = moment(submittedDate).subtract(parseInt(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                                             }
-                                                            console.log("submittedDate=====>",submittedDate);
+                                                            console.log("submittedDate=====>", submittedDate);
                                                             if ((moment(submittedDate).add(parseInt(problemList[prob].data1), 'days').format("YYYY-MM-DD") <= moment(myDateShipment).format("YYYY-MM-DD"))) {
                                                                 if (filteredShipmentList[s].shipmentId != 0) {
                                                                     shipmentIdsFromShipmnetList.push(filteredShipmentList[s].shipmentId);
@@ -1344,7 +1345,7 @@ export default class QatProblemActions extends Component {
                                                     // approved shipments logic======================
                                                     var shipmentList = programList[pp].shipmentList;
                                                     var myDateShipment = moment(Date.now()).format("YYYY-MM-DD");
-                                                    var filteredShipmentList = shipmentList.filter(c =>(c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS));
+                                                    var filteredShipmentList = shipmentList.filter(c => (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS));
                                                     // console.log("approved status list===>", filteredShipmentList);
                                                     if (filteredShipmentList.length > 0) {
 
@@ -1391,120 +1392,120 @@ export default class QatProblemActions extends Component {
                                                                 submittedDate = moment(approvedDate).subtract(parseInt(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                                                 // plannedDate = moment(submittedDate).subtract(parseInt(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                                             }
-                                                            console.log("approvedDate=====>",approvedDate);
+                                                            console.log("approvedDate=====>", approvedDate);
 
-                                                            if((moment(approvedDate).add(parseInt(problemList[prob].data1), 'days').format("YYYY-MM-DD") <= moment(myDateShipment).format("YYYY-MM-DD"))){
+                                                            if ((moment(approvedDate).add(parseInt(problemList[prob].data1), 'days').format("YYYY-MM-DD") <= moment(myDateShipment).format("YYYY-MM-DD"))) {
 
-                                                            if (filteredShipmentList[s].shipmentId != 0) {
-                                                                shipmentIdsFromShipmnetList.push(filteredShipmentList[s].shipmentId);
-                                                            } else {
-                                                                shipmentIdsFromShipmnetList.push(filteredShipmentList[s].index);
-                                                            }
-
-                                                            var indexShipment = 0;
-                                                            var newAddShipment = false;
-                                                            if (filteredShipmentList[s].shipmentId > 0) {
-                                                                indexShipment = problemActionList.findIndex(
-                                                                    c => c.program.id == programList[pp].programId
-                                                                        && c.shipmentId == filteredShipmentList[s].shipmentId
-                                                                        && c.realmProblem.problem.problemId == 5
-                                                                    // && c.versionId == versionID
-                                                                );
-                                                            } else {
-                                                                indexShipment = problemActionList.findIndex(
-                                                                    c => c.program.id == programList[pp].programId
-                                                                        && c.index == filteredShipmentList[s].index
-                                                                        && c.realmProblem.problem.problemId == 5
-                                                                    // && c.versionId == versionID
-                                                                );
-                                                                newAddShipment = true;
-                                                            }
-
-                                                            if (indexShipment == -1) {
-                                                                var index = 0;
-                                                                if (filteredShipmentList[s].shipmentId == 0) {
-                                                                    index = filteredShipmentList[s].index;
+                                                                if (filteredShipmentList[s].shipmentId != 0) {
+                                                                    shipmentIdsFromShipmnetList.push(filteredShipmentList[s].shipmentId);
+                                                                } else {
+                                                                    shipmentIdsFromShipmnetList.push(filteredShipmentList[s].index);
                                                                 }
-                                                                var json = {
-                                                                    problemReportId: 0,
-                                                                    program: {
-                                                                        id: programList[pp].programId,
-                                                                        label: programList[pp].label,
-                                                                        code: programList[pp].programCode
-                                                                    },
-                                                                    versionId: versionID,
-                                                                    realmProblem: problemList[prob],
 
-                                                                    dt: '',
-                                                                    region: {
-                                                                        id: 0
-                                                                    },
-                                                                    planningUnit: {
-                                                                        id: filteredShipmentList[s].planningUnit.id,
-                                                                        label: filteredShipmentList[s].planningUnit.label,
-
-                                                                    },
-                                                                    shipmentId: filteredShipmentList[s].shipmentId,
-                                                                    data5: '',
-                                                                    newAdded: newAddShipment,
-
-                                                                    problemActionIndex: problemActionIndex,
-
-                                                                    index: index,
-                                                                    problemStatus: {
-                                                                        id: 1,
-                                                                        label: { label_en: 'Open' }
-                                                                    },
-                                                                    problemType: {
-                                                                        id: 1,
-                                                                        label: {
-                                                                            label_en: 'Automatic'
-                                                                        }
-                                                                    },
-                                                                    reviewed: false,
-                                                                    createdBy: {
-                                                                        userId: userId,
-                                                                        username: username
-                                                                    },
-                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
-                                                                    lastModifiedBy: {
-                                                                        userId: userId,
-                                                                        username: username
-                                                                    },
-                                                                    lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
-                                                                    problemTransList: [
-                                                                        {
-                                                                            problemReportTransId: '',
-                                                                            problemStatus: {
-                                                                                id: 1,
-                                                                                label: {
-                                                                                    active: true,
-                                                                                    labelId: 461,
-                                                                                    label_en: "Open",
-                                                                                    label_sp: null,
-                                                                                    label_fr: null,
-                                                                                    label_pr: null
-                                                                                }
-                                                                            },
-                                                                            notes: "Open",
-                                                                            createdBy: {
-                                                                                userId: userId,
-                                                                                username: username
-                                                                            },
-                                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
-                                                                        }
-                                                                    ]
-
+                                                                var indexShipment = 0;
+                                                                var newAddShipment = false;
+                                                                if (filteredShipmentList[s].shipmentId > 0) {
+                                                                    indexShipment = problemActionList.findIndex(
+                                                                        c => c.program.id == programList[pp].programId
+                                                                            && c.shipmentId == filteredShipmentList[s].shipmentId
+                                                                            && c.realmProblem.problem.problemId == 5
+                                                                        // && c.versionId == versionID
+                                                                    );
+                                                                } else {
+                                                                    indexShipment = problemActionList.findIndex(
+                                                                        c => c.program.id == programList[pp].programId
+                                                                            && c.index == filteredShipmentList[s].index
+                                                                            && c.realmProblem.problem.problemId == 5
+                                                                        // && c.versionId == versionID
+                                                                    );
+                                                                    newAddShipment = true;
                                                                 }
-                                                                problemActionList.push(json);
-                                                                problemActionIndex++;
-                                                            } else {
-                                                                // make shipmet problem status eual to open========
-                                                                if (indexShipment != -1 && problemActionList[indexShipment].problemStatus.id == 2) {
-                                                                    openProblem(indexShipment, username, userId, problemActionList);
+
+                                                                if (indexShipment == -1) {
+                                                                    var index = 0;
+                                                                    if (filteredShipmentList[s].shipmentId == 0) {
+                                                                        index = filteredShipmentList[s].index;
+                                                                    }
+                                                                    var json = {
+                                                                        problemReportId: 0,
+                                                                        program: {
+                                                                            id: programList[pp].programId,
+                                                                            label: programList[pp].label,
+                                                                            code: programList[pp].programCode
+                                                                        },
+                                                                        versionId: versionID,
+                                                                        realmProblem: problemList[prob],
+
+                                                                        dt: '',
+                                                                        region: {
+                                                                            id: 0
+                                                                        },
+                                                                        planningUnit: {
+                                                                            id: filteredShipmentList[s].planningUnit.id,
+                                                                            label: filteredShipmentList[s].planningUnit.label,
+
+                                                                        },
+                                                                        shipmentId: filteredShipmentList[s].shipmentId,
+                                                                        data5: '',
+                                                                        newAdded: newAddShipment,
+
+                                                                        problemActionIndex: problemActionIndex,
+
+                                                                        index: index,
+                                                                        problemStatus: {
+                                                                            id: 1,
+                                                                            label: { label_en: 'Open' }
+                                                                        },
+                                                                        problemType: {
+                                                                            id: 1,
+                                                                            label: {
+                                                                                label_en: 'Automatic'
+                                                                            }
+                                                                        },
+                                                                        reviewed: false,
+                                                                        createdBy: {
+                                                                            userId: userId,
+                                                                            username: username
+                                                                        },
+                                                                        createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
+                                                                        lastModifiedBy: {
+                                                                            userId: userId,
+                                                                            username: username
+                                                                        },
+                                                                        lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
+                                                                        problemTransList: [
+                                                                            {
+                                                                                problemReportTransId: '',
+                                                                                problemStatus: {
+                                                                                    id: 1,
+                                                                                    label: {
+                                                                                        active: true,
+                                                                                        labelId: 461,
+                                                                                        label_en: "Open",
+                                                                                        label_sp: null,
+                                                                                        label_fr: null,
+                                                                                        label_pr: null
+                                                                                    }
+                                                                                },
+                                                                                notes: "Open",
+                                                                                createdBy: {
+                                                                                    userId: userId,
+                                                                                    username: username
+                                                                                },
+                                                                                createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
+                                                                            }
+                                                                        ]
+
+                                                                    }
+                                                                    problemActionList.push(json);
+                                                                    problemActionIndex++;
+                                                                } else {
+                                                                    // make shipmet problem status eual to open========
+                                                                    if (indexShipment != -1 && problemActionList[indexShipment].problemStatus.id == 2) {
+                                                                        openProblem(indexShipment, username, userId, problemActionList);
+                                                                    }
                                                                 }
                                                             }
-                                                        }
                                                         }
                                                         for (var kb = 0; kb < problemActionList.length; kb++) {
                                                             if (problemActionList[kb].realmProblem.problem.problemId == 5 && (problemActionList[kb].problemStatus.id == 1 || problemActionList[kb].problemStatus.id == 3)) {
@@ -1659,120 +1660,120 @@ export default class QatProblemActions extends Component {
                                                                 submittedDate = moment(approvedDate).subtract(parseInt(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                                                 // plannedDate = moment(submittedDate).subtract(parseInt(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                                             }
-                                                            console.log("shippedDate=====>",shippedDate);
+                                                            console.log("shippedDate=====>", shippedDate);
 
-                                                            if((moment(shippedDate).add(parseInt(problemList[prob].data1), 'days').format("YYYY-MM-DD") <= moment(myDateShipment).format("YYYY-MM-DD"))){
+                                                            if ((moment(shippedDate).add(parseInt(problemList[prob].data1), 'days').format("YYYY-MM-DD") <= moment(myDateShipment).format("YYYY-MM-DD"))) {
 
-                                                            if (filteredShipmentList[s].shipmentId != 0) {
-                                                                shipmentIdsFromShipmnetList.push(filteredShipmentList[s].shipmentId);
-                                                            } else {
-                                                                shipmentIdsFromShipmnetList.push(filteredShipmentList[s].index);
-                                                            }
-
-                                                            var indexShipment = 0;
-                                                            var newAddShipment = false;
-                                                            if (filteredShipmentList[s].shipmentId > 0) {
-                                                                indexShipment = problemActionList.findIndex(
-                                                                    c => c.program.id == programList[pp].programId
-                                                                        && c.shipmentId == filteredShipmentList[s].shipmentId
-                                                                        && c.realmProblem.problem.problemId == 6
-                                                                    // && c.versionId == versionID
-                                                                );
-                                                            } else {
-                                                                indexShipment = problemActionList.findIndex(
-                                                                    c => c.program.id == programList[pp].programId
-                                                                        && c.index == filteredShipmentList[s].index
-                                                                        && c.realmProblem.problem.problemId == 6
-                                                                    // && c.versionId == versionID
-                                                                );
-                                                                newAddShipment = true;
-                                                            }
-
-                                                            if (indexShipment == -1) {
-                                                                var index = 0;
-                                                                if (filteredShipmentList[s].shipmentId == 0) {
-                                                                    index = filteredShipmentList[s].index;
+                                                                if (filteredShipmentList[s].shipmentId != 0) {
+                                                                    shipmentIdsFromShipmnetList.push(filteredShipmentList[s].shipmentId);
+                                                                } else {
+                                                                    shipmentIdsFromShipmnetList.push(filteredShipmentList[s].index);
                                                                 }
-                                                                var json = {
-                                                                    problemReportId: 0,
-                                                                    program: {
-                                                                        id: programList[pp].programId,
-                                                                        label: programList[pp].label,
-                                                                        code: programList[pp].programCode
-                                                                    },
-                                                                    versionId: versionID,
-                                                                    realmProblem: problemList[prob],
 
-                                                                    dt: '',
-                                                                    region: {
-                                                                        id: 0
-                                                                    },
-                                                                    planningUnit: {
-                                                                        id: filteredShipmentList[s].planningUnit.id,
-                                                                        label: filteredShipmentList[s].planningUnit.label,
-
-                                                                    },
-                                                                    shipmentId: filteredShipmentList[s].shipmentId,
-                                                                    data5: '',
-                                                                    newAdded: newAddShipment,
-
-                                                                    problemActionIndex: problemActionIndex,
-
-                                                                    index: index,
-                                                                    problemStatus: {
-                                                                        id: 1,
-                                                                        label: { label_en: 'Open' }
-                                                                    },
-                                                                    problemType: {
-                                                                        id: 1,
-                                                                        label: {
-                                                                            label_en: 'Automatic'
-                                                                        }
-                                                                    },
-                                                                    reviewed: false,
-                                                                    createdBy: {
-                                                                        userId: userId,
-                                                                        username: username
-                                                                    },
-                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
-                                                                    lastModifiedBy: {
-                                                                        userId: userId,
-                                                                        username: username
-                                                                    },
-                                                                    lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
-                                                                    problemTransList: [
-                                                                        {
-                                                                            problemReportTransId: '',
-                                                                            problemStatus: {
-                                                                                id: 1,
-                                                                                label: {
-                                                                                    active: true,
-                                                                                    labelId: 461,
-                                                                                    label_en: "Open",
-                                                                                    label_sp: null,
-                                                                                    label_fr: null,
-                                                                                    label_pr: null
-                                                                                }
-                                                                            },
-                                                                            notes: "Open",
-                                                                            createdBy: {
-                                                                                userId: userId,
-                                                                                username: username
-                                                                            },
-                                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
-                                                                        }
-                                                                    ]
-
+                                                                var indexShipment = 0;
+                                                                var newAddShipment = false;
+                                                                if (filteredShipmentList[s].shipmentId > 0) {
+                                                                    indexShipment = problemActionList.findIndex(
+                                                                        c => c.program.id == programList[pp].programId
+                                                                            && c.shipmentId == filteredShipmentList[s].shipmentId
+                                                                            && c.realmProblem.problem.problemId == 6
+                                                                        // && c.versionId == versionID
+                                                                    );
+                                                                } else {
+                                                                    indexShipment = problemActionList.findIndex(
+                                                                        c => c.program.id == programList[pp].programId
+                                                                            && c.index == filteredShipmentList[s].index
+                                                                            && c.realmProblem.problem.problemId == 6
+                                                                        // && c.versionId == versionID
+                                                                    );
+                                                                    newAddShipment = true;
                                                                 }
-                                                                problemActionList.push(json);
-                                                                problemActionIndex++;
-                                                            } else {
-                                                                // make shipmet problem status eual to open========
-                                                                if (indexShipment != -1 && problemActionList[indexShipment].problemStatus.id == 2) {
-                                                                    openProblem(indexShipment, username, userId, problemActionList);
+
+                                                                if (indexShipment == -1) {
+                                                                    var index = 0;
+                                                                    if (filteredShipmentList[s].shipmentId == 0) {
+                                                                        index = filteredShipmentList[s].index;
+                                                                    }
+                                                                    var json = {
+                                                                        problemReportId: 0,
+                                                                        program: {
+                                                                            id: programList[pp].programId,
+                                                                            label: programList[pp].label,
+                                                                            code: programList[pp].programCode
+                                                                        },
+                                                                        versionId: versionID,
+                                                                        realmProblem: problemList[prob],
+
+                                                                        dt: '',
+                                                                        region: {
+                                                                            id: 0
+                                                                        },
+                                                                        planningUnit: {
+                                                                            id: filteredShipmentList[s].planningUnit.id,
+                                                                            label: filteredShipmentList[s].planningUnit.label,
+
+                                                                        },
+                                                                        shipmentId: filteredShipmentList[s].shipmentId,
+                                                                        data5: '',
+                                                                        newAdded: newAddShipment,
+
+                                                                        problemActionIndex: problemActionIndex,
+
+                                                                        index: index,
+                                                                        problemStatus: {
+                                                                            id: 1,
+                                                                            label: { label_en: 'Open' }
+                                                                        },
+                                                                        problemType: {
+                                                                            id: 1,
+                                                                            label: {
+                                                                                label_en: 'Automatic'
+                                                                            }
+                                                                        },
+                                                                        reviewed: false,
+                                                                        createdBy: {
+                                                                            userId: userId,
+                                                                            username: username
+                                                                        },
+                                                                        createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
+                                                                        lastModifiedBy: {
+                                                                            userId: userId,
+                                                                            username: username
+                                                                        },
+                                                                        lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
+                                                                        problemTransList: [
+                                                                            {
+                                                                                problemReportTransId: '',
+                                                                                problemStatus: {
+                                                                                    id: 1,
+                                                                                    label: {
+                                                                                        active: true,
+                                                                                        labelId: 461,
+                                                                                        label_en: "Open",
+                                                                                        label_sp: null,
+                                                                                        label_fr: null,
+                                                                                        label_pr: null
+                                                                                    }
+                                                                                },
+                                                                                notes: "Open",
+                                                                                createdBy: {
+                                                                                    userId: userId,
+                                                                                    username: username
+                                                                                },
+                                                                                createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
+                                                                            }
+                                                                        ]
+
+                                                                    }
+                                                                    problemActionList.push(json);
+                                                                    problemActionIndex++;
+                                                                } else {
+                                                                    // make shipmet problem status eual to open========
+                                                                    if (indexShipment != -1 && problemActionList[indexShipment].problemStatus.id == 2) {
+                                                                        openProblem(indexShipment, username, userId, problemActionList);
+                                                                    }
                                                                 }
                                                             }
-                                                        }
                                                         }
                                                         for (var kb = 0; kb < problemActionList.length; kb++) {
                                                             if (problemActionList[kb].realmProblem.problem.problemId == 6 && (problemActionList[kb].problemStatus.id == 1 || problemActionList[kb].problemStatus.id == 3)) {
@@ -1879,7 +1880,7 @@ export default class QatProblemActions extends Component {
                                                     // arrived shipments logic======================
                                                     var shipmentList = programList[pp].shipmentList;
                                                     var myDateShipment = moment(Date.now()).format("YYYY-MM-DD");
-                                                    var filteredShipmentList = shipmentList.filter(c =>(c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS || c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS || c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS));
+                                                    var filteredShipmentList = shipmentList.filter(c => (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS || c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS || c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS));
                                                     console.log("approved status list===>", filteredShipmentList);
                                                     if (filteredShipmentList.length > 0) {
                                                         var shipmentIdsFromShipmnetList = [];
@@ -1925,119 +1926,119 @@ export default class QatProblemActions extends Component {
                                                                 submittedDate = moment(approvedDate).subtract(parseInt(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                                                 // plannedDate = moment(submittedDate).subtract(parseInt(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                                             }
-                                                            console.log("arrivedDate=====>",arrivedDate);
-                                                            if((moment(arrivedDate).format("YYYY-MM-DD") <= moment(myDateShipment).format("YYYY-MM-DD"))){
+                                                            console.log("arrivedDate=====>", arrivedDate);
+                                                            if ((moment(arrivedDate).format("YYYY-MM-DD") <= moment(myDateShipment).format("YYYY-MM-DD"))) {
 
-                                                            if (filteredShipmentList[s].shipmentId != 0) {
-                                                                shipmentIdsFromShipmnetList.push(filteredShipmentList[s].shipmentId);
-                                                            } else {
-                                                                shipmentIdsFromShipmnetList.push(filteredShipmentList[s].index);
-                                                            }
-
-                                                            var indexShipment = 0;
-                                                            var newAddShipment = false;
-                                                            if (filteredShipmentList[s].shipmentId > 0) {
-                                                                indexShipment = problemActionList.findIndex(
-                                                                    c => c.program.id == programList[pp].programId
-                                                                        && c.shipmentId == filteredShipmentList[s].shipmentId
-                                                                        && c.realmProblem.problem.problemId == 7
-                                                                    // && c.versionId == versionID
-                                                                );
-                                                            } else {
-                                                                indexShipment = problemActionList.findIndex(
-                                                                    c => c.program.id == programList[pp].programId
-                                                                        && c.index == filteredShipmentList[s].index
-                                                                        && c.realmProblem.problem.problemId == 7
-                                                                    // && c.versionId == versionID
-                                                                );
-                                                                newAddShipment = true;
-                                                            }
-
-                                                            if (indexShipment == -1) {
-                                                                var index = 0;
-                                                                if (filteredShipmentList[s].shipmentId == 0) {
-                                                                    index = filteredShipmentList[s].index;
+                                                                if (filteredShipmentList[s].shipmentId != 0) {
+                                                                    shipmentIdsFromShipmnetList.push(filteredShipmentList[s].shipmentId);
+                                                                } else {
+                                                                    shipmentIdsFromShipmnetList.push(filteredShipmentList[s].index);
                                                                 }
-                                                                var json = {
-                                                                    problemReportId: 0,
-                                                                    program: {
-                                                                        id: programList[pp].programId,
-                                                                        label: programList[pp].label,
-                                                                        code: programList[pp].programCode
-                                                                    },
-                                                                    versionId: versionID,
-                                                                    realmProblem: problemList[prob],
 
-                                                                    dt: '',
-                                                                    region: {
-                                                                        id: 0
-                                                                    },
-                                                                    planningUnit: {
-                                                                        id: filteredShipmentList[s].planningUnit.id,
-                                                                        label: filteredShipmentList[s].planningUnit.label,
-
-                                                                    },
-                                                                    shipmentId: filteredShipmentList[s].shipmentId,
-                                                                    data5: '',
-                                                                    newAdded: newAddShipment,
-
-                                                                    problemActionIndex: problemActionIndex,
-
-                                                                    index: index,
-                                                                    problemStatus: {
-                                                                        id: 1,
-                                                                        label: { label_en: 'Open' }
-                                                                    },
-                                                                    problemType: {
-                                                                        id: 1,
-                                                                        label: {
-                                                                            label_en: 'Automatic'
-                                                                        }
-                                                                    },
-                                                                    reviewed: false,
-                                                                    createdBy: {
-                                                                        userId: userId,
-                                                                        username: username
-                                                                    },
-                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
-                                                                    lastModifiedBy: {
-                                                                        userId: userId,
-                                                                        username: username
-                                                                    },
-                                                                    lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
-                                                                    problemTransList: [
-                                                                        {
-                                                                            problemReportTransId: '',
-                                                                            problemStatus: {
-                                                                                id: 1,
-                                                                                label: {
-                                                                                    active: true,
-                                                                                    labelId: 461,
-                                                                                    label_en: "Open",
-                                                                                    label_sp: null,
-                                                                                    label_fr: null,
-                                                                                    label_pr: null
-                                                                                }
-                                                                            },
-                                                                            notes: "Open",
-                                                                            createdBy: {
-                                                                                userId: userId,
-                                                                                username: username
-                                                                            },
-                                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
-                                                                        }
-                                                                    ]
-
+                                                                var indexShipment = 0;
+                                                                var newAddShipment = false;
+                                                                if (filteredShipmentList[s].shipmentId > 0) {
+                                                                    indexShipment = problemActionList.findIndex(
+                                                                        c => c.program.id == programList[pp].programId
+                                                                            && c.shipmentId == filteredShipmentList[s].shipmentId
+                                                                            && c.realmProblem.problem.problemId == 7
+                                                                        // && c.versionId == versionID
+                                                                    );
+                                                                } else {
+                                                                    indexShipment = problemActionList.findIndex(
+                                                                        c => c.program.id == programList[pp].programId
+                                                                            && c.index == filteredShipmentList[s].index
+                                                                            && c.realmProblem.problem.problemId == 7
+                                                                        // && c.versionId == versionID
+                                                                    );
+                                                                    newAddShipment = true;
                                                                 }
-                                                                problemActionList.push(json);
-                                                                problemActionIndex++;
-                                                            } else {
-                                                                // make shipmet problem status eual to open========
-                                                                if (indexShipment != -1 && problemActionList[indexShipment].problemStatus.id == 2) {
-                                                                    openProblem(indexShipment, username, userId, problemActionList);
+
+                                                                if (indexShipment == -1) {
+                                                                    var index = 0;
+                                                                    if (filteredShipmentList[s].shipmentId == 0) {
+                                                                        index = filteredShipmentList[s].index;
+                                                                    }
+                                                                    var json = {
+                                                                        problemReportId: 0,
+                                                                        program: {
+                                                                            id: programList[pp].programId,
+                                                                            label: programList[pp].label,
+                                                                            code: programList[pp].programCode
+                                                                        },
+                                                                        versionId: versionID,
+                                                                        realmProblem: problemList[prob],
+
+                                                                        dt: '',
+                                                                        region: {
+                                                                            id: 0
+                                                                        },
+                                                                        planningUnit: {
+                                                                            id: filteredShipmentList[s].planningUnit.id,
+                                                                            label: filteredShipmentList[s].planningUnit.label,
+
+                                                                        },
+                                                                        shipmentId: filteredShipmentList[s].shipmentId,
+                                                                        data5: '',
+                                                                        newAdded: newAddShipment,
+
+                                                                        problemActionIndex: problemActionIndex,
+
+                                                                        index: index,
+                                                                        problemStatus: {
+                                                                            id: 1,
+                                                                            label: { label_en: 'Open' }
+                                                                        },
+                                                                        problemType: {
+                                                                            id: 1,
+                                                                            label: {
+                                                                                label_en: 'Automatic'
+                                                                            }
+                                                                        },
+                                                                        reviewed: false,
+                                                                        createdBy: {
+                                                                            userId: userId,
+                                                                            username: username
+                                                                        },
+                                                                        createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
+                                                                        lastModifiedBy: {
+                                                                            userId: userId,
+                                                                            username: username
+                                                                        },
+                                                                        lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
+                                                                        problemTransList: [
+                                                                            {
+                                                                                problemReportTransId: '',
+                                                                                problemStatus: {
+                                                                                    id: 1,
+                                                                                    label: {
+                                                                                        active: true,
+                                                                                        labelId: 461,
+                                                                                        label_en: "Open",
+                                                                                        label_sp: null,
+                                                                                        label_fr: null,
+                                                                                        label_pr: null
+                                                                                    }
+                                                                                },
+                                                                                notes: "Open",
+                                                                                createdBy: {
+                                                                                    userId: userId,
+                                                                                    username: username
+                                                                                },
+                                                                                createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
+                                                                            }
+                                                                        ]
+
+                                                                    }
+                                                                    problemActionList.push(json);
+                                                                    problemActionIndex++;
+                                                                } else {
+                                                                    // make shipmet problem status eual to open========
+                                                                    if (indexShipment != -1 && problemActionList[indexShipment].problemStatus.id == 2) {
+                                                                        openProblem(indexShipment, username, userId, problemActionList);
+                                                                    }
                                                                 }
                                                             }
-                                                        }
                                                         }
                                                         for (var kb = 0; kb < problemActionList.length; kb++) {
                                                             if (problemActionList[kb].realmProblem.problem.problemId == 7 && (problemActionList[kb].problemStatus.id == 1 || problemActionList[kb].problemStatus.id == 3)) {
@@ -2202,7 +2203,7 @@ export default class QatProblemActions extends Component {
                                                                         }
                                                                     }
 
-                                                                    if (check1 != true && index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3 )) {
+                                                                    if (check1 != true && index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3)) {
 
                                                                         var filterObj = problemActionList[index1];
                                                                         var transList = filterObj.problemTransList;
@@ -2358,7 +2359,7 @@ export default class QatProblemActions extends Component {
                                                                 }
                                                                 else {
                                                                     console.log("dont flag problem=====>");
-                                                                    if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3 )) {
+                                                                    if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3)) {
                                                                         // console.log("****** in logic to make isfound 0 future 18 consumption**********", problemActionList[index]);
                                                                         var filterObj = problemActionList[index];
                                                                         var transList = filterObj.problemTransList;
@@ -2491,7 +2492,7 @@ export default class QatProblemActions extends Component {
                                                                         }
                                                                     }
 
-                                                                    if (check1 != true && index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3 )) {
+                                                                    if (check1 != true && index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3)) {
 
                                                                         var filterObj = problemActionList[index1];
                                                                         var transList = filterObj.problemTransList;
@@ -2645,7 +2646,7 @@ export default class QatProblemActions extends Component {
                                                                 }
                                                                 else {
                                                                     // console.log("dont flag problem=====>");
-                                                                    if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3 )) {
+                                                                    if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3)) {
                                                                         // console.log("****** in logic to make isfound 0 future 18 consumption**********", problemActionList[index]);
                                                                         var filterObj = problemActionList[index];
                                                                         var transList = filterObj.problemTransList;
@@ -2762,7 +2763,7 @@ export default class QatProblemActions extends Component {
                                                                         }
                                                                     }
 
-                                                                    if (check1 != true && index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3 )) {
+                                                                    if (check1 != true && index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3)) {
 
                                                                         var filterObj = problemActionList[index1];
                                                                         var transList = filterObj.problemTransList;
@@ -2918,7 +2919,7 @@ export default class QatProblemActions extends Component {
                                                                 }
                                                                 else {
                                                                     // console.log("dont flag problem=====>");
-                                                                    if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3 )) {
+                                                                    if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3)) {
                                                                         // console.log("****** in logic to make isfound 0 future 18 consumption**********", problemActionList[index]);
                                                                         var filterObj = problemActionList[index];
                                                                         var transList = filterObj.problemTransList;
@@ -3101,7 +3102,7 @@ export default class QatProblemActions extends Component {
                                                         );
 
 
-                                                        if (monthWithMosLessThenMin1 == '' && index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3 )) {
+                                                        if (monthWithMosLessThenMin1 == '' && index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3)) {
 
                                                             var filterObj = problemActionList[index1];
                                                             var transList = filterObj.problemTransList;
@@ -3247,7 +3248,7 @@ export default class QatProblemActions extends Component {
                                                         // console.log("index*************>", index);
                                                         // console.log("versionId************", versionID);
 
-                                                        if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3 ) && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
+                                                        if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
                                                             console.log("//////at this point resolve the problem.");
                                                             var filterObj = problemActionList[index];
                                                             var transList = filterObj.problemTransList;
@@ -3422,7 +3423,7 @@ export default class QatProblemActions extends Component {
                                                             // && c.versionId == versionID
                                                         );
 
-                                                        if (monthWithMosGreaterThenMax1 == '' && index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3 )) {
+                                                        if (monthWithMosGreaterThenMax1 == '' && index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3)) {
                                                             var filterObj = problemActionList[index1];
                                                             var transList = filterObj.problemTransList;
                                                             let tempProblemTransObj = {
@@ -3560,7 +3561,7 @@ export default class QatProblemActions extends Component {
                                                         }
                                                     } else {
                                                         // console.log("no months with MOS greater then max ===#########");
-                                                        if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3 ) && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
+                                                        if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
                                                             // console.log("//////at this point resolve the problem. ###########");
                                                             var filterObj = problemActionList[index];
                                                             var transList = filterObj.problemTransList;
@@ -3732,7 +3733,7 @@ export default class QatProblemActions extends Component {
                                                             // && c.versionId == versionID
                                                         );
 
-                                                        if (monthWithMosLessThenMin1 == '' && index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3 )) {
+                                                        if (monthWithMosLessThenMin1 == '' && index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3)) {
 
                                                             var filterObj = problemActionList[index1];
                                                             var transList = filterObj.problemTransList;
@@ -3873,7 +3874,7 @@ export default class QatProblemActions extends Component {
                                                         }
                                                     } else {
                                                         console.log("no months with MOS less then min or have shipmnet coming withing lead time===#########");
-                                                        if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3 ) && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
+                                                        if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
                                                             // console.log("//////at this point resolve the problem.");
                                                             var filterObj = problemActionList[index];
                                                             var transList = filterObj.problemTransList;
@@ -4045,7 +4046,7 @@ export default class QatProblemActions extends Component {
                                                             // && c.versionId == versionID
                                                         );
 
-                                                        if (monthWithMosLessThenMin1 == '' && index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3 )) {
+                                                        if (monthWithMosLessThenMin1 == '' && index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3)) {
                                                             var filterObj = problemActionList[index1];
                                                             var transList = filterObj.problemTransList;
                                                             let tempProblemTransObj = {
@@ -4184,7 +4185,7 @@ export default class QatProblemActions extends Component {
                                                         }
                                                     } else {
                                                         // console.log("no months with MOS less then min ===#########");
-                                                        if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3 ) && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
+                                                        if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
                                                             // console.log("//////at this point resolve the problem.");
                                                             var filterObj = problemActionList[index];
                                                             var transList = filterObj.problemTransList;
@@ -4356,7 +4357,7 @@ export default class QatProblemActions extends Component {
                                                             // && c.versionId == versionID
                                                         );
 
-                                                        if (monthWithMosGreaterThenMax1 == '' && index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3 )) {
+                                                        if (monthWithMosGreaterThenMax1 == '' && index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3)) {
 
                                                             var filterObj = problemActionList[index1];
                                                             var transList = filterObj.problemTransList;
@@ -4497,7 +4498,7 @@ export default class QatProblemActions extends Component {
                                                         }
                                                     } else {
                                                         // console.log("no months with MOS greater then max ===#########");
-                                                        if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3 ) && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
+                                                        if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
                                                             // console.log("//////at this point resolve the problem. ###########");
                                                             var filterObj = problemActionList[index];
                                                             var transList = filterObj.problemTransList;
@@ -4678,7 +4679,7 @@ export default class QatProblemActions extends Component {
                                                         );
 
 
-                                                        if (monthWithMosLessThenMin1 == '' && index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3 )) {
+                                                        if (monthWithMosLessThenMin1 == '' && index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3)) {
 
                                                             var filterObj = problemActionList[index1];
                                                             var transList = filterObj.problemTransList;
@@ -4820,7 +4821,7 @@ export default class QatProblemActions extends Component {
                                                         }
                                                     } else {
                                                         // console.log("no months with MOS less then min or have shipmnet coming withing lead time===#########");
-                                                        if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3 ) && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
+                                                        if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
                                                             // console.log("//////at this point resolve the problem.");
                                                             var filterObj = problemActionList[index];
                                                             var transList = filterObj.problemTransList;
@@ -4921,7 +4922,7 @@ export default class QatProblemActions extends Component {
                                                                     openProblem(index1, username, userId, problemActionList);
                                                                 }
                                                             } else {
-                                                                if (index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3 )) {
+                                                                if (index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3)) {
                                                                     var filterObj = problemActionList[index1];
                                                                     var transList = filterObj.problemTransList;
                                                                     let tempProblemTransObj = {
@@ -5046,7 +5047,7 @@ export default class QatProblemActions extends Component {
 
                                                         } else {
                                                             // console.log("dont rais prob--------");
-                                                            if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3 )) {
+                                                            if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3)) {
                                                                 // console.log("resolve the problem problem id 21");
                                                                 // problemActionList[index].isFound = 0;
                                                                 var filterObj = problemActionList[index];
@@ -5094,8 +5095,8 @@ export default class QatProblemActions extends Component {
                                         }
                                         // }
 
-                                        var problemTransaction = db1.transaction(['programData'], 'readwrite');
-                                        var problemOs = problemTransaction.objectStore('programData');
+                                        var problemTransaction = db1.transaction([objectStoreFromProps], 'readwrite');
+                                        var problemOs = problemTransaction.objectStore(objectStoreFromProps);
                                         var paList = problemActionList.filter(c => c.program.id == programList[pp].programId)
 
                                         programList[pp].problemReportList = paList;
@@ -5120,7 +5121,7 @@ export default class QatProblemActions extends Component {
                                             // this.props.fetchData(false);
                                             if (this.props.updateState != undefined) {
                                                 this.props.updateState(false);
-                                                this.props.fetchData(false);
+                                                this.props.fetchData();
                                             }
 
                                         }.bind(this);
