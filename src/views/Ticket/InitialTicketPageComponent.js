@@ -701,7 +701,7 @@ export default class InitialTicketPageComponent extends Component {
     return (
       <Dropdown nav  >
 
-        <img src={imageHelp} className="HelpIcon" title={i18n.t('static.ticket.help')} onClick={this.togglehelp} />
+        <img src={imageHelp} className="HelpIcon" title={i18n.t('static.ticket.help')} onClick={this.togglehelp} style={{width:'31px',height:'31px'}}/>
 
 
 
