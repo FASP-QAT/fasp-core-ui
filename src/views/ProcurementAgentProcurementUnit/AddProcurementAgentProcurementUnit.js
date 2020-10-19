@@ -624,7 +624,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
 
                                             },
                                             {
-                                                title: i18n.t('static.procurementAgentProcurementUnit.approvedToShippedLeadTime'),
+                                                title: i18n.t('static.program.approvetoshipleadtime'),
                                                 type: 'numeric',
                                             },
                                             {
