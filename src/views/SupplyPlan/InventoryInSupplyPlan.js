@@ -203,7 +203,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                             console.log("inventoryListUnFiltered", inventoryListUnFiltered);
                             console.log("Adjustment Type", adjustmentType);
                             console.log("planningUnitId", planningUnitId)
-                            index = inventoryListUnFiltered[j].index;
+                            index = inventoryList[j].index;
                         }
                         data[14] = index;
                         data[15] = 0;

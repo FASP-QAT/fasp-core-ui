@@ -1599,7 +1599,7 @@ export default class ConsumptionDetails extends React.Component {
         return (
 
             <div className="animated">
-                <QatProblemActions ref="problemListChild" updateState={this.updateState} fetchData={this.fetchData}></QatProblemActions>
+                <QatProblemActions ref="problemListChild" updateState={this.updateState} fetchData={this.fetchData} objectStore="programData"></QatProblemActions>
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
                 }} />
