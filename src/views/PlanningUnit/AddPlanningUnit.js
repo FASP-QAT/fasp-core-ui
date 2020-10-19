@@ -11,10 +11,10 @@ import UnitService from '../../api/UnitService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import { SPACE_REGEX } from '../../Constants.js';
 
-const initialValues = {
-    unitId: [],
+let initialValues = {
+    unitId: '',
     label: '',
-    forecastingUnitId: [],
+    forecastingUnitId: '',
     multiplier: ''
 }
 const entityname = i18n.t('static.planningunit.planningunit');
@@ -172,15 +172,29 @@ export default class AddPlanningUnit extends Component {
         UnitService.getUnitListAll()
             .then(response => {
                 if (response.status == 200) {
+                    let { planningUnit } = this.state;
+                    planningUnit.unit.id = (response.data.length == 1 ? response.data[0].unitId : "")
                     this.setState({
-                        units: response.data, loading: false
-                    })
+                        units: response.data, loading: false, planningUnit
+                    },
+                        () => {
+                            // initialValues = {
+                            //     unitId: (response.data.length == 1 ? response.data[0].unitId : "")
+                            // }
+                        })
                     // AuthenticationService.setupAxiosInterceptors();
                     ForecastingUnitService.getForecastingUnitList().then(response => {
                         console.log(response.data)
+                        let { planningUnit } = this.state;
+                        planningUnit.forecastingUnit.forecastingUnitId = (response.data.length == 1 ? response.data[0].forecastingUnitId : "")
                         this.setState({
-                            forecastingUnits: response.data, loading: false
-                        })
+                            forecastingUnits: response.data, loading: false, planningUnit
+                        },
+                            () => {
+                                if (response.data.length == 1) {
+                                    this.changePlanningUnit();
+                                }
+                            })
                     }).catch(
                         error => {
                             if (error.message === "Network Error") {
