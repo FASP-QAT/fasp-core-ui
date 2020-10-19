@@ -12,8 +12,11 @@ import ForecastingUnitService from '../../api/ForecastingUnitService';
 import { SPACE_REGEX } from '../../Constants';
 import getLabelText from '../../CommonComponent/getLabelText';
 
+let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.planningunit.planningunit"))
+let summaryText_2 = "Add Planning Unit"
+const selectedRealm = (AuthenticationService.getRealmId() !== "" && AuthenticationService.getRealmId() !== -1) ? AuthenticationService.getRealmId() : ""
 const initialValues = {
-    summary: "Add Planning Unit",
+    summary: summaryText_1,
     planningUnitDesc: "",
     forecastingUnitDesc: "",
     unit: "",
@@ -71,7 +74,7 @@ export default class PlanningUnitTicketComponent extends Component {
         super(props);
         this.state = {
             planningUnit: {
-                summary: 'Add Planning Unit',
+                summary: summaryText_1,
                 planningUnitDesc: '',
                 forecastingUnitDesc: '',
                 unit: '',
@@ -100,13 +103,13 @@ export default class PlanningUnitTicketComponent extends Component {
             planningUnit.planningUnitDesc = event.target.value;
         }
         if (event.target.name == "forecastingUnitDesc") {
-            planningUnit.forecastingUnitDesc = this.state.forecastingUnits.filter(c => c.forecastingUnitId == event.target.value)[0].label.label_en;
+            planningUnit.forecastingUnitDesc = event.target.value !== "" ? this.state.forecastingUnits.filter(c => c.forecastingUnitId == event.target.value)[0].label.label_en : "";
             this.setState({
                 forecastingUnitId: event.target.value
             })
         }
         if (event.target.name == "unit") {
-            planningUnit.unit = this.state.units.filter(c => c.unitId == event.target.value)[0].label.label_en;
+            planningUnit.unit = event.target.value !== "" ? this.state.units.filter(c => c.unitId == event.target.value)[0].label.label_en : "";
             this.setState({
                 unitId: event.target.value
             })
@@ -273,6 +276,7 @@ export default class PlanningUnitTicketComponent extends Component {
                             this.setState({
                                 loading: true
                             })
+                            this.state.planningUnit.summary = summaryText_2
                             JiraTikcetService.addEmailRequestIssue(this.state.planningUnit).then(response => {
                                 console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {

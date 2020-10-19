@@ -16,9 +16,12 @@ import 'react-select/dist/react-select.min.css';
 import classNames from 'classnames';
 import { LABEL_REGEX, SPACE_REGEX } from '../../Constants';
 
+let summaryText_1 = (i18n.t("static.ticket.addUpdateUser"))
+let summaryText_2 = "Add / Update User"
+const selectedRealm = (AuthenticationService.getRealmId() !== "" && AuthenticationService.getRealmId() !== -1) ? AuthenticationService.getRealmId() : ""
 const initialValues = {
-    summary: "Add / Update User",
-    realm: "",
+    summary: summaryText_1,
+    realm: selectedRealm,
     name: "",
     emailId: "",
     phoneNumber: "",
@@ -104,7 +107,7 @@ export default class UserTicketComponent extends Component {
         this.state = {
             lang: localStorage.getItem('lang'),
             user: {
-                summary: 'Add / Update User',
+                summary: summaryText_1,
                 realm: "",
                 name: "",
                 emailId: "",
@@ -135,7 +138,7 @@ export default class UserTicketComponent extends Component {
             user.summary = event.target.value;
         }
         if (event.target.name == "realm") {
-            user.realm = this.state.realms.filter(c => c.realmId == event.target.value)[0].label.label_en;
+            user.realm = event.target.value !== "" ? this.state.realms.filter(c => c.realmId == event.target.value)[0].label.label_en : "";
             this.setState({
                 realmId: event.target.value
             })
@@ -282,10 +285,24 @@ export default class UserTicketComponent extends Component {
 
         RealmService.getRealmListAll()
             .then(response => {
-                if (response.status == 200) {
+                if (response.status == 200) {                    
                     this.setState({
-                        realms: response.data
-                    })
+                        realms: response.data,
+                        realmId: selectedRealm
+                    });
+                    if (selectedRealm !== "") {
+                        this.setState({
+                            realms: (response.data).filter(c => c.realmId == selectedRealm)
+                        })
+    
+                        let { user } = this.state;
+                        user.realm = (response.data).filter(c => c.realmId == selectedRealm)[0].label.label_en;
+                        this.setState({
+                            user
+                        }, () => {                               
+    
+                        })
+                    }
                 } else {
                     this.setState({
                         message: response.data.messageCode
@@ -460,6 +477,7 @@ export default class UserTicketComponent extends Component {
                             this.setState({
                                 loading: true
                             })
+                            this.state.user.summary = summaryText_2
                             JiraTikcetService.addUpdateUserRequest(this.state.user).then(response => {
                                 console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
@@ -573,7 +591,7 @@ export default class UserTicketComponent extends Component {
                                                 onBlur={handleBlur}
                                                 value={this.state.realmId}
                                                 required>
-                                                <option value="0">{i18n.t('static.common.select')}</option>
+                                                <option value="">{i18n.t('static.common.select')}</option>
                                                 {realmList}
                                             </Input>
                                             <FormFeedback className="red">{errors.realm}</FormFeedback>

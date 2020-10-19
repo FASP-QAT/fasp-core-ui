@@ -53,6 +53,7 @@ import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME } from '../../Constants.js';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import BootstrapTable from 'react-bootstrap-table-next';
+import imageHelp from '../../assets/img/help-icon.png';
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
 
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
@@ -218,7 +219,8 @@ class ApplicationDashboard extends Component {
       message: '',
       dashboard: '',
       users: [],
-      lang: localStorage.getItem('lang')
+      lang: localStorage.getItem('lang'),
+      openIssues: ''
     };
     // this.state = {
 
@@ -321,6 +323,13 @@ class ApplicationDashboard extends Component {
           })
       }
     }
+    DashboardService.openIssues()
+      .then(response => {
+        console.log("Customer Open Issues===", response);
+        this.setState({
+          openIssues: response.data
+        })
+      })
     this.hideFirstComponent();
     console.log("====== in application dasboard =======");
 
@@ -1163,6 +1172,32 @@ class ApplicationDashboard extends Component {
                 </Card>
               </Col>
             }
+
+            <Col xs="12" sm="6" lg="3">
+              <Card className=" CardHeight">
+                <CardBody className="box-p">
+                  <div class="h1 text-muted text-left mb-2  ">
+                    {/* <i class="fa fa-question-circle icon-color"></i> */}
+                    <i><img src={imageHelp} className="" style={{width: '40px', height: '40px', marginTop: '-15px'}}/></i>
+                    {/* <ButtonGroup className="float-right">
+                      <Dropdown id='card7' isOpen={this.state.card7} toggle={() => { this.setState({ card7: !this.state.card7 }); }}>
+                        <DropdownToggle caret className="p-0" color="transparent">
+                        </DropdownToggle>
+                        <DropdownMenu right>
+                          <DropdownItem onClick={() => this.redirectToCrud("/report/supplyPlanVersionAndReview")}>{i18n.t('static.dashboard.viewSupplyPlan')}</DropdownItem>
+                        </DropdownMenu>
+                      </Dropdown>
+                    </ButtonGroup> */}
+                  </div>
+
+                  <div className="TextTittle ">Open Issues</div>
+                  <div className="text-count">{this.state.openIssues}</div>
+                  <div className="chart-wrapper mt-4 pb-2" >
+                  </div>
+                </CardBody>
+              </Card>
+            </Col>
+
           </Row>
         </Online>
         {/* <Row className="mt-2">
