@@ -522,7 +522,7 @@ export default class CostOfInventory extends Component {
                 {
                     title:  i18n.t('static.procurementAgentPlanningUnit.catalogPrice'),
                     type: 'text',
-                    readOnly: true
+                    readOnly: true,
                 },
                 {
                     title: i18n.t('static.report.costUsd'),
