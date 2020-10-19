@@ -710,7 +710,7 @@ export default class ProductCategoryTree extends Component {
                                             setTouched,
                                             handleReset
                                         }) => (
-                                                <Form onSubmit={handleSubmit} className="needs-validation" onReset={handleReset} noValidate name='productCategoryForm'>
+                                                <Form onSubmit={handleSubmit} className="needs-validation" onReset={handleReset} noValidate name='productCategoryForm' autocomplete="off">
 
                                                     <FormGroup>
                                                         {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PRODUCT_CATEGORY') &&

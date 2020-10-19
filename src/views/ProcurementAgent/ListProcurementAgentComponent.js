@@ -752,7 +752,7 @@ class ListProcurementAgentComponent extends Component {
                 {
                     title: i18n.t('static.procurementAgent.localProcurementAgent'),
                     type: 'text',
-                    readOnly: true
+                    type: 'hidden',
                 },
                 {
                     title: i18n.t('static.common.lastModifiedBy'),
