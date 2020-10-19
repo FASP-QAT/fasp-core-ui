@@ -11,7 +11,7 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import getLabelText from '../../CommonComponent/getLabelText';
 import { ALPHABET_NUMBER_REGEX, SPACE_REGEX } from '../../Constants.js';
 
-const initialValues = {
+let initialValues = {
     realmId: [],
     label: ''
 }
@@ -123,10 +123,19 @@ export default class AddDataSourceTypeComponent extends Component {
         // AuthenticationService.setupAxiosInterceptors();
         RealmService.getRealmListAll()
             .then(response => {
+                let { dataSourceType } = this.state
+                dataSourceType.realm.id = (response.data.length == 1 ? response.data[0].realmId : "")
                 this.setState({
                     realms: response.data,
-                    loading: false
-                })
+                    loading: false,
+                    dataSourceType
+                },
+                    () => {
+                        initialValues = {
+                            realmId: (response.data.length == 1 ? response.data[0].realmId : "")
+                        }
+                    })
+
             })
             .catch(
                 error => {
@@ -200,6 +209,7 @@ export default class AddDataSourceTypeComponent extends Component {
                                 <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
                             </CardHeader> */}
                             <Formik
+                                enableReinitialize={true}
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {

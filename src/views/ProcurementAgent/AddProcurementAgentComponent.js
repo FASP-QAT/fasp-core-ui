@@ -16,7 +16,7 @@ import reactCSS from 'reactcss'
 import getLabelText from '../../CommonComponent/getLabelText';
 const entityname = i18n.t('static.procurementagent.procurementagent')
 
-const initialValues = {
+let initialValues = {
     realmId: [],
     procurementAgentCode: "",
     procurementAgentName: "",
@@ -344,9 +344,16 @@ class AddProcurementAgentComponent extends Component {
         RealmService.getRealmListAll()
             .then(response => {
                 if (response.status == 200) {
+                    let { procurementAgent } = this.state;
+                    procurementAgent.realm.id = (response.data.length == 1 ? response.data[0].realmId : "")
                     this.setState({
-                        realms: response.data, loading: false
-                    })
+                        realms: response.data, loading: false, procurementAgent
+                    },
+                        () => {
+                            initialValues = {
+                                realmId: (response.data.length == 1 ? response.data[0].realmId : "")
+                            }
+                        })
                 } else {
                     this.setState({
                         message: response.data.messageCode, loading: false

@@ -14,7 +14,7 @@ import PlanningUnitService from "../../api/PlanningUnitService";
 import i18n from '../../i18n';
 import ProductCategoryServcie from '../../api/PoroductCategoryService.js';
 import { jExcelLoadedFunction } from "../../CommonComponent/JExcelCommonFunctions";
-import { DECIMAL_NO_REGEX, JEXCEL_PAGINATION_OPTION } from "../../Constants";
+import { JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_DECIMAL_CATELOG_PRICE, DECIMAL_NO_REGEX, JEXCEL_PAGINATION_OPTION } from "../../Constants";
 const entityname = i18n.t('static.dashboard.programPlanningUnit');
 
 
@@ -845,7 +845,8 @@ class AddprogramPlanningUnit extends Component {
                 //Reorder frequency
                 var col = ("C").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(2, y);
-                var reg = /^[0-9\b]+$/;
+                // var reg = /^[0-9\b]+$/;
+                var reg = JEXCEL_INTEGER_REGEX
                 // console.log("value-----", value);
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
@@ -867,7 +868,8 @@ class AddprogramPlanningUnit extends Component {
                 //Min months of stock
                 var col = ("D").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(3, y);
-                var reg = /^[0-9\b]+$/;
+                // var reg = /^[0-9\b]+$/;
+                var reg = JEXCEL_INTEGER_REGEX
                 // console.log("value-----", value);
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
@@ -889,7 +891,8 @@ class AddprogramPlanningUnit extends Component {
                 //Months in future for AMC
                 var col = ("E").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(4, y);
-                var reg = /^[0-9\b]+$/;
+                // var reg = /^[0-9\b]+$/;
+                var reg = JEXCEL_INTEGER_REGEX
                 // console.log("value-----", value);
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
@@ -911,7 +914,8 @@ class AddprogramPlanningUnit extends Component {
                 //Months in past for AMC
                 var col = ("F").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(5, y);
-                var reg = /^[0-9\b]+$/;
+                // var reg = /^[0-9\b]+$/;
+                var reg = JEXCEL_INTEGER_REGEX
                 // console.log("value-----", value);
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
@@ -933,7 +937,8 @@ class AddprogramPlanningUnit extends Component {
                 //Local procurement lead time
                 var col = ("G").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(6, y);
-                var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
+                // var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
+                var reg = JEXCEL_DECIMAL_LEAD_TIME
                 // console.log("value-----", value);
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
@@ -941,7 +946,8 @@ class AddprogramPlanningUnit extends Component {
                     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
                 } else {
-                    if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    // if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    if (!(reg.test(value))) {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
                         this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -956,7 +962,8 @@ class AddprogramPlanningUnit extends Component {
                 //Shelf life
                 var col = ("H").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(7, y);
-                var reg = /^[0-9\b]+$/;
+                // var reg = /^[0-9\b]+$/;
+                var reg = JEXCEL_INTEGER_REGEX
                 // console.log("value-----", value);
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
@@ -980,7 +987,8 @@ class AddprogramPlanningUnit extends Component {
                 var col = ("I").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(8, y);
                 // var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
-                var reg = DECIMAL_NO_REGEX;
+                // var reg = DECIMAL_NO_REGEX;
+                var reg = JEXCEL_DECIMAL_CATELOG_PRICE
                 // console.log("value-----", value);
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
@@ -988,7 +996,8 @@ class AddprogramPlanningUnit extends Component {
                     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
                 } else {
-                    if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    // if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    if (!(reg.test(value))) {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
                         this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -1078,7 +1087,8 @@ class AddprogramPlanningUnit extends Component {
         //Reorder frequency
         if (x == 2) {
             console.log("changed 4");
-            var reg = /^[0-9\b]+$/;
+            // var reg = /^[0-9\b]+$/;
+            var reg = JEXCEL_INTEGER_REGEX
             var col = ("C").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -1104,7 +1114,8 @@ class AddprogramPlanningUnit extends Component {
         //Min months of stock
         if (x == 3) {
             console.log("changed 5");
-            var reg = /^[0-9\b]+$/;
+            // var reg = /^[0-9\b]+$/;
+            var reg = JEXCEL_INTEGER_REGEX
             var col = ("D").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -1130,7 +1141,8 @@ class AddprogramPlanningUnit extends Component {
         //Months in future for AMC
         if (x == 4) {
             console.log("changed 6");
-            var reg = /^[0-9\b]+$/;
+            // var reg = /^[0-9\b]+$/;
+            var reg = JEXCEL_INTEGER_REGEX
             var col = ("E").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -1156,7 +1168,8 @@ class AddprogramPlanningUnit extends Component {
         //Months in past for AMC
         if (x == 5) {
             console.log("changed 7");
-            var reg = /^[0-9\b]+$/;
+            // var reg = /^[0-9\b]+$/;
+            var reg = JEXCEL_INTEGER_REGEX
             var col = ("F").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -1182,7 +1195,8 @@ class AddprogramPlanningUnit extends Component {
         //Local procurement lead time
         if (x == 6) {
             console.log("changed 8");
-            var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
+            // var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
+            var reg = JEXCEL_DECIMAL_LEAD_TIME
             var col = ("G").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -1191,7 +1205,8 @@ class AddprogramPlanningUnit extends Component {
                 this.el.setValueFromCoords(11, y, 1, true);
                 valid = false;
             } else {
-                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                // if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                if (!(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -1208,7 +1223,8 @@ class AddprogramPlanningUnit extends Component {
         //Shelf life
         if (x == 7) {
             console.log("changed 9");
-            var reg = /^[0-9\b]+$/;
+            // var reg = /^[0-9\b]+$/;
+            var reg = JEXCEL_INTEGER_REGEX
             var col = ("H").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -1235,7 +1251,7 @@ class AddprogramPlanningUnit extends Component {
         if (x == 8) {
             console.log("changed 10");
             // var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
-            var reg = DECIMAL_NO_REGEX;
+            var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
             var col = ("I").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -1244,7 +1260,8 @@ class AddprogramPlanningUnit extends Component {
                 this.el.setValueFromCoords(11, y, 1, true);
                 valid = false;
             } else {
-                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                // if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                if (!(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
