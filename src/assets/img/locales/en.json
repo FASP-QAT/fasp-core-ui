@@ -1417,5 +1417,6 @@
     "static.quantimed.importData": "Import Data",
     "static.quantimed.mapAtLeastOnePlanningUnitValidationText": "Please map at least one planning unit",    
     "static.report.shippedToArrivedAirLeadTime": "'Shipped to Arrived' air lead time ",
-    "static.report.shippedToArrivedSeaLeadTime": "'Shipped to Arrived' sea lead time "
+    "static.report.shippedToArrivedSeaLeadTime": "'Shipped to Arrived' sea lead time ",
+    "static.shipment.dateIsLesserThanPrevDate":"Selected date is less than the date selected in prev columns."
 }

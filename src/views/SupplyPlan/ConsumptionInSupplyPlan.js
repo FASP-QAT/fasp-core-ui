@@ -159,6 +159,19 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                     if (this.props.consumptionPage == "supplyPlanCompare") {
                         consumptionEditable = false;
                     }
+
+                    var roleList = AuthenticationService.getLoggedInUserRole();
+                    console.log("RoleList------------>", roleList);
+                    if (roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') {
+                        consumptionEditable = false;
+                    }
+
+                    if (this.props.consumptionPage != "supplyPlanCompare" && this.props.consumptionPage != "consumptionDataEntry" && consumptionEditable == false) {
+                        document.getElementById("addConsumptionRowSupplyPlan").style.display = "none";
+                    }else if(this.props.consumptionPage != "supplyPlanCompare" && this.props.consumptionPage != "consumptionDataEntry" && consumptionEditable == true){
+                        document.getElementById("addConsumptionRowSupplyPlan").style.display = "block";
+                    }
+                    
                     var paginationOption = false;
                     var searchOption = false;
                     var paginationArray = []
@@ -208,7 +221,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         data[14] = 0;
                         consumptionDataArr[j] = data;
                     }
-                    if (consumptionList.length == 0) {
+                    if (consumptionList.length == 0 && consumptionEditable) {
                         data = [];
                         if (this.props.consumptionPage != "consumptionDataEntry") {
                             data[0] = moment(this.props.items.consumptionStartDate).startOf('month').format("YYYY-MM-DD"); //A

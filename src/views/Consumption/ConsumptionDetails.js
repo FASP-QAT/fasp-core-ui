@@ -350,6 +350,11 @@ export default class ConsumptionDetails extends React.Component {
                 document.getElementById("consumptionTableDiv").style.display = "block";
                 if (document.getElementById("addRowButtonId") != null) {
                     document.getElementById("addRowButtonId").style.display = "block";
+                    var roleList = AuthenticationService.getLoggedInUserRole();
+                    console.log("RoleList------------>", roleList);
+                    if (roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') {
+                        document.getElementById("addRowButtonId").style.display = "none";
+                    }
                 }
                 var db1;
                 getDatabase();

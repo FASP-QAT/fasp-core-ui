@@ -345,6 +345,11 @@ export default class AddInventory extends Component {
                 document.getElementById("adjustmentsTableDiv").style.display = "block";
                 if (document.getElementById("addRowButtonId") != null) {
                     document.getElementById("addRowButtonId").style.display = "block";
+                    var roleList = AuthenticationService.getLoggedInUserRole();
+                    if (roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') {
+                        console.log("In if");
+                        document.getElementById("addRowButtonId").style.display = "none";
+                    }
                 }
                 var db1;
                 getDatabase();
@@ -554,7 +559,7 @@ export default class AddInventory extends Component {
                                     )} />
 
                         <div>
-                            {this.state.showInventory == 1 && <InventoryInSupplyPlanComponent ref="inventoryChild" items={this.state} toggleLarge={this.toggleLarge} updateState={this.updateState} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} inventoryPage="inventoryDataEntry" />}
+                            <InventoryInSupplyPlanComponent ref="inventoryChild" items={this.state} toggleLarge={this.toggleLarge} updateState={this.updateState} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} inventoryPage="inventoryDataEntry" />
                             <div className="table-responsive" id="adjustmentsTableDiv">
                                 <div id="adjustmentsTable" />
                             </div>
@@ -620,8 +625,8 @@ export default class AddInventory extends Component {
         }
         if (cont == true) {
             let id = AuthenticationService.displayDashboardBasedOnRole();
-            var entityname = this.state.inventoryType == 1 ?  i18n.t("static.inventoryDetailHead.inventoryDetail")  : i18n.t("static.inventory.adjustmentdetails");
-            console.log("Entity name",entityname)
+            var entityname = this.state.inventoryType == 1 ? i18n.t("static.inventoryDetailHead.inventoryDetail") : i18n.t("static.inventory.adjustmentdetails");
+            console.log("Entity name", entityname)
             this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
         }
     }
