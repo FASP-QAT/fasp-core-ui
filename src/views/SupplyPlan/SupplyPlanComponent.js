@@ -1989,7 +1989,7 @@ export default class SupplyPlanComponent extends React.Component {
                     programList: proList,
                     loading: false
                 })
-                var programIdd = this.props.match.params.programId;
+                var programIdd = this.props.match.params.programId || localStorage.getItem("sesProgramId");
                 console.log("programIdd", programIdd);
                 if (programIdd != '' && programIdd != undefined) {
                     var programSelect = { value: programIdd, label: proList.filter(c => c.value == programIdd)[0].label };
@@ -2020,6 +2020,7 @@ export default class SupplyPlanComponent extends React.Component {
         })
         var programId = value != "" && value != undefined ? value.value : 0;
         if (programId != 0) {
+            localStorage.setItem("sesProgramId", programId);
             var db1;
             var storeOS;
             getDatabase();
@@ -2139,7 +2140,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     planningUnitListForConsumption: planningUnitListForConsumption,
                                     loading: false
                                 })
-                                var planningUnitIdProp = this.props.match.params.planningUnitId;
+                                var planningUnitIdProp = this.props.match.params.planningUnitId || localStorage.getItem("sesPlanningUnitId");
                                 console.log("planningUnitIdProp===>", planningUnitIdProp);
                                 if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
                                     var planningUnit = { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label };
@@ -2204,6 +2205,7 @@ export default class SupplyPlanComponent extends React.Component {
         var planningUnitName = "";
         if (planningUnitId != 0) {
             planningUnitName = value.label;
+            localStorage.setItem("sesPlanningUnitId", planningUnitId);
         }
 
         var programPlanningUnit = ((this.state.programPlanningUnitList).filter(p => p.planningUnit.id == planningUnitId))[0];
@@ -2675,7 +2677,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         plannedErpShipmentsTotalData.push("")
                                     }
 
-                                    inventoryTotalData.push(jsonList[0].adjustmentQty == 0 ? "" : jsonList[0].adjustmentQty);
+                                    inventoryTotalData.push(jsonList[0].adjustmentQty == 0 ? jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : "" : jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : jsonList[0].adjustmentQty);
                                     totalExpiredStockArr.push({ qty: jsonList[0].expiredStock, details: jsonList[0].batchDetails.filter(c => moment(c.expiryDate).format("YYYY-MM-DD") >= m[n].startDate && moment(c.expiryDate).format("YYYY-MM-DD") <= m[n].endDate), month: m[n] });
                                     monthsOfStockArray.push(parseFloat(jsonList[0].mos).toFixed(1));
                                     amcTotalData.push(Math.round(parseFloat(jsonList[0].amc)))
