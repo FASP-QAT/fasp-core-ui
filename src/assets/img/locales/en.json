@@ -1351,12 +1351,12 @@
     "static.supplyPlan.dateustBeLessThanCurDate":"Date must be less than current date",
     "static.ticket.unavailableDropdownValidationText": " - if you don't see the ? you want, please submit a ticket for that item.",
     "static.problemContext.editProblem":"Edit problem",
-    "static.problemList.high":"Criticality High",
-    "static.problemList.medium":"Criticality Medium",
-    "static.problemList.low":"Criticality Low",
+    "static.problemList.high":"High",
+    "static.problemList.medium":"Medium",
+    "static.problemList.low":"Low",
     "static.problemOnboarding.duplicateProgramDisplayName":"Duplicate program display name",
     "static.problemContext.viewTrans":"View transaction",
-    "static.problemContext.transDetails":"Transaction Details",
+    "static.problemContext.transDetails":"Transaction History",
     "static.quantimed.quantimedImport": "Quantimed Import",
     "static.quantimed.quantimedImportSuccess": "Quantimed Data Imported Successfully",
     "static.quantimed.quantimedImportScreenOne": "Import Quantimed Data File",
@@ -1414,5 +1414,6 @@
     "static.quantimed.planningUnitNotFoundText": "Planning Unit Not Found",
     "static.quantimed.doNotImport": "Do not import",
     "static.quantimed.importData": "Import Data",
-    "static.quantimed.mapAtLeastOnePlanningUnitValidationText": "Please map at least one planning unit"    
+    "static.quantimed.mapAtLeastOnePlanningUnitValidationText": "Please map at least one planning unit",
+    "pipeline.garbageDataValidation":"Garbage data found please validate garbage data to proceed."    
 }

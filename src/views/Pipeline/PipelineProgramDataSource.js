@@ -204,7 +204,7 @@ export default class PipelineProgramDataSource extends Component {
                 var DataSourceListQat = [];
                 // var activeDataSourceList=[];
                 // AuthenticationService.setupAxiosInterceptors();
-                DataSourceService.getActiveDataSourceList()
+                DataSourceService.getAllDataSourceList()
                     .then(response => {
                         if (response.status == 200) {
                             console.log("data source====>",response.data);
