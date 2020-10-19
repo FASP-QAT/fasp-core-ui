@@ -780,6 +780,11 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             if (rowData[4] == 2) {
                 var valid = checkValidtion("text", "K", y, rowData[10], elInstance);
             }
+            if (rowData[10].length > 600) {
+                inValid("K", y, i18n.t('static.dataentry.notesMaxLength'), elInstance);
+            } else {
+                positiveValidation("K", y, elInstance);
+            }
         }
         // this.showOnlyErrors();
     }
@@ -1243,6 +1248,13 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         valid = false;
                         elInstance.setValueFromCoords(16, y, 1, true);
                     }
+                }
+
+                if (rowData[10].length > 600) {
+                    inValid("K", y, i18n.t('static.dataentry.notesMaxLength'), elInstance);
+                    valid = false;
+                } else {
+                    positiveValidation("K", y, elInstance);
                 }
 
                 if (rowData[4] == 1) {

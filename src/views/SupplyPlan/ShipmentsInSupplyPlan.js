@@ -1592,6 +1592,14 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             }
         }
 
+        if (x == 19) {
+            if (rowData[19].length > 600) {
+                inValid("T", y, i18n.t('static.dataentry.notesMaxLength'), elInstance);
+            } else {
+                positiveValidation("T", y, elInstance);
+            }
+        }
+
         if (x == 5) {
             var valid = checkValidtion("text", "F", y, rowData[5], elInstance);
             if (valid == true) {
@@ -2622,6 +2630,13 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 if (validation == false) {
                     valid = false;
                     elInstance.setValueFromCoords(30, y, 1, true);
+                }
+
+                if (rowData[19].length > 600) {
+                    inValid("T", y, i18n.t('static.dataentry.notesMaxLength'), elInstance);
+                    valid = false;
+                } else {
+                    positiveValidation("T", y, elInstance);
                 }
 
                 var validation = checkValidtion("text", "F", y, rowData[5], elInstance);

@@ -168,10 +168,10 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
 
                     if (this.props.consumptionPage != "supplyPlanCompare" && this.props.consumptionPage != "consumptionDataEntry" && consumptionEditable == false) {
                         document.getElementById("addConsumptionRowSupplyPlan").style.display = "none";
-                    }else if(this.props.consumptionPage != "supplyPlanCompare" && this.props.consumptionPage != "consumptionDataEntry" && consumptionEditable == true){
+                    } else if (this.props.consumptionPage != "supplyPlanCompare" && this.props.consumptionPage != "consumptionDataEntry" && consumptionEditable == true) {
                         document.getElementById("addConsumptionRowSupplyPlan").style.display = "block";
                     }
-                    
+
                     var paginationOption = false;
                     var searchOption = false;
                     var paginationArray = []
@@ -681,6 +681,14 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                 positiveValidation("I", y, elInstance);
             }
         }
+
+        if (x == 9) {
+            if (rowData[9].length > 600) {
+                inValid("J", y, i18n.t('static.dataentry.notesMaxLength'), elInstance);
+            } else {
+                positiveValidation("J", y, elInstance);
+            }
+        }
         if (x == 2) {
             var dataSource = rowData[3];
             var dataSourceType = "";
@@ -1083,6 +1091,13 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                     } else {
                         positiveValidation("I", y, elInstance);
                     }
+                }
+
+                if (rowData[9].length > 600) {
+                    inValid("J", y, i18n.t('static.dataentry.notesMaxLength'), elInstance);
+                    valid = false;
+                } else {
+                    positiveValidation("J", y, elInstance);
                 }
 
                 validation = checkValidtion("text", "C", y, rowData[2], elInstance);
