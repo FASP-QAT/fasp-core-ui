@@ -479,10 +479,10 @@ export default class CostOfInventory extends Component {
         for (var j = 0; j < costOfInventory.length; j++) {
             data = [];
             data[0] = getLabelText(costOfInventory[j].planningUnit.label, this.state.lang)
-            data[1] = this.formatter(costOfInventory[j].stock)
+            data[1] = costOfInventory[j].stock
             data[2] = (costOfInventory[j].calculated? i18n.t('static.program.no'):i18n.t('static.program.yes'))
-            data[3] = this.formatterDouble(costOfInventory[j].catalogPrice);
-            data[4] = this.formatterDouble(costOfInventory[j].cost);
+            data[3] = costOfInventory[j].catalogPrice;
+            data[4] = costOfInventory[j].cost;
 
             costOfInventoryArray[count] = data;
             count++;
@@ -507,27 +507,23 @@ export default class CostOfInventory extends Component {
                 {
                     title: i18n.t('static.report.planningUnit'),
                     type: 'text',
-                    readOnly: true
+                    mask:'#,###'
                 },
                 {
                     title: i18n.t('static.report.stock'),
-                    type: 'text',
-                    readOnly: true
+                    type: 'number'
                 },
                 {
                     title: i18n.t('static.report.actualInv'),
-                    type: 'text',
-                    readOnly: true
+                    type: 'text'
                 },
                 {
                     title:  i18n.t('static.procurementAgentPlanningUnit.catalogPrice'),
-                    type: 'text',
-                    readOnly: true
+                    type: 'number'
                 },
                 {
                     title: i18n.t('static.report.costUsd'),
-                    type: 'text',
-                    readOnly: true
+                    type: 'number'
                 },
             ],
             text: {
