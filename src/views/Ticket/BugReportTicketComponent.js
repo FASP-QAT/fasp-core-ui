@@ -259,16 +259,18 @@ export default class BugReportTicketComponent extends Component {
                                                 <Label className="uploadfilelable" htmlFor="attachFile">{i18n.t('static.ticket.uploadScreenshot')}<span class="red Reqasterisk">*</span></Label>
                                             </Col>
                                             <div className="custom-file">
-                                                <Input type="file" className="custom-file-input" id="attachFile" name="attachFile" accept=".zip,.png,.jpg,.jpeg"
+                                                <Input type="file" className="custom-file-input" id="attachFile" name="attachFile"  accept=".zip,.png,.jpg,.jpeg"
                                                     valid={!errors.attachFile && this.state.bugReport.attachFile != ''}
                                                     invalid={touched.attachFile && !!errors.attachFile}
                                                     onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                     onBlur={handleBlur}
                                                 />
-                                                <label className="custom-file-label" id="attachFile">{this.state.bugReport.attachFile}</label>
+                                    
+                                                <label className="custom-file-label" id="attachFile" >{this.state.bugReport.attachFile}</label>
                                                 <FormFeedback className="red">{errors.attachFile}</FormFeedback>
                                             </div>
                                         </FormGroup>
+                                       
                                         <ModalFooter className="pr-0 pb-0">
 
                                             <Button type="button" size="md" color="info" className="mr-1" onClick={this.props.toggleMain}><i className="fa fa-angle-double-left "></i> {i18n.t('static.common.back')}</Button>
