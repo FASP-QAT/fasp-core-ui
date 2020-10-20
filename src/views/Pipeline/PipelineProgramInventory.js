@@ -133,6 +133,28 @@ export default class PipelineProgramInventory extends Component {
             } else {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
+
+                var realmCountryPlanningUnitList = this.state.realmCountryPlanningUnitList;
+                var filteredList = realmCountryPlanningUnitList.filter(c => c.realmCountryPlanningUnitId == value);
+                var multiplier = filteredList[0].multiplier;
+                this.el.setValueFromCoords(4, y, multiplier);
+            }
+        }
+        if(x == 5){
+            var col = ("F").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if (isNaN(Date.parse(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invaliddate'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
             }
         }
 
@@ -259,7 +281,7 @@ export default class PipelineProgramInventory extends Component {
                 }
 
                 // AuthenticationService.setupAxiosInterceptors();
-                DataSourceService.getActiveDataSourceList().then(response => {
+                DataSourceService.getAllDataSourceList().then(response => {
                     var dataSourceList = [];
                     // console.log("inventory data source List ++++++++++++++++++----->", response.data);
                     for (var j = 0; j < response.data.length; j++) {
@@ -348,7 +370,7 @@ export default class PipelineProgramInventory extends Component {
                                         {
                                             title: i18n.t('static.unit.multiplier'),
                                             type: 'text',
-                                            readonly: true
+                                            readOnly: true
                                         },
                                         {
                                             title: i18n.t('static.inventory.inventoryDate'),

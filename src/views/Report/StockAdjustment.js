@@ -55,8 +55,8 @@ class StockAdjustmentComponent extends Component {
             data: [],
             lang: localStorage.getItem('lang'),
             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate:{year:  new Date().getFullYear()-3, month: new Date().getMonth()+2},
-            maxDate:{year:  new Date().getFullYear()+3, month: new Date().getMonth()},
+            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
+            maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
             loading: true
         }
         this.formatLabel = this.formatLabel.bind(this);
@@ -86,23 +86,66 @@ class StockAdjustmentComponent extends Component {
                             programs: [], loading: false
                         }, () => { this.consolidatedProgramList() })
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message, loading: false });
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
                         } else {
                             switch (error.response ? error.response.status : "") {
-                                case 500:
+
                                 case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
                                 case 404:
                                 case 406:
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                        loading: false
+                                    });
+                                    break;
                                 case 412:
-                                    this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                        loading: false
+                                    });
                                     break;
                                 default:
-                                    this.setState({ message: 'static.unkownError', loading: false });
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
                                     break;
                             }
                         }
                     }
                 );
+            // .catch(
+            //     error => {
+            //         this.setState({
+            //             programs: [], loading: false
+            //         }, () => { this.consolidatedProgramList() })
+            //         if (error.message === "Network Error") {
+            //             this.setState({ message: error.message, loading: false });
+            //         } else {
+            //             switch (error.response ? error.response.status : "") {
+            //                 case 500:
+            //                 case 401:
+            //                 case 404:
+            //                 case 406:
+            //                 case 412:
+            //                     this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+            //                     break;
+            //                 default:
+            //                     this.setState({ message: 'static.unkownError', loading: false });
+            //                     break;
+            //             }
+            //         }
+            //     }
+            // );
 
         } else {
             console.log('offline')
@@ -274,80 +317,122 @@ class StockAdjustmentComponent extends Component {
                     this.el.destroy();
                 });
             } else {
-            if (versionId.includes('Local')) {
-                const lan = 'en';
-                var db1;
-                var storeOS;
-                getDatabase();
-                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                openRequest.onsuccess = function (e) {
-                    db1 = e.target.result;
-                    var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
-                    var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
-                    var planningunitRequest = planningunitOs.getAll();
-                    var planningList = []
-                    planningunitRequest.onerror = function (event) {
-                        // Handle errors!
-                    };
-                    planningunitRequest.onsuccess = function (e) {
-                        var myResult = [];
-                        myResult = planningunitRequest.result;
-                        var programId = (document.getElementById("programId").value).split("_")[0];
-                        var proList = []
-                        // console.log(myResult)
-                        for (var i = 0; i < myResult.length; i++) {
-                            if (myResult[i].program.id == programId) {
+                if (versionId.includes('Local')) {
+                    const lan = 'en';
+                    var db1;
+                    var storeOS;
+                    getDatabase();
+                    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                    openRequest.onsuccess = function (e) {
+                        db1 = e.target.result;
+                        var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+                        var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
+                        var planningunitRequest = planningunitOs.getAll();
+                        var planningList = []
+                        planningunitRequest.onerror = function (event) {
+                            // Handle errors!
+                        };
+                        planningunitRequest.onsuccess = function (e) {
+                            var myResult = [];
+                            myResult = planningunitRequest.result;
+                            var programId = (document.getElementById("programId").value).split("_")[0];
+                            var proList = []
+                            // console.log(myResult)
+                            for (var i = 0; i < myResult.length; i++) {
+                                if (myResult[i].program.id == programId) {
 
-                                proList[i] = myResult[i]
+                                    proList[i] = myResult[i]
+                                }
                             }
-                        }
+                            this.setState({
+                                planningUnits: proList, message: ''
+                            }, () => {
+                                this.fetchData();
+                            })
+                        }.bind(this);
+                    }.bind(this)
+
+
+                }
+                else {
+                    // AuthenticationService.setupAxiosInterceptors();
+
+                    //let productCategoryId = document.getElementById("productCategoryId").value;
+                    ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
+                        // console.log('**' + JSON.stringify(response.data))
                         this.setState({
-                            planningUnits: proList, message: ''
+                            planningUnits: response.data, message: ''
                         }, () => {
                             this.fetchData();
                         })
-                    }.bind(this);
-                }.bind(this)
-
-
-            }
-            else {
-                // AuthenticationService.setupAxiosInterceptors();
-
-                //let productCategoryId = document.getElementById("productCategoryId").value;
-                ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
-                    // console.log('**' + JSON.stringify(response.data))
-                    this.setState({
-                        planningUnits: response.data, message: ''
-                    }, () => {
-                        this.fetchData();
-                    })
-                })
-                    .catch(
+                    }).catch(
                         error => {
                             this.setState({
                                 planningUnits: [],
                             })
                             if (error.message === "Network Error") {
-                                this.setState({ message: error.message });
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
                             } else {
                                 switch (error.response ? error.response.status : "") {
-                                    case 500:
+
                                     case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
                                     case 404:
                                     case 406:
+                                        this.setState({
+                                            message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
+                                            loading: false
+                                        });
+                                        break;
                                     case 412:
-                                        this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
+                                        this.setState({
+                                            message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
+                                            loading: false
+                                        });
                                         break;
                                     default:
-                                        this.setState({ message: 'static.unkownError' });
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
                                         break;
                                 }
                             }
                         }
                     );
+                    // .catch(
+                    //     error => {
+                    //         this.setState({
+                    //             planningUnits: [],
+                    //         })
+                    //         if (error.message === "Network Error") {
+                    //             this.setState({ message: error.message });
+                    //         } else {
+                    //             switch (error.response ? error.response.status : "") {
+                    //                 case 500:
+                    //                 case 401:
+                    //                 case 404:
+                    //                 case 406:
+                    //                 case 412:
+                    //                     this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
+                    //                     break;
+                    //                 default:
+                    //                     this.setState({ message: 'static.unkownError' });
+                    //                     break;
+                    //             }
+                    //         }
+                    //     }
+                    // );
+                }
             }
-        }
         });
 
     }
@@ -392,9 +477,9 @@ class StockAdjustmentComponent extends Component {
         return x1 + x2;
     }
 
-    addDoubleQuoteToRowContent=(arr)=>{
-        return arr.map(ele=>'"'+ele+'"')
-     }
+    addDoubleQuoteToRowContent = (arr) => {
+        return arr.map(ele => '"' + ele + '"')
+    }
 
     exportCSV(columns) {
 
@@ -415,7 +500,7 @@ class StockAdjustmentComponent extends Component {
 
 
         var A = [this.addDoubleQuoteToRowContent(headers)]
-        this.state.data.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.dataSource.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),ele.planningUnit.id, (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (new moment(ele.inventoryDate).format('MMM YYYY')).replaceAll(' ', '%20'), ele.stockAdjustemntQty, ele.lastModifiedBy.username, new moment(ele.lastModifiedDate).format(`${DATE_FORMAT_CAP}`), ele.notes])));
+        this.state.data.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.dataSource.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.planningUnit.id, (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (new moment(ele.inventoryDate).format('MMM YYYY')).replaceAll(' ', '%20'), ele.stockAdjustemntQty, ele.lastModifiedBy.username, new moment(ele.lastModifiedDate).format(`${DATE_FORMAT_CAP}`), ele.notes])));
         for (var i = 0; i < A.length; i++) {
             // console.log(A[i])
             csvRow.push(A[i].join(","))
@@ -500,7 +585,7 @@ class StockAdjustmentComponent extends Component {
 
         const headers = [];
         columns.map((item, idx) => { headers[idx] = (item.text) });
-        let data = this.state.data.map(ele => [getLabelText(ele.dataSource.label, this.state.lang),ele.planningUnit.id, getLabelText(ele.planningUnit.label, this.state.lang), new moment(ele.inventoryDate).format('MMM YYYY'), this.formatter(ele.stockAdjustemntQty), ele.lastModifiedBy.username, new moment(ele.lastModifiedDate).format(`${DATE_FORMAT_CAP}`), ele.notes]);
+        let data = this.state.data.map(ele => [getLabelText(ele.dataSource.label, this.state.lang), ele.planningUnit.id, getLabelText(ele.planningUnit.label, this.state.lang), new moment(ele.inventoryDate).format('MMM YYYY'), this.formatter(ele.stockAdjustemntQty), ele.lastModifiedBy.username, new moment(ele.lastModifiedDate).format(`${DATE_FORMAT_CAP}`), ele.notes]);
         let startY = 150 + (this.state.planningUnitValues.length * 3)
         let content = {
             margin: { top: 80, bottom: 50 },
@@ -648,7 +733,7 @@ class StockAdjustmentComponent extends Component {
             if (versionId.includes('Local')) {
                 startDate = this.state.rangeValue.from.year + '-' + String(this.state.rangeValue.from.month).padStart(2, '0') + '-01';
                 endDate = this.state.rangeValue.to.year + '-' + String(this.state.rangeValue.to.month).padStart(2, '0') + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
-        
+
                 planningUnitIds = this.state.planningUnitValues.map(ele => (ele.value).toString())
                 var db1;
                 var storeOS;
@@ -659,7 +744,7 @@ class StockAdjustmentComponent extends Component {
                 openRequest.onerror = function (event) {
                     this.setState({
                         message: i18n.t('static.program.errortext'),
-                        loading:false
+                        loading: false
                     })
                 }.bind(this);
                 openRequest.onsuccess = function (e) {
@@ -675,36 +760,36 @@ class StockAdjustmentComponent extends Component {
                     programRequest.onerror = function (event) {
                         this.setState({
                             message: i18n.t('static.program.errortext'),
-                            loading:false
+                            loading: false
                         })
                     }.bind(this);
                     programRequest.onsuccess = function (e) {
-                        
+
                         console.log("2----", programRequest)
                         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         var programJson = JSON.parse(programData);
                         console.log(programJson)
-                        console.log(startDate,endDate)
-                       var data=[]
-                        planningUnitIds.map(planningUnitId =>{
-                           var inventoryList = ((programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && (c.inventoryDate >= startDate && c.inventoryDate <= endDate)&& c.adjustmentQty != 0));
-                          console.log(inventoryList)
+                        console.log(startDate, endDate)
+                        var data = []
+                        planningUnitIds.map(planningUnitId => {
+                            var inventoryList = ((programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && (c.inventoryDate >= startDate && c.inventoryDate <= endDate) && c.adjustmentQty != 0));
+                            console.log(inventoryList)
 
-                            inventoryList.map(ele=>{
-                                   
-                                    var json = {
-                                        program: programJson,
-                                        inventoryDate: moment(ele.inventoryDate).format('MMM YYYY'),
-                                        planningUnit: ele.planningUnit,
-                                        stockAdjustemntQty:  ele.adjustmentQty,
-                                        lastModifiedBy: programJson.currentVersion.lastModifiedBy,
-                                        lastModifiedDate: programJson.currentVersion.lastModifiedDate,
-                                        notes: ele.notes,
-                                        dataSource: ele.dataSource
-                                    }
-                                    data.push(json)
-                               })
+                            inventoryList.map(ele => {
+
+                                var json = {
+                                    program: programJson,
+                                    inventoryDate: moment(ele.inventoryDate).format('MMM YYYY'),
+                                    planningUnit: ele.planningUnit,
+                                    stockAdjustemntQty: ele.adjustmentQty,
+                                    lastModifiedBy: programJson.currentVersion.lastModifiedBy,
+                                    lastModifiedDate: programJson.currentVersion.lastModifiedDate,
+                                    notes: ele.notes,
+                                    dataSource: ele.dataSource
+                                }
+                                data.push(json)
+                            })
                         })
                         console.log(data)
                         this.setState({
@@ -746,23 +831,70 @@ class StockAdjustmentComponent extends Component {
                                 this.el.destroy();
                             });
                             if (error.message === "Network Error") {
-                                this.setState({ message: error.message, loading: false });
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
                             } else {
                                 switch (error.response ? error.response.status : "") {
-                                    case 500:
+
                                     case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
                                     case 404:
                                     case 406:
+                                        this.setState({
+                                            message: i18n.t(error.response.data.messageCode),
+                                            loading: false
+                                        });
+                                        break;
                                     case 412:
-                                        this.setState({ loading: false, message: i18n.t(error.response.data.messageCode) });
+                                        this.setState({
+                                            message: i18n.t(error.response.data.messageCode),
+                                            loading: false
+                                        });
                                         break;
                                     default:
-                                        this.setState({ message: 'static.unkownError', loading: false });
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
                                         break;
                                 }
                             }
                         }
                     );
+                // .catch(
+                //     error => {
+                //         this.setState({
+                //             data: [],
+                //             loading: false
+                //         }, () => {
+                //             this.el = jexcel(document.getElementById("tableDiv"), '');
+                //             this.el.destroy();
+                //         });
+                //         if (error.message === "Network Error") {
+                //             this.setState({ message: error.message, loading: false });
+                //         } else {
+                //             switch (error.response ? error.response.status : "") {
+                //                 case 500:
+                //                 case 401:
+                //                 case 404:
+                //                 case 406:
+                //                 case 412:
+                //                     this.setState({ loading: false, message: i18n.t(error.response.data.messageCode) });
+                //                     break;
+                //                 default:
+                //                     this.setState({ message: 'static.unkownError', loading: false });
+                //                     break;
+                //             }
+                //         }
+                //     }
+                // );
 
 
             }
@@ -849,7 +981,7 @@ class StockAdjustmentComponent extends Component {
                 formatter: (cell, row) => {
                     return getLabelText(cell, this.state.lang);
                 }
-            },{
+            }, {
                 dataField: 'planningUnit.id',
                 text: i18n.t('static.report.qatPID'),
                 sort: true,
@@ -946,11 +1078,7 @@ class StockAdjustmentComponent extends Component {
         }
         return (
             <div className="animated">
-                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
-                    this.setState({ message: message })
-                }} loading={(loading) => {
-                    this.setState({ loading: loading })
-                }} />
+                <AuthenticationServiceComponent history={this.props.history} />
                 <h5>{i18n.t(this.props.match.params.message)}</h5>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
@@ -973,7 +1101,7 @@ class StockAdjustmentComponent extends Component {
 
                                         <Picker
                                             ref="pickRange"
-                                            years={{min: this.state.minDate, max: this.state.maxDate}}
+                                            years={{ min: this.state.minDate, max: this.state.maxDate }}
                                             value={rangeValue}
                                             lang={pickerLang}
                                             //theme="light"

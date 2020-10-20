@@ -159,6 +159,17 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     if (this.props.inventoryPage == "supplyPlanCompare") {
                         inventoryEditable = false;
                     }
+
+                    var roleList = AuthenticationService.getLoggedInUserRole();
+                    if (roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') {
+                        inventoryEditable = false;
+                    }
+
+                    if (this.props.inventoryPage != "supplyPlanCompare" && this.props.inventoryPage != "inventoryDataEntry" && inventoryEditable == false) {
+                        document.getElementById("addInventoryRowSupplyPlan").style.display = "none";
+                    } else if (this.props.inventoryPage != "supplyPlanCompare" && this.props.inventoryPage != "inventoryDataEntry" && inventoryEditable == true) {
+                        document.getElementById("addInventoryRowSupplyPlan").style.display = "block";
+                    }
                     var paginationOption = false;
                     var searchOption = false;
                     var paginationArray = []
@@ -211,7 +222,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         inventoryDataArr[j] = data;
                     }
                     var regionList = this.props.items.regionList;
-                    if (inventoryList.length == 0) {
+                    if (inventoryList.length == 0 && inventoryEditable) {
                         data = [];
                         if (this.props.inventoryPage != "inventoryDataEntry") {
                             data[0] = moment(this.props.items.inventoryEndDate).endOf('month').format("YYYY-MM-DD"); //A
@@ -769,6 +780,11 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             if (rowData[4] == 2) {
                 var valid = checkValidtion("text", "K", y, rowData[10], elInstance);
             }
+            if (rowData[10].length > 600) {
+                inValid("K", y, i18n.t('static.dataentry.notesMaxLength'), elInstance);
+            } else {
+                positiveValidation("K", y, elInstance);
+            }
         }
         // this.showOnlyErrors();
     }
@@ -1232,6 +1248,13 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         valid = false;
                         elInstance.setValueFromCoords(16, y, 1, true);
                     }
+                }
+
+                if (rowData[10].length > 600) {
+                    inValid("K", y, i18n.t('static.dataentry.notesMaxLength'), elInstance);
+                    valid = false;
+                } else {
+                    positiveValidation("K", y, elInstance);
                 }
 
                 if (rowData[4] == 1) {

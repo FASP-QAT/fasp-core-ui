@@ -350,6 +350,11 @@ export default class ShipmentDetails extends React.Component {
                     if ((this.state.shipmentType).value == 1) {
                         console.log("in if 1")
                         document.getElementById("addRowButtonId").style.display = "block";
+                        var roleList = AuthenticationService.getLoggedInUserRole();
+                        console.log("RoleList------------>", roleList);
+                        if (roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') {
+                            document.getElementById("addRowButtonId").style.display = "none";
+                        }
                     } else {
                         console.log("in else")
                         document.getElementById("addRowButtonId").style.display = "none";
@@ -598,7 +603,7 @@ export default class ShipmentDetails extends React.Component {
                         </div>
 
                         <div className="shipmentconsumptionSearchMarginTop">
-                            {this.state.showShipments == 1 && <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} updateState={this.updateState} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} hideFourthComponent={this.hideFourthComponent} hideFifthComponent={this.hideFifthComponent} shipmentPage="shipmentDataEntry" />}
+                            <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} updateState={this.updateState} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} hideFourthComponent={this.hideFourthComponent} hideFifthComponent={this.hideFifthComponent} shipmentPage="shipmentDataEntry" />
                             <div className="table-responsive" id="shipmentsDetailsTableDiv">
                                 <div id="shipmentsDetailsTable" className="jexcelremoveReadonlybackground" />
                             </div>
@@ -642,7 +647,7 @@ export default class ShipmentDetails extends React.Component {
                     <ModalFooter>
                         <div id="showShipmentBatchInfoButtonsDiv" style={{ display: 'none' }} className="mr-0">
                             {this.state.shipmentBatchInfoChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right" onClick={() => this.refs.shipmentChild.saveShipmentBatchInfo()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBatchInfo')}</Button>}
-                            {this.refs.shipmentChild != undefined && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.refs.shipmentChild.addBatchRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
+                            {this.refs.shipmentChild != undefined && <Button color="info" id="addShipmentBatchRowId" size="md" className="float-right mr-1" type="button" onClick={this.refs.shipmentChild.addBatchRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
                         </div>
                         <div id="showSaveShipmentsDatesButtonsDiv" style={{ display: 'none' }} className="mr-0">
                             {this.state.shipmentDatesChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right" onClick={() => this.refs.shipmentChild.saveShipmentsDate()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveShipmentDates')}</Button>}

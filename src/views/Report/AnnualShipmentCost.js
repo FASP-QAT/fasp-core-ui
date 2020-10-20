@@ -54,7 +54,7 @@ class AnnualShipmentCost extends Component {
             versions: [],
             lang: localStorage.getItem('lang'),
             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth()+2 },
+            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
             maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
             outPutList: [],
             message: '',
@@ -220,7 +220,7 @@ class AnnualShipmentCost extends Component {
                                                     if (reportbaseValue == 1) {
                                                         list2 = list.filter(c => (c.plannedDate >= dtstr && c.plannedDate <= enddtStr));
                                                     } else {
-                                                        list2 = list.filter(c =>c.receivedDate==null||c.receivedDate==""? ( c.expectedDeliveryDate >= dtstr && c.expectedDeliveryDate <= enddtStr):(c.receivedDate >= dtstr && c.receivedDate <= enddtStr ));
+                                                        list2 = list.filter(c => c.receivedDate == null || c.receivedDate == "" ? (c.expectedDeliveryDate >= dtstr && c.expectedDeliveryDate <= enddtStr) : (c.receivedDate >= dtstr && c.receivedDate <= enddtStr));
                                                     }
                                                     console.log(list2)
                                                     var cost = 0;
@@ -239,7 +239,7 @@ class AnnualShipmentCost extends Component {
                                     this.setState({ outPutList: outPutList, message: '', loading: false });
 
 
-                                   }.bind(this)
+                                }.bind(this)
                             }.bind(this)
                         }.bind(this)
                     }.bind(this)
@@ -258,7 +258,7 @@ class AnnualShipmentCost extends Component {
                                     'FUNDING_SOURCE_ID': responseData[i].fundingSource.id,
                                     'PROCUREMENT_AGENT_ID': responseData[i].procurementAgent.id,
                                     'fundingsource': responseData[i].fundingSource.code,
-                                    'procurementAgent':responseData[i].procurementAgent.code,
+                                    'procurementAgent': responseData[i].procurementAgent.code,
                                     'PLANNING_UNIT_ID': responseData[i].planningUnit.id,
                                     'planningUnit': getLabelText(responseData[i].planningUnit.label, this.state.lang)
                                 }
@@ -281,23 +281,66 @@ class AnnualShipmentCost extends Component {
                                     outPutList: []
                                 })
                                 if (error.message === "Network Error") {
-                                    this.setState({ message: error.message });
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
                                 } else {
                                     switch (error.response ? error.response.status : "") {
-                                        case 500:
+
                                         case 401:
+                                            this.props.history.push(`/login/static.message.sessionExpired`)
+                                            break;
+                                        case 403:
+                                            this.props.history.push(`/accessDenied`)
+                                            break;
+                                        case 500:
                                         case 404:
                                         case 406:
+                                            this.setState({
+                                                message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                                loading: false
+                                            });
+                                            break;
                                         case 412:
-                                            this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                            this.setState({
+                                                message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                                loading: false
+                                            });
                                             break;
                                         default:
-                                            this.setState({ message: 'static.unkownError' });
+                                            this.setState({
+                                                message: 'static.unkownError',
+                                                loading: false
+                                            });
                                             break;
                                     }
                                 }
                             }
                         );
+                    // .catch(
+                    //     error => {
+                    //         this.setState({
+                    //             outPutList: []
+                    //         })
+                    //         if (error.message === "Network Error") {
+                    //             this.setState({ message: error.message });
+                    //         } else {
+                    //             switch (error.response ? error.response.status : "") {
+                    //                 case 500:
+                    //                 case 401:
+                    //                 case 404:
+                    //                 case 406:
+                    //                 case 412:
+                    //                     this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                    //                     break;
+                    //                 default:
+                    //                     this.setState({ message: 'static.unkownError' });
+                    //                     break;
+                    //             }
+                    //         }
+                    //     }
+                    // );
                 }
             } else if (programId == 0) {
                 this.setState({ message: i18n.t('static.common.selectProgram'), data: [], outPutList: [] });
@@ -327,23 +370,66 @@ class AnnualShipmentCost extends Component {
                             programs: []
                         }, () => { this.consolidatedProgramList() })
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
                         } else {
                             switch (error.response ? error.response.status : "") {
-                                case 500:
+
                                 case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
                                 case 404:
                                 case 406:
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                        loading: false
+                                    });
+                                    break;
                                 case 412:
-                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                        loading: false
+                                    });
                                     break;
                                 default:
-                                    this.setState({ message: 'static.unkownError' });
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
                                     break;
                             }
                         }
                     }
                 );
+            // .catch(
+            //     error => {
+            //         this.setState({
+            //             programs: []
+            //         }, () => { this.consolidatedProgramList() })
+            //         if (error.message === "Network Error") {
+            //             this.setState({ message: error.message });
+            //         } else {
+            //             switch (error.response ? error.response.status : "") {
+            //                 case 500:
+            //                 case 401:
+            //                 case 404:
+            //                 case 406:
+            //                 case 412:
+            //                     this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+            //                     break;
+            //                 default:
+            //                     this.setState({ message: 'static.unkownError' });
+            //                     break;
+            //             }
+            //         }
+            //     }
+            // );
 
         } else {
             console.log('offline')
@@ -419,7 +505,7 @@ class AnnualShipmentCost extends Component {
         return x1 + x2;
     }
     show() {
-      
+
     }
     handleRangeChange(value, text, listIndex) {
         //
@@ -475,11 +561,11 @@ class AnnualShipmentCost extends Component {
                     var splittext = doc.splitTextToSize(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8);
 
                     doc.text(doc.internal.pageSize.width / 8, 80, splittext)
-                   var y=80+splittext.length*10
-                     splittext = doc.splitTextToSize(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8);
+                    var y = 80 + splittext.length * 10
+                    splittext = doc.splitTextToSize(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8);
 
                     doc.text(doc.internal.pageSize.width / 8, y, splittext)
-                    y=y+splittext.length*10
+                    y = y + splittext.length * 10
                     splittext = doc.splitTextToSize(i18n.t('static.common.reportbase') + ' : ' + document.getElementById("view").selectedOptions[0].text, doc.internal.pageSize.width / 8);
 
                     doc.text(doc.internal.pageSize.width / 8, y, splittext)
@@ -570,12 +656,12 @@ class AnnualShipmentCost extends Component {
             var values = Object.entries(record).map(([key, value]) => (value)
             )
 
-            var splittext = doc.splitTextToSize(record.procurementAgent , index);
+            var splittext = doc.splitTextToSize(record.procurementAgent, index);
             for (var i = 0; i < splittext.length; i++) {
                 yindex = yindex + 10;
-               
-                    doc.setFont('helvetica', 'bold')
-              
+
+                doc.setFont('helvetica', 'bold')
+
                 if (yindex > doc.internal.pageSize.height - 100) {
                     doc.addPage();
                     yindex = 80;
@@ -584,12 +670,12 @@ class AnnualShipmentCost extends Component {
                 doc.text(50, yindex, splittext[i]);
 
             }
-            splittext = doc.splitTextToSize(record.fundingsource , index);
+            splittext = doc.splitTextToSize(record.fundingsource, index);
             for (var i = 0; i < splittext.length; i++) {
                 yindex = yindex + 10;
-                
-                    doc.setFont('helvetica', 'bold')
-                
+
+                doc.setFont('helvetica', 'bold')
+
                 if (yindex > doc.internal.pageSize.height - 100) {
                     doc.addPage();
                     yindex = 80;
@@ -604,9 +690,9 @@ class AnnualShipmentCost extends Component {
             //  yindex = yindex + 10;
             for (var i = 0; i < splittext.length; i++) {
                 yindex = yindex + 10;
-               
-                    doc.setFont('helvetica', 'normal')
-               
+
+                doc.setFont('helvetica', 'normal')
+
                 if (yindex > doc.internal.pageSize.height - 100) {
                     doc.addPage();
                     yindex = 80;
@@ -641,14 +727,14 @@ class AnnualShipmentCost extends Component {
             totalAmount[year.length] = totalAmount[x] == null ? total : totalAmount[year.length] + total
             GrandTotalAmount[year.length] = GrandTotalAmount[year.length] == null ? total : GrandTotalAmount[year.length] + total
             if (j < data.length - 1) {
-               
+
                 if (data[j].PROCUREMENT_AGENT_ID != data[j + 1].PROCUREMENT_AGENT_ID || data[j].FUNDING_SOURCE_ID != data[j + 1].FUNDING_SOURCE_ID) {
                     console.log("in this if=======");
                     yindex = yindex + 40
                     if (yindex > doc.internal.pageSize.height - 100) {
                         doc.addPage();
                         yindex = 80;
-    
+
                     }
                     initalvalue = 10
                     doc.setLineDash([2, 2], 0);
@@ -726,7 +812,7 @@ class AnnualShipmentCost extends Component {
         doc.setFontSize(8);
 
 
-         addHeaders(doc)
+        addHeaders(doc)
         addFooters(doc)
         doc.autoTable({ pagesplit: true })
         return doc;
@@ -741,7 +827,7 @@ class AnnualShipmentCost extends Component {
         var string = doc.output('datauristring');
         var embed = "<embed width='100%' height='100%' src='" + string + "'/>"
         document.getElementById("pdf").innerHTML = embed
-     }
+    }
 
 
 
@@ -908,30 +994,72 @@ class AnnualShipmentCost extends Component {
                         }, () => {
                             this.fetchData();
                         })
-                    })
-                        .catch(
-                            error => {
+                    }).catch(
+                        error => {
+                            this.setState({
+                                planningUnits: [],
+                            })
+                            if (error.message === "Network Error") {
                                 this.setState({
-                                    planningUnits: [],
-                                })
-                                if (error.message === "Network Error") {
-                                    this.setState({ message: error.message });
-                                } else {
-                                    switch (error.response ? error.response.status : "") {
-                                        case 500:
-                                        case 401:
-                                        case 404:
-                                        case 406:
-                                        case 412:
-                                            this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
-                                            break;
-                                        default:
-                                            this.setState({ message: 'static.unkownError' });
-                                            break;
-                                    }
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
+
+                                    case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
+                                    case 404:
+                                    case 406:
+                                        this.setState({
+                                            message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
+                                            loading: false
+                                        });
+                                        break;
+                                    case 412:
+                                        this.setState({
+                                            message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
+                                            loading: false
+                                        });
+                                        break;
+                                    default:
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                        break;
                                 }
                             }
-                        );
+                        }
+                    );
+                    // .catch(
+                    //     error => {
+                    //         this.setState({
+                    //             planningUnits: [],
+                    //         })
+                    //         if (error.message === "Network Error") {
+                    //             this.setState({ message: error.message });
+                    //         } else {
+                    //             switch (error.response ? error.response.status : "") {
+                    //                 case 500:
+                    //                 case 401:
+                    //                 case 404:
+                    //                 case 406:
+                    //                 case 412:
+                    //                     this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
+                    //                     break;
+                    //                 default:
+                    //                     this.setState({ message: 'static.unkownError' });
+                    //                     break;
+                    //             }
+                    //         }
+                    //     }
+                    // );
                 }
             }
         });
@@ -953,23 +1081,66 @@ class AnnualShipmentCost extends Component {
                         productCategories: []
                     })
                     if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
                     } else {
                         switch (error.response ? error.response.status : "") {
-                            case 500:
+
                             case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
                             case 404:
                             case 406:
+                                this.setState({
+                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }),
+                                    loading: false
+                                });
+                                break;
                             case 412:
-                                this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
+                                this.setState({
+                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }),
+                                    loading: false
+                                });
                                 break;
                             default:
-                                this.setState({ message: 'static.unkownError' });
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
                                 break;
                         }
                     }
                 }
             );
+        // .catch(
+        //     error => {
+        //         this.setState({
+        //             productCategories: []
+        //         })
+        //         if (error.message === "Network Error") {
+        //             this.setState({ message: error.message });
+        //         } else {
+        //             switch (error.response ? error.response.status : "") {
+        //                 case 500:
+        //                 case 401:
+        //                 case 404:
+        //                 case 406:
+        //                 case 412:
+        //                     this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
+        //                     break;
+        //                 default:
+        //                     this.setState({ message: 'static.unkownError' });
+        //                     break;
+        //             }
+        //         }
+        //     }
+        // );
 
     }
 
@@ -988,23 +1159,66 @@ class AnnualShipmentCost extends Component {
                             countrys: []
                         })
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
                         } else {
                             switch (error.response ? error.response.status : "") {
-                                case 500:
+
                                 case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
                                 case 404:
                                 case 406:
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.fundingsource.fundingsource') }),
+                                        loading: false
+                                    });
+                                    break;
                                 case 412:
-                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.fundingsource.fundingsource') }) });
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.fundingsource.fundingsource') }),
+                                        loading: false
+                                    });
                                     break;
                                 default:
-                                    this.setState({ message: 'static.unkownError' });
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
                                     break;
                             }
                         }
                     }
                 );
+            // .catch(
+            //     error => {
+            //         this.setState({
+            //             countrys: []
+            //         })
+            //         if (error.message === "Network Error") {
+            //             this.setState({ message: error.message });
+            //         } else {
+            //             switch (error.response ? error.response.status : "") {
+            //                 case 500:
+            //                 case 401:
+            //                 case 404:
+            //                 case 406:
+            //                 case 412:
+            //                     this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.fundingsource.fundingsource') }) });
+            //                     break;
+            //                 default:
+            //                     this.setState({ message: 'static.unkownError' });
+            //                     break;
+            //             }
+            //         }
+            //     }
+            // );
         } else {
             var db3;
             var fSourceResult = [];
@@ -1042,29 +1256,73 @@ class AnnualShipmentCost extends Component {
                     this.setState({
                         procurementAgents: response.data
                     })
-                }).catch(
+                })
+                .catch(
                     error => {
                         this.setState({
                             countrys: []
                         })
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
                         } else {
                             switch (error.response ? error.response.status : "") {
-                                case 500:
+
                                 case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
                                 case 404:
                                 case 406:
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.procurementagent.procurementagent') }),
+                                        loading: false
+                                    });
+                                    break;
                                 case 412:
-                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.procurementagent.procurementagent') }) });
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.procurementagent.procurementagent') }),
+                                        loading: false
+                                    });
                                     break;
                                 default:
-                                    this.setState({ message: 'static.unkownError' });
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
                                     break;
                             }
                         }
                     }
                 );
+            // .catch(
+            //     error => {
+            //         this.setState({
+            //             countrys: []
+            //         })
+            //         if (error.message === "Network Error") {
+            //             this.setState({ message: error.message });
+            //         } else {
+            //             switch (error.response ? error.response.status : "") {
+            //                 case 500:
+            //                 case 401:
+            //                 case 404:
+            //                 case 406:
+            //                 case 412:
+            //                     this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.procurementagent.procurementagent') }) });
+            //                     break;
+            //                 default:
+            //                     this.setState({ message: 'static.unkownError' });
+            //                     break;
+            //             }
+            //         }
+            //     }
+            // );
         } else {
             var db1;
             var papuResult = [];
@@ -1098,29 +1356,73 @@ class AnnualShipmentCost extends Component {
                     this.setState({
                         shipmentStatuses: response.data
                     })
-                }).catch(
+                })
+                .catch(
                     error => {
                         this.setState({
                             countrys: []
                         })
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
                         } else {
                             switch (error.response ? error.response.status : "") {
-                                case 500:
+
                                 case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
                                 case 404:
                                 case 406:
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.common.status') }),
+                                        loading: false
+                                    });
+                                    break;
                                 case 412:
-                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.common.status') }) });
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.common.status') }),
+                                        loading: false
+                                    });
                                     break;
                                 default:
-                                    this.setState({ message: 'static.unkownError' });
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
                                     break;
                             }
                         }
                     }
                 );
+            // .catch(
+            //     error => {
+            //         this.setState({
+            //             countrys: []
+            //         })
+            //         if (error.message === "Network Error") {
+            //             this.setState({ message: error.message });
+            //         } else {
+            //             switch (error.response ? error.response.status : "") {
+            //                 case 500:
+            //                 case 401:
+            //                 case 404:
+            //                 case 406:
+            //                 case 412:
+            //                     this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.common.status') }) });
+            //                     break;
+            //                 default:
+            //                     this.setState({ message: 'static.unkownError' });
+            //                     break;
+            //             }
+            //         }
+            //     }
+            // );
         } else {
             var db2;
             var sStatusResult = [];
@@ -1245,7 +1547,7 @@ class AnnualShipmentCost extends Component {
         return (
             <div className="animated fadeIn" >
                 {/* <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6> */}
-             <AuthenticationServiceComponent history={this.props.history} />
+                <AuthenticationServiceComponent history={this.props.history} />
                 {/* <h5>{i18n.t(this.props.match.params.message)}</h5> */}
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
 

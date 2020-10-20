@@ -24,9 +24,10 @@ import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import BootstrapTable from 'react-bootstrap-table-next';
 import paginationFactory from 'react-bootstrap-table2-paginator';
-import { JEXCEL_PAGINATION_OPTION} from '../../Constants.js';
+import { JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
 import { Link } from 'react-router-dom';
 // import { NavLink } from 'react-router-dom';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 
 const entityname = i18n.t('static.program.program');
 
@@ -607,7 +608,7 @@ class EditSupplyPlanStatus extends Component {
                     showShipments: 1,
                     shipmentList: shipmentList,
                     shipmentListUnFiltered: shipmentListUnFiltered,
-                    programJson:programJson
+                    programJson: programJson
                 })
                 this.refs.shipmentChild.showShipmentData();
             }.bind(this)
@@ -1552,18 +1553,38 @@ class EditSupplyPlanStatus extends Component {
                         planningUnits: [],
                     })
                     if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
                     } else {
                         switch (error.response ? error.response.status : "") {
-                            case 500:
+
                             case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
                             case 404:
                             case 406:
+                                this.setState({
+                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
+                                    loading: false
+                                });
+                                break;
                             case 412:
-                                this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
+                                this.setState({
+                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
+                                    loading: false
+                                });
                                 break;
                             default:
-                                this.setState({ message: 'static.unkownError' });
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
                                 break;
                         }
                     }
@@ -1663,20 +1684,44 @@ class EditSupplyPlanStatus extends Component {
             })
             .catch(
                 error => {
-                    switch (error.message) {
-                        case "Network Error":
-                            this.setState({
-                                message: error.message
-                            })
-                            break
-                        default:
-                            this.setState({
-                                message: error.response
-                            })
-                            break
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
                     }
                 }
-            )
+            );
 
         // AuthenticationService.setupAxiosInterceptors();
         ProgramService.getVersionStatusList().then(response => {
@@ -1691,18 +1736,38 @@ class EditSupplyPlanStatus extends Component {
                         statuses: [],
                     })
                     if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
                     } else {
                         switch (error.response ? error.response.status : "") {
-                            case 500:
+
                             case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
                             case 404:
                             case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
                             case 412:
-                                this.setState({ message: error.response.data.messageCode });
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
                                 break;
                             default:
-                                this.setState({ message: 'static.unkownError' });
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
                                 break;
                         }
                     }
@@ -2893,6 +2958,7 @@ class EditSupplyPlanStatus extends Component {
 
         return (
             <div className="animated fadeIn">
+                <AuthenticationServiceComponent history={this.props.history} />
                 <h5 className="red" id="div2">{i18n.t(this.state.message, { entityname })}</h5>
 
                 <Col sm={12} sm={12} style={{ flexBasis: 'auto' }}>
@@ -3364,127 +3430,147 @@ class EditSupplyPlanStatus extends Component {
                                 </div>
                             </div>
                         </Modal>
-                    {/* problem trans modal */}
-                    <Modal isOpen={this.state.transView}
-                        className={'modal-lg ' + this.props.className, "modalWidth"}>
-                        <ModalHeader toggle={() => this.toggleTransModal()} className="modalHeaderSupplyPlan">
-                            <strong>{i18n.t('static.problemContext.transDetails')}</strong>
-                        </ModalHeader>
-                        <ModalBody>
-                            <ToolkitProvider
-                                keyField="problemReportId"
-                                data={this.state.problemTransList}
-                                columns={columns}
-                                search={{ searchFormatted: true }}
-                                hover
-                                filter={filterFactory()}
-                            >
-                                {
-                                    props => (
-                                        <div className="col-md-12 bg-white pb-1 mb-2">
-                                            <ul class="navbar-nav"><li class="nav-item pl-0"><a aria-current="page" class="nav-link active" >
-                                                {/* <b>{i18n.t('static.report.problemTransDetails')}</b> */}
-                                            </a></li></ul>
-                                            <div className="TableCust">
-                                                <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
+                        {/* problem trans modal */}
+                        <Modal isOpen={this.state.transView}
+                            className={'modal-lg ' + this.props.className, "modalWidth"}>
+                            <ModalHeader toggle={() => this.toggleTransModal()} className="modalHeaderSupplyPlan">
+                                <strong>{i18n.t('static.problemContext.transDetails')}</strong>
+                            </ModalHeader>
+                            <ModalBody>
+                                <ToolkitProvider
+                                    keyField="problemReportId"
+                                    data={this.state.problemTransList}
+                                    columns={columns}
+                                    search={{ searchFormatted: true }}
+                                    hover
+                                    filter={filterFactory()}
+                                >
+                                    {
+                                        props => (
+                                            <div className="col-md-12 bg-white pb-1 mb-2">
+                                                <ul class="navbar-nav"><li class="nav-item pl-0"><a aria-current="page" class="nav-link active" >
+                                                    {/* <b>{i18n.t('static.report.problemTransDetails')}</b> */}
+                                                </a></li></ul>
+                                                <div className="TableCust">
+                                                    <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
 
-                                                    <SearchBar {...props.searchProps} />
-                                                    <ClearSearchButton {...props.searchProps} />
+                                                        <SearchBar {...props.searchProps} />
+                                                        <ClearSearchButton {...props.searchProps} />
+                                                    </div>
+                                                    <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                                        pagination={paginationFactory(options)}
+                                                        rowEvents={{
+                                                            onClick: (e, row, rowIndex) => {
+                                                                this.editProblem(row);
+                                                            }
+                                                        }}
+                                                        {...props.baseProps}
+                                                    />
+
+
                                                 </div>
-                                                <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
-                                                    pagination={paginationFactory(options)}
-                                                    rowEvents={{
-                                                        onClick: (e, row, rowIndex) => {
-                                                            this.editProblem(row);
-                                                        }
-                                                    }}
-                                                    {...props.baseProps}
-                                                />
-
-
                                             </div>
-                                        </div>
-                                    )
-                                }
-                            </ToolkitProvider>
-                        </ModalBody>
-                        {/* <ModalFooter>
+                                        )
+                                    }
+                                </ToolkitProvider>
+                            </ModalBody>
+                            {/* <ModalFooter>
                             </ModalFooter> */}
-                    </Modal>
-                    {/* problem trans modal */}
+                        </Modal>
+                        {/* problem trans modal */}
 
-                    <Formik
-                        enableReinitialize={true}
-                        initialValues={{
-                            programId: this.props.match.params.programId,
-                            versionId: this.props.match.params.versionId,
-                            versionStatusId: this.state.program.currentVersion.versionStatus.id,
-                            versionNotes: this.state.program.currentVersion.notes
-                        }}
-                        validate={validate(validationSchema)}
-                        onSubmit={(values, { setSubmitting, setErrors }) => {
-                            var elInstance = this.state.problemEl;
-                            var json = elInstance.getJson();
-                            // console.log("problemList===>", json);
-                            // console.log("program===>", this.state.program);
-                            var reviewedProblemList = [];
-                            for (var i = 0; i < json.length; i++) {
-                                var map = new Map(Object.entries(json[i]));
-                                if (map.get("20") == 1) {
-                                    reviewedProblemList.push({
-                                        problemReportId: map.get("0"),
-                                        reviewed: map.get("18"),
-                                        notes: map.get("19")
-                                    });
+                        <Formik
+                            enableReinitialize={true}
+                            initialValues={{
+                                programId: this.props.match.params.programId,
+                                versionId: this.props.match.params.versionId,
+                                versionStatusId: this.state.program.currentVersion.versionStatus.id,
+                                versionNotes: this.state.program.currentVersion.notes
+                            }}
+                            validate={validate(validationSchema)}
+                            onSubmit={(values, { setSubmitting, setErrors }) => {
+                                var elInstance = this.state.problemEl;
+                                var json = elInstance.getJson();
+                                // console.log("problemList===>", json);
+                                // console.log("program===>", this.state.program);
+                                var reviewedProblemList = [];
+                                for (var i = 0; i < json.length; i++) {
+                                    var map = new Map(Object.entries(json[i]));
+                                    if (map.get("20") == 1) {
+                                        reviewedProblemList.push({
+                                            problemReportId: map.get("0"),
+                                            reviewed: map.get("18"),
+                                            notes: map.get("19")
+                                        });
+                                    }
                                 }
-                            }
-                            console.log("reviewedProblemList===>", reviewedProblemList);
-                            ProgramService.updateProgramStatus(this.state.program, reviewedProblemList)
-                                .then(response => {
-                                    console.log("messageCode", response)
-                                    this.props.history.push(`/report/supplyPlanVersionAndReview/` + 'green/' + i18n.t("static.message.supplyplanversionapprovedsuccess"))
-                                })
-                                .catch(
-                                    error => {
-                                        if (error.message === "Network Error") {
-                                            this.setState({ message: error.message });
-                                        } else {
-                                            switch (error.response ? error.response.status : "") {
-                                                case 500:
-                                                case 401:
-                                                case 404:
-                                                case 406:
-                                                case 412:
-                                                    this.setState({ message: error.response.data.messageCode });
-                                                    break;
-                                                default:
-                                                    this.setState({ message: 'static.unkownError' });
-                                                    break;
+                                console.log("reviewedProblemList===>", reviewedProblemList);
+                                ProgramService.updateProgramStatus(this.state.program, reviewedProblemList)
+                                    .then(response => {
+                                        console.log("messageCode", response)
+                                        this.props.history.push(`/report/supplyPlanVersionAndReview/` + 'green/' + i18n.t("static.message.supplyplanversionapprovedsuccess"))
+                                    })
+                                    .catch(
+                                        error => {
+                                            if (error.message === "Network Error") {
+                                                this.setState({
+                                                    message: 'static.unkownError',
+                                                    loading: false
+                                                });
+                                            } else {
+                                                switch (error.response ? error.response.status : "") {
+
+                                                    case 401:
+                                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                                        break;
+                                                    case 403:
+                                                        this.props.history.push(`/accessDenied`)
+                                                        break;
+                                                    case 500:
+                                                    case 404:
+                                                    case 406:
+                                                        this.setState({
+                                                            message: error.response.data.messageCode,
+                                                            loading: false
+                                                        });
+                                                        break;
+                                                    case 412:
+                                                        this.setState({
+                                                            message: error.response.data.messageCode,
+                                                            loading: false
+                                                        });
+                                                        break;
+                                                    default:
+                                                        this.setState({
+                                                            message: 'static.unkownError',
+                                                            loading: false
+                                                        });
+                                                        break;
+                                                }
                                             }
                                         }
-                                    }
-                                );
+                                    );
 
 
-                        }}
-                        render={
-                            ({
-                                values,
-                                errors,
-                                touched,
-                                handleChange,
-                                handleBlur,
-                                handleSubmit,
-                                isSubmitting,
-                                isValid,
-                                setTouched
-                            }) => (
-                                    <Form onSubmit={handleSubmit} noValidate name='supplyplanForm'>
-                                        <CardBody className="pt-lg-0">
-                                            <Col md="12 pl-0">
-                                                <div className="row">
+                            }}
+                            render={
+                                ({
+                                    values,
+                                    errors,
+                                    touched,
+                                    handleChange,
+                                    handleBlur,
+                                    handleSubmit,
+                                    isSubmitting,
+                                    isValid,
+                                    setTouched
+                                }) => (
+                                        <Form onSubmit={handleSubmit} noValidate name='supplyplanForm'>
+                                            <CardBody className="pt-lg-0">
+                                                <Col md="12 pl-0">
+                                                    <div className="row">
 
-                                                    {/*  <FormGroup className="tab-ml-1">
+                                                        {/*  <FormGroup className="tab-ml-1">
                                                         <Label for="programName">{i18n.t('static.program.program')}<span className="red Reqasterisk">*</span> </Label>
                                                         <Input type="text"
                                                             name="programId"
@@ -3499,68 +3585,68 @@ class EditSupplyPlanStatus extends Component {
                                                             disabled />
                                                         <FormFeedback className="red">{errors.programId}</FormFeedback>
                                                     </FormGroup> */}
-                                                    <FormGroup className="col-md-3">
+                                                        <FormGroup className="col-md-3">
 
-                                                        <Label htmlFor="versionNotes">{i18n.t('static.program.notes')}</Label>
+                                                            <Label htmlFor="versionNotes">{i18n.t('static.program.notes')}</Label>
 
+                                                            <Input
+                                                                type="textarea"
+                                                                maxLength={600}
+                                                                name="versionNotes"
+                                                                id="versionNotes"
+                                                                value={this.state.program.currentVersion.notes}
+                                                                bsSize="sm"
+                                                                valid={!errors.versionNotes}
+                                                                invalid={touched.versionNotes && !!errors.versionNotes || this.state.program.currentVersion.versionStatus.id == 3 ? this.state.program.currentVersion.notes == '' : false}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                onBlur={handleBlur}
+                                                                required
+                                                            />
+                                                            <FormFeedback className="red">{errors.versionNotes}</FormFeedback>
+
+                                                        </FormGroup>
+
+                                                        <FormGroup className="col-md-3">
+                                                            <Label htmlFor="versionStatusId">{i18n.t('static.common.status')}<span className="red Reqasterisk">*</span> </Label>
+                                                            <Input
+                                                                type="select"
+                                                                name="versionStatusId"
+                                                                id="versionStatusId"
+                                                                bsSize="sm"
+                                                                valid={!errors.versionStatusId}
+                                                                invalid={touched.versionStatusId && !!errors.versionStatusId}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                onBlur={handleBlur}
+                                                                value={this.state.program.currentVersion.versionStatus.id}
+                                                                required
+                                                            >
+                                                                <option value="">{i18n.t('static.common.select')}</option>
+                                                                {statusList}
+                                                            </Input>
+                                                            <FormFeedback className="red">{errors.versionStatusId}</FormFeedback>
+                                                        </FormGroup>
                                                         <Input
-                                                            type="textarea"
-                                                            maxLength={600}
-                                                            name="versionNotes"
-                                                            id="versionNotes"
-                                                            value={this.state.program.currentVersion.notes}
-                                                            bsSize="sm"
-                                                            valid={!errors.versionNotes}
-                                                            invalid={touched.versionNotes && !!errors.versionNotes || this.state.program.currentVersion.versionStatus.id == 3 ? this.state.program.currentVersion.notes == '' : false}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            required
+                                                            type="hidden"
+                                                            name="needNotesValidation"
+                                                            id="needNotesValidation"
+                                                            value={(this.state.program.currentVersion.versionStatus.id == 3 ? true : false)}
                                                         />
-                                                        <FormFeedback className="red">{errors.versionNotes}</FormFeedback>
+                                                    </div>
+                                                </Col>
+                                            </CardBody>
+                                            <CardFooter>
+                                                <FormGroup>
+                                                    <Button type="submit" size="md" color="success" className="float-left mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
+                                                    <Button type="button" size="md" color="warning" className="float-left mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> Reset</Button>
+                                                    <Button type="button" size="md" color="danger" className="float-left mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
 
-                                                    </FormGroup>
-
-                                                    <FormGroup className="col-md-3">
-                                                        <Label htmlFor="versionStatusId">{i18n.t('static.common.status')}<span className="red Reqasterisk">*</span> </Label>
-                                                        <Input
-                                                            type="select"
-                                                            name="versionStatusId"
-                                                            id="versionStatusId"
-                                                            bsSize="sm"
-                                                            valid={!errors.versionStatusId}
-                                                            invalid={touched.versionStatusId && !!errors.versionStatusId}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.program.currentVersion.versionStatus.id}
-                                                            required
-                                                        >
-                                                            <option value="">{i18n.t('static.common.select')}</option>
-                                                            {statusList}
-                                                        </Input>
-                                                        <FormFeedback className="red">{errors.versionStatusId}</FormFeedback>
-                                                    </FormGroup>
-                                                    <Input
-                                                        type="hidden"
-                                                        name="needNotesValidation"
-                                                        id="needNotesValidation"
-                                                        value={(this.state.program.currentVersion.versionStatus.id == 3 ? true : false)}
-                                                    />
-                                                </div>
-                                            </Col>
-                                        </CardBody>
-                                        <CardFooter>
-                                            <FormGroup>
-                                                <Button type="submit" size="md" color="success" className="float-left mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
-                                                <Button type="button" size="md" color="warning" className="float-left mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> Reset</Button>
-                                                <Button type="button" size="md" color="danger" className="float-left mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-
-                                                &nbsp;
+                                                    &nbsp;
                                              </FormGroup>
-                                        </CardFooter>
-                                    </Form>
-                                )} />
+                                            </CardFooter>
+                                        </Form>
+                                    )} />
                     </Card>
-                    
+
                 </Col>
 
             </div >
@@ -3580,7 +3666,46 @@ class EditSupplyPlanStatus extends Component {
                 this.setState({
                     program
                 })
-            })
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
 
 
     }

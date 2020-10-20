@@ -321,11 +321,7 @@ export default class ConsumptionDetails extends React.Component {
         return (
 
             <div className="animated fadeIn">
-                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
-                    this.setState({ message: message })
-                }} loading={(loading) => {
-                    this.setState({ loading: loading })
-                }} />
+                 <AuthenticationServiceComponent history={this.props.history} />
 
                 <h5>{i18n.t(this.state.message)}</h5>
                 <Card>

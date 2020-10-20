@@ -82,28 +82,28 @@ const options = {
                 fontColor: 'black',
                 fontStyle: "normal",
                 fontSize: "12"
-              },
+            },
             ticks: {
                 beginAtZero: true,
                 fontColor: 'black',
                 callback: function (value) {
-                  var cell1 = value
-                  cell1 += '';
-                  var x = cell1.split('.');
-                  var x1 = x[0];
-                  var x2 = x.length > 1 ? '.' + x[1] : '';
-                  var rgx = /(\d+)(\d{3})/;
-                  while (rgx.test(x1)) {
-                    x1 = x1.replace(rgx, '$1' + ',' + '$2');
-                  }
-                  return x1 + x2;
-        
+                    var cell1 = value
+                    cell1 += '';
+                    var x = cell1.split('.');
+                    var x1 = x[0];
+                    var x2 = x.length > 1 ? '.' + x[1] : '';
+                    var rgx = /(\d+)(\d{3})/;
+                    while (rgx.test(x1)) {
+                        x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                    }
+                    return x1 + x2;
+
                 }
-              },
+            },
             gridLines: {
                 display: false
             }
-            
+
         }],
         yAxes: [{
             stacked: true,
@@ -115,22 +115,22 @@ const options = {
         custom: CustomTooltips,
         callbacks: {
             label: function (tooltipItem, data) {
-      
-              let label = data.labels[tooltipItem.index];
-              let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
-      
-              var cell1 = value
-              cell1 += '';
-              var x = cell1.split('.');
-              var x1 = x[0];
-              var x2 = x.length > 1 ? '.' + x[1] : '';
-              var rgx = /(\d+)(\d{3})/;
-              while (rgx.test(x1)) {
-                x1 = x1.replace(rgx, '$1' + ',' + '$2');
-              }
-              return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
+
+                let label = data.labels[tooltipItem.index];
+                let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+
+                var cell1 = value
+                cell1 += '';
+                var x = cell1.split('.');
+                var x1 = x[0];
+                var x2 = x.length > 1 ? '.' + x[1] : '';
+                var rgx = /(\d+)(\d{3})/;
+                while (rgx.test(x1)) {
+                    x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                }
+                return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
             }
-          }
+        }
     },
     maintainAspectRatio: false
     ,
@@ -227,7 +227,7 @@ class ShipmentGlobalDemandView extends Component {
             show: false,
             message: '',
             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth()+2 },
+            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
             maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
             loading: true
         };
@@ -247,10 +247,10 @@ class ShipmentGlobalDemandView extends Component {
         if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
         return '?'
     }
-    addDoubleQuoteToRowContent=(arr)=>{
-        return arr.map(ele=>'"'+ele+'"')
-     }
-     
+    addDoubleQuoteToRowContent = (arr) => {
+        return arr.map(ele => '"' + ele + '"')
+    }
+
     exportCSV() {
 
         var csvRow = [];
@@ -267,8 +267,8 @@ class ShipmentGlobalDemandView extends Component {
             csvRow.push('')
             this.state.shipmentStatusLabels.map(ele =>
                 csvRow.push((i18n.t('static.common.status')).replaceAll(' ', '%20') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
-                csvRow.push('"' +((i18n.t('static.report.includeapproved') + ' : ' + document.getElementById("includeApprovedVersions").selectedOptions[0].text).replaceAll(' ', '%20')+'"'))
-     
+            csvRow.push('"' + ((i18n.t('static.report.includeapproved') + ' : ' + document.getElementById("includeApprovedVersions").selectedOptions[0].text).replaceAll(' ', '%20') + '"'))
+
 
         } else {
 
@@ -310,7 +310,7 @@ class ShipmentGlobalDemandView extends Component {
             for (var item = 0; item < re.length; item++) {
                 let item1 = Object.values(re[item].procurementAgentQty);
                 console.log(item1)
-                A.push([this.addDoubleQuoteToRowContent([re[item].planningUnit.id,(getLabelText(re[item].planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),...item1, re[item].total])])
+                A.push([this.addDoubleQuoteToRowContent([re[item].planningUnit.id, (getLabelText(re[item].planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ...item1, re[item].total])])
             }
             for (var i = 0; i < A.length; i++) {
                 csvRow.push(A[i].join(","))
@@ -406,7 +406,7 @@ class ShipmentGlobalDemandView extends Component {
                 align: 'left'
             })
 
-         
+
         } else {
             doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
                 align: 'left'
@@ -417,7 +417,7 @@ class ShipmentGlobalDemandView extends Component {
             })
 
             var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-         
+
         }
         doc.setFontSize(8);
         doc.setTextColor("#002f6c");
@@ -466,7 +466,7 @@ class ShipmentGlobalDemandView extends Component {
         doc.text(i18n.t('static.report.includeapproved') + ' : ' + document.getElementById("includeApprovedVersions").selectedOptions[0].text, doc.internal.pageSize.width / 8, y, {
             align: 'left'
         })
-      
+
 
         doc.setTextColor("#fff");
         const title = i18n.t('static.dashboard.shipmentGlobalDemandViewheader');
@@ -477,7 +477,7 @@ class ShipmentGlobalDemandView extends Component {
         var height = doc.internal.pageSize.height;
         var h1 = 50;
         var aspectwidth1 = (width - h1);
-        let startY = y+10//150 + (this.state.planningUnitLabels.length * 3) + (this.state.fundingSourceLabels.length * 3) + (this.state.shipmentStatusLabels.length * 3)
+        let startY = y + 10//150 + (this.state.planningUnitLabels.length * 3) + (this.state.fundingSourceLabels.length * 3) + (this.state.shipmentStatusLabels.length * 3)
         console.log('startY', startY)
         let pages = Math.ceil(startY / height)
         for (var j = 1; j < pages; j++) {
@@ -563,7 +563,7 @@ class ShipmentGlobalDemandView extends Component {
             let shipmentStatusIds = this.state.shipmentStatusValues.length == this.state.shipmentStatuses.length ? [] : this.state.shipmentStatusValues.map(ele => (ele.value).toString());
             let realmId = document.getElementById('realmId').value;
             let useApprovedVersion = document.getElementById("includeApprovedVersions").value
-    
+
 
             if (realmId > 0 && productCategoryId != -1 && this.state.planningUnitValues.length > 0 && this.state.fundingSourceValues.length > 0 && this.state.shipmentStatusValues.length > 0) {
                 this.setState({
@@ -606,7 +606,46 @@ class ShipmentGlobalDemandView extends Component {
                             this.setState({ loading: false })
                         }
 
-                    })
+                    }).catch(
+                        error => {
+                            if (error.message === "Network Error") {
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
+
+                                    case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
+                                    case 404:
+                                    case 406:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    case 412:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    default:
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                        break;
+                                }
+                            }
+                        }
+                    );
 
             } else if (realmId <= 0) {
                 this.setState({
@@ -974,7 +1013,7 @@ class ShipmentGlobalDemandView extends Component {
             this.getPrograms();
             this.getFundingSource();
             this.getShipmentStatusList();
-          
+
         }
 
     }
@@ -995,24 +1034,64 @@ class ShipmentGlobalDemandView extends Component {
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
-                        this.setState({ message: error.message, loading: false });
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
                     } else {
-                        switch (error.response.status) {
-                            case 500:
+                        switch (error.response ? error.response.status : "") {
+
                             case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
                             case 404:
                             case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
                             case 412:
-                                this.setState({ message: error.response.data.messageCode, loading: false });
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
                                 break;
                             default:
-                                this.setState({ message: 'static.unkownError', loading: false });
-                                console.log("Error code unkown");
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
                                 break;
                         }
                     }
                 }
             );
+        // .catch(
+        //     error => {
+        //         if (error.message === "Network Error") {
+        //             this.setState({ message: error.message, loading: false });
+        //         } else {
+        //             switch (error.response.status) {
+        //                 case 500:
+        //                 case 401:
+        //                 case 404:
+        //                 case 406:
+        //                 case 412:
+        //                     this.setState({ message: error.response.data.messageCode, loading: false });
+        //                     break;
+        //                 default:
+        //                     this.setState({ message: 'static.unkownError', loading: false });
+        //                     console.log("Error code unkown");
+        //                     break;
+        //             }
+        //         }
+        //     }
+        // );
     }
 
     getShipmentStatusList() {
@@ -1030,23 +1109,66 @@ class ShipmentGlobalDemandView extends Component {
                             countrys: []
                         })
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message, loading: false });
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
                         } else {
                             switch (error.response ? error.response.status : "") {
-                                case 500:
+
                                 case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
                                 case 404:
                                 case 406:
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.common.status') }),
+                                        loading: false
+                                    });
+                                    break;
                                 case 412:
-                                    this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.common.status') }) });
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.common.status') }),
+                                        loading: false
+                                    });
                                     break;
                                 default:
-                                    this.setState({ message: 'static.unkownError', loading: false });
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
                                     break;
                             }
                         }
                     }
                 );
+            // .catch(
+            //     error => {
+            //         this.setState({
+            //             countrys: []
+            //         })
+            //         if (error.message === "Network Error") {
+            //             this.setState({ message: error.message, loading: false });
+            //         } else {
+            //             switch (error.response ? error.response.status : "") {
+            //                 case 500:
+            //                 case 401:
+            //                 case 404:
+            //                 case 406:
+            //                 case 412:
+            //                     this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.common.status') }) });
+            //                     break;
+            //                 default:
+            //                     this.setState({ message: 'static.unkownError', loading: false });
+            //                     break;
+            //             }
+            //         }
+            //     }
+            // );
         } else {
             var db2;
             var sStatusResult = [];
@@ -1085,23 +1207,66 @@ class ShipmentGlobalDemandView extends Component {
                             fundingSources: []
                         }, () => { this.consolidatedFundingSourceList() })
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message, loading: false });
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
                         } else {
                             switch (error.response ? error.response.status : "") {
-                                case 500:
+
                                 case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
                                 case 404:
                                 case 406:
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                        loading: false
+                                    });
+                                    break;
                                 case 412:
-                                    this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                        loading: false
+                                    });
                                     break;
                                 default:
-                                    this.setState({ message: 'static.unkownError', loading: false });
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
                                     break;
                             }
                         }
                     }
                 );
+            // .catch(
+            //     error => {
+            //         this.setState({
+            //             fundingSources: []
+            //         }, () => { this.consolidatedFundingSourceList() })
+            //         if (error.message === "Network Error") {
+            //             this.setState({ message: error.message, loading: false });
+            //         } else {
+            //             switch (error.response ? error.response.status : "") {
+            //                 case 500:
+            //                 case 401:
+            //                 case 404:
+            //                 case 406:
+            //                 case 412:
+            //                     this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+            //                     break;
+            //                 default:
+            //                     this.setState({ message: 'static.unkownError', loading: false });
+            //                     break;
+            //             }
+            //         }
+            //     }
+            // );
 
         } else {
             console.log('offline')
@@ -1311,23 +1476,66 @@ class ShipmentGlobalDemandView extends Component {
                         productCategories: [], loading: false
                     })
                     if (error.message === "Network Error") {
-                        this.setState({ message: error.message, loading: false });
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
                     } else {
                         switch (error.response ? error.response.status : "") {
-                            case 500:
+
                             case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
                             case 404:
                             case 406:
+                                this.setState({
+                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }),
+                                    loading: false
+                                });
+                                break;
                             case 412:
-                                this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
+                                this.setState({
+                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }),
+                                    loading: false
+                                });
                                 break;
                             default:
-                                this.setState({ message: 'static.unkownError', loading: false });
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
                                 break;
                         }
                     }
                 }
             );
+        // .catch(
+        //     error => {
+        //         this.setState({
+        //             productCategories: [], loading: false
+        //         })
+        //         if (error.message === "Network Error") {
+        //             this.setState({ message: error.message, loading: false });
+        //         } else {
+        //             switch (error.response ? error.response.status : "") {
+        //                 case 500:
+        //                 case 401:
+        //                 case 404:
+        //                 case 406:
+        //                 case 412:
+        //                     this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
+        //                     break;
+        //                 default:
+        //                     this.setState({ message: 'static.unkownError', loading: false });
+        //                     break;
+        //             }
+        //         }
+        //     }
+        // );
         this.getPlanningUnit();
     }
 
@@ -1388,30 +1596,72 @@ class ShipmentGlobalDemandView extends Component {
                         }, () => {
                             this.fetchData()
                         });
-                    })
-                        .catch(
-                            error => {
+                    }).catch(
+                        error => {
+                            this.setState({
+                                planningUnits: [],
+                            })
+                            if (error.message === "Network Error") {
                                 this.setState({
-                                    planningUnits: [],
-                                })
-                                if (error.message === "Network Error") {
-                                    this.setState({ message: error.message });
-                                } else {
-                                    switch (error.response ? error.response.status : "") {
-                                        case 500:
-                                        case 401:
-                                        case 404:
-                                        case 406:
-                                        case 412:
-                                            //  this.setState({ message: error.response.data.messageCode });
-                                            break;
-                                        default:
-                                            this.setState({ message: 'static.unkownError' });
-                                            break;
-                                    }
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
+
+                                    case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
+                                    case 404:
+                                    case 406:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    case 412:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    default:
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                        break;
                                 }
                             }
-                        );
+                        }
+                    );
+                    // .catch(
+                    //     error => {
+                    //         this.setState({
+                    //             planningUnits: [],
+                    //         })
+                    //         if (error.message === "Network Error") {
+                    //             this.setState({ message: error.message });
+                    //         } else {
+                    //             switch (error.response ? error.response.status : "") {
+                    //                 case 500:
+                    //                 case 401:
+                    //                 case 404:
+                    //                 case 406:
+                    //                 case 412:
+                    //                     //  this.setState({ message: error.response.data.messageCode });
+                    //                     break;
+                    //                 default:
+                    //                     this.setState({ message: 'static.unkownError' });
+                    //                     break;
+                    //             }
+                    //         }
+                    //     }
+                    // );
                 }
 
             }
@@ -1656,11 +1906,7 @@ class ShipmentGlobalDemandView extends Component {
 
         return (
             <div className="animated fadeIn" >
-                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
-                    this.setState({ message: message })
-                }} loading={(loading) => {
-                    this.setState({ loading: loading })
-                }} />
+                <AuthenticationServiceComponent history={this.props.history} />
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
 
@@ -1709,7 +1955,7 @@ class ShipmentGlobalDemandView extends Component {
                                                         <Input
                                                             bsSize="sm"
                                                             type="select" name="realmId" id="realmId"
-                                                            onChange={(e) => {  this.getProductCategories();this.fetchData(); }}
+                                                            onChange={(e) => { this.getProductCategories(); this.fetchData(); }}
                                                         >
                                                             <option value="">{i18n.t('static.common.select')}</option>
                                                             {realms}

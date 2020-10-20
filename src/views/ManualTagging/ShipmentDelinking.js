@@ -418,7 +418,10 @@ export default class ShipmentDelinking extends Component {
             programs: [],
             planningUnits: [],
             shipmentId: '',
-            haslink: false
+            haslink: false,
+            notes: false,
+            shipmentId: '',
+            active: true
         }
         this.filterData = this.filterData.bind(this);
         this.formatLabel = this.formatLabel.bind(this);
@@ -428,24 +431,38 @@ export default class ShipmentDelinking extends Component {
         this.delinkShipment = this.delinkShipment.bind(this);
         this.getProgramList = this.getProgramList.bind(this);
         this.buildJExcel = this.buildJExcel.bind(this);
+        this.dataChange = this.dataChange.bind(this);
     }
-    delinkShipment(event, row) {
-        event.stopPropagation();
-        console.log("shipment id row---" + row.shipmentId);
-        ManualTaggingService.delinkShipment(row.shipmentId)
+
+    dataChange(val) {
+        console.log("val---------------------------%%%%%%%%%%%%%", val)
+        if (val === "no") {
+            this.toggleLarge();
+        }
+
+        this.setState({
+            notes: val === "no" ? false : true
+        },
+            () => { });
+    }
+    delinkShipment() {
+        let notes = document.getElementById("notesTxt").value;
+        this.setState({ loading: true })
+        ManualTaggingService.delinkShipment(this.state.shipmentId, notes)
             .then(response => {
                 console.log("link response===", response);
                 this.setState({
                     message: i18n.t('static.shipment.delinkingsuccess'),
                     color: 'green',
-                    haslink: true
-                },
-                    () => {
-                        console.log(this.state.message, "success 1")
-                        this.hideSecondComponent();
-                        document.getElementById('div2').style.display = 'block';
-                        this.filterData();
-                    })
+                    haslink: true,
+                    loading: false
+
+                }, () => {
+                    this.hideSecondComponent();
+                    document.getElementById('div2').style.display = 'block';
+                    this.filterData();
+                });
+
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
@@ -486,6 +503,8 @@ export default class ShipmentDelinking extends Component {
                     }
                 }
             );
+        this.toggleLarge();
+
     }
     hideFirstComponent() {
         this.timeout = setTimeout(function () {
@@ -563,7 +582,7 @@ export default class ShipmentDelinking extends Component {
                     type: 'text',
                     readOnly: true
                 },
-                
+
                 {
                     title: i18n.t('static.fundingsource.fundingsourceCode'),
                     type: 'text',
@@ -691,76 +710,25 @@ export default class ShipmentDelinking extends Component {
         if ((x == 0 && value != 0) || (y == 0)) {
             console.log("HEADER SELECTION--------------------------");
         } else {
-            confirmAlert({
-                message: i18n.t('static.mt.confirmDelink'),
-                buttons: [
-                    {
-                        label: i18n.t('static.program.yes'),
-                        onClick: () => {
-                            this.setState({ loading: true })
-                            ManualTaggingService.delinkShipment(`${this.el.getValueFromCoords(0, x)}`)
-                                .then(response => {
-                                    console.log("link response===", response);
-                                    this.setState({
-                                        message: i18n.t('static.shipment.delinkingsuccess'),
-                                        color: 'green',
-                                        haslink: true,
-                                        loading: false
+            this.setState({
+                shipmentId: `${this.el.getValueFromCoords(0, x)}`
+            })
+            this.toggleLarge();
+            // confirmAlert({
+            //     message: i18n.t('static.mt.confirmDelink'),
+            //     buttons: [
+            //         {
+            //             label: i18n.t('static.program.yes'),
+            //             onClick: () => {
+            //                 var userName = prompt('Please Enter your Name')
 
-                                    }, () => {
-                                        this.hideSecondComponent();
-                                        document.getElementById('div2').style.display = 'block';
-                                        this.filterData();
-                                    });
-
-                                }).catch(
-                                    error => {
-                                        if (error.message === "Network Error") {
-                                            this.setState({
-                                                message: 'static.unkownError',
-                                                loading: false
-                                            });
-                                        } else {
-                                            switch (error.response ? error.response.status : "") {
-
-                                                case 401:
-                                                    this.props.history.push(`/login/static.message.sessionExpired`)
-                                                    break;
-                                                case 403:
-                                                    this.props.history.push(`/accessDenied`)
-                                                    break;
-                                                case 500:
-                                                case 404:
-                                                case 406:
-                                                    this.setState({
-                                                        message: error.response.data.messageCode,
-                                                        loading: false
-                                                    });
-                                                    break;
-                                                case 412:
-                                                    this.setState({
-                                                        message: error.response.data.messageCode,
-                                                        loading: false
-                                                    });
-                                                    break;
-                                                default:
-                                                    this.setState({
-                                                        message: 'static.unkownError',
-                                                        loading: false
-                                                    });
-                                                    break;
-                                            }
-                                        }
-                                    }
-                                );
-
-                        }
-                    },
-                    {
-                        label: i18n.t('static.program.no')
-                    }
-                ]
-            });
+            //             }
+            //         },
+            //         {
+            //             label: i18n.t('static.program.no')
+            //         }
+            //     ]
+            // });
             // var outputListAfterSearch = [];
             // let row = this.state.outputList.filter(c => (c.shipmentId == this.el.getValueFromCoords(0, x)))[0];
             // outputListAfterSearch.push(row);
@@ -857,6 +825,12 @@ export default class ShipmentDelinking extends Component {
         }
 
 
+    }
+
+    toggleLarge = () => {
+        this.setState({
+            manualTag: !this.state.manualTag,
+        })
     }
 
     getProgramList() {
@@ -1196,7 +1170,51 @@ export default class ShipmentDelinking extends Component {
                             </div>
                         </div>
 
+                        {/* Consumption modal */}
+                        <Modal isOpen={this.state.manualTag}
+                            className={'modal-sm ' + this.props.className}>
+                            <ModalHeader toggle={() => this.toggleLarge()} className="modalHeaderSupplyPlan">
+                                <strong>{i18n.t('static.dashboard.delinking')}</strong>
+                            </ModalHeader>
+                            <ModalBody>
+                                <Col md="12 pl-0">
+                                    <div className="row">
+                                        <div className="col-md-12">
+                                            <h4>{i18n.t('static.mt.confirmDelink')}</h4>
+                                        </div>
+                                        <div className="col-md-12 float-right">
+                                            <Button className="float-right mr-1" color="secondary Gobtn btn-sm" onClick={() => { this.dataChange("yes") }}>{i18n.t('static.program.yes')}</Button>
+                                            <Button className="float-right mr-1" color="secondary Gobtn btn-sm" onClick={() => { this.dataChange("no") }}>{i18n.t('static.program.no')}</Button>
+                                        </div>
+                                    </div>
+                                    {this.state.notes &&
+                                        <FormGroup className="col-md-12">
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.common.notes')}</Label>
+                                            <div className="controls ">
+                                                <InputGroup>
+                                                    <Input
+                                                        type="text"
+                                                        name="notesTxt"
+                                                        id="notesTxt"
+                                                        bsSize="sm"
+                                                        autocomplete="off"
+                                                    >
+                                                    </Input>
+                                                </InputGroup>
+                                            </div>
+                                        </FormGroup>}
 
+                                </Col>
+
+                            </ModalBody>
+                            <ModalFooter>
+
+                                {this.state.notes &&
+                                    <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.delinkShipment}> <i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                }
+                            </ModalFooter>
+                        </Modal>
+                        {/* Consumption modal */}
                     </CardBody>
                 </Card>
                 <div style={{ display: this.state.loading ? "block" : "none" }}>

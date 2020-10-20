@@ -295,14 +295,14 @@ class ForcastMatrixOverTime extends Component {
   exportCSV() {
 
     var csvRow = [];
-    csvRow.push( '"' +(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20')+'"')
-    csvRow.push( '"' +(i18n.t('static.report.timeWindow')+ ' : ' + (document.getElementById("viewById").selectedOptions[0].text)).replaceAll(' ', '%20')+'"')
-    csvRow.push( '"' +(i18n.t('static.program.program') + ': ' + (document.getElementById("programId").selectedOptions[0].text)).replaceAll(' ', '%20')+'"')
-    csvRow.push( '"' +(i18n.t('static.report.version') + ' : ' + (document.getElementById("versionId").selectedOptions[0].text)).replaceAll(' ', '%20')+'"')
-    csvRow.push( '"' +(i18n.t('static.planningunit.planningunit') + ' : ' + (document.getElementById("planningUnitId").selectedOptions[0].text)).replaceAll(' ', '%20')+'"')
+    csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
+    csvRow.push('"' + (i18n.t('static.report.timeWindow') + ' : ' + (document.getElementById("viewById").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
+    csvRow.push('"' + (i18n.t('static.program.program') + ': ' + (document.getElementById("programId").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
+    csvRow.push('"' + (i18n.t('static.report.version') + ' : ' + (document.getElementById("versionId").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
+    csvRow.push('"' + (i18n.t('static.planningunit.planningunit') + ' : ' + (document.getElementById("planningUnitId").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
     csvRow.push('')
     csvRow.push('')
-    csvRow.push(( '"' +i18n.t('static.common.youdatastart')).replaceAll(' ', '%20')+'"')
+    csvRow.push(('"' + i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
     csvRow.push('')
     var re;
     var A = [this.addDoubleQuoteToRowContent([(i18n.t('static.report.month')).replaceAll(' ', '%20'), (i18n.t('static.report.forecastConsumption')).replaceAll(' ', '%20'), (i18n.t('static.report.actualConsumption')).replaceAll(' ', '%20'), ((i18n.t('static.report.error')).replaceAll(' ', '%20')).replaceAll(' ', '%20')])]
@@ -311,7 +311,7 @@ class ForcastMatrixOverTime extends Component {
 
 
     for (var item = 0; item < re.length; item++) {
-      A.push(this.addDoubleQuoteToRowContent([this.dateFormatter(re[item].month).replaceAll(' ', '%20'), re[item].forecastedConsumption == null ? '' : re[item].forecastedConsumption, re[item].actualConsumption == null ? '' : re[item].actualConsumption, re[item].message == null ? this.PercentageFormatter(re[item].forecastError) :( i18n.t(re[item].message)).replaceAll(' ','%20')]))
+      A.push(this.addDoubleQuoteToRowContent([this.dateFormatter(re[item].month).replaceAll(' ', '%20'), re[item].forecastedConsumption == null ? '' : re[item].forecastedConsumption, re[item].actualConsumption == null ? '' : re[item].actualConsumption, re[item].message == null ? this.PercentageFormatter(re[item].forecastError) : (i18n.t(re[item].message)).replaceAll(' ', '%20')]))
     }
     for (var i = 0; i < A.length; i++) {
       csvRow.push(A[i].join(","))
@@ -445,23 +445,66 @@ class ForcastMatrixOverTime extends Component {
               programs: [], loading: false
             }, () => { this.consolidatedProgramList() })
             if (error.message === "Network Error") {
-              this.setState({ loading: false, message: error.message });
+              this.setState({
+                message: 'static.unkownError',
+                loading: false
+              });
             } else {
               switch (error.response ? error.response.status : "") {
-                case 500:
+
                 case 401:
+                  this.props.history.push(`/login/static.message.sessionExpired`)
+                  break;
+                case 403:
+                  this.props.history.push(`/accessDenied`)
+                  break;
+                case 500:
                 case 404:
                 case 406:
+                  this.setState({
+                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                    loading: false
+                  });
+                  break;
                 case 412:
-                  this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                  this.setState({
+                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                    loading: false
+                  });
                   break;
                 default:
-                  this.setState({ loading: false, message: 'static.unkownError' });
+                  this.setState({
+                    message: 'static.unkownError',
+                    loading: false
+                  });
                   break;
               }
             }
           }
         );
+      // .catch(
+      //   error => {
+      //     this.setState({
+      //       programs: [], loading: false
+      //     }, () => { this.consolidatedProgramList() })
+      //     if (error.message === "Network Error") {
+      //       this.setState({ loading: false, message: error.message });
+      //     } else {
+      //       switch (error.response ? error.response.status : "") {
+      //         case 500:
+      //         case 401:
+      //         case 404:
+      //         case 406:
+      //         case 412:
+      //           this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+      //           break;
+      //         default:
+      //           this.setState({ loading: false, message: 'static.unkownError' });
+      //           break;
+      //       }
+      //     }
+      //   }
+      // );
 
     } else {
       console.log('offline')
@@ -681,30 +724,72 @@ class ForcastMatrixOverTime extends Component {
             }, () => {
               this.fetchData();
             })
-          })
-            .catch(
-              error => {
+          }).catch(
+            error => {
+              this.setState({
+                planningUnits: [],
+              })
+              if (error.message === "Network Error") {
                 this.setState({
-                  planningUnits: [],
-                })
-                if (error.message === "Network Error") {
-                  this.setState({ message: error.message });
-                } else {
-                  switch (error.response ? error.response.status : "") {
-                    case 500:
-                    case 401:
-                    case 404:
-                    case 406:
-                    case 412:
-                      this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
-                      break;
-                    default:
-                      this.setState({ message: 'static.unkownError' });
-                      break;
-                  }
+                  message: 'static.unkownError',
+                  loading: false
+                });
+              } else {
+                switch (error.response ? error.response.status : "") {
+
+                  case 401:
+                    this.props.history.push(`/login/static.message.sessionExpired`)
+                    break;
+                  case 403:
+                    this.props.history.push(`/accessDenied`)
+                    break;
+                  case 500:
+                  case 404:
+                  case 406:
+                    this.setState({
+                      message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
+                      loading: false
+                    });
+                    break;
+                  case 412:
+                    this.setState({
+                      message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
+                      loading: false
+                    });
+                    break;
+                  default:
+                    this.setState({
+                      message: 'static.unkownError',
+                      loading: false
+                    });
+                    break;
                 }
               }
-            );
+            }
+          );
+          // .catch(
+          //   error => {
+          //     this.setState({
+          //       planningUnits: [],
+          //     })
+          //     if (error.message === "Network Error") {
+          //       this.setState({ message: error.message });
+          //     } else {
+          //       switch (error.response ? error.response.status : "") {
+          //         case 500:
+          //         case 401:
+          //         case 404:
+          //         case 406:
+          //         case 412:
+          //           this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
+          //           break;
+          //         default:
+          //           this.setState({ message: 'static.unkownError' });
+          //           break;
+          //       }
+          //     }
+          //   }
+          // );
         }
       }
     });
@@ -780,7 +865,7 @@ class ForcastMatrixOverTime extends Component {
                   console.log(dt, conlist)
                   var actconsumption = 0;
                   var forConsumption = 0;
-                  if (conlist.length ==2) {
+                  if (conlist.length == 2) {
                     montcnt = montcnt + 1
                   }
                   for (var l = 0; l < conlist.length; l++) {
@@ -852,25 +937,68 @@ class ForcastMatrixOverTime extends Component {
               this.setState({
                 matricsList: [], loading: false
               })
-
               if (error.message === "Network Error") {
-                this.setState({ loading: false, message: error.message });
+                this.setState({
+                  message: 'static.unkownError',
+                  loading: false
+                });
               } else {
                 switch (error.response ? error.response.status : "") {
-                  case 500:
+
                   case 401:
+                    this.props.history.push(`/login/static.message.sessionExpired`)
+                    break;
+                  case 403:
+                    this.props.history.push(`/accessDenied`)
+                    break;
+                  case 500:
                   case 404:
                   case 406:
+                    this.setState({
+                      message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                      loading: false
+                    });
+                    break;
                   case 412:
-                    this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                    this.setState({
+                      message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                      loading: false
+                    });
                     break;
                   default:
-                    this.setState({ loading: false, message: 'static.unkownError' });
+                    this.setState({
+                      message: 'static.unkownError',
+                      loading: false
+                    });
                     break;
                 }
               }
             }
           );
+        // .catch(
+        //   error => {
+        //     this.setState({
+        //       matricsList: [], loading: false
+        //     })
+
+        //     if (error.message === "Network Error") {
+        //       this.setState({ loading: false, message: error.message });
+        //     } else {
+        //       switch (error.response ? error.response.status : "") {
+        //         case 500:
+        //         case 401:
+        //         case 404:
+        //         case 406:
+        //         case 412:
+        //           this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+        //           break;
+        //         default:
+        //           this.setState({ loading: false, message: 'static.unkownError' });
+        //           break;
+        //       }
+        //     }
+        //   }
+        // );
       }
     }
     else if (programId == 0) {
@@ -1005,11 +1133,7 @@ class ForcastMatrixOverTime extends Component {
 
     return (
       <div className="animated fadeIn" >
-        <AuthenticationServiceComponent history={this.props.history} message={(message) => {
-          this.setState({ message: message })
-        }} loading={(loading) => {
-          this.setState({ loading: loading })
-        }} />
+        <AuthenticationServiceComponent history={this.props.history} />
         <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
         <h5 className="red">{i18n.t(this.state.message)}</h5>
         <SupplyPlanFormulas ref="formulaeChild" />

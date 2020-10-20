@@ -31,6 +31,7 @@ import InventoryInSupplyPlanComponent from "./InventoryInSupplyPlan";
 import ConsumptionInSupplyPlanComponent from "./ConsumptionInSupplyPlan";
 import { calculateSupplyPlan } from "./SupplyPlanCalculations";
 import SupplyPlanFormulas from "./SupplyPlanFormulas";
+import AuthenticationService from "../Common/AuthenticationService";
 
 const entityname = i18n.t('static.dashboard.supplyPlan')
 
@@ -1581,7 +1582,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 <div className="pt-4"></div>
                             </ModalBody>
                             <ModalFooter>
-                                {this.refs.consumptionChild != undefined && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.refs.consumptionChild.addRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
+                                {this.refs.consumptionChild != undefined && <Button color="info" id="addConsumptionRowSupplyPlan" size="md" className="float-right mr-1" type="button" onClick={this.refs.consumptionChild.addRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
                                 {this.state.consumptionChangedFlag == 1 && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.refs.consumptionChild.saveConsumption}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>}{' '}
                                 <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceled('Consumption')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                             </ModalFooter>
@@ -1767,7 +1768,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 <div className="pt-4"></div>
                             </ModalBody>
                             <ModalFooter>
-                                {this.refs.inventoryChild != undefined && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.refs.inventoryChild.addRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
+                                {this.refs.inventoryChild != undefined && <Button id="addInventoryRowSupplyPlan" color="info" size="md" className="float-right mr-1" type="button" onClick={this.refs.inventoryChild.addRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
                                 {this.state.inventoryChangedFlag == 1 && <Button size="md" color="success" className="submitBtn float-right mr-1" onClick={this.refs.inventoryChild.saveInventory}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>}{' '}
                                 <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceled('Adjustments')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                             </ModalFooter>
@@ -1804,7 +1805,7 @@ export default class SupplyPlanComponent extends React.Component {
                         </ModalHeader>
                         <div style={{ display: this.state.loading ? "none" : "block" }}>
                             <ModalBody>
-                                {this.state.showShipments && <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} hideFourthComponent={this.hideFourthComponent} hideFifthComponent={this.hideFifthComponent} shipmentPage="supplyPlan" />}
+                                <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} hideFourthComponent={this.hideFourthComponent} hideFifthComponent={this.hideFifthComponent} shipmentPage="supplyPlan" />
                                 <h6 className="red" id="div2">{this.state.noFundsBudgetError || this.state.shipmentBatchError || this.state.shipmentError}</h6>
                                 <div className="table-responsive">
                                     <div id="shipmentsDetailsTable" />
@@ -2984,10 +2985,15 @@ export default class SupplyPlanComponent extends React.Component {
                 });
                 this.formSubmit(this.state.planningUnit, monthCountConsumption);
             } else if (supplyPlanType == 'SuggestedShipments') {
-                this.setState({
-                    shipments: !this.state.shipments
-                });
-                this.suggestedShipmentsDetailsClicked(month, quantity, isEmergencyOrder);
+                var roleList = AuthenticationService.getLoggedInUserRole();
+                console.log("RoleList------------>", roleList);
+                if (roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') {
+                } else {
+                    this.setState({
+                        shipments: !this.state.shipments
+                    });
+                    this.suggestedShipmentsDetailsClicked(month, quantity, isEmergencyOrder);
+                }
             } else if (supplyPlanType == 'shipments') {
                 this.setState({
                     shipments: !this.state.shipments
@@ -3655,6 +3661,14 @@ export default class SupplyPlanComponent extends React.Component {
                     if (document.getElementById("addRowId") != null) {
                         document.getElementById("addRowId").style.display = "none"
                     }
+                }
+
+                var roleList = AuthenticationService.getLoggedInUserRole();
+                if (roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') {
+                    if (document.getElementById("addRowId") != null) {
+                        document.getElementById("addRowId").style.display = "none"
+                    }
+                } else {
                 }
                 this.setState({
                     showShipments: 1,

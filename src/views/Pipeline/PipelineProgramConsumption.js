@@ -10,7 +10,7 @@ import { jExcelLoadedFunction, jExcelLoadedFunctionWithoutPagination, jExcelLoad
 import { ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE, JEXCEL_DATE_FORMAT_WITHOUT_DATE } from '../../Constants';
 import RealmCountryService from '../../api/RealmCountryService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
+import { JEXCEL_PAGINATION_OPTION, JEXCEL_INTEGER_REGEX } from '../../Constants.js';
 export default class PipelineProgramConsumption extends Component {
 
     constructor(props) {
@@ -30,6 +30,7 @@ export default class PipelineProgramConsumption extends Component {
         for (var y = 0; y < json.length; y++) {
 
             var col = ("B").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(1, y);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -65,27 +66,33 @@ export default class PipelineProgramConsumption extends Component {
             }
 
 
-            var reg = /^[0-9\b]+$/;
+            var reg = JEXCEL_INTEGER_REGEX;
             var col = ("G").concat(parseInt(y) + 1);
             var value = this.el.getValueFromCoords(6, y);
+            value = value.toString().replaceAll("\,", "");
             if (value == "") {
+                // alert("in if");
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                 valid = false;
             } else {
+                // alert("in else");
                 if (isNaN(parseInt(value)) || !(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
                     valid = false;
+                    // alert("in if 2");
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
+                    // alert("in else 2");
                 }
             }
 
         }
+        console.log("valid=====>", valid);
         return valid;
     }
 
@@ -115,6 +122,8 @@ export default class PipelineProgramConsumption extends Component {
         }
         if (x == 3) {
             var col = ("D").concat(parseInt(y) + 1);
+            // console.log("value=====>", value);
+            // console.log("list====>", filteredList);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -122,11 +131,35 @@ export default class PipelineProgramConsumption extends Component {
             } else {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
+
+                var realmCountryPlanningUnitList = this.state.realmCountryPlanningUnitList;
+                var filteredList = realmCountryPlanningUnitList.filter(c => c.realmCountryPlanningUnitId == value);
+                var multiplier = filteredList[0].multiplier;
+                this.el.setValueFromCoords(4, y, multiplier);
+            }
+
+        }
+        if (x == 5) {
+            var col = ("F").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if (isNaN(Date.parse(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invaliddate'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
             }
         }
         if (x == 6) {
-            var reg = /^[0-9\b]+$/;
+            var reg = JEXCEL_INTEGER_REGEX;
             var col = ("G").concat(parseInt(y) + 1);
+            value = value.toString().replaceAll("\,", "");
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -231,7 +264,8 @@ export default class PipelineProgramConsumption extends Component {
                 planningUnitId: map.get("0"),
                 consumptionDate: map.get("5"),
                 actualFlag: map.get("9"),
-                consumptionQty: map.get("6"),
+                // consumptionQty: map.get("6"),
+                consumptionQty: (map.get("6")).toString().replaceAll("\,", ""),
                 dayOfStockOut: map.get("7"),
                 dataSourceId: dataSourceId,
                 notes: map.get("8"),
@@ -274,7 +308,7 @@ export default class PipelineProgramConsumption extends Component {
                 }
 
                 // AuthenticationService.setupAxiosInterceptors();
-                DataSourceService.getActiveDataSourceList().then(response => {
+                DataSourceService.getAllDataSourceList().then(response => {
                     // console.log("data source List ----->", response.data);
                     for (var j = 0; j < response.data.length; j++) {
                         if (response.data[j].dataSourceType.id == ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE || response.data[j].dataSourceType.id == FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE)
@@ -377,7 +411,7 @@ export default class PipelineProgramConsumption extends Component {
                                             {
                                                 title: i18n.t('static.unit.multiplier'),
                                                 type: 'text',
-                                                readonly: true
+                                                readOnly: true
                                             },
                                             {
                                                 title: i18n.t('static.pipeline.consumptionDate'),
@@ -389,7 +423,8 @@ export default class PipelineProgramConsumption extends Component {
                                             {
                                                 title: i18n.t('static.consumption.consumptionqty'),
                                                 type: 'numeric',
-                                                mask: '###,###,###.##'
+                                                mask: '#,##.00',
+                                                decimal: '.'
                                             },
                                             {
                                                 title: i18n.t('static.consumption.daysofstockout'),
@@ -400,7 +435,7 @@ export default class PipelineProgramConsumption extends Component {
                                                 type: 'text'
                                             },
                                             {
-                                                title: i18n.t('static.consumption.actualflag'),
+                                                title: i18n.t('static.consumption.consumptionType'),
                                                 type: 'dropdown',
                                                 source: [{ id: true, name: i18n.t('static.consumption.actual') }, { id: false, name: i18n.t('static.consumption.forcast') }]
                                             },
