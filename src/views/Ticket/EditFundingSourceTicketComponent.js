@@ -68,7 +68,7 @@ export default class EditFundingSourceTicketComponent extends Component {
             message: '',
             fundingSources: [],
             fundingSourceId: '',
-            loading: false
+            loading: true
         }
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
@@ -134,7 +134,7 @@ export default class EditFundingSourceTicketComponent extends Component {
                     //     selSource: response.data
                     // })
                     this.setState({
-                        fundingSources: response.data,
+                        fundingSources: response.data, loading: false
                     })
                 } else {
                     this.setState({
