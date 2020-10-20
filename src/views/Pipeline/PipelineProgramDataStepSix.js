@@ -33,37 +33,37 @@ const initialValuesSix = {
 const validationSchemaSix = function (values) {
     return Yup.object().shape({
         programName: Yup.string()
-        .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
-        .required(i18n.t('static.program.validprogramtext')),
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
+            .required(i18n.t('static.program.validprogramtext')),
         userId: Yup.string()
             .required(i18n.t('static.program.validmanagertext')),
         airFreightPerc: Yup.string()
-        // .typeError(i18n.t('static.procurementUnit.validNumberText'))
-        .matches(/^\s*(?=.*[1-9])\d{1,2}(?:\.\d{1,2})?\s*$/, i18n.t('static.message.2digitDecimal'))
-        .required(i18n.t('static.program.validairfreighttext'))
-        .min(0, i18n.t('static.program.validvaluetext')),
+            // .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
+            .required(i18n.t('static.program.validairfreighttext'))
+            .min(0, i18n.t('static.program.validvaluetext')),
         seaFreightPerc: Yup.string()
-        // .typeError(i18n.t('static.procurementUnit.validNumberText'))
-        .matches(/^\s*(?=.*[1-9])\d{1,2}(?:\.\d{1,2})?\s*$/, i18n.t('static.message.2digitDecimal'))
-        .required(i18n.t('static.program.validseafreighttext'))
-        .min(0, i18n.t('static.program.validvaluetext')),
+            // .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
+            .required(i18n.t('static.program.validseafreighttext'))
+            .min(0, i18n.t('static.program.validvaluetext')),
         // deliveredToReceivedLeadTime: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
         // .required(i18n.t('static.program.validdelivertoreceivetext')).min(0, i18n.t('static.program.validvaluetext')),
         plannedToSubmittedLeadTime: Yup.string()
-        // .typeError(i18n.t('static.procurementUnit.validNumberText'))
-        .matches(/^\s*(?=.*[1-9])\d{1,2}(?:\.\d{1,2})?\s*$/, i18n.t('static.message.2digitDecimal'))
-        .required(i18n.t('static.program.validplantosubmittext'))
-        .min(0, i18n.t('static.program.validvaluetext')),
+            // .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
+            .required(i18n.t('static.program.validplantosubmittext'))
+            .min(0, i18n.t('static.program.validvaluetext')),
         submittedToApprovedLeadTime: Yup.string()
-        // .typeError(i18n.t('static.procurementUnit.validNumberText'))
-        .matches(/^\s*(?=.*[1-9])\d{1,2}(?:\.\d{1,2})?\s*$/, i18n.t('static.message.2digitDecimal'))
-        .required(i18n.t('static.program.validsubmittoapprovetext'))
-        .min(0, i18n.t('static.program.validvaluetext')),
+            // .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
+            .required(i18n.t('static.program.validsubmittoapprovetext'))
+            .min(0, i18n.t('static.program.validvaluetext')),
         approvedToShippedLeadTime: Yup.string()
-        // .typeError(i18n.t('static.procurementUnit.validNumberText'))
-        .matches(/^\s*(?=.*[1-9])\d{1,2}(?:\.\d{1,2})?\s*$/, i18n.t('static.message.2digitDecimal'))
-        .required(i18n.t('static.program.validapprovetoshiptext'))
-        .min(0, i18n.t('static.program.validvaluetext')),
+            // .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
+            .required(i18n.t('static.program.validapprovetoshiptext'))
+            .min(0, i18n.t('static.program.validvaluetext')),
         monthsInFutureForAmc: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
             .required(i18n.t('static.program.validfutureamctext')).min(0, i18n.t('static.program.validvaluetext')),
         monthsInPastForAmc: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
@@ -73,20 +73,20 @@ const validationSchemaSix = function (values) {
             .required((i18n.t('static.pipeline.entershelflife'))).min(0, i18n.t('static.program.validvaluetext')),
 
         arrivedToDeliveredLeadTime: Yup.string()
-        // .typeError(i18n.t('static.procurementUnit.validNumberText'))
-        .matches(/^\s*(?=.*[1-9])\d{1,2}(?:\.\d{1,2})?\s*$/, i18n.t('static.message.2digitDecimal'))
-        .required(i18n.t('static.program.arrivedToReceiviedtext'))
-        .min(0, i18n.t('static.program.validvaluetext')),
+            // .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
+            .required(i18n.t('static.program.arrivedToReceivedLeadTime'))
+            .min(0, i18n.t('static.program.validvaluetext')),
         shippedToArrivedBySeaLeadTime: Yup.string()
-        // .typeError(i18n.t('static.procurementUnit.validNumberText'))
-        .matches(/^\s*(?=.*[1-9])\d{1,2}(?:\.\d{1,2})?\s*$/, i18n.t('static.message.2digitDecimal'))
-        .required(i18n.t('static.program.shippedToArrivedBySeatext'))
-        .min(0, i18n.t('static.program.validvaluetext')),
+            // .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
+            .required(i18n.t('static.realmcountry.shippedToArrivedSeaLeadTimetext'))
+            .min(0, i18n.t('static.program.validvaluetext')),
         shippedToArrivedByAirLeadTime: Yup.string()
-        // .typeError(i18n.t('static.procurementUnit.validNumberText'))
-        .matches(/^\s*(?=.*[1-9])\d{1,2}(?:\.\d{1,2})?\s*$/, i18n.t('static.message.2digitDecimal'))
-        .required(i18n.t('static.program.shippedToArrivedByAirtext'))
-        .min(0, i18n.t('static.program.validvaluetext')),
+            // .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
+            .required(i18n.t('static.realmcountry.shippedToArrivedAirLeadTimetext'))
+            .min(0, i18n.t('static.program.validvaluetext')),
         // healthAreaId: Yup.string()
         //     .required(i18n.t('static.program.validhealthareatext')),
         // programNotes: Yup.string()

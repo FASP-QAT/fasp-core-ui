@@ -123,7 +123,7 @@ export default class UserTicketComponent extends Component {
             realmId: '',
             roleId: '',
             languageId: '',
-            loading: false
+            loading: true
         }
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
@@ -230,7 +230,7 @@ export default class UserTicketComponent extends Component {
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        languages: response.data
+                        languages: response.data, loading: false
                     })
                 } else {
                     this.setState({
@@ -287,7 +287,7 @@ export default class UserTicketComponent extends Component {
                 if (response.status == 200) {                    
                     this.setState({
                         realms: response.data,
-                        realmId: selectedRealm
+                        realmId: selectedRealm, loading: false
                     });
                     if (selectedRealm !== "") {
                         this.setState({
