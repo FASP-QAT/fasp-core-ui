@@ -95,7 +95,7 @@ export default class PipelineProgramImport extends Component {
         }, 8000);
     }
     showPipelineProgramInfo() {
-
+        
         confirmAlert({
             title: i18n.t('static.program.confirmsubmit'),
             message: i18n.t('static.message.negativeInventoryMessage'),
@@ -108,10 +108,12 @@ export default class PipelineProgramImport extends Component {
                         // alert(myJson);
                         // alert(fileName);
                         // AuthenticationService.setupAxiosInterceptors();
+                        this.setState({loading:true});
                         PipelineService.savePipelineJson(myJson, fileName)
                             .then(response => {
-                                console.log("response--------->", response)
-                                console.log("messageCode-->", response.data.messageCode)
+                                console.log("response--------->", response);
+                                console.log("messageCode-->", response.data.messageCode);
+                                
                                 if (response.status == 200) {
                                     this.props.history.push('/pipeline/pieplineProgramList/' + 'green/' + i18n.t('static.message.pipelineProgramImportSuccess'))
                                 }
