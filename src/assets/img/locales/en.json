@@ -1417,5 +1417,8 @@
     "static.quantimed.importData": "Import Data",
     "static.quantimed.mapAtLeastOnePlanningUnitValidationText": "Please map at least one planning unit",    
     "static.report.shippedToArrivedAirLeadTime": "'Shipped to Arrived' air lead time ",
-    "static.report.shippedToArrivedSeaLeadTime": "'Shipped to Arrived' sea lead time "
+    "static.report.shippedToArrivedSeaLeadTime": "'Shipped to Arrived' sea lead time ",
+    "static.report.erpOrder":"ERP Order",
+    "static.report.localprocurement":"Local Procurement",
+    "static.report.orderNo":"Procurer Order ID"
 }

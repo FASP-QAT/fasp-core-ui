@@ -113,7 +113,7 @@ class ProductCatalog extends Component {
                 getLabelText(ele.tracerCategory.label, this.state.lang).replaceAll(' ', '%20'),
                 getLabelText(ele.forecastingUnit.label, this.state.lang).replaceAll(' ', '%20'),
                 getLabelText(ele.fUnit.label, this.state.lang).replaceAll(' ', '%20'),
-                ele.genericName.labelId != 0 ? getLabelText(ele.genericName, this.state.lang).replaceAll(' ', '%20') : '',
+                ele.genericName.genericName != '' && ele.genericName.genericName != null ? getLabelText(ele.genericName, this.state.lang).replaceAll(' ', '%20') : '',
                 ele.forecastingtoPlanningUnitMultiplier,
                 ele.planningUnit.id,
                 getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(' ', '%20'),
@@ -769,14 +769,7 @@ class ProductCatalog extends Component {
 
 
         const columns = [
-            {
-                dataField: 'planningUnit.id',
-                text: i18n.t('static.report.qatPID'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { align: 'center' }
-            },
+           
             {
                 dataField: 'program.label',
                 text: i18n.t('static.program.program'),
@@ -843,6 +836,13 @@ class ProductCatalog extends Component {
                 sort: true,
                 align: 'right',
                 headerAlign: 'right'
+            }, {
+                dataField: 'planningUnit.id',
+                text: i18n.t('static.report.qatPID'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                style: { align: 'center' }
             },
             {
                 dataField: 'planningUnit.label',
