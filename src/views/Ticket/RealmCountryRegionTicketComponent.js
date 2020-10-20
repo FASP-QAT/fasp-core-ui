@@ -88,7 +88,7 @@ export default class RealmCountryRegionTicketComponent extends Component {
             message: '',
             realmCountries: [],
             realmCountryId: '',
-            loading: false,
+            loading: true,
             realmId: '',
             realmList: []
         }
@@ -224,7 +224,7 @@ export default class RealmCountryRegionTicketComponent extends Component {
                 if (response.status == 200) {
                     this.setState({
                         realmList: response.data,
-                        realmId: selectedRealm
+                        realmId: selectedRealm, loading: false
                     });
                     if (selectedRealm !== "") {
                         this.setState({

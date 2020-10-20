@@ -71,7 +71,7 @@ export default class EditProgramTicketComponent extends Component {
             message: '',
             programId: '',
             programList: [],
-            loading: false
+            loading: true
         }
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
@@ -134,7 +134,7 @@ export default class EditProgramTicketComponent extends Component {
             if (response.status == 200) {
                 console.log("resp--------------------", response.data);
                 this.setState({
-                    programList: response.data
+                    programList: response.data, loading: false
                 })
             } else {
                 this.setState({

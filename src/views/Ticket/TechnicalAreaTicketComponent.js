@@ -96,7 +96,7 @@ export default class TechnicalAreaTicketComponent extends Component {
             countryId: '',
             countries: [],
             realmCountryList: [],
-            loading: false
+            loading: true
         }
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
@@ -167,7 +167,7 @@ export default class TechnicalAreaTicketComponent extends Component {
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        countries: response.data
+                        countries: response.data, loading: false
                     })
                 }
                 else {
@@ -225,7 +225,7 @@ export default class TechnicalAreaTicketComponent extends Component {
             .then(response => {
                 this.setState({
                     realms: response.data,
-                    realmId: selectedRealm
+                    realmId: selectedRealm, loading: false
                 });
                 if (selectedRealm !== "") {
                     this.setState({

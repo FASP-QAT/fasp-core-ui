@@ -103,7 +103,7 @@ export default class BudgetTicketComponent extends Component {
             programId: '',
             fundingSourceId: '',
             currencyId: '',
-            loading: false
+            loading: true
         }
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
@@ -188,7 +188,7 @@ export default class BudgetTicketComponent extends Component {
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        programs: response.data
+                        programs: response.data, loading: false
                     })
                 }
                 else {
@@ -245,7 +245,7 @@ export default class BudgetTicketComponent extends Component {
         FundingSourceService.getFundingSourceListAll()
             .then(response => {
                 this.setState({
-                    fundingSources: response.data
+                    fundingSources: response.data, loading: false
                 })
             }).catch(
                 error => {
@@ -291,7 +291,7 @@ export default class BudgetTicketComponent extends Component {
         CurrencyService.getCurrencyList().then(response => {
             if (response.status == 200) {
                 this.setState({
-                    currencies: response.data,
+                    currencies: response.data, loading: false
                 })
             } else {
                 this.setState({ message: response.data.messageCode })

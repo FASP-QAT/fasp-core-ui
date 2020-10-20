@@ -68,7 +68,7 @@ export default class EditProcurementAgentTicketComponent extends Component {
             message: '',
             procurementAgents: [],
             procurementAgentId: '',
-            loading: false
+            loading: true
         }
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
@@ -129,7 +129,7 @@ export default class EditProcurementAgentTicketComponent extends Component {
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        procurementAgents: response.data
+                        procurementAgents: response.data, loading: false
                     })
                 } else {
                     this.setState({

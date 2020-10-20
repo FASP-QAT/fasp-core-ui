@@ -299,7 +299,10 @@ export default class PipelineProgramSetup extends Component {
                     })
                 }
             }
-            )
+            ).catch(error => {
+                alert(i18n.t('pipeline.garbageDataValidation'));
+
+            });
         // }
 
     }
@@ -459,7 +462,7 @@ export default class PipelineProgramSetup extends Component {
                 }
             }).catch(error => {
                 alert(i18n.t('pipeline.garbageDataValidation'));
-               
+
             });
     }
     finishedStepSeven = () => {
@@ -505,7 +508,7 @@ export default class PipelineProgramSetup extends Component {
                 }
             }).catch(error => {
                 alert(i18n.t('pipeline.garbageDataValidation'));
-               
+
             });
 
     }

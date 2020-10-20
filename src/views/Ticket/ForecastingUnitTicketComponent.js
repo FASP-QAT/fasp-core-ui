@@ -99,7 +99,7 @@ export default class ForecastingUnitTicketComponent extends Component {
             tracerCategoryId: '',
             productCategories: [],
             productCategoryId: '',
-            loading: false
+            loading: true
         }
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
@@ -183,7 +183,7 @@ export default class ForecastingUnitTicketComponent extends Component {
         UnitService.getUnitListAll()
             .then(response => {
                 this.setState({
-                    units: response.data
+                    units: response.data, loading: false
                 })
             }).catch(
                 error => {
@@ -229,7 +229,7 @@ export default class ForecastingUnitTicketComponent extends Component {
             .then(response => {
                 this.setState({
                     realms: response.data,
-                    realmId: selectedRealm
+                    realmId: selectedRealm, loading: false
                 });
                 if (selectedRealm !== "") {
                     this.setState({
@@ -290,7 +290,7 @@ export default class ForecastingUnitTicketComponent extends Component {
         TracerCategoryService.getTracerCategoryListAll()
             .then(response => {
                 this.setState({
-                    tracerCategories: response.data
+                    tracerCategories: response.data, loading: false
                 })
             }).catch(
                 error => {
