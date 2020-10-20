@@ -157,12 +157,12 @@ export default class PlanningUnitTicketComponent extends Component {
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        units: response.data, loading: false
+                        units: response.data
                     })
                     // AuthenticationService.setupAxiosInterceptors();
                     ForecastingUnitService.getForecastingUnitList().then(response => {
                         this.setState({
-                            forecastingUnits: response.data
+                            forecastingUnits: response.data, loading: false
                         })
                     })
                 }
