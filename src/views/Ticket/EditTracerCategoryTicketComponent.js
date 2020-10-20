@@ -69,7 +69,7 @@ export default class EditTracerCategoryTicketComponent extends Component {
             message: '',
             tracerCategories: [],
             tracerCategoryId: '',
-            loading: false
+            loading: true
         }
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
@@ -130,7 +130,7 @@ export default class EditTracerCategoryTicketComponent extends Component {
             .then(response => {
                 console.log("response.data----", response.data);
                 this.setState({
-                    tracerCategories: response.data
+                    tracerCategories: response.data, loading: false
                 })
             }).catch(
                 error => {

@@ -80,7 +80,7 @@ export default class FundingSourceTicketComponent extends Component {
             message: '',
             realms: [],
             realmId: '',
-            loading: false
+            loading: true
         }
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
@@ -148,7 +148,7 @@ export default class FundingSourceTicketComponent extends Component {
             .then(response => {
                 this.setState({
                     realms: response.data,
-                    realmId: selectedRealm
+                    realmId: selectedRealm, loading: false
                 });
                 if (selectedRealm !== "") {
                     this.setState({

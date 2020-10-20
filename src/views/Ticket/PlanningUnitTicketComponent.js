@@ -87,7 +87,7 @@ export default class PlanningUnitTicketComponent extends Component {
             forecastingUnits: [],
             unitId: '',
             forecastingUnitId: '',
-            loading: false
+            loading: true
         }
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
@@ -162,7 +162,7 @@ export default class PlanningUnitTicketComponent extends Component {
                     // AuthenticationService.setupAxiosInterceptors();
                     ForecastingUnitService.getForecastingUnitList().then(response => {
                         this.setState({
-                            forecastingUnits: response.data
+                            forecastingUnits: response.data, loading: false
                         })
                     })
                 }

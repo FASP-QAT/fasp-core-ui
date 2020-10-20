@@ -73,7 +73,7 @@ export default class EditOrganisationTicketComponent extends Component {
             message: '',
             organizations: [],
             organizationId: '',
-            loading: false
+            loading: true
         }
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
@@ -135,7 +135,7 @@ export default class EditOrganisationTicketComponent extends Component {
             .then(response => {
                 console.log("response---", response);
                 this.setState({
-                    organizations: response.data,
+                    organizations: response.data, loading: false
                 })
             }).catch(
                 error => {

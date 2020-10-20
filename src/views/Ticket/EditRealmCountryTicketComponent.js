@@ -70,7 +70,7 @@ export default class EditRealmCountryTicketComponent extends Component {
             message: '',
             realmCountries: [],
             realmCountryId: '',
-            loading: false
+            loading: true
         }
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);

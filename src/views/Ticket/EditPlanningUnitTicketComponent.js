@@ -69,7 +69,7 @@ export default class EditPlanningUnitTicketComponent extends Component {
             message: '',
             planningUnits: [],
             planningUnitId: '',
-            loading: false
+            loading: true
         }
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
@@ -131,7 +131,7 @@ export default class EditPlanningUnitTicketComponent extends Component {
             PlanningUnitService.getPlanningUnitByRealmId(AuthenticationService.getRealmId()).then(response => {
                 console.log(response.data)
                 this.setState({
-                    planningUnits: response.data,
+                    planningUnits: response.data, loading: false
 
                 });
             }).catch(
