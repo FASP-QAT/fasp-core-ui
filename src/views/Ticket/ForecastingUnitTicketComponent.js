@@ -14,9 +14,12 @@ import ProductService from '../../api/ProductService';
 import RealmService from '../../api/RealmService';
 import { SPACE_REGEX } from '../../Constants';
 
+let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.forecastingunit.forecastingunit"))
+let summaryText_2 = "Add Forecasting Unit"
+const selectedRealm = (AuthenticationService.getRealmId() !== "" && AuthenticationService.getRealmId() !== -1) ? AuthenticationService.getRealmId() : ""
 const initialValues = {
-    summary: "Add Forecasting Unit",
-    realm: "",
+    summary: summaryText_1,
+    realm: selectedRealm,
     tracerCategory: "",
     productCategory: "",
     forecastingUnitDesc: "",
@@ -77,7 +80,7 @@ export default class ForecastingUnitTicketComponent extends Component {
         super(props);
         this.state = {
             forecastingUnit: {
-                summary: 'Add Forecasting Unit',
+                summary: summaryText_1,
                 realm: "",
                 tracerCategory: "",
                 productCategory: "",
@@ -96,7 +99,7 @@ export default class ForecastingUnitTicketComponent extends Component {
             tracerCategoryId: '',
             productCategories: [],
             productCategoryId: '',
-            loading: false
+            loading: true
         }
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
@@ -110,19 +113,19 @@ export default class ForecastingUnitTicketComponent extends Component {
             forecastingUnit.summary = event.target.value;
         }
         if (event.target.name == "realm") {
-            forecastingUnit.realm = this.state.realms.filter(c => c.realmId == event.target.value)[0].label.label_en;
+            forecastingUnit.realm = event.target.value !== "" ? this.state.realms.filter(c => c.realmId == event.target.value)[0].label.label_en : "";
             this.setState({
                 realmId: event.target.value
             })
         }
         if (event.target.name == "tracerCategory") {
-            forecastingUnit.tracerCategory = this.state.tracerCategories.filter(c => c.tracerCategoryId == event.target.value)[0].label.label_en;
+            forecastingUnit.tracerCategory = event.target.value !== "" ? this.state.tracerCategories.filter(c => c.tracerCategoryId == event.target.value)[0].label.label_en : "";
             this.setState({
                 tracerCategoryId: event.target.value
             })
         }
         if (event.target.name == "productCategory") {
-            forecastingUnit.productCategory = this.state.productCategories.filter(c => c.payload.productCategoryId == event.target.value)[0].payload.label.label_en;
+            forecastingUnit.productCategory = event.target.value !== "" ? this.state.productCategories.filter(c => c.payload.productCategoryId == event.target.value)[0].payload.label.label_en : "";
             this.setState({
                 productCategoryId: event.target.value
             })
@@ -150,12 +153,12 @@ export default class ForecastingUnitTicketComponent extends Component {
     touchAll(setTouched, errors) {
         setTouched({
             summary: true,
-            realm: "",
-            tracerCategory: "",
-            productCategory: "",
-            forecastingUnitDesc: "",
-            genericName: "",
-            unit: "",
+            realm: true,
+            tracerCategory: true,
+            productCategory: true,
+            forecastingUnitDesc: true,
+            genericName: true,
+            unit: true,
             notes: true
         })
         this.validateForm(errors)
@@ -180,7 +183,7 @@ export default class ForecastingUnitTicketComponent extends Component {
         UnitService.getUnitListAll()
             .then(response => {
                 this.setState({
-                    units: response.data
+                    units: response.data, loading: false
                 })
             }).catch(
                 error => {
@@ -225,8 +228,24 @@ export default class ForecastingUnitTicketComponent extends Component {
         RealmService.getRealmListAll()
             .then(response => {
                 this.setState({
-                    realms: response.data
-                })
+                    realms: response.data,
+                    realmId: selectedRealm, loading: false
+                });
+                if (selectedRealm !== "") {
+                    this.setState({
+                        realms: (response.data).filter(c => c.realmId == selectedRealm)
+                    })
+
+                    let { forecastingUnit } = this.state;
+                    forecastingUnit.realm = (response.data).filter(c => c.realmId == selectedRealm)[0].label.label_en;
+                    this.setState({
+                        forecastingUnit
+                    }, () => {
+
+                        this.getProductCategoryByRealmId(selectedRealm);                        
+
+                    })
+                }
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
@@ -271,7 +290,7 @@ export default class ForecastingUnitTicketComponent extends Component {
         TracerCategoryService.getTracerCategoryListAll()
             .then(response => {
                 this.setState({
-                    tracerCategories: response.data
+                    tracerCategories: response.data, loading: false
                 })
             }).catch(
                 error => {
@@ -315,53 +334,54 @@ export default class ForecastingUnitTicketComponent extends Component {
             );
     }
 
-    getProductCategoryByRealmId() {
-        let realmId = document.getElementById("realm").value;
-        ProductService.getProductCategoryList(realmId)
-            .then(response => {
-                this.setState({
-                    productCategories: response.data
-                })
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({
-                            message: 'static.unkownError',
-                            loading: false
-                        });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
+    getProductCategoryByRealmId(realmId) {
+        if (realmId != "") {
+            ProductService.getProductCategoryList(realmId)
+                .then(response => {
+                    this.setState({
+                        productCategories: response.data
+                    })
+                }).catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
 
-                            case 401:
-                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                break;
-                            case 403:
-                                this.props.history.push(`/accessDenied`)
-                                break;
-                            case 500:
-                            case 404:
-                            case 406:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            case 412:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            default:
-                                this.setState({
-                                    message: 'static.unkownError',
-                                    loading: false
-                                });
-                                break;
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
+                                    break;
+                            }
                         }
                     }
-                }
-            );
+                );
+        }
     }
 
     hideSecondComponent() {
@@ -442,6 +462,8 @@ export default class ForecastingUnitTicketComponent extends Component {
                             this.setState({
                                 loading: true
                             })
+                            this.state.forecastingUnit.summary = summaryText_2;
+                            this.state.forecastingUnit.userLanguageCode = this.state.lang;
                             JiraTikcetService.addEmailRequestIssue(this.state.forecastingUnit).then(response => {
                                 console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
@@ -536,7 +558,7 @@ export default class ForecastingUnitTicketComponent extends Component {
                                                 bsSize="sm"
                                                 valid={!errors.realm && this.state.forecastingUnit.realm != ''}
                                                 invalid={touched.realm && !!errors.realm}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); this.getProductCategoryByRealmId() }}
+                                                onChange={(e) => { handleChange(e); this.dataChange(e); this.getProductCategoryByRealmId(e.target.value) }}
                                                 onBlur={handleBlur}
                                                 value={this.state.realmId}
                                                 required >

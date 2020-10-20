@@ -11,9 +11,12 @@ import RealmService from '../../api/RealmService';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { SPACE_REGEX } from '../../Constants';
 
+let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.product.productcategory"))
+let summaryText_2 = "Add Planning Unit Category"
+const selectedRealm = (AuthenticationService.getRealmId() !== "" && AuthenticationService.getRealmId() !== -1) ? AuthenticationService.getRealmId() : ""
 const initialValues = {
-    summary: "Add Planning Unit Category",
-    realmName: "",
+    summary: summaryText_1,
+    realmName: selectedRealm,
     productCategoryName: "",
     notes: ""
 }
@@ -60,7 +63,7 @@ export default class ProductCategoryTicketComponent extends Component {
         super(props);
         this.state = {
             productCategory: {
-                summary: "Add Planning Unit Category",
+                summary: summaryText_1,
                 realmName: "",
                 productCategoryName: "",
                 notes: ""
@@ -69,7 +72,7 @@ export default class ProductCategoryTicketComponent extends Component {
             message: '',
             realms: [],
             realmId: '',
-            loading: false
+            loading: true
         }
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
@@ -82,7 +85,7 @@ export default class ProductCategoryTicketComponent extends Component {
             productCategory.summary = event.target.value;
         }
         if (event.target.name == "realmName") {
-            productCategory.realmName = this.state.realms.filter(c => c.realmId == event.target.value)[0].label.label_en;
+            productCategory.realmName = event.target.value !== "" ? this.state.realms.filter(c => c.realmId == event.target.value)[0].label.label_en : "";
             this.setState({
                 realmId: event.target.value
             })
@@ -128,8 +131,23 @@ export default class ProductCategoryTicketComponent extends Component {
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        realms: response.data
-                    })
+                        realms: response.data,
+                        realmId: selectedRealm, loading: false
+                    });
+                    if (selectedRealm !== "") {
+                        this.setState({
+                            realms: (response.data).filter(c => c.realmId == selectedRealm)
+                        })
+    
+                        let { productCategory } = this.state;
+                        productCategory.realmName = (response.data).filter(c => c.realmId == selectedRealm)[0].label.label_en;
+                        this.setState({
+                            productCategory
+                        }, () => {
+
+    
+                        })
+                    }
                 } else {
                     this.setState({
                         message: response.data.messageCode
@@ -225,6 +243,8 @@ export default class ProductCategoryTicketComponent extends Component {
                             this.setState({
                                 loading: true
                             })
+                            this.state.productCategory.summary = summaryText_2;
+                            this.state.productCategory.userLanguageCode = this.state.lang;
                             JiraTikcetService.addEmailRequestIssue(this.state.productCategory).then(response => {
                                 console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {

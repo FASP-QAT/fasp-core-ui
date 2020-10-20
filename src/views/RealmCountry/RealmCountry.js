@@ -122,7 +122,7 @@ class RealmCountry extends Component {
                         CountryService.getCountryListAll()
                             .then(response => {
                                 if (response.status == 200) {
-                                    console.log(response.data)
+                                    console.log("CountryService--------", response.data)
                                     this.setState({
                                         countries: response.data
                                     })
@@ -142,7 +142,8 @@ class RealmCountry extends Component {
                                                     var paJson = {
                                                         name: getLabelText(countries[i].label, this.state.lang),
                                                         id: parseInt(countries[i].countryId),
-                                                        active: countries[i].active
+                                                        active: countries[i].active,
+                                                        countryCode: countries[i].countryCode
                                                     }
                                                     countryArr[i] = paJson
                                                 }
@@ -157,6 +158,19 @@ class RealmCountry extends Component {
                                                     currencyArr[i] = paJson
                                                 }
                                             }
+                                            countryArr.sort(function (a, b) {
+                                                var countryCodeA = a.countryCode.toUpperCase(); // ignore upper and lowercase
+                                                var countryCodeB = b.countryCode.toUpperCase(); // ignore upper and lowercase
+                                                if (countryCodeA < countryCodeB) {
+                                                    return -1;
+                                                }
+                                                if (countryCodeA > countryCodeB) {
+                                                    return 1;
+                                                }
+
+                                                // names must be equal
+                                                return 0;
+                                            });
                                             this.setState({
                                                 countryArr: countryArr,
                                                 currencyArr: currencyArr

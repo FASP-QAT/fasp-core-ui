@@ -15,8 +15,8 @@ class ManualTaggingSerice {
         return axios.post(`${API_URL}/api/linkShipmentWithARTMIS/`, { orderNo, primeLineNo, shipmentId }, {}
         );
     }
-    delinkShipment(shipmentId) {
-        return axios.post(`${API_URL}/api/delinkShipment/`, { shipmentId }, {}
+    delinkShipment(shipmentId,notes) {
+        return axios.post(`${API_URL}/api/delinkShipment/`, { shipmentId,notes }, {}
         );
     }
     getShipmentListForDelinking(programId, planningUnitId) {

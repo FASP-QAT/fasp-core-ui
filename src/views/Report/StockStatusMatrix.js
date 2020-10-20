@@ -344,25 +344,68 @@ export default class StockStatusMatrix extends React.Component {
               this.setState({
                 selData: [], data: [], loading: false
               })
-
               if (error.message === "Network Error") {
-                this.setState({ message: error.message, loading: false });
+                this.setState({
+                  message: 'static.unkownError',
+                  loading: false
+                });
               } else {
                 switch (error.response ? error.response.status : "") {
-                  case 500:
+
                   case 401:
+                    this.props.history.push(`/login/static.message.sessionExpired`)
+                    break;
+                  case 403:
+                    this.props.history.push(`/accessDenied`)
+                    break;
+                  case 500:
                   case 404:
                   case 406:
+                    this.setState({
+                      message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }),
+                      loading: false
+                    });
+                    break;
                   case 412:
-                    this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
+                    this.setState({
+                      message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }),
+                      loading: false
+                    });
                     break;
                   default:
-                    this.setState({ loading: false, message: 'static.unkownError' });
+                    this.setState({
+                      message: 'static.unkownError',
+                      loading: false
+                    });
                     break;
                 }
               }
             }
           );
+        // .catch(
+        //   error => {
+        //     this.setState({
+        //       data: [], loading: false
+        //     })
+
+        //     if (error.message === "Network Error") {
+        //       this.setState({ message: error.message, loading: false });
+        //     } else {
+        //       switch (error.response ? error.response.status : "") {
+        //         case 500:
+        //         case 401:
+        //         case 404:
+        //         case 406:
+        //         case 412:
+        //           this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
+        //           break;
+        //         default:
+        //           this.setState({ loading: false, message: 'static.unkownError' });
+        //           break;
+        //       }
+        //     }
+        //   }
+        // );
 
 
 
@@ -455,23 +498,66 @@ export default class StockStatusMatrix extends React.Component {
                 productCategories: []
               })
               if (error.message === "Network Error") {
-                this.setState({ message: error.message });
+                this.setState({
+                  message: 'static.unkownError',
+                  loading: false
+                });
               } else {
                 switch (error.response ? error.response.status : "") {
-                  case 500:
+
                   case 401:
+                    this.props.history.push(`/login/static.message.sessionExpired`)
+                    break;
+                  case 403:
+                    this.props.history.push(`/accessDenied`)
+                    break;
+                  case 500:
                   case 404:
                   case 406:
+                    this.setState({
+                      message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }),
+                      loading: false
+                    });
+                    break;
                   case 412:
-                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
+                    this.setState({
+                      message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }),
+                      loading: false
+                    });
                     break;
                   default:
-                    this.setState({ message: 'static.unkownError' });
+                    this.setState({
+                      message: 'static.unkownError',
+                      loading: false
+                    });
                     break;
                 }
               }
             }
           );
+        // .catch(
+        //   error => {
+        //     this.setState({
+        //       productCategories: []
+        //     })
+        //     if (error.message === "Network Error") {
+        //       this.setState({ message: error.message });
+        //     } else {
+        //       switch (error.response ? error.response.status : "") {
+        //         case 500:
+        //         case 401:
+        //         case 404:
+        //         case 406:
+        //         case 412:
+        //           this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
+        //           break;
+        //         default:
+        //           this.setState({ message: 'static.unkownError' });
+        //           break;
+        //       }
+        //     }
+        //   }
+        // );
       }
 
 
@@ -494,23 +580,66 @@ export default class StockStatusMatrix extends React.Component {
               programs: [], loading: false
             }, () => { this.consolidatedProgramList() })
             if (error.message === "Network Error") {
-              this.setState({ loading: false, message: error.message });
+              this.setState({
+                message: 'static.unkownError',
+                loading: false
+              });
             } else {
               switch (error.response ? error.response.status : "") {
-                case 500:
+
                 case 401:
+                  this.props.history.push(`/login/static.message.sessionExpired`)
+                  break;
+                case 403:
+                  this.props.history.push(`/accessDenied`)
+                  break;
+                case 500:
                 case 404:
                 case 406:
+                  this.setState({
+                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                    loading: false
+                  });
+                  break;
                 case 412:
-                  this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                  this.setState({
+                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                    loading: false
+                  });
                   break;
                 default:
-                  this.setState({ loading: false, message: 'static.unkownError' });
+                  this.setState({
+                    message: 'static.unkownError',
+                    loading: false
+                  });
                   break;
               }
             }
           }
         );
+      // .catch(
+      //   error => {
+      //     this.setState({
+      //       programs: [], loading: false
+      //     }, () => { this.consolidatedProgramList() })
+      //     if (error.message === "Network Error") {
+      //       this.setState({ loading: false, message: error.message });
+      //     } else {
+      //       switch (error.response ? error.response.status : "") {
+      //         case 500:
+      //         case 401:
+      //         case 404:
+      //         case 406:
+      //         case 412:
+      //           this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+      //           break;
+      //         default:
+      //           this.setState({ loading: false, message: 'static.unkownError' });
+      //           break;
+      //       }
+      //     }
+      //   }
+      // );
 
     } else {
       this.setState({ loading: false })
@@ -729,30 +858,72 @@ export default class StockStatusMatrix extends React.Component {
             }, () => {
               this.filterData();
             })
-          })
-            .catch(
-              error => {
+          }).catch(
+            error => {
+              this.setState({
+                planningUnits: [],
+              })
+              if (error.message === "Network Error") {
                 this.setState({
-                  planningUnits: [],
-                })
-                if (error.message === "Network Error") {
-                  this.setState({ message: error.message });
-                } else {
-                  switch (error.response ? error.response.status : "") {
-                    case 500:
-                    case 401:
-                    case 404:
-                    case 406:
-                    case 412:
-                      this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
-                      break;
-                    default:
-                      this.setState({ message: 'static.unkownError' });
-                      break;
-                  }
+                  message: 'static.unkownError',
+                  loading: false
+                });
+              } else {
+                switch (error.response ? error.response.status : "") {
+
+                  case 401:
+                    this.props.history.push(`/login/static.message.sessionExpired`)
+                    break;
+                  case 403:
+                    this.props.history.push(`/accessDenied`)
+                    break;
+                  case 500:
+                  case 404:
+                  case 406:
+                    this.setState({
+                      message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
+                      loading: false
+                    });
+                    break;
+                  case 412:
+                    this.setState({
+                      message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
+                      loading: false
+                    });
+                    break;
+                  default:
+                    this.setState({
+                      message: 'static.unkownError',
+                      loading: false
+                    });
+                    break;
                 }
               }
-            );
+            }
+          );
+          // .catch(
+          //   error => {
+          //     this.setState({
+          //       planningUnits: [],
+          //     })
+          //     if (error.message === "Network Error") {
+          //       this.setState({ message: error.message });
+          //     } else {
+          //       switch (error.response ? error.response.status : "") {
+          //         case 500:
+          //         case 401:
+          //         case 404:
+          //         case 406:
+          //         case 412:
+          //           this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
+          //           break;
+          //         default:
+          //           this.setState({ message: 'static.unkownError' });
+          //           break;
+          //       }
+          //     }
+          //   }
+          // );
         }
       }
     });
@@ -1209,11 +1380,7 @@ export default class StockStatusMatrix extends React.Component {
     return (
 
       <div className="animated">
-        <AuthenticationServiceComponent history={this.props.history} message={(message) => {
-          this.setState({ message: message })
-        }} loading={(loading) => {
-          this.setState({ loading: loading })
-        }} />
+        <AuthenticationServiceComponent history={this.props.history} />
         <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
         <h5 className="red">{i18n.t(this.state.message, { entityname })}</h5>
         <SupplyPlanFormulas ref="formulaeChild" />

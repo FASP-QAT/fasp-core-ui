@@ -438,9 +438,9 @@ class ShipmentGlobalView extends Component {
             this.state.procurementAgentLabels.map(ele =>
                 csvRow.push('"' + (i18n.t('static.procurementagent.procurementagent') + ' : ' + (ele.toString())).replaceAll(' ', '%20') + '"'))
         }
-        csvRow.push('"' +((i18n.t('static.report.includeapproved') + ' : ' + document.getElementById("includeApprovedVersions").selectedOptions[0].text).replaceAll(' ', '%20')+'"'))
+        csvRow.push('"' + ((i18n.t('static.report.includeapproved') + ' : ' + document.getElementById("includeApprovedVersions").selectedOptions[0].text).replaceAll(' ', '%20') + '"'))
         csvRow.push((i18n.t('static.program.isincludeplannedshipment') + ' , ' + document.getElementById("includePlanningShipments").selectedOptions[0].text).replaceAll(' ', '%20'))
-       
+
         csvRow.push('')
         csvRow.push('')
         csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
@@ -760,25 +760,68 @@ class ShipmentGlobalView extends Component {
                         this.setState({
                             consumptions: []
                         })
-
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
                         } else {
                             switch (error.response ? error.response.status : "") {
-                                case 500:
+
                                 case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
                                 case 404:
                                 case 406:
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
+                                        loading: false
+                                    });
+                                    break;
                                 case 412:
-                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }) });
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
+                                        loading: false
+                                    });
                                     break;
                                 default:
-                                    this.setState({ message: 'static.unkownError' });
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
                                     break;
                             }
                         }
                     }
                 );
+            // .catch(
+            //     error => {
+            //         this.setState({
+            //             consumptions: []
+            //         })
+
+            //         if (error.message === "Network Error") {
+            //             this.setState({ message: error.message });
+            //         } else {
+            //             switch (error.response ? error.response.status : "") {
+            //                 case 500:
+            //                 case 401:
+            //                 case 404:
+            //                 case 406:
+            //                 case 412:
+            //                     this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }) });
+            //                     break;
+            //                 default:
+            //                     this.setState({ message: 'static.unkownError' });
+            //                     break;
+            //             }
+            //         }
+            //     }
+            // );
         } else if (CountryIds.length == 0) {
             this.setState({ message: i18n.t('static.program.validcountrytext'), consumptions: [] });
 
@@ -801,7 +844,7 @@ class ShipmentGlobalView extends Component {
         RealmCountryService.getRealmCountryForProgram(realmId)
             .then(response => {
                 this.setState({
-                    countrys: response.data.map(ele=>ele.realmCountry)
+                    countrys: response.data.map(ele => ele.realmCountry)
                 })
             }).catch(
                 error => {
@@ -809,23 +852,66 @@ class ShipmentGlobalView extends Component {
                         countrys: []
                     })
                     if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
                     } else {
                         switch (error.response ? error.response.status : "") {
-                            case 500:
+
                             case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
                             case 404:
                             case 406:
-                            case 412:
-                            default:
-                                this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }) });
+                                this.setState({
+                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
+                                    loading: false
+                                });
                                 break;
-                                this.setState({ message: 'static.unkownError' });
+                            case 412:
+                                this.setState({
+                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
                                 break;
                         }
                     }
                 }
             );
+        // .catch(
+        //     error => {
+        //         this.setState({
+        //             countrys: []
+        //         })
+        //         if (error.message === "Network Error") {
+        //             this.setState({ message: error.message });
+        //         } else {
+        //             switch (error.response ? error.response.status : "") {
+        //                 case 500:
+        //                 case 401:
+        //                 case 404:
+        //                 case 406:
+        //                 case 412:
+        //                 default:
+        //                     this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }) });
+        //                     break;
+        //                     this.setState({ message: 'static.unkownError' });
+        //                     break;
+        //             }
+        //         }
+        //     }
+        // );
         this.fetchData();
     }
     getPlanningUnit() {
@@ -839,31 +925,74 @@ class ShipmentGlobalView extends Component {
                 }, () => {
                     this.fetchData()
                 });
-            })
-                .catch(
-                    error => {
+            }).catch(
+                error => {
+                    this.setState({
+                        planningUnits: [],
+                        planningUnitValues: []
+                    })
+                    if (error.message === "Network Error") {
                         this.setState({
-                            planningUnits: [],
-                            planningUnitValues: []
-                        })
-                        if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
-                        } else {
-                            switch (error.response ? error.response.status : "") {
-                                case 500:
-                                case 401:
-                                case 404:
-                                case 406:
-                                case 412:
-                                    //  this.setState({ message: error.response.data.messageCode });
-                                    break;
-                                default:
-                                    this.setState({ message: 'static.unkownError' });
-                                    break;
-                            }
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
                         }
                     }
-                );
+                }
+            );
+            // .catch(
+            //     error => {
+            //         this.setState({
+            //             planningUnits: [],
+            //             planningUnitValues: []
+            //         })
+            //         if (error.message === "Network Error") {
+            //             this.setState({ message: error.message });
+            //         } else {
+            //             switch (error.response ? error.response.status : "") {
+            //                 case 500:
+            //                 case 401:
+            //                 case 404:
+            //                 case 406:
+            //                 case 412:
+            //                     //  this.setState({ message: error.response.data.messageCode });
+            //                     break;
+            //                 default:
+            //                     this.setState({ message: 'static.unkownError' });
+            //                     break;
+            //             }
+            //         }
+            //     }
+            // );
         }
 
     }
@@ -921,24 +1050,64 @@ class ShipmentGlobalView extends Component {
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
-                        this.setState({ message: error.message, loading: false });
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
                     } else {
-                        switch (error.response.status) {
-                            case 500:
+                        switch (error.response ? error.response.status : "") {
+
                             case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
                             case 404:
                             case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
                             case 412:
-                                this.setState({ loading: false, message: error.response.data.messageCode });
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
                                 break;
                             default:
-                                this.setState({ message: 'static.unkownError', loading: false });
-                                console.log("Error code unkown");
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
                                 break;
                         }
                     }
                 }
             );
+        // .catch(
+        //     error => {
+        //         if (error.message === "Network Error") {
+        //             this.setState({ message: error.message, loading: false });
+        //         } else {
+        //             switch (error.response.status) {
+        //                 case 500:
+        //                 case 401:
+        //                 case 404:
+        //                 case 406:
+        //                 case 412:
+        //                     this.setState({ loading: false, message: error.response.data.messageCode });
+        //                     break;
+        //                 default:
+        //                     this.setState({ message: 'static.unkownError', loading: false });
+        //                     console.log("Error code unkown");
+        //                     break;
+        //             }
+        //         }
+        //     }
+        // );
     }
 
     getProcurementAgent = () => {
@@ -990,23 +1159,66 @@ class ShipmentGlobalView extends Component {
                         fundingSources: []
                     })
                     if (error.message === "Network Error") {
-                        this.setState({ message: error.message, loading: false });
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
                     } else {
                         switch (error.response ? error.response.status : "") {
-                            case 500:
+
                             case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
                             case 404:
                             case 406:
+                                this.setState({
+                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                    loading: false
+                                });
+                                break;
                             case 412:
-                                this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                this.setState({
+                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                    loading: false
+                                });
                                 break;
                             default:
-                                this.setState({ message: 'static.unkownError', loading: false });
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
                                 break;
                         }
                     }
                 }
             );
+        // .catch(
+        //     error => {
+        //         this.setState({
+        //             fundingSources: []
+        //         })
+        //         if (error.message === "Network Error") {
+        //             this.setState({ message: error.message, loading: false });
+        //         } else {
+        //             switch (error.response ? error.response.status : "") {
+        //                 case 500:
+        //                 case 401:
+        //                 case 404:
+        //                 case 406:
+        //                 case 412:
+        //                     this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+        //                     break;
+        //                 default:
+        //                     this.setState({ message: 'static.unkownError', loading: false });
+        //                     break;
+        //             }
+        //         }
+        //     }
+        // );
     }
 
     getProductCategories() {
@@ -1026,23 +1238,66 @@ class ShipmentGlobalView extends Component {
                         productCategories: [], loading: false
                     })
                     if (error.message === "Network Error") {
-                        this.setState({ message: error.message, loading: false });
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
                     } else {
                         switch (error.response ? error.response.status : "") {
-                            case 500:
+
                             case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
                             case 404:
                             case 406:
+                                this.setState({
+                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }),
+                                    loading: false
+                                });
+                                break;
                             case 412:
-                                this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
+                                this.setState({
+                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }),
+                                    loading: false
+                                });
                                 break;
                             default:
-                                this.setState({ message: 'static.unkownError', loading: false });
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
                                 break;
                         }
                     }
                 }
             );
+        // .catch(
+        //     error => {
+        //         this.setState({
+        //             productCategories: [], loading: false
+        //         })
+        //         if (error.message === "Network Error") {
+        //             this.setState({ message: error.message, loading: false });
+        //         } else {
+        //             switch (error.response ? error.response.status : "") {
+        //                 case 500:
+        //                 case 401:
+        //                 case 404:
+        //                 case 406:
+        //                 case 412:
+        //                     this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
+        //                     break;
+        //                 default:
+        //                     this.setState({ message: 'static.unkownError', loading: false });
+        //                     break;
+        //             }
+        //         }
+        //     }
+        // );
         this.getPlanningUnit();
     }
 
@@ -1092,7 +1347,7 @@ class ShipmentGlobalView extends Component {
         let CountryIds = this.state.countryValues.length == this.state.countrys.length ? [] : this.state.countryValues.map(ele => (ele.value).toString());
         let useApprovedVersion = document.getElementById("includeApprovedVersions").value
         let includePlanningShipments = document.getElementById("includePlanningShipments").value
-    
+
         let planningUnitId = document.getElementById("planningUnitId").value;
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
@@ -1125,8 +1380,8 @@ class ShipmentGlobalView extends Component {
                 planningUnitId: planningUnitId,
                 reportView: viewby,
                 fundingSourceProcurementAgentIds: fundingSourceProcurementAgentIds
-                ,useApprovedSupplyPlanOnly: useApprovedVersion,
-                includePlannedShipments:includePlanningShipments
+                , useApprovedSupplyPlanOnly: useApprovedVersion,
+                includePlannedShipments: includePlanningShipments
             }
             console.log("INPUTJSON--------->", inputjson);
             // AuthenticationService.setupAxiosInterceptors();
@@ -1193,23 +1448,69 @@ class ShipmentGlobalView extends Component {
                             // this.consolidatedProgramList() 
                         })
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
                         } else {
                             switch (error.response ? error.response.status : "") {
-                                case 500:
+
                                 case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
                                 case 404:
                                 case 406:
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                        loading: false
+                                    });
+                                    break;
                                 case 412:
-                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                        loading: false
+                                    });
                                     break;
                                 default:
-                                    this.setState({ message: '' });
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
                                     break;
                             }
                         }
                     }
                 );
+            // .catch(
+            //     error => {
+            //         this.setState({
+            //             // programs: []
+            //             loading: false
+            //         }, () => {
+            //             // this.consolidatedProgramList() 
+            //         })
+            //         if (error.message === "Network Error") {
+            //             this.setState({ message: error.message });
+            //         } else {
+            //             switch (error.response ? error.response.status : "") {
+            //                 case 500:
+            //                 case 401:
+            //                 case 404:
+            //                 case 406:
+            //                 case 412:
+            //                     this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+            //                     break;
+            //                 default:
+            //                     this.setState({ message: '' });
+            //                     break;
+            //             }
+            //         }
+            //     }
+            // );
 
         } else if (realmId <= 0) {
             this.setState({
@@ -1498,11 +1799,7 @@ class ShipmentGlobalView extends Component {
 
         return (
             <div className="animated fadeIn" >
-                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
-                    this.setState({ message: message })
-                }} loading={(loading) => {
-                    this.setState({ loading: loading })
-                }} />
+                <AuthenticationServiceComponent history={this.props.history} />
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
 
@@ -1709,23 +2006,23 @@ class ShipmentGlobalView extends Component {
                                             </div>
                                         </FormGroup>
                                         <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.program.isincludeplannedshipment')}</Label>
-                                                <div className="controls ">
-                                                    <InputGroup>
-                                                        <Input
-                                                            type="select"
-                                                            name="includePlanningShipments"
-                                                            id="includePlanningShipments"
-                                                            bsSize="sm"
-                                                            onChange={(e) => { this.fetchData() }}
-                                                        >
-                                                            <option value="true">{i18n.t('static.program.yes')}</option>
-                                                            <option value="false">{i18n.t('static.program.no')}</option>
-                                                        </Input>
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.program.isincludeplannedshipment')}</Label>
+                                            <div className="controls ">
+                                                <InputGroup>
+                                                    <Input
+                                                        type="select"
+                                                        name="includePlanningShipments"
+                                                        id="includePlanningShipments"
+                                                        bsSize="sm"
+                                                        onChange={(e) => { this.fetchData() }}
+                                                    >
+                                                        <option value="true">{i18n.t('static.program.yes')}</option>
+                                                        <option value="false">{i18n.t('static.program.no')}</option>
+                                                    </Input>
 
-                                                    </InputGroup>
-                                                </div>
-                                            </FormGroup>
+                                                </InputGroup>
+                                            </div>
+                                        </FormGroup>
 
 
                                     </div>

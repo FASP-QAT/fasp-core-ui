@@ -14,8 +14,10 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import { SPACE_REGEX } from '../../Constants';
 import RealmCountryService from '../../api/RealmCountryService';
 
+let summaryText_1 = (i18n.t("static.common.edit") + " " + i18n.t("static.program.realmcountrydashboard"))
+let summaryText_2 = "Edit Realm Country"
 const initialValues = {
-    summary: "Edit Realm Country",
+    summary: summaryText_1,
     realmCountryName: "",
     notes: ""
 }
@@ -26,7 +28,7 @@ const validationSchema = function (values) {
             .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.common.summarytext')),
         realmCountryName: Yup.string()
-            .required(i18n.t('static.common.pleaseSelect').concat(" ").concat((i18n.t('static.dashboard.realmcountry')).concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?', i18n.t('static.dashboard.realmcountry'))))),
+            .required(i18n.t('static.common.pleaseSelect').concat(" ").concat((i18n.t('static.program.realmcountrydashboard')).concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?', i18n.t('static.program.realmcountrydashboard'))))),
         notes: Yup.string()
             .required(i18n.t('static.program.validnotestext'))
     })
@@ -60,7 +62,7 @@ export default class EditRealmCountryTicketComponent extends Component {
         super(props);
         this.state = {
             realmCountry: {
-                summary: "Edit Realm Country",
+                summary: summaryText_1,
                 realmCountryName: "",
                 notes: ""
             },
@@ -68,7 +70,7 @@ export default class EditRealmCountryTicketComponent extends Component {
             message: '',
             realmCountries: [],
             realmCountryId: '',
-            loading: false
+            loading: true
         }
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
@@ -81,7 +83,12 @@ export default class EditRealmCountryTicketComponent extends Component {
             realmCountry.summary = event.target.value;
         }
         if (event.target.name == "realmCountryName") {
-            realmCountry.realmCountryName = event.target.options[event.target.selectedIndex].innerHTML;
+            var outText = "";
+            if(event.target.value !== "") {
+                var realmCountryT = this.state.realmCountries.filter(c => c.realmCountryId == event.target.value)[0];
+                outText = realmCountryT.realm.label.label_en + " | " + realmCountryT.country.label.label_en;
+            }
+            realmCountry.realmCountryName = outText;
             this.setState({
                 realmCountryId: event.target.value
             })
@@ -229,6 +236,8 @@ export default class EditRealmCountryTicketComponent extends Component {
                             this.setState({
                                 loading: true
                             })
+                            this.state.realmCountry.summary = summaryText_2;
+                            this.state.realmCountry.userLanguageCode = this.state.lang;
                             JiraTikcetService.addEmailRequestIssue(this.state.realmCountry).then(response => {
                                 console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
@@ -318,7 +327,7 @@ export default class EditRealmCountryTicketComponent extends Component {
                                             <FormFeedback className="red">{errors.summary}</FormFeedback>
                                         </FormGroup>
                                         <FormGroup>
-                                            <Label for="realmCountryName">{i18n.t('static.dashboard.realmcountry')}<span class="red Reqasterisk">*</span></Label>
+                                            <Label for="realmCountryName">{i18n.t('static.program.realmcountrydashboard')}<span class="red Reqasterisk">*</span></Label>
                                             <Input type="select" name="realmCountryName" id="realmCountryName"
                                                 bsSize="sm"
                                                 valid={!errors.realmCountryName && this.state.realmCountry.realmCountryName != ''}

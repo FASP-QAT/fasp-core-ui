@@ -245,9 +245,9 @@ class GlobalConsumption extends Component {
     console.log(this.state.planningUnitValues)
     this.state.planningUnitValues.map(ele =>
       csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + (((ele.label).toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
-      csvRow.push('"' +((i18n.t('static.report.includeapproved') + ' : ' + document.getElementById("includeApprovedVersions").selectedOptions[0].text).replaceAll(' ', '%20')+'"'))
-     
-      csvRow.push('')
+    csvRow.push('"' + ((i18n.t('static.report.includeapproved') + ' : ' + document.getElementById("includeApprovedVersions").selectedOptions[0].text).replaceAll(' ', '%20') + '"'))
+
+    csvRow.push('')
     csvRow.push('')
     csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
     csvRow.push('')
@@ -405,7 +405,7 @@ class GlobalConsumption extends Component {
 
     doc.text(i18n.t('static.report.includeapproved') + ' : ' + document.getElementById("includeApprovedVersions").selectedOptions[0].text, doc.internal.pageSize.width / 8, y, {
       align: 'left'
-  })
+    })
 
 
 
@@ -421,7 +421,7 @@ class GlobalConsumption extends Component {
     var height = doc.internal.pageSize.height;
     var h1 = 50;
     var aspectwidth1 = (width - h1);
-    let startY = y+10
+    let startY = y + 10
     console.log('startY', startY)
     let pages = Math.ceil(startY / height)
     for (var j = 1; j < pages; j++) {
@@ -527,7 +527,7 @@ class GlobalConsumption extends Component {
     let viewById = document.getElementById("viewById").value;
     let realmId = document.getElementById('realmId').value;
     let useApprovedVersion = document.getElementById("includeApprovedVersions").value
-    
+
     console.log("realmId--------->", realmId);
     let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
     let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
@@ -576,7 +576,46 @@ class GlobalConsumption extends Component {
           }, () => {
 
           });
-        })
+        }).catch(
+          error => {
+            if (error.message === "Network Error") {
+              this.setState({
+                message: 'static.unkownError',
+                loading: false
+              });
+            } else {
+              switch (error.response ? error.response.status : "") {
+
+                case 401:
+                  this.props.history.push(`/login/static.message.sessionExpired`)
+                  break;
+                case 403:
+                  this.props.history.push(`/accessDenied`)
+                  break;
+                case 500:
+                case 404:
+                case 406:
+                  this.setState({
+                    message: error.response.data.messageCode,
+                    loading: false
+                  });
+                  break;
+                case 412:
+                  this.setState({
+                    message: error.response.data.messageCode,
+                    loading: false
+                  });
+                  break;
+                default:
+                  this.setState({
+                    message: 'static.unkownError',
+                    loading: false
+                  });
+                  break;
+              }
+            }
+          }
+        );
     } else if (realmId <= 0) {
       this.setState({ message: i18n.t('static.common.realmtext'), consumptions: [] });
 
@@ -600,7 +639,7 @@ class GlobalConsumption extends Component {
       RealmCountryService.getRealmCountryForProgram(realmId)
         .then(response => {
           this.setState({
-            countrys: response.data.map(ele=>ele.realmCountry)
+            countrys: response.data.map(ele => ele.realmCountry)
           })
         }).catch(
           error => {
@@ -608,23 +647,66 @@ class GlobalConsumption extends Component {
               countrys: []
             })
             if (error.message === "Network Error") {
-              this.setState({ message: error.message });
+              this.setState({
+                message: 'static.unkownError',
+                loading: false
+              });
             } else {
               switch (error.response ? error.response.status : "") {
-                case 500:
+
                 case 401:
+                  this.props.history.push(`/login/static.message.sessionExpired`)
+                  break;
+                case 403:
+                  this.props.history.push(`/accessDenied`)
+                  break;
+                case 500:
                 case 404:
                 case 406:
-                case 412:
-                default:
-                  this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }) });
+                  this.setState({
+                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
+                    loading: false
+                  });
                   break;
-                  this.setState({ message: 'static.unkownError' });
+                case 412:
+                  this.setState({
+                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
+                    loading: false
+                  });
+                  break;
+                default:
+                  this.setState({
+                    message: 'static.unkownError',
+                    loading: false
+                  });
                   break;
               }
             }
           }
         );
+      // .catch(
+      //   error => {
+      //     this.setState({
+      //       countrys: []
+      //     })
+      //     if (error.message === "Network Error") {
+      //       this.setState({ message: error.message });
+      //     } else {
+      //       switch (error.response ? error.response.status : "") {
+      //         case 500:
+      //         case 401:
+      //         case 404:
+      //         case 406:
+      //         case 412:
+      //         default:
+      //           this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }) });
+      //           break;
+      //           this.setState({ message: 'static.unkownError' });
+      //           break;
+      //       }
+      //     }
+      //   }
+      // );
 
     } else {
       const lan = 'en';
@@ -682,7 +764,46 @@ class GlobalConsumption extends Component {
             this.setState({
               planningUnits: response.data,
             })
-          })
+          }).catch(
+            error => {
+              if (error.message === "Network Error") {
+                this.setState({
+                  message: 'static.unkownError',
+                  loading: false
+                });
+              } else {
+                switch (error.response ? error.response.status : "") {
+
+                  case 401:
+                    this.props.history.push(`/login/static.message.sessionExpired`)
+                    break;
+                  case 403:
+                    this.props.history.push(`/accessDenied`)
+                    break;
+                  case 500:
+                  case 404:
+                  case 406:
+                    this.setState({
+                      message: error.response.data.messageCode,
+                      loading: false
+                    });
+                    break;
+                  case 412:
+                    this.setState({
+                      message: error.response.data.messageCode,
+                      loading: false
+                    });
+                    break;
+                  default:
+                    this.setState({
+                      message: 'static.unkownError',
+                      loading: false
+                    });
+                    break;
+                }
+              }
+            }
+          );
       }
     })
 
@@ -702,23 +823,66 @@ class GlobalConsumption extends Component {
             programs: [], loading: false
           })
           if (error.message === "Network Error") {
-            this.setState({ message: error.message, loading: false });
+            this.setState({
+              message: 'static.unkownError',
+              loading: false
+            });
           } else {
             switch (error.response ? error.response.status : "") {
-              case 500:
+
               case 401:
+                this.props.history.push(`/login/static.message.sessionExpired`)
+                break;
+              case 403:
+                this.props.history.push(`/accessDenied`)
+                break;
+              case 500:
               case 404:
               case 406:
+                this.setState({
+                  message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                  loading: false
+                });
+                break;
               case 412:
-                this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                this.setState({
+                  message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                  loading: false
+                });
                 break;
               default:
-                this.setState({ message: 'static.unkownError', loading: false });
+                this.setState({
+                  message: 'static.unkownError',
+                  loading: false
+                });
                 break;
             }
           }
         }
       );
+    // .catch(
+    //   error => {
+    //     this.setState({
+    //       programs: [], loading: false
+    //     })
+    //     if (error.message === "Network Error") {
+    //       this.setState({ message: error.message, loading: false });
+    //     } else {
+    //       switch (error.response ? error.response.status : "") {
+    //         case 500:
+    //         case 401:
+    //         case 404:
+    //         case 406:
+    //         case 412:
+    //           this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+    //           break;
+    //         default:
+    //           this.setState({ message: 'static.unkownError', loading: false });
+    //           break;
+    //       }
+    //     }
+    //   }
+    // );
   }
 
 
@@ -746,24 +910,64 @@ class GlobalConsumption extends Component {
       }).catch(
         error => {
           if (error.message === "Network Error") {
-            this.setState({ message: error.message, loading: false });
+            this.setState({
+              message: 'static.unkownError',
+              loading: false
+            });
           } else {
-            switch (error.response.status) {
-              case 500:
+            switch (error.response ? error.response.status : "") {
+
               case 401:
+                this.props.history.push(`/login/static.message.sessionExpired`)
+                break;
+              case 403:
+                this.props.history.push(`/accessDenied`)
+                break;
+              case 500:
               case 404:
               case 406:
+                this.setState({
+                  message: error.response.data.messageCode,
+                  loading: false
+                });
+                break;
               case 412:
-                this.setState({ message: error.response.data.messageCode, loading: false });
+                this.setState({
+                  message: error.response.data.messageCode,
+                  loading: false
+                });
                 break;
               default:
-                this.setState({ message: 'static.unkownError', loading: false });
-                console.log("Error code unkown");
+                this.setState({
+                  message: 'static.unkownError',
+                  loading: false
+                });
                 break;
             }
           }
         }
       );
+    // .catch(
+    //   error => {
+    //     if (error.message === "Network Error") {
+    //       this.setState({ message: error.message, loading: false });
+    //     } else {
+    //       switch (error.response.status) {
+    //         case 500:
+    //         case 401:
+    //         case 404:
+    //         case 406:
+    //         case 412:
+    //           this.setState({ message: error.response.data.messageCode, loading: false });
+    //           break;
+    //         default:
+    //           this.setState({ message: 'static.unkownError', loading: false });
+    //           console.log("Error code unkown");
+    //           break;
+    //       }
+    //     }
+    //   }
+    // );
   }
 
   toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
@@ -902,11 +1106,7 @@ class GlobalConsumption extends Component {
 
     return (
       <div className="animated fadeIn" >
-        <AuthenticationServiceComponent history={this.props.history} message={(message) => {
-          this.setState({ message: message })
-        }} loading={(loading) => {
-          this.setState({ loading: loading })
-        }} />
+        <AuthenticationServiceComponent history={this.props.history} />
         <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
         <h5 className="red">{i18n.t(this.state.message)}</h5>
 

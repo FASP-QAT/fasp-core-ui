@@ -17,8 +17,11 @@ import FundingSourceService from '../../api/FundingSourceService';
 import CurrencyService from '../../api/CurrencyService';
 import getLabelText from '../../CommonComponent/getLabelText';
 
+let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.dashboard.budget"))
+let summaryText_2 = "Add Budget"
+const selectedRealm = (AuthenticationService.getRealmId() !== "" && AuthenticationService.getRealmId() !== -1) ? AuthenticationService.getRealmId() : ""
 const initialValues = {
-    summary: "Add Budget",
+    summary: summaryText_1,
     programName: "",
     fundingSourceName: "",
     budgetName: "",
@@ -81,7 +84,7 @@ export default class BudgetTicketComponent extends Component {
         super(props);
         this.state = {
             budget: {
-                summary: "Add Budget",
+                summary: summaryText_1,
                 programName: "",
                 fundingSourceName: "",
                 budgetName: "",
@@ -100,7 +103,7 @@ export default class BudgetTicketComponent extends Component {
             programId: '',
             fundingSourceId: '',
             currencyId: '',
-            loading: false
+            loading: true
         }
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
@@ -120,13 +123,13 @@ export default class BudgetTicketComponent extends Component {
             budget.budgetName = event.target.value;
         }
         if (event.target.name === "programName") {
-            budget.programName = this.state.programs.filter(c => c.programId == event.target.value)[0].label.label_en;
+            budget.programName = event.target.value !== "" ? this.state.programs.filter(c => c.programId == event.target.value)[0].label.label_en : "";
             this.setState({
                 programId: event.target.value
             })
         }
         if (event.target.name === "fundingSourceName") {
-            budget.fundingSourceName = this.state.fundingSources.filter(c => c.fundingSourceId == event.target.value)[0].label.label_en;
+            budget.fundingSourceName = event.target.value !== "" ? this.state.fundingSources.filter(c => c.fundingSourceId == event.target.value)[0].label.label_en : "";
             this.setState({
                 fundingSourceId: event.target.value
             })
@@ -138,7 +141,7 @@ export default class BudgetTicketComponent extends Component {
             budget.budgetCode = event.target.value.toUpperCase();
         }
         if (event.target.name === "currency") {
-            budget.currency = this.state.currencies.filter(c => c.currencyId == event.target.value)[0].label.label_en;
+            budget.currency = event.target.value !== "" ? this.state.currencies.filter(c => c.currencyId == event.target.value)[0].label.label_en : "";
             this.setState({
                 currencyId: event.target.value
             })
@@ -185,7 +188,7 @@ export default class BudgetTicketComponent extends Component {
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        programs: response.data
+                        programs: response.data, loading: false
                     })
                 }
                 else {
@@ -242,7 +245,7 @@ export default class BudgetTicketComponent extends Component {
         FundingSourceService.getFundingSourceListAll()
             .then(response => {
                 this.setState({
-                    fundingSources: response.data
+                    fundingSources: response.data, loading: false
                 })
             }).catch(
                 error => {
@@ -288,7 +291,7 @@ export default class BudgetTicketComponent extends Component {
         CurrencyService.getCurrencyList().then(response => {
             if (response.status == 200) {
                 this.setState({
-                    currencies: response.data,
+                    currencies: response.data, loading: false
                 })
             } else {
                 this.setState({ message: response.data.messageCode })
@@ -437,6 +440,8 @@ export default class BudgetTicketComponent extends Component {
                             this.setState({
                                 loading: true
                             })
+                            this.state.budget.summary = summaryText_2;
+                            this.state.budget.userLanguageCode = this.state.lang;
                             JiraTikcetService.addEmailRequestIssue(this.state.budget).then(response => {
                                 console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
@@ -579,7 +584,7 @@ export default class BudgetTicketComponent extends Component {
                                             <FormFeedback className="red">{errors.budgetName}</FormFeedback>
                                         </FormGroup>
                                         <FormGroup>
-                                            <Label for="budget">{i18n.t('static.budget.budgetCode')}<span className="red Reqasterisk">*</span></Label>
+                                            <Label for="budget">{i18n.t('static.budget.budgetDisplayName')}<span className="red Reqasterisk">*</span></Label>
                                             <Input type="text"
                                                 name="budgetCode"
                                                 id="budgetCode"

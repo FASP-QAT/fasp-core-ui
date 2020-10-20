@@ -31,6 +31,7 @@ import InventoryInSupplyPlanComponent from "./InventoryInSupplyPlan";
 import ConsumptionInSupplyPlanComponent from "./ConsumptionInSupplyPlan";
 import { calculateSupplyPlan } from "./SupplyPlanCalculations";
 import SupplyPlanFormulas from "./SupplyPlanFormulas";
+import AuthenticationService from "../Common/AuthenticationService";
 
 const entityname = i18n.t('static.dashboard.supplyPlan')
 
@@ -1581,7 +1582,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 <div className="pt-4"></div>
                             </ModalBody>
                             <ModalFooter>
-                                {this.refs.consumptionChild != undefined && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.refs.consumptionChild.addRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
+                                {this.refs.consumptionChild != undefined && <Button color="info" id="addConsumptionRowSupplyPlan" size="md" className="float-right mr-1" type="button" onClick={this.refs.consumptionChild.addRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
                                 {this.state.consumptionChangedFlag == 1 && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.refs.consumptionChild.saveConsumption}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>}{' '}
                                 <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceled('Consumption')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                             </ModalFooter>
@@ -1767,7 +1768,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 <div className="pt-4"></div>
                             </ModalBody>
                             <ModalFooter>
-                                {this.refs.inventoryChild != undefined && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.refs.inventoryChild.addRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
+                                {this.refs.inventoryChild != undefined && <Button id="addInventoryRowSupplyPlan" color="info" size="md" className="float-right mr-1" type="button" onClick={this.refs.inventoryChild.addRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
                                 {this.state.inventoryChangedFlag == 1 && <Button size="md" color="success" className="submitBtn float-right mr-1" onClick={this.refs.inventoryChild.saveInventory}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>}{' '}
                                 <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceled('Adjustments')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                             </ModalFooter>
@@ -1804,7 +1805,7 @@ export default class SupplyPlanComponent extends React.Component {
                         </ModalHeader>
                         <div style={{ display: this.state.loading ? "none" : "block" }}>
                             <ModalBody>
-                                {this.state.showShipments && <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} hideFourthComponent={this.hideFourthComponent} hideFifthComponent={this.hideFifthComponent} shipmentPage="supplyPlan" />}
+                                <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} hideFourthComponent={this.hideFourthComponent} hideFifthComponent={this.hideFifthComponent} shipmentPage="supplyPlan" />
                                 <h6 className="red" id="div2">{this.state.noFundsBudgetError || this.state.shipmentBatchError || this.state.shipmentError}</h6>
                                 <div className="table-responsive">
                                     <div id="shipmentsDetailsTable" />
@@ -1989,7 +1990,7 @@ export default class SupplyPlanComponent extends React.Component {
                     programList: proList,
                     loading: false
                 })
-                var programIdd = this.props.match.params.programId;
+                var programIdd = this.props.match.params.programId || localStorage.getItem("sesProgramId");
                 console.log("programIdd", programIdd);
                 if (programIdd != '' && programIdd != undefined) {
                     var programSelect = { value: programIdd, label: proList.filter(c => c.value == programIdd)[0].label };
@@ -2020,6 +2021,7 @@ export default class SupplyPlanComponent extends React.Component {
         })
         var programId = value != "" && value != undefined ? value.value : 0;
         if (programId != 0) {
+            localStorage.setItem("sesProgramId", programId);
             var db1;
             var storeOS;
             getDatabase();
@@ -2139,7 +2141,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     planningUnitListForConsumption: planningUnitListForConsumption,
                                     loading: false
                                 })
-                                var planningUnitIdProp = this.props.match.params.planningUnitId;
+                                var planningUnitIdProp = this.props.match.params.planningUnitId || localStorage.getItem("sesPlanningUnitId");
                                 console.log("planningUnitIdProp===>", planningUnitIdProp);
                                 if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
                                     var planningUnit = { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label };
@@ -2204,6 +2206,7 @@ export default class SupplyPlanComponent extends React.Component {
         var planningUnitName = "";
         if (planningUnitId != 0) {
             planningUnitName = value.label;
+            localStorage.setItem("sesPlanningUnitId", planningUnitId);
         }
 
         var programPlanningUnit = ((this.state.programPlanningUnitList).filter(p => p.planningUnit.id == planningUnitId))[0];
@@ -2675,7 +2678,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         plannedErpShipmentsTotalData.push("")
                                     }
 
-                                    inventoryTotalData.push(jsonList[0].adjustmentQty == 0 ? "" : jsonList[0].adjustmentQty);
+                                    inventoryTotalData.push(jsonList[0].adjustmentQty == 0 ? jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : "" : jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : jsonList[0].adjustmentQty);
                                     totalExpiredStockArr.push({ qty: jsonList[0].expiredStock, details: jsonList[0].batchDetails.filter(c => moment(c.expiryDate).format("YYYY-MM-DD") >= m[n].startDate && moment(c.expiryDate).format("YYYY-MM-DD") <= m[n].endDate), month: m[n] });
                                     monthsOfStockArray.push(parseFloat(jsonList[0].mos).toFixed(1));
                                     amcTotalData.push(Math.round(parseFloat(jsonList[0].amc)))
@@ -2982,10 +2985,15 @@ export default class SupplyPlanComponent extends React.Component {
                 });
                 this.formSubmit(this.state.planningUnit, monthCountConsumption);
             } else if (supplyPlanType == 'SuggestedShipments') {
-                this.setState({
-                    shipments: !this.state.shipments
-                });
-                this.suggestedShipmentsDetailsClicked(month, quantity, isEmergencyOrder);
+                var roleList = AuthenticationService.getLoggedInUserRole();
+                console.log("RoleList------------>", roleList);
+                if (roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') {
+                } else {
+                    this.setState({
+                        shipments: !this.state.shipments
+                    });
+                    this.suggestedShipmentsDetailsClicked(month, quantity, isEmergencyOrder);
+                }
             } else if (supplyPlanType == 'shipments') {
                 this.setState({
                     shipments: !this.state.shipments
@@ -3212,9 +3220,9 @@ export default class SupplyPlanComponent extends React.Component {
                     for (var sl = 0; sl < shipmentList.length; sl++) {
                         var bdl = shipmentList[sl].batchInfoList;
                         for (var bd = 0; bd < bdl.length; bd++) {
-                            var index = batchList.findIndex(c => c.batchNo == bdl[bd].batch.batchNo);
+                            var index = batchList.findIndex(c => c.batchNo == bdl[bd].batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
                             if (index == -1) {
-                                var batchDetailsToPush = batchInfoList.filter(c => c.batchNo == bdl[bd].batch.batchNo && c.planningUnitId == planningUnitId)[0];
+                                var batchDetailsToPush = batchInfoList.filter(c => c.batchNo == bdl[bd].batch.batchNo && c.planningUnitId == planningUnitId && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"))[0];
                                 batchList.push(batchDetailsToPush);
                             }
                         }
@@ -3299,9 +3307,9 @@ export default class SupplyPlanComponent extends React.Component {
                     for (var sl = 0; sl < shipmentList.length; sl++) {
                         var bdl = shipmentList[sl].batchInfoList;
                         for (var bd = 0; bd < bdl.length; bd++) {
-                            var index = batchList.findIndex(c => c.batchNo == bdl[bd].batch.batchNo);
+                            var index = batchList.findIndex(c => c.batchNo == bdl[bd].batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
                             if (index == -1) {
-                                var batchDetailsToPush = batchInfoList.filter(c => c.batchNo == bdl[bd].batch.batchNo && c.planningUnitId == planningUnitId)[0];
+                                var batchDetailsToPush = batchInfoList.filter(c => c.batchNo == bdl[bd].batch.batchNo && c.planningUnitId == planningUnitId && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"))[0];
                                 batchList.push(batchDetailsToPush);
                             }
                         }
@@ -3653,6 +3661,14 @@ export default class SupplyPlanComponent extends React.Component {
                     if (document.getElementById("addRowId") != null) {
                         document.getElementById("addRowId").style.display = "none"
                     }
+                }
+
+                var roleList = AuthenticationService.getLoggedInUserRole();
+                if (roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') {
+                    if (document.getElementById("addRowId") != null) {
+                        document.getElementById("addRowId").style.display = "none"
+                    }
+                } else {
                 }
                 this.setState({
                     showShipments: 1,

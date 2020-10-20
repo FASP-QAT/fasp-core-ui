@@ -247,8 +247,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             shipmentStatusList: shipmentStatusList
                                         })
                                         if (this.state.shipmentsEl != "" && this.state.shipmentsEl != undefined) {
-                                            this.el = jexcel(document.getElementById("shipmentsDetailsTable"), '');
-                                            this.el.destroy();
+                                            // this.el = jexcel(document.getElementById("shipmentsDetailsTable"), '');
+                                            this.state.shipmentsEl.destroy();
                                         }
                                         var data = [];
                                         var shipmentsArr = [];
@@ -257,6 +257,11 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             shipmentEditable = false;
                                         }
                                         if (this.props.shipmentPage == "shipmentDataEntry" && (this.props.items.shipmentType).value == 2) {
+                                            shipmentEditable = false;
+                                        }
+
+                                        var roleList = AuthenticationService.getLoggedInUserRole();
+                                        if (roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') {
                                             shipmentEditable = false;
                                         }
                                         var paginationOption = false;
@@ -279,6 +284,10 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             }
                                             if (this.props.shipmentPage == "shipmentDataEntry" && (this.props.items.shipmentType).value == 2) {
                                                 erpType = "text";
+                                            }
+
+                                            if (this.props.shipmentPage != "shipmentDataEntry" && shipmentList[i].erpFlag.toString() == "true") {
+                                                shipmentEditable = false;
                                             }
 
                                             var totalShipmentQty = 0;
@@ -397,19 +406,19 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                 { type: 'text', title: i18n.t('static.report.id'), width: 80, readOnly: true },
                                                 { type: 'hidden', title: i18n.t('static.supplyPlan.qatProduct'), width: 150 },
                                                 { type: 'dropdown', title: i18n.t('static.shipmentDataEntry.shipmentStatus'), source: shipmentStatusList, filter: this.filterShipmentStatus, width: 100 },
-                                                { type: 'calendar', title: i18n.t('static.common.receivedate'), options: { format: JEXCEL_DATE_FORMAT }, width: 100 },
+                                                { type: 'calendar', title: i18n.t('static.common.receivedate'), options: { format: JEXCEL_DATE_FORMAT }, width: 150 },
                                                 { type: 'dropdown', title: i18n.t("static.supplyPlan.shipmentMode"), source: [{ id: 1, name: i18n.t('static.supplyPlan.sea') }, { id: 2, name: i18n.t('static.supplyPlan.air') }], width: 100 },
                                                 { type: 'dropdown', title: i18n.t('static.procurementagent.procurementagent'), source: procurementAgentList, filter: this.filterProcurementAgent, width: 120 },
                                                 { type: 'checkbox', title: i18n.t('static.shipmentDataEntry.localProcurement'), width: 80 },
                                                 { type: 'text', title: i18n.t('static.shipmentDataentry.procurementAgentOrderNo'), width: 100 },
                                                 { type: erpType, title: i18n.t('static.shipmentDataentry.procurementAgentPrimeLineNo'), width: 100 },
                                                 { type: 'numeric', readOnly: true, title: i18n.t("static.supplyPlan.adjustesOrderQty"), width: 100, mask: '#,##.00', decimal: '.' },
-                                                { type: 'checkbox', title: i18n.t('static.supplyPlan.emergencyOrder'), width: 80 },
+                                                { type: 'checkbox', title: i18n.t('static.supplyPlan.emergencyOrder'), width: 100 },
                                                 { type: 'dropdown', title: i18n.t('static.subfundingsource.fundingsource'), source: fundingSourceList, filter: this.filterFundingSource, width: 120 },
                                                 { type: 'dropdown', title: i18n.t('static.dashboard.budget'), source: budgetList, filter: this.budgetDropdownFilter, width: 120 },
                                                 { type: 'dropdown', title: i18n.t('static.dashboard.currency'), source: currencyList, filter: this.filterCurrency, width: 120 },
                                                 { type: 'numeric', title: i18n.t('static.supplyPlan.pricePerPlanningUnit'), width: 80, mask: '#,##.00', decimal: '.' },
-                                                { type: 'numeric', readOnly: true, title: i18n.t('static.shipment.productcost'), width: 80, mask: '#,##.00', decimal: '.' },
+                                                { type: 'numeric', readOnly: true, title: i18n.t('static.shipment.productcost'), width: 120, mask: '#,##.00', decimal: '.' },
                                                 { type: 'numeric', title: i18n.t('static.shipment.freightcost'), width: 80, mask: '#,##.00', decimal: '.' },
                                                 { type: 'dropdown', title: i18n.t('static.datasource.datasource'), source: dataSourceList, filter: this.filterDataSourceList, width: 150 },
                                                 { type: 'text', title: i18n.t('static.program.notes'), width: 200 },
@@ -510,15 +519,26 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                             // var elInstance=this.state.plannedPsmShipmentsEl;
 
                                                             var batchInfo = rowData[24];
-                                                            var tableEditable = true;
+                                                            var tableEditable = shipmentEditable;
                                                             if (rowData[21].toString() == "true" || this.props.shipmentPage == "supplyPlanCompare") {
                                                                 tableEditable = false;
                                                             }
                                                             if (this.props.shipmentPage != "shipmentDataEntry" && document.getElementById("addRowBatchId") != null) {
-                                                                if (rowData[21].toString() == "false") {
+                                                                console.log("in if");
+                                                                if (rowData[21].toString() == "false" && tableEditable == true) {
                                                                     document.getElementById("addRowBatchId").style.display = "block";
                                                                 } else {
+                                                                    console.log("In else")
                                                                     document.getElementById("addRowBatchId").style.display = "none";
+                                                                }
+                                                            }
+
+                                                            if (this.props.shipmentPage == "shipmentDataEntry") {
+                                                                if (tableEditable == false) {
+                                                                    console.log("In false")
+                                                                    document.getElementById("addShipmentBatchRowId").style.display = "none";
+                                                                } else {
+                                                                    document.getElementById("addShipmentBatchRowId").style.display = "block";
                                                                 }
                                                             }
                                                             for (var sb = 0; sb < batchInfo.length; sb++) {
@@ -528,9 +548,11 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                 data[2] = batchInfo[sb].shipmentQty;
                                                                 data[3] = batchInfo[sb].shipmentTransBatchInfoId;
                                                                 data[4] = y;
-                                                                data[5] = batchInfoListAll.findIndex(c => c.batchNo == batchInfo[sb].batch.batchNo)
+                                                                data[5] = batchInfoListAll.findIndex(c => c.batchNo == batchInfo[sb].batch.batchNo && moment(c.expiryDate).format("YYYY-MM-DD")==moment(batchInfo[sb].batch.expiryDate).format("YYYY-MM-DD"))
                                                                 data[6] = batchInfo[sb].batch.autoGenerated;
                                                                 data[7] = batchInfo[sb].batch.batchNo;
+                                                                data[8] = batchInfo[sb].batch.expiryDate;
+                                                                data[9] = batchInfo[sb].batch.autoGenerated;
                                                                 json.push(data);
                                                             }
                                                             if (batchInfo.length == 0) {
@@ -543,6 +565,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                 data[5] = -1;
                                                                 data[6] = false;
                                                                 data[7] = "";
+                                                                data[8] = "";
+                                                                data[9] = "";
                                                                 json.push(data)
                                                             }
                                                             var options = {
@@ -580,6 +604,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                         type: 'hidden',
                                                                     },
                                                                     { type: 'checkbox', title: i18n.t('static.report.autogenerated'), readOnly: true },
+                                                                    { type: 'hidden' },
+                                                                    { type: 'hidden' },
                                                                     { type: 'hidden' }
                                                                 ],
                                                                 pagination: false,
@@ -732,9 +758,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                         expectedPlannedDate = moment(expectedSubmittedDate).subtract(parseInt(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                                                     }
 
-
-
-                                                                    var tableEditable = true;
+                                                                    var tableEditable = shipmentEditable;
                                                                     if (rowData[21].toString() == "true" || this.props.shipmentPage == "supplyPlanCompare" || shipmentStatus == ON_HOLD_SHIPMENT_STATUS || shipmentStatus == CANCELLED_SHIPMENT_STATUS) {
                                                                         tableEditable = false;
                                                                     }
@@ -1021,7 +1045,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
 
     addRowInJexcel() {
         var obj = this.state.shipmentsEl;
-        console.log("this.props.items.catalogPrice",this.props.items.catalogPrice)
+        console.log("this.props.items.catalogPrice", this.props.items.catalogPrice)
         var json = obj.getJson();
         var data = [];
         data[0] = true;
@@ -1103,6 +1127,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         data[5] = -1;
         data[6] = "false";
         data[7] = "";
+        data[8] = "";
+        data[9] = "";
         obj.insertRow(data);
     }
 
@@ -1398,7 +1424,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 console.log("In else", shipmentDatesJson.expectedDeliveryDate);
             }
         }
-        
+
         if (x != 28 && x != 26 && x != 30) {
             elInstance.setValueFromCoords(30, y, 0, true);
 
@@ -1574,6 +1600,14 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             }
         }
 
+        if (x == 19) {
+            if (rowData[19].length > 600) {
+                inValid("T", y, i18n.t('static.dataentry.notesMaxLength'), elInstance);
+            } else {
+                positiveValidation("T", y, elInstance);
+            }
+        }
+
         if (x == 5) {
             var valid = checkValidtion("text", "F", y, rowData[5], elInstance);
             if (valid == true) {
@@ -1639,8 +1673,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 if (batchDetails.length == 1) {
                     if (batchDetails[0].batch.autoGenerated.toString() == "true") {
                         batchDetails[0].shipmentQty = rowData[10];
+                        console.log("rowData[10]", rowData[10]);
                         elInstance.setValueFromCoords(24, y, batchDetails, true);
-                        elInstance.setValueFromCoords(25, y, rowData[8], true);
+                        elInstance.setValueFromCoords(25, y, rowData[10], true);
                     }
                 }
             }
@@ -1911,10 +1946,12 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         if (x == 0) {
             this.props.updateState("shipmentBatchInfoDuplicateError", "");
             positiveValidation("A", y, elInstance);
-            if (value != rowData[7]) {
-                elInstance.setValueFromCoords(6, y, 0, true);
-            } else if (value == rowData[7]) {
-                elInstance.setValueFromCoords(6, y, 1, true);
+            if (rowData[9].toString() == "true") {
+                if (rowData[0] != rowData[7] || rowData[1] != rowData[8]) {
+                    elInstance.setValueFromCoords(6, y, 0, true);
+                } else if (rowData[0] == rowData[7] && rowData[1] == rowData[8] && rowData[6]) {
+                    elInstance.setValueFromCoords(6, y, 1, true);
+                }
             }
             if (value != "") {
                 if (value.length > 26) {
@@ -1930,6 +1967,13 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         }
 
         if (x == 1) {
+            if (rowData[9].toString() == "true") {
+                if (rowData[0] != rowData[7] || rowData[1] != rowData[8]) {
+                    elInstance.setValueFromCoords(6, y, 0, true);
+                } else if (rowData[0] == rowData[7] && rowData[1] == rowData[8] && rowData[6]) {
+                    elInstance.setValueFromCoords(6, y, 1, true);
+                }
+            }
             checkValidtion("text", "B", y, rowData[1], elInstance);
         }
         if (x == 2) {
@@ -1949,14 +1993,17 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
 
             var batchInfoList = this.state.batchInfoListAll;
             var checkDuplicate = batchInfoList.filter(c =>
-                c.batchNo == map.get("0")
+                c.batchNo == map.get("0") && 
+                moment(c.expiryDate).format("YYYY-MM")==moment(map.get("1")).startOf('month').format("YYYY-MM")
             )
             var index = batchInfoList.findIndex(c =>
-                c.batchNo == map.get("0")
+                c.batchNo == map.get("0") && 
+                moment(c.expiryDate).format("YYYY-MM")==moment(map.get("1")).startOf('month').format("YYYY-MM")
             );
 
             var checkDuplicateInMap = mapArray.filter(c =>
-                c.get("0") == map.get("0")
+                c.get("0") == map.get("0") &&
+                moment(c.get("1")).startOf('month').format("YYYY-MM")==moment(map.get("1")).startOf('month').format("YYYY-MM")
             )
 
             if ((checkDuplicate.length >= 1 && index != map.get("5")) || checkDuplicateInMap.length > 1) {
@@ -2032,7 +2079,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     batchNo = (BATCH_PREFIX).concat(programId).concat(planningUnitId).concat(moment(Date.now()).format("YYMMDD")).concat(generateRandomAplhaNumericCode(3));
                     autoGenerated = true
                 }
-                var batchInfoList = this.state.batchInfoListAll.filter(c => c.batchNo == map.get("0"));
+                var batchInfoList = this.state.batchInfoListAll.filter(c => c.batchNo == map.get("0") && moment(c.expiryDate).format("YYYY-MM")==moment(map.get("1")).startOf('month').format("YYYY-MM"));
                 var batchId = 0;
                 if (batchInfoList.length > 0) {
                     batchId = batchInfoList[0].batchId;
@@ -2266,10 +2313,12 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                 expectedSubmittedDate = moment(expectedApprovedDate).subtract(parseInt(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                 expectedPlannedDate = moment(expectedSubmittedDate).subtract(parseInt(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
                             }
-                            if (lastShipmentStatus == "" && moment(expectedPlannedDate).format("YYYY-MM-DD") < moment(Date.now()).format("YYYY-MM-DD")) {
-                                shipmentInstance.setValueFromCoords(11, rowDataForDates[7], true, true);
-                            } else {
-                                shipmentInstance.setValueFromCoords(11, rowDataForDates[7], false, true);
+                            if (lastShipmentStatus == "") {
+                                if (lastShipmentStatus == "" && moment(expectedPlannedDate).format("YYYY-MM-DD") < moment(Date.now()).format("YYYY-MM-DD")) {
+                                    shipmentInstance.setValueFromCoords(11, rowDataForDates[7], true, true);
+                                } else {
+                                    shipmentInstance.setValueFromCoords(11, rowDataForDates[7], false, true);
+                                }
                             }
                             console.log("dates", expectedArrivedDate);
                             console.log("dates", expectedShippedDate);
@@ -2290,61 +2339,61 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
 
         if (x == 2 && y == 1) {
             if (rowDataForDates1[1] != "" && rowDataForDates1[1] != null && rowDataForDates1[1] != "Invalid date" && rowDataForDates1[2] != "" && rowDataForDates1[2] != null && rowDataForDates1[2] != "Invalid date" && moment(rowDataForDates1[2]).format("YYYY-MM-DD") < moment(rowDataForDates1[1]).format("YYYY-MM-DD")) {
-                inValid("C", 1, i18n.t('static.message.invaliddate'), elInstance);
+                inValid("C", 1, i18n.t('static.shipment.dateIsLesserThanPrevDate'), elInstance);
             }
         }
 
         if (x == 3 && y == 1) {
             if (rowDataForDates1[2] != "" && rowDataForDates1[2] != null && rowDataForDates1[2] != "Invalid date" && rowDataForDates1[3] != "" && rowDataForDates1[3] != null && rowDataForDates1[3] != "Invalid date" && moment(rowDataForDates1[3]).format("YYYY-MM-DD") < moment(rowDataForDates1[2]).format("YYYY-MM-DD")) {
-                inValid("D", 1, i18n.t('static.message.invaliddate'), elInstance);
+                inValid("D", 1, i18n.t('static.shipment.dateIsLesserThanPrevDate'), elInstance);
             }
             if (rowDataForDates1[1] != "" && rowDataForDates1[1] != null && rowDataForDates1[1] != "Invalid date" && rowDataForDates1[3] != "" && rowDataForDates1[3] != null && rowDataForDates1[3] != "Invalid date" && moment(rowDataForDates1[3]).format("YYYY-MM-DD") < moment(rowDataForDates1[1]).format("YYYY-MM-DD")) {
-                inValid("D", 1, i18n.t('static.message.invaliddate'), elInstance);
+                inValid("D", 1, i18n.t('static.shipment.dateIsLesserThanPrevDate'), elInstance);
             }
         }
 
         if (x == 4 && y == 1) {
             if (rowDataForDates1[3] != "" && rowDataForDates1[3] != null && rowDataForDates1[3] != "Invalid date" && rowDataForDates1[4] != "" && rowDataForDates1[4] != null && rowDataForDates1[4] != "Invalid date" && moment(rowDataForDates1[4]).format("YYYY-MM-DD") < moment(rowDataForDates1[3]).format("YYYY-MM-DD")) {
-                inValid("E", 1, i18n.t('static.message.invaliddate'), elInstance);
+                inValid("E", 1, i18n.t('static.shipment.dateIsLesserThanPrevDate'), elInstance);
             }
             if (rowDataForDates1[2] != "" && rowDataForDates1[2] != null && rowDataForDates1[2] != "Invalid date" && rowDataForDates1[4] != "" && moment(rowDataForDates1[4]).format("YYYY-MM-DD") < moment(rowDataForDates1[2]).format("YYYY-MM-DD")) {
-                inValid("E", 1, i18n.t('static.message.invaliddate'), elInstance);
+                inValid("E", 1, i18n.t('static.shipment.dateIsLesserThanPrevDate'), elInstance);
             }
             if (rowDataForDates1[1] != "" && rowDataForDates1[1] != null && rowDataForDates1[1] != "Invalid date" && rowDataForDates1[4] != "" && rowDataForDates1[4] != null && rowDataForDates1[4] != "Invalid date" && moment(rowDataForDates1[4]).format("YYYY-MM-DD") < moment(rowDataForDates1[1]).format("YYYY-MM-DD")) {
-                inValid("E", 1, i18n.t('static.message.invaliddate'), elInstance);
+                inValid("E", 1, i18n.t('static.shipment.dateIsLesserThanPrevDate'), elInstance);
             }
         }
 
         if (x == 5 && y == 1) {
             if (rowDataForDates1[4] != "" && rowDataForDates1[4] != null && rowDataForDates1[4] != "Invalid date" && rowDataForDates1[5] != "" && rowDataForDates1[5] != null && rowDataForDates1[5] != "Invalid date" && moment(rowDataForDates1[5]).format("YYYY-MM-DD") < moment(rowDataForDates1[4]).format("YYYY-MM-DD")) {
-                inValid("F", 1, i18n.t('static.message.invaliddate'), elInstance);
+                inValid("F", 1, i18n.t('static.shipment.dateIsLesserThanPrevDate'), elInstance);
             }
             if (rowDataForDates1[3] != "" && rowDataForDates1[3] != null && rowDataForDates1[3] != "Invalid date" && rowDataForDates1[5] != "" && rowDataForDates1[5] != null && rowDataForDates1[5] != "Invalid date" && moment(rowDataForDates1[5]).format("YYYY-MM-DD") < moment(rowDataForDates1[3]).format("YYYY-MM-DD")) {
-                inValid("F", 1, i18n.t('static.message.invaliddate'), elInstance);
+                inValid("F", 1, i18n.t('static.shipment.dateIsLesserThanPrevDate'), elInstance);
             }
             if (rowDataForDates1[2] != "" && rowDataForDates1[2] != null && rowDataForDates1[2] != "Invalid date" && rowDataForDates1[5] != "" && rowDataForDates1[5] != null && rowDataForDates1[5] != "Invalid date" && moment(rowDataForDates1[5]).format("YYYY-MM-DD") < moment(rowDataForDates1[2]).format("YYYY-MM-DD")) {
-                inValid("F", 1, i18n.t('static.message.invaliddate'), elInstance);
+                inValid("F", 1, i18n.t('static.shipment.dateIsLesserThanPrevDate'), elInstance);
             }
             if (rowDataForDates1[1] != "" && rowDataForDates1[1] != null && rowDataForDates1[1] != "Invalid date" && rowDataForDates1[5] != "" && rowDataForDates1[5] != null && rowDataForDates1[5] != "Invalid date" && moment(rowDataForDates1[5]).format("YYYY-MM-DD") < moment(rowDataForDates1[1]).format("YYYY-MM-DD")) {
-                inValid("F", 1, i18n.t('static.message.invaliddate'), elInstance);
+                inValid("F", 1, i18n.t('static.shipment.dateIsLesserThanPrevDate'), elInstance);
             }
         }
 
         if (x == 6 && y == 1) {
             if (rowDataForDates1[5] != "" && rowDataForDates1[5] != null && rowDataForDates1[5] != "Invalid date" && rowDataForDates1[6] != "" && rowDataForDates1[6] != null && rowDataForDates1[6] != "Invalid date" && moment(rowDataForDates1[6]).format("YYYY-MM-DD") < moment(rowDataForDates1[5]).format("YYYY-MM-DD")) {
-                inValid("G", 1, i18n.t('static.message.invaliddate'), elInstance);
+                inValid("G", 1, i18n.t('static.shipment.dateIsLesserThanPrevDate'), elInstance);
             }
             if (rowDataForDates1[4] != "" && rowDataForDates1[4] != null && rowDataForDates1[4] != "Invalid date" && rowDataForDates1[6] != "" && rowDataForDates1[6] != null && rowDataForDates1[6] != "Invalid date" && moment(rowDataForDates1[6]).format("YYYY-MM-DD") < moment(rowDataForDates1[4]).format("YYYY-MM-DD")) {
-                inValid("G", 1, i18n.t('static.message.invaliddate'), elInstance);
+                inValid("G", 1, i18n.t('static.shipment.dateIsLesserThanPrevDate'), elInstance);
             }
             if (rowDataForDates1[3] != "" && rowDataForDates1[3] != null && rowDataForDates1[3] != "Invalid date" && rowDataForDates1[6] != "" && rowDataForDates1[6] != null && rowDataForDates1[6] != "Invalid date" && moment(rowDataForDates1[6]).format("YYYY-MM-DD") < moment(rowDataForDates1[3]).format("YYYY-MM-DD")) {
-                inValid("G", 1, i18n.t('static.message.invaliddate'), elInstance);
+                inValid("G", 1, i18n.t('static.shipment.dateIsLesserThanPrevDate'), elInstance);
             }
             if (rowDataForDates1[2] != "" && rowDataForDates1[2] != null && rowDataForDates1[2] != "Invalid date" && rowDataForDates1[6] != "" && rowDataForDates1[6] != null && rowDataForDates1[6] != "Invalid date" && moment(rowDataForDates1[6]).format("YYYY-MM-DD") < moment(rowDataForDates1[2]).format("YYYY-MM-DD")) {
-                inValid("G", 1, i18n.t('static.message.invaliddate'), elInstance);
+                inValid("G", 1, i18n.t('static.shipment.dateIsLesserThanPrevDate'), elInstance);
             }
             if (rowDataForDates1[1] != "" && rowDataForDates1[1] != null && rowDataForDates1[1] != "Invalid date" && rowDataForDates1[6] != "" && rowDataForDates1[6] != null && rowDataForDates1[6] != "Invalid date" && moment(rowDataForDates1[6]).format("YYYY-MM-DD") < moment(rowDataForDates1[1]).format("YYYY-MM-DD")) {
-                inValid("G", 1, i18n.t('static.message.invaliddate'), elInstance);
+                inValid("G", 1, i18n.t('static.shipment.dateIsLesserThanPrevDate'), elInstance);
             }
         }
     }
@@ -2364,67 +2413,67 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         }
 
         if (rowDataForDates1[1] != "" && rowDataForDates1[1] != null && rowDataForDates1[1] != "Invalid date" && rowDataForDates1[2] != "" && rowDataForDates1[2] != null && rowDataForDates1[2] != "Invalid date" && moment(rowDataForDates1[2]).format("YYYY-MM-DD") < moment(rowDataForDates1[1]).format("YYYY-MM-DD")) {
-            inValid("C", 1, i18n.t('static.message.invaliddate'), elInstance);
+            inValid("C", 1, i18n.t('static.shipment.dateIsLesserThanPrevDate'), elInstance);
             valid = false;
         }
 
         if (rowDataForDates1[2] != "" && rowDataForDates1[2] != null && rowDataForDates1[2] != "Invalid date" && rowDataForDates1[3] != "" && rowDataForDates1[3] != null && rowDataForDates1[3] != "Invalid date" && moment(rowDataForDates1[3]).format("YYYY-MM-DD") < moment(rowDataForDates1[2]).format("YYYY-MM-DD")) {
-            inValid("D", 1, i18n.t('static.message.invaliddate'), elInstance);
+            inValid("D", 1, i18n.t('static.shipment.dateIsLesserThanPrevDate'), elInstance);
             valid = false;
         }
         if (rowDataForDates1[1] != "" && rowDataForDates1[1] != null && rowDataForDates1[1] != "Invalid date" && rowDataForDates1[3] != "" && rowDataForDates1[3] != null && rowDataForDates1[3] != "Invalid date" && moment(rowDataForDates1[3]).format("YYYY-MM-DD") < moment(rowDataForDates1[1]).format("YYYY-MM-DD")) {
-            inValid("D", 1, i18n.t('static.message.invaliddate'), elInstance);
+            inValid("D", 1, i18n.t('static.shipment.dateIsLesserThanPrevDate'), elInstance);
             valid = false;
         }
 
         if (rowDataForDates1[3] != "" && rowDataForDates1[3] != null && rowDataForDates1[3] != "Invalid date" && rowDataForDates1[4] != "" && rowDataForDates1[4] != null && rowDataForDates1[4] != "Invalid date" && moment(rowDataForDates1[4]).format("YYYY-MM-DD") < moment(rowDataForDates1[3]).format("YYYY-MM-DD")) {
-            inValid("E", 1, i18n.t('static.message.invaliddate'), elInstance);
+            inValid("E", 1, i18n.t('static.shipment.dateIsLesserThanPrevDate'), elInstance);
             valid = false;
         }
         if (rowDataForDates1[2] != "" && rowDataForDates1[2] != null && rowDataForDates1[2] != "Invalid date" && rowDataForDates1[4] != "" && rowDataForDates1[4] != null && rowDataForDates1[4] != "Invalid date" && moment(rowDataForDates1[4]).format("YYYY-MM-DD") < moment(rowDataForDates1[2]).format("YYYY-MM-DD")) {
-            inValid("E", 1, i18n.t('static.message.invaliddate'), elInstance);
+            inValid("E", 1, i18n.t('static.shipment.dateIsLesserThanPrevDate'), elInstance);
             valid = false;
         }
         if (rowDataForDates1[1] != "" && rowDataForDates1[1] != null && rowDataForDates1[1] != "Invalid date" && rowDataForDates1[4] != "" && rowDataForDates1[4] != null && rowDataForDates1[4] != "Invalid date" && moment(rowDataForDates1[4]).format("YYYY-MM-DD") < moment(rowDataForDates1[1]).format("YYYY-MM-DD")) {
-            inValid("E", 1, i18n.t('static.message.invaliddate'), elInstance);
+            inValid("E", 1, i18n.t('static.shipment.dateIsLesserThanPrevDate'), elInstance);
             valid = false;
         }
 
         if (rowDataForDates1[4] != "" && rowDataForDates1[4] != null && rowDataForDates1[4] != "Invalid date" && rowDataForDates1[5] != "" && rowDataForDates1[5] != null && rowDataForDates1[5] != "Invalid date" && moment(rowDataForDates1[5]).format("YYYY-MM-DD") < moment(rowDataForDates1[4]).format("YYYY-MM-DD")) {
-            inValid("F", 1, i18n.t('static.message.invaliddate'), elInstance);
+            inValid("F", 1, i18n.t('static.shipment.dateIsLesserThanPrevDate'), elInstance);
             valid = false;
         }
         if (rowDataForDates1[3] != "" && rowDataForDates1[3] != null && rowDataForDates1[3] != "Invalid date" && rowDataForDates1[5] != "" && rowDataForDates1[5] != null && rowDataForDates1[5] != "Invalid date" && moment(rowDataForDates1[5]).format("YYYY-MM-DD") < moment(rowDataForDates1[3]).format("YYYY-MM-DD")) {
-            inValid("F", 1, i18n.t('static.message.invaliddate'), elInstance);
+            inValid("F", 1, i18n.t('static.shipment.dateIsLesserThanPrevDate'), elInstance);
             valid = false;
         }
         if (rowDataForDates1[2] != "" && rowDataForDates1[2] != null && rowDataForDates1[2] != "Invalid date" && rowDataForDates1[5] != "" && rowDataForDates1[5] != null && rowDataForDates1[5] != "Invalid date" && moment(rowDataForDates1[5]).format("YYYY-MM-DD") < moment(rowDataForDates1[2]).format("YYYY-MM-DD")) {
-            inValid("F", 1, i18n.t('static.message.invaliddate'), elInstance);
+            inValid("F", 1, i18n.t('static.shipment.dateIsLesserThanPrevDate'), elInstance);
             valid = false;
         }
         if (rowDataForDates1[1] != "" && rowDataForDates1[1] != null && rowDataForDates1[1] != "Invalid date" && rowDataForDates1[5] != "" && rowDataForDates1[5] != null && rowDataForDates1[5] != "Invalid date" && moment(rowDataForDates1[5]).format("YYYY-MM-DD") < moment(rowDataForDates1[1]).format("YYYY-MM-DD")) {
-            inValid("F", 1, i18n.t('static.message.invaliddate'), elInstance);
+            inValid("F", 1, i18n.t('static.shipment.dateIsLesserThanPrevDate'), elInstance);
             valid = false;
         }
 
         if (rowDataForDates1[5] != "" && rowDataForDates1[5] != null && rowDataForDates1[5] != "Invalid date" && rowDataForDates1[6] != "" && rowDataForDates1[6] != null && rowDataForDates1[6] != "Invalid date" && moment(rowDataForDates1[6]).format("YYYY-MM-DD") < moment(rowDataForDates1[5]).format("YYYY-MM-DD")) {
-            inValid("G", 1, i18n.t('static.message.invaliddate'), elInstance);
+            inValid("G", 1, i18n.t('static.shipment.dateIsLesserThanPrevDate'), elInstance);
             valid = false;
         }
         if (rowDataForDates1[4] != "" && rowDataForDates1[4] != null && rowDataForDates1[4] != "Invalid date" && rowDataForDates1[6] != "" && rowDataForDates1[6] != null && rowDataForDates1[6] != "Invalid date" && moment(rowDataForDates1[6]).format("YYYY-MM-DD") < moment(rowDataForDates1[4]).format("YYYY-MM-DD")) {
-            inValid("G", 1, i18n.t('static.message.invaliddate'), elInstance);
+            inValid("G", 1, i18n.t('static.shipment.dateIsLesserThanPrevDate'), elInstance);
             valid = false;
         }
         if (rowDataForDates1[3] != "" && rowDataForDates1[3] != null && rowDataForDates1[3] != "Invalid date" && rowDataForDates1[6] != "" && rowDataForDates1[6] != null && rowDataForDates1[6] != "Invalid date" && moment(rowDataForDates1[6]).format("YYYY-MM-DD") < moment(rowDataForDates1[3]).format("YYYY-MM-DD")) {
-            inValid("G", 1, i18n.t('static.message.invaliddate'), elInstance);
+            inValid("G", 1, i18n.t('static.shipment.dateIsLesserThanPrevDate'), elInstance);
             valid = false;
         }
         if (rowDataForDates1[2] != "" && rowDataForDates1[2] != null && rowDataForDates1[2] != "Invalid date" && rowDataForDates1[6] != "" && rowDataForDates1[6] != null && rowDataForDates1[6] != "Invalid date" && moment(rowDataForDates1[6]).format("YYYY-MM-DD") < moment(rowDataForDates1[2]).format("YYYY-MM-DD")) {
-            inValid("G", 1, i18n.t('static.message.invaliddate'), elInstance);
+            inValid("G", 1, i18n.t('static.shipment.dateIsLesserThanPrevDate'), elInstance);
             valid = false;
         }
         if (rowDataForDates1[1] != "" && rowDataForDates1[1] != null && rowDataForDates1[1] != "Invalid date" && rowDataForDates1[6] != "" && rowDataForDates1[6] != null && rowDataForDates1[6] != "Invalid date" && moment(rowDataForDates1[6]).format("YYYY-MM-DD") < moment(rowDataForDates1[1]).format("YYYY-MM-DD")) {
-            inValid("G", 1, i18n.t('static.message.invaliddate'), elInstance);
+            inValid("G", 1, i18n.t('static.shipment.dateIsLesserThanPrevDate'), elInstance);
             valid = false;
         }
         return valid;
@@ -2603,6 +2652,13 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     elInstance.setValueFromCoords(30, y, 1, true);
                 }
 
+                if (rowData[19].length > 600) {
+                    inValid("T", y, i18n.t('static.dataentry.notesMaxLength'), elInstance);
+                    valid = false;
+                } else {
+                    positiveValidation("T", y, elInstance);
+                }
+
                 var validation = checkValidtion("text", "F", y, rowData[5], elInstance);
                 if (validation == false) {
                     valid = false;
@@ -2742,13 +2798,13 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             shipmentMode = "Air";
                         }
                         var shipmentDatesJson = map.get("26");
-                        var plannedDate = shipmentDatesJson.plannedDate!="" && shipmentDatesJson.plannedDate!="Invalid date"?shipmentDatesJson.plannedDate:null;
-                        var submittedDate = shipmentDatesJson.submittedDate!="" && shipmentDatesJson.submittedDate!="Invalid date"?shipmentDatesJson.submittedDate:null;
-                        var approvedDate = shipmentDatesJson.approvedDate!="" && shipmentDatesJson.approvedDate!="Invalid date"?shipmentDatesJson.approvedDate:null;
-                        var shippedDate = shipmentDatesJson.shippedDate!="" && shipmentDatesJson.shippedDate!="Invalid date"?shipmentDatesJson.shippedDate:null;
-                        var arrivedDate = shipmentDatesJson.arrivedDate!="" && shipmentDatesJson.arrivedDate!="Invalid date"?shipmentDatesJson.arrivedDate:null;
-                        var receivedDate = shipmentDatesJson.receivedDate!="" && shipmentDatesJson.receivedDate!="Invalid date"?shipmentDatesJson.receivedDate:null;
-                        var expectedDeliveryDate = shipmentDatesJson.expectedDeliveryDate!="" && shipmentDatesJson.expectedDeliveryDate!="Invalid date"?shipmentDatesJson.expectedDeliveryDate:null;
+                        var plannedDate = shipmentDatesJson.plannedDate != "" && shipmentDatesJson.plannedDate != "Invalid date" ? shipmentDatesJson.plannedDate : null;
+                        var submittedDate = shipmentDatesJson.submittedDate != "" && shipmentDatesJson.submittedDate != "Invalid date" ? shipmentDatesJson.submittedDate : null;
+                        var approvedDate = shipmentDatesJson.approvedDate != "" && shipmentDatesJson.approvedDate != "Invalid date" ? shipmentDatesJson.approvedDate : null;
+                        var shippedDate = shipmentDatesJson.shippedDate != "" && shipmentDatesJson.shippedDate != "Invalid date" ? shipmentDatesJson.shippedDate : null;
+                        var arrivedDate = shipmentDatesJson.arrivedDate != "" && shipmentDatesJson.arrivedDate != "Invalid date" ? shipmentDatesJson.arrivedDate : null;
+                        var receivedDate = shipmentDatesJson.receivedDate != "" && shipmentDatesJson.receivedDate != "Invalid date" ? shipmentDatesJson.receivedDate : null;
+                        var expectedDeliveryDate = shipmentDatesJson.expectedDeliveryDate != "" && shipmentDatesJson.expectedDeliveryDate != "Invalid date" ? shipmentDatesJson.expectedDeliveryDate : null;
                         console.log("shipmentDatesJson", shipmentDatesJson);
                         console.log("Received date", receivedDate);
                         console.log("Shipment Received date", shipmentDatesJson.receivedDate);
@@ -2809,7 +2865,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                 if (totalShipmentQty < adjustedOrderQty) {
                                     var indexBatchNo = eBatchInfoList.findIndex(c => c.batch.autoGenerated.toString() == "true");
                                     if (indexBatchNo != -1) {
-                                        eBatchInfoList[indexBatchNo].shipmentQty = eBatchInfoList[indexBatchNo].shipmentQty + remainingBatchQty;
+                                        eBatchInfoList[indexBatchNo].shipmentQty = parseInt(eBatchInfoList[indexBatchNo].shipmentQty) + parseInt(remainingBatchQty);
                                     } else {
                                         console.log("In if")
                                         var programId = (document.getElementById("programId").value).split("_")[0];
@@ -2886,7 +2942,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             for (var bi = 0; bi < shipmentBatchInfoList.length; bi++) {
                                 console.log("shipmentBatchInfoList[bi]", shipmentBatchInfoList[bi]);
                                 // Push shipment batch details in program json batch info list
-                                var index = batchInfoList.findIndex(c => c.batchNo == shipmentBatchInfoList[bi].batch.batchNo);
+                                var index = batchInfoList.findIndex(c => c.batchNo == shipmentBatchInfoList[bi].batch.batchNo && moment(c.expiryDate).format("YYYY-MM")==moment(shipmentBatchInfoList[bi].batch.expiryDate).format("YYYY-MM"));
                                 console.log("Batch info list 1st", batchInfoList);
                                 console.log("Index1", index);
                                 if (index == -1) {
@@ -3047,7 +3103,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             }
                             console.log("shipmentBatchInfoList.length", shipmentBatchInfoList.length);
                             for (var bi = 0; bi < shipmentBatchInfoList.length; bi++) {
-                                var index = batchInfoList.findIndex(c => c.batchNo == shipmentBatchInfoList[bi].batch.batchNo);
+                                var index = batchInfoList.findIndex(c => c.batchNo == shipmentBatchInfoList[bi].batch.batchNo && moment(c.expiryDate).format("YYYY-MM")==moment(shipmentBatchInfoList[bi].batch.expiryDate).format("YYYY-MM"));
                                 console.log("BatchInfoList", batchInfoList);
                                 console.log("Index", index);
                                 if (index == -1) {
@@ -3151,7 +3207,15 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             if (unitsPerPalletEuro2 != 0 && unitsPerPalletEuro2 != null) {
                 orderBasedOn.push({ id: 4, name: i18n.t('static.supplyPlan.palletEuro2') })
             }
+
             var tableEditable = true;
+            if (this.props.shipmentPage == "supplyPlanCompare") {
+                tableEditable = false;
+            }
+            if (this.props.shipmentPage == "shipmentDataEntry" && (this.props.items.shipmentType).value == 2) {
+                tableEditable = false;
+            }
+
             if (rowData[21].toString() == "true" || this.props.shipmentPage == "supplyPlanCompare") {
                 tableEditable = false;
             }

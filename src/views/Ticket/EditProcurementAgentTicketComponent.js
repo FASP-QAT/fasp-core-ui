@@ -12,8 +12,10 @@ import { SPACE_REGEX } from '../../Constants';
 import ProcurementAgentService from '../../api/ProcurementAgentService';
 import getLabelText from '../../CommonComponent/getLabelText';
 
+let summaryText_1 = (i18n.t("static.common.edit") + " " + i18n.t("static.procurementagent.procurementagent"))
+let summaryText_2 = "Edit Procurement Agent"
 const initialValues = {
-    summary: "Edit Procurement Agent",
+    summary: summaryText_1,
     procurementAgentName: "",
     notes: ""
 }
@@ -58,7 +60,7 @@ export default class EditProcurementAgentTicketComponent extends Component {
         super(props);
         this.state = {
             procurementAgent: {
-                summary: "Edit Procurement Agent",
+                summary: summaryText_1,
                 procurementAgentName: "",
                 notes: ""
             },
@@ -66,7 +68,7 @@ export default class EditProcurementAgentTicketComponent extends Component {
             message: '',
             procurementAgents: [],
             procurementAgentId: '',
-            loading: false
+            loading: true
         }
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
@@ -79,7 +81,12 @@ export default class EditProcurementAgentTicketComponent extends Component {
             procurementAgent.summary = event.target.value;
         }
         if (event.target.name == "procurementAgentName") {
-            procurementAgent.procurementAgentName = event.target.options[event.target.selectedIndex].innerHTML;
+            var outText = "";
+            if(event.target.value !== "") {
+                var procurementAgentT = this.state.procurementAgents.filter(c => c.procurementAgentId == event.target.value)[0];
+                outText = procurementAgentT.realm.label.label_en + " | " + procurementAgentT.label.label_en + " | " + procurementAgentT.procurementAgentCode;
+            }
+            procurementAgent.procurementAgentName = outText;
             this.setState({
                 procurementAgentId: event.target.value
             })
@@ -122,7 +129,7 @@ export default class EditProcurementAgentTicketComponent extends Component {
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        procurementAgents: response.data
+                        procurementAgents: response.data, loading: false
                     })
                 } else {
                     this.setState({
@@ -205,7 +212,7 @@ export default class EditProcurementAgentTicketComponent extends Component {
             && procurementAgents.map((item, i) => {
                 return (
                     <option key={i} value={item.procurementAgentId}>
-                        {getLabelText(item.realm.label, this.state.lang) + " | " + getLabelText(item.label, this.state.lang) + " | " + item.procurementAgentCode}
+                        {getLabelText(item.label, this.state.lang) + " | " + item.procurementAgentCode}
                     </option>
                 )
             }, this);
@@ -223,6 +230,8 @@ export default class EditProcurementAgentTicketComponent extends Component {
                             this.setState({
                                 loading: true
                             })
+                            this.state.procurementAgent.summary = summaryText_2;
+                            this.state.procurementAgent.userLanguageCode = this.state.lang;
                             JiraTikcetService.addEmailRequestIssue(this.state.procurementAgent).then(response => {
                                 console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {

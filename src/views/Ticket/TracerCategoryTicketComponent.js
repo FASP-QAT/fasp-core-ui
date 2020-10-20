@@ -11,9 +11,12 @@ import RealmService from '../../api/RealmService';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { BUDGET_NAME_REGEX, SPACE_REGEX } from '../../Constants';
 
+let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.tracercategory.tracercategory"))
+let summaryText_2 = "Add Tracer Category"
+const selectedRealm = (AuthenticationService.getRealmId() !== "" && AuthenticationService.getRealmId() !== -1) ? AuthenticationService.getRealmId() : ""
 const initialValues = {
-    summary: "Add Tracer Category",
-    realmName: "",
+    summary: summaryText_1,
+    realmName: selectedRealm,
     tracerCategoryName: "",
     notes: ""
 }
@@ -61,7 +64,7 @@ export default class TracerCategoryTicketComponent extends Component {
         super(props);
         this.state = {
             tracerCategory: {
-                summary: "Add Tracer Category",
+                summary: summaryText_1,
                 realmName: "",
                 tracerCategoryName: "",
                 notes: ""
@@ -70,7 +73,7 @@ export default class TracerCategoryTicketComponent extends Component {
             message: '',
             realms: [],
             realmId: '',
-            loading: false
+            loading: true
         }
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
@@ -83,7 +86,7 @@ export default class TracerCategoryTicketComponent extends Component {
             tracerCategory.summary = event.target.value;
         }
         if (event.target.name == "realmName") {
-            tracerCategory.realmName = this.state.realms.filter(c => c.realmId == event.target.value)[0].label.label_en;
+            tracerCategory.realmName = event.target.value !== "" ? this.state.realms.filter(c => c.realmId == event.target.value)[0].label.label_en : "";
             this.setState({
                 realmId: event.target.value
             })
@@ -129,8 +132,22 @@ export default class TracerCategoryTicketComponent extends Component {
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        realms: response.data
-                    })
+                        realms: response.data,
+                        realmId: selectedRealm, loading: false
+                    });
+                    if (selectedRealm !== "") {
+                        this.setState({
+                            realms: (response.data).filter(c => c.realmId == selectedRealm)
+                        })
+    
+                        let { tracerCategory } = this.state;
+                        tracerCategory.realmName = (response.data).filter(c => c.realmId == selectedRealm)[0].label.label_en;
+                        this.setState({
+                            tracerCategory
+                        }, () => {
+    
+                        })
+                    }
                 } else {
                     this.setState({
                         message: response.data.messageCode
@@ -226,6 +243,8 @@ export default class TracerCategoryTicketComponent extends Component {
                             this.setState({
                                 loading: true
                             })
+                            this.state.tracerCategory.summary = summaryText_2;
+                            this.state.tracerCategory.userLanguageCode = this.state.lang;
                             JiraTikcetService.addEmailRequestIssue(this.state.tracerCategory).then(response => {
                                 console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {

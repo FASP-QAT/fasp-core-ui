@@ -12,8 +12,10 @@ import { LABEL_REGEX, SPACE_REGEX } from '../../Constants';
 import FundingSourceService from '../../api/FundingSourceService';
 import getLabelText from '../../CommonComponent/getLabelText';
 
+let summaryText_1 = (i18n.t("static.common.edit") + " " + i18n.t("static.fundingsource.fundingsource"))
+let summaryText_2 = "Edit Funding Source"
 const initialValues = {
-    summary: "Edit Funding Source",
+    summary: summaryText_1,
     fundingSourceName: "",
     notes: ""
 }
@@ -58,7 +60,7 @@ export default class EditFundingSourceTicketComponent extends Component {
         super(props);
         this.state = {
             fundingSource: {
-                summary: "Edit Funding Source",
+                summary: summaryText_1,
                 fundingSourceName: "",
                 notes: ""
             },
@@ -66,7 +68,7 @@ export default class EditFundingSourceTicketComponent extends Component {
             message: '',
             fundingSources: [],
             fundingSourceId: '',
-            loading: false
+            loading: true
         }
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
@@ -79,7 +81,12 @@ export default class EditFundingSourceTicketComponent extends Component {
             fundingSource.summary = event.target.value;
         }
         if (event.target.name == "fundingSourceName") {
-            fundingSource.fundingSourceName = event.target.options[event.target.selectedIndex].innerHTML;
+            var outText = "";
+            if(event.target.value !== "") {
+                var fundingSourceT = this.state.fundingSources.filter(c => c.fundingSourceId == event.target.value)[0];
+                outText = fundingSourceT.realm.label.label_en + " | " + fundingSourceT.label.label_en + " | " + fundingSourceT.fundingSourceCode;
+            }
+            fundingSource.fundingSourceName = outText;
             this.setState({
                 fundingSourceId: event.target.value
             })
@@ -127,7 +134,7 @@ export default class EditFundingSourceTicketComponent extends Component {
                     //     selSource: response.data
                     // })
                     this.setState({
-                        fundingSources: response.data,
+                        fundingSources: response.data, loading: false
                     })
                 } else {
                     this.setState({
@@ -208,7 +215,7 @@ export default class EditFundingSourceTicketComponent extends Component {
             && fundingSources.map((item, i) => {
                 return (
                     <option key={i} value={item.fundingSourceId}>
-                        {getLabelText(item.realm.label, this.state.lang) + " | " + getLabelText(item.label, this.state.lang) + " | " + item.fundingSourceCode}
+                        {getLabelText(item.label, this.state.lang) + " | " + item.fundingSourceCode}
                     </option>
                 )
             }, this);
@@ -226,6 +233,8 @@ export default class EditFundingSourceTicketComponent extends Component {
                             this.setState({
                                 loading: true
                             })
+                            this.state.fundingSource.summary = summaryText_2;
+                            this.state.fundingSource.userLanguageCode = this.state.lang;
                             JiraTikcetService.addEmailRequestIssue(this.state.fundingSource).then(response => {
                                 console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {

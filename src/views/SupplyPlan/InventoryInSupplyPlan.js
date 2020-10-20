@@ -159,6 +159,17 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     if (this.props.inventoryPage == "supplyPlanCompare") {
                         inventoryEditable = false;
                     }
+
+                    var roleList = AuthenticationService.getLoggedInUserRole();
+                    if (roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') {
+                        inventoryEditable = false;
+                    }
+
+                    if (this.props.inventoryPage != "supplyPlanCompare" && this.props.inventoryPage != "inventoryDataEntry" && inventoryEditable == false) {
+                        document.getElementById("addInventoryRowSupplyPlan").style.display = "none";
+                    } else if (this.props.inventoryPage != "supplyPlanCompare" && this.props.inventoryPage != "inventoryDataEntry" && inventoryEditable == true) {
+                        document.getElementById("addInventoryRowSupplyPlan").style.display = "block";
+                    }
                     var paginationOption = false;
                     var searchOption = false;
                     var paginationArray = []
@@ -203,7 +214,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                             console.log("inventoryListUnFiltered", inventoryListUnFiltered);
                             console.log("Adjustment Type", adjustmentType);
                             console.log("planningUnitId", planningUnitId)
-                            index = inventoryListUnFiltered[j].index;
+                            index = inventoryList[j].index;
                         }
                         data[14] = index;
                         data[15] = 0;
@@ -211,7 +222,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         inventoryDataArr[j] = data;
                     }
                     var regionList = this.props.items.regionList;
-                    if (inventoryList.length == 0) {
+                    if (inventoryList.length == 0 && inventoryEditable) {
                         data = [];
                         if (this.props.inventoryPage != "inventoryDataEntry") {
                             data[0] = moment(this.props.items.inventoryEndDate).endOf('month').format("YYYY-MM-DD"); //A
@@ -319,8 +330,8 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                         for (var k = 0; k < batchInfoList.length; k++) {
                                             if (batchInfoList[k].planningUnitId == planningUnitId) {
                                                 var batchJson = {
-                                                    name: batchInfoList[k].batchNo,
-                                                    id: batchInfoList[k].batchNo,
+                                                    name: batchInfoList[k].batchNo + "~" + moment(batchInfoList[k].expiryDate).format("YYYY-MM-DD"),
+                                                    id: batchInfoList[k].batchNo + "~" + moment(batchInfoList[k].expiryDate).format("YYYY-MM-DD"),
                                                     createdDate: batchInfoList[k].createdDate,
                                                     expiryDate: batchInfoList[k].expiryDate,
                                                     batchId: batchInfoList[k].batchId
@@ -369,7 +380,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                         }
                                         for (var sb = 0; sb < batchInfo.length; sb++) {
                                             var data = [];
-                                            data[0] = batchInfo[sb].batch.batchNo; //A
+                                            data[0] = batchInfo[sb].batch.batchNo + "~" + moment(batchInfo[sb].batch.expiryDate).format("YYYY-MM-DD"); //A
                                             data[1] = moment(batchInfo[sb].batch.expiryDate).format(DATE_FORMAT_CAP);
                                             data[2] = adjustmentType; //B
                                             data[3] = parseInt(batchInfo[sb].adjustmentQty); //C
@@ -768,7 +779,21 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         if (x == 10) {
             if (rowData[4] == 2) {
                 var valid = checkValidtion("text", "K", y, rowData[10], elInstance);
+                if (valid == true) {
+                    if (rowData[10].length > 600) {
+                        inValid("K", y, i18n.t('static.dataentry.notesMaxLength'), elInstance);
+                    } else {
+                        positiveValidation("K", y, elInstance);
+                    }
+                }
+            } else {
+                if (rowData[10].length > 600) {
+                    inValid("K", y, i18n.t('static.dataentry.notesMaxLength'), elInstance);
+                } else {
+                    positiveValidation("K", y, elInstance);
+                }
             }
+
         }
         // this.showOnlyErrors();
     }
@@ -812,7 +837,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             if (valid == true) {
                 console.log("elInstance.getCell(`A${parseInt(y) + 1}`).innerText", elInstance.getCell(`A${parseInt(y) + 1}`).innerText)
                 if (value != -1) {
-                    var expiryDate = this.props.items.batchInfoList.filter(c => c.batchNo == elInstance.getCell(`A${parseInt(y) + 1}`).innerText)[0].expiryDate;
+                    var expiryDate = this.props.items.batchInfoList.filter(c => (c.batchNo == (elInstance.getCell(`A${parseInt(y) + 1}`).innerText).split("~")[0] && moment(c.expiryDate).format("YYYY-MM") == moment((elInstance.getCell(`A${parseInt(y) + 1}`).innerText).split("~")[1]).format("YYYY-MM")))[0].expiryDate;
                     elInstance.setValueFromCoords(1, y, moment(expiryDate).format(DATE_FORMAT_CAP), true);
                 } else {
                     elInstance.setValueFromCoords(1, y, "", true);
@@ -1009,12 +1034,12 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     var batchInfoJson = {
                         inventoryTransBatchInfoId: map.get("5"),
                         batch: {
-                            batchId: this.state.batchInfoList.filter(c => c.name == elInstance.getCell(`A${parseInt(i) + 1}`).innerText)[0].batchId,
-                            batchNo: elInstance.getCell(`A${parseInt(i) + 1}`).innerText,
+                            batchId: this.state.batchInfoList.filter(c => c.name == (elInstance.getCell(`A${parseInt(i) + 1}`).innerText))[0].batchId,
+                            batchNo: (elInstance.getCell(`A${parseInt(i) + 1}`).innerText).split("~")[0],
                             autoGenerated: 0,
                             planningUnitId: parseInt(document.getElementById("planningUnitId").value),
                             expiryDate: moment(map.get("1")).format("YYYY-MM-DD"),
-                            createdDate: this.state.batchInfoList.filter(c => c.name == elInstance.getCell(`A${parseInt(i) + 1}`).innerText)[0].createdDate
+                            createdDate: this.state.batchInfoList.filter(c => c.name == (elInstance.getCell(`A${parseInt(i) + 1}`).innerText))[0].createdDate
                         },
                         adjustmentQty: (map.get("2") == 1) ? (map.get("3")).toString().replaceAll("\,", "") : (map.get("3")).toString().replaceAll("\,", "") != 0 ? (map.get("3")).toString().replaceAll("\,", "") : null,
                         actualQty: (map.get("2") == 1) ? (map.get("4")).toString().replaceAll("\,", "") : (map.get("3")).toString().replaceAll("\,", "") != 0 ? (map.get("3")).toString().replaceAll("\,", "") : null
@@ -1231,8 +1256,23 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     if (validation == false) {
                         valid = false;
                         elInstance.setValueFromCoords(16, y, 1, true);
+                    } else {
+                        if (rowData[10].length > 600) {
+                            inValid("K", y, i18n.t('static.dataentry.notesMaxLength'), elInstance);
+                            valid = false;
+                        } else {
+                            positiveValidation("K", y, elInstance);
+                        }
+                    }
+                } else {
+                    if (rowData[10].length > 600) {
+                        inValid("K", y, i18n.t('static.dataentry.notesMaxLength'), elInstance);
+                        valid = false;
+                    } else {
+                        positiveValidation("K", y, elInstance);
                     }
                 }
+
 
                 if (rowData[4] == 1) {
                     var validation = checkValidtion("number", "G", y, rowData[6], elInstance, JEXCEL_INTEGER_REGEX, 1, 1);

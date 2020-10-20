@@ -18,9 +18,12 @@ import { SPACE_REGEX, ALPHABET_NUMBER_REGEX } from '../../Constants';
 import RealmCountryService from '../../api/RealmCountryService';
 import getLabelText from '../../CommonComponent/getLabelText';
 
+let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.healtharea.healtharea"))
+let summaryText_2 = "Add Technical Area"
+const selectedRealm = (AuthenticationService.getRealmId() !== "" && AuthenticationService.getRealmId() !== -1) ? AuthenticationService.getRealmId() : ""
 const initialValues = {
-    summary: "Add Technical Area",
-    realmName: "",
+    summary: summaryText_1,
+    realmName: selectedRealm,
     countryName: "",
     technicalAreaName: "",
     technicalAreaCode: "",
@@ -78,7 +81,7 @@ export default class TechnicalAreaTicketComponent extends Component {
         super(props);
         this.state = {
             technicalArea: {
-                summary: "Add Technical Area",
+                summary: summaryText_1,
                 realmName: "",
                 countryName: [],
                 technicalAreaName: "",
@@ -93,7 +96,7 @@ export default class TechnicalAreaTicketComponent extends Component {
             countryId: '',
             countries: [],
             realmCountryList: [],
-            loading: false
+            loading: true
         }
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
@@ -110,7 +113,7 @@ export default class TechnicalAreaTicketComponent extends Component {
             technicalArea.summary = event.target.value;
         }
         if (event.target.name == "realmName") {
-            technicalArea.realmName = this.state.realms.filter(c => c.realmId == event.target.value)[0].label.label_en;
+            technicalArea.realmName = event.target.value !== "" ? this.state.realms.filter(c => c.realmId == event.target.value)[0].label.label_en : "";
             this.setState({
                 realmId: event.target.value
             })
@@ -164,7 +167,7 @@ export default class TechnicalAreaTicketComponent extends Component {
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        countries: response.data
+                        countries: response.data, loading: false
                     })
                 }
                 else {
@@ -221,8 +224,22 @@ export default class TechnicalAreaTicketComponent extends Component {
         UserService.getRealmList()
             .then(response => {
                 this.setState({
-                    realms: response.data
-                })
+                    realms: response.data,
+                    realmId: selectedRealm, loading: false
+                });
+                if (selectedRealm !== "") {
+                    this.setState({
+                        realms: (response.data).filter(c => c.realmId == selectedRealm)
+                    })
+
+                    let { technicalArea } = this.state;
+                    technicalArea.realmName = (response.data).filter(c => c.realmId == selectedRealm)[0].label.label_en;
+                    this.setState({
+                        technicalArea
+                    }, () => {
+                        this.getRealmCountryList(selectedRealm)
+                    })
+                }
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
@@ -277,66 +294,68 @@ export default class TechnicalAreaTicketComponent extends Component {
         this.setState({ technicalArea: technicalArea });
     }
 
-    getRealmCountryList(e) {
+    getRealmCountryList(realmId) {
         // AuthenticationService.setupAxiosInterceptors();
-        RealmCountryService.getRealmCountryForProgram(e.target.value)
-            .then(response => {
-                if (response.status == 200) {
-                    var json = response.data;
-                    console.log("json", json)
-                    var regList = [];
-                    for (var i = 0; i < json.length; i++) {
-                        regList[i] = { value: json[i].realmCountry.id, label: json[i].realmCountry.label.label_en }
-                    }
-                    this.setState({
-                        countryId: '',
-                        realmCountryList: regList
-                    })
-                } else {
-                    this.setState({
-                        message: response.data.messageCode
-                    })
-                }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
+        if (realmId !== "") {
+            RealmCountryService.getRealmCountryForProgram(realmId)
+                .then(response => {
+                    if (response.status == 200) {
+                        var json = response.data;
+                        console.log("json", json)
+                        var regList = [];
+                        for (var i = 0; i < json.length; i++) {
+                            regList[i] = { value: json[i].realmCountry.id, label: json[i].realmCountry.label.label_en }
+                        }
                         this.setState({
-                            message: 'static.unkownError',
-                            loading: false
-                        });
+                            countryId: '',
+                            realmCountryList: regList
+                        })
                     } else {
-                        switch (error.response ? error.response.status : "") {
+                        this.setState({
+                            message: response.data.messageCode
+                        })
+                    }
+                }).catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
 
-                            case 401:
-                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                break;
-                            case 403:
-                                this.props.history.push(`/accessDenied`)
-                                break;
-                            case 500:
-                            case 404:
-                            case 406:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            case 412:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            default:
-                                this.setState({
-                                    message: 'static.unkownError',
-                                    loading: false
-                                });
-                                break;
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
+                                    break;
+                            }
                         }
                     }
-                }
-            );
+                );
+        }
     }
 
     hideSecondComponent() {
@@ -513,6 +532,8 @@ export default class TechnicalAreaTicketComponent extends Component {
                             this.setState({
                                 loading: true
                             })
+                            this.state.technicalArea.summary = summaryText_2;
+                            this.state.technicalArea.userLanguageCode = this.state.lang;
                             JiraTikcetService.addEmailRequestIssue(this.state.technicalArea).then(response => {
                                 console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
@@ -609,7 +630,7 @@ export default class TechnicalAreaTicketComponent extends Component {
                                                 bsSize="sm"
                                                 valid={!errors.realmName && this.state.technicalArea.realmName != ''}
                                                 invalid={touched.realmName && !!errors.realmName}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); this.getRealmCountryList(e) }}
+                                                onChange={(e) => { handleChange(e); this.dataChange(e); this.getRealmCountryList(e.target.value) }}
                                                 onBlur={handleBlur}
                                                 value={this.state.realmId}
                                                 required >

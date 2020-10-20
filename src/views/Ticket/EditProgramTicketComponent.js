@@ -15,8 +15,10 @@ import HealthAreaService from '../../api/HealthAreaService';
 import classNames from 'classnames';
 import { SPACE_REGEX } from '../../Constants';
 
+let summaryText_1 = (i18n.t("static.common.edit") + " " + i18n.t("static.program.programMaster"))
+let summaryText_2 = "Edit Program"
 const initialValues = {
-    summary: "Edit Program",
+    summary: summaryText_1,
     realmId: '',
     notes: ""
 }
@@ -61,7 +63,7 @@ export default class EditProgramTicketComponent extends Component {
         super(props);
         this.state = {
             program: {
-                summary: "Edit Program",
+                summary: summaryText_1,
                 programName: '',
                 notes: ""
             },
@@ -69,7 +71,7 @@ export default class EditProgramTicketComponent extends Component {
             message: '',
             programId: '',
             programList: [],
-            loading: false
+            loading: true
         }
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
@@ -82,7 +84,12 @@ export default class EditProgramTicketComponent extends Component {
             program.summary = event.target.value;
         }
         if (event.target.name == "programName") {
-            program.programName = event.target.options[event.target.selectedIndex].innerHTML;
+            var outText = "";
+            if(event.target.value !== "") {
+                var programT = this.state.programList.filter(c => c.programId == event.target.value)[0];
+                outText = programT.realmCountry.realm.label.label_en + " | " + programT.label.label_en + " | " + programT.programCode;
+            }
+            program.programName = outText;
             // this.setState({
             this.state.programId = event.target.value
             // })            
@@ -127,7 +134,7 @@ export default class EditProgramTicketComponent extends Component {
             if (response.status == 200) {
                 console.log("resp--------------------", response.data);
                 this.setState({
-                    programList: response.data
+                    programList: response.data, loading: false
                 })
             } else {
                 this.setState({
@@ -210,7 +217,7 @@ export default class EditProgramTicketComponent extends Component {
             && programList.map((item, i) => {
                 return (
                     <option key={i} value={item.programId}>
-                        {getLabelText(item.realmCountry.realm.label, this.state.lang) + " | " + getLabelText(item.label, this.state.lang) + " | " + item.programCode}
+                        {getLabelText(item.label, this.state.lang) + " | " + item.programCode}
                     </option>
                 )
             }, this);
@@ -229,6 +236,8 @@ export default class EditProgramTicketComponent extends Component {
                             this.setState({
                                 loading: true
                             })
+                            this.state.program.summary = summaryText_2;
+                            this.state.program.userLanguageCode = this.state.lang;
                             JiraTikcetService.addEmailRequestIssue(this.state.program).then(response => {
                                 console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {

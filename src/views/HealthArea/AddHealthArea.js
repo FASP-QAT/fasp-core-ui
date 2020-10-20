@@ -17,7 +17,7 @@ import { ALPHABET_NUMBER_REGEX, SPACE_REGEX } from '../../Constants.js';
 
 const entityname = i18n.t('static.healtharea.healtharea');
 
-const initialValues = {
+let initialValues = {
   realmId: '',
   healthAreaName: '',
   realmCountryId: [],
@@ -337,9 +337,20 @@ export default class AddHealthAreaComponent extends Component {
     UserService.getRealmList()
       .then(response => {
         console.log("realm list---", response.data);
+        let { healthArea } = this.state;
+        healthArea.realm.id = (response.data.length == 1 ? response.data[0].realmId : "")
         this.setState({
-          realms: response.data, loading: false
-        })
+          realms: response.data, loading: false,
+          healthArea
+        },
+          () => {
+            initialValues = {
+              realmId: (response.data.length == 1 ? response.data[0].realmId : "")
+            }
+            if (response.data.length == 1) {
+              this.getRealmCountryList();
+            }
+          })
       }).catch(
         error => {
           if (error.message === "Network Error") {
@@ -402,21 +413,30 @@ export default class AddHealthAreaComponent extends Component {
   }
 
   getRealmCountryList(e) {
-    if (e.target.value != 0) {
-      HealthAreaService.getRealmCountryList(e.target.value)
+    let realmId = this.state.healthArea.realm.id;
+    if (realmId != "") {
+      HealthAreaService.getRealmCountryList(realmId)
         .then(response => {
           console.log("Realm Country List list---", response.data);
           if (response.status == 200) {
             var json = response.data;
             var regList = [];
+            let { healthArea } = this.state;
+            healthArea.realmCountryArray = (response.data.length == 1 ? [response.data[0].realmCountryId] : [])
             for (var i = 0; i < json.length; i++) {
               regList[i] = { value: json[i].realmCountryId, label: json[i].country.label.label_en }
             }
             this.setState({
               realmCountryId: '',
               realmCountryList: regList,
-              loading: false
-            })
+              loading: false,
+              healthArea
+            },
+              () => {
+                initialValues = {
+                  realmCountryId: (response.data.length == 1 ? [response.data[0].realmCountryId] : [])
+                }
+              })
           } else {
             this.setState({
               message: response.data.messageCode
@@ -468,6 +488,20 @@ export default class AddHealthAreaComponent extends Component {
         realmCountryList: [],
         loading: false
       })
+      let { healthArea } = this.state;
+      healthArea.realmCountryArray = []
+      this.setState({
+        realmCountryId: '',
+        realmCountryList: [],
+        loading: false,
+        healthArea
+      },
+        () => {
+          initialValues = {
+            realmId: '',
+            realmCountryId: [],
+          }
+        })
     }
   }
 
@@ -608,7 +642,7 @@ export default class AddHealthAreaComponent extends Component {
                               onChange={(e) => { handleChange(e); this.dataChange(e); this.getRealmCountryList(e) }}
                               onBlur={handleBlur}
                               type="select" name="realmId" id="realmId">
-                              <option value="0">{i18n.t('static.common.select')}</option>
+                              <option value="">{i18n.t('static.common.select')}</option>
                               {realmList}
                             </Input>
                             <FormFeedback>{errors.realmId}</FormFeedback>
@@ -632,7 +666,8 @@ export default class AddHealthAreaComponent extends Component {
                               onBlur={() => setFieldTouched("realmCountryId", true)}
                               multi
                               options={this.state.realmCountryList}
-                              value={this.state.realmCountryId}
+                              // value={this.state.realmCountryId}
+                              value={this.state.healthArea.realmCountryArray}
                             />
                             <FormFeedback>{errors.realmCountryId}</FormFeedback>
                           </FormGroup>

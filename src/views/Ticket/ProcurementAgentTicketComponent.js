@@ -12,9 +12,12 @@ import { SPACE_REGEX } from '../../Constants';
 import ProcurementAgentService from '../../api/ProcurementAgentService';
 import getLabelText from '../../CommonComponent/getLabelText';
 
+let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.procurementagent.procurementagent"))
+let summaryText_2 = "Add Procurement Agent"
+const selectedRealm = (AuthenticationService.getRealmId() !== "" && AuthenticationService.getRealmId() !== -1) ? AuthenticationService.getRealmId() : ""
 const initialValues = {
-    summary: "Add Procurement Agent",
-    realmName: "",
+    summary: summaryText_1,
+    realmName: selectedRealm,
     procurementAgentName: '',
     procurementAgentCode: '',
     submittedToApprovedLeadTime: '',
@@ -36,11 +39,11 @@ const validationSchema = function (values) {
             .required(i18n.t('static.procurementAgent.procurementagentnametext')),
         submittedToApprovedLeadTime: Yup.string()
             .min(0, i18n.t('static.program.validvaluetext'))
-            .matches(/^\s*(?=.*[1-9])\d{1,2}(?:\.\d{1,2})?\s*$/, i18n.t('static.message.2digitDecimal'))
+            .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
             .required(i18n.t('static.procurementagent.submitToApproveLeadTime')),
         approvedToShippedLeadTime: Yup.string()
             .min(0, i18n.t('static.program.validvaluetext'))
-            .matches(/^\s*(?=.*[1-9])\d{1,2}(?:\.\d{1,2})?\s*$/, i18n.t('static.message.2digitDecimal'))
+            .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
             .required(i18n.t('static.procurementagent.approvedToShippedLeadTime')),
         // notes: Yup.string()
         //     .required(i18n.t('static.common.notestext'))
@@ -75,7 +78,7 @@ export default class ProcurementAgentTicketComponent extends Component {
         super(props);
         this.state = {
             procurementAgent: {
-                summary: "Add Procurement Agent",
+                summary: summaryText_1,
                 realmName: "",
                 procurementAgentName: "",
                 procurementAgentCode: "",
@@ -88,7 +91,7 @@ export default class ProcurementAgentTicketComponent extends Component {
             message: '',
             realms: [],
             realmId: '',
-            loading: false
+            loading: true
         }
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
@@ -103,7 +106,7 @@ export default class ProcurementAgentTicketComponent extends Component {
             procurementAgent.summary = event.target.value;
         }
         if (event.target.name == "realmName") {
-            procurementAgent.realmName = this.state.realms.filter(c => c.realmId == event.target.value)[0].label.label_en;
+            procurementAgent.realmName = event.target.value !== "" ? this.state.realms.filter(c => c.realmId == event.target.value)[0].label.label_en : "";
             this.setState({
                 realmId: event.target.value
             })
@@ -163,8 +166,22 @@ export default class ProcurementAgentTicketComponent extends Component {
         RealmService.getRealmListAll()
             .then(response => {
                 this.setState({
-                    realms: response.data
-                })
+                    realms: response.data,
+                    realmId: selectedRealm, loading: false
+                });
+                if (selectedRealm !== "") {
+                    this.setState({
+                        realms: (response.data).filter(c => c.realmId == selectedRealm)
+                    })
+
+                    let { procurementAgent } = this.state;
+                    procurementAgent.realmName = (response.data).filter(c => c.realmId == selectedRealm)[0].label.label_en;
+                    this.setState({
+                        procurementAgent
+                    }, () => {
+
+                    })
+                }
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
@@ -384,6 +401,8 @@ export default class ProcurementAgentTicketComponent extends Component {
                             this.setState({
                                 loading: true
                             })
+                            this.state.procurementAgent.summary = summaryText_2;
+                            this.state.procurementAgent.userLanguageCode = this.state.lang;
                             JiraTikcetService.addEmailRequestIssue(this.state.procurementAgent).then(response => {
                                 console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {

@@ -14,8 +14,10 @@ import ProgramService from '../../api/ProgramService';
 import HealthAreaService from '../../api/HealthAreaService';
 import RegionService from '../../api/RegionService';
 
+let summaryText_1 = (i18n.t("static.common.edit") + " " + i18n.t("static.dashboad.regioncountry"))
+let summaryText_2 = "Edit Realm Country Region"
 const initialValues = {
-    summary: "Edit Realm Country Region",
+    summary: summaryText_1,
     realmCountryRegionName: '',
     notes: ""
 }
@@ -60,13 +62,13 @@ export default class EditRealmCountryRegionTicketComponent extends Component {
         super(props);
         this.state = {
             realmCountryRegion: {
-                summary: "Edit Realm Country Region",
+                summary: summaryText_1,
                 realmCountryRegionName: '',
                 notes: ""
             },
             lang: localStorage.getItem('lang'),
             message: '',
-            loading: false,
+            loading: true,
             realmCountryRegionId: '',
             realmCountryRegionList: []
         }
@@ -81,7 +83,12 @@ export default class EditRealmCountryRegionTicketComponent extends Component {
             realmCountryRegion.summary = event.target.value;
         }
         if (event.target.name == "realmCountryRegionName") {
-            realmCountryRegion.realmCountryRegionName = event.target.options[event.target.selectedIndex].innerHTML;
+            var outText = "";
+            if(event.target.value !== "") {
+                var realmCountryRegionT = this.state.realmCountryRegionList.filter(c => c.regionId == event.target.value)[0];
+                outText = realmCountryRegionT.realmCountry.realm.label.label_en + " | " + realmCountryRegionT.realmCountry.country.label.label_en + " | " + realmCountryRegionT.label.label_en;
+            }
+            realmCountryRegion.realmCountryRegionName = outText;
             // this.setState({
             this.state.realmCountryRegionId = event.target.value
             // })            
@@ -211,7 +218,7 @@ export default class EditRealmCountryRegionTicketComponent extends Component {
             && realmCountryRegionList.map((item, i) => {
                 return (
                     <option key={i} value={item.regionId}>
-                        {getLabelText(item.realmCountry.realm.label, this.state.lang) + " | " + getLabelText(item.realmCountry.country.label, this.state.lang) + " | " + getLabelText(item.label, this.state.lang)}
+                        {getLabelText(item.realmCountry.country.label, this.state.lang) + " | " + getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);
@@ -229,7 +236,9 @@ export default class EditRealmCountryRegionTicketComponent extends Component {
                             this.setState({
                                 loading: true
                             })
-                            JiraTikcetService.addEmailRequestIssue(values).then(response => {
+                            this.state.realmCountryRegion.summary = summaryText_2;
+                            this.state.realmCountryRegion.userLanguageCode = this.state.lang;
+                            JiraTikcetService.addEmailRequestIssue(this.state.realmCountryRegion).then(response => {
                                 console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
                                     var msg = response.data.key;
