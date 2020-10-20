@@ -1743,14 +1743,10 @@ class ShipmentSummery extends Component {
                                                             <th style={{ 'text-align': 'center' }}>{i18n.t('static.report.planningUnit/ForecastingUnit')}</th>
                                                             <th style={{ 'width': '87px', 'text-align': 'center' }}>{i18n.t('static.report.id')}</th>
                                                             <th style={{ 'width': '87px', 'text-align': 'center' }}>{i18n.t('static.supplyPlan.consideAsEmergencyOrder')}</th>
-<<<<<<< HEAD
-                                                            <th style={{ 'text-align': 'center' }}>{i18n.t('static.report.procurementAgentName')}</th>
-=======
                                                             <th style={{ 'width': '87px', 'text-align': 'center' }}>{i18n.t('static.report.erpOrder')}</th>
                                                             <th style={{ 'width': '87px', 'text-align': 'center' }}>{i18n.t('static.report.localprocurement')}</th>
                                                             <th style={{ 'width': '87px', 'text-align': 'center' }}>{i18n.t('static.report.orderNo')}</th>
                                                              <th style={{ 'text-align': 'center' }}>{i18n.t('static.report.procurementAgentName')}</th>
->>>>>>> stock status level
                                                             <th style={{ 'text-align': 'center' }}>{i18n.t('static.budget.fundingsource')}</th>
                                                             <th style={{ 'text-align': 'center' }}>{i18n.t('static.common.status')}</th>
                                                             <th style={{ 'text-align': 'center' }}>{i18n.t('static.report.qty')}</th>
