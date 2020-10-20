@@ -16,7 +16,7 @@ import { Link } from 'react-router-dom';
 import { jExcelLoadedFunction, jExcelLoadedFunctionPipeline } from '../../CommonComponent/JExcelCommonFunctions.js'
 import { CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, JEXCEL_DATE_FORMAT } from '../../Constants.js'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
+import { JEXCEL_PAGINATION_OPTION,SHIPMENT_DATA_SOURCE_TYPE } from '../../Constants.js';
 
 export default class PipelineProgramShipment extends Component {
 
@@ -628,8 +628,9 @@ export default class PipelineProgramShipment extends Component {
                                     .then(response => {
                                         if (response.status == 200) {
                                             // console.log(response.data)
+                                            var dataSourceFilterList=response.data.filter(c=>c.dataSourceType.id == SHIPMENT_DATA_SOURCE_TYPE);
                                             this.setState({
-                                                dataSourceList: response.data.map(ele => ({
+                                                dataSourceList: dataSourceFilterList.map(ele => ({
                                                     name: getLabelText(ele.label, this.state.lang),
                                                     id: ele.dataSourceId
                                                 }))
@@ -1017,9 +1018,9 @@ export default class PipelineProgramShipment extends Component {
             item.quantity,
             item.rate,
             // item.freightCost == 0 ? item.quantity * this.props.items.program.seaFreightPerc : item.freightCost, 
-            item.freightCost,
+            parseFloat(item.freightCost).toFixed(2),
             // item.quantity * item.rate, 
-            item.productCost,
+            parseFloat(item.productCost).toFixed(2),
             moment(item.expectedDeliveryDate).format("YYYY-MM-DD"),
             moment(item.orderedDate).format("YYYY-MM-DD"),
             moment(item.plannedDate).format("YYYY-MM-DD"),

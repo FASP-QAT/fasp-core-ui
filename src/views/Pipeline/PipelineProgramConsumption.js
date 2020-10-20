@@ -6,7 +6,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import DataSourceService from '../../api/DataSourceService.js';
 import PlanningUnitService from '../../api/PlanningUnitService';
 import moment from 'moment';
-import { jExcelLoadedFunction, jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunctionPipeline } from '../../CommonComponent/JExcelCommonFunctions';
+import { jExcelLoadedFunction, jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunctionPipeline, checkValidtion, inValid, positiveValidation } from '../../CommonComponent/JExcelCommonFunctions';
 import { ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE, JEXCEL_DATE_FORMAT_WITHOUT_DATE } from '../../Constants';
 import RealmCountryService from '../../api/RealmCountryService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
@@ -89,6 +89,20 @@ export default class PipelineProgramConsumption extends Component {
                     this.el.setComments(col, "");
                     // alert("in else 2");
                 }
+            }
+
+            var value = this.el.getValueFromCoords(7, y);
+            value = value.toString().replaceAll("\,", "");
+            var validation = checkValidtion("numberNotRequired", "H", y, value, this.el, JEXCEL_INTEGER_REGEX, 1, 1);
+            if (validation == true) {
+                if (parseInt(value) > 31) {
+                    inValid("H", y, i18n.t('static.supplyPlan.daysOfStockMaxValue'), this.el);
+                    valid = false;
+                } else {
+                    positiveValidation("H", y, this.el);
+                }
+            } else {
+                valid = false;
             }
 
         }
@@ -176,6 +190,18 @@ export default class PipelineProgramConsumption extends Component {
             }
         }
 
+        if (x == 7) {
+            var valid = checkValidtion("numberNotRequired", "H", y, value, this.el, JEXCEL_INTEGER_REGEX, 1, 1);
+            if (valid == true) {
+                if (parseInt(value) > 31) {
+                    inValid("H", y, i18n.t('static.supplyPlan.daysOfStockMaxValue'), this.el);
+                } else {
+                    positiveValidation("H", y, this.el);
+                }
+            }
+
+        }
+
     }
 
     loaded() {
@@ -237,10 +263,28 @@ export default class PipelineProgramConsumption extends Component {
                 this.el.setComments(col, (list[y].realmCountryPlanningUnitId).concat(i18n.t('static.message.notExist')));
             }
 
+            var value = (this.el.getRowData(y)[6]).toString();
+            var col = ("G").concat(parseInt(y) + 1);
+            var reg = JEXCEL_INTEGER_REGEX;
+
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
 
 
+
+            }
         }
-
 
     }
     saveConsumption() {
@@ -310,16 +354,17 @@ export default class PipelineProgramConsumption extends Component {
                 // AuthenticationService.setupAxiosInterceptors();
                 DataSourceService.getAllDataSourceList().then(response => {
                     // console.log("data source List ----->", response.data);
-                    for (var j = 0; j < response.data.length; j++) {
-                        if (response.data[j].dataSourceType.id == ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE || response.data[j].dataSourceType.id == FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE)
-                            var dataSourceJson = {
-                                id: ((response.data)[j]).dataSourceId,
-                                name: ((response.data)[j]).label.label_en
-                            }
+                    var dataSourceFilterList = response.data.filter(c => c.dataSourceType.id == ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE || c.dataSourceType.id == FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE);
+                    for (var j = 0; j < dataSourceFilterList.length; j++) {
+                        // if (response.data[j].dataSourceType.id == ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE || response.data[j].dataSourceType.id == FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE)
+                        var dataSourceJson = {
+                            id: ((dataSourceFilterList)[j]).dataSourceId,
+                            name: ((dataSourceFilterList)[j]).label.label_en
+                        }
                         dataSourceList.push(dataSourceJson);
                     }
 
-
+                    console.log("final data source====>", dataSourceList);
                     // AuthenticationService.setupAxiosInterceptors();
                     PlanningUnitService.getActivePlanningUnitList()
                         .then(response => {
@@ -356,7 +401,7 @@ export default class PipelineProgramConsumption extends Component {
                                                 data[2] = consumptionList[j].regionId;
                                             };
                                             // data[2] = consumptionList[j].regionId;
-                                            data[6] = (cm == 0 || cm != consumptionList[j].consNumMonth - 1) ? Math.ceil(consumptionList[j].consumptionQty / consumptionList[j].consNumMonth) : Math.ceil(consumptionList[j].consumptionQty / consumptionList[j].consNumMonth) + (consumptionList[j].consumptionQty - ((Math.ceil(consumptionList[j].consumptionQty / consumptionList[j].consNumMonth)) * consumptionList[j].consNumMonth));
+                                            data[6] = Math.round((cm == 0 || cm != consumptionList[j].consNumMonth - 1) ? Math.ceil(consumptionList[j].consumptionQty / consumptionList[j].consNumMonth) : Math.ceil(consumptionList[j].consumptionQty / consumptionList[j].consNumMonth) + (consumptionList[j].consumptionQty - ((Math.ceil(consumptionList[j].consumptionQty / consumptionList[j].consNumMonth)) * consumptionList[j].consNumMonth)));
                                             data[7] = consumptionList[j].dayOfStockOut;
                                             data[1] = consumptionList[j].dataSourceId;
                                             data[3] = consumptionList[j].realmCountryPlanningUnitId;
