@@ -675,10 +675,12 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
 
         if (x == 8) {
             var valid = checkValidtion("numberNotRequired", "I", y, rowData[8], elInstance, JEXCEL_INTEGER_REGEX, 1, 1);
-            if (parseInt(rowData[8]) > 31) {
-                inValid("I", y, i18n.t('static.supplyPlan.daysOfStockMaxValue'), elInstance);
-            } else {
-                positiveValidation("I", y, elInstance);
+            if (valid == true) {
+                if (parseInt(rowData[8]) > 31) {
+                    inValid("I", y, i18n.t('static.supplyPlan.daysOfStockMaxValue'), elInstance);
+                } else {
+                    positiveValidation("I", y, elInstance);
+                }
             }
         }
 
