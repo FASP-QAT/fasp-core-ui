@@ -121,8 +121,8 @@ class warehouseCapacity extends Component {
 
         for (var item = 0; item < re.length; item++) {
             // A.push([(getLabelText(re[item].realmCountry.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),(getLabelText(re[item].region.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),(getLabelText(re[item].programList.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),re[item].gln, re[item].capacityCbm])
-            A.push(this.addDoubleQuoteToRowContent([(getLabelText(re[item].realmCountry.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(re[item].region.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (re[item].programList.map(ele=>{return getLabelText(ele.label,this.state.lang)})).join('\n').replaceAll(' ', '%20'), re[item].gln == null ? '' : re[item].gln, re[item].capacityCbm]))
-            
+            A.push(this.addDoubleQuoteToRowContent([(getLabelText(re[item].realmCountry.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(re[item].region.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (re[item].programList.map(ele => { return getLabelText(ele.label, this.state.lang) })).join('\n').replaceAll(' ', '%20'), re[item].gln == null ? '' : re[item].gln, re[item].capacityCbm]))
+
         }
 
         for (var i = 0; i < A.length; i++) {
@@ -198,15 +198,15 @@ class warehouseCapacity extends Component {
                     doc.setFont('helvetica', 'normal')
 
                     if (navigator.onLine) {
-var y=90
+                        var y = 90
                         var planningText = doc.splitTextToSize(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.join('; '), doc.internal.pageSize.width * 3 / 4);
                         // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
                         for (var i = 0; i < planningText.length; i++) {
-                          if (y > doc.internal.pageSize.height - 100) {
-                            doc.addPage();
-                            y = 80;
-                    
-                          }
+                            if (y > doc.internal.pageSize.height - 100) {
+                                doc.addPage();
+                                y = 80;
+
+                            }
                         }
                         // doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
                         //     align: 'left'
@@ -243,13 +243,13 @@ var y=90
             i18n.t('static.program.program'),
             i18n.t('static.region.gln'),
             i18n.t('static.region.capacitycbm')
-             ]
-let data=this.state.data.map(elt=>[getLabelText(elt.realmCountry.label, this.state.lang), getLabelText(elt.region.label, this.state.lang), (elt.programList.map(ele=>{return getLabelText(ele.label,this.state.lang)})).join('\n'), elt.gln == null ? '' : elt.gln, elt.capacityCbm])
+        ]
+        let data = this.state.data.map(elt => [getLabelText(elt.realmCountry.label, this.state.lang), getLabelText(elt.region.label, this.state.lang), (elt.programList.map(ele => { return getLabelText(ele.label, this.state.lang) })).join('\n'), elt.gln == null ? '' : elt.gln, elt.capacityCbm])
         let content = {
             margin: { top: 40, left: 100, bottom: 50 },
             startY: 150,
-             head: [headers],
-             body: data,
+            head: [headers],
+            body: data,
             styles: { lineWidth: 1, fontSize: 8, cellWidth: 80, halign: 'center' },
             columnStyles: {
                 0: { cellWidth: 113 },
@@ -297,7 +297,7 @@ let data=this.state.data.map(elt=>[getLabelText(elt.realmCountry.label, this.sta
         RealmCountryService.getRealmCountryForProgram(realmId)
             .then(response => {
                 this.setState({
-                    countries: response.data.map(ele=>ele.realmCountry), loading: false
+                    countries: response.data.map(ele => ele.realmCountry), loading: false
                 })
             }).catch(
                 error => {
@@ -305,71 +305,114 @@ let data=this.state.data.map(elt=>[getLabelText(elt.realmCountry.label, this.sta
                         countries: [], loading: false
                     })
                     if (error.message === "Network Error") {
-                        this.setState({ loading: false, message: error.message });
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
                     } else {
                         switch (error.response ? error.response.status : "") {
-                            case 500:
+
                             case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
                             case 404:
                             case 406:
+                                this.setState({
+                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
+                                    loading: false
+                                });
+                                break;
                             case 412:
-                                this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }) });
+                                this.setState({
+                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
+                                    loading: false
+                                });
                                 break;
                             default:
-                                this.setState({ loading: false, message: 'static.unkownError' });
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
                                 break;
                         }
                     }
                 }
             );
+        // .catch(
+        //     error => {
+        //         this.setState({
+        //             countries: [], loading: false
+        //         })
+        //         if (error.message === "Network Error") {
+        //             this.setState({ loading: false, message: error.message });
+        //         } else {
+        //             switch (error.response ? error.response.status : "") {
+        //                 case 500:
+        //                 case 401:
+        //                 case 404:
+        //                 case 406:
+        //                 case 412:
+        //                     this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }) });
+        //                     break;
+        //                 default:
+        //                     this.setState({ loading: false, message: 'static.unkownError' });
+        //                     break;
+        //             }
+        //         }
+        //     }
+        // );
 
     }
     filterProgram = () => {
-        let countryIds = this.state.countryValues.map(ele=>ele.value);
-        console.log('countryIds',countryIds,'programs',this.state.programs)
+        let countryIds = this.state.countryValues.map(ele => ele.value);
+        console.log('countryIds', countryIds, 'programs', this.state.programs)
         this.setState({
             programLst: [],
             programValues: [],
             programLabels: []
         }, () => {
             if (countryIds.length != 0) {
-                let programLst =[];
-                 for(var i=0;i<countryIds.length;i++){
-                     programLst=[...programLst,...this.state.programs.filter(c => c.realmCountry.realmCountryId == countryIds[i])]
-                    }
+                let programLst = [];
+                for (var i = 0; i < countryIds.length; i++) {
+                    programLst = [...programLst, ...this.state.programs.filter(c => c.realmCountry.realmCountryId == countryIds[i])]
+                }
 
-                console.log('programLst',programLst)
+                console.log('programLst', programLst)
                 if (programLst.length > 0) {
 
                     this.setState({
                         programLst: programLst
                     }, () => {
-                         this.fetchData() 
+                        this.fetchData()
                     });
                 } else {
                     this.setState({
                         programLst: []
-                    },() => {
-                        this.fetchData() 
-                   });
+                    }, () => {
+                        this.fetchData()
+                    });
                 }
             }
-         
+
         })
     }
     handleChange(countrysId) {
 
         countrysId = countrysId.sort(function (a, b) {
-          return parseInt(a.value) - parseInt(b.value);
+            return parseInt(a.value) - parseInt(b.value);
         })
         this.setState({
-          countryValues: countrysId.map(ele => ele),
-          countryLabels: countrysId.map(ele => ele.label)
+            countryValues: countrysId.map(ele => ele),
+            countryLabels: countrysId.map(ele => ele.label)
         }, () => {
-    this.filterProgram()
-      
+            this.filterProgram()
+
         })
-      }
+    }
     handleChangeProgram(programIds) {
         programIds = programIds.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
@@ -399,23 +442,66 @@ let data=this.state.data.map(elt=>[getLabelText(elt.realmCountry.label, this.sta
                             programs: [], loading: false
                         })
                         if (error.message === "Network Error") {
-                            this.setState({ loading: false, message: error.message });
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
                         } else {
                             switch (error.response ? error.response.status : "") {
-                                case 500:
+
                                 case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
                                 case 404:
                                 case 406:
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                        loading: false
+                                    });
+                                    break;
                                 case 412:
-                                    this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                        loading: false
+                                    });
                                     break;
                                 default:
-                                    this.setState({ loading: false, message: 'static.unkownError' });
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
                                     break;
                             }
                         }
                     }
                 );
+            // .catch(
+            //     error => {
+            //         this.setState({
+            //             programs: [], loading: false
+            //         })
+            //         if (error.message === "Network Error") {
+            //             this.setState({ loading: false, message: error.message });
+            //         } else {
+            //             switch (error.response ? error.response.status : "") {
+            //                 case 500:
+            //                 case 401:
+            //                 case 404:
+            //                 case 406:
+            //                 case 412:
+            //                     this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+            //                     break;
+            //                 default:
+            //                     this.setState({ loading: false, message: 'static.unkownError' });
+            //                     break;
+            //             }
+            //         }
+            //     }
+            // );
         } else {
             console.log('offline Program list')
             this.setState({ loading: false })
@@ -466,7 +552,7 @@ let data=this.state.data.map(elt=>[getLabelText(elt.realmCountry.label, this.sta
 
             let programId = this.state.programValues.length == this.state.programs.length ? [] : this.state.programValues.map(ele => (ele.value).toString());
             let CountryIds = this.state.countryValues.length == this.state.countries.length ? [] : this.state.countryValues.map(ele => (ele.value).toString());
-    
+
             console.log("programId---", programId);
             if (this.state.programValues.length > 0 && this.state.countryValues.length > 0) {
                 this.setState({ loading: true })
@@ -493,23 +579,69 @@ let data=this.state.data.map(elt=>[getLabelText(elt.realmCountry.label, this.sta
                                 this.el.destroy();
                             })
                             if (error.message === "Network Error") {
-                                this.setState({ loading: false, message: error.message });
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
                             } else {
                                 switch (error.response ? error.response.status : "") {
-                                    case 500:
+
                                     case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
                                     case 404:
                                     case 406:
+                                        this.setState({
+                                            message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                            loading: false
+                                        });
+                                        break;
                                     case 412:
-                                        this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                        this.setState({
+                                            message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                            loading: false
+                                        });
                                         break;
                                     default:
-                                        this.setState({ loading: false, message: 'static.unkownError' });
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
                                         break;
                                 }
                             }
                         }
                     );
+                // .catch(
+                //     error => {
+                //         this.setState({
+                //             data: [], loading: false
+                //         }, () => {
+                //             this.el = jexcel(document.getElementById("tableDiv"), '');
+                //             this.el.destroy();
+                //         })
+                //         if (error.message === "Network Error") {
+                //             this.setState({ loading: false, message: error.message });
+                //         } else {
+                //             switch (error.response ? error.response.status : "") {
+                //                 case 500:
+                //                 case 401:
+                //                 case 404:
+                //                 case 406:
+                //                 case 412:
+                //                     this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                //                     break;
+                //                 default:
+                //                     this.setState({ loading: false, message: 'static.unkownError' });
+                //                     break;
+                //             }
+                //         }
+                //     }
+                // );
 
             } else if (this.state.programValues.length == 0) {
                 this.setState({ message: i18n.t('static.common.selectProgram'), data: [] }, () => {
@@ -732,11 +864,7 @@ let data=this.state.data.map(elt=>[getLabelText(elt.realmCountry.label, this.sta
 
         return (
             <div className="animated fadeIn" >
-                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
-                    this.setState({ message: message })
-                }} loading={(loading) => {
-                    this.setState({ loading: loading })
-                }} />
+                <AuthenticationServiceComponent history={this.props.history} />
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
 
@@ -764,27 +892,27 @@ let data=this.state.data.map(elt=>[getLabelText(elt.realmCountry.label, this.sta
                                     <div className="pl-0">
                                         <div className="row">
                                             <Online>
-                                            <FormGroup className="col-md-3 ">
-                      <Label htmlFor="countrysId">{i18n.t('static.program.realmcountry')}</Label>
-                      <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                                                <FormGroup className="col-md-3 ">
+                                                    <Label htmlFor="countrysId">{i18n.t('static.program.realmcountry')}</Label>
+                                                    <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
 
-                      <div className="controls edit">
-                        <MultiSelect
+                                                    <div className="controls edit">
+                                                        <MultiSelect
 
-                          bsSize="sm"
-                          name="countrysId"
-                          id="countrysId"
-                          value={this.state.countryValues}
-                          onChange={(e) => { this.handleChange(e) }}
-                          options={countryList && countryList.length > 0 ? countryList : []}
-                        />
-                        {!!this.props.error &&
-                          this.props.touched && (
-                            <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
-                          )}
-                      </div>
+                                                            bsSize="sm"
+                                                            name="countrysId"
+                                                            id="countrysId"
+                                                            value={this.state.countryValues}
+                                                            onChange={(e) => { this.handleChange(e) }}
+                                                            options={countryList && countryList.length > 0 ? countryList : []}
+                                                        />
+                                                        {!!this.props.error &&
+                                                            this.props.touched && (
+                                                                <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
+                                                            )}
+                                                    </div>
 
-                    </FormGroup>
+                                                </FormGroup>
                                             </Online>
                                             <Online>
 

@@ -248,8 +248,10 @@ class AddFundingSourceComponent extends Component {
     }
   }
   Capitalize(str) {
+    var reg = /^[1-9]\d*(\.\d+)?$/
     if (str != null && str != "") {
-      return str.charAt(0).toUpperCase() + str.slice(1);
+      // return str.charAt(0).toUpperCase() + str.slice(1);
+      return (!(reg.test(str)) ? str.charAt(0).toUpperCase() + str.slice(1) : str)
     } else {
       return "";
     }

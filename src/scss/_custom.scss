@@ -446,6 +446,12 @@ label.arrow_label:after {
 .Select--multi .Select-value-icon:hover {
   color: #212721 !important;
 }
+.Select--multi .Select-value-label {
+  border-bottom-right-radius: 2px;
+  border-top-right-radius: 2px;
+  cursor: default;
+  padding: 2px 4px!important;
+}
 .form-check-inline .form-check-input {
   margin-left: 2rem;
 }
@@ -1527,7 +1533,7 @@ h5,
 }
 .icon-wrapper i {
   margin: 0 auto;
-  font-size: 20px;
+  font-size: 24px;
   position: relative;
   z-index: 5;
 }
@@ -3655,4 +3661,9 @@ background-color: yellow;
 }
 .pipelineimportfile{
   margin-top: -10px;
+}
+.custom-file-input-btn {
+  color: #fff!important;
+  background-color: #20a8d8!important;
+  border-radius: 0px  5px 5px 0px;
 }

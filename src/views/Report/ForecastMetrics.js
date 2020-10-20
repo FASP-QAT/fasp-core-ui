@@ -153,8 +153,8 @@ class ForecastMetrics extends Component {
       message: '',
       singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
       rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-      minDate:{year:  new Date().getFullYear()-3, month: new Date().getMonth()+2},
-      maxDate:{year:  new Date().getFullYear()+3, month: new Date().getMonth()},
+      minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
+      maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
       loading: true
 
 
@@ -200,36 +200,36 @@ class ForecastMetrics extends Component {
       return this.roundN(cell) + '%';
     } else if ((cell == "0" && row.months == 0)) {
       return "No data points containing both actual and forecast consumption ";
-    } else if(cell == null){
+    } else if (cell == null) {
       return "No data points containing  actual consumption ";
-    }else {
+    } else {
       return "0%"
     }
   }
-  addDoubleQuoteToRowContent=(arr)=>{
-    return arr.map(ele=>'"'+ele+'"')
- }
+  addDoubleQuoteToRowContent = (arr) => {
+    return arr.map(ele => '"' + ele + '"')
+  }
   exportCSV() {
 
     var csvRow = [];
-    csvRow.push('"' +(i18n.t('static.report.month') + ' : ' + this.makeText(this.state.singleValue2)).replaceAll(' ', '%20')+'"')
-    csvRow.push('"' +(i18n.t('static.report.timeWindow') + ' , ' + (document.getElementById("viewById").selectedOptions[0].text)).replaceAll(' ', '%20')+'"')
+    csvRow.push('"' + (i18n.t('static.report.month') + ' : ' + this.makeText(this.state.singleValue2)).replaceAll(' ', '%20') + '"')
+    csvRow.push('"' + (i18n.t('static.report.timeWindow') + ' , ' + (document.getElementById("viewById").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
 
     this.state.countryLabels.map(ele =>
-      csvRow.push('"' +(i18n.t('static.dashboard.country') + ' : ' + (ele.toString())).replaceAll(' ', '%20')+'"'))
+      csvRow.push('"' + (i18n.t('static.dashboard.country') + ' : ' + (ele.toString())).replaceAll(' ', '%20') + '"'))
     this.state.programLabels.map(ele =>
-      csvRow.push('"' +(i18n.t('static.program.program') + ' : ' + (ele.toString())).replaceAll(' ', '%20')+'"'))
+      csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + (ele.toString())).replaceAll(' ', '%20') + '"'))
     this.state.planningUnitLabels.map(ele =>
-      csvRow.push('"' +(i18n.t('static.planningunit.planningunit') + ' : ' + (ele.toString())).replaceAll(' ', '%20')+'"'))
-      csvRow.push('"' +((i18n.t('static.report.includeapproved') + ' : ' + document.getElementById("includeApprovedVersions").selectedOptions[0].text).replaceAll(' ', '%20')+'"'))
-        
+      csvRow.push('"' + (i18n.t('static.planningunit.planningunit') + ' : ' + (ele.toString())).replaceAll(' ', '%20') + '"'))
+    csvRow.push('"' + ((i18n.t('static.report.includeapproved') + ' : ' + document.getElementById("includeApprovedVersions").selectedOptions[0].text).replaceAll(' ', '%20') + '"'))
+
     csvRow.push('')
     csvRow.push('')
-    csvRow.push('"' +(i18n.t('static.common.youdatastart')).replaceAll(' ', '%20')+'"')
+    csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
     csvRow.push('')
     var re;
 
-    var A = [this.addDoubleQuoteToRowContent([(i18n.t('static.program.program')).replaceAll(' ', '%20'),(i18n.t('static.report.qatPID')).replaceAll(' ', '%20'), (i18n.t('static.dashboard.planningunit')).replaceAll(' ', '%20'),
+    var A = [this.addDoubleQuoteToRowContent([(i18n.t('static.program.program')).replaceAll(' ', '%20'), (i18n.t('static.report.qatPID')).replaceAll(' ', '%20'), (i18n.t('static.dashboard.planningunit')).replaceAll(' ', '%20'),
     //(i18n.t('static.report.historicalConsumptionDiff')).replaceAll(' ','%20'),(i18n.t('static.report.historicalConsumptionActual')).replaceAll(' ','%20'),
     (i18n.t('static.report.error')).replaceAll(' ', '%20'), (i18n.t('static.report.noofmonth')).replaceAll(' ', '%20')])]
 
@@ -237,9 +237,9 @@ class ForecastMetrics extends Component {
 
     for (var item = 0; item < re.length; item++) {
       console.log(re[item].planningUnit)
-      A.push([this.addDoubleQuoteToRowContent([(getLabelText(re[item].program.label).replaceAll(',', '%20')).replaceAll(' ', '%20'),re[item].planningUnit.id, re[item].planningUnit.id == 0 ? '' : (getLabelText(re[item].planningUnit.label)).replaceAll(' ', '%20'),
+      A.push([this.addDoubleQuoteToRowContent([(getLabelText(re[item].program.label).replaceAll(',', '%20')).replaceAll(' ', '%20'), re[item].planningUnit.id, re[item].planningUnit.id == 0 ? '' : (getLabelText(re[item].planningUnit.label)).replaceAll(' ', '%20'),
       // re[item].historicalConsumptionDiff,re[item].historicalConsumptionActual,
-      re[item].message !=null  ? (i18n.t(re[item].message)).replaceAll(' ', '%20') : this.roundN(re[item].forecastError) + '%', re[item].monthCount])])
+      re[item].message != null ? (i18n.t(re[item].message)).replaceAll(' ', '%20') : this.roundN(re[item].forecastError) + '%', re[item].monthCount])])
     }
     for (var i = 0; i < A.length; i++) {
       csvRow.push(A[i].join(","))
@@ -362,24 +362,24 @@ class ForecastMetrics extends Component {
 
     doc.text(i18n.t('static.report.includeapproved') + ' : ' + document.getElementById("includeApprovedVersions").selectedOptions[0].text, doc.internal.pageSize.width / 8, y, {
       align: 'left'
-  })
+    })
 
 
     var height = doc.internal.pageSize.height;
     var h1 = 50;
-    let startY = y+20
+    let startY = y + 20
     console.log('startY', startY)
     let pages = Math.ceil(startY / height)
     for (var j = 1; j < pages; j++) {
       doc.addPage()
     }
     let startYtable = startY - ((height - h1) * (pages - 1))
-    const headers = [[i18n.t('static.program.program'), i18n.t('static.report.qatPID'),i18n.t('static.dashboard.planningunit'),
+    const headers = [[i18n.t('static.program.program'), i18n.t('static.report.qatPID'), i18n.t('static.dashboard.planningunit'),
     //i18n.t('static.report.historicalConsumptionDiff'),i18n.t('static.report.historicalConsumptionActual'),
     i18n.t('static.report.error'), i18n.t('static.report.noofmonth')]]
-    const data = this.state.consumptions.map(elt => [getLabelText(elt.program.label),elt.planningUnit.id, getLabelText(elt.planningUnit.label),
+    const data = this.state.consumptions.map(elt => [getLabelText(elt.program.label), elt.planningUnit.id, getLabelText(elt.planningUnit.label),
     //elt.historicalConsumptionDiff,elt.historicalConsumptionActual,
-    elt.message !=null ? i18n.t(elt.message) : this.roundN(elt.forecastError) + '%', elt.monthCount]);
+    elt.message != null ? i18n.t(elt.message) : this.roundN(elt.forecastError) + '%', elt.monthCount]);
     let content = {
       margin: { top: 80, bottom: 50 },
       startY: startYtable,
@@ -392,7 +392,7 @@ class ForecastMetrics extends Component {
         2: { cellWidth: 169.89 },
         3: { cellWidth: 141 },
         4: { cellWidth: 141 }
-        
+
       }
 
     };
@@ -472,7 +472,7 @@ class ForecastMetrics extends Component {
       data = [];
       data[0] = getLabelText(consumptions[j].program.label, this.state.lang)
       data[1] = getLabelText(consumptions[j].planningUnit.label, this.state.lang)
-      data[2] = consumptions[j].message!=null?i18n.t(consumptions[j].message):this.roundN(consumptions[j].forecastError)+"%";
+      data[2] = consumptions[j].message != null ? i18n.t(consumptions[j].message) : this.roundN(consumptions[j].forecastError) + "%";
       data[3] = consumptions[j].monthCount;
       data[4] = this.roundN(consumptions[j].forecastError);
 
@@ -534,7 +534,7 @@ class ForecastMetrics extends Component {
         if (forecastError > 50) {
           for (var i = 0; i < colArr.length; i++) {
             elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
-          //  elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', '#f48282');
+            //  elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', '#f48282');
             let textColor = 'red'//contrast('#f48282');
             elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'color', textColor);
           }
@@ -588,7 +588,7 @@ class ForecastMetrics extends Component {
     if (this.state.countryValues.length > 0 && this.state.planningUnitValues.length > 0 && this.state.programValues.length > 0) {
       this.setState({ loading: true })
       var inputjson = {
-        "realmCountryIds": CountryIds, "programIds": programIds, "planningUnitIds": planningUnitIds, "startDate": startDate, "previousMonths": monthInCalc,"useApprovedSupplyPlanOnly": useApprovedVersion
+        "realmCountryIds": CountryIds, "programIds": programIds, "planningUnitIds": planningUnitIds, "startDate": startDate, "previousMonths": monthInCalc, "useApprovedSupplyPlanOnly": useApprovedVersion
 
       }
       // AuthenticationService.setupAxiosInterceptors();
@@ -610,25 +610,71 @@ class ForecastMetrics extends Component {
               this.el = jexcel(document.getElementById("tableDiv"), '');
               this.el.destroy();
             });
-
             if (error.message === "Network Error") {
-              this.setState({ message: error.message, loading: false });
+              this.setState({
+                message: 'static.unkownError',
+                loading: false
+              });
             } else {
               switch (error.response ? error.response.status : "") {
-                case 500:
+
                 case 401:
+                  this.props.history.push(`/login/static.message.sessionExpired`)
+                  break;
+                case 403:
+                  this.props.history.push(`/accessDenied`)
+                  break;
+                case 500:
                 case 404:
                 case 406:
+                  this.setState({
+                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
+                    loading: false
+                  });
+                  break;
                 case 412:
-                  this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }), loading: false });
+                  this.setState({
+                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
+                    loading: false
+                  });
                   break;
                 default:
-                  this.setState({ message: 'static.unkownError', loading: false });
+                  this.setState({
+                    message: 'static.unkownError',
+                    loading: false
+                  });
                   break;
               }
             }
           }
         );
+      // .catch(
+      //   error => {
+      //     this.setState({
+      //       consumptions: [], loading: false
+      //     }, () => {
+      //       this.el = jexcel(document.getElementById("tableDiv"), '');
+      //       this.el.destroy();
+      //     });
+
+      //     if (error.message === "Network Error") {
+      //       this.setState({ message: error.message, loading: false });
+      //     } else {
+      //       switch (error.response ? error.response.status : "") {
+      //         case 500:
+      //         case 401:
+      //         case 404:
+      //         case 406:
+      //         case 412:
+      //           this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }), loading: false });
+      //           break;
+      //         default:
+      //           this.setState({ message: 'static.unkownError', loading: false });
+      //           break;
+      //       }
+      //     }
+      //   }
+      // );
     } else if (this.state.countryValues.length == 0) {
       this.setState({ message: i18n.t('static.program.validcountrytext'), consumptions: [] }, () => {
         this.el = jexcel(document.getElementById("tableDiv"), '');
@@ -657,7 +703,7 @@ class ForecastMetrics extends Component {
       RealmCountryService.getRealmCountryForProgram(realmId)
         .then(response => {
           this.setState({
-            countrys: response.data.map(ele=>ele.realmCountry), loading: false
+            countrys: response.data.map(ele => ele.realmCountry), loading: false
           })
         }).catch(
           error => {
@@ -665,23 +711,66 @@ class ForecastMetrics extends Component {
               countrys: [], loading: false
             })
             if (error.message === "Network Error") {
-              this.setState({ message: error.message, loading: false });
+              this.setState({
+                message: 'static.unkownError',
+                loading: false
+              });
             } else {
               switch (error.response ? error.response.status : "") {
-                case 500:
+
                 case 401:
+                  this.props.history.push(`/login/static.message.sessionExpired`)
+                  break;
+                case 403:
+                  this.props.history.push(`/accessDenied`)
+                  break;
+                case 500:
                 case 404:
                 case 406:
-                case 412:
-                default:
-                  this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }), loading: false });
+                  this.setState({
+                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
+                    loading: false
+                  });
                   break;
-                  this.setState({ message: 'static.unkownError', loading: false });
+                case 412:
+                  this.setState({
+                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
+                    loading: false
+                  });
+                  break;
+                default:
+                  this.setState({
+                    message: 'static.unkownError',
+                    loading: false
+                  });
                   break;
               }
             }
           }
         );
+      // .catch(
+      //   error => {
+      //     this.setState({
+      //       countrys: [], loading: false
+      //     })
+      //     if (error.message === "Network Error") {
+      //       this.setState({ message: error.message, loading: false });
+      //     } else {
+      //       switch (error.response ? error.response.status : "") {
+      //         case 500:
+      //         case 401:
+      //         case 404:
+      //         case 406:
+      //         case 412:
+      //         default:
+      //           this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }), loading: false });
+      //           break;
+      //           this.setState({ message: 'static.unkownError', loading: false });
+      //           break;
+      //       }
+      //     }
+      //   }
+      // );
 
     } else {
       const lan = 'en';
@@ -738,7 +827,46 @@ class ForecastMetrics extends Component {
             this.setState({
               planningUnits: response.data,
             })
-          })
+          }).catch(
+            error => {
+              if (error.message === "Network Error") {
+                this.setState({
+                  message: 'static.unkownError',
+                  loading: false
+                });
+              } else {
+                switch (error.response ? error.response.status : "") {
+
+                  case 401:
+                    this.props.history.push(`/login/static.message.sessionExpired`)
+                    break;
+                  case 403:
+                    this.props.history.push(`/accessDenied`)
+                    break;
+                  case 500:
+                  case 404:
+                  case 406:
+                    this.setState({
+                      message: error.response.data.messageCode,
+                      loading: false
+                    });
+                    break;
+                  case 412:
+                    this.setState({
+                      message: error.response.data.messageCode,
+                      loading: false
+                    });
+                    break;
+                  default:
+                    this.setState({
+                      message: 'static.unkownError',
+                      loading: false
+                    });
+                    break;
+                }
+              }
+            }
+          );
       }
     })
 
@@ -759,23 +887,66 @@ class ForecastMetrics extends Component {
             programs: [], loading: false
           })
           if (error.message === "Network Error") {
-            this.setState({ message: error.message, loading: false });
+            this.setState({
+              message: 'static.unkownError',
+              loading: false
+            });
           } else {
             switch (error.response ? error.response.status : "") {
-              case 500:
+
               case 401:
+                this.props.history.push(`/login/static.message.sessionExpired`)
+                break;
+              case 403:
+                this.props.history.push(`/accessDenied`)
+                break;
+              case 500:
               case 404:
               case 406:
+                this.setState({
+                  message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                  loading: false
+                });
+                break;
               case 412:
-                this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }), loading: false });
+                this.setState({
+                  message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                  loading: false
+                });
                 break;
               default:
-                this.setState({ message: 'static.unkownError', loading: false });
+                this.setState({
+                  message: 'static.unkownError',
+                  loading: false
+                });
                 break;
             }
           }
         }
       );
+    // .catch(
+    //   error => {
+    //     this.setState({
+    //       programs: [], loading: false
+    //     })
+    //     if (error.message === "Network Error") {
+    //       this.setState({ message: error.message, loading: false });
+    //     } else {
+    //       switch (error.response ? error.response.status : "") {
+    //         case 500:
+    //         case 401:
+    //         case 404:
+    //         case 406:
+    //         case 412:
+    //           this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }), loading: false });
+    //           break;
+    //         default:
+    //           this.setState({ message: 'static.unkownError', loading: false });
+    //           break;
+    //       }
+    //     }
+    //   }
+    // );
   }
 
   getProductCategories() {
@@ -793,23 +964,66 @@ class ForecastMetrics extends Component {
             productCategories: []
           })
           if (error.message === "Network Error") {
-            this.setState({ message: error.message });
+            this.setState({
+              message: 'static.unkownError',
+              loading: false
+            });
           } else {
             switch (error.response ? error.response.status : "") {
-              case 500:
+
               case 401:
+                this.props.history.push(`/login/static.message.sessionExpired`)
+                break;
+              case 403:
+                this.props.history.push(`/accessDenied`)
+                break;
+              case 500:
               case 404:
               case 406:
+                this.setState({
+                  message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }),
+                  loading: false
+                });
+                break;
               case 412:
-                this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
+                this.setState({
+                  message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }),
+                  loading: false
+                });
                 break;
               default:
-                this.setState({ message: 'static.unkownError' });
+                this.setState({
+                  message: 'static.unkownError',
+                  loading: false
+                });
                 break;
             }
           }
         }
       );
+    // .catch(
+    //   error => {
+    //     this.setState({
+    //       productCategories: []
+    //     })
+    //     if (error.message === "Network Error") {
+    //       this.setState({ message: error.message });
+    //     } else {
+    //       switch (error.response ? error.response.status : "") {
+    //         case 500:
+    //         case 401:
+    //         case 404:
+    //         case 406:
+    //         case 412:
+    //           this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
+    //           break;
+    //         default:
+    //           this.setState({ message: 'static.unkownError' });
+    //           break;
+    //       }
+    //     }
+    //   }
+    // );
 
 
   }
@@ -1002,11 +1216,7 @@ class ForecastMetrics extends Component {
 
     return (
       <div className="animated fadeIn" >
-        <AuthenticationServiceComponent history={this.props.history} message={(message) => {
-          this.setState({ message: message })
-        }} loading={(loading) => {
-          this.setState({ loading: loading })
-        }} />
+        <AuthenticationServiceComponent history={this.props.history} />
         <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
         <h5 className="red">{i18n.t(this.state.message)}</h5>
         <SupplyPlanFormulas ref="formulaeChild" />
@@ -1041,7 +1251,7 @@ class ForecastMetrics extends Component {
                       <div className="controls edit">
                         <Picker
                           ref="pickAMonth2"
-                          years={{min: this.state.minDate, max: this.state.maxDate}}
+                          years={{ min: this.state.minDate, max: this.state.maxDate }}
                           value={singleValue2}
                           lang={pickerLang.months}
                           theme="dark"
@@ -1135,24 +1345,24 @@ class ForecastMetrics extends Component {
                       </div>
                     </FormGroup>
                     <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.includeapproved')}</Label>
-                                                <div className="controls ">
-                                                    <InputGroup>
-                                                        <Input
-                                                            type="select"
-                                                            name="includeApprovedVersions"
-                                                            id="includeApprovedVersions"
-                                                            bsSize="sm"
-                                                            onChange={(e) => { this.filterData() }}
-                                                        >
-                                                            <option value="true">{i18n.t('static.program.yes')}</option>
-                                                            <option value="false">{i18n.t('static.program.no')}</option>
-                                                        </Input>
+                      <Label htmlFor="appendedInputButton">{i18n.t('static.report.includeapproved')}</Label>
+                      <div className="controls ">
+                        <InputGroup>
+                          <Input
+                            type="select"
+                            name="includeApprovedVersions"
+                            id="includeApprovedVersions"
+                            bsSize="sm"
+                            onChange={(e) => { this.filterData() }}
+                          >
+                            <option value="true">{i18n.t('static.program.yes')}</option>
+                            <option value="false">{i18n.t('static.program.no')}</option>
+                          </Input>
 
-                                                    </InputGroup>
-                                                </div>
-                                            </FormGroup>
-                                            
+                        </InputGroup>
+                      </div>
+                    </FormGroup>
+
 
                   </div>
                 </div>
@@ -1205,16 +1415,16 @@ class ForecastMetrics extends Component {
           </CardBody>
         </Card>
         <div style={{ display: this.state.loading ? "block" : "none" }}>
-              <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                <div class="align-items-center">
-                  <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+          <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+            <div class="align-items-center">
+              <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                  <div class="spinner-border blue ml-4" role="status">
+              <div class="spinner-border blue ml-4" role="status">
 
-                  </div>
-                </div>
               </div>
             </div>
+          </div>
+        </div>
 
 
       </div>

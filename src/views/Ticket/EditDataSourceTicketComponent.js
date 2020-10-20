@@ -14,8 +14,10 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import { SPACE_REGEX } from '../../Constants';
 import DataSourceService from '../../api/DataSourceService';
 
+let summaryText_1 = (i18n.t("static.common.edit") + " " + i18n.t("static.datasource.datasource"))
+let summaryText_2 = "Edit Data Source"
 const initialValues = {
-    summary: "Edit Data Source",
+    summary: summaryText_1,
     dataSourceName: "",
     notes: ""
 }
@@ -60,7 +62,7 @@ export default class EditDataSourceTicketComponent extends Component {
         super(props);
         this.state = {
             dataSource: {
-                summary: "Edit Data Source",
+                summary: summaryText_1,
                 dataSourceName: "",
                 notes: ""
             },
@@ -81,7 +83,12 @@ export default class EditDataSourceTicketComponent extends Component {
             dataSource.summary = event.target.value;
         }
         if (event.target.name == "dataSourceName") {
-            dataSource.dataSourceName = event.target.options[event.target.selectedIndex].innerHTML;
+            var outText = "";
+            if(event.target.value !== "") {
+                var dataSourceT = this.state.dataSources.filter(c => c.dataSourceId == event.target.value)[0];
+                outText = dataSourceT.dataSourceType.label.label_en + " | " + dataSourceT.label.label_en;
+            }
+            dataSource.dataSourceName = outText;
             this.setState({
                 dataSourceId: event.target.value
             })
@@ -220,6 +227,8 @@ export default class EditDataSourceTicketComponent extends Component {
                             this.setState({
                                 loading: true
                             })
+                            this.state.dataSource.summary = summaryText_2;
+                            this.state.dataSource.userLanguageCode = this.state.lang;
                             JiraTikcetService.addEmailRequestIssue(this.state.dataSource).then(response => {
                                 console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {

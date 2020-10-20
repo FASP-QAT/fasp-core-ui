@@ -601,9 +601,9 @@ class DefaultLayout extends Component {
       // 15 min
       // timeout: 1000 * 450 * 1,
       // 5 min
-      timeout: 1000 * 150 * 1,
+      // timeout: 1000 * 150 * 1,
       // 1 hr
-      // timeout: 1000 * 1800 * 1,
+      timeout: 1000 * 1800 * 1,
       showModal: false,
       userLoggedIn: false,
       isTimedOut: false
@@ -1019,7 +1019,6 @@ class DefaultLayout extends Component {
                             url: '/programProduct/addProgramProduct',
                             icon: 'fa fa-list-alt',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_EDIT_PROGRAM') ? false : true) }
-                      
                           },
 
                           {
@@ -1252,14 +1251,14 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.dashboard.delinking'),
                             url: '/shipment/delinking',
-                            icon: 'fa fa-truck',
+                            icon: 'fa fa-chain-broken',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DELINKING') ? false : true) }
                           },
                           {
                             name: i18n.t('static.quantimed.quantimedImport'),
                             url: '/quantimed/quantimedImport',
                             icon: 'fa fa-file-text-o',
-                            attributes: { hidden: false }
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_QUANTIMED_IMPORT') ? false : true) }
                           }
 
                         ]

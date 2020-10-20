@@ -1153,9 +1153,9 @@ class AuthenticationService {
                     }
                     break;
                 case "/quantimed/quantimedImport":
-                    // if (bfunction.includes("ROLE_BF_ADD_PROBLEM")) {
-                    return true;
-                    // }
+                    if (bfunction.includes("ROLE_BF_QUANTIMED_IMPORT")) {
+                        return true;
+                    }
                     break;
                 default:
                     console.log("default case");

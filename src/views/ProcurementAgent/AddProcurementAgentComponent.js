@@ -668,7 +668,7 @@ class AddProcurementAgentComponent extends Component {
                                                         {/* </InputGroupAddon> */}
                                                         <FormFeedback className="red">{errors.approvedToShippedLeadTime}</FormFeedback>
                                                     </FormGroup>
-                                                    <FormGroup>
+                                                    {/* <FormGroup>
                                                         <Label className="P-absltRadio">{i18n.t('static.procurementAgent.localProcurementAgent')}  </Label>
                                                         <FormGroup check inline className="procurementAgentradiomargin">
                                                             <Input
@@ -702,7 +702,7 @@ class AddProcurementAgentComponent extends Component {
                                                                 {i18n.t('static.program.no')}
                                                             </Label>
                                                         </FormGroup>
-                                                    </FormGroup>
+                                                    </FormGroup> */}
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
