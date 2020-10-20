@@ -11,6 +11,10 @@ import i18n from '../../i18n'
 import { Online, Offline } from 'react-detect-offline';
 import AuthenticationService from '../../views/Common/AuthenticationService';
 import imageUsermanual from '../../assets/img/User-manual-icon.png';
+import iconsUparrowBlue from '../../assets/img/icons-uparrow-blue-.png';
+import iconsUparrowRed from '../../assets/img/icons-uparrow-red.png';
+import iconsDownarrowBlue from '../../assets/img/icons-downarrow-blue.png';
+import iconsDownarrowRed from '../../assets/img/icons-downarrow-red.png';
 import { API_URL } from '../../Constants';
 
 const propTypes = {
@@ -92,12 +96,15 @@ class DefaultHeader extends Component {
             <NavLink to="#" className="nav-link">
               <img src={imageUsermanual} className="HelpIcon" title={i18n.t('static.user.changesInLocalVersion')} />
             </NavLink>
-          </NavItem>
+          </NavItem> */}
           <NavItem className="">
             <NavLink to="#" className="nav-link">
-              <img src={imageUsermanual} className="HelpIcon" title={i18n.t('static.header.notLatestVersion')} />
+              {localStorage.getItem("sesLatestProgram") &&
+                < img src={iconsDownarrowRed} className="HelpIcon" title={i18n.t('static.header.notLatestVersion')} />}
+              {!localStorage.getItem("sesLatestProgram") &&
+                <img src={iconsDownarrowBlue} className="HelpIcon" title={i18n.t('static.header.notLatestVersion')} />}
             </NavLink>
-          </NavItem> */}
+          </NavItem>
           <NavItem className="">
             <span className="nav-link">
               <a href={`${API_URL}/file/qatUserGuide`}>

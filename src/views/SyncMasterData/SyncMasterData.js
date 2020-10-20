@@ -21,6 +21,7 @@ import UserService from '../../api/UserService';
 import { qatProblemActions } from '../../CommonComponent/QatProblemActions'
 import { calculateSupplyPlan } from '../SupplyPlan/SupplyPlanCalculations';
 import QatProblemActions from '../../CommonComponent/QatProblemActions'
+import GetLatestProgramVersion from '../../CommonComponent/GetLatestProgramVersion'
 
 export default class SyncMasterData extends Component {
 
@@ -88,6 +89,7 @@ export default class SyncMasterData extends Component {
         return (
             <div className="animated fadeIn">
                 <QatProblemActions ref="problemListChild" updateState={undefined} fetchData={undefined} objectStore="programData"></QatProblemActions>
+                <GetLatestProgramVersion ref="programListChild"></GetLatestProgramVersion>
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5 className="pl-md-5" style={{ color: "red" }} id="div2">{this.state.message != "" && i18n.t('static.masterDataSync.masterDataSyncFailed')}</h5>
                 <div className="col-md-12" style={{ display: this.state.loading ? "none" : "block" }}>
@@ -221,7 +223,7 @@ export default class SyncMasterData extends Component {
                 //                 }.bind(this);
                 //                 putRequest.onsuccess = function (event) {
                 //                     console.log("Planning unit list", planningUnitList);
-                                  
+
                 //                     calculateSupplyPlan(prog.id, 0, 'programData', 'masterDataSync', '', planningUnitList, minDate);
                 //                 }
                 //             }
@@ -269,12 +271,14 @@ export default class SyncMasterData extends Component {
                 this.setState({
                     message: 'static.common.onlinealerttext'
                 },
-                () => {
-                    this.hideSecondComponent();
-                })
+                    () => {
+                        this.hideSecondComponent();
+                    })
                 valid = false;
             }
         }
+
+        this.refs.programListChild.checkNewerVersions();
         if (valid) {
             this.setState({
                 syncedMasters: this.state.syncedMasters + 1,
@@ -285,9 +289,9 @@ export default class SyncMasterData extends Component {
             this.setState({
                 message: 'static.common.onlinealerttext'
             },
-            () => {
-                this.hideSecondComponent();
-            })
+                () => {
+                    this.hideSecondComponent();
+                })
         }
         console.log("Valid", valid);
         return valid;
