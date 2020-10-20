@@ -1190,7 +1190,7 @@ class ApplicationDashboard extends Component {
                     </ButtonGroup> */}
                   </div>
 
-                  <div className="TextTittle ">Open Issues</div>
+                  <div className="TextTittle ">{i18n.t("static.ticket.openIssues")}</div>
                   <div className="text-count">{this.state.openIssues}</div>
                   <div className="chart-wrapper mt-4 pb-2" >
                   </div>
