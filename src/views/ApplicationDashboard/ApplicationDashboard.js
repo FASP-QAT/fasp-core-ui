@@ -1139,7 +1139,7 @@ class ApplicationDashboard extends Component {
 
             </Row>
           }
-          <Row>
+          <Row className="mt-2">
             {this.state.programList.length > 0 &&
               <Col xs="12" sm="6" lg="3">
                 <Card className=" CardHeight">
