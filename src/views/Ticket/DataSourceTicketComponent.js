@@ -87,7 +87,7 @@ export default class DataSourceTicketComponent extends Component {
             realmId: "",
             programId: '',
             dataSourceTypeId: '',
-            loading: false
+            loading: true
         }
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
@@ -163,7 +163,7 @@ export default class DataSourceTicketComponent extends Component {
             .then(response => {
                 this.setState({
                     realms: response.data,
-                    realmId: selectedRealm
+                    realmId: selectedRealm, loading: false
                 });
                 if (selectedRealm !== "") {
                     this.setState({

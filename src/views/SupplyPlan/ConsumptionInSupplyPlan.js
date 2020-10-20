@@ -159,6 +159,19 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                     if (this.props.consumptionPage == "supplyPlanCompare") {
                         consumptionEditable = false;
                     }
+
+                    var roleList = AuthenticationService.getLoggedInUserRole();
+                    console.log("RoleList------------>", roleList);
+                    if (roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') {
+                        consumptionEditable = false;
+                    }
+
+                    if (this.props.consumptionPage != "supplyPlanCompare" && this.props.consumptionPage != "consumptionDataEntry" && consumptionEditable == false) {
+                        document.getElementById("addConsumptionRowSupplyPlan").style.display = "none";
+                    } else if (this.props.consumptionPage != "supplyPlanCompare" && this.props.consumptionPage != "consumptionDataEntry" && consumptionEditable == true) {
+                        document.getElementById("addConsumptionRowSupplyPlan").style.display = "block";
+                    }
+
                     var paginationOption = false;
                     var searchOption = false;
                     var paginationArray = []
@@ -208,7 +221,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         data[14] = 0;
                         consumptionDataArr[j] = data;
                     }
-                    if (consumptionList.length == 0) {
+                    if (consumptionList.length == 0 && consumptionEditable) {
                         data = [];
                         if (this.props.consumptionPage != "consumptionDataEntry") {
                             data[0] = moment(this.props.items.consumptionStartDate).startOf('month').format("YYYY-MM-DD"); //A
@@ -306,8 +319,8 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                                         for (var k = 0; k < batchInfoList.length; k++) {
                                             if (batchInfoList[k].planningUnitId == planningUnitId) {
                                                 var batchJson = {
-                                                    name: batchInfoList[k].batchNo,
-                                                    id: batchInfoList[k].batchNo,
+                                                    name: batchInfoList[k].batchNo + "~" + moment(batchInfoList[k].expiryDate).format("YYYY-MM-DD"),
+                                                    id: batchInfoList[k].batchNo + "~" + moment(batchInfoList[k].expiryDate).format("YYYY-MM-DD"),
                                                     createdDate: batchInfoList[k].createdDate,
                                                     expiryDate: batchInfoList[k].expiryDate,
                                                     batchId: batchInfoList[k].batchId,
@@ -342,7 +355,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                                         }
                                         for (var sb = 0; sb < batchInfo.length; sb++) {
                                             var data = [];
-                                            data[0] = batchInfo[sb].batch.batchNo; //A
+                                            data[0] = batchInfo[sb].batch.batchNo + "~" + moment(batchInfo[sb].batch.expiryDate).format("YYYY-MM-DD"); //A
                                             data[1] = moment(batchInfo[sb].batch.expiryDate).format(DATE_FORMAT_CAP);
                                             data[2] = batchInfo[sb].consumptionQty; //C
                                             data[3] = batchInfo[sb].consumptionTransBatchInfoId; //E
@@ -668,6 +681,14 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                 positiveValidation("I", y, elInstance);
             }
         }
+
+        if (x == 9) {
+            if (rowData[9].length > 600) {
+                inValid("J", y, i18n.t('static.dataentry.notesMaxLength'), elInstance);
+            } else {
+                positiveValidation("J", y, elInstance);
+            }
+        }
         if (x == 2) {
             var dataSource = rowData[3];
             var dataSourceType = "";
@@ -728,7 +749,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             var valid = checkValidtion("text", "A", y, rowData[0], elInstance);
             if (valid == true) {
                 if (value != -1) {
-                    var expiryDate = this.props.items.batchInfoList.filter(c => c.batchNo == elInstance.getCell(`A${parseInt(y) + 1}`).innerText)[0].expiryDate;
+                    var expiryDate = this.props.items.batchInfoList.filter(c => (c.batchNo == (elInstance.getCell(`A${parseInt(y) + 1}`).innerText).split("~")[0] && moment(c.expiryDate).format("YYYY-MM") == moment((elInstance.getCell(`A${parseInt(y) + 1}`).innerText).split("~")[1]).format("YYYY-MM")))[0].expiryDate;
                     elInstance.setValueFromCoords(1, y, moment(expiryDate).format(DATE_FORMAT_CAP), true);
                 } else {
                     elInstance.setValueFromCoords(1, y, "", true);
@@ -869,12 +890,12 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                     var batchInfoJson = {
                         consumptionTransBatchInfoId: map.get("3"),
                         batch: {
-                            batchId: this.state.batchInfoList.filter(c => c.name == elInstance.getCell(`A${parseInt(i) + 1}`).innerText)[0].batchId,
-                            batchNo: elInstance.getCell(`A${parseInt(i) + 1}`).innerText,
+                            batchId: this.state.batchInfoList.filter(c => c.name == (elInstance.getCell(`A${parseInt(i) + 1}`).innerText))[0].batchId,
+                            batchNo: (elInstance.getCell(`A${parseInt(i) + 1}`).innerText).split("~")[0],
                             autoGenerated: 0,
                             planningUnitId: parseInt(document.getElementById("planningUnitId").value),
                             expiryDate: moment(map.get("1")).format("YYYY-MM-DD"),
-                            createdDate: this.state.batchInfoList.filter(c => c.name == elInstance.getCell(`A${parseInt(i) + 1}`).innerText)[0].createdDate
+                            createdDate: this.state.batchInfoList.filter(c => c.name == (elInstance.getCell(`A${parseInt(i) + 1}`).innerText))[0].createdDate
                         },
                         consumptionQty: parseInt(map.get("2").toString().replaceAll("\,", "")),
                     }
@@ -1070,6 +1091,13 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                     } else {
                         positiveValidation("I", y, elInstance);
                     }
+                }
+
+                if (rowData[9].length > 600) {
+                    inValid("J", y, i18n.t('static.dataentry.notesMaxLength'), elInstance);
+                    valid = false;
+                } else {
+                    positiveValidation("J", y, elInstance);
                 }
 
                 validation = checkValidtion("text", "C", y, rowData[2], elInstance);

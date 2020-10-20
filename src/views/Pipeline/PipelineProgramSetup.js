@@ -23,7 +23,7 @@ import PipelineProgramShipment from './PipelineProgramShipment';
 export default class PipelineProgramSetup extends Component {
     constructor(props) {
         super(props);
-        var realmId=AuthenticationService.getRealmId();
+        var realmId = AuthenticationService.getRealmId();
         this.state = {
             progressPer: 0,
             pipelineProgramSetupPer: 0,
@@ -39,7 +39,7 @@ export default class PipelineProgramSetup extends Component {
                 realmCountry: {
                     realmCountryId: '',
                     realm: {
-                        realmId:realmId
+                        realmId: realmId
                     }
 
                 },
@@ -255,14 +255,14 @@ export default class PipelineProgramSetup extends Component {
                 if (response.status == "200") {
                     // PipelineService.getPipelineProgramConsumption(this.props.match.params.pipelineId).then(response => {
                     //     if (response.status == "200") {
-                        
+
                     if (checkValidation == true) {
-                       
+
                         PipelineService.createRealmCountryPlanningUnits(this.props.match.params.pipelineId).
-                        then(response => {
-                            console.log("createdRealmCountryPlanningUnit Response===>",response)
-                        });
-                       
+                            then(response => {
+                                console.log("createdRealmCountryPlanningUnit Response===>", response)
+                            });
+
                         this.setState({
                             pipelineProgramSetupPer: 29.56, planningUnitStatus: false, consumptionStatus: false, inventoryStatus: false,
                             shipmentStatus: false,
@@ -299,7 +299,10 @@ export default class PipelineProgramSetup extends Component {
                     })
                 }
             }
-            )
+            ).catch(error => {
+                alert(i18n.t('pipeline.garbageDataValidation'));
+
+            });
         // }
 
     }
@@ -457,6 +460,9 @@ export default class PipelineProgramSetup extends Component {
                         message: response.data.messageCode
                     })
                 }
+            }).catch(error => {
+                alert(i18n.t('pipeline.garbageDataValidation'));
+
             });
     }
     finishedStepSeven = () => {
@@ -500,6 +506,9 @@ export default class PipelineProgramSetup extends Component {
                         message: response.data.messageCode
                     })
                 }
+            }).catch(error => {
+                alert(i18n.t('pipeline.garbageDataValidation'));
+
             });
 
     }

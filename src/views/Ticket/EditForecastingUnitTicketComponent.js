@@ -71,7 +71,7 @@ export default class EditForecastingUnitTicketComponent extends Component {
             message: '',
             forecastingUnits: [],
             forecastingUnitId: '',
-            loading: false
+            loading: true
         }
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);

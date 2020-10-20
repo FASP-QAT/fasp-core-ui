@@ -1672,8 +1672,8 @@ export default class WhatIfReportComponent extends React.Component {
                                                 if (shipmentDetails[i].emergencyOrder.toString() == "true") {
                                                     isEmergencyOrder = true
                                                 }
-                                                if(shipmentDetails[i].localProcurement.toString()=="true"){
-                                                    isLocalProcurementAgent=true;
+                                                if (shipmentDetails[i].localProcurement.toString() == "true") {
+                                                    isLocalProcurementAgent = true;
                                                 }
                                                 sd1.push(shipmentDetail);
                                             } else if (shipmentDetails[i].shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == ARRIVED_SHIPMENT_STATUS) {
@@ -1701,8 +1701,8 @@ export default class WhatIfReportComponent extends React.Component {
                                                 if (shipmentDetails[i].emergencyOrder.toString() == "true") {
                                                     isEmergencyOrder = true
                                                 }
-                                                if(shipmentDetails[i].localProcurement.toString()=="true"){
-                                                    isLocalProcurementAgent=true;
+                                                if (shipmentDetails[i].localProcurement.toString() == "true") {
+                                                    isLocalProcurementAgent = true;
                                                 }
                                                 sd2.push(shipmentDetail);
                                             } else if (shipmentDetails[i].shipmentStatus.id == APPROVED_SHIPMENT_STATUS) {
@@ -1730,8 +1730,8 @@ export default class WhatIfReportComponent extends React.Component {
                                                 if (shipmentDetails[i].emergencyOrder.toString() == "true") {
                                                     isEmergencyOrder = true
                                                 }
-                                                if(shipmentDetails[i].localProcurement.toString()=="true"){
-                                                    isLocalProcurementAgent=true;
+                                                if (shipmentDetails[i].localProcurement.toString() == "true") {
+                                                    isLocalProcurementAgent = true;
                                                 }
                                                 sd3.push(shipmentDetail);
                                             } else if (shipmentDetails[i].shipmentStatus.id == PLANNED_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS) {
@@ -1759,8 +1759,8 @@ export default class WhatIfReportComponent extends React.Component {
                                                 if (shipmentDetails[i].emergencyOrder.toString() == "true") {
                                                     isEmergencyOrder = true
                                                 }
-                                                if(shipmentDetails[i].localProcurement.toString()=="true"){
-                                                    isLocalProcurementAgent=true;
+                                                if (shipmentDetails[i].localProcurement.toString() == "true") {
+                                                    isLocalProcurementAgent = true;
                                                 }
                                                 sd4.push(shipmentDetail);
                                             }
@@ -1772,7 +1772,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         if (sd1.length > 1) {
                                             colour = "#d9ead3";
                                         }
-                                        deliveredShipmentsTotalData.push({ qty: jsonList[0].receivedShipmentsTotalData, month: m[n], shipmentDetail: sd1, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder,isLocalProcurementAgent:isLocalProcurementAgent });
+                                        deliveredShipmentsTotalData.push({ qty: jsonList[0].receivedShipmentsTotalData, month: m[n], shipmentDetail: sd1, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder, isLocalProcurementAgent: isLocalProcurementAgent });
                                     } else {
                                         deliveredShipmentsTotalData.push("")
                                     }
@@ -1782,7 +1782,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         if (sd2.length > 1) {
                                             colour = "#d9ead3";
                                         }
-                                        shippedShipmentsTotalData.push({ qty: jsonList[0].shippedShipmentsTotalData, month: m[n], shipmentDetail: sd2, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder,isLocalProcurementAgent:isLocalProcurementAgent });
+                                        shippedShipmentsTotalData.push({ qty: jsonList[0].shippedShipmentsTotalData, month: m[n], shipmentDetail: sd2, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder, isLocalProcurementAgent: isLocalProcurementAgent });
                                     } else {
                                         shippedShipmentsTotalData.push("")
                                     }
@@ -1792,7 +1792,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         if (sd3.length > 1) {
                                             colour = "#d9ead3";
                                         }
-                                        orderedShipmentsTotalData.push({ qty: jsonList[0].approvedShipmentsTotalData, month: m[n], shipmentDetail: sd3, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder,isLocalProcurementAgent:isLocalProcurementAgent });
+                                        orderedShipmentsTotalData.push({ qty: jsonList[0].approvedShipmentsTotalData, month: m[n], shipmentDetail: sd3, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder, isLocalProcurementAgent: isLocalProcurementAgent });
                                     } else {
                                         orderedShipmentsTotalData.push("")
                                     }
@@ -1802,7 +1802,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         if (sd4.length > 1) {
                                             colour = "#d9ead3";
                                         }
-                                        plannedShipmentsTotalData.push({ qty: parseInt(jsonList[0].submittedShipmentsTotalData) + parseInt(jsonList[0].onholdShipmentsTotalData) + parseInt(jsonList[0].plannedShipmentsTotalData), month: m[n], shipmentDetail: sd4, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder,isLocalProcurementAgent:isLocalProcurementAgent });
+                                        plannedShipmentsTotalData.push({ qty: parseInt(jsonList[0].submittedShipmentsTotalData) + parseInt(jsonList[0].onholdShipmentsTotalData) + parseInt(jsonList[0].plannedShipmentsTotalData), month: m[n], shipmentDetail: sd4, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder, isLocalProcurementAgent: isLocalProcurementAgent });
                                     } else {
                                         plannedShipmentsTotalData.push("")
                                     }
@@ -1816,7 +1816,7 @@ export default class WhatIfReportComponent extends React.Component {
                                     var sd3 = [];
                                     var sd4 = [];
                                     var isEmergencyOrder = 0;
-                                    var isLocalProcurementAgent=0;
+                                    var isLocalProcurementAgent = 0;
                                     if (shipmentDetails != "" && shipmentDetails != undefined) {
                                         for (var i = 0; i < shipmentDetails.length; i++) {
                                             if (shipmentDetails[i].shipmentStatus.id == DELIVERED_SHIPMENT_STATUS) {
@@ -1844,8 +1844,8 @@ export default class WhatIfReportComponent extends React.Component {
                                                 if (shipmentDetails[i].emergencyOrder.toString() == "true") {
                                                     isEmergencyOrder = true
                                                 }
-                                                if(shipmentDetails[i].localProcurement.toString()=="true"){
-                                                    isLocalProcurementAgent=true;
+                                                if (shipmentDetails[i].localProcurement.toString() == "true") {
+                                                    isLocalProcurementAgent = true;
                                                 }
                                                 sd1.push(shipmentDetail);
 
@@ -1874,8 +1874,8 @@ export default class WhatIfReportComponent extends React.Component {
                                                 if (shipmentDetails[i].emergencyOrder.toString() == "true") {
                                                     isEmergencyOrder = true
                                                 }
-                                                if(shipmentDetails[i].localProcurement.toString()=="true"){
-                                                    isLocalProcurementAgent=true;
+                                                if (shipmentDetails[i].localProcurement.toString() == "true") {
+                                                    isLocalProcurementAgent = true;
                                                 }
                                                 sd2.push(shipmentDetail);
                                             } else if (shipmentDetails[i].shipmentStatus.id == APPROVED_SHIPMENT_STATUS) {
@@ -1903,8 +1903,8 @@ export default class WhatIfReportComponent extends React.Component {
                                                 if (shipmentDetails[i].emergencyOrder.toString() == "true") {
                                                     isEmergencyOrder = true
                                                 }
-                                                if(shipmentDetails[i].localProcurement.toString()=="true"){
-                                                    isLocalProcurementAgent=true;
+                                                if (shipmentDetails[i].localProcurement.toString() == "true") {
+                                                    isLocalProcurementAgent = true;
                                                 }
                                                 sd3.push(shipmentDetail);
                                             } else if (shipmentDetails[i].shipmentStatus.id == PLANNED_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS) {
@@ -1932,8 +1932,8 @@ export default class WhatIfReportComponent extends React.Component {
                                                 if (shipmentDetails[i].emergencyOrder.toString() == "true") {
                                                     isEmergencyOrder = true
                                                 }
-                                                if(shipmentDetails[i].localProcurement.toString()=="true"){
-                                                    isLocalProcurementAgent=true;
+                                                if (shipmentDetails[i].localProcurement.toString() == "true") {
+                                                    isLocalProcurementAgent = true;
                                                 }
                                                 sd4.push(shipmentDetail);
                                             }
@@ -1945,7 +1945,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         if (sd1.length > 1) {
                                             colour = "#d9ead3";
                                         }
-                                        deliveredErpShipmentsTotalData.push({ qty: jsonList[0].receivedErpShipmentsTotalData, month: m[n], shipmentDetail: sd1, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder,isLocalProcurementAgent:isLocalProcurementAgent });
+                                        deliveredErpShipmentsTotalData.push({ qty: jsonList[0].receivedErpShipmentsTotalData, month: m[n], shipmentDetail: sd1, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder, isLocalProcurementAgent: isLocalProcurementAgent });
                                     } else {
                                         deliveredErpShipmentsTotalData.push("")
                                     }
@@ -1955,7 +1955,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         if (sd2.length > 1) {
                                             colour = "#d9ead3";
                                         }
-                                        shippedErpShipmentsTotalData.push({ qty: jsonList[0].shippedErpShipmentsTotalData, month: m[n], shipmentDetail: sd2, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder,isLocalProcurementAgent:isLocalProcurementAgent });
+                                        shippedErpShipmentsTotalData.push({ qty: jsonList[0].shippedErpShipmentsTotalData, month: m[n], shipmentDetail: sd2, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder, isLocalProcurementAgent: isLocalProcurementAgent });
                                     } else {
                                         shippedErpShipmentsTotalData.push("")
                                     }
@@ -1965,7 +1965,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         if (sd3.length > 1) {
                                             colour = "#d9ead3";
                                         }
-                                        orderedErpShipmentsTotalData.push({ qty: jsonList[0].approvedErpShipmentsTotalData, month: m[n], shipmentDetail: sd3, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder,isLocalProcurementAgent:isLocalProcurementAgent });
+                                        orderedErpShipmentsTotalData.push({ qty: jsonList[0].approvedErpShipmentsTotalData, month: m[n], shipmentDetail: sd3, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder, isLocalProcurementAgent: isLocalProcurementAgent });
                                     } else {
                                         orderedErpShipmentsTotalData.push("")
                                     }
@@ -1975,7 +1975,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         if (sd4.length > 1) {
                                             colour = "#d9ead3";
                                         }
-                                        plannedErpShipmentsTotalData.push({ qty: parseInt(jsonList[0].submittedErpShipmentsTotalData) + parseInt(jsonList[0].onholdErpShipmentsTotalData) + parseInt(jsonList[0].plannedErpShipmentsTotalData), month: m[n], shipmentDetail: sd4, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder,isLocalProcurementAgent:isLocalProcurementAgent });
+                                        plannedErpShipmentsTotalData.push({ qty: parseInt(jsonList[0].submittedErpShipmentsTotalData) + parseInt(jsonList[0].onholdErpShipmentsTotalData) + parseInt(jsonList[0].plannedErpShipmentsTotalData), month: m[n], shipmentDetail: sd4, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder, isLocalProcurementAgent: isLocalProcurementAgent });
                                     } else {
                                         plannedErpShipmentsTotalData.push("")
                                     }
@@ -2281,10 +2281,15 @@ export default class WhatIfReportComponent extends React.Component {
                 });
                 this.formSubmit(this.state.planningUnit, monthCountConsumption);
             } else if (supplyPlanType == 'SuggestedShipments') {
-                this.setState({
-                    shipments: !this.state.shipments
-                });
-                this.suggestedShipmentsDetailsClicked(month, quantity, isEmergencyOrder);
+                var roleList = AuthenticationService.getLoggedInUserRole();
+                console.log("RoleList------------>", roleList);
+                if (roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') {
+                } else {
+                    this.setState({
+                        shipments: !this.state.shipments
+                    });
+                    this.suggestedShipmentsDetailsClicked(month, quantity, isEmergencyOrder);
+                }
             } else if (supplyPlanType == 'shipments') {
                 this.setState({
                     shipments: !this.state.shipments
@@ -2504,9 +2509,9 @@ export default class WhatIfReportComponent extends React.Component {
                     for (var sl = 0; sl < shipmentList.length; sl++) {
                         var bdl = shipmentList[sl].batchInfoList;
                         for (var bd = 0; bd < bdl.length; bd++) {
-                            var index = batchList.findIndex(c => c.batchNo == bdl[bd].batch.batchNo);
+                            var index = batchList.findIndex(c => c.batchNo == bdl[bd].batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
                             if (index == -1) {
-                                var batchDetailsToPush = batchInfoList.filter(c => c.batchNo == bdl[bd].batch.batchNo && c.planningUnitId == planningUnitId)[0];
+                                var batchDetailsToPush = batchInfoList.filter(c => c.batchNo == bdl[bd].batch.batchNo && c.planningUnitId == planningUnitId && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"))[0];
                                 batchList.push(batchDetailsToPush);
                             }
                         }
@@ -2593,9 +2598,9 @@ export default class WhatIfReportComponent extends React.Component {
                     for (var sl = 0; sl < shipmentList.length; sl++) {
                         var bdl = shipmentList[sl].batchInfoList;
                         for (var bd = 0; bd < bdl.length; bd++) {
-                            var index = batchList.findIndex(c => c.batchNo == bdl[bd].batch.batchNo);
+                            var index = batchList.findIndex(c => c.batchNo == bdl[bd].batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
                             if (index == -1) {
-                                var batchDetailsToPush = batchInfoList.filter(c => c.batchNo == bdl[bd].batch.batchNo && c.planningUnitId == planningUnitId)[0];
+                                var batchDetailsToPush = batchInfoList.filter(c => c.batchNo == bdl[bd].batch.batchNo && c.planningUnitId == planningUnitId && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"))[0];
                                 batchList.push(batchDetailsToPush);
                             }
                         }
@@ -3101,7 +3106,7 @@ export default class WhatIfReportComponent extends React.Component {
 
                                     </Form>
                                 )} />
-                    <span onClick={() => this.toggleAccordionScenarioList()}>{this.state.showScenarioList ? <i className="fa fa-minus-square-o scenarioListIcon" ></i> : <i className="fa fa-plus-square-o scenarioListIcon" ></i>}</span>&nbsp;&nbsp;<span style={{fontSize:'16px'}}>{i18n.t('static.whatIf.scenarioList')}</span>
+                    <span onClick={() => this.toggleAccordionScenarioList()}>{this.state.showScenarioList ? <i className="fa fa-minus-square-o scenarioListIcon" ></i> : <i className="fa fa-plus-square-o scenarioListIcon" ></i>}</span>&nbsp;&nbsp;<span style={{ fontSize: '16px' }}>{i18n.t('static.whatIf.scenarioList')}</span>
                     <Row className="pt-3 pb-3 scenarioListDiv" >
                         <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                             <Col md="12 pl-0" id="realmDiv">
@@ -3248,7 +3253,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             {
                                                 this.state.deliveredShipmentsTotalData.map(item1 => {
                                                     if (item1.toString() != "") {
-                                                        return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} align="right" className={item1.isEmergencyOrder == true ? item1.isLocalProcurementAgent == true?"localProcurementEmergencyComment hoverTd":"emergencyComment hoverTd" : item1.isLocalProcurementAgent==true?"localProcurementAgent hoverTd":"hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'deliveredShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                        return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} align="right" className={item1.isEmergencyOrder == true ? item1.isLocalProcurementAgent == true ? "localProcurementEmergencyComment hoverTd" : "emergencyComment hoverTd" : item1.isLocalProcurementAgent == true ? "localProcurementAgent hoverTd" : "hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'deliveredShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                                     } else {
                                                         return (<td align="right" >{item1}</td>)
                                                     }
@@ -3263,7 +3268,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             {
                                                 this.state.shippedShipmentsTotalData.map(item1 => {
                                                     if (item1.toString() != "") {
-                                                        return (<td align="right" bgcolor={item1.colour} style={{ color: item1.textColor }} data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className={item1.isEmergencyOrder == true ? item1.isLocalProcurementAgent == true?"localProcurementEmergencyComment hoverTd":"emergencyComment hoverTd" : item1.isLocalProcurementAgent==true?"localProcurementAgent hoverTd":"hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'shippedShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                        return (<td align="right" bgcolor={item1.colour} style={{ color: item1.textColor }} data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className={item1.isEmergencyOrder == true ? item1.isLocalProcurementAgent == true ? "localProcurementEmergencyComment hoverTd" : "emergencyComment hoverTd" : item1.isLocalProcurementAgent == true ? "localProcurementAgent hoverTd" : "hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'shippedShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                                     } else {
                                                         return (<td align="right" >{item1}</td>)
                                                     }
@@ -3277,7 +3282,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             {
                                                 this.state.orderedShipmentsTotalData.map(item1 => {
                                                     if (item1.toString() != "") {
-                                                        return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} align="right" className={item1.isEmergencyOrder == true ? item1.isLocalProcurementAgent == true?"localProcurementEmergencyComment hoverTd":"emergencyComment hoverTd" : item1.isLocalProcurementAgent==true?"localProcurementAgent hoverTd":"hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'orderedShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                        return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} align="right" className={item1.isEmergencyOrder == true ? item1.isLocalProcurementAgent == true ? "localProcurementEmergencyComment hoverTd" : "emergencyComment hoverTd" : item1.isLocalProcurementAgent == true ? "localProcurementAgent hoverTd" : "hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'orderedShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                                     } else {
                                                         return (<td align="right" >{item1}</td>)
                                                     }
@@ -3290,7 +3295,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             {
                                                 this.state.plannedShipmentsTotalData.map(item1 => {
                                                     if (item1.toString() != "") {
-                                                        return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className={item1.isEmergencyOrder == true ? item1.isLocalProcurementAgent == true?"localProcurementEmergencyComment hoverTd":"emergencyComment hoverTd" : item1.isLocalProcurementAgent==true?"localProcurementAgent hoverTd":"hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'plannedShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                        return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className={item1.isEmergencyOrder == true ? item1.isLocalProcurementAgent == true ? "localProcurementEmergencyComment hoverTd" : "emergencyComment hoverTd" : item1.isLocalProcurementAgent == true ? "localProcurementAgent hoverTd" : "hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'plannedShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                                     } else {
                                                         return (<td align="right" >{item1}</td>)
                                                     }
@@ -3314,7 +3319,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             {
                                                 this.state.deliveredErpShipmentsTotalData.map(item1 => {
                                                     if (item1.toString() != "") {
-                                                        return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className={item1.isEmergencyOrder == true ? item1.isLocalProcurementAgent == true?"localProcurementEmergencyComment hoverTd":"emergencyComment hoverTd" : item1.isLocalProcurementAgent==true?"localProcurementAgent hoverTd":"hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'deliveredErpShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                        return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className={item1.isEmergencyOrder == true ? item1.isLocalProcurementAgent == true ? "localProcurementEmergencyComment hoverTd" : "emergencyComment hoverTd" : item1.isLocalProcurementAgent == true ? "localProcurementAgent hoverTd" : "hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'deliveredErpShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                                     } else {
                                                         return (<td align="right" >{item1}</td>)
                                                     }
@@ -3328,7 +3333,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             {
                                                 this.state.shippedErpShipmentsTotalData.map(item1 => {
                                                     if (item1.toString() != "") {
-                                                        return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className={item1.isEmergencyOrder == true ? item1.isLocalProcurementAgent == true?"localProcurementEmergencyComment hoverTd":"emergencyComment hoverTd" : item1.isLocalProcurementAgent==true?"localProcurementAgent hoverTd":"hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'shippedErpShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                        return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className={item1.isEmergencyOrder == true ? item1.isLocalProcurementAgent == true ? "localProcurementEmergencyComment hoverTd" : "emergencyComment hoverTd" : item1.isLocalProcurementAgent == true ? "localProcurementAgent hoverTd" : "hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'shippedErpShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                                     } else {
                                                         return (<td align="right" >{item1}</td>)
                                                     }
@@ -3341,7 +3346,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             {
                                                 this.state.orderedErpShipmentsTotalData.map(item1 => {
                                                     if (item1.toString() != "") {
-                                                        return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className={item1.isEmergencyOrder == true ? item1.isLocalProcurementAgent == true?"localProcurementEmergencyComment hoverTd":"emergencyComment hoverTd" : item1.isLocalProcurementAgent==true?"localProcurementAgent hoverTd":"hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'orderedErpShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                        return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className={item1.isEmergencyOrder == true ? item1.isLocalProcurementAgent == true ? "localProcurementEmergencyComment hoverTd" : "emergencyComment hoverTd" : item1.isLocalProcurementAgent == true ? "localProcurementAgent hoverTd" : "hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'orderedErpShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                                     } else {
                                                         return (<td align="right" >{item1}</td>)
                                                     }
@@ -3354,7 +3359,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             {
                                                 this.state.plannedErpShipmentsTotalData.map(item1 => {
                                                     if (item1.toString() != "") {
-                                                        return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className={item1.isEmergencyOrder == true ? item1.isLocalProcurementAgent == true?"localProcurementEmergencyComment hoverTd":"emergencyComment hoverTd" : item1.isLocalProcurementAgent==true?"localProcurementAgent hoverTd":"hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'plannedErpShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                        return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className={item1.isEmergencyOrder == true ? item1.isLocalProcurementAgent == true ? "localProcurementEmergencyComment hoverTd" : "emergencyComment hoverTd" : item1.isLocalProcurementAgent == true ? "localProcurementAgent hoverTd" : "hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'plannedErpShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                                     } else {
                                                         return (<td align="right" >{item1}</td>)
                                                     }
@@ -3570,7 +3575,7 @@ export default class WhatIfReportComponent extends React.Component {
                             <div className="pt-4"></div>
                         </ModalBody>
                         <ModalFooter>
-                            {this.refs.consumptionChild != undefined && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.refs.consumptionChild.addRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
+                            {this.refs.consumptionChild != undefined && <Button color="info" id="addConsumptionRowSupplyPlan" size="md" className="float-right mr-1" type="button" onClick={this.refs.consumptionChild.addRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
                             {this.state.consumptionChangedFlag == 1 && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.refs.consumptionChild.saveConsumption}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>}{' '}
                             <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceled('Consumption')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                         </ModalFooter>
@@ -3755,7 +3760,7 @@ export default class WhatIfReportComponent extends React.Component {
                             <div className="pt-4"></div>
                         </ModalBody>
                         <ModalFooter>
-                            {this.refs.inventoryChild != undefined && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.refs.inventoryChild.addRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
+                            {this.refs.inventoryChild != undefined && <Button id="addInventoryRowSupplyPlan" color="info" size="md" className="float-right mr-1" type="button" onClick={this.refs.inventoryChild.addRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
                             {this.state.inventoryChangedFlag == 1 && <Button size="md" color="success" className="submitBtn float-right mr-1" onClick={this.refs.inventoryChild.saveInventory}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>}{' '}
                             <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceled('Adjustments')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                         </ModalFooter>
@@ -3792,7 +3797,7 @@ export default class WhatIfReportComponent extends React.Component {
                     </ModalHeader>
                     <div style={{ display: this.state.loading ? "none" : "block" }}>
                         <ModalBody>
-                            {this.state.showShipments && <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} hideFourthComponent={this.hideFourthComponent} hideFifthComponent={this.hideFifthComponent} shipmentPage="whatIf" />}
+                            <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} hideFourthComponent={this.hideFourthComponent} hideFifthComponent={this.hideFifthComponent} shipmentPage="whatIf" />
                             <h6 className="red" id="div2">{this.state.noFundsBudgetError || this.state.shipmentBatchError || this.state.shipmentError}</h6>
                             <div className="table-responsive">
                                 <div id="shipmentsDetailsTable" />
@@ -4117,6 +4122,14 @@ export default class WhatIfReportComponent extends React.Component {
                     if (document.getElementById("addRowId") != null) {
                         document.getElementById("addRowId").style.display = "none"
                     }
+                }
+
+                var roleList = AuthenticationService.getLoggedInUserRole();
+                if (roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') {
+                    if (document.getElementById("addRowId") != null) {
+                        document.getElementById("addRowId").style.display = "none"
+                    }
+                } else {
                 }
                 this.setState({
                     showShipments: 1,

@@ -82,7 +82,7 @@ export default class RealmCountryTicketComponent extends Component {
             realm: '',
             country: '',
             currency: '',
-            loading: false
+            loading: true
         }
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
@@ -152,7 +152,7 @@ export default class RealmCountryTicketComponent extends Component {
                 if (response.status == 200) {
                     this.setState({
                         realms: response.data,
-                        realm: selectedRealm
+                        realm: selectedRealm, loading: false
                     });
                     if (selectedRealm !== "") {
                         this.setState({
@@ -219,7 +219,7 @@ export default class RealmCountryTicketComponent extends Component {
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        countries: response.data
+                        countries: response.data, loading: false
                     })
                 } else {
                     this.setState({
@@ -275,7 +275,7 @@ export default class RealmCountryTicketComponent extends Component {
         CurrencyService.getCurrencyListActive().then(response => {
             if (response.status == 200) {
                 this.setState({
-                    currencies: response.data
+                    currencies: response.data, loading: false
                 })
             } else {
                 this.setState({

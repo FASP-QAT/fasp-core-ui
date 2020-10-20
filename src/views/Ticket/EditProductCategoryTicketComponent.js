@@ -68,7 +68,7 @@ export default class EditProductCategoryTicketComponent extends Component {
             message: '',
             planningUnitCategories: [],
             planningUnitCategoryId: '',
-            loading: false
+            loading: true
         }
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
@@ -132,7 +132,7 @@ export default class EditProductCategoryTicketComponent extends Component {
                 if (response.status == 200) {
                     console.log("planningUnitCategories", response.data)
                     this.setState({
-                        planningUnitCategories: response.data,
+                        planningUnitCategories: response.data, loading: false
                     });
                     this.setState({ loading: false });
 
