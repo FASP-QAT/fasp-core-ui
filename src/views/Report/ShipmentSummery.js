@@ -293,7 +293,10 @@ class ShipmentSummery extends Component {
         csvRow.push('')
         csvRow.push('')
 
-        var B = [this.addDoubleQuoteToRowContent([(i18n.t('static.report.qatPIDFID')).replaceAll(' ', '%20'),(i18n.t('static.report.planningUnit/ForecastingUnit')).replaceAll(' ', '%20'), (i18n.t('static.report.id')).replaceAll(' ', '%20'),i18n.t('static.supplyPlan.consideAsEmergencyOrder'), (i18n.t('static.report.procurementAgentName')).replaceAll(' ', '%20'),
+        var B = [this.addDoubleQuoteToRowContent([(i18n.t('static.report.qatPIDFID')).replaceAll(' ', '%20'),(i18n.t('static.report.planningUnit/ForecastingUnit')).replaceAll(' ', '%20'), (i18n.t('static.report.id')).replaceAll(' ', '%20'),
+        i18n.t('static.supplyPlan.consideAsEmergencyOrder').replaceAll(' ', '%20'), i18n.t('static.report.erpOrder').replaceAll(' ', '%20'), 
+        i18n.t('static.report.localprocurement').replaceAll(' ', '%20'), i18n.t('static.report.orderNo').replaceAll(' ', '%20'), 
+        (i18n.t('static.report.procurementAgentName')).replaceAll(' ', '%20'),
         (i18n.t('static.budget.fundingsource')).replaceAll(' ', '%20'), (i18n.t('static.common.status')).replaceAll(' ', '%20'), (i18n.t('static.report.qty')).replaceAll(' ', '%20'),
         (i18n.t('static.report.expectedReceiveddate')).replaceAll(' ', '%20'), (i18n.t('static.report.productCost')).replaceAll(' ', '%20'), (i18n.t('static.report.freightCost')).replaceAll(' ', '%20'),
         (i18n.t('static.report.totalCost')).replaceAll(' ', '%20'), (i18n.t('static.program.notes')).replaceAll(' ', '%20')])]
@@ -303,7 +306,11 @@ class ShipmentSummery extends Component {
 
 
         for (var item = 0; item < re.length; item++) {
-            B.push(this.addDoubleQuoteToRowContent([re[item].planningUnit.id,(getLabelText(re[item].planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), re[item].shipmentId,re[item].emergencyOrder==true?i18n.t('static.supplyPlan.consideAsEmergencyOrder'):'', (re[item].procurementAgent.code).replaceAll(' ', '%20'), (re[item].fundingSource.code).replaceAll(' ', '%20'), (getLabelText(re[item].shipmentStatus.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
+            B.push(this.addDoubleQuoteToRowContent([re[item].planningUnit.id,(getLabelText(re[item].planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), re[item].shipmentId,
+            re[item].emergencyOrder==true?i18n.t('static.supplyPlan.consideAsEmergencyOrder').replaceAll(' ', '%20'):'',
+            re[item].erpOrder==true?i18n.t('static.report.erpOrder').replaceAll(' ', '%20'):'',
+            re[item].localProcurement==true?i18n.t('static.supplyPlan.localprocurement').replaceAll(' ', '%20'):'',
+            re[item].orderNo!=null? re[item].orderNo:'', (re[item].procurementAgent.code).replaceAll(' ', '%20'), (re[item].fundingSource.code).replaceAll(' ', '%20'), (getLabelText(re[item].shipmentStatus.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
             viewById == 1 ? re[item].shipmentQty : (parseFloat(re[item].shipmentQty) * re[item].multiplier).toFixed(2), (moment(re[item].expectedDeliveryDate, 'yyyy-MM-dd').format('MMM YYYY').replaceAll(',', ' ')).replaceAll(' ', '%20'),
             parseFloat(re[item].productCost).toFixed(2),
             parseFloat(re[item].freightCost).toFixed(2),
@@ -433,14 +440,14 @@ class ShipmentSummery extends Component {
             margin: { top: 80, bottom: 100 },
             startY: doc.autoTableEndPosY() + 50,
             pageBreak: 'auto',
-            styles: { lineWidth: 1, fontSize: 8, cellWidth: 59, halign: 'center' },
+            styles: { lineWidth: 1, fontSize: 8, cellWidth: 46, halign: 'center' },
             columnStyles: {
-                0: { cellWidth: 112.89 },
+                0: { cellWidth: 104.89 },
             },
             html: '#mytable2',
 
             didDrawCell: function (data) {
-                if (data.column.index === 12 && data.cell.section === 'body') {
+                if (data.column.index === 15 && data.cell.section === 'body') {
                     var td = data.cell.raw;
                     var img = td.getElementsByTagName('img')[0];
                     var dim = data.cell.height - data.cell.padding('vertical');
@@ -906,8 +913,8 @@ class ShipmentSummery extends Component {
                         // const activeFilter = shipmentList;
                         console.log(startDate, endDate)
                         // let dateFilter = activeFilter.filter(c => moment(c.deliveredDate).isBetween(startDate, endDate, null, '[)'))
-                        let dateFilter = activeFilter.filter(c => (c.receivedDate == null || c.receivedDate == "") ? (c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate) : (c.receivedDate >= startDate && c.receivedDate <= endDate))
-                        console.log(dateFilter)
+                        let dateFilter = activeFilter.filter(c =>(c.receivedDate == null || c.receivedDate == "") ? ( c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate ):  (c.receivedDate >= startDate && c.receivedDate <= endDate))
+
                         let data = [];
                         let planningUnitFilter = [];
                         for (let i = 0; i < planningUnitIds.length; i++) {
@@ -969,7 +976,11 @@ class ShipmentSummery extends Component {
                                     "productCost": planningUnitFilter[i].productCost * planningUnitFilter[i].currency.conversionRateToUsd,
                                     "freightCost": planningUnitFilter[i].freightCost * planningUnitFilter[i].currency.conversionRateToUsd,
                                     "totalCost": (planningUnitFilter[i].productCost * planningUnitFilter[i].currency.conversionRateToUsd) + (planningUnitFilter[i].freightCost * planningUnitFilter[i].currency.conversionRateToUsd),
-                                    "notes": planningUnitFilter[i].notes
+                                    "notes": planningUnitFilter[i].notes,
+                                    "emergencyOrder":planningUnitFilter[i].emergencyOrder,
+                                    "erpFlag":planningUnitFilter[i].erpFlag,
+                                    "localProcurement":planningUnitFilter[i].localProcurement,
+                                    "orderNo":planningUnitFilter[i].orderNo
                                 }
                                 data.push(json);
 
@@ -1732,7 +1743,14 @@ class ShipmentSummery extends Component {
                                                             <th style={{ 'text-align': 'center' }}>{i18n.t('static.report.planningUnit/ForecastingUnit')}</th>
                                                             <th style={{ 'width': '87px', 'text-align': 'center' }}>{i18n.t('static.report.id')}</th>
                                                             <th style={{ 'width': '87px', 'text-align': 'center' }}>{i18n.t('static.supplyPlan.consideAsEmergencyOrder')}</th>
+<<<<<<< HEAD
                                                             <th style={{ 'text-align': 'center' }}>{i18n.t('static.report.procurementAgentName')}</th>
+=======
+                                                            <th style={{ 'width': '87px', 'text-align': 'center' }}>{i18n.t('static.report.erpOrder')}</th>
+                                                            <th style={{ 'width': '87px', 'text-align': 'center' }}>{i18n.t('static.report.localprocurement')}</th>
+                                                            <th style={{ 'width': '87px', 'text-align': 'center' }}>{i18n.t('static.report.orderNo')}</th>
+                                                             <th style={{ 'text-align': 'center' }}>{i18n.t('static.report.procurementAgentName')}</th>
+>>>>>>> stock status level
                                                             <th style={{ 'text-align': 'center' }}>{i18n.t('static.budget.fundingsource')}</th>
                                                             <th style={{ 'text-align': 'center' }}>{i18n.t('static.common.status')}</th>
                                                             <th style={{ 'text-align': 'center' }}>{i18n.t('static.report.qty')}</th>
@@ -1799,6 +1817,9 @@ class ShipmentSummery extends Component {
                                                                     <td style={{ 'text-align': 'left' }}>{getLabelText(this.state.shipmentDetailsList[idx].planningUnit.label, this.state.lang)}</td>
                                                                     <td style={{ 'text-align': 'center' }}>{this.state.shipmentDetailsList[idx].shipmentId}</td>
                                                                     <td style={{ 'text-align': 'center' }}>{(this.state.shipmentDetailsList[idx].emergencyOrder==true?i18n.t('static.supplyPlan.consideAsEmergencyOrder'):'')}</td>
+                                                                    <td style={{ 'text-align': 'center' }}>{(this.state.shipmentDetailsList[idx].erpOrder==true?i18n.t('static.report.erpOrder'):'')}</td>
+                                                                    <td style={{ 'text-align': 'center' }}>{(this.state.shipmentDetailsList[idx].localprocurement==true?i18n.t('static.report.localprocurement'):'')}</td>
+                                                                    <td style={{ 'text-align': 'center' }}>{(this.state.shipmentDetailsList[idx].orderNo!=null? this.state.shipmentDetailsList[idx].orderNo:'')}</td>
                                                                     <td style={{ 'text-align': 'center' }}>{this.state.shipmentDetailsList[idx].procurementAgent.code}</td>
                                                                     <td style={{ 'text-align': 'center' }}>{this.state.shipmentDetailsList[idx].fundingSource.code}</td>
                                                                     <td style={{ 'text-align': 'center' }}>{getLabelText(this.state.shipmentDetailsList[idx].shipmentStatus.label, this.state.lang)}</td>
