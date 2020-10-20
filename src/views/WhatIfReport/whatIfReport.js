@@ -2509,9 +2509,9 @@ export default class WhatIfReportComponent extends React.Component {
                     for (var sl = 0; sl < shipmentList.length; sl++) {
                         var bdl = shipmentList[sl].batchInfoList;
                         for (var bd = 0; bd < bdl.length; bd++) {
-                            var index = batchList.findIndex(c => c.batchNo == bdl[bd].batch.batchNo);
+                            var index = batchList.findIndex(c => c.batchNo == bdl[bd].batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
                             if (index == -1) {
-                                var batchDetailsToPush = batchInfoList.filter(c => c.batchNo == bdl[bd].batch.batchNo && c.planningUnitId == planningUnitId)[0];
+                                var batchDetailsToPush = batchInfoList.filter(c => c.batchNo == bdl[bd].batch.batchNo && c.planningUnitId == planningUnitId && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"))[0];
                                 batchList.push(batchDetailsToPush);
                             }
                         }
@@ -2598,9 +2598,9 @@ export default class WhatIfReportComponent extends React.Component {
                     for (var sl = 0; sl < shipmentList.length; sl++) {
                         var bdl = shipmentList[sl].batchInfoList;
                         for (var bd = 0; bd < bdl.length; bd++) {
-                            var index = batchList.findIndex(c => c.batchNo == bdl[bd].batch.batchNo);
+                            var index = batchList.findIndex(c => c.batchNo == bdl[bd].batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
                             if (index == -1) {
-                                var batchDetailsToPush = batchInfoList.filter(c => c.batchNo == bdl[bd].batch.batchNo && c.planningUnitId == planningUnitId)[0];
+                                var batchDetailsToPush = batchInfoList.filter(c => c.batchNo == bdl[bd].batch.batchNo && c.planningUnitId == planningUnitId && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"))[0];
                                 batchList.push(batchDetailsToPush);
                             }
                         }
