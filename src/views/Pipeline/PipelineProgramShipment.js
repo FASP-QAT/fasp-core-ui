@@ -16,7 +16,7 @@ import { Link } from 'react-router-dom';
 import { jExcelLoadedFunction, jExcelLoadedFunctionPipeline } from '../../CommonComponent/JExcelCommonFunctions.js'
 import { CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, JEXCEL_DATE_FORMAT } from '../../Constants.js'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { JEXCEL_PAGINATION_OPTION,SHIPMENT_DATA_SOURCE_TYPE } from '../../Constants.js';
+import { JEXCEL_PAGINATION_OPTION, SHIPMENT_DATA_SOURCE_TYPE } from '../../Constants.js';
 
 export default class PipelineProgramShipment extends Component {
 
@@ -628,7 +628,7 @@ export default class PipelineProgramShipment extends Component {
                                     .then(response => {
                                         if (response.status == 200) {
                                             // console.log(response.data)
-                                            var dataSourceFilterList=response.data.filter(c=>c.dataSourceType.id == SHIPMENT_DATA_SOURCE_TYPE);
+                                            var dataSourceFilterList = response.data.filter(c => c.dataSourceType.id == SHIPMENT_DATA_SOURCE_TYPE);
                                             this.setState({
                                                 dataSourceList: dataSourceFilterList.map(ele => ({
                                                     name: getLabelText(ele.label, this.state.lang),
@@ -1261,6 +1261,7 @@ export default class PipelineProgramShipment extends Component {
     SubmitProgram() {
         // this.SubmitShipment()
         this.loaded()
+        this.setState({loading:true});
         var data = this.el.getJson().map(ele => ({
             "shipmentId": null,
             "procurementUnit": null,
@@ -1296,11 +1297,12 @@ export default class PipelineProgramShipment extends Component {
                 console.log("==========>", response.data)
                 this.setState({
                     message: response.data.messageCode,
-                    changedData: false,loading: true
+                    changedData: false, 
+                    // loading: true
                 }, () => console.log("=====", this.state));
-            
-        // PipelineService.getPlanningUnitListWithFinalInventry(this.props.match.params.pipelineId)
-        //     .then(response => {
+
+                // PipelineService.getPlanningUnitListWithFinalInventry(this.props.match.params.pipelineId)
+                //     .then(response => {
                 // var planningUnitListFinalInventory = response.data;
                 // console.log("planningUnitListFinalInventory====", planningUnitListFinalInventory);
                 // var negtiveInventoryList = (planningUnitListFinalInventory).filter(c => c.inventory < 0);
@@ -1311,143 +1313,146 @@ export default class PipelineProgramShipment extends Component {
                 //         pathname: `/pipeline/planningUnitListFinalInventory/${this.props.match.params.pipelineId}`
                 //     });
                 // } else {
-                    PipelineService.submitProgram(this.props.match.params.pipelineId)
-                        .then(response => {
-                            console.log(response.data.messageCode)
-                            this.setState({
-                                message: response.data.messageCode,
-                                changedData: false, loading: false
-                            })
-                            this.props.history.push({
-                                pathname: `/pipeline/pieplineProgramList`
-                            });
-                        }
-                        ).catch(
-                            error => {
-                                if (error.message === "Network Error") {
-                                    this.setState({
-                                        message: 'static.unkownError',
-                                        loading: false
-                                    });
-                                } else {
-                                    switch (error.response ? error.response.status : "") {
+                PipelineService.submitProgram(this.props.match.params.pipelineId)
+                    .then(response => {
+                        console.log(response.data.messageCode)
+                        this.setState({
+                            message: response.data.messageCode,
+                            changedData: false, loading: false
+                        })
+                        this.props.history.push(
+                            // {
+                            // pathname: `/pipeline/pieplineProgramList`
+                            '/pipeline/pieplineProgramList/' + 'green/' + i18n.t('static.message.pipelineProgramImportSuccess')
+                            // }
+                        );
+                    }
+                    ).catch(
+                        error => {
+                            if (error.message === "Network Error") {
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
 
-                                        case 401:
-                                            this.props.history.push(`/login/static.message.sessionExpired`)
-                                            break;
-                                        case 403:
-                                            this.props.history.push(`/accessDenied`)
-                                            break;
-                                        case 500:
-                                        case 404:
-                                        case 406:
-                                            this.setState({
-                                                message: error.response.data.messageCode,
-                                                loading: false
-                                            });
-                                            break;
-                                        case 412:
-                                            this.setState({
-                                                message: error.response.data.messageCode,
-                                                loading: false
-                                            });
-                                            break;
-                                        default:
-                                            this.setState({
-                                                message: 'static.unkownError',
-                                                loading: false
-                                            });
-                                            break;
-                                    }
+                                    case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
+                                    case 404:
+                                    case 406:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    case 412:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    default:
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                        break;
                                 }
                             }
-                        );
+                        }
+                    );
 
 
-                    console.log('You have submitted the program');
+                console.log('You have submitted the program');
                 // }
 
-            // }).catch(
-            //     error => {
-            //         if (error.message === "Network Error") {
-            //             this.setState({
-            //                 message: 'static.unkownError',
-            //                 loading: false
-            //             });
-            //         } else {
-            //             switch (error.response ? error.response.status : "") {
+                // }).catch(
+                //     error => {
+                //         if (error.message === "Network Error") {
+                //             this.setState({
+                //                 message: 'static.unkownError',
+                //                 loading: false
+                //             });
+                //         } else {
+                //             switch (error.response ? error.response.status : "") {
 
-            //                 case 401:
-            //                     this.props.history.push(`/login/static.message.sessionExpired`)
-            //                     break;
-            //                 case 403:
-            //                     this.props.history.push(`/accessDenied`)
-            //                     break;
-            //                 case 500:
-            //                 case 404:
-            //                 case 406:
-            //                     this.setState({
-            //                         message: error.response.data.messageCode,
-            //                         loading: false
-            //                     });
-            //                     break;
-            //                 case 412:
-            //                     this.setState({
-            //                         message: error.response.data.messageCode,
-            //                         loading: false
-            //                     });
-            //                     break;
-            //                 default:
-            //                     this.setState({
-            //                         message: 'static.unkownError',
-            //                         loading: false
-            //                     });
-            //                     break;
-            //             }
-            //         }
-            //     }
-            // );
+                //                 case 401:
+                //                     this.props.history.push(`/login/static.message.sessionExpired`)
+                //                     break;
+                //                 case 403:
+                //                     this.props.history.push(`/accessDenied`)
+                //                     break;
+                //                 case 500:
+                //                 case 404:
+                //                 case 406:
+                //                     this.setState({
+                //                         message: error.response.data.messageCode,
+                //                         loading: false
+                //                     });
+                //                     break;
+                //                 case 412:
+                //                     this.setState({
+                //                         message: error.response.data.messageCode,
+                //                         loading: false
+                //                     });
+                //                     break;
+                //                 default:
+                //                     this.setState({
+                //                         message: 'static.unkownError',
+                //                         loading: false
+                //                     });
+                //                     break;
+                //             }
+                //         }
+                //     }
+                // );
 
-        }).catch(
-            error => {
-                if (error.message === "Network Error") {
-                    this.setState({
-                        message: 'static.unkownError',
-                        loading: false
-                    });
-                } else {
-                    switch (error.response ? error.response.status : "") {
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
 
-                        case 401:
-                            this.props.history.push(`/login/static.message.sessionExpired`)
-                            break;
-                        case 403:
-                            this.props.history.push(`/accessDenied`)
-                            break;
-                        case 500:
-                        case 404:
-                        case 406:
-                            this.setState({
-                                message: error.response.data.messageCode,
-                                loading: false
-                            });
-                            break;
-                        case 412:
-                            this.setState({
-                                message: error.response.data.messageCode,
-                                loading: false
-                            });
-                            break;
-                        default:
-                            this.setState({
-                                message: 'static.unkownError',
-                                loading: false
-                            });
-                            break;
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
                     }
                 }
-            }
-        );
+            );
 
 
 
