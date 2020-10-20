@@ -45,7 +45,7 @@ export default class ShipmentDetails extends React.Component {
             shipmentChangedFlag: 0,
             shipmentModalTitle: "",
             shipmentType: { value: 1, label: i18n.t('static.shipment.manualShipments') },
-            rangeValue: { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() }, to: { year: new Date(endDate).getFullYear(), month: new Date(endDate).getMonth() } },
+            rangeValue: localStorage.getItem("sesRangeValue") != "" ? JSON.parse(localStorage.getItem("sesRangeValue")) : { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() }, to: { year: new Date(endDate).getFullYear(), month: new Date(endDate).getMonth() } },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() },
         }
@@ -85,6 +85,7 @@ export default class ShipmentDetails extends React.Component {
         }
         if (cont == true) {
             this.setState({ rangeValue: value, shipmentChangedFlag: 0 })
+            localStorage.setItem("sesRangeValue", JSON.stringify(value));
             this.formSubmit(this.state.planningUnit, value);
         }
     }
@@ -208,7 +209,7 @@ export default class ShipmentDetails extends React.Component {
                 if (document.getElementById("addRowButtonId") != null) {
                     document.getElementById("addRowButtonId").style.display = "none";
                 }
-                var programIdd = this.props.match.params.programId;
+                var programIdd = this.props.match.params.programId || localStorage.getItem("sesProgramId");
                 console.log("programIdd", programIdd);
                 if (programIdd != '' && programIdd != undefined) {
                     var programSelect = { value: programIdd, label: proList.filter(c => c.value == programIdd)[0].label };
@@ -251,6 +252,7 @@ export default class ShipmentDetails extends React.Component {
             })
             var programId = value != "" && value != undefined ? value.value : 0;
             if (programId != 0) {
+                localStorage.setItem("sesProgramId", programId);
                 var db1;
                 var storeOS;
                 getDatabase();
@@ -298,7 +300,7 @@ export default class ShipmentDetails extends React.Component {
                             planningUnitListAll: myResult,
                             loading: false
                         })
-                        var planningUnitIdProp = this.props.match.params.planningUnitId;
+                        var planningUnitIdProp = this.props.match.params.planningUnitId || localStorage.getItem("sesPlanningUnitId");
                         console.log("planningUnitIdProp===>", planningUnitIdProp);
                         if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
                             var planningUnit = { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label };
@@ -340,6 +342,7 @@ export default class ShipmentDetails extends React.Component {
             var planningUnitId = value != "" && value != undefined ? value.value : 0;
             var programId = document.getElementById("programId").value;
             if (planningUnitId != 0) {
+                localStorage.setItem("sesPlanningUnitId", planningUnitId);
                 document.getElementById("shipmentsDetailsTableDiv").style.display = "block";
                 console.log("(this.state.shipmentType).value", (this.state.shipmentType).value);
                 if (document.getElementById("addRowButtonId") != null) {

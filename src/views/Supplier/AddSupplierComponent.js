@@ -9,7 +9,7 @@ import RealmService from "../../api/RealmService";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 
-const initialValues = {
+let initialValues = {
   realmId: [],
   supplier: ""
 }
@@ -122,9 +122,16 @@ class AddSupplierComponent extends Component {
     // AuthenticationService.setupAxiosInterceptors();
     RealmService.getRealmListAll()
       .then(response => {
+        let { supplier } = this.state;
+        supplier.realm.id = (response.data.length == 1 ? response.data[0].realmId : "")
         this.setState({
-          realms: response.data, loading: false
-        })
+          realms: response.data, loading: false, supplier
+        },
+          () => {
+            initialValues = {
+              realmId: (response.data.length == 1 ? response.data[0].realmId : "")
+            }
+          })
       }).catch(
         error => {
           if (error.message === "Network Error") {
@@ -188,6 +195,7 @@ class AddSupplierComponent extends Component {
                 <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
               </CardHeader> */}
               <Formik
+                enableReinitialize={true}
                 initialValues={initialValues}
                 validate={validate(validationSchema)}
                 onSubmit={(values, { setSubmitting, setErrors }) => {
