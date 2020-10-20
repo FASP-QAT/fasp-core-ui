@@ -13,7 +13,7 @@
     "static.common.displayName": "Enter Display Name",
     "static.common.dashboard": "Dashboard",
     "static.program.realmcountry": "Country",
-    "static.program.realmcountrydashboard": "Realm Country",
+    "static.program.realmcountrydashboard": "Country",
     "static.program.program": "Program",
     "static.message.user.usernameExists": "Username already exists",
     "static.message.user.emailIdExists": "Email address already exists",
@@ -223,7 +223,7 @@
     "static.country.country": "Country Name (English)",
     "static.healtharea.healthareatext": "Enter Technical Area",
     "static.program.selectzipfile": "Select zip file",
-    "static.procurementAgent.procurementagentnametext": "Enter name",
+    "static.procurementAgent.procurementagentnametext": "Enter Name",
     "static.product.productunittext": "Select Unit",
     "static.region.validcountry": "Enter value greater than 0",
     "static.program.validpastamctext": "Enter # past months used for calculating AMC",
@@ -1423,5 +1423,6 @@
     "static.report.shippedToArrivedAirLeadTime": "'Shipped to Arrived' air lead time ",
     "static.report.shippedToArrivedSeaLeadTime": "'Shipped to Arrived' sea lead time ",
     "static.shipment.dateIsLesserThanPrevDate":"Selected date is less than the date selected in prev columns.",
-    "static.dataentry.notesMaxLength":"Maximum 600 charaters only"
+    "static.dataentry.notesMaxLength":"Maximum 600 charaters only",
+    "static.ticket.openIssues": "Open Issues"
 }

@@ -10,7 +10,7 @@ import JiraTikcetService from '../../api/JiraTikcetService';
 import { SPACE_REGEX } from '../../Constants';
 
 let summaryText_1 = (i18n.t('static.common.bugreport'))
-let summaryText_2 = "Add / Update User"
+let summaryText_2 = "Report a bug"
 const initialValues = {
     summary: summaryText_1,
     description: ""
