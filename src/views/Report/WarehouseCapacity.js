@@ -246,7 +246,7 @@ class warehouseCapacity extends Component {
         ]
         let data = this.state.data.map(elt => [getLabelText(elt.realmCountry.label, this.state.lang), getLabelText(elt.region.label, this.state.lang), (elt.programList.map(ele => { return getLabelText(ele.label, this.state.lang) })).join('\n'), elt.gln == null ? '' : elt.gln, elt.capacityCbm])
         let content = {
-            margin: { top: 40, left: 100, bottom: 50 },
+            margin: { top: 90, left: 100, bottom: 80 },
             startY: 150,
             head: [headers],
             body: data,

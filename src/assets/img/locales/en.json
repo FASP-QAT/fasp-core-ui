@@ -1422,7 +1422,13 @@
     "static.common.edit": "Edit",    
     "static.report.shippedToArrivedAirLeadTime": "'Shipped to Arrived' air lead time ",
     "static.report.shippedToArrivedSeaLeadTime": "'Shipped to Arrived' sea lead time ",
+    "static.report.erpOrder":"ERP Order",
+    "static.report.localprocurement":"Local Procurement",
+    "static.report.orderNo":"Procurer Order ID",
     "static.shipment.dateIsLesserThanPrevDate":"Selected date is less than the date selected in prev columns.",
     "static.dataentry.notesMaxLength":"Maximum 600 charaters only",
-    "static.ticket.openIssues": "Open Issues"
+    "static.ticket.openIssues": "Open Issues",
+    "static.report.erpOrder":"ERP Order",
+    "static.report.localprocurement":"Local Procurement",
+    "static.report.orderNo":"Procurer Order ID"
 }
