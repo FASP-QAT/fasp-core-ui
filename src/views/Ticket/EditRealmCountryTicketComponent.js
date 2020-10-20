@@ -28,7 +28,7 @@ const validationSchema = function (values) {
             .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.common.summarytext')),
         realmCountryName: Yup.string()
-            .required(i18n.t('static.common.pleaseSelect').concat(" ").concat((i18n.t('static.dashboard.realmcountry')).concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?', i18n.t('static.dashboard.realmcountry'))))),
+            .required(i18n.t('static.common.pleaseSelect').concat(" ").concat((i18n.t('static.program.realmcountrydashboard')).concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?', i18n.t('static.program.realmcountrydashboard'))))),
         notes: Yup.string()
             .required(i18n.t('static.program.validnotestext'))
     })
@@ -70,7 +70,7 @@ export default class EditRealmCountryTicketComponent extends Component {
             message: '',
             realmCountries: [],
             realmCountryId: '',
-            loading: false
+            loading: true
         }
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
@@ -327,7 +327,7 @@ export default class EditRealmCountryTicketComponent extends Component {
                                             <FormFeedback className="red">{errors.summary}</FormFeedback>
                                         </FormGroup>
                                         <FormGroup>
-                                            <Label for="realmCountryName">{i18n.t('static.dashboard.realmcountry')}<span class="red Reqasterisk">*</span></Label>
+                                            <Label for="realmCountryName">{i18n.t('static.program.realmcountrydashboard')}<span class="red Reqasterisk">*</span></Label>
                                             <Input type="select" name="realmCountryName" id="realmCountryName"
                                                 bsSize="sm"
                                                 valid={!errors.realmCountryName && this.state.realmCountry.realmCountryName != ''}

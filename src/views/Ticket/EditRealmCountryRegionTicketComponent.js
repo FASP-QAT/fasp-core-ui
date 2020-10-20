@@ -68,7 +68,7 @@ export default class EditRealmCountryRegionTicketComponent extends Component {
             },
             lang: localStorage.getItem('lang'),
             message: '',
-            loading: false,
+            loading: true,
             realmCountryRegionId: '',
             realmCountryRegionList: []
         }

@@ -74,7 +74,7 @@ export default class EditTechnicalAreaTicketComponent extends Component {
             message: '',
             technicalAreas: [],
             technicalAreaId: '',
-            loading: false
+            loading: true
         }
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
@@ -138,7 +138,7 @@ export default class EditTechnicalAreaTicketComponent extends Component {
                     console.log("response---", response.data);
 
                     this.setState({
-                        technicalAreas: response.data
+                        technicalAreas: response.data, loading: false
                     })
                 }
                 else {

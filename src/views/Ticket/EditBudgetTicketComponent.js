@@ -74,7 +74,7 @@ export default class EditBudgetTicketComponent extends Component {
             message: '',
             budgets: [],
             budgetId: '',
-            loading: false
+            loading: true
         }
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);

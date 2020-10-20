@@ -158,7 +158,7 @@ export default class ProgramTicketComponent extends Component {
             programManagerList: [],
             regionList: [],
             regionId: '',
-            loading: false
+            loading: true
         }
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
@@ -576,7 +576,7 @@ export default class ProgramTicketComponent extends Component {
                 if (response.status == 200) {
                     this.setState({
                         realmList: response.data,
-                        realmId: selectedRealm
+                        realmId: selectedRealm, loading: false
                     });
                     if (selectedRealm !== "") {
                         this.setState({
