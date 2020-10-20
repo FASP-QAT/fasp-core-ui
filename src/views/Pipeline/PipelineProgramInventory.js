@@ -5,11 +5,11 @@ import PipelineService from '../../api/PipelineService.js';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import DataSourceService from '../../api/DataSourceService.js';
 import PlanningUnitService from '../../api/PlanningUnitService'
-import { jExcelLoadedFunction, jExcelLoadedFunctionPipeline } from '../../CommonComponent/JExcelCommonFunctions.js'
+import { jExcelLoadedFunction, jExcelLoadedFunctionPipeline, checkValidtion, inValid, positiveValidation } from '../../CommonComponent/JExcelCommonFunctions.js'
 import RealmCountryService from '../../api/RealmCountryService'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { JEXCEL_DATE_FORMAT_WITHOUT_DATE } from '../../Constants';
-import { JEXCEL_PAGINATION_OPTION} from '../../Constants.js';
+import { JEXCEL_DATE_FORMAT_WITHOUT_DATE, INVENTORY_DATA_SOURCE_TYPE, JEXCEL_NEGATIVE_INTEGER_NO_REGEX } from '../../Constants';
+import { JEXCEL_PAGINATION_OPTION, JEXCEL_INTEGER_REGEX } from '../../Constants.js';
 export default class PipelineProgramInventory extends Component {
 
     constructor(props) {
@@ -72,7 +72,7 @@ export default class PipelineProgramInventory extends Component {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
             }
-            
+
             var col = ("D").concat(parseInt(y) + 1);
             var value = this.el.getValueFromCoords(3, y);
             if (value == "") {
@@ -84,7 +84,7 @@ export default class PipelineProgramInventory extends Component {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
             }
-            
+
             /* var col = ("H").concat(parseInt(y) + 1);
              var value = this.el.getValueFromCoords(7, y);
              if (value == "") {
@@ -96,6 +96,34 @@ export default class PipelineProgramInventory extends Component {
                  this.el.setStyle(col, "background-color", "transparent");
                  this.el.setComments(col, "");
              }*/
+
+            var value = this.el.getValueFromCoords(6, y);
+            var validation = checkValidtion("number", "G", y, value, this.el, JEXCEL_INTEGER_REGEX, 1, 1);
+            if (validation == false) {
+                valid = false;
+            }
+
+
+            var reg = JEXCEL_NEGATIVE_INTEGER_NO_REGEX;
+            var col = ("H").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(7, y);
+            value = value.toString().replaceAll("\,", "");
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+
+
 
         }
         return valid;
@@ -140,7 +168,7 @@ export default class PipelineProgramInventory extends Component {
                 this.el.setValueFromCoords(4, y, multiplier);
             }
         }
-        if(x == 5){
+        if (x == 5) {
             var col = ("F").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -158,7 +186,31 @@ export default class PipelineProgramInventory extends Component {
             }
         }
 
+        if (x == 6) {
+            var valid = checkValidtion("number", "G", y, value, this.el, JEXCEL_INTEGER_REGEX, 1, 1);
+        }
 
+        if (x == 7) {
+           
+            var reg = JEXCEL_NEGATIVE_INTEGER_NO_REGEX;
+            var col = ("H").concat(parseInt(y) + 1);
+            value = value.toString().replaceAll("\,", "");
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+
+        }
 
     }
 
@@ -283,11 +335,13 @@ export default class PipelineProgramInventory extends Component {
                 // AuthenticationService.setupAxiosInterceptors();
                 DataSourceService.getAllDataSourceList().then(response => {
                     var dataSourceList = [];
-                    // console.log("inventory data source List ++++++++++++++++++----->", response.data);
-                    for (var j = 0; j < response.data.length; j++) {
+                    var dataSourceFilterList = response.data.filter(c => c.dataSourceType.id == INVENTORY_DATA_SOURCE_TYPE);
+                    console.log("inventory data source List ++++++++++++++++++----->", response.data);
+                    // INVENTORY_DATA_SOURCE_TYPE
+                    for (var j = 0; j < dataSourceFilterList.length; j++) {
                         var dataSourceJson = {
-                            id: ((response.data)[j]).dataSourceId,
-                            name: ((response.data)[j]).label.label_en
+                            id: ((dataSourceFilterList)[j]).dataSourceId,
+                            name: ((dataSourceFilterList)[j]).label.label_en
                         }
                         dataSourceList.push(dataSourceJson);
                     }
@@ -392,8 +446,8 @@ export default class PipelineProgramInventory extends Component {
                                             title: 'Note',
                                             type: 'text'
                                         }
-                                    ], 
-                                    pagination:localStorage.getItem("sesRecordCount"),
+                                    ],
+                                    pagination: localStorage.getItem("sesRecordCount"),
                                     contextMenu: false,
                                     search: true,
                                     columnSorting: true,

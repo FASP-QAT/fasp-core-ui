@@ -67,7 +67,7 @@ export default class EditRealmTicketComponent extends Component {
             message: '',
             realms: [],
             realmId: '',
-            loading: false
+            loading: true
         }
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
@@ -128,7 +128,7 @@ export default class EditRealmTicketComponent extends Component {
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        realms: response.data
+                        realms: response.data, loading: false
                     })
                 } else {
                     this.setState({
