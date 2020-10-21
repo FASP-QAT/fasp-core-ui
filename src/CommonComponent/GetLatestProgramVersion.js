@@ -27,19 +27,18 @@ export default class GetLatestProgramVersion extends Component {
     }
 
     checkNewerVersions() {
-        AuthenticationService.setupAxiosInterceptors()
-        console.log("program child check newer versions-------------------------------------------")
-        ProgramService.checkNewerVersions(this.state.programs)
-            .then(response => {
-                localStorage.setItem("sesLatestProgram", response.data);
-                console.log("response--------------------------------------->", response);
-            })
-
+        if (navigator.onLine) {
+            AuthenticationService.setupAxiosInterceptors()
+            ProgramService.checkNewerVersions(this.state.programs)
+                .then(response => {
+                    localStorage.removeItem("sesLatestProgram");
+                    localStorage.setItem("sesLatestProgram", response.data);
+                })
+        }
     }
     componentDidMount() {
-        
+
         this.getPrograms();
-        console.log("program child called-------------------------------------------")
     }
     render() {
         return (

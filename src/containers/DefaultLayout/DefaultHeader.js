@@ -97,14 +97,26 @@ class DefaultHeader extends Component {
               <img src={imageUsermanual} className="HelpIcon" title={i18n.t('static.user.changesInLocalVersion')} />
             </NavLink>
           </NavItem> */}
-          <NavItem className="">
-            <NavLink to="#" className="nav-link">
-              {localStorage.getItem("sesLatestProgram") &&
-                < img src={iconsDownarrowRed} className="HelpIcon" title={i18n.t('static.header.notLatestVersion')} />}
-              {!localStorage.getItem("sesLatestProgram") &&
-                <img src={iconsDownarrowBlue} className="HelpIcon" title={i18n.t('static.header.notLatestVersion')} />}
-            </NavLink>
-          </NavItem>
+          <Online>
+            <NavItem className="">
+              <NavLink to="#" className="nav-link">
+                {localStorage.getItem("sesLatestProgram") == "true" &&
+                  <img src={iconsDownarrowRed} className="HelpIcon" onClick={this.props.latestProgram} title={i18n.t('static.header.notLatestVersion')} style={{ width: '30px', height: '30px' }} />}
+                {localStorage.getItem("sesLatestProgram") == "false" &&
+                  <img src={iconsDownarrowBlue} className="HelpIcon" onClick={this.props.latestProgram} title={i18n.t('static.header.notLatestVersion')} style={{ width: '30px', height: '30px' }} />}
+              </NavLink>
+            </NavItem>
+          </Online>
+          {/* <Online> */}
+            <NavItem className="">
+              <NavLink to="#" className="nav-link">
+                {localStorage.getItem("sesLocalVersionChange") == "true" &&
+                  <img src={iconsUparrowRed} className="HelpIcon" onClick={this.props.commitProgram} title={i18n.t('static.header.changesInLocalVersion')} style={{ width: '30px', height: '30px' }} />}
+                {localStorage.getItem("sesLocalVersionChange") == "false" &&
+                  <img src={iconsUparrowBlue} className="HelpIcon" onClick={this.props.commitProgram} title={i18n.t('static.header.changesInLocalVersion')} style={{ width: '30px', height: '30px' }} />}
+              </NavLink>
+            </NavItem>
+          {/* </Online> */}
           <NavItem className="">
             <span className="nav-link">
               <a href={`${API_URL}/file/qatUserGuide`}>
@@ -121,7 +133,7 @@ class DefaultHeader extends Component {
             </NavLink>
           </NavItem>
           {/* <DefaultHeaderDropdown /> */}
-          <DefaultHeaderDropdown onLogout={this.props.onLogout} accnt onChangePassword={this.props.onChangePassword} onChangeDashboard={this.props.onChangeDashboard} />
+          <DefaultHeaderDropdown onLogout={this.props.onLogout} accnt onChangePassword={this.props.onChangePassword} onChangeDashboard={this.props.onChangeDashboard} latestProgram={this.props.latestProgram} commitProgram={this.props.commitProgram} />
           <NavItem className="">
             <NavLink to="#" className="nav-link">
               <span className="icon-wrapper icon-wrapper-alt rounded-circle ">

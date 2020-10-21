@@ -7,6 +7,7 @@ import { Offline, Online } from "react-detect-offline";
 import { Redirect, Route, Switch } from 'react-router-dom';
 import { Container } from 'reactstrap';
 import IdleTimer from 'react-idle-timer';
+import ChangeInLocalProgramVersion from '../../CommonComponent/ChangeInLocalProgramVersion'
 
 // routes config
 //import routes from '../../routes';
@@ -646,12 +647,14 @@ class DefaultLayout extends Component {
 
   displayHeaderTitle = (name) => {
     if (this.state.name !== name) {
+
       this.setState({
         name
       });
     }
   }
   componentDidMount() {
+    // this.refs.programChangeChild.checkIfLocalProgramVersionChanged()
     var curUserBusinessFunctions = AuthenticationService.getLoggedInUserRoleBusinessFunction();
     var bfunction = [];
     if (curUserBusinessFunctions != null && curUserBusinessFunctions != "") {
@@ -688,6 +691,26 @@ class DefaultLayout extends Component {
     });
 
   }
+  goToLoadProgram(e) {
+    e.preventDefault();
+    this.props.history.push(`/program/downloadProgram/`)
+  }
+  goToCommitProgram(e) {
+    e.preventDefault();
+    if (navigator.onLine) {
+      this.props.history.push(`/program/syncPage/`)
+    } else {
+      confirmAlert({
+        message: i18n.t('static.commit.offline'),
+        buttons: [
+          {
+            label: i18n.t('static.common.close')
+          }
+        ]
+      });
+    }
+
+  }
   showDashboard(e) {
     console.log("e------------------", e);
     e.preventDefault();
@@ -701,6 +724,7 @@ class DefaultLayout extends Component {
     let events = ["keydown", "mousedown"];
     return (
       <div className="app">
+        {/* <ChangeInLocalProgramVersion ref="programChangeChild" updateState={true}></ChangeInLocalProgramVersion> */}
         <IdleTimer
           ref={ref => { this.idleTimer = ref }}
           element={document}
@@ -711,9 +735,11 @@ class DefaultLayout extends Component {
           timeout={this.state.timeout}
           events={events}
         />
+
         <AppHeader fixed>
           <Suspense fallback={this.loading()}>
-            <DefaultHeader onLogout={e => this.signOut(e)} onChangePassword={e => this.changePassword(e)} onChangeDashboard={e => this.showDashboard(e)} title={this.state.name} />
+
+            <DefaultHeader onLogout={e => this.signOut(e)} onChangePassword={e => this.changePassword(e)} onChangeDashboard={e => this.showDashboard(e)} latestProgram={e => this.goToLoadProgram(e)} title={this.state.name} commitProgram={e => this.goToCommitProgram(e)} />
           </Suspense>
         </AppHeader>
         <div className="app-body">

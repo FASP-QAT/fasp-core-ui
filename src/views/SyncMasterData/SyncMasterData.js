@@ -22,6 +22,7 @@ import { qatProblemActions } from '../../CommonComponent/QatProblemActions'
 import { calculateSupplyPlan } from '../SupplyPlan/SupplyPlanCalculations';
 import QatProblemActions from '../../CommonComponent/QatProblemActions'
 import GetLatestProgramVersion from '../../CommonComponent/GetLatestProgramVersion'
+import ChangeInLocalProgramVersion from '../../CommonComponent/ChangeInLocalProgramVersion'
 
 export default class SyncMasterData extends Component {
 
@@ -90,6 +91,7 @@ export default class SyncMasterData extends Component {
             <div className="animated fadeIn">
                 <QatProblemActions ref="problemListChild" updateState={undefined} fetchData={undefined} objectStore="programData"></QatProblemActions>
                 <GetLatestProgramVersion ref="programListChild"></GetLatestProgramVersion>
+                <ChangeInLocalProgramVersion ref="programChangeChild"></ChangeInLocalProgramVersion>
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5 className="pl-md-5" style={{ color: "red" }} id="div2">{this.state.message != "" && i18n.t('static.masterDataSync.masterDataSyncFailed')}</h5>
                 <div className="col-md-12" style={{ display: this.state.loading ? "none" : "block" }}>
@@ -279,6 +281,8 @@ export default class SyncMasterData extends Component {
         }
 
         this.refs.programListChild.checkNewerVersions();
+        this.refs.programChangeChild.checkIfLocalProgramVersionChanged();
+
         if (valid) {
             this.setState({
                 syncedMasters: this.state.syncedMasters + 1,
