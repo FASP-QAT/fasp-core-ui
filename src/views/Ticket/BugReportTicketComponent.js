@@ -268,7 +268,7 @@ export default class BugReportTicketComponent extends Component {
                                                     onBlur={handleBlur}
                                                 />
                                     
-                                                <label className="custom-file-label" id="attachFile" >{this.state.bugReport.attachFile}</label>
+                                                <label className="custom-file-label" id="attachFile" data-browse={i18n.t('static.uploadfile.Browse')} >{this.state.bugReport.attachFile}</label>
                                                 <FormFeedback className="red">{errors.attachFile}</FormFeedback>
                                             </div>
                                         </FormGroup>
