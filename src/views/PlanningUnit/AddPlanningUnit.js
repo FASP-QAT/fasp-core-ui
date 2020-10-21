@@ -172,29 +172,15 @@ export default class AddPlanningUnit extends Component {
         UnitService.getUnitListAll()
             .then(response => {
                 if (response.status == 200) {
-                    let { planningUnit } = this.state;
-                    planningUnit.unit.id = (response.data.length == 1 ? response.data[0].unitId : "")
                     this.setState({
-                        units: response.data, loading: false, planningUnit
-                    },
-                        () => {
-                            // initialValues = {
-                            //     unitId: (response.data.length == 1 ? response.data[0].unitId : "")
-                            // }
-                        })
+                        units: response.data, loading: false
+                    })
                     // AuthenticationService.setupAxiosInterceptors();
                     ForecastingUnitService.getForecastingUnitList().then(response => {
                         console.log(response.data)
-                        let { planningUnit } = this.state;
-                        planningUnit.forecastingUnit.forecastingUnitId = (response.data.length == 1 ? response.data[0].forecastingUnitId : "")
                         this.setState({
-                            forecastingUnits: response.data, loading: false, planningUnit
-                        },
-                            () => {
-                                if (response.data.length == 1) {
-                                    this.changePlanningUnit();
-                                }
-                            })
+                            forecastingUnits: response.data, loading: false
+                        })
                     }).catch(
                         error => {
                             if (error.message === "Network Error") {
