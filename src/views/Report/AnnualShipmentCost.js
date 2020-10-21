@@ -1353,7 +1353,7 @@ class AnnualShipmentCost extends Component {
                         </div>
                     </div>
                     <CardBody className="pb-lg-2 pt-lg-0 ">
-                        <div className="TableCust" >
+                        <div className="" >
                             <div ref={ref}>
                                 <Form >
                                     <div className="pl-0">
