@@ -15,7 +15,6 @@ let initialValues = {
   fundingSourceId: [],
   subFundingSource: "",
   fundingSourceCode: "",
-  realmId: []
 }
 const entityname = i18n.t('static.fundingsource.fundingsource');
 const validationSchema = function (values) {
@@ -262,14 +261,7 @@ class AddFundingSourceComponent extends Component {
     RealmService.getRealmListAll()
       .then(response => {
         if (response.status == 200) {
-          let { fundingSource } = this.state;
-          fundingSource.realm.id = (response.data.length == 1 ? response.data[0].realmId : "");
-          this.setState({ realms: response.data, loading: false },
-            () => {
-              initialValues = {
-                realmId: (response.data.length == 1 ? response.data[0].realmId : "")
-              }
-            })
+          this.setState({ realms: response.data, loading: false })
         } else {
           this.setState({ message: response.data.messageCode, loading: false })
         }
