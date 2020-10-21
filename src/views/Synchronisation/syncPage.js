@@ -2040,7 +2040,7 @@ export default class syncPage extends Component {
     return (
       <div className="animated fadeIn">
         <AuthenticationServiceComponent history={this.props.history} />
-        <QatProblemActions ref="problemListChild" updateState={this.updateState} fetchData={this.fetchData} objectStore="programData"/>
+        <QatProblemActions ref="problemListChild" updateState={this.updateState} fetchData={this.fetchData} objectStore="programData" />
         <h5 id="div1" className={this.state.color}>{i18n.t(this.state.message, { entityname })}</h5>
         <h5 className="red" id="div2">{this.state.noFundsBudgetError || this.state.commitVersionError}</h5>
         <Row style={{ display: this.state.loading ? "none" : "block" }}>
@@ -2395,6 +2395,7 @@ export default class syncPage extends Component {
               programRequest2.onsuccess = function (e) {
 
                 var json = response.data;
+                console.log("JSON-------------------->", json);
                 var version = json.requestedProgramVersion;
                 if (version == -1) {
                   version = json.currentVersion.versionId
