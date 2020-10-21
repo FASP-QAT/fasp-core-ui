@@ -98,6 +98,7 @@ class DefaultHeader extends Component {
               <img src={imageUsermanual} className="HelpIcon" title={i18n.t('static.header.notLatestVersion')} />
             </NavLink>
           </NavItem> */}
+           
           <NavItem className="">
             <span className="nav-link">
               <a href={`${API_URL}/file/qatUserGuide`}>
