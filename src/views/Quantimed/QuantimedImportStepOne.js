@@ -306,7 +306,7 @@ class QuantimedImportStepOne extends Component {
                                                     <Col xs="12" md="4" className="custom-file">
                                                         {/* <Input type="file" id="file-input" name="file-input" /> */}
                                                         <Input type="file" className="custom-file-input" id="file-input" name="file-input" accept=".xml" onChange={(e) => { handleChange(e); this.dataChange(e) }} />
-                                                        <label className="custom-file-label" id="file-input">{i18n.t('static.chooseFile.chooseFile')}</label>
+                                                        <label className="custom-file-label" id="file-input" data-browse={i18n.t('static.uploadfile.Browse')}>{i18n.t('static.chooseFile.chooseFile')}</label>
                                                     </Col>
                                                 </FormGroup>
                                                 <FormGroup>
