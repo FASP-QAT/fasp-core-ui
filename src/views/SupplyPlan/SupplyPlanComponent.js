@@ -8,7 +8,7 @@ import i18n from '../../i18n';
 import 'react-contexify/dist/ReactContexify.min.css';
 import { Formik } from 'formik';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, MONTHS_IN_PAST_FOR_SUPPLY_PLAN, TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN, CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, NO_OF_MONTHS_ON_LEFT_CLICKED, ON_HOLD_SHIPMENT_STATUS, NO_OF_MONTHS_ON_RIGHT_CLICKED, DATE_FORMAT_CAP, INDEXED_DB_NAME, INDEXED_DB_VERSION, TBD_PROCUREMENT_AGENT_ID, NONE_SELECTED_DATA_SOURCE_ID } from '../../Constants.js'
+import { SECRET_KEY, MONTHS_IN_PAST_FOR_SUPPLY_PLAN, TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN, CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, NO_OF_MONTHS_ON_LEFT_CLICKED, ON_HOLD_SHIPMENT_STATUS, NO_OF_MONTHS_ON_RIGHT_CLICKED, DATE_FORMAT_CAP, INDEXED_DB_NAME, INDEXED_DB_VERSION, TBD_PROCUREMENT_AGENT_ID, NONE_SELECTED_DATA_SOURCE_ID, USD_CURRENCY_ID } from '../../Constants.js'
 import getLabelText from '../../CommonComponent/getLabelText'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
@@ -2697,9 +2697,9 @@ export default class SupplyPlanComponent extends React.Component {
                                     var currentMonth = moment(Date.now()).utcOffset('-0500').startOf('month').format("YYYY-MM-DD");
                                     var compare = (m[n].startDate >= currentMonth);
                                     var stockInHand = jsonList[0].closingBalance;
-                                    if (compare && parseInt(stockInHand) <= parseInt(jsonList[0].minStock)) {
-                                        // var suggestedOrd = parseInt(jsonList[0].maxStock - jsonList[0].minStock);
-                                        var suggestedOrd = parseInt(jsonList[0].maxStock - jsonList[0].closingBalance);
+                                    var amc = Math.round(parseFloat(jsonList[0].amc));
+                                    if (compare && parseInt(stockInHand) <= parseInt(amc * parseInt(jsonList[0].minStockMoS))) {
+                                        var suggestedOrd = parseInt((amc * parseInt(jsonList[0].maxStockMoS)) - jsonList[0].closingBalance);
                                         if (suggestedOrd == 0) {
                                             var addLeadTimes = parseFloat(programJson.plannedToSubmittedLeadTime) + parseFloat(programJson.submittedToApprovedLeadTime) +
                                                 parseFloat(programJson.approvedToShippedLeadTime) + parseFloat(programJson.shippedToArrivedBySeaLeadTime) +
@@ -3425,7 +3425,7 @@ export default class SupplyPlanComponent extends React.Component {
                         id: NONE_SELECTED_DATA_SOURCE_ID
                     },
                     currency: {
-                        currencyId: ""
+                        currencyId: USD_CURRENCY_ID
                     },
                     expectedDeliveryDate: moment(month).format("YYYY-MM-DD"),
                     planningUnit: {

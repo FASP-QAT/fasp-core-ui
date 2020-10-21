@@ -264,7 +264,7 @@ const routes = [
   { path: '/pipeline/planningUnitListFinalInventory/:pipelineId', name: 'static.breadcrum.list', entityname: 'static.dashboard.planningunit', component: PlanningUnitListNegativeInventory },
   { path: '/pipeline/pieplineProgramList/:color/:message', name: 'static.dashboard.pipelineprogramlist', component: PipelineProgramList },
   { path: '/pipeline/pieplineProgramList', exact: true, name: 'static.dashboard.pipelineprogramlist', component: PipelineProgramList },
-  { path: '/pipeline/pieplineProgramSetup/:pipelineId', name: 'static.dashboard.setupprogram', component: pipelineProgramSetup },
+  { path: '/pipeline/pieplineProgramSetup/:pipelineId', name: 'static.dashboard.programimport', component: pipelineProgramSetup },
   { path: '/pipeline/pipelineProgramImport', name: 'static.dashboard.programimport', component: pipeline },
   { path: '/program/programOnboarding', name: 'static.dashboard.setupprogram', component: ProgramOnboarding },
 

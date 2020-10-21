@@ -408,9 +408,9 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
 
           var planningText = doc.splitTextToSize(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.join(' , '), doc.internal.pageSize.width * 3 / 4);
           doc.text(doc.internal.pageSize.width / 8, 150, planningText)
-
+var len=160+(planningText.length*10)
           var planningText = doc.splitTextToSize((i18n.t('static.tracercategory.tracercategory') + ' : ' + this.state.tracerCategoryLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-          doc.text(doc.internal.pageSize.width / 8, 180, planningText)
+          doc.text(doc.internal.pageSize.width / 8,len , planningText)
 
         }
 
@@ -431,16 +431,16 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
     var data = [];
     this.state.data.map(elt => elt.programData.map(p => data.push([elt.planningUnit.id, getLabelText(elt.planningUnit.label, this.state.lang), getLabelText(p.program.label, this.state.lang), this.formatter(this.round(p.amc)), this.formatter(this.round(p.finalClosingBalance)), this.formatter(this.roundN(p.mos)), p.minMos, p.maxMos])));
     var height = doc.internal.pageSize.height;
-    var startY = 150 + (this.state.countryValues.length * 2) + 20
+    var startY = 150 + (this.state.countryValues.length * 2) + this.state.tracerCategoryLabels.length*3
     let content = {
       margin: { top: 80, bottom: 50 },
       startY: startY,
       head: headers,
       body: data,
-      styles: { lineWidth: 1, fontSize: 8, halign: 'center', cellWidth: 80 },
+      styles: { lineWidth: 1, fontSize: 8, halign: 'center', cellWidth: 67 },
       columnStyles: {
-        0: { cellWidth: 181.89 },
-        1: { cellWidth: 180 },
+        1: { cellWidth: 181.89 },
+        2: { cellWidth: 178 },
       }
 
     };
@@ -978,7 +978,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
                             <tr>
                               <th className="text-center" style={{ width: '27%' }}>{i18n.t('static.planningunit.planningunit')}</th>
                               {
-                                this.state.programs.map(ele => { return (<th className="text-center" style={{ width: '27%' }}>{ele}</th>) })}
+                                this.state.programs.map(ele => { return (<th className="text-center" style={{ width: ((100-27)/this.state.programs.length)+'%' }}>{ele}</th>) })}
                             </tr>
                           </thead>
 

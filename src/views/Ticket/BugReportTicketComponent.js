@@ -10,7 +10,7 @@ import JiraTikcetService from '../../api/JiraTikcetService';
 import { SPACE_REGEX } from '../../Constants';
 
 let summaryText_1 = (i18n.t('static.common.bugreport'))
-let summaryText_2 = "Add / Update User"
+let summaryText_2 = "Report a bug"
 const initialValues = {
     summary: summaryText_1,
     description: ""
@@ -268,7 +268,7 @@ export default class BugReportTicketComponent extends Component {
                                                     onBlur={handleBlur}
                                                 />
                                     
-                                                <label className="custom-file-label" id="attachFile" >{this.state.bugReport.attachFile}</label>
+                                                <label className="custom-file-label" id="attachFile" data-browse={i18n.t('static.uploadfile.Browse')} >{this.state.bugReport.attachFile}</label>
                                                 <FormFeedback className="red">{errors.attachFile}</FormFeedback>
                                             </div>
                                         </FormGroup>

@@ -1116,14 +1116,14 @@ export default class ConsumptionDetails extends React.Component {
         ]);
 
         let content = {
-            margin: { top: 90, bottom: 70 },
+            margin: { top: 90, bottom: 80 },
             startY: 200,
             head: [headers],
             body: data,
-            styles: { lineWidth: 1, fontSize: 8, cellWidth: 55, halign: 'center' },
+            styles: { lineWidth: 1, fontSize: 8, halign: 'center' },
             columnStyles: {
                 3: { cellWidth: 170 },
-                4: { cellWidth: 170 },
+                4: { cellWidth: 180 },
                 6: { cellWidth: 150 },
 
             }

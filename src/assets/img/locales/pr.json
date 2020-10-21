@@ -936,5 +936,10 @@
     "static.quantimed.planningUnitNotFoundText": "Unidade de planejamento não encontrada",
     "static.quantimed.doNotImport": "Não importe",
     "static.quantimed.importData": "Importar dados",
-    "static.quantimed.mapAtLeastOnePlanningUnitValidationText": "Mapeie pelo menos uma unidade de planejamento"
+    "static.quantimed.mapAtLeastOnePlanningUnitValidationText": "Mapeie pelo menos uma unidade de planejamento",
+    "static.ticket.openIssues": "Abrir Problemas",
+    "static.uploadfile.Browse":"Squeaky toy",
+    "static.jexcel.search": "Pesquisa",
+    "static.jexcel.clear": "Claro"
+    
 }
