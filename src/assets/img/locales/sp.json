@@ -1210,5 +1210,6 @@
     "static.quantimed.planningUnitNotFoundText": "Unidad de planificación no encontrada",
     "static.quantimed.doNotImport": "No importar",
     "static.quantimed.importData": "Datos de importacion",
-    "static.quantimed.mapAtLeastOnePlanningUnitValidationText": "Mapear al menos una unidad de planificación"
+    "static.quantimed.mapAtLeastOnePlanningUnitValidationText": "Mapear al menos una unidad de planificación",
+    "static.ticket.openIssues": "Abierto Cuestiones"
 }

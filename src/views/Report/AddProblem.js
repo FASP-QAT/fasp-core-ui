@@ -367,7 +367,7 @@ class AddRoleComponent extends Component {
             // console.log("problemList====>", probList);
             var programObj = programJson;
             var planningUnitObj = planningUnitList.filter(c => c.planningUnit.id == planningUnitId)[0];
-            var regionObj = {};
+            var regionObj = { id: 0 };
             if (regionId != 0 && regionId != "") {
               regionObj = regionList.filter(c => c.regionId == regionId)[0];
             } else {
@@ -390,7 +390,7 @@ class AddRoleComponent extends Component {
                   && c.realmProblem.problem.problemId == 13);
 
               if (index == -1) {
-
+                var curDate = ((moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD HH:mm:ss')));
                 var json = {
                   problemReportId: 0,
                   program: {
@@ -402,7 +402,7 @@ class AddRoleComponent extends Component {
                   realmProblem: problemObj,
 
                   dt: '',
-                  region: '',
+                  region: regionObj,
                   planningUnit: {
                     id: planningUnitObj.planningUnit.id,
                     label: planningUnitObj.planningUnit.label,
@@ -429,12 +429,12 @@ class AddRoleComponent extends Component {
                     userId: userId,
                     username: username
                   },
-                  createdDate: moment(Date.now()).format("YYYY-MM-DD"),
+                  createdDate: curDate,
                   lastModifiedBy: {
                     userId: userId,
                     username: username
                   },
-                  lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD"),
+                  lastModifiedDate: curDate,
                   problemTransList: [
                     {
                       problemReportTransId: '',
@@ -454,7 +454,7 @@ class AddRoleComponent extends Component {
                         userId: userId,
                         username: username
                       },
-                      createdDate: moment(Date.now()).format("YYYY-MM-DD")
+                      createdDate: curDate
                     }
                   ]
 

@@ -266,7 +266,7 @@ export default class QatProblemActions extends Component {
                                                                             label_pr: null
                                                                         }
                                                                     },
-                                                                    notes: 'Resolved',
+                                                                    notes: '',
                                                                     createdBy: {
                                                                         userId: userId,
                                                                         username: username
@@ -367,7 +367,7 @@ export default class QatProblemActions extends Component {
                                                                                     label_pr: null
                                                                                 }
                                                                             },
-                                                                            notes: "Open",
+                                                                            notes: "",
                                                                             createdBy: {
                                                                                 userId: userId,
                                                                                 username: username
@@ -403,7 +403,7 @@ export default class QatProblemActions extends Component {
                                                                             label_pr: null
                                                                         }
                                                                     },
-                                                                    notes: 'Resolved',
+                                                                    notes: '',
                                                                     createdBy: {
                                                                         userId: userId,
                                                                         username: username
@@ -483,7 +483,7 @@ export default class QatProblemActions extends Component {
                                                                             label_pr: null
                                                                         }
                                                                     },
-                                                                    notes: 'Resolved',
+                                                                    notes: '',
                                                                     createdBy: {
                                                                         userId: userId,
                                                                         username: username
@@ -576,7 +576,7 @@ export default class QatProblemActions extends Component {
                                                                                     label_pr: null
                                                                                 }
                                                                             },
-                                                                            notes: "Open",
+                                                                            notes: "",
                                                                             createdBy: {
                                                                                 userId: userId,
                                                                                 username: username
@@ -614,7 +614,7 @@ export default class QatProblemActions extends Component {
                                                                             label_pr: null
                                                                         }
                                                                     },
-                                                                    notes: 'Resolved',
+                                                                    notes: '',
                                                                     createdBy: {
                                                                         userId: userId,
                                                                         username: username
@@ -746,7 +746,7 @@ export default class QatProblemActions extends Component {
                                                                                     label_pr: null
                                                                                 }
                                                                             },
-                                                                            notes: "Open",
+                                                                            notes: "",
                                                                             createdBy: {
                                                                                 userId: userId,
                                                                                 username: username
@@ -795,7 +795,7 @@ export default class QatProblemActions extends Component {
                                                                                 label_pr: null
                                                                             }
                                                                         },
-                                                                        notes: 'Resolved',
+                                                                        notes: '',
                                                                         createdBy: {
                                                                             userId: userId,
                                                                             username: username
@@ -841,7 +841,7 @@ export default class QatProblemActions extends Component {
                                                                             label_pr: null
                                                                         }
                                                                     },
-                                                                    notes: 'Resolved',
+                                                                    notes: '',
                                                                     createdBy: {
                                                                         userId: userId,
                                                                         username: username
@@ -921,7 +921,7 @@ export default class QatProblemActions extends Component {
                                                                             label_pr: null
                                                                         }
                                                                     },
-                                                                    notes: 'Resolved',
+                                                                    notes: '',
                                                                     createdBy: {
                                                                         userId: userId,
                                                                         username: username
@@ -1011,7 +1011,7 @@ export default class QatProblemActions extends Component {
                                                                                     label_pr: null
                                                                                 }
                                                                             },
-                                                                            notes: "Open",
+                                                                            notes: "",
                                                                             createdBy: {
                                                                                 userId: userId,
                                                                                 username: username
@@ -1049,7 +1049,7 @@ export default class QatProblemActions extends Component {
                                                                             label_pr: null
                                                                         }
                                                                     },
-                                                                    notes: 'Resolved',
+                                                                    notes: '',
                                                                     createdBy: {
                                                                         userId: userId,
                                                                         username: username
@@ -1219,7 +1219,7 @@ export default class QatProblemActions extends Component {
                                                                                         label_pr: null
                                                                                     }
                                                                                 },
-                                                                                notes: "Open",
+                                                                                notes: "",
                                                                                 createdBy: {
                                                                                     userId: userId,
                                                                                     username: username
@@ -1269,7 +1269,7 @@ export default class QatProblemActions extends Component {
                                                                                 label_pr: null
                                                                             }
                                                                         },
-                                                                        notes: 'Resolved',
+                                                                        notes: '',
                                                                         createdBy: {
                                                                             userId: userId,
                                                                             username: username
@@ -1313,7 +1313,7 @@ export default class QatProblemActions extends Component {
                                                                             label_pr: null
                                                                         }
                                                                     },
-                                                                    notes: 'Resolved',
+                                                                    notes: '',
                                                                     createdBy: {
                                                                         userId: userId,
                                                                         username: username
@@ -1487,7 +1487,7 @@ export default class QatProblemActions extends Component {
                                                                                         label_pr: null
                                                                                     }
                                                                                 },
-                                                                                notes: "Open",
+                                                                                notes: "",
                                                                                 createdBy: {
                                                                                     userId: userId,
                                                                                     username: username
@@ -1536,7 +1536,7 @@ export default class QatProblemActions extends Component {
                                                                                 label_pr: null
                                                                             }
                                                                         },
-                                                                        notes: 'Resolved',
+                                                                        notes: '',
                                                                         createdBy: {
                                                                             userId: userId,
                                                                             username: username
@@ -1580,7 +1580,7 @@ export default class QatProblemActions extends Component {
                                                                             label_pr: null
                                                                         }
                                                                     },
-                                                                    notes: 'Resolved',
+                                                                    notes: '',
                                                                     createdBy: {
                                                                         userId: userId,
                                                                         username: username
@@ -1755,7 +1755,7 @@ export default class QatProblemActions extends Component {
                                                                                         label_pr: null
                                                                                     }
                                                                                 },
-                                                                                notes: "Open",
+                                                                                notes: "",
                                                                                 createdBy: {
                                                                                     userId: userId,
                                                                                     username: username
@@ -1804,7 +1804,7 @@ export default class QatProblemActions extends Component {
                                                                                 label_pr: null
                                                                             }
                                                                         },
-                                                                        notes: 'Resolved',
+                                                                        notes: '',
                                                                         createdBy: {
                                                                             userId: userId,
                                                                             username: username
@@ -1848,7 +1848,7 @@ export default class QatProblemActions extends Component {
                                                                             label_pr: null
                                                                         }
                                                                     },
-                                                                    notes: 'Resolved',
+                                                                    notes: '',
                                                                     createdBy: {
                                                                         userId: userId,
                                                                         username: username
@@ -2020,7 +2020,7 @@ export default class QatProblemActions extends Component {
                                                                                         label_pr: null
                                                                                     }
                                                                                 },
-                                                                                notes: "Open",
+                                                                                notes: "",
                                                                                 createdBy: {
                                                                                     userId: userId,
                                                                                     username: username
@@ -2069,7 +2069,7 @@ export default class QatProblemActions extends Component {
                                                                                 label_pr: null
                                                                             }
                                                                         },
-                                                                        notes: 'Resolved',
+                                                                        notes: '',
                                                                         createdBy: {
                                                                             userId: userId,
                                                                             username: username
@@ -2113,7 +2113,7 @@ export default class QatProblemActions extends Component {
                                                                             label_pr: null
                                                                         }
                                                                     },
-                                                                    notes: 'Resolved',
+                                                                    notes: '',
                                                                     createdBy: {
                                                                         userId: userId,
                                                                         username: username
@@ -2220,7 +2220,7 @@ export default class QatProblemActions extends Component {
                                                                                     label_pr: null
                                                                                 }
                                                                             },
-                                                                            notes: 'Resolved',
+                                                                            notes: '',
                                                                             createdBy: {
                                                                                 userId: userId,
                                                                                 username: username
@@ -2339,7 +2339,7 @@ export default class QatProblemActions extends Component {
                                                                                             label_pr: null
                                                                                         }
                                                                                     },
-                                                                                    notes: "Open",
+                                                                                    notes: "",
                                                                                     createdBy: {
                                                                                         userId: userId,
                                                                                         username: username
@@ -2376,7 +2376,7 @@ export default class QatProblemActions extends Component {
                                                                                     label_pr: null
                                                                                 }
                                                                             },
-                                                                            notes: 'Resolved',
+                                                                            notes: '',
                                                                             createdBy: {
                                                                                 userId: userId,
                                                                                 username: username
@@ -2509,7 +2509,7 @@ export default class QatProblemActions extends Component {
                                                                                     label_pr: null
                                                                                 }
                                                                             },
-                                                                            notes: 'Resolved',
+                                                                            notes: '',
                                                                             createdBy: {
                                                                                 userId: userId,
                                                                                 username: username
@@ -2626,7 +2626,7 @@ export default class QatProblemActions extends Component {
                                                                                             label_pr: null
                                                                                         }
                                                                                     },
-                                                                                    notes: "Open",
+                                                                                    notes: "",
                                                                                     createdBy: {
                                                                                         userId: userId,
                                                                                         username: username
@@ -2663,7 +2663,7 @@ export default class QatProblemActions extends Component {
                                                                                     label_pr: null
                                                                                 }
                                                                             },
-                                                                            notes: 'Resolved',
+                                                                            notes: '',
                                                                             createdBy: {
                                                                                 userId: userId,
                                                                                 username: username
@@ -2780,7 +2780,7 @@ export default class QatProblemActions extends Component {
                                                                                     label_pr: null
                                                                                 }
                                                                             },
-                                                                            notes: 'Resolved',
+                                                                            notes: '',
                                                                             createdBy: {
                                                                                 userId: userId,
                                                                                 username: username
@@ -2899,7 +2899,7 @@ export default class QatProblemActions extends Component {
                                                                                             label_pr: null
                                                                                         }
                                                                                     },
-                                                                                    notes: "Open",
+                                                                                    notes: "",
                                                                                     createdBy: {
                                                                                         userId: userId,
                                                                                         username: username
@@ -2936,7 +2936,7 @@ export default class QatProblemActions extends Component {
                                                                                     label_pr: null
                                                                                 }
                                                                             },
-                                                                            notes: 'Resolved',
+                                                                            notes: '',
                                                                             createdBy: {
                                                                                 userId: userId,
                                                                                 username: username
@@ -3119,7 +3119,7 @@ export default class QatProblemActions extends Component {
                                                                         label_pr: null
                                                                     }
                                                                 },
-                                                                notes: 'Resolved',
+                                                                notes: '',
                                                                 createdBy: {
                                                                     userId: userId,
                                                                     username: username
@@ -3223,7 +3223,7 @@ export default class QatProblemActions extends Component {
                                                                                     label_pr: null
                                                                                 }
                                                                             },
-                                                                            notes: "Open",
+                                                                            notes: "",
                                                                             createdBy: {
                                                                                 userId: userId,
                                                                                 username: username
@@ -3265,7 +3265,7 @@ export default class QatProblemActions extends Component {
                                                                         label_pr: null
                                                                     }
                                                                 },
-                                                                notes: 'Resolved',
+                                                                notes: '',
                                                                 createdBy: {
                                                                     userId: userId,
                                                                     username: username
@@ -3439,7 +3439,7 @@ export default class QatProblemActions extends Component {
                                                                         label_pr: null
                                                                     }
                                                                 },
-                                                                notes: 'Resolved',
+                                                                notes: '',
                                                                 createdBy: {
                                                                     userId: userId,
                                                                     username: username
@@ -3539,7 +3539,7 @@ export default class QatProblemActions extends Component {
                                                                                     label_pr: null
                                                                                 }
                                                                             },
-                                                                            notes: "Open",
+                                                                            notes: "",
                                                                             createdBy: {
                                                                                 userId: userId,
                                                                                 username: username
@@ -3578,7 +3578,7 @@ export default class QatProblemActions extends Component {
                                                                         label_pr: null
                                                                     }
                                                                 },
-                                                                notes: 'Resolved',
+                                                                notes: '',
                                                                 createdBy: {
                                                                     userId: userId,
                                                                     username: username
@@ -3750,7 +3750,7 @@ export default class QatProblemActions extends Component {
                                                                         label_pr: null
                                                                     }
                                                                 },
-                                                                notes: 'Resolved',
+                                                                notes: '',
                                                                 createdBy: {
                                                                     userId: userId,
                                                                     username: username
@@ -3852,7 +3852,7 @@ export default class QatProblemActions extends Component {
                                                                                     label_pr: null
                                                                                 }
                                                                             },
-                                                                            notes: "Open",
+                                                                            notes: "",
                                                                             createdBy: {
                                                                                 userId: userId,
                                                                                 username: username
@@ -3891,7 +3891,7 @@ export default class QatProblemActions extends Component {
                                                                         label_pr: null
                                                                     }
                                                                 },
-                                                                notes: 'Resolved',
+                                                                notes: '',
                                                                 createdBy: {
                                                                     userId: userId,
                                                                     username: username
@@ -4062,7 +4062,7 @@ export default class QatProblemActions extends Component {
                                                                         label_pr: null
                                                                     }
                                                                 },
-                                                                notes: 'Resolved',
+                                                                notes: '',
                                                                 createdBy: {
                                                                     userId: userId,
                                                                     username: username
@@ -4163,7 +4163,7 @@ export default class QatProblemActions extends Component {
                                                                                     label_pr: null
                                                                                 }
                                                                             },
-                                                                            notes: "Open",
+                                                                            notes: "",
                                                                             createdBy: {
                                                                                 userId: userId,
                                                                                 username: username
@@ -4202,7 +4202,7 @@ export default class QatProblemActions extends Component {
                                                                         label_pr: null
                                                                     }
                                                                 },
-                                                                notes: 'Resolved',
+                                                                notes: '',
                                                                 createdBy: {
                                                                     userId: userId,
                                                                     username: username
@@ -4374,7 +4374,7 @@ export default class QatProblemActions extends Component {
                                                                         label_pr: null
                                                                     }
                                                                 },
-                                                                notes: 'Resolved',
+                                                                notes: '',
                                                                 createdBy: {
                                                                     userId: userId,
                                                                     username: username
@@ -4476,7 +4476,7 @@ export default class QatProblemActions extends Component {
                                                                                     label_pr: null
                                                                                 }
                                                                             },
-                                                                            notes: "Open",
+                                                                            notes: "",
                                                                             createdBy: {
                                                                                 userId: userId,
                                                                                 username: username
@@ -4515,7 +4515,7 @@ export default class QatProblemActions extends Component {
                                                                         label_pr: null
                                                                     }
                                                                 },
-                                                                notes: 'Resolved',
+                                                                notes: '',
                                                                 createdBy: {
                                                                     userId: userId,
                                                                     username: username
@@ -4696,7 +4696,7 @@ export default class QatProblemActions extends Component {
                                                                         label_pr: null
                                                                     }
                                                                 },
-                                                                notes: 'Resolved',
+                                                                notes: '',
                                                                 createdBy: {
                                                                     userId: userId,
                                                                     username: username
@@ -4799,7 +4799,7 @@ export default class QatProblemActions extends Component {
                                                                                     label_pr: null
                                                                                 }
                                                                             },
-                                                                            notes: "Open",
+                                                                            notes: "",
                                                                             createdBy: {
                                                                                 userId: userId,
                                                                                 username: username
@@ -4838,7 +4838,7 @@ export default class QatProblemActions extends Component {
                                                                         label_pr: null
                                                                     }
                                                                 },
-                                                                notes: 'Resolved',
+                                                                notes: '',
                                                                 createdBy: {
                                                                     userId: userId,
                                                                     username: username
@@ -4938,7 +4938,7 @@ export default class QatProblemActions extends Component {
                                                                                 label_pr: null
                                                                             }
                                                                         },
-                                                                        notes: 'Resolved',
+                                                                        notes: '',
                                                                         createdBy: {
                                                                             userId: userId,
                                                                             username: username
@@ -5027,7 +5027,7 @@ export default class QatProblemActions extends Component {
                                                                                     label_pr: null
                                                                                 }
                                                                             },
-                                                                            notes: "Open",
+                                                                            notes: "",
                                                                             createdBy: {
                                                                                 userId: userId,
                                                                                 username: username
@@ -5065,7 +5065,7 @@ export default class QatProblemActions extends Component {
                                                                             label_pr: null
                                                                         }
                                                                     },
-                                                                    notes: 'Resolved',
+                                                                    notes: '',
                                                                     createdBy: {
                                                                         userId: userId,
                                                                         username: username

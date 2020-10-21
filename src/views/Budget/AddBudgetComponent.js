@@ -19,7 +19,7 @@ import { DATE_FORMAT_SM, DATE_PLACEHOLDER_TEXT, ALPHABET_NUMBER_REGEX, BUDGET_NA
 
 const entityname = i18n.t('static.dashboard.budget');
 // const [startDate, setStartDate] = useState(new Date());
-let initialValues = {
+const initialValues = {
     budget: '',
     programId: '',
     fundingSourceId: '',
@@ -283,10 +283,8 @@ class AddBudgetComponent extends Component {
         ProgramService.getProgramList()
             .then(response => {
                 if (response.status == 200) {
-                    let { budget } = this.state;
-                    budget.program.id = (response.data.length == 1 ? response.data[0].programId : '')
                     this.setState({
-                        programs: response.data, loading: false, budget
+                        programs: response.data, loading: false
                     })
                 }
                 else {
@@ -342,12 +340,10 @@ class AddBudgetComponent extends Component {
 
         FundingSourceService.getFundingSourceListAll()
             .then(response => {
-                let { budget } = this.state;
-                budget.fundingSource.fundingSourceId = (response.data.length == 1 ? response.data[0].fundingSourceId : '')
                 this.setState({
                     // fundingSources: response.data
                     fundingSources: response.data.filter(c => (c.allowedInBudget == true || c.allowedInBudget == "true"))
-                    , loading: false, budget
+                    , loading: false
                 })
             }).catch(
                 error => {
@@ -392,11 +388,8 @@ class AddBudgetComponent extends Component {
 
         CurrencyService.getCurrencyList().then(response => {
             if (response.status == 200) {
-                let { budget } = this.state;
-                budget.currency.currencyId = (response.data.length == 1 ? response.data[0].currencyId + "~" + response.data[0].conversionRateToUsd : '')
-                budget.currency.conversionRateToUsd = (response.data.length == 1 ? (response.data[0].currencyId + "~" + response.data[0].conversionRateToUsd).split("~")[1] : '')
                 this.setState({
-                    currencyList: response.data, loading: false, budget
+                    currencyList: response.data, loading: false
                 })
             } else {
                 this.setState({ message: response.data.messageCode, loading: false })
@@ -483,16 +476,7 @@ class AddBudgetComponent extends Component {
                                 <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
                             </CardHeader> */}
                             <Formik
-                                // initialValues={initialValues}
-                                enableReinitialize={true}
-                                initialValues={{
-                                    programId: this.state.budget.program.id,
-                                    fundingSourceId: this.state.budget.fundingSource.fundingSourceId,
-                                    currencyId: this.state.budget.currency.currencyId,
-                                    budget: this.state.budget.label.label_en,
-                                    budgetCode: this.state.budget.budgetCode,
-                                    budgetAmt: this.state.budget.budgetAmt
-                                }}
+                                initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
 
@@ -837,8 +821,8 @@ class AddBudgetComponent extends Component {
                                                         {/* <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button> */}
                                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                         <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                        {/* <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button> */}
-                                                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                        {/* <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check" disabled={!isValid}></i>{i18n.t('static.common.submit')}</Button> */}
 
                                                         &nbsp;
                                                     </FormGroup>

@@ -1212,5 +1212,6 @@
     "static.quantimed.planningUnitNotFoundText": "Unité de planification introuvable",
     "static.quantimed.doNotImport": "N'importez pas",
     "static.quantimed.importData": "Importer des données",
-    "static.quantimed.mapAtLeastOnePlanningUnitValidationText": "Mapper au moins une unité de planification"
+    "static.quantimed.mapAtLeastOnePlanningUnitValidationText": "Mapper au moins une unité de planification",
+    "static.ticket.openIssues": "Ouvert Problèmes"
 }

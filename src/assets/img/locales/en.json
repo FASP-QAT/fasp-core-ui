@@ -1401,8 +1401,8 @@
     "static.report.actualInv": "Actual Inventory Count",
     "static.inventory.adjustmentdetils": "Adjustment details",
     "static.pipeline.downLoadConverter":"Download Pipeline Converter",
-    "static.pipeline.pipelineConvertorLinux":"Linux.",
-    "static.pipeline.pipelineConvertorWindows":"Windows.",
+    "static.pipeline.pipelineConvertorLinux":"Linux",
+    "static.pipeline.pipelineConvertorWindows":"Windows",
     "static.message.planningUnitUpdate": "Planning unit added/updated successfully",
     "static.program.arrivedToReceivedLeadTime": "Enter 'Arrived to Received' lead time (in months)",
     "static.user.usermanual" :"User Manual",
@@ -1422,6 +1422,10 @@
     "static.common.edit": "Edit",    
     "static.report.shippedToArrivedAirLeadTime": "'Shipped to Arrived' air lead time ",
     "static.report.shippedToArrivedSeaLeadTime": "'Shipped to Arrived' sea lead time ",
+    "static.report.erpOrder":"ERP Order",
+    "static.report.localprocurement":"Local Procurement",
+    "static.report.orderNo":"Procurer Order ID",
     "static.shipment.dateIsLesserThanPrevDate":"Selected date is less than the date selected in prev columns.",
-    "static.dataentry.notesMaxLength":"Maximum 600 charaters only"
+    "static.dataentry.notesMaxLength":"Maximum 600 charaters only",
+    "static.ticket.openIssues": "Open Issues"
 }
