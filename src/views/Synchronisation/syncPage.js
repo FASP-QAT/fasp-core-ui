@@ -301,11 +301,11 @@ export default class syncPage extends Component {
         { title: i18n.t('static.inventory.dataSource'), type: 'dropdown', source: this.state.dataSourceList, width: 100 },
         { title: i18n.t('static.supplyPlan.alternatePlanningUnit'), type: 'dropdown', source: this.state.realmCountryPlanningUnitList, width: 150 },
         { title: i18n.t('static.supplyPlan.inventoryType'), type: 'dropdown', source: [{ id: 1, name: i18n.t('static.inventory.inventory') }, { id: 2, name: i18n.t('static.inventoryType.adjustment') }], width: 100 },
-        { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: 'numeric', mask: '[-]#,##', width: 80 },
-        { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: 'numeric', mask: '#,##', width: 80 },
+        { title: i18n.t('static.inventory.adjustmentQunatity'), type: 'numeric', mask: '[-]#,##', width: 120 },
+        { title: i18n.t('static.inventory.inventoryQunatity'), type: 'numeric', mask: '#,##', width: 120 },
         { title: i18n.t('static.unit.multiplier'), type: 'numeric', mask: '#,##', width: 80, },
-        { title: i18n.t('static.supplyPlan.quantityQATProduct'), type: 'numeric', mask: '[-]#,##', width: 80, },
-        { title: i18n.t('static.supplyPlan.quantityQATProduct'), type: 'numeric', mask: '#,##', width: 80, },
+        { title: i18n.t('static.inventory.adjustmentQunatityPU'), type: 'numeric', mask: '[-]#,##', width: 120, },
+        { title: i18n.t('static.inventory.inventoryQunatityPU'), type: 'numeric', mask: '#,##', width: 120, },
         { title: i18n.t('static.program.notes'), type: 'text', width: 200 },
         { title: i18n.t('static.inventory.active'), type: 'checkbox', width: 70 },
         { type: 'hidden', title: i18n.t('static.supplyPlan.batchInfo'), width: 0 },
@@ -1269,11 +1269,11 @@ export default class syncPage extends Component {
                                       { title: i18n.t('static.inventory.dataSource'), type: 'dropdown', source: dataSourceList, width: 100 },
                                       { title: i18n.t('static.supplyPlan.alternatePlanningUnit'), type: 'dropdown', source: realmCountryPlanningUnitList, width: 150 },
                                       { title: i18n.t('static.supplyPlan.inventoryType'), type: 'dropdown', source: [{ id: 1, name: i18n.t('static.inventory.inventory') }, { id: 2, name: i18n.t('static.inventoryType.adjustment') }], width: 100 },
-                                      { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: 'numeric', mask: '[-]#,##', width: 80 },
-                                      { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: 'numeric', mask: '#,##', width: 80 },
+                                      { title: i18n.t('static.inventory.adjustmentQunatity'), type: 'numeric', mask: '[-]#,##', width: 120 },
+                                      { title: i18n.t('static.inventory.inventoryQunatity'), type: 'numeric', mask: '#,##', width: 120 },
                                       { title: i18n.t('static.unit.multiplier'), type: 'numeric', mask: '#,##', width: 80, },
-                                      { title: i18n.t('static.supplyPlan.quantityQATProduct'), type: 'numeric', mask: '[-]#,##', width: 80, },
-                                      { title: i18n.t('static.supplyPlan.quantityQATProduct'), type: 'numeric', mask: '#,##', width: 80, },
+                                      { title: i18n.t('static.inventory.adjustmentQunatityPU'), type: 'numeric', mask: '[-]#,##', width: 120, },
+                                      { title: i18n.t('static.inventory.inventoryQunatityPU'), type: 'numeric', mask: '#,##', width: 120, },
                                       { title: i18n.t('static.program.notes'), type: 'text', width: 200 },
                                       { title: i18n.t('static.inventory.active'), type: 'checkbox', width: 70 },
                                       { type: 'hidden', title: i18n.t('static.supplyPlan.batchInfo'), width: 0 },
@@ -2114,7 +2114,7 @@ export default class syncPage extends Component {
                               active={this.state.activeTab[0] === '1'}
                               onClick={() => { this.toggle(0, '1'); }}
                             >
-                              {i18n.t('static.report.consumptionReport')}
+                              {i18n.t('static.supplyPlan.consumption')}
                             </NavLink>
                           </NavItem>
                           <NavItem>
