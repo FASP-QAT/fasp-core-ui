@@ -20,10 +20,9 @@ import getLabelText from '../../CommonComponent/getLabelText';
 
 let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.healtharea.healtharea"))
 let summaryText_2 = "Add Technical Area"
-const selectedRealm = (AuthenticationService.getRealmId() !== "" && AuthenticationService.getRealmId() !== -1) ? AuthenticationService.getRealmId() : ""
 const initialValues = {
-    summary: summaryText_1,
-    realmName: selectedRealm,
+    summary: "",
+    realmName: "",
     countryName: "",
     technicalAreaName: "",
     technicalAreaCode: "",
@@ -225,19 +224,19 @@ export default class TechnicalAreaTicketComponent extends Component {
             .then(response => {
                 this.setState({
                     realms: response.data,
-                    realmId: selectedRealm, loading: false
+                    realmId: this.props.items.userRealmId, loading: false
                 });
-                if (selectedRealm !== "") {
+                if (this.props.items.userRealmId !== "") {
                     this.setState({
-                        realms: (response.data).filter(c => c.realmId == selectedRealm)
+                        realms: (response.data).filter(c => c.realmId == this.props.items.userRealmId)
                     })
 
                     let { technicalArea } = this.state;
-                    technicalArea.realmName = (response.data).filter(c => c.realmId == selectedRealm)[0].label.label_en;
+                    technicalArea.realmName = (response.data).filter(c => c.realmId == this.props.items.userRealmId)[0].label.label_en;
                     this.setState({
                         technicalArea
                     }, () => {
-                        this.getRealmCountryList(selectedRealm)
+                        this.getRealmCountryList(this.props.items.userRealmId)
                     })
                 }
             }).catch(
@@ -372,13 +371,15 @@ export default class TechnicalAreaTicketComponent extends Component {
     resetClicked() {
         let { technicalArea } = this.state;
         // technicalArea.summary = '';
-        technicalArea.realmName = '';
+        technicalArea.realmName = this.props.items.userRealmId !== "" ? this.state.realms.filter(c => c.realmId == this.props.items.userRealmId)[0].label.label_en : "";
         technicalArea.countryName = '';
         technicalArea.technicalAreaName = '';
         technicalArea.technicalAreaCode = '';
         technicalArea.notes = '';
         this.setState({
-            technicalArea
+            technicalArea: technicalArea,                        
+            realmId: this.props.items.userRealmId,
+            countryId: ''
         },
             () => { });
     }
@@ -526,7 +527,15 @@ export default class TechnicalAreaTicketComponent extends Component {
                 <br></br>
                 <div style={{ display: this.state.loading ? "none" : "block" }}>
                     <Formik
-                        initialValues={initialValues}
+                        enableReinitialize={true}
+                        initialValues={{
+                            summary: summaryText_1,
+                            realmName: this.props.items.userRealmId,
+                            countryName: "",
+                            technicalAreaName: "",
+                            technicalAreaCode: "",
+                            notes: ""
+                        }}
                         validate={validate(validationSchema)}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
                             this.setState({

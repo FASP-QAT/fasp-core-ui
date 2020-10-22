@@ -23,6 +23,7 @@ import { getDatabase } from '../../CommonComponent/IndexedDbFunctions';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import bsCustomFileInput from 'bs-custom-file-input'
 import AuthenticationService from '../Common/AuthenticationService';
+import GetLatestProgramVersion from '../../CommonComponent/GetLatestProgramVersion'
 
 const initialValues = {
     programId: ''
@@ -176,6 +177,7 @@ export default class ImportProgram extends Component {
                                 loading: false
                             })
                             let id = AuthenticationService.displayDashboardBasedOnRole();
+                            this.refs.programListChild.checkNewerVersions();
                             this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.program.dataimportsuccess'))
                         } else {
                             confirmAlert({
@@ -224,6 +226,7 @@ export default class ImportProgram extends Component {
                                                 loading: false
                                             })
                                             let id = AuthenticationService.displayDashboardBasedOnRole();
+                                            this.refs.programListChild.checkNewerVersions();
                                             this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.program.dataimportsuccess'))
                                         }
                                     },
@@ -360,6 +363,7 @@ export default class ImportProgram extends Component {
     render() {
         return (
             <>
+                <GetLatestProgramVersion ref="programListChild"></GetLatestProgramVersion>
                 <h5 style={{ color: "red" }} id="div2">
                     {i18n.t(this.state.message, { entityname })}</h5>
                 <AuthenticationServiceComponent history={this.props.history} />

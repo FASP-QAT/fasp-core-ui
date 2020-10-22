@@ -13,10 +13,9 @@ import { BUDGET_NAME_REGEX, SPACE_REGEX } from '../../Constants';
 
 let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.tracercategory.tracercategory"))
 let summaryText_2 = "Add Tracer Category"
-const selectedRealm = (AuthenticationService.getRealmId() !== "" && AuthenticationService.getRealmId() !== -1) ? AuthenticationService.getRealmId() : ""
 const initialValues = {
-    summary: summaryText_1,
-    realmName: selectedRealm,
+    summary: "",
+    realmName: "",
     tracerCategoryName: "",
     notes: ""
 }
@@ -133,15 +132,15 @@ export default class TracerCategoryTicketComponent extends Component {
                 if (response.status == 200) {
                     this.setState({
                         realms: response.data,
-                        realmId: selectedRealm, loading: false
+                        realmId: this.props.items.userRealmId, loading: false
                     });
-                    if (selectedRealm !== "") {
+                    if (this.props.items.userRealmId !== "") {
                         this.setState({
-                            realms: (response.data).filter(c => c.realmId == selectedRealm)
+                            realms: (response.data).filter(c => c.realmId == this.props.items.userRealmId)
                         })
     
                         let { tracerCategory } = this.state;
-                        tracerCategory.realmName = (response.data).filter(c => c.realmId == selectedRealm)[0].label.label_en;
+                        tracerCategory.realmName = (response.data).filter(c => c.realmId == this.props.items.userRealmId)[0].label.label_en;
                         this.setState({
                             tracerCategory
                         }, () => {
@@ -209,11 +208,12 @@ export default class TracerCategoryTicketComponent extends Component {
     resetClicked() {
         let { tracerCategory } = this.state;
         // tracerCategory.summary = '';
-        tracerCategory.realmName = '';
+        tracerCategory.realmName = this.props.items.userRealmId !== "" ? this.state.realms.filter(c => c.realmId == this.props.items.userRealmId)[0].label.label_en : "";
         tracerCategory.tracerCategoryName = '';
         tracerCategory.notes = '';
         this.setState({
-            tracerCategory
+            tracerCategory: tracerCategory,
+            realmId: this.props.items.userRealmId
         },
             () => { });
     }
@@ -237,7 +237,13 @@ export default class TracerCategoryTicketComponent extends Component {
                 <br></br>
                 <div style={{ display: this.state.loading ? "none" : "block" }}>
                     <Formik
-                        initialValues={initialValues}
+                        enableReinitialize={true}
+                        initialValues={{
+                            summary: summaryText_1,
+                            realmName: this.props.items.userRealmId,
+                            tracerCategoryName: "",
+                            notes: ""
+                        }}
                         validate={validate(validationSchema)}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
                             this.setState({

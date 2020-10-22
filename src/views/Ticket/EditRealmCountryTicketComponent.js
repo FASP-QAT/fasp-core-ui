@@ -204,7 +204,8 @@ export default class EditRealmCountryTicketComponent extends Component {
         realmCountry.realmCountryName = '';
         realmCountry.notes = '';
         this.setState({
-            realmCountry
+            realmCountry: realmCountry,
+            realmCountryId: ''
         },
             () => { });
     }
