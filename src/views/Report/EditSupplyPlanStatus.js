@@ -1295,9 +1295,9 @@ class EditSupplyPlanStatus extends Component {
                                 var currentMonth = moment(Date.now()).utcOffset('-0500').startOf('month').format("YYYY-MM-DD");
                                 var compare = (m[n].startDate >= currentMonth);
                                 var stockInHand = jsonList[0].closingBalance;
-                                if (compare && parseInt(stockInHand) <= parseInt(jsonList[0].minStock)) {
-                                    // var suggestedOrd = parseInt(jsonList[0].maxStock - jsonList[0].minStock);
-                                    var suggestedOrd = parseInt(jsonList[0].maxStock - jsonList[0].closingBalance);
+                                var amc = Math.round(parseFloat(jsonList[0].amc));
+                                if (compare && parseInt(stockInHand) <= parseInt(amc * parseInt(jsonList[0].minStockMoS))) {
+                                    var suggestedOrd = parseInt((amc * parseInt(jsonList[0].maxStockMoS)) - jsonList[0].closingBalance);
                                     if (suggestedOrd == 0) {
                                         var addLeadTimes = parseFloat(programJson.plannedToSubmittedLeadTime) + parseFloat(programJson.submittedToApprovedLeadTime) +
                                             parseFloat(programJson.approvedToShippedLeadTime) + parseFloat(programJson.shippedToArrivedBySeaLeadTime) +

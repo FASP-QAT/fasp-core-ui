@@ -23,6 +23,7 @@ import { getDatabase } from '../../CommonComponent/IndexedDbFunctions';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import bsCustomFileInput from 'bs-custom-file-input'
 import AuthenticationService from '../Common/AuthenticationService';
+import GetLatestProgramVersion from '../../CommonComponent/GetLatestProgramVersion'
 
 const initialValues = {
     programId: ''
@@ -176,6 +177,7 @@ export default class ImportProgram extends Component {
                                 loading: false
                             })
                             let id = AuthenticationService.displayDashboardBasedOnRole();
+                            this.refs.programListChild.checkNewerVersions();
                             this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.program.dataimportsuccess'))
                         } else {
                             confirmAlert({
@@ -224,6 +226,7 @@ export default class ImportProgram extends Component {
                                                 loading: false
                                             })
                                             let id = AuthenticationService.displayDashboardBasedOnRole();
+                                            this.refs.programListChild.checkNewerVersions();
                                             this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.program.dataimportsuccess'))
                                         }
                                     },
@@ -360,6 +363,7 @@ export default class ImportProgram extends Component {
     render() {
         return (
             <>
+                <GetLatestProgramVersion ref="programListChild"></GetLatestProgramVersion>
                 <h5 style={{ color: "red" }} id="div2">
                     {i18n.t(this.state.message, { entityname })}</h5>
                 <AuthenticationServiceComponent history={this.props.history} />
@@ -385,7 +389,7 @@ export default class ImportProgram extends Component {
                                                 <Col xs="12" md="4" className="custom-file">
                                                     {/* <Input type="file" id="file-input" name="file-input" /> */}
                                                     <Input type="file" className="custom-file-input" id="file-input" name="file-input" accept=".zip" />
-                                                    <label className="custom-file-label" id="file-input">{i18n.t('static.chooseFile.chooseFile')}</label>
+                                                    <label className="custom-file-label" id="file-input" data-browse={i18n.t('static.uploadfile.Browse')}>{i18n.t('static.chooseFile.chooseFile')}</label>
                                                 </Col>
                                             </FormGroup>
                                             <FormGroup id="programIdDiv" className="col-md-4">

@@ -549,12 +549,12 @@ export default class CostOfInventory extends Component {
 
                 {
                     title: i18n.t('static.report.planningUnit'),
-                    type: 'text',
-                    mask: '#,###'
+                    type: 'text'
                 },
                 {
                     title: i18n.t('static.report.stock'),
-                    type: 'number'
+                    type: 'number',
+                    mask:'#,###'
                 },
                 {
                     title: i18n.t('static.report.actualInv'),

@@ -7,11 +7,15 @@ import { Offline, Online } from "react-detect-offline";
 import { Redirect, Route, Switch } from 'react-router-dom';
 import { Container } from 'reactstrap';
 import IdleTimer from 'react-idle-timer';
+// import ChangeInLocalProgramVersion from '../../CommonComponent/ChangeInLocalProgramVersion'
+import moment from 'moment';
+
 
 // routes config
 //import routes from '../../routes';
 import AuthenticationService from '../../views/Common/AuthenticationService.js';
 
+const ChangeInLocalProgramVersion = React.lazy(() => import('../../CommonComponent/ChangeInLocalProgramVersion'));
 const DefaultAside = React.lazy(() => import('./DefaultAside'));
 const DefaultFooter = React.lazy(() => import('./DefaultFooter'));
 const DefaultHeader = React.lazy(() => import('./DefaultHeader'));
@@ -263,7 +267,7 @@ const routes = [
   { path: '/pipeline/planningUnitListFinalInventory/:pipelineId', name: 'static.breadcrum.list', entityname: 'static.dashboard.planningunit', component: PlanningUnitListNegativeInventory },
   { path: '/pipeline/pieplineProgramList/:color/:message', name: 'static.dashboard.pipelineprogramlist', component: PipelineProgramList },
   { path: '/pipeline/pieplineProgramList', exact: true, name: 'static.dashboard.pipelineprogramlist', component: PipelineProgramList },
-  { path: '/pipeline/pieplineProgramSetup/:pipelineId', name: 'static.dashboard.setupprogram', component: pipelineProgramSetup },
+  { path: '/pipeline/pieplineProgramSetup/:pipelineId', name: 'static.dashboard.programimport', component: pipelineProgramSetup },
   { path: '/pipeline/pipelineProgramImport', name: 'static.dashboard.programimport', component: pipeline },
   { path: '/program/programOnboarding', name: 'static.dashboard.setupprogram', component: ProgramOnboarding },
 
@@ -614,27 +618,27 @@ class DefaultLayout extends Component {
     this.onIdle = this._onIdle.bind(this)
   }
   checkEvent = (e) => {
-    console.log("checkEvent called---", e);
+    // console.log("checkEvent called---", e);
     if (e.type != "mousemove") {
       this._onAction(e);
     }
   }
   _onAction(e) {
-    console.log('user did something', e)
-    console.log('user event type', e.type)
+    // console.log('user did something', e)
+    // console.log('user event type', e.type)
     this.setState({ isTimedOut: false })
   }
 
   _onActive(e) {
-    console.log('user is active', e)
+    // console.log('user is active', e)
     this.setState({ isTimedOut: false })
   }
 
   _onIdle(e) {
-    console.log('user is idle', e)
+    // console.log('user is idle', e)
     const isTimedOut = this.state.isTimedOut
     if (isTimedOut) {
-      console.log("user timed out")
+      // console.log("user timed out")
       this.props.history.push('/logout/static.message.sessionExpired')
     } else {
       this.setState({ showModal: true })
@@ -646,12 +650,14 @@ class DefaultLayout extends Component {
 
   displayHeaderTitle = (name) => {
     if (this.state.name !== name) {
+
       this.setState({
         name
       });
     }
   }
   componentDidMount() {
+    // this.refs.programChangeChild.checkIfLocalProgramVersionChanged()
     var curUserBusinessFunctions = AuthenticationService.getLoggedInUserRoleBusinessFunction();
     var bfunction = [];
     if (curUserBusinessFunctions != null && curUserBusinessFunctions != "") {
@@ -660,7 +666,7 @@ class DefaultLayout extends Component {
       }
       this.setState({ businessFunctions: bfunction });
     }
-    console.log("has business function---", this.state.businessFunctions.includes('ROLE_BF_DELETE_LOCAL_PROGARM'));
+    // console.log("has business function---", this.state.businessFunctions.includes('ROLE_BF_DELETE_LOCAL_PROGARM'));
 
   }
 
@@ -688,19 +694,57 @@ class DefaultLayout extends Component {
     });
 
   }
+  goToLoadProgram(e) {
+    e.preventDefault();
+    this.props.history.push(`/program/downloadProgram/`)
+  }
+  goToCommitProgram(e) {
+    e.preventDefault();
+    if (navigator.onLine) {
+      this.props.history.push(`/program/syncPage/`)
+    } else {
+      confirmAlert({
+        message: i18n.t('static.commit.offline'),
+        buttons: [
+          {
+            label: i18n.t('static.common.close')
+          }
+        ]
+      });
+    }
+
+  }
   showDashboard(e) {
-    console.log("e------------------", e);
+    // console.log("e------------------", e);
     e.preventDefault();
     var id = AuthenticationService.displayDashboardBasedOnRole();
     this.props.history.push(`/ApplicationDashboard/` + `${id}`)
   }
-
-
+  // componentDidUpdate() {
+  //   console.log("Parent component did update called---",this.refs)
+  // }
+  checkClick = (e, programDataLastModifiedDate, downloadedProgramDataLastModifiedDate) => {
+    // e.preventDefault();
+    console.log("d---this.state.programDataLastModifiedDate---", programDataLastModifiedDate);
+    console.log("d---downloadedProgramDataLastModifiedDate  ", downloadedProgramDataLastModifiedDate);
+    console.log("d---result local version---", moment(programDataLastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(downloadedProgramDataLastModifiedDate).format("YYYY-MM-DD HH:mm:ss"))
+    localStorage.removeItem("sesLocalVersionChange");
+    if (moment(programDataLastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(downloadedProgramDataLastModifiedDate).format("YYYY-MM-DD HH:mm:ss")) {
+      console.log("d---hurrey local version changed-------------------------------------------------------------");
+      localStorage.setItem("sesLocalVersionChange", true);
+      console.log("d--------in if---------------")
+    } else {
+      localStorage.setItem("sesLocalVersionChange", false);
+      console.log("d--------in else---------------")
+    }
+  }
   render() {
-    console.log('in I18n defaultlayout')
+    // console.log('in I18n defaultlayout')
     let events = ["keydown", "mousedown"];
     return (
       <div className="app">
+        {<ChangeInLocalProgramVersion ref="programChangeChild" func={this.checkClick} updateState={true}></ChangeInLocalProgramVersion>}
+
         <IdleTimer
           ref={ref => { this.idleTimer = ref }}
           element={document}
@@ -711,9 +755,10 @@ class DefaultLayout extends Component {
           timeout={this.state.timeout}
           events={events}
         />
+
         <AppHeader fixed>
           <Suspense fallback={this.loading()}>
-            <DefaultHeader onLogout={e => this.signOut(e)} onChangePassword={e => this.changePassword(e)} onChangeDashboard={e => this.showDashboard(e)} title={this.state.name} />
+            <DefaultHeader onLogout={e => this.signOut(e)} onChangePassword={e => this.changePassword(e)} onChangeDashboard={e => this.showDashboard(e)} latestProgram={e => this.goToLoadProgram(e)} title={this.state.name} commitProgram={e => this.goToCommitProgram(e)} />
           </Suspense>
         </AppHeader>
         <div className="app-body">

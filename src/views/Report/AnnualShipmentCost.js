@@ -29,6 +29,7 @@ import {
 } from 'reactstrap';
 import ReportService from '../../api/ReportService';
 
+import MultiSelect from 'react-multi-select-component';
 const ref = React.createRef();
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -52,6 +53,14 @@ class AnnualShipmentCost extends Component {
             show: false,
             programs: [],
             versions: [],
+            planningUnitValues: [],
+            planningUnitLabels: [],
+            statusValues: [],
+            statusLabels: [],
+            procurementAgentValues: [],
+            procurementAgentLabels: [],
+            fundingSourceValues: [],
+            fundingSourceLabels: [],
             lang: localStorage.getItem('lang'),
             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
@@ -81,19 +90,23 @@ class AnnualShipmentCost extends Component {
         }
     }
     fetchData() {
+        let procurementAgentIds = this.state.procurementAgentValues.length == this.state.procurementAgents.length ? [] : this.state.procurementAgentValues.map(ele => (ele.value).toString());
+        let fundingSourceIds = this.state.fundingSourceValues.length == this.state.fundingSources.length ? [] : this.state.fundingSourceValues.map(ele => (ele.value).toString());
+        let shipmentStatusIds = this.state.statusValues.length == this.state.shipmentStatuses.length ? [] : this.state.statusValues.map(ele => (ele.value).toString());
+
         this.setState({
             outPutList: []
         }, () => {
             let json = {
                 "programId": document.getElementById("programId").value,
                 "versionId": document.getElementById("versionId").value,
-                "procurementAgentId": document.getElementById("procurementAgentId").value,
+                "procurementAgentIds": procurementAgentIds,
                 "planningUnitId": document.getElementById("planningUnitId").value,
-                "fundingSourceId": document.getElementById("fundingSourceId").value,
-                "shipmentStatusId": document.getElementById("shipmentStatusId").value,
+                "fundingSourceIds": fundingSourceIds,
+                "shipmentStatusIds": shipmentStatusIds,
                 "startDate": this.state.rangeValue.from.year + '-' + ("00" + this.state.rangeValue.from.month).substr(-2) + '-01',
                 "stopDate": this.state.rangeValue.to.year + '-' + ("00" + this.state.rangeValue.to.month).substr(-2) + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate(),
-                "reportbaseValue": document.getElementById("view").value,
+                "reportBasedOn": document.getElementById("view").value,
 
             }
 
@@ -104,7 +117,7 @@ class AnnualShipmentCost extends Component {
             let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
             let reportbaseValue = document.getElementById("view").value;
 
-            if (programId > 0 && versionId != 0 && planningUnitId != 0) {
+            if (programId > 0 && versionId != 0 && planningUnitId > 0 && this.state.procurementAgentValues.length > 0 && this.state.fundingSourceValues.length > 0 && this.state.statusValues.length > 0) {
                 if (versionId.includes('Local')) {
                     var db1;
                     var storeOS;
@@ -174,22 +187,38 @@ class AnnualShipmentCost extends Component {
                                     var shipmentList = [];
                                     shipmentList = programJson.shipmentList;
                                     var list = shipmentList.filter(c => c.planningUnit.id == planningUnitId)
-                                    console.log(list)
-                                    var procurementAgentId = document.getElementById("procurementAgentId").value;
-                                    var fundingSourceId = document.getElementById("fundingSourceId").value;
-                                    var shipmentStatusId = document.getElementById("shipmentStatusId").value;
 
-                                    if (procurementAgentId != -1) {
-                                        list = list.filter(c => c.procurementAgent.id == procurementAgentId);
+                                    if (reportbaseValue == 1) {
+                                        list = list.filter(c => (c.plannedDate >= startDate && c.plannedDate <= endDate));
+                                    } else {
+                                        list = list.filter(c => c.receivedDate == null || c.receivedDate == "" ? (c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate) : (c.receivedDate >= startDate && c.receivedDate <= endDate));
                                     }
-                                    if (fundingSourceId != -1) {
-                                        list = list.filter(c => c.fundingSource.id == fundingSourceId);
-                                    }
-                                    if (shipmentStatusId != -1) {
-                                        list = list.filter(c => c.shipmentStatus.id == shipmentStatusId);
-                                    }
-                                    var availableProcure = [...new Set(list.map(ele => ele.procurementAgent.id))];
-                                    var availableFunding = [...new Set(list.map(ele => ele.fundingSource.id))];
+                                    console.log(list)
+                                    // var procurementAgentId = document.getElementById("procurementAgentId").value;
+                                    // var fundingSourceId = document.getElementById("fundingSourceId").value;
+                                    // var shipmentStatusId = document.getElementById("shipmentStatusId").value;
+
+                                    // if (procurementAgentId != -1) {
+                                    var procurementAgentfilteredList = []
+                                    this.state.procurementAgentValues.map(procurementAgent => {
+                                        procurementAgentfilteredList = [...procurementAgentfilteredList, ...list.filter(c => c.procurementAgent.id == procurementAgent.value)];
+                                    })
+                                    console.log('procurementAgentfilteredList', procurementAgentfilteredList)
+                                    // }
+                                    var fundingSourcefilteredList = []
+                                    // if (fundingSourceId != -1) {
+                                    this.state.fundingSourceValues.map(fundingsource => {
+                                        fundingSourcefilteredList = [...fundingSourcefilteredList, ...procurementAgentfilteredList.filter(c => c.fundingSource.id == fundingsource.value)];
+                                    })
+                                    console.log('fundingSourcefilteredList', fundingSourcefilteredList)
+                                    // if (shipmentStatusId != -1) {
+                                    var list1 = []
+                                    this.state.statusValues.map(status => {
+                                        list1 = [...list1, ...fundingSourcefilteredList.filter(c => c.shipmentStatus.id == status.value)];
+                                    })
+                                    console.log('list1', list1)
+                                    var availableProcure = [...new Set(list1.map(ele => ele.procurementAgent.id))];
+                                    var availableFunding = [...new Set(list1.map(ele => ele.fundingSource.id))];
                                     console.log(availableProcure)
                                     console.log(availableFunding)
                                     var list1 = list
@@ -197,6 +226,7 @@ class AnnualShipmentCost extends Component {
                                         availableFunding.map(f => {
                                             console.log(p, '======', f)
                                             list = list1.filter(c => c.procurementAgent.id == p && c.fundingSource.id == f)
+                                            console.log(list)
                                             if (list.length > 0) {
                                                 var fundingSource = this.state.fundingSources.filter(c => c.fundingSourceId == f)[0]
                                                 var procurementAgent = this.state.procurementAgents.filter(c => c.procurementAgentId == p)[0]
@@ -281,66 +311,23 @@ class AnnualShipmentCost extends Component {
                                     outPutList: []
                                 })
                                 if (error.message === "Network Error") {
-                                    this.setState({
-                                        message: 'static.unkownError',
-                                        loading: false
-                                    });
+                                    this.setState({ message: error.message });
                                 } else {
                                     switch (error.response ? error.response.status : "") {
-
-                                        case 401:
-                                            this.props.history.push(`/login/static.message.sessionExpired`)
-                                            break;
-                                        case 403:
-                                            this.props.history.push(`/accessDenied`)
-                                            break;
                                         case 500:
+                                        case 401:
                                         case 404:
                                         case 406:
-                                            this.setState({
-                                                message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                                                loading: false
-                                            });
-                                            break;
                                         case 412:
-                                            this.setState({
-                                                message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                                                loading: false
-                                            });
+                                            this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
                                             break;
                                         default:
-                                            this.setState({
-                                                message: 'static.unkownError',
-                                                loading: false
-                                            });
+                                            this.setState({ message: 'static.unkownError' });
                                             break;
                                     }
                                 }
                             }
                         );
-                    // .catch(
-                    //     error => {
-                    //         this.setState({
-                    //             outPutList: []
-                    //         })
-                    //         if (error.message === "Network Error") {
-                    //             this.setState({ message: error.message });
-                    //         } else {
-                    //             switch (error.response ? error.response.status : "") {
-                    //                 case 500:
-                    //                 case 401:
-                    //                 case 404:
-                    //                 case 406:
-                    //                 case 412:
-                    //                     this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
-                    //                     break;
-                    //                 default:
-                    //                     this.setState({ message: 'static.unkownError' });
-                    //                     break;
-                    //             }
-                    //         }
-                    //     }
-                    // );
                 }
             } else if (programId == 0) {
                 this.setState({ message: i18n.t('static.common.selectProgram'), data: [], outPutList: [] });
@@ -348,8 +335,16 @@ class AnnualShipmentCost extends Component {
             } else if (versionId == 0) {
                 this.setState({ message: i18n.t('static.program.validversion'), data: [], outPutList: [] });
 
-            } else {
+            } else if (planningUnitId == 0) {
                 this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [], outPutList: [] });
+
+            } else if (this.state.procurementAgentValues.length == 0) {
+                this.setState({ message: i18n.t('static.procurementAgent.selectProcurementAgent'), data: [], outPutList: [] })
+            } else if (this.state.fundingSourceValues.length == 0) {
+                this.setState({ message: i18n.t('static.fundingSource.selectFundingSource'), data: [], outPutList: [] })
+            }
+            else {
+                this.setState({ message: i18n.t('static.report.validShipmentStatusText'), data: [], outPutList: [] });
 
             }
         })
@@ -370,66 +365,23 @@ class AnnualShipmentCost extends Component {
                             programs: []
                         }, () => { this.consolidatedProgramList() })
                         if (error.message === "Network Error") {
-                            this.setState({
-                                message: 'static.unkownError',
-                                loading: false
-                            });
+                            this.setState({ message: error.message });
                         } else {
                             switch (error.response ? error.response.status : "") {
-
-                                case 401:
-                                    this.props.history.push(`/login/static.message.sessionExpired`)
-                                    break;
-                                case 403:
-                                    this.props.history.push(`/accessDenied`)
-                                    break;
                                 case 500:
+                                case 401:
                                 case 404:
                                 case 406:
-                                    this.setState({
-                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                                        loading: false
-                                    });
-                                    break;
                                 case 412:
-                                    this.setState({
-                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                                        loading: false
-                                    });
+                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
                                     break;
                                 default:
-                                    this.setState({
-                                        message: 'static.unkownError',
-                                        loading: false
-                                    });
+                                    this.setState({ message: 'static.unkownError' });
                                     break;
                             }
                         }
                     }
                 );
-            // .catch(
-            //     error => {
-            //         this.setState({
-            //             programs: []
-            //         }, () => { this.consolidatedProgramList() })
-            //         if (error.message === "Network Error") {
-            //             this.setState({ message: error.message });
-            //         } else {
-            //             switch (error.response ? error.response.status : "") {
-            //                 case 500:
-            //                 case 401:
-            //                 case 404:
-            //                 case 406:
-            //                 case 412:
-            //                     this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
-            //                     break;
-            //                 default:
-            //                     this.setState({ message: 'static.unkownError' });
-            //                     break;
-            //             }
-            //         }
-            //     }
-            // );
 
         } else {
             console.log('offline')
@@ -582,18 +534,19 @@ class AnnualShipmentCost extends Component {
                     // doc.text(i18n.t('static.dashboard.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
                     //     align: 'left'
                     // })
-                    doc.text(i18n.t('static.procurementagent.procurementagent') + ' : ' + document.getElementById("procurementAgentId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 120, {
+                    var fundingSourceText = doc.splitTextToSize((i18n.t('static.budget.fundingsource') + ' : ' + this.state.fundingSourceLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+                    doc.text(doc.internal.pageSize.width / 8, 120, fundingSourceText)
+
+                    var procurementAgentText = doc.splitTextToSize((i18n.t('static.procurementagent.procurementagent') + ' : ' + this.state.procurementAgentLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+                    doc.text(doc.internal.pageSize.width / 8, 120 + (fundingSourceText.length * 10), procurementAgentText)
+
+                    doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 120 + (fundingSourceText.length * 10) + (procurementAgentText.length * 10), {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.dashboard.fundingsource') + ' : ' + document.getElementById("fundingSourceId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
-                        align: 'left'
-                    })
-                    doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 140, {
-                        align: 'left'
-                    })
-                    doc.text(i18n.t('static.common.status') + ' : ' + document.getElementById("shipmentStatusId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
-                        align: 'left'
-                    })
+                    var statustext = doc.splitTextToSize((i18n.t('static.common.status') + ' : ' + this.state.statusLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+                    doc.text(doc.internal.pageSize.width / 8, 130 + (fundingSourceText.length * 10) + (procurementAgentText.length * 10), statustext)
+
+
                 }
             }
         }
@@ -994,72 +947,30 @@ class AnnualShipmentCost extends Component {
                         }, () => {
                             this.fetchData();
                         })
-                    }).catch(
-                        error => {
-                            this.setState({
-                                planningUnits: [],
-                            })
-                            if (error.message === "Network Error") {
+                    })
+                        .catch(
+                            error => {
                                 this.setState({
-                                    message: 'static.unkownError',
-                                    loading: false
-                                });
-                            } else {
-                                switch (error.response ? error.response.status : "") {
-
-                                    case 401:
-                                        this.props.history.push(`/login/static.message.sessionExpired`)
-                                        break;
-                                    case 403:
-                                        this.props.history.push(`/accessDenied`)
-                                        break;
-                                    case 500:
-                                    case 404:
-                                    case 406:
-                                        this.setState({
-                                            message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
-                                            loading: false
-                                        });
-                                        break;
-                                    case 412:
-                                        this.setState({
-                                            message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
-                                            loading: false
-                                        });
-                                        break;
-                                    default:
-                                        this.setState({
-                                            message: 'static.unkownError',
-                                            loading: false
-                                        });
-                                        break;
+                                    planningUnits: [],
+                                })
+                                if (error.message === "Network Error") {
+                                    this.setState({ message: error.message });
+                                } else {
+                                    switch (error.response ? error.response.status : "") {
+                                        case 500:
+                                        case 401:
+                                        case 404:
+                                        case 406:
+                                        case 412:
+                                            this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
+                                            break;
+                                        default:
+                                            this.setState({ message: 'static.unkownError' });
+                                            break;
+                                    }
                                 }
                             }
-                        }
-                    );
-                    // .catch(
-                    //     error => {
-                    //         this.setState({
-                    //             planningUnits: [],
-                    //         })
-                    //         if (error.message === "Network Error") {
-                    //             this.setState({ message: error.message });
-                    //         } else {
-                    //             switch (error.response ? error.response.status : "") {
-                    //                 case 500:
-                    //                 case 401:
-                    //                 case 404:
-                    //                 case 406:
-                    //                 case 412:
-                    //                     this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
-                    //                     break;
-                    //                 default:
-                    //                     this.setState({ message: 'static.unkownError' });
-                    //                     break;
-                    //             }
-                    //         }
-                    //     }
-                    // );
+                        );
                 }
             }
         });
@@ -1081,66 +992,23 @@ class AnnualShipmentCost extends Component {
                         productCategories: []
                     })
                     if (error.message === "Network Error") {
-                        this.setState({
-                            message: 'static.unkownError',
-                            loading: false
-                        });
+                        this.setState({ message: error.message });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
-                            case 401:
-                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                break;
-                            case 403:
-                                this.props.history.push(`/accessDenied`)
-                                break;
                             case 500:
+                            case 401:
                             case 404:
                             case 406:
-                                this.setState({
-                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }),
-                                    loading: false
-                                });
-                                break;
                             case 412:
-                                this.setState({
-                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }),
-                                    loading: false
-                                });
+                                this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
                                 break;
                             default:
-                                this.setState({
-                                    message: 'static.unkownError',
-                                    loading: false
-                                });
+                                this.setState({ message: 'static.unkownError' });
                                 break;
                         }
                     }
                 }
             );
-        // .catch(
-        //     error => {
-        //         this.setState({
-        //             productCategories: []
-        //         })
-        //         if (error.message === "Network Error") {
-        //             this.setState({ message: error.message });
-        //         } else {
-        //             switch (error.response ? error.response.status : "") {
-        //                 case 500:
-        //                 case 401:
-        //                 case 404:
-        //                 case 406:
-        //                 case 412:
-        //                     this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
-        //                     break;
-        //                 default:
-        //                     this.setState({ message: 'static.unkownError' });
-        //                     break;
-        //             }
-        //         }
-        //     }
-        // );
 
     }
 
@@ -1159,66 +1027,23 @@ class AnnualShipmentCost extends Component {
                             countrys: []
                         })
                         if (error.message === "Network Error") {
-                            this.setState({
-                                message: 'static.unkownError',
-                                loading: false
-                            });
+                            this.setState({ message: error.message });
                         } else {
                             switch (error.response ? error.response.status : "") {
-
-                                case 401:
-                                    this.props.history.push(`/login/static.message.sessionExpired`)
-                                    break;
-                                case 403:
-                                    this.props.history.push(`/accessDenied`)
-                                    break;
                                 case 500:
+                                case 401:
                                 case 404:
                                 case 406:
-                                    this.setState({
-                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.fundingsource.fundingsource') }),
-                                        loading: false
-                                    });
-                                    break;
                                 case 412:
-                                    this.setState({
-                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.fundingsource.fundingsource') }),
-                                        loading: false
-                                    });
+                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.fundingsource.fundingsource') }) });
                                     break;
                                 default:
-                                    this.setState({
-                                        message: 'static.unkownError',
-                                        loading: false
-                                    });
+                                    this.setState({ message: 'static.unkownError' });
                                     break;
                             }
                         }
                     }
                 );
-            // .catch(
-            //     error => {
-            //         this.setState({
-            //             countrys: []
-            //         })
-            //         if (error.message === "Network Error") {
-            //             this.setState({ message: error.message });
-            //         } else {
-            //             switch (error.response ? error.response.status : "") {
-            //                 case 500:
-            //                 case 401:
-            //                 case 404:
-            //                 case 406:
-            //                 case 412:
-            //                     this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.fundingsource.fundingsource') }) });
-            //                     break;
-            //                 default:
-            //                     this.setState({ message: 'static.unkownError' });
-            //                     break;
-            //             }
-            //         }
-            //     }
-            // );
         } else {
             var db3;
             var fSourceResult = [];
@@ -1256,73 +1081,29 @@ class AnnualShipmentCost extends Component {
                     this.setState({
                         procurementAgents: response.data
                     })
-                })
-                .catch(
+                }).catch(
                     error => {
                         this.setState({
                             countrys: []
                         })
                         if (error.message === "Network Error") {
-                            this.setState({
-                                message: 'static.unkownError',
-                                loading: false
-                            });
+                            this.setState({ message: error.message });
                         } else {
                             switch (error.response ? error.response.status : "") {
-
-                                case 401:
-                                    this.props.history.push(`/login/static.message.sessionExpired`)
-                                    break;
-                                case 403:
-                                    this.props.history.push(`/accessDenied`)
-                                    break;
                                 case 500:
+                                case 401:
                                 case 404:
                                 case 406:
-                                    this.setState({
-                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.procurementagent.procurementagent') }),
-                                        loading: false
-                                    });
-                                    break;
                                 case 412:
-                                    this.setState({
-                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.procurementagent.procurementagent') }),
-                                        loading: false
-                                    });
+                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.procurementagent.procurementagent') }) });
                                     break;
                                 default:
-                                    this.setState({
-                                        message: 'static.unkownError',
-                                        loading: false
-                                    });
+                                    this.setState({ message: 'static.unkownError' });
                                     break;
                             }
                         }
                     }
                 );
-            // .catch(
-            //     error => {
-            //         this.setState({
-            //             countrys: []
-            //         })
-            //         if (error.message === "Network Error") {
-            //             this.setState({ message: error.message });
-            //         } else {
-            //             switch (error.response ? error.response.status : "") {
-            //                 case 500:
-            //                 case 401:
-            //                 case 404:
-            //                 case 406:
-            //                 case 412:
-            //                     this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.procurementagent.procurementagent') }) });
-            //                     break;
-            //                 default:
-            //                     this.setState({ message: 'static.unkownError' });
-            //                     break;
-            //             }
-            //         }
-            //     }
-            // );
         } else {
             var db1;
             var papuResult = [];
@@ -1356,73 +1137,29 @@ class AnnualShipmentCost extends Component {
                     this.setState({
                         shipmentStatuses: response.data
                     })
-                })
-                .catch(
+                }).catch(
                     error => {
                         this.setState({
                             countrys: []
                         })
                         if (error.message === "Network Error") {
-                            this.setState({
-                                message: 'static.unkownError',
-                                loading: false
-                            });
+                            this.setState({ message: error.message });
                         } else {
                             switch (error.response ? error.response.status : "") {
-
-                                case 401:
-                                    this.props.history.push(`/login/static.message.sessionExpired`)
-                                    break;
-                                case 403:
-                                    this.props.history.push(`/accessDenied`)
-                                    break;
                                 case 500:
+                                case 401:
                                 case 404:
                                 case 406:
-                                    this.setState({
-                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.common.status') }),
-                                        loading: false
-                                    });
-                                    break;
                                 case 412:
-                                    this.setState({
-                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.common.status') }),
-                                        loading: false
-                                    });
+                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.common.status') }) });
                                     break;
                                 default:
-                                    this.setState({
-                                        message: 'static.unkownError',
-                                        loading: false
-                                    });
+                                    this.setState({ message: 'static.unkownError' });
                                     break;
                             }
                         }
                     }
                 );
-            // .catch(
-            //     error => {
-            //         this.setState({
-            //             countrys: []
-            //         })
-            //         if (error.message === "Network Error") {
-            //             this.setState({ message: error.message });
-            //         } else {
-            //             switch (error.response ? error.response.status : "") {
-            //                 case 500:
-            //                 case 401:
-            //                 case 404:
-            //                 case 406:
-            //                 case 412:
-            //                     this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.common.status') }) });
-            //                     break;
-            //                 default:
-            //                     this.setState({ message: 'static.unkownError' });
-            //                     break;
-            //             }
-            //         }
-            //     }
-            // );
         } else {
             var db2;
             var sStatusResult = [];
@@ -1447,6 +1184,59 @@ class AnnualShipmentCost extends Component {
 
         }
     }
+
+    handlePlanningUnitChange = (planningUnitIds) => {
+        planningUnitIds = planningUnitIds.sort(function (a, b) {
+            return parseInt(a.value) - parseInt(b.value);
+        })
+        this.setState({
+            planningUnitValues: planningUnitIds.map(ele => ele),
+            planningUnitLabels: planningUnitIds.map(ele => ele.label)
+        }, () => {
+
+            this.fetchData()
+        })
+    }
+    handleProcurementAgentChange = (procurementAgentIds) => {
+        procurementAgentIds = procurementAgentIds.sort(function (a, b) {
+            return parseInt(a.value) - parseInt(b.value);
+        })
+        this.setState({
+            procurementAgentValues: procurementAgentIds.map(ele => ele),
+            procurementAgentLabels: procurementAgentIds.map(ele => ele.label)
+        }, () => {
+
+            this.fetchData()
+        })
+    }
+
+    handleFundingSourceChange = (fundingSourceIds) => {
+        fundingSourceIds = fundingSourceIds.sort(function (a, b) {
+            return parseInt(a.value) - parseInt(b.value);
+        })
+        this.setState({
+            fundingSourceValues: fundingSourceIds.map(ele => ele),
+            fundingSourceLabels: fundingSourceIds.map(ele => ele.label)
+        }, () => {
+
+            this.fetchData()
+        })
+    }
+
+    handleStatusChange = (statusIds) => {
+        statusIds = statusIds.sort(function (a, b) {
+            return parseInt(a.value) - parseInt(b.value);
+        })
+        this.setState({
+            statusValues: statusIds.map(ele => ele),
+            statusLabels: statusIds.map(ele => ele.label)
+        }, () => {
+
+            this.fetchData()
+        })
+    }
+
+
     componentDidMount() {
         // AuthenticationService.setupAxiosInterceptors();
         this.getPrograms();
@@ -1563,7 +1353,7 @@ class AnnualShipmentCost extends Component {
                         </div>
                     </div>
                     <CardBody className="pb-lg-2 pt-lg-0 ">
-                        <div className="TableCust" >
+                        <div className="" >
                             <div ref={ref}>
                                 <Form >
                                     <div className="pl-0">
@@ -1686,62 +1476,64 @@ class AnnualShipmentCost extends Component {
                                             </FormGroup>
 
 
-                                            <FormGroup className="col-md-3">
+                                            <FormGroup className="col-md-3" >
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.procurementagent.procurementagent')}</Label>
-                                                <div className="controls ">
-                                                    <InputGroup>
-                                                        <Input
-                                                            type="select"
-                                                            name="procurementAgentId"
-                                                            id="procurementAgentId"
-                                                            bsSize="sm"
-                                                            onChange={this.fetchData}
+                                                <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                                                <div className="controls">
+                                                    <MultiSelect
+                                                        name="procurementAgentId"
+                                                        id="planningUnitId"
+                                                        bsSize="procurementAgentId"
+                                                        value={this.state.procurementAgentValues}
+                                                        onChange={(e) => { this.handleProcurementAgentChange(e) }}
+                                                        options={procurementAgents.length > 0
+                                                            && procurementAgents.map((item, i) => {
+                                                                return ({ label: item.procurementAgentCode, value: item.procurementAgentId })
+                                                            }, this)}
+                                                    />
 
-                                                        >
-                                                            <option value="-1">{i18n.t('static.common.all')}</option>
-                                                            {procurementAgentList}
-                                                        </Input>
-
-                                                    </InputGroup>
                                                 </div>
                                             </FormGroup>
-                                            <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.fundingsource.fundingsource')}</Label>
-                                                <div className="controls ">
-                                                    <InputGroup>
-                                                        <Input
-                                                            type="select"
-                                                            name="fundingSourceId"
-                                                            id="fundingSourceId"
-                                                            bsSize="sm"
-                                                            onChange={this.fetchData}
+                                            <FormGroup className="col-md-3" id="fundingSourceDiv">
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.budget.fundingsource')}</Label>
+                                                <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                                                <div className="controls">
+                                                    <MultiSelect
+                                                        name="fundingSourceId"
+                                                        id="fundingSourceId"
+                                                        bsSize="md"
+                                                        value={this.state.fundingSourceValues}
+                                                        onChange={(e) => { this.handleFundingSourceChange(e) }}
+                                                        options={fundingSources.length > 0
+                                                            && fundingSources.map((item, i) => {
+                                                                return (
+                                                                    { label: item.fundingSourceCode, value: item.fundingSourceId }
+                                                                )
+                                                            }, this)}
+                                                    />
 
-                                                        >
-                                                            <option value="-1">{i18n.t('static.common.all')}</option>
-                                                            {fundingSourceList}
-                                                        </Input>
-
-                                                    </InputGroup>
                                                 </div>
                                             </FormGroup>
+
 
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.common.status')}</Label>
+                                                <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                                 <div className="controls">
-                                                    <InputGroup>
-                                                        <Input
-                                                            type="select"
-                                                            name="shipmentStatusId"
-                                                            id="shipmentStatusId"
-                                                            bsSize="sm"
-                                                            onChange={this.fetchData}
-                                                        >
-                                                            <option value="-1">{i18n.t('static.common.all')}</option>
-                                                            {shipmentStatusList}
-                                                        </Input>
+                                                    <MultiSelect
+                                                        name="shipmentStatusId"
+                                                        id="shipmentStatusId"
+                                                        bsSize="md"
+                                                        value={this.state.statusValues}
+                                                        onChange={(e) => { this.handleStatusChange(e) }}
+                                                        options={shipmentStatuses.length > 0
+                                                            && shipmentStatuses.map((item, i) => {
+                                                                return (
+                                                                    { label: getLabelText(item.label, this.state.lang), value: item.shipmentStatusId }
+                                                                )
+                                                            }, this)}
+                                                    /></div>
 
-                                                    </InputGroup>
-                                                </div>
                                             </FormGroup>
 
 

@@ -15,11 +15,11 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import { SPACE_REGEX } from '../../Constants.js';
 
-let initialValues = {
-    realmId: "",
-    productCategoryId: "",
-    tracerCategoryId: "",
-    unitId: "",
+const initialValues = {
+    realmId: [],
+    productCategoryId: [],
+    tracerCategoryId: [],
+    unitId: [],
     label: ''
 }
 const entityname = i18n.t('static.forecastingunit.forecastingunit');
@@ -102,27 +102,11 @@ export default class AddForecastingUnitComponent extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.getProductCategoryByRealmId = this.getProductCategoryByRealmId.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
-        this.setInitialValue = this.setInitialValue.bind(this);
     }
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 8000);
-    }
-
-    setInitialValue() {
-        initialValues = {
-            // unitId: (this.state.units.length == 1 ? this.state.units[0].unitId : ''),
-            // realmId: (this.state.realms.length == 1 ? this.state.realms[0].realmId : ''),
-            // tracerCategoryId: (this.state.tracerCategories.length == 1 ? this.state.tracerCategories[0].tracerCategoryId : ''),
-            // productCategoryId: (this.state.productcategories.length == 1 ? this.state.productcategories[0].payload.productCategoryId : '')
-
-            unitId: this.state.forecastingUnit.unit.id,
-            realmId: this.state.forecastingUnit.realm.id,
-            tracerCategoryId: this.state.forecastingUnit.tracerCategory.id,
-            productCategoryId: this.state.forecastingUnit.productCategory.id
-        }
-        console.log("Initial Values------>", initialValues)
     }
 
     dataChange(event) {
@@ -184,18 +168,9 @@ export default class AddForecastingUnitComponent extends Component {
         // AuthenticationService.setupAxiosInterceptors();
         UnitService.getUnitListAll()
             .then(response => {
-                let { forecastingUnit } = this.state;
-                forecastingUnit.unit.id = (response.data.length == 1 ? response.data[0].unitId : '')
                 this.setState({
-                    units: response.data, loading: false,
-                    forecastingUnit
-                },
-                    () => {
-                        // initialValues = {
-                        //     unitId: (response.data.length == 1 ? response.data[0].unitId : '')
-                        // }
-                        this.setInitialValue();
-                    })
+                    units: response.data, loading: false
+                })
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
@@ -238,25 +213,10 @@ export default class AddForecastingUnitComponent extends Component {
             );
         RealmService.getRealmListAll()
             .then(response => {
-                let { forecastingUnit } = this.state
-                forecastingUnit.realm.id = (response.data.length == 1 ? response.data[0].realmId : '')
                 this.setState({
                     realms: response.data,
-                    loading: false,
-                    forecastingUnit
-                },
-                    () => {
-                        // initialValues = {
-                        //     realmId: (response.data.length == 1 ? response.data[0].realmId : '')
-                        // }
-                        if (response.data.length == 1) {
-                            initialValues = {
-                                realmId: (response.data.length == 1 ? response.data[0].realmId : '')
-                            }
-                            this.getProductCategoryByRealmId();
-                        }
-                        // this.setInitialValue();
-                    })
+                    loading: false
+                })
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
@@ -300,19 +260,10 @@ export default class AddForecastingUnitComponent extends Component {
 
         TracerCategoryService.getTracerCategoryListAll()
             .then(response => {
-                let { forecastingUnit } = this.state;
-                forecastingUnit.tracerCategory.id = (response.data.length == 1 ? response.data[0].tracerCategoryId : '')
                 this.setState({
                     tracerCategories: response.data,
-                    loading: false,
-                    forecastingUnit
-                },
-                    () => {
-                        // initialValues = {
-                        //     tracerCategoryId: (response.data.length == 1 ? response.data[0].tracerCategoryId : '')
-                        // }
-                        this.setInitialValue();
-                    })
+                    loading: false
+                })
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
@@ -369,23 +320,14 @@ export default class AddForecastingUnitComponent extends Component {
     }
 
     getProductCategoryByRealmId() {
-        let realmId = this.state.forecastingUnit.realm.id
+        let realmId = document.getElementById("realmId").value;
         if (realmId != "") {
             ProductService.getProductCategoryList(realmId)
                 .then(response => {
                     console.log("productCategory------>", response.data.slice(1))
-                    let { forecastingUnit } = this.state;
-                    forecastingUnit.productCategory.id = (response.data.slice(1).length == 1 ? response.data.slice(1)[0].payload.productCategoryId : '')
                     this.setState({
                         productcategories: response.data.slice(1),
-                        forecastingUnit
-                    },
-                        () => {
-                            // initialValues = {
-                            //     productCategoryId: (response.data.slice(1).length == 1 ? response.data.slice(1)[0].payload.productCategoryId : '')
-                            // }
-                            this.setInitialValue();
-                        })
+                    })
                 }).catch(
                     error => {
                         if (error.message === "Network Error") {
@@ -430,17 +372,6 @@ export default class AddForecastingUnitComponent extends Component {
             this.setState({
                 productcategories: []
             })
-            let { forecastingUnit } = this.state;
-            forecastingUnit.productCategory.id = ''
-            this.setState({
-                productcategories: [],
-                forecastingUnit
-            },
-                () => {
-                    initialValues = {
-                        productCategoryId: ''
-                    }
-                })
         }
     }
 
@@ -492,7 +423,6 @@ export default class AddForecastingUnitComponent extends Component {
                                 <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
                             </CardHeader> */}
                             <Formik
-                                enableReinitialize={true}
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {

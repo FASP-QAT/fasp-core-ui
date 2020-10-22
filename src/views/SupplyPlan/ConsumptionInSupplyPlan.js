@@ -277,6 +277,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         allowManualInsertRow: false,
                         allowExport: false,
                         copyCompatibility: true,
+                        parseFormulas: true,
                         // filters: true,
                         // license: 'NjBkYTU0YmJhMDI5MzUzODc3ZmY0OTg2NjFiYjQ4ZmQ4YTgxZjlmMGIxOTI5M2RiZTI5NGIyYzJkMDhmNDYwN2Y0NzFmNmFjYzEyNzZmNGJhN2ZiZjVjOTk0ZjFiMzc2ZTEyZjU5YTY2MzUwZGI1MjNiMDVjNThkNGIyNzY5NzgsZXlKdVlXMWxJam9pUVd0cGJDQk5ZV2hwYlhkaGJHRWlMQ0prWVhSbElqb3hOakF6TkRBM05qQXdMQ0prYjIxaGFXNGlPbHNpYkc5allXeG9iM04wSWl3aWJHOWpZV3hvYjNOMElsMHNJbkJzWVc0aU9qQjk=',
                         text: {
@@ -675,10 +676,12 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
 
         if (x == 8) {
             var valid = checkValidtion("numberNotRequired", "I", y, rowData[8], elInstance, JEXCEL_INTEGER_REGEX, 1, 1);
-            if (parseInt(rowData[8]) > 31) {
-                inValid("I", y, i18n.t('static.supplyPlan.daysOfStockMaxValue'), elInstance);
-            } else {
-                positiveValidation("I", y, elInstance);
+            if (valid == true) {
+                if (parseInt(rowData[8]) > 31) {
+                    inValid("I", y, i18n.t('static.supplyPlan.daysOfStockMaxValue'), elInstance);
+                } else {
+                    positiveValidation("I", y, elInstance);
+                }
             }
         }
 

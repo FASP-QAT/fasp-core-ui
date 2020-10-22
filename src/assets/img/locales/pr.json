@@ -915,7 +915,7 @@
     "static.ticket.requestUpdateTo": "Solicite uma atualização para...",
     "static.ticket.addMasters": "Adicionar Masters",
     "static.ticket.editMasters": "Editar Masters",
-    "static.message.alreadyTagged":"Este pedido não. e linha principal no. já estão marcados. Para alterar a marcação, desvincule primeiro e tente.",
+    "static.message.alreadyTagged": "Este pedido não. e linha principal no. já estão marcados. Para alterar a marcação, desvincule primeiro e tente.",
     "static.shipment.linkingsuccess": "Remessa vinculada com sucesso",
     "static.common.edit": "Editar",
     "static.quantimed.quantimedImport": "Quantimed Importar",
@@ -938,5 +938,14 @@
     "static.quantimed.importData": "Importar dados",
     "static.quantimed.mapAtLeastOnePlanningUnitValidationText": "Mapeie pelo menos uma unidade de planejamento",
     "static.ticket.openIssues": "Abrir Problemas",
+    "static.uploadfile.Browse": "Squeaky toy",
+    "static.jexcel.search": "Pesquisa",
+    "static.jexcel.clear": "Claro",
+    "static.common.notesvalidation": "Por favor insira notas",
+    "static.mt.confirmDelink": "Tem certeza que deseja desvincular?",
+    "static.commit.qatshipmentId": "Id de Remessa QAT",
+    "static.supplyPlan.mtshipmentStatus": "Status",
+    "static.supplyPlan.mtexpectedDeliveryDate": "Data de Recebimento",
+    "static.shipment.delinkingsuccess": "Remessa desvinculada com sucesso",
     "static.ticket.filesuploadnote": "Se você tiver vários arquivos, compacte-os e envie-os."
 }
