@@ -690,9 +690,9 @@ export default class EditLanguageComponent extends Component {
 
                                             }
 
-
+                                            var curDate = ((moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD HH:mm:ss')));
                                             filterObj.lastModifiedBy = { userId: userId, username: username }
-                                            filterObj.lastModifiedDate = moment();
+                                            filterObj.lastModifiedDate = curDate;
 
                                             let tempProblemTransList = filterObj.problemTransList;
 
@@ -704,7 +704,7 @@ export default class EditLanguageComponent extends Component {
                                                     "userId": userId,
                                                     "username": username
                                                 },
-                                                "createdDate": moment()
+                                                "createdDate": curDate
                                             }
 
                                             tempProblemTransList.push(tempProblemTransObj);

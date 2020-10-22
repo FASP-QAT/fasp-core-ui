@@ -708,7 +708,7 @@ class ProcurementAgentExport extends Component {
         var a = document.createElement("a")
         a.href = 'data:attachment/csv,' + csvString
         a.target = "_Blank"
-        a.download = i18n.t('static.report.procurementAgent') + i18n.t('static.program.savedBy') + document.getElementById("viewById").selectedOptions[0].text + "-" + this.state.rangeValue.from.year + this.state.rangeValue.from.month + i18n.t('static.report.consumptionTo') + this.state.rangeValue.to.year + this.state.rangeValue.to.month + ".csv"
+        a.download = i18n.t('static.report.shipmentCostReport')+' ' + i18n.t('static.program.savedBy') + document.getElementById("viewById").selectedOptions[0].text + "-" + this.state.rangeValue.from.year + this.state.rangeValue.from.month + i18n.t('static.report.consumptionTo') + this.state.rangeValue.to.year + this.state.rangeValue.to.month + ".csv"
         document.body.appendChild(a)
         a.click()
     }
@@ -745,7 +745,7 @@ class ProcurementAgentExport extends Component {
                 doc.setPage(i)
                 doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
                 doc.setTextColor("#002f6c");
-                doc.text(i18n.t('static.report.procurementAgent') + i18n.t('static.program.savedBy') + document.getElementById("viewById").selectedOptions[0].text, doc.internal.pageSize.width / 2, 60, {
+                doc.text(i18n.t('static.report.shipmentCostReport')+' '+ i18n.t('static.program.savedBy')+' ' + document.getElementById("viewById").selectedOptions[0].text, doc.internal.pageSize.width / 2, 60, {
                     align: 'center'
                 })
                 if (i == 1) {
@@ -764,6 +764,8 @@ class ProcurementAgentExport extends Component {
                         doc.text(doc.internal.pageSize.width / 8, 110, fundingSourceText)
                         poslen = 110 + fundingSourceText.length * 10
 
+                    }else{
+                        poslen=90
                     }
                     console.log(poslen)
                     poslen = poslen + 20
@@ -832,9 +834,9 @@ class ProcurementAgentExport extends Component {
                 startY: startY,
                 head: [headers],
                 body: data,
-                styles: { lineWidth: 1, fontSize: 8, cellWidth: 108, halign: 'center' },
+                styles: { lineWidth: 1, fontSize: 8, cellWidth: 90, halign: 'center' },
                 columnStyles: {
-                    0: { cellWidth: 221.89 },
+                    1: { cellWidth: 221.89 },
                 }
             };
         }
@@ -842,7 +844,7 @@ class ProcurementAgentExport extends Component {
         doc.autoTable(content);
         addHeaders(doc)
         addFooters(doc)
-        doc.save(i18n.t('static.report.procurementAgent') + i18n.t('static.program.savedBy') + document.getElementById("viewById").selectedOptions[0].text + ".pdf")
+        doc.save(i18n.t('static.report.shipmentCostReport') +' '+ i18n.t('static.program.savedBy') + document.getElementById("viewById").selectedOptions[0].text + ".pdf")
     }
 
     buildJExcel() {
