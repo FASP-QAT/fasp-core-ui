@@ -8,6 +8,8 @@ import { Redirect, Route, Switch } from 'react-router-dom';
 import { Container } from 'reactstrap';
 import IdleTimer from 'react-idle-timer';
 import ChangeInLocalProgramVersion from '../../CommonComponent/ChangeInLocalProgramVersion'
+import moment from 'moment';
+
 
 // routes config
 //import routes from '../../routes';
@@ -718,13 +720,25 @@ class DefaultLayout extends Component {
     this.props.history.push(`/ApplicationDashboard/` + `${id}`)
   }
 
-
+  checkClick=(e,programDataLastModifiedDate,downloadedProgramDataLastModifiedDate)=>{
+   // e.preventDefault();
+    console.log("this.state.programDataLastModifiedDate---", programDataLastModifiedDate);
+    console.log("downloadedProgramDataLastModifiedDate  ", downloadedProgramDataLastModifiedDate);
+    console.log("result local version---", moment(programDataLastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(downloadedProgramDataLastModifiedDate).format("YYYY-MM-DD HH:mm:ss"))
+    localStorage.removeItem("sesLocalVersionChange");
+    if (moment(programDataLastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(downloadedProgramDataLastModifiedDate).format("YYYY-MM-DD HH:mm:ss")) {
+        console.log("hurrey local version changed-------------------------------------------------------------");
+        localStorage.setItem("sesLocalVersionChange", true);
+    } else {
+        localStorage.setItem("sesLocalVersionChange", false);
+    }
+}
   render() {
     console.log('in I18n defaultlayout')
     let events = ["keydown", "mousedown"];
     return (
       <div className="app">
-        {/* <ChangeInLocalProgramVersion ref="programChangeChild" updateState={true}></ChangeInLocalProgramVersion> */}
+        { <ChangeInLocalProgramVersion ref="programChangeChild"  func ={this.checkClick } updateState={true}></ChangeInLocalProgramVersion> }
         <IdleTimer
           ref={ref => { this.idleTimer = ref }}
           element={document}

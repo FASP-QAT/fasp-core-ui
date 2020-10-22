@@ -29,14 +29,16 @@ export default class ChangeInLocalProgramVersion extends Component {
             state2: 0,
             state3: 0
         }
-        this.checkIfLocalProgramVersionChanged = this.checkIfLocalProgramVersionChanged.bind(this);
+        //this.checkIfLocalProgramVersionChanged = this.checkIfLocalProgramVersionChanged.bind(this);
         this.getProgramData = this.getProgramData.bind(this);
         this.getDownloadedPrograms = this.getDownloadedPrograms.bind(this);
+        
     }
-
     render() {
         return (
-            <>
+            <>{
+                this.props.func(this, this.state.downloadedProgramDataLastModifiedDate,this.state.programDataLastModifiedDate) 
+            }
             </>
         );
     }
@@ -55,18 +57,7 @@ export default class ChangeInLocalProgramVersion extends Component {
     //         // this.checkIfLocalProgramVersionChanged();
     //     }
     // }
-    checkIfLocalProgramVersionChanged() {
-        console.log("this.state.programDataLastModifiedDate---", this.state.programDataLastModifiedDate);
-        console.log("this.state.downloadedProgramDataLastModifiedDate---", this.state.downloadedProgramDataLastModifiedDate);
-        console.log("result local version---", moment(this.state.programDataLastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(this.state.downloadedProgramDataLastModifiedDate).format("YYYY-MM-DD HH:mm:ss"))
-        localStorage.removeItem("sesLocalVersionChange");
-        if (moment(this.state.programDataLastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(this.state.downloadedProgramDataLastModifiedDate).format("YYYY-MM-DD HH:mm:ss")) {
-            console.log("hurrey local version changed-------------------------------------------------------------");
-            localStorage.setItem("sesLocalVersionChange", true);
-        } else {
-            localStorage.setItem("sesLocalVersionChange", false);
-        }
-    }
+    
     getProgramData() {
         console.log("get programs called");
         var db1;
