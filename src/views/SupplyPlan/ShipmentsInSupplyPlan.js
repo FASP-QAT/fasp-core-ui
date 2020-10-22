@@ -1,11 +1,12 @@
 import React from "react";
-import jexcel from 'jexcel';
-import "../../../node_modules/jexcel/dist/jexcel.css";
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 import i18n from '../../i18n';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunctionOnlyHideRow, checkValidtion, inValid, positiveValidation, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { SECRET_KEY, SHIPMENT_DATA_SOURCE_TYPE, DELIVERED_SHIPMENT_STATUS, TBD_PROCUREMENT_AGENT_ID, TBD_FUNDING_SOURCE, SUBMITTED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, JEXCEL_DECIMAL_NO_REGEX, JEXCEL_INTEGER_REGEX, CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, INDEXED_DB_VERSION, INDEXED_DB_NAME, ALPHABET_NUMBER_REGEX, JEXCEL_DATE_FORMAT, BATCH_PREFIX, NONE_SELECTED_DATA_SOURCE_ID, LABEL_WITH_SPECIAL_SYMBOL_REGEX, BATCH_NO_REGEX, JEXCEL_PAGINATION_OPTION, USD_CURRENCY_ID } from "../../Constants";
+import { SECRET_KEY, SHIPMENT_DATA_SOURCE_TYPE, DELIVERED_SHIPMENT_STATUS, TBD_PROCUREMENT_AGENT_ID, TBD_FUNDING_SOURCE, SUBMITTED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, JEXCEL_DECIMAL_NO_REGEX, JEXCEL_INTEGER_REGEX, CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, INDEXED_DB_VERSION, INDEXED_DB_NAME, ALPHABET_NUMBER_REGEX, JEXCEL_DATE_FORMAT, BATCH_PREFIX, NONE_SELECTED_DATA_SOURCE_ID, LABEL_WITH_SPECIAL_SYMBOL_REGEX, BATCH_NO_REGEX, JEXCEL_PAGINATION_OPTION, USD_CURRENCY_ID, JEXCEL_PRO_KEY } from "../../Constants";
 import moment, { invalid } from "moment";
 import { paddingZero, generateRandomAplhaNumericCode, contrast } from "../../CommonComponent/JavascriptCommonFunctions";
 import CryptoJS from 'crypto-js'
@@ -450,6 +451,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             onchange: this.shipmentChanged,
                                             oneditionstart: this.shipmentEditStart,
                                             allowExport: false,
+                                            license: JEXCEL_PRO_KEY,
                                             text: {
                                                 showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')} `,
                                                 show: '',
@@ -629,6 +631,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                     show: '',
                                                                     entries: '',
                                                                 },
+                                                                license: JEXCEL_PRO_KEY,
                                                                 onload: this.loadedBatchInfoShipment,
                                                                 updateTable: function (el, cell, x, y, source, value, id) {
                                                                 }.bind(this),
@@ -868,6 +871,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                         onchange: this.shipmentDatesChanged,
                                                                         editable: tableEditable,
                                                                         contextMenu: false,
+                                                                        license: JEXCEL_PRO_KEY,
                                                                         text: {
                                                                             showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} `,
                                                                             show: '',
@@ -3302,6 +3306,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 editable: tableEditable,
                 contextMenu: false,
                 onchange: this.shipmentQtyChanged,
+                license: JEXCEL_PRO_KEY,
                 text: {
                     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
                     show: '',
@@ -3369,6 +3374,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     allowExport: false,
                     editable: false,
                     contextMenu: false,
+                    license: JEXCEL_PRO_KEY,
                     text: {
                         showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
                         show: '',

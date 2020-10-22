@@ -352,11 +352,12 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import DimensionService from '../../api/DimensionService.js';
 import getLabelText from '../../CommonComponent/getLabelText.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import jexcel from 'jexcel';
-import "../../../node_modules/jexcel/dist/jexcel.css";
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 import moment from 'moment';
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
-import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
+import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
 
 // import { HashRouter, Route, Switch } from 'react-router-dom';
 const entityname = i18n.t('static.unit.unit');
@@ -558,7 +559,8 @@ export default class UnitListComponent extends Component {
             allowExport: false,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
-            contextMenu: false
+            contextMenu: false,
+            license: JEXCEL_PRO_KEY,
         };
         var languageEl = jexcel(document.getElementById("tableDiv"), options);
         this.el = languageEl;

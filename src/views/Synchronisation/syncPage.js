@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
-import jexcel from 'jexcel';
-import "../../../node_modules/jexcel/dist/jexcel.css";
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 import {
   Col, Row, Card, CardBody, Form,
   FormGroup, Label, InputGroup, Input, Button,
   Nav, NavItem, NavLink, TabContent, TabPane, CardFooter, Modal, ModalBody, ModalFooter, ModalHeader
 } from 'reactstrap';
 import CryptoJS from 'crypto-js';
-import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, LOCAL_VERSION_COLOUR, LATEST_VERSION_COLOUR, PENDING_APPROVAL_VERSION_STATUS, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, CANCELLED_SHIPMENT_STATUS, JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
+import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, LOCAL_VERSION_COLOUR, LATEST_VERSION_COLOUR, PENDING_APPROVAL_VERSION_STATUS, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, CANCELLED_SHIPMENT_STATUS, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import getLabelText from '../../CommonComponent/getLabelText';
 import i18n from '../../i18n';
@@ -168,7 +169,8 @@ export default class syncPage extends Component {
       allowDeleteRow: false,
       tableOverflow: false,
       editable: false,
-      onload: this.loadedResolveConflicts
+      onload: this.loadedResolveConflicts,
+      license: JEXCEL_PRO_KEY,
     };
     var resolveConflict = jexcel(document.getElementById("resolveConflictsTable"), options);
     this.el = resolveConflict;
@@ -331,7 +333,8 @@ export default class syncPage extends Component {
       tableOverflow: false,
       editable: false,
       contextMenu: false,
-      onload: this.loadedResolveConflictsInventory
+      onload: this.loadedResolveConflictsInventory,
+      license: JEXCEL_PRO_KEY,
     };
     var resolveConflictInventory = jexcel(document.getElementById("resolveConflictsInventoryTable"), options);
     this.el = resolveConflictInventory;
@@ -506,7 +509,8 @@ export default class syncPage extends Component {
       tableOverflow: false,
       editable: false,
       contextMenu: false,
-      onload: this.loadedResolveConflictsShipment
+      onload: this.loadedResolveConflictsShipment,
+      license: JEXCEL_PRO_KEY,
     };
     var resolveConflictShipment = jexcel(document.getElementById("resolveConflictsShipmentTable"), options);
     this.el = resolveConflictShipment;
@@ -1133,6 +1137,7 @@ export default class syncPage extends Component {
                                       show: '',
                                       entries: '',
                                     },
+                                    license: JEXCEL_PRO_KEY,
                                     contextMenu: function (obj, x, y, e) {
                                       var items = [];
                                       //Resolve conflicts
@@ -1299,6 +1304,7 @@ export default class syncPage extends Component {
                                       show: '',
                                       entries: '',
                                     },
+                                    license: JEXCEL_PRO_KEY,
                                     contextMenu: function (obj, x, y, e) {
                                       var items = [];
                                       //Resolve conflicts
@@ -1456,6 +1462,7 @@ export default class syncPage extends Component {
                                     allowDeleteRow: false,
                                     editable: false,
                                     onload: this.loadedFunctionForMergeShipment,
+                                    license: JEXCEL_PRO_KEY,
                                     text: {
                                       showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
                                       show: '',
@@ -2722,6 +2729,7 @@ export default class syncPage extends Component {
           allowDeleteRow: false,
           editable: false,
           onload: this.loadedFunctionForMergeProblemList,
+          license: JEXCEL_PRO_KEY,
           text: {
             showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
             show: '',

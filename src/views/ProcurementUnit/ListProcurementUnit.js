@@ -322,11 +322,12 @@ import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'reac
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import jexcel from 'jexcel';
 import moment from 'moment';
-import "../../../node_modules/jexcel/dist/jexcel.css";
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
-import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION } from "../../Constants";
+import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from "../../Constants";
 
 const entityname = i18n.t('static.procurementUnit.procurementUnit');
 export default class ListProcurementUnit extends Component {
@@ -510,6 +511,7 @@ export default class ListProcurementUnit extends Component {
       paginationOptions: JEXCEL_PAGINATION_OPTION,
       position: 'top',
       contextMenu: false,
+      license: JEXCEL_PRO_KEY,
     };
     var languageEl = jexcel(document.getElementById("tableDiv"), options);
     this.el = languageEl;

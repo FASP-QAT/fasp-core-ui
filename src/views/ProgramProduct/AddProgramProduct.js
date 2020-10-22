@@ -1,6 +1,7 @@
 import React, { Component } from "react";
-import jexcel from 'jexcel';
-import "../../../node_modules/jexcel/dist/jexcel.css";
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 import {
     Card, CardBody, CardHeader, InputGroup,
     Label, Input, FormGroup,
@@ -14,7 +15,7 @@ import PlanningUnitService from "../../api/PlanningUnitService";
 import i18n from '../../i18n';
 import ProductCategoryServcie from '../../api/PoroductCategoryService.js';
 import { jExcelLoadedFunction } from "../../CommonComponent/JExcelCommonFunctions";
-import { JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_DECIMAL_CATELOG_PRICE, DECIMAL_NO_REGEX, JEXCEL_PAGINATION_OPTION } from "../../Constants";
+import { JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_DECIMAL_CATELOG_PRICE, DECIMAL_NO_REGEX, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from "../../Constants";
 const entityname = i18n.t('static.dashboard.programPlanningUnit');
 
 
@@ -409,6 +410,7 @@ class AddprogramPlanningUnit extends Component {
                                                                 entries: '',
                                                             },
                                                             onload: this.loaded,
+                                                            license: JEXCEL_PRO_KEY,
                                                             contextMenu: function (obj, x, y, e) {
                                                                 var items = [];
                                                                 //Add consumption batch info

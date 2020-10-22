@@ -6,9 +6,10 @@ import {
     Form, FormGroup, Label, Input, CardFooter, Col, Card, Row
 } from 'reactstrap';
 import getLabelText from '../../CommonComponent/getLabelText';
-import jexcel from 'jexcel';
 import "../ProductCategory/style.css"
-import "../../../node_modules/jexcel/dist/jexcel.css";
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionQuantimed, jExcelLoadedFunctionWithoutPagination } from '../../CommonComponent/JExcelCommonFunctions.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import AuthenticationService from '../Common/AuthenticationService';
@@ -18,7 +19,7 @@ import QuantimedImportService from '../../api/QuantimedImportService';
 import moment from "moment";
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
-import { DATE_FORMAT_CAP_WITHOUT_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION, QUANTIMED_DATA_SOURCE_ID, SECRET_KEY } from '../../Constants';
+import { DATE_FORMAT_CAP_WITHOUT_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION, QUANTIMED_DATA_SOURCE_ID, SECRET_KEY, JEXCEL_PRO_KEY } from '../../Constants';
 import CryptoJS from 'crypto-js'
 import { getDatabase } from '../../CommonComponent/IndexedDbFunctions';
 import { calculateSupplyPlan } from '../SupplyPlan/SupplyPlanCalculations';
@@ -425,6 +426,7 @@ export default class QunatimedImportStepFour extends Component {
                     allowDeleteRow: false,
                     tableOverflow: false,
                     onload: this.loaded_four,
+                    license: JEXCEL_PRO_KEY,
                     // tableHeight: '500px',
                 };
 

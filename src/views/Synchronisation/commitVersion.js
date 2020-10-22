@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import jexcel from 'jexcel';
-import "../../../node_modules/jexcel/dist/jexcel.css";
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 import {
   Col, Row, Card, CardBody, CardHeader, Form,
   FormGroup, Label, InputGroup, Input, InputGroupAddon, Button,

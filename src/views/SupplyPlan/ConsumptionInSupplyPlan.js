@@ -1,14 +1,12 @@
 import React from "react";
-import jexcel from 'jexcel';
-import "../../../node_modules/jexcel/dist/jexcel.css";
-// import jexcel from 'jexcel-pro';
-// import "../../../node_modules/jexcel-pro/dist/jexcel.css";
-// import "../../../node_modules/jsuites/dist/jsuites.css";
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 import i18n from '../../i18n';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunctionOnlyHideRow, checkValidtion, inValid, positiveValidation, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { SECRET_KEY, JEXCEL_INTEGER_REGEX, INDEXED_DB_VERSION, INDEXED_DB_NAME, DATE_FORMAT_CAP, ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE, JEXCEL_DATE_FORMAT_WITHOUT_DATE, ACTUAL_CONSUMPTION_TYPE, FORCASTED_CONSUMPTION_TYPE, JEXCEL_PAGINATION_OPTION, ACTUAL_CONSUMPTION_MONTHS_IN_PAST, FORECASTED_CONSUMPTION_MONTHS_IN_PAST } from "../../Constants";
+import { SECRET_KEY, JEXCEL_INTEGER_REGEX, INDEXED_DB_VERSION, INDEXED_DB_NAME, DATE_FORMAT_CAP, ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE, JEXCEL_DATE_FORMAT_WITHOUT_DATE, ACTUAL_CONSUMPTION_TYPE, FORCASTED_CONSUMPTION_TYPE, JEXCEL_PAGINATION_OPTION, ACTUAL_CONSUMPTION_MONTHS_IN_PAST, FORECASTED_CONSUMPTION_MONTHS_IN_PAST, JEXCEL_PRO_KEY } from "../../Constants";
 import moment from "moment";
 import CryptoJS from 'crypto-js'
 import { calculateSupplyPlan } from "./SupplyPlanCalculations";
@@ -278,7 +276,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         allowExport: false,
                         copyCompatibility: true,
                         // filters: true,
-                        // license: 'NjBkYTU0YmJhMDI5MzUzODc3ZmY0OTg2NjFiYjQ4ZmQ4YTgxZjlmMGIxOTI5M2RiZTI5NGIyYzJkMDhmNDYwN2Y0NzFmNmFjYzEyNzZmNGJhN2ZiZjVjOTk0ZjFiMzc2ZTEyZjU5YTY2MzUwZGI1MjNiMDVjNThkNGIyNzY5NzgsZXlKdVlXMWxJam9pUVd0cGJDQk5ZV2hwYlhkaGJHRWlMQ0prWVhSbElqb3hOakF6TkRBM05qQXdMQ0prYjIxaGFXNGlPbHNpYkc5allXeG9iM04wSWl3aWJHOWpZV3hvYjNOMElsMHNJbkJzWVc0aU9qQjk=',
+                        license: JEXCEL_PRO_KEY,
                         text: {
                             // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
                             showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
@@ -410,6 +408,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                                             allowExport: false,
                                             onchange: this.batchInfoChangedConsumption,
                                             editable: consumptionBatchEditable,
+                                            license: JEXCEL_PRO_KEY,
                                             text: {
                                                 showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
                                                 show: '',

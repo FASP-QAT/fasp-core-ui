@@ -690,11 +690,12 @@ import StatusUpdateButtonFeature from "../../CommonComponent/StatusUpdateButtonF
 import UpdateButtonFeature from '../../CommonComponent/UpdateButtonFeature';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import CryptoJS from 'crypto-js';
-import jexcel from 'jexcel';
-import "../../../node_modules/jexcel/dist/jexcel.css";
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 import moment from "moment";
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { JEXCEL_DECIMAL_NO_REGEX, JEXCEL_DATE_FORMAT, JEXCEL_PAGINATION_OPTION } from "../../Constants";
+import { JEXCEL_DECIMAL_NO_REGEX, JEXCEL_DATE_FORMAT, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from "../../Constants";
 
 let initialValues = {
     startDate: '',
@@ -1007,6 +1008,7 @@ class PlanningUnitCapacity extends Component {
                 entries: '',
             },
             onload: this.loaded,
+            license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
                 var items = [];
                 //Add consumption batch info

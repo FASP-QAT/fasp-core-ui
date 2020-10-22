@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import jexcel from 'jexcel';
-import "../../../node_modules/jexcel/dist/jexcel.css";
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 import ProcurementAgentService from "../../api/ProcurementAgentService";
 import {
     Card, CardBody, CardHeader,
@@ -13,7 +14,7 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import ProcurementUnitService from "../../api/ProcurementUnitService";
 import i18n from '../../i18n';
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions';
-import { JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_DECIMAL_LEAD_TIME, DECIMAL_NO_REGEX, INTEGER_NO_REGEX, JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
+import { JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_DECIMAL_LEAD_TIME, DECIMAL_NO_REGEX, INTEGER_NO_REGEX, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
 const entityname = i18n.t('static.dashboard.procurementAgentProcurementUnit')
 
 
@@ -662,6 +663,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                             entries: '',
                                         },
                                         onload: this.loaded,
+                                        license: JEXCEL_PRO_KEY,
                                         contextMenu: function (obj, x, y, e) {
                                             var items = [];
                                             //Add consumption batch info

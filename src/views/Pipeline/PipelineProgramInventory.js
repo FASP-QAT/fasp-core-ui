@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
-import jexcel from 'jexcel';
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 import i18n from '../../i18n';
 import PipelineService from '../../api/PipelineService.js';
 import AuthenticationService from '../Common/AuthenticationService.js';
@@ -8,7 +10,7 @@ import PlanningUnitService from '../../api/PlanningUnitService'
 import { jExcelLoadedFunction, jExcelLoadedFunctionPipeline, checkValidtion, inValid, positiveValidation } from '../../CommonComponent/JExcelCommonFunctions.js'
 import RealmCountryService from '../../api/RealmCountryService'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { JEXCEL_DATE_FORMAT_WITHOUT_DATE, INVENTORY_DATA_SOURCE_TYPE, JEXCEL_NEGATIVE_INTEGER_NO_REGEX } from '../../Constants';
+import { JEXCEL_DATE_FORMAT_WITHOUT_DATE, INVENTORY_DATA_SOURCE_TYPE, JEXCEL_NEGATIVE_INTEGER_NO_REGEX, JEXCEL_PRO_KEY } from '../../Constants';
 import { JEXCEL_PAGINATION_OPTION, JEXCEL_INTEGER_REGEX } from '../../Constants.js';
 export default class PipelineProgramInventory extends Component {
 
@@ -467,6 +469,7 @@ export default class PipelineProgramInventory extends Component {
                                         entries: '',
                                     },
                                     onload: this.loadedJexcelCommonFunction,
+                                    license: JEXCEL_PRO_KEY,
                                 };
 
                                 this.el = jexcel(document.getElementById("inventorytableDiv"), options);

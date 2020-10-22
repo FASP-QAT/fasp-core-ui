@@ -265,10 +265,11 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import data from '../Tables/DataTable/_data';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import jexcel from 'jexcel';
-import "../../../node_modules/jexcel/dist/jexcel.css";
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
-import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
+import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
 import moment from 'moment';
 
 // import { HashRouter, Route, Switch } from 'react-router-dom';
@@ -443,7 +444,8 @@ export default class LanguageListComponent extends Component {
                                 allowExport: false,
                                 paginationOptions: JEXCEL_PAGINATION_OPTION,
                                 position: 'top',
-                                contextMenu: false
+                                contextMenu: false,
+                                license: JEXCEL_PRO_KEY,
                             };
                             var languageEl = jexcel(document.getElementById("tableDiv"), options);
                             this.el = languageEl;

@@ -1,8 +1,9 @@
 import React from "react";
 import ReactDOM from 'react-dom';
-import jexcel from 'jexcel';
 // import "./style.css";
-import "../../../node_modules/jexcel/dist/jexcel.css";
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 import * as JsStoreFunctions from "../../CommonComponent/JsStoreFunctions.js";
 import { qatProblemActions } from '../../CommonComponent/QatProblemActions';
 import { DATE_FORMAT_CAP, INDEXED_DB_NAME, INDEXED_DB_VERSION } from '../../Constants.js';

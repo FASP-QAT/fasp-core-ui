@@ -19,10 +19,11 @@ import CurrencyService from "../../api/CurrencyService";
 import UnitService from "../../api/UnitService";
 import StatusUpdateButtonFeature from "../../CommonComponent/StatusUpdateButtonFeature";
 import UpdateButtonFeature from '../../CommonComponent/UpdateButtonFeature'
-import jexcel from 'jexcel';
-import "../../../node_modules/jexcel/dist/jexcel.css";
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { JEXCEL_PAGINATION_OPTION } from "../../Constants";
+import { JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from "../../Constants";
 let initialValues = {
     defaultCurrency: {
         currencyId: '',
@@ -293,6 +294,7 @@ class RealmCountry extends Component {
                                                 oneditionend: this.onedit,
                                                 copyCompatibility: true,
                                                 allowManualInsertRow: false,
+                                                license: JEXCEL_PRO_KEY,
                                                 text: {
                                                     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
                                                     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,

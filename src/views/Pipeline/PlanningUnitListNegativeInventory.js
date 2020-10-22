@@ -1,11 +1,13 @@
 import React, { Component } from 'react';
-import jexcel from 'jexcel';
-import "../../../node_modules/jexcel/dist/jexcel.css";
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 import i18n from '../../i18n';
 import PipelineService from '../../api/PipelineService.js';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import { Card, CardHeader, CardBody, CardFooter, Button } from 'reactstrap';
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
+import { JEXCEL_PRO_KEY } from '../../Constants';
 
 export default class PlanningUnitListNegativeInventory extends Component {
 
@@ -69,6 +71,7 @@ export default class PlanningUnitListNegativeInventory extends Component {
                         entries: '',
                     },
                     onload: this.loaded,
+                    license: JEXCEL_PRO_KEY,
 
                 };
                 var elVar = jexcel(document.getElementById("planningUnitList"), options);

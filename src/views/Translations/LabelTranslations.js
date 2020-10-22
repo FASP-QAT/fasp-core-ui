@@ -1,9 +1,10 @@
 import React from "react";
-import jexcel from 'jexcel';
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 
 
 import "../ProductCategory/style.css"
-import "../../../node_modules/jexcel/dist/jexcel.css";
 import {
     Card, CardBody, CardHeader, FormGroup,
     CardFooter, Button, Col, Row
@@ -13,7 +14,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import LabelsService from '../../api/LabelService.js';
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { JEXCEL_PAGINATION_OPTION } from "../../Constants";
+import { JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from "../../Constants";
 
 const entityname = i18n.t('static.label.labelTranslations');
 export default class DatabaseTranslations extends React.Component {
@@ -92,7 +93,8 @@ export default class DatabaseTranslations extends React.Component {
                     oneditionstart: this.editStart,
                     allowDeleteRow: false,
                     tableOverflow: false,
-                    onload: this.loaded
+                    onload: this.loaded,
+                    license: JEXCEL_PRO_KEY,
                     // tableHeight: '500px',
                 };
                 this.el = jexcel(document.getElementById("labelTranslationTable"), options);

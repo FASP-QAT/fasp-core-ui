@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import jexcel from 'jexcel';
-import "../../../node_modules/jexcel/dist/jexcel.css";
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 import PipelineService from '../../api/PipelineService.js';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import FundingSourceService from '../../api/FundingSourceService'
@@ -9,7 +10,7 @@ import ProductCategoryServcie from '../../api/PoroductCategoryService.js';
 import { textFilter } from 'react-bootstrap-table2-filter';
 import { jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunction, jExcelLoadedFunctionPipeline } from '../../CommonComponent/JExcelCommonFunctions.js'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { JEXCEL_PAGINATION_OPTION} from '../../Constants.js';
+import { JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY} from '../../Constants.js';
 export default class PipelineProgramFundingSource extends Component {
     constructor(props) {
         super(props);
@@ -225,6 +226,7 @@ export default class PipelineProgramFundingSource extends Component {
                                             entries: '',
                                         },
                                         onload: this.loadedJexcelCommonFunction,
+                                        license: JEXCEL_PRO_KEY,
                                         // onload: this.loaded
 
                                     };
