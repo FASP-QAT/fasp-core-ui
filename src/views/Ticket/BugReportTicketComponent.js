@@ -271,6 +271,10 @@ export default class BugReportTicketComponent extends Component {
                                                 <label className="custom-file-label" id="attachFile" >{this.state.bugReport.attachFile}</label>
                                                 <FormFeedback className="red">{errors.attachFile}</FormFeedback>
                                             </div>
+                                            <br></br><br></br>
+                                            <div>
+                                                <p>{i18n.t('static.ticket.filesuploadnote')}</p>
+                                            </div>
                                         </FormGroup>
                                        
                                         <ModalFooter className="pr-0 pb-0">

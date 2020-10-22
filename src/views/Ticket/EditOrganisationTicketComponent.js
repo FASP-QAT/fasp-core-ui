@@ -197,7 +197,8 @@ export default class EditOrganisationTicketComponent extends Component {
         organisation.organizationName = '';
         organisation.notes = '';
         this.setState({
-            organisation
+            organisation: organisation,
+            organizationId: ''
         },
             () => { });
     }

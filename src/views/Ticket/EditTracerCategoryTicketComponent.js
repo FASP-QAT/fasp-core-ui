@@ -191,7 +191,8 @@ export default class EditTracerCategoryTicketComponent extends Component {
         tracerCategory.tracerCategoryName = '';
         tracerCategory.notes = '';
         this.setState({
-            tracerCategory
+            tracerCategory: tracerCategory,
+            tracerCategoryId: ''
         },
             () => { });
     }

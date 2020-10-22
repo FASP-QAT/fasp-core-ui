@@ -13,12 +13,11 @@ import ProgramService from '../../api/ProgramService';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { SPACE_REGEX } from '../../Constants';
 
-let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.datasource.datasource"))
-let summaryText_2 = "Add Data Source"
-const selectedRealm = (AuthenticationService.getRealmId() !== "" && AuthenticationService.getRealmId() !== -1) ? AuthenticationService.getRealmId() : ""
+const summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.datasource.datasource"))
+const summaryText_2 = "Add Data Source"
 const initialValues = {
-    summary: summaryText_1,
-    realmName: selectedRealm,
+    summary: "",
+    realmName: "",
     programName: "",
     dataSourceType: "",
     dataSourceName: "",
@@ -163,21 +162,21 @@ export default class DataSourceTicketComponent extends Component {
             .then(response => {
                 this.setState({
                     realms: response.data,
-                    realmId: selectedRealm, loading: false
+                    realmId: this.props.items.userRealmId, loading: false
                 });
-                if (selectedRealm !== "") {
+                if (this.props.items.userRealmId !== "") {
                     this.setState({
-                        realms: (response.data).filter(c => c.realmId == selectedRealm)
+                        realms: (response.data).filter(c => c.realmId == this.props.items.userRealmId)
                     })
 
                     let { dataSource } = this.state;
-                    dataSource.realmName = (response.data).filter(c => c.realmId == selectedRealm)[0].label.label_en;
+                    dataSource.realmName = (response.data).filter(c => c.realmId == this.props.items.userRealmId)[0].label.label_en;
                     this.setState({
                         dataSource
                     }, () => {
 
-                        this.getDataSourceTypeByRealmId(selectedRealm);
-                        this.getProgramByRealmId(selectedRealm);
+                        this.getDataSourceTypeByRealmId(this.props.items.userRealmId);
+                        this.getProgramByRealmId(this.props.items.userRealmId);
 
                     })
                 }
@@ -341,13 +340,16 @@ export default class DataSourceTicketComponent extends Component {
     resetClicked() {
         let { dataSource } = this.state;
         // dataSource.summary = '';
-        dataSource.realmName = '';
+        dataSource.realmName = this.props.items.userRealmId !== "" ? this.state.realms.filter(c => c.realmId == this.props.items.userRealmId)[0].label.label_en : "";
         dataSource.programName = '';
         dataSource.dataSourceType = '';
         dataSource.dataSourceName = '';
         dataSource.notes = '';
         this.setState({
-            dataSource
+            dataSource: dataSource,
+            realmId: this.props.items.userRealmId,
+            programId: '',
+            dataSourceTypeId: ''
         },
             () => { });
     }
@@ -390,7 +392,15 @@ export default class DataSourceTicketComponent extends Component {
                 <br></br>
                 <div style={{ display: this.state.loading ? "none" : "block" }}>
                     <Formik
-                        initialValues={initialValues}
+                        enableReinitialize={true}
+                        initialValues={{
+                            summary: summaryText_1,
+                            realmName: this.props.items.userRealmId,
+                            programName: "",
+                            dataSourceType: "",
+                            dataSourceName: "",
+                            notes: ""
+                        }}
                         validate={validate(validationSchema)}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
                             this.setState({

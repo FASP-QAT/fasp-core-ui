@@ -15,6 +15,11 @@ import RealmService from '../../api/RealmService';
 import { SPACE_REGEX } from '../../Constants';
 import ForecastingUnitService from '../../api/ForecastingUnitService';
 
+import Select from 'react-select';
+import 'react-select/dist/react-select.min.css';
+import classNames from 'classnames';
+import '../Forms/ValidationForms/ValidationForms.css'
+
 let summaryText_1 = (i18n.t("static.common.edit") + " " + i18n.t("static.forecastingunit.forecastingunit"))
 let summaryText_2 = "Edit Forecasting Unit"
 const initialValues = {
@@ -29,7 +34,7 @@ const validationSchema = function (values) {
             .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.common.summarytext')),
         forecastingUnitName: Yup.string()
-            .required(i18n.t('static.common.pleaseSelect').concat(" ").concat((i18n.t('static.forecastingunit.forecastingunit')).concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?', i18n.t('static.forecastingunit.forecastingunit'))))),
+            .required(i18n.t('static.common.pleaseSelect').concat(" ").concat((i18n.t('static.forecastingunit.forecastingunit')).concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?', i18n.t('static.forecastingunit.forecastingunit'))))).nullable(),
         notes: Yup.string()
             .required(i18n.t('static.program.validnotestext'))
     })
@@ -69,6 +74,7 @@ export default class EditForecastingUnitTicketComponent extends Component {
             },
             lang: localStorage.getItem('lang'),
             message: '',
+            forecastingUnitList: [],
             forecastingUnits: [],
             forecastingUnitId: '',
             loading: true
@@ -76,6 +82,7 @@ export default class EditForecastingUnitTicketComponent extends Component {
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.changeForecastingUnit = this.changeForecastingUnit.bind(this);
     }
 
     dataChange(event) {
@@ -85,11 +92,11 @@ export default class EditForecastingUnitTicketComponent extends Component {
         }
         if (event.target.name == "forecastingUnitName") {
             var outText = "";
-            if(event.target.value !== "") {
+            if (event.target.value !== "") {
                 var forecastingUnitT = this.state.forecastingUnits.filter(c => c.forecastingUnitId == event.target.value)[0];
                 outText = forecastingUnitT.realm.label.label_en + " | " + forecastingUnitT.label.label_en;
             }
-            forecastingUnit.forecastingUnitName = outText;            
+            forecastingUnit.forecastingUnitName = outText;
             this.setState({
                 forecastingUnitId: event.target.value
             })
@@ -102,6 +109,29 @@ export default class EditForecastingUnitTicketComponent extends Component {
             forecastingUnit
         }, () => { })
     };
+
+    changeForecastingUnit(event) {
+        if (event === null) {
+            let { forecastingUnit } = this.state;
+            forecastingUnit.forecastingUnitName = ''
+            this.setState({
+                forecastingUnit: forecastingUnit,
+                forecastingUnitId: ''
+            });
+        } else {
+            let { forecastingUnit } = this.state;        
+            var outText = "";
+            if(event.value !== "") {
+                var forecastingUnitT = this.state.forecastingUnits.filter(c => c.forecastingUnitId == event.value)[0];
+                outText = forecastingUnitT.realm.label.label_en + " | " + forecastingUnitT.label.label_en;
+            }
+            forecastingUnit.forecastingUnitName = outText;            
+            this.setState({
+                forecastingUnit: forecastingUnit,
+                forecastingUnitId: event.value
+            });
+        }
+    }
 
     touchAll(setTouched, errors) {
         setTouched({
@@ -129,12 +159,17 @@ export default class EditForecastingUnitTicketComponent extends Component {
     componentDidMount() {
         // AuthenticationService.setupAxiosInterceptors();
 
-        if (AuthenticationService.getRealmId() != -1) {
-            ForecastingUnitService.getForcastingUnitByRealmId(AuthenticationService.getRealmId()).then(response => {
+        if (this.props.items.userRealmId != -1) {
+            ForecastingUnitService.getForcastingUnitByRealmId(this.props.items.userRealmId).then(response => {
                 if (response.status == 200) {
                     console.log("response------->" + response);
+                    var unitList = [];
+                    for (var i = 0; i < response.data.length; i++) {
+                        unitList[i] = { value: response.data[i].forecastingUnitId, label: getLabelText(response.data[i].label, this.state.lang) }
+                    }
                     this.setState({
                         forecastingUnits: response.data,
+                        forecastingUnitList: unitList,
                         loading: false
                     })
                 }
@@ -193,8 +228,13 @@ export default class EditForecastingUnitTicketComponent extends Component {
             ForecastingUnitService.getForecastingUnitList().then(response => {
                 if (response.status == 200) {
                     console.log("response------->" + response);
+                    var unitList = [];
+                    for (var i = 0; i < response.data.length; i++) {
+                        unitList[i] = { value: response.data[i].forecastingUnitId, label: getLabelText(response.data[i].label, this.state.lang) }
+                    }
                     this.setState({
                         forecastingUnits: response.data,
+                        forecastingUnitList: unitList,
                         loading: false
                     })
                 }
@@ -269,22 +309,23 @@ export default class EditForecastingUnitTicketComponent extends Component {
         forecastingUnit.forecastingUnitName = '';
         forecastingUnit.notes = '';
         this.setState({
-            forecastingUnit
+            forecastingUnit: forecastingUnit,
+            forecastingUnitId: ''
         },
             () => { });
     }
 
     render() {
 
-        const { forecastingUnits } = this.state;
-        let forecastingUnitList = forecastingUnits.length > 0
-            && forecastingUnits.map((item, i) => {
-                return (
-                    <option key={i} value={item.forecastingUnitId}>
-                        {getLabelText(item.label, this.state.lang)}
-                    </option>
-                )
-            }, this);
+        // const { forecastingUnits } = this.state;
+        // let forecastingUnitList = forecastingUnits.length > 0
+        //     && forecastingUnits.map((item, i) => {
+        //         return (
+        //             <option key={i} value={item.forecastingUnitId}>
+        //                 {getLabelText(item.label, this.state.lang)}
+        //             </option>
+        //         )
+        //     }, this);
 
         return (
             <div className="col-md-12">
@@ -374,7 +415,9 @@ export default class EditForecastingUnitTicketComponent extends Component {
                                 isSubmitting,
                                 isValid,
                                 setTouched,
-                                handleReset
+                                handleReset,
+                                setFieldValue,
+                                setFieldTouched
                             }) => (
                                     <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm' autocomplete="off">
                                         < FormGroup >
@@ -390,8 +433,8 @@ export default class EditForecastingUnitTicketComponent extends Component {
                                             <FormFeedback className="red">{errors.summary}</FormFeedback>
                                         </FormGroup>
                                         < FormGroup >
-                                            <Label for="realm">{i18n.t('static.forecastingunit.forecastingunit')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="select" name="forecastingUnitName" id="forecastingUnitName"
+                                            <Label for="forecastingUnitName">{i18n.t('static.forecastingunit.forecastingunit')}<span class="red Reqasterisk">*</span></Label>
+                                            {/* <Input type="select" name="forecastingUnitName" id="forecastingUnitName"
                                                 bsSize="sm"
                                                 valid={!errors.forecastingUnitName && this.state.forecastingUnit.forecastingUnitName != ''}
                                                 invalid={touched.forecastingUnitName && !!errors.forecastingUnitName}
@@ -401,7 +444,29 @@ export default class EditForecastingUnitTicketComponent extends Component {
                                                 required >
                                                 <option value="">{i18n.t('static.common.select')}</option>
                                                 {forecastingUnitList}
-                                            </Input>
+                                            </Input> */}
+
+                                            <Select
+                                                className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                    { 'is-valid': !errors.forecastingUnitName && this.state.forecastingUnit.forecastingUnitName != '' },
+                                                    { 'is-invalid': (touched.forecastingUnitName && !!errors.forecastingUnitName) }
+                                                )}
+                                                bsSize="sm"
+                                                name="forecastingUnitName"
+                                                id="forecastingUnitName"
+                                                isClearable={false}
+                                                onChange={(e) => {
+                                                    handleChange(e);
+                                                    setFieldValue("forecastingUnitName", e);
+                                                    this.changeForecastingUnit(e);
+                                                }}
+                                                onBlur={() => setFieldTouched("forecastingUnitName", true)}                                                                                          
+                                                required
+                                                min={1}
+                                                options={this.state.forecastingUnitList}
+                                                value={this.state.forecastingUnitId}
+                                            />
+
                                             <FormFeedback className="red">{errors.forecastingUnitName}</FormFeedback>
                                         </FormGroup>
 

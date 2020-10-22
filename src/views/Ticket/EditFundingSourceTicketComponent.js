@@ -204,7 +204,8 @@ export default class EditFundingSourceTicketComponent extends Component {
         fundingSource.fundingSourceName = '';
         fundingSource.notes = '';
         this.setState({
-            fundingSource
+            fundingSource: fundingSource,
+            fundingSourceId: ''
         },
             () => { });
     }

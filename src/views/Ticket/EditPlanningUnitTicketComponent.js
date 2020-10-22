@@ -13,6 +13,11 @@ import { SPACE_REGEX } from '../../Constants';
 import PlanningUnitService from '../../api/PlanningUnitService';
 import getLabelText from '../../CommonComponent/getLabelText';
 
+import Select from 'react-select';
+import 'react-select/dist/react-select.min.css';
+import classNames from 'classnames';
+import '../Forms/ValidationForms/ValidationForms.css'
+
 let summaryText_1 = (i18n.t("static.common.edit") + " " + i18n.t("static.planningunit.planningunit"))
 let summaryText_2 = "Edit Planning Unit"
 const initialValues = {
@@ -27,7 +32,7 @@ const validationSchema = function (values) {
             .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.common.summarytext')),
         planningUnitName: Yup.string()
-            .required(i18n.t('static.common.pleaseSelect').concat(" ").concat((i18n.t('static.planningunit.planningunit')).concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?', i18n.t('static.planningunit.planningunit'))))),
+            .required(i18n.t('static.common.pleaseSelect').concat(" ").concat((i18n.t('static.planningunit.planningunit')).concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?', i18n.t('static.planningunit.planningunit'))))).nullable(),
         notes: Yup.string()
             .required(i18n.t('static.program.validnotestext'))
     })
@@ -68,12 +73,14 @@ export default class EditPlanningUnitTicketComponent extends Component {
             lang: localStorage.getItem('lang'),
             message: '',
             planningUnits: [],
+            planningUnitList: [],
             planningUnitId: '',
             loading: true
         }
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.changePlanningUnit = this.changePlanningUnit.bind(this);
     }
 
     dataChange(event) {
@@ -84,7 +91,7 @@ export default class EditPlanningUnitTicketComponent extends Component {
 
         if (event.target.name == "planningUnitName") {
             var outText = "";
-            if(event.target.value !== "") {
+            if (event.target.value !== "") {
                 var planningUnitT = this.state.planningUnits.filter(c => c.planningUnitId == event.target.value)[0];
                 outText = planningUnitT.label.label_en;
             }
@@ -101,6 +108,29 @@ export default class EditPlanningUnitTicketComponent extends Component {
             planningUnit
         }, () => { })
     };
+
+    changePlanningUnit(event) {
+        if (event === null) {
+            let { planningUnit } = this.state;
+            planningUnit.planningUnitName = ''
+            this.setState({
+                planningUnit: planningUnit,
+                planningUnitId: ''
+            });
+        } else {
+            let { planningUnit } = this.state;
+            var outText = "";
+            if (event.value !== "") {
+                var planningUnitT = this.state.planningUnits.filter(c => c.planningUnitId == event.value)[0];
+                outText = planningUnitT.label.label_en;
+            }
+            planningUnit.planningUnitName = outText;
+            this.setState({
+                planningUnit: planningUnit,
+                planningUnitId: event.value
+            });
+        }
+    }
 
     touchAll(setTouched, errors) {
         setTouched({
@@ -127,12 +157,17 @@ export default class EditPlanningUnitTicketComponent extends Component {
 
     componentDidMount() {
         // AuthenticationService.setupAxiosInterceptors();
-        if (AuthenticationService.getRealmId() != -1) {
-            PlanningUnitService.getPlanningUnitByRealmId(AuthenticationService.getRealmId()).then(response => {
+        if (this.props.items.userRealmId != -1) {
+            PlanningUnitService.getPlanningUnitByRealmId(this.props.items.userRealmId).then(response => {
                 console.log(response.data)
+                var unitList = [];
+                for (var i = 0; i < response.data.length; i++) {
+                    unitList[i] = { value: response.data[i].planningUnitId, label: getLabelText(response.data[i].label, this.state.lang) }
+                }
                 this.setState({
-                    planningUnits: response.data, loading: false
-
+                    planningUnits: response.data,
+                    planningUnitList: unitList,
+                    loading: false
                 });
             }).catch(
                 error => {
@@ -177,9 +212,14 @@ export default class EditPlanningUnitTicketComponent extends Component {
         } else {
             PlanningUnitService.getAllPlanningUnitList.then(response => {
                 console.log(response.data)
+                var unitList = [];
+                for (var i = 0; i < response.data.length; i++) {
+                    unitList[i] = { value: response.data[i].planningUnitId, label: getLabelText(response.data[i].label, this.state.lang) }
+                }
                 this.setState({
                     planningUnits: response.data,
-
+                    planningUnitList: unitList,
+                    loading: false
                 });
             }).catch(
                 error => {
@@ -241,22 +281,23 @@ export default class EditPlanningUnitTicketComponent extends Component {
         planningUnit.planningUnitName = '';
         planningUnit.notes = '';
         this.setState({
-            planningUnit
+            planningUnit: planningUnit,
+            planningUnitId: ''
         },
             () => { });
     }
 
     render() {
 
-        const { planningUnits } = this.state;
-        let planningUnitList = planningUnits.length > 0
-            && planningUnits.map((item, i) => {
-                return (
-                    <option key={i} value={item.planningUnitId}>
-                        {getLabelText(item.label, this.state.lang)}
-                    </option>
-                )
-            }, this);
+        // const { planningUnits } = this.state;
+        // let planningUnitList = planningUnits.length > 0
+        //     && planningUnits.map((item, i) => {
+        //         return (
+        //             <option key={i} value={item.planningUnitId}>
+        //                 {getLabelText(item.label, this.state.lang)}
+        //             </option>
+        //         )
+        //     }, this);
 
         return (
             <div className="col-md-12">
@@ -346,7 +387,9 @@ export default class EditPlanningUnitTicketComponent extends Component {
                                 isSubmitting,
                                 isValid,
                                 setTouched,
-                                handleReset
+                                handleReset,
+                                setFieldValue,
+                                setFieldTouched
                             }) => (
                                     <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm' autocomplete="off">
                                         < FormGroup >
@@ -363,7 +406,7 @@ export default class EditPlanningUnitTicketComponent extends Component {
                                         </FormGroup>
                                         < FormGroup >
                                             <Label for="planningUnitName">{i18n.t('static.planningunit.planningunit')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="select" name="planningUnitName" id="planningUnitName"
+                                            {/* <Input type="select" name="planningUnitName" id="planningUnitName"
                                                 bsSize="sm"
                                                 valid={!errors.planningUnitName && this.state.planningUnit.planningUnitName != ''}
                                                 invalid={touched.planningUnitName && !!errors.planningUnitName}
@@ -373,7 +416,29 @@ export default class EditPlanningUnitTicketComponent extends Component {
                                                 required >
                                                 <option value="">{i18n.t('static.common.select')}</option>
                                                 {planningUnitList}
-                                            </Input>
+                                            </Input> */}
+
+                                            <Select
+                                                className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                    { 'is-valid': !errors.planningUnitName && this.state.planningUnit.planningUnitName != '' },
+                                                    { 'is-invalid': (touched.planningUnitName && !!errors.planningUnitName) }
+                                                )}
+                                                bsSize="sm"
+                                                name="planningUnitName"
+                                                id="planningUnitName"
+                                                isClearable={false}
+                                                onChange={(e) => {
+                                                    handleChange(e);
+                                                    setFieldValue("planningUnitName", e);
+                                                    this.changePlanningUnit(e);
+                                                }}
+                                                onBlur={() => setFieldTouched("planningUnitName", true)}
+                                                required
+                                                min={1}
+                                                options={this.state.planningUnitList}
+                                                value={this.state.planningUnitId}
+                                            />
+
                                             <FormFeedback className="red">{errors.planningUnitName}</FormFeedback>
                                         </FormGroup>
 

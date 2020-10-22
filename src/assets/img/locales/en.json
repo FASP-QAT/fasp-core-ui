@@ -1424,5 +1424,6 @@
     "static.report.shippedToArrivedSeaLeadTime": "'Shipped to Arrived' sea lead time ",
     "static.shipment.dateIsLesserThanPrevDate":"Selected date is less than the date selected in prev columns.",
     "static.dataentry.notesMaxLength":"Maximum 600 charaters only",
-    "static.ticket.openIssues": "Open Issues"
+    "static.ticket.openIssues": "Open Issues",
+    "static.ticket.filesuploadnote": "If you have multiple files, please compress and upload them."
 }

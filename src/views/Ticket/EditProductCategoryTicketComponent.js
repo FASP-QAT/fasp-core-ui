@@ -125,7 +125,7 @@ export default class EditProductCategoryTicketComponent extends Component {
 
     componentDidMount() {
         // AuthenticationService.setupAxiosInterceptors();
-        PoroductCategoryService.getProductCategoryListByRealmId(AuthenticationService.getRealmId())
+        PoroductCategoryService.getProductCategoryListByRealmId(this.props.items.userRealmId)
 
             .then(response => {
                 console.log("response product category list ====>", response.data);
@@ -201,7 +201,8 @@ export default class EditProductCategoryTicketComponent extends Component {
         planningUnitCategory.planningUnitCategoryName = '';
         planningUnitCategory.notes = '';
         this.setState({
-            planningUnitCategory
+            planningUnitCategory: planningUnitCategory,
+            planningUnitCategoryId: ''
         },
             () => { });
     }

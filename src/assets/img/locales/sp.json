@@ -1211,5 +1211,6 @@
     "static.quantimed.doNotImport": "No importar",
     "static.quantimed.importData": "Datos de importacion",
     "static.quantimed.mapAtLeastOnePlanningUnitValidationText": "Mapear al menos una unidad de planificación",
-    "static.ticket.openIssues": "Abierto Cuestiones"
+    "static.ticket.openIssues": "Abierto Cuestiones",
+    "static.ticket.filesuploadnote": "Si tiene varios archivos, comprímalos y cárguelos."
 }
