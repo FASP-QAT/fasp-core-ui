@@ -225,7 +225,7 @@ class ProductCatalog extends Component {
             startY: 200,
             head: [headers],
             body: data,
-            styles: { lineWidth: 1, fontSize: 8, cellWidth: 55, halign: 'center' },
+            styles: { lineWidth: 1, fontSize: 8, cellWidth: 51, halign: 'center' },
         };
         doc.autoTable(content);
         addHeaders(doc)

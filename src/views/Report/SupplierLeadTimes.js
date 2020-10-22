@@ -297,7 +297,7 @@ class SupplierLeadTimes extends Component {
                 ele.arrivedToDeliveredLeadTime,
                 ele.totalSeaLeadTime,
                 ele.totalAirLeadTime,
-                ele.localProcurementAgentLeadTime
+                ele.localProcurementAgentLeadTime==null?'':ele.localProcurementAgentLeadTime
 
                 // (new moment(ele.inventoryDate).format('MMM YYYY')).replaceAll(' ', '%20'),
                 // ele.stockAdjustemntQty,
@@ -447,11 +447,11 @@ class SupplierLeadTimes extends Component {
             startY: startYtable,
             head: [headers],
             body: data,
-            styles: { lineWidth: 1, fontSize: 8, cellWidth: 57, halign: 'center' },
+            styles: { lineWidth: 1, fontSize: 8, cellWidth: 53, halign: 'center' },
             columnStyles: {
                 // 0: { cellWidth: 170 },
                 // 1: { cellWidth: 171.89 },
-                1: { cellWidth: 134.89 }
+                2: { cellWidth: 129.89 }
             }
         };
         doc.autoTable(content);

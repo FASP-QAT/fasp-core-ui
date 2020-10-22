@@ -1032,6 +1032,8 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     rowNumber = map.get("6");
                 }
                 if (map.get("0") != -1) {
+                    console.log("map.get(4)", map.get("4"));
+                    console.log("Condition", (map.get("2") == 2) && (map.get("4")).toString().replaceAll("\,", "") != null && (map.get("4")).toString().replaceAll("\,", "") != "" && (map.get("4")).toString().replaceAll("\,", "") != undefined);
                     countForNonFefo += 1;
                     var batchInfoJson = {
                         inventoryTransBatchInfoId: map.get("5"),
@@ -1043,8 +1045,8 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                             expiryDate: moment(map.get("1")).format("YYYY-MM-DD"),
                             createdDate: this.state.batchInfoList.filter(c => c.name == (elInstance.getCell(`A${parseInt(i) + 1}`).innerText))[0].createdDate
                         },
-                        adjustmentQty: (map.get("2") == 1) ? (map.get("3")).toString().replaceAll("\,", "") : (map.get("3")).toString().replaceAll("\,", "") != 0 ? (map.get("3")).toString().replaceAll("\,", "") : null,
-                        actualQty: (map.get("2") == 1) ? (map.get("4")).toString().replaceAll("\,", "") : (map.get("3")).toString().replaceAll("\,", "") != 0 ? (map.get("3")).toString().replaceAll("\,", "") : null
+                        adjustmentQty: (map.get("2") == 2) ? (map.get("3")).toString().replaceAll("\,", "") : (map.get("2") == 1) && (map.get("3")).toString().replaceAll("\,", "") != 0 ? (map.get("3")).toString().replaceAll("\,", "") : null,
+                        actualQty: (map.get("2") == 1) ? (map.get("4")).toString().replaceAll("\,", "") : (map.get("2") == 2) && (map.get("4")).toString().replaceAll("\,", "") != null && (map.get("4")).toString().replaceAll("\,", "") != "" && (map.get("4")).toString().replaceAll("\,", "") != undefined && (map.get("4")).toString().replaceAll("\,", "") != "NaN" ? (map.get("4")).toString().replaceAll("\,", "") : null
                     }
                     batchInfoArray.push(batchInfoJson);
                 }
@@ -1091,7 +1093,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
 
             if (allConfirm == true) {
                 if (map.get("2") == 1) {
-                    inventoryInstance.setValueFromCoords(5, rowNumber, "", true);
+                    // inventoryInstance.setValueFromCoords(5, rowNumber, "", true);
                     if (totalActualStock > rowData[6]) {
                         inventoryInstance.setValueFromCoords(6, rowNumber, totalActualStock, true);
                     }
@@ -1103,7 +1105,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     if ((totalAdjustments > 0 ? totalAdjustments > rowData[5] : totalAdjustments < rowData[5])) {
                         inventoryInstance.setValueFromCoords(5, rowNumber, totalAdjustments, true);
                     }
-                    inventoryInstance.setValueFromCoords(6, rowNumber, "", true);
+                    // inventoryInstance.setValueFromCoords(6, rowNumber, "", true);
                     // var cell = inventoryInstance.getCell(`F${parseInt(rowNumber) + 1}`)
                     // cell.classList.add('readonly');
                 }

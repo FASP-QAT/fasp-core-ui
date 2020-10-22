@@ -181,7 +181,7 @@ class StockStatusAcrossPlanningUnits extends Component {
             body: data,
             styles: { lineWidth: 1, fontSize: 8, halign: 'center', cellWidth: 75 },
             columnStyles: {
-                0: { cellWidth: 161.89 },
+                1: { cellWidth: 161.89 },
             }
         };
         doc.autoTable(content);

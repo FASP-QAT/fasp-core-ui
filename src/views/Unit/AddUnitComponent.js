@@ -13,7 +13,7 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import { UNIT_LABEL_REGEX } from '../../Constants.js';
 
 
-let initialValues = {
+const initialValues = {
     unitName: "",
     unitCode: "",
     dimensionId: []
@@ -139,18 +139,9 @@ class AddUnitComponent extends Component {
         DimensionService.getDimensionListAll()
             .then(response => {
                 if (response.status == 200) {
-                    let { unit } = this.state;
-                    unit.dimension.id = (response.data.length == 1 ? response.data[0].dimensionId : "")
                     this.setState({
-                        dimensions: response.data, loading: false, unit
-                    },
-                        () => {
-                            initialValues = {
-                                dimensionId: (response.data.length == 1 ? response.data[0].dimensionId : "")
-                            }
-                        })
-
-
+                        dimensions: response.data, loading: false,
+                    })
                 } else {
 
                     this.setState({
@@ -230,9 +221,7 @@ class AddUnitComponent extends Component {
                                 <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
                             </CardHeader> */}
                             <Formik
-                                enableReinitialize={true}
                                 initialValues={initialValues}
-                                // initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     this.setState({

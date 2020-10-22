@@ -337,20 +337,9 @@ export default class AddHealthAreaComponent extends Component {
     UserService.getRealmList()
       .then(response => {
         console.log("realm list---", response.data);
-        let { healthArea } = this.state;
-        healthArea.realm.id = (response.data.length == 1 ? response.data[0].realmId : "")
         this.setState({
           realms: response.data, loading: false,
-          healthArea
-        },
-          () => {
-            initialValues = {
-              realmId: (response.data.length == 1 ? response.data[0].realmId : "")
-            }
-            if (response.data.length == 1) {
-              this.getRealmCountryList();
-            }
-          })
+        })
       }).catch(
         error => {
           if (error.message === "Network Error") {
@@ -413,7 +402,7 @@ export default class AddHealthAreaComponent extends Component {
   }
 
   getRealmCountryList(e) {
-    let realmId = this.state.healthArea.realm.id;
+    let realmId = e.target.value;
     if (realmId != "") {
       HealthAreaService.getRealmCountryList(realmId)
         .then(response => {
@@ -421,22 +410,14 @@ export default class AddHealthAreaComponent extends Component {
           if (response.status == 200) {
             var json = response.data;
             var regList = [];
-            let { healthArea } = this.state;
-            healthArea.realmCountryArray = (response.data.length == 1 ? [response.data[0].realmCountryId] : [])
             for (var i = 0; i < json.length; i++) {
               regList[i] = { value: json[i].realmCountryId, label: json[i].country.label.label_en }
             }
             this.setState({
               realmCountryId: '',
               realmCountryList: regList,
-              loading: false,
-              healthArea
-            },
-              () => {
-                initialValues = {
-                  realmCountryId: (response.data.length == 1 ? [response.data[0].realmCountryId] : [])
-                }
-              })
+              loading: false
+            })
           } else {
             this.setState({
               message: response.data.messageCode
@@ -486,22 +467,8 @@ export default class AddHealthAreaComponent extends Component {
       this.setState({
         realmCountryId: '',
         realmCountryList: [],
-        loading: false
-      })
-      let { healthArea } = this.state;
-      healthArea.realmCountryArray = []
-      this.setState({
-        realmCountryId: '',
-        realmCountryList: [],
         loading: false,
-        healthArea
-      },
-        () => {
-          initialValues = {
-            realmId: '',
-            realmCountryId: [],
-          }
-        })
+      })
     }
   }
 
@@ -546,7 +513,7 @@ export default class AddHealthAreaComponent extends Component {
                   healthAreaName: this.state.healthArea.label.label_en,
                   healthAreaCode: this.state.healthArea.healthAreaCode,
                   realmId: this.state.healthArea.realm.id,
-                  realmCountryId: this.state.healthArea.realmCountryArray
+                  realmCountryId: this.state.realmCountryId
                 }}
                 validate={validate(validationSchema)}
                 onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -666,8 +633,8 @@ export default class AddHealthAreaComponent extends Component {
                               onBlur={() => setFieldTouched("realmCountryId", true)}
                               multi
                               options={this.state.realmCountryList}
-                              // value={this.state.realmCountryId}
-                              value={this.state.healthArea.realmCountryArray}
+                              value={this.state.realmCountryId}
+                            // value={this.state.healthArea.realmCountryArray}
                             />
                             <FormFeedback>{errors.realmCountryId}</FormFeedback>
                           </FormGroup>

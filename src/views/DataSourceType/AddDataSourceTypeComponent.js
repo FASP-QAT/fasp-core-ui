@@ -11,7 +11,7 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import getLabelText from '../../CommonComponent/getLabelText';
 import { ALPHABET_NUMBER_REGEX, SPACE_REGEX } from '../../Constants.js';
 
-let initialValues = {
+const initialValues = {
     realmId: [],
     label: ''
 }
@@ -123,19 +123,10 @@ export default class AddDataSourceTypeComponent extends Component {
         // AuthenticationService.setupAxiosInterceptors();
         RealmService.getRealmListAll()
             .then(response => {
-                let { dataSourceType } = this.state
-                dataSourceType.realm.id = (response.data.length == 1 ? response.data[0].realmId : "")
                 this.setState({
                     realms: response.data,
-                    loading: false,
-                    dataSourceType
-                },
-                    () => {
-                        initialValues = {
-                            realmId: (response.data.length == 1 ? response.data[0].realmId : "")
-                        }
-                    })
-
+                    loading: false
+                })
             })
             .catch(
                 error => {
@@ -209,7 +200,6 @@ export default class AddDataSourceTypeComponent extends Component {
                                 <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
                             </CardHeader> */}
                             <Formik
-                                enableReinitialize={true}
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -328,7 +318,7 @@ export default class AddDataSourceTypeComponent extends Component {
 
                                                         <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                         <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                         &nbsp;
                                                     </FormGroup>
                                                 </CardFooter>

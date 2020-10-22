@@ -1209,7 +1209,8 @@ class StockStatusOverTime extends Component {
         var height = doc.internal.pageSize.height;
         var h1 = 50;
         var aspectwidth1 = (width - h1);
-        var startY = 190 + (this.state.planningUnitValues.length * 3)
+        var startY = 190 + doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + (this.state.planningUnitValues.map(ele => ele.label)).join('; ')), doc.internal.pageSize.width * 3 / 4).length*10;
+                 
         let pages = Math.ceil(startY / height)
         for (var j = 1; j < pages; j++) {
             doc.addPage()
