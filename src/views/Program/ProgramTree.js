@@ -532,7 +532,7 @@ class Program extends Component {
                 loading: false, color: "red"
             },
                 () => {
-                    this.hideSecondComponent();
+                    this.hideFirstComponent();
                 })
             // this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errorSelectAtleastOneProgram'))
         } else if (programInvalidCheckedCount > 0) {
