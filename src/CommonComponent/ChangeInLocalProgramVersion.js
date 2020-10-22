@@ -34,7 +34,6 @@ export default class ChangeInLocalProgramVersion extends Component {
         this.getDownloadedPrograms = this.getDownloadedPrograms.bind(this);
         
     }
-
     render() {
         return (
             <>{

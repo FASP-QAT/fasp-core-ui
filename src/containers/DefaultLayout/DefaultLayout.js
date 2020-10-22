@@ -721,7 +721,7 @@ class DefaultLayout extends Component {
   }
 
   checkClick=(e,programDataLastModifiedDate,downloadedProgramDataLastModifiedDate)=>{
-    e.preventDefault();
+   // e.preventDefault();
     console.log("this.state.programDataLastModifiedDate---", programDataLastModifiedDate);
     console.log("downloadedProgramDataLastModifiedDate  ", downloadedProgramDataLastModifiedDate);
     console.log("result local version---", moment(programDataLastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(downloadedProgramDataLastModifiedDate).format("YYYY-MM-DD HH:mm:ss"))
